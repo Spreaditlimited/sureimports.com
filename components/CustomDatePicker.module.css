@@ -1,0 +1,7 @@
+.customDatePicker {
+  border: none !important;
+}
+
+.customDatePicker .react-date-picker__wrapper {
+  border: 1px solid #ccc !important;
+}

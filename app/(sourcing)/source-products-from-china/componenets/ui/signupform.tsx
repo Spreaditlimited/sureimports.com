@@ -1,0 +1,204 @@
+'use client';
+import React, { useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+import user from '@/public/images/user.svg';
+import email from '@/public/images/email.svg';
+import lock from '@/public/images/lock.svg';
+import call from '@/public/images/call.svg';
+import eye from '@/public/images/eye.svg';
+import closeeye from '@/public/images/closeeye.svg';
+
+const SignupForm: React.FC = () => {
+  const [visibleField, setVisibleField] = useState<
+    'password' | 'confirm' | null
+  >(null);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // your form submit logic
+    console.log('Form submitted');
+  };
+
+  return (
+    <div className="rounded-[30px] bg-white p-[40px_30px_45px] shadow-custom max-sm:p-[30px_25px_40px] max-[420px]:p-[25px_15px]">
+      <h2 className="text-center text-[30px] font-semibold leading-normal text-black max-xl17:text-[26px] max-xl14:text-[20px] max-sm:hidden max-sm:text-[24px]">
+        Join over <span className="text-blue font-bold">30,000</span> Customers
+        today
+      </h2>
+      <h2 className="hidden text-center text-[30px] font-semibold leading-normal text-black max-xl17:text-[26px] max-xl14:text-[20px] max-sm:block max-sm:text-[24px]">
+        Join over <span className="text-blue font-bold">30,000</span> Customers
+      </h2>
+
+      <form
+        onSubmit={handleSubmit}
+        className="mt-[50px] max-xl14:mt-[30px] max-sm:mt-[30px]"
+      >
+        {/* First and Last Name */}
+        <div className="grid grid-cols-1 gap-[20px] max-sm:gap-[10px] sm:grid-cols-2">
+          {/* First Name */}
+          <div className="mb-[20px] max-sm:mb-[0px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              First Name
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-[15px] top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={user} alt="user" />
+              </span>
+              <input
+                type="text"
+                placeholder="Enter First Name"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Last Name */}
+          <div className="mb-[20px] max-sm:mb-[10px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              Last Name
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-3 top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={user} alt="user" />
+              </span>
+              <input
+                type="text"
+                placeholder="Enter Last Name"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Email and Phone */}
+        <div className="grid grid-cols-1 gap-[20px] max-sm:gap-[10px] sm:grid-cols-2">
+          {/* Email */}
+          <div className="mb-[20px] max-sm:mb-[0px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              Email Address
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-3 top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={email} alt="email" />
+              </span>
+              <input
+                type="email"
+                placeholder="Enter your Email"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Phone */}
+          <div className="mb-[20px] max-sm:mb-[10px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              Phone Number
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-3 top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={call} alt="phone" />
+              </span>
+              <input
+                type="tel"
+                placeholder="Enter Phone number"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Password and Confirm */}
+        <div className="grid grid-cols-1 gap-[20px] max-sm:gap-[10px] sm:grid-cols-2">
+          {/* Password */}
+          <div className="mb-[20px] max-sm:mb-[0px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              Password
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-3 top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={lock} alt="lock" />
+              </span>
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={() =>
+                  setVisibleField(
+                    visibleField === 'password' ? null : 'password',
+                  )
+                }
+              >
+                <Image
+                  src={visibleField === 'password' ? eye : closeeye}
+                  alt="eye"
+                />
+              </span>
+              <input
+                type={visibleField === 'password' ? 'text' : 'password'}
+                placeholder="********"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Confirm Password */}
+          <div className="mb-[20px] max-sm:mb-[10px]">
+            <label className="mb-[12px] block text-[18px] font-normal leading-[155%] text-black">
+              Confirm Password
+            </label>
+            <div className="relative">
+              <span className="border-r-lightblack absolute left-3 top-1/2 -translate-y-1/2 border-r pr-[15px]">
+                <Image src={lock} alt="lock" />
+              </span>
+              <span
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={() =>
+                  setVisibleField(visibleField === 'confirm' ? null : 'confirm')
+                }
+              >
+                <Image
+                  src={visibleField === 'confirm' ? eye : closeeye}
+                  alt="eye"
+                />
+              </span>
+              <input
+                type={visibleField === 'confirm' ? 'text' : 'password'}
+                placeholder="********"
+                className="placeholder:text-lightblack w-full rounded-[10px] bg-[#F1F5F9] p-[16px_30px_16px_64px] placeholder:text-[16px] focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="bg-blue mt-[20px] w-full rounded-[30px] p-[14px_20px] text-[18px] font-semibold leading-[155%] text-white transition-all hover:bg-indigo-700 max-xl14:mt-[10px] max-sm:mt-[15px]"
+        >
+          Sign up
+        </button>
+      </form>
+
+      <p className="text-blacklight mx-auto mt-[30px] max-w-[470px] text-center text-[15px] font-normal leading-[160%] max-xl14:mt-[20px] max-xl14:text-[14px] max-sm:mt-[20px] max-sm:text-[14px]">
+        By signing up, you agree to our{' '}
+        <Link href="/" className="text-blue">
+          Terms of Service
+        </Link>{' '}
+        and{' '}
+        <Link href="/" className="text-blue">
+          Privacy Policy
+        </Link>
+        . This site is protected by reCAPTCHA and the Google{' '}
+        <Link href="/" className="text-blue">
+          Privacy Policy
+        </Link>{' '}
+        and{' '}
+        <Link href="/" className="text-blue">
+          Terms of Service
+        </Link>{' '}
+        apply.
+      </p>
+    </div>
+  );
+};
+
+export default SignupForm;

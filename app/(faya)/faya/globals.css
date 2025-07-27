@@ -1,0 +1,123 @@
+/* @import "tailwindcss"; */
+
+:root {
+  --background: #ffffff;
+  --foreground: #161629;
+  --dark-color: #161629;
+  --secondary-color: #475569;
+  --secondary-bg: #f1f5f9;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #161629;
+    --foreground: #fff;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.container {
+  @apply mx-auto max-w-[1920px] px-5 sm:px-8 lg:px-12 xl:px-12 2xl:px-20;
+}
+a,
+button {
+  @apply cursor-pointer;
+}
+
+.text-gradient {
+  background: linear-gradient(96deg, #fff 0%, rgba(255, 255, 255, 0.4) 95.54%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-dark {
+  background: linear-gradient(90deg, #161629 0%, #474784 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gradient {
+  background: linear-gradient(96deg, #161629 0%, #474784 95.54%), #fff;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #3730a3 !important;
+}
+
+.custom-pagination {
+  gap: 0px !important;
+  margin: 2px !important;
+}
+
+#buy-now {
+  background-image: url(../public/assets/img/checkout-bg.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  @media all and (max-width: 768px) {
+    background-size: center;
+  }
+}
+#buy-now .tab-btn button {
+  @media all and (max-width: 420px) {
+    font-size: 14px;
+    letter-spacing: -0.45px;
+  }
+}
+
+/* Hide arrows in Chrome, Safari, Edge */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide arrows in Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+/* Hide scrollbar for Firefox */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Edge */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.buy-now-reseller {
+  @media all and (max-width: 400px) {
+    gap: 10px;
+  }
+}
+.buy-now-reseller button,
+a {
+  @media all and (max-width: 400px) {
+    font-size: 13px;
+    gap: 4px;
+  }
+}
+.buy-now-reseller button,
+a {
+  @media all and (max-width: 350px) {
+    padding-right: 10px;
+  }
+}

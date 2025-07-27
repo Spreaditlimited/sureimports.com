@@ -1,0 +1,4 @@
+{
+  "conventionalCommits.scopes": ["init", "login", "website", "dashboard"],
+  "typescript.tsdk": "node_modules\\typescript\\lib"
+}
