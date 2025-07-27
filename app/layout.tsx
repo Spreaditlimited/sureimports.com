@@ -18,6 +18,8 @@ const inter = Inter({ subsets: ['latin'] });
 let titlex = 'Import from China';
 let descriptionx =
   'Import from China. We guarantee the quality and accuracy of every product we source for you from China.';
+
+  
 export const metadata: Metadata = {
   title: titlex,
   description: descriptionx,
