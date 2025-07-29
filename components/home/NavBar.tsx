@@ -30,9 +30,9 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
-import { cn } from '@/_lib/utils';
-import NotificationMessage from './NotificationMessage';
-import NotificationStrip from './NotificationStrip';
+import { cn } from '@/lib/utils';
+// import NotificationMessage from './NotificationMessage';
+// import NotificationStrip from './NotificationStrip';
 
 const components: { title: string; href: string; icon: string }[] = [
   {
@@ -246,7 +246,7 @@ const NavBar = () => {
                   </Link>
                 </NavigationMenuItem> */}
 
-                <NavigationMenuItem>
+                {/* <NavigationMenuItem>
                   <Link
                     href="https://spreaditglobal.com/calculator"
                     legacyBehavior
@@ -262,9 +262,9 @@ const NavBar = () => {
                       Calculator
                     </NavigationMenuLink>
                   </Link>
-                </NavigationMenuItem>
+                </NavigationMenuItem> */}
 
-                <NavigationMenuItem>
+                {/* <NavigationMenuItem>
                   <Link
                     href="https://calendly.com/sureimports/product-sourcing-one-one-one-session/"
                     legacyBehavior
@@ -283,7 +283,9 @@ const NavBar = () => {
                       </div>
                     </NavigationMenuLink>
                   </Link>
-                </NavigationMenuItem>
+                </NavigationMenuItem> */}
+
+
               </NavigationMenuList>
             </NavigationMenu>
 
@@ -339,7 +341,7 @@ const NavBar = () => {
                           {
                             'after:w-full after:scale-x-100': pathname === '/',
                             'text-white': pathname !== '/',
-                          },
+                          }
                         )}
                       >
                         Home
@@ -398,7 +400,7 @@ const NavBar = () => {
                                     'after:w-full after:scale-x-100':
                                       pathname === component.href,
                                     'text-white': pathname !== component.href,
-                                  },
+                                  }
                                 )}
                               >
                                 <Image
@@ -430,7 +432,7 @@ const NavBar = () => {
                                     'after:scale-x-100X after:w-full':
                                       pathname === component.href,
                                     'text-white': pathname !== component.href,
-                                  },
+                                  }
                                 )}
                               >
                                 <Image
@@ -490,7 +492,7 @@ const NavBar = () => {
                             'after:w-full after:scale-x-100':
                               pathname === '/calculator',
                             'text-white': pathname !== '/calculator',
-                          },
+                          }
                         )}
                         target="_blank"
                       >
@@ -507,7 +509,7 @@ const NavBar = () => {
                             'after:w-full after:scale-x-100':
                               pathname === '/calendly',
                             'text-white': pathname !== '/calendly',
-                          },
+                          }
                         )}
                         target="_blank"
                       >
@@ -537,7 +539,7 @@ const NavBar = () => {
                       'w-30 m-7 h-12 w-full bg-white text-base text-indigo-800 hover:bg-indigo-100',
                       {
                         'ml-0': isMobile,
-                      },
+                      }
                     )}
                   >
                     <Link href="/auth/login" passHref>
@@ -572,7 +574,7 @@ const ListItem = React.forwardRef<
           className={cn(
             'block select-none space-y-1 rounded-xl p-3 leading-none text-indigo-800 no-underline outline-none transition-colors hover:bg-indigo-800 hover:bg-opacity-10 focus:bg-indigo-800 focus:text-white focus:outline-none focus:ring-2 focus:ring-indigo-800 focus:ring-opacity-50',
             { 'after:w-full after:scale-x-100': active }, // Apply active class
-            className,
+            className
           )}
           {...props}
         >

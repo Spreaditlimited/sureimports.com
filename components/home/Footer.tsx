@@ -60,8 +60,13 @@ const locations: Location[] = [
     title: 'Lagos, Nigeria',
     address: [
       'Sure Importers Limited',
-      '5 Olutosin Ajayi Street, Ajao Estate, Lagos',
+      '5 Olutosin Ajayi Street, Ajao Estate, Lagos.',
     ],
+    contacts: [],
+  },
+  {
+    title: 'Call Us',
+    address: [],
     contacts: ['+234 803 764 9956', '+234 806 458 3664', '+234 806 839 7263'],
   },
   {
@@ -85,16 +90,16 @@ const locations: Location[] = [
   //   ],
   //   contacts: [],
   // },
-  {
-    title: 'London, United Kingdom',
-    address: [
-      //'Sure Importers Limited',
-      'Spreadit Sourcing Limited ',
-      '33 Bevan Court, Dunlop Street, WA4 6AA, Warrington, England.',
-      //'85 Great Portland Street, London W1W 7LT United Kingdom',
-    ],
-    contacts: [],
-  },
+  // {
+  //   title: 'London, United Kingdom',
+  //   address: [
+  //     //'Sure Importers Limited',
+  //     'Spreadit Sourcing Limited ',
+  //     '33 Bevan Court, Dunlop Street, WA4 6AA, Warrington, England.',
+  //     //'85 Great Portland Street, London W1W 7LT United Kingdom',
+  //   ],
+  //   contacts: [],
+  // },
   // {
   //   title: 'New Jersey, USA',
   //   address: [
@@ -107,7 +112,7 @@ const locations: Location[] = [
 ];
 
 const LocationDetails: React.FC<Location> = ({ title, address, contacts }) => (
-  <section className="max-w-52 max-md:max-w-40 max-sm:w-36">
+  <section className="max-w-80 max-md:max-w-80 max-sm:w-80">
     <div className="text-sm font-bold uppercase text-white">{title}</div>
     <div className="mt-2 flex flex-col text-base font-normal leading-6 text-white opacity-80">
       {address.map((line, index) => (
@@ -129,20 +134,30 @@ const Footer: React.FC = () => (
         <NavigationMenuList className="flex w-full max-md:flex-wrap">
           {[
             { name: 'Terms', href: '/terms-and-conditions' },
-            { name: 'Privacy Policy', href: '/privacy-policy' },
-            { name: 'Shipping Policy', href: '/shipping-policy' },
-            { name: 'Warranty Policy', href: '/warranty-policy' },
-            { name: 'About', href: '/about-us' },
-            { name: 'Team', href: '/team' },
+            {
+              name: 'Privacy Policy',
+              href: 'https://www.sureimports.com/privacy-policy',
+            },
+            {
+              name: 'Shipping Policy',
+              href: 'https://www.sureimports.com/shipping-policy',
+            },
+            {
+              name: 'Warranty Policy',
+              href: 'https://www.sureimports.com/warranty-policy',
+            },
+            { name: 'About', href: 'https://www.sureimports.com/about-us' },
+            { name: 'Team', href: 'https://www.sureimports.com/team' },
+            { name: 'Affiliate', href: 'https://affiliate.sureimports.com' },
             // { name: 'Affiliate', href: '/affiliate-spreadit' },
             // {
             //   name: 'Blog',
             //   href: `${process.env.NEXT_PUBLIC_ACADEMY_SITE_URL}/`,
             // },
-            {
-              name: 'Calculator',
-              href: 'https://spreaditglobal.com/calculator',
-            },
+            // {
+            //   name: 'Calculator',
+            //   href: 'https://spreaditglobal.com/calculator',
+            // },
           ].map((item, index) => (
             <NavigationMenuItem key={index}>
               <Link href={item.href} legacyBehavior passHref>
