@@ -122,6 +122,7 @@ export async function POST(request: NextRequest) {
       message2: 'SUCCESS',
       message3: 200,
     };
+    
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
