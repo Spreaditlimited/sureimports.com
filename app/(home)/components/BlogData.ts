@@ -1,9 +1,9 @@
-import ijeomaAvatar from "/images/new/images/sureimports-ceo.jpg";
-import avoidMistakesImage from '../public/images/affiliate-ashboard.png';
-import londonUsedImage from '../public/images/affiliate-ashboard.png';
+import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.jpg";
+import avoidMistakesImage from "/images/new/images/logo.png";
+import londonUsedImage from "/images/new/images/logo.png";
 import Image from "next/image";
-import chinaToYourDoorImage from '../public/images/affiliate-ashboard.png';
-
+import chinaToYourDoorImage from "/images/new/images/logo.png";
+  
 export interface BlogPost {
   id: string;
   title: string;
