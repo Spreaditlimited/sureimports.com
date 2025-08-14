@@ -30,7 +30,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
               className="hover:opacity-80 transition-opacity"
             >
                 <Image 
-                  src={logo} 
+                  src="/images/new/images/logo.png"
                   alt="Sure Imports Logo"
                   width={140}
                   height={24}
