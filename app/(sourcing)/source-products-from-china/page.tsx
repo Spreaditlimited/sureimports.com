@@ -20,8 +20,10 @@ import icon7 from '@/public/images/work-source-7.svg';
 import Card from './sourcing/card';
 import HowWorks from './componenets/ui/howWorks';
 import WomenBusinessSlider from './sourcing/womenBusinessSlider';
-import Footer from '@/components/home/Footer';
-import NavBar from '@/components/home/NavBar';
+// import Footer from '@/components/home/Footer';
+// import NavBar from '@/components/home/NavBar';
+import Header from '@/app/(home)/components/Navigation';
+import Footer from '@/app/(home)/components/Footer';
 const Sourcing = () => {
   const steps = [
     {
@@ -115,7 +117,7 @@ const Sourcing = () => {
 
   return (
     <>
-      <NavBar />
+      <Header />
       <Hero />
       <WomenBusinessSlider />
       <section className="p-[60px_0px_120px] max-xl17:p-[25px_0px_50px] max-xl:p-[30px_0px_40px] max-lg:p-[30px_0px_30px] max-sm:p-[25px_0px_25px]">

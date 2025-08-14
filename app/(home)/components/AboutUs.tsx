@@ -1,8 +1,9 @@
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Users, Globe, Award, TrendingUp, Zap, Code, Heart, Target } from "lucide-react";
 import Image from "next/image";
-import tochukwuImage from '../public/images/affiliate-ashboard.png';
+import tochukwuImage from '../public/images/sureimports-ceo.jpg';
 
 export default function AboutUs() {
   const achievements = [
@@ -235,14 +236,16 @@ export default function AboutUs() {
 
         {/* Vision Statement */}
         <section>
-          <Card className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
+
+          <div className="rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20">
             <CardContent className="p-8 text-center">
               <h2 className="text-2xl font-bold text-white mb-6">Our Vision for the Future</h2>
               <p className="text-lg text-gray-300 leading-relaxed max-w-4xl mx-auto">
                 To become the world's most trusted global procurement platform, where businesses of every size can access quality products, reliable suppliers, and innovative solutions that drive growth and success in an interconnected world.
               </p>
             </CardContent>
-          </Card>
+          </div>
+
         </section>
       </div>
     </div>

@@ -7,6 +7,8 @@ import { useState } from "react";
 import Image from "next/image";
 import YouTubeIcon from "./icons/YouTubeIcon";
 import TikTokIcon from "./icons/TikTokIcon";
+import { useRouter } from 'next/navigation';
+import logo from '../public/images/logo.png';
 
 interface NavigationProps {
   onNavigateHome?: () => void;
@@ -16,7 +18,7 @@ interface NavigationProps {
 
 export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigateBlog }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  const router = useRouter();
   return (
     <nav className="w-full bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -27,28 +29,38 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
               onClick={onNavigateHome}
               className="hover:opacity-80 transition-opacity"
             >
-              <Image
-                src="/images/logo.png"
+                <Image 
+                  src={logo} 
+                  alt="Sure Imports Logo"
+                  width={140}
+                  height={24}
+                  priority
+                  // loading="eager"
+                  draggable={false}
+                  // className="w-full h-full object-contain"
+                />
+              {/* <Image
+                src="../public/images/logo.png"
                 alt="SURE IMPORTS"
                 width={120}
                 height={24}
                 className="h-6 w-auto opacity-90"
                 priority
-              />
+              /> */}
             </button>
           </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <button 
-              onClick={onNavigateHome}
+              onClick={() => router.push("/")}
               className="text-white hover:text-blue-400 transition-colors duration-200 relative group"
             >
               Home
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
             </button>
             <button 
-              onClick={onNavigateBlog}
+              onClick={() => router.push("/blog")}
               className="text-gray-300 hover:text-blue-400 transition-colors duration-200 relative group flex items-center space-x-1"
             >
               <BookOpen className="w-4 h-4" />
@@ -100,7 +112,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/buy-from-chinese-websites"
-                    target="_blank"
+                    //target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start space-x-3 w-full"
                   >
@@ -116,7 +128,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/source-products-from-china"
-                    target="_blank"
+                    //target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start space-x-3 w-full"
                   >
@@ -140,7 +152,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/buy-phones-from-china"
-                    target="_blank"
+                    //target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start space-x-3 w-full"
                   >
@@ -156,7 +168,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/faya"
-                    target="_blank"
+                    //target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-start space-x-3 w-full"
                   >

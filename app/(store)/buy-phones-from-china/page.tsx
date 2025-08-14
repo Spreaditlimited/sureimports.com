@@ -13,6 +13,7 @@ import Browse from './componenets/browse';
 import Realreview from './componenets/realreview';
 import RealMobilereview from './componenets/realmobilereview';
 
+
 const Home: React.FC = () => {
   const [isMobile, setIsMobile] = useState<boolean>(false);
 

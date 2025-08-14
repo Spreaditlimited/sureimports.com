@@ -1,3 +1,4 @@
+'use client';
 import { useState, useMemo } from "react";
 import { Search, Calendar, Clock, User, Tag, Filter, ChevronDown, TrendingUp, BookOpen, Users } from "lucide-react";
 import { Button } from "./ui/button";
@@ -20,6 +21,7 @@ import {
   searchBlogPosts,
   type BlogPost 
 } from "./BlogData";
+import { useRouter } from "next/navigation";
 
 // Lightweight image component that supports StaticImageData and provides a simple fallback
 type ImageSource = string | StaticImageData;
@@ -45,18 +47,14 @@ function ImageWithFallback({ src, alt = "", fallbackSrc, ...props }: ImageWithFa
   );
 }
 
-interface BlogListProps {
-  onSelectPost: (slug: string) => void;
-  onNavigateHome: () => void;
-}
-
-export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps) {
+export default function BlogList() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">("newest");
 
   const filteredPosts = useMemo(() => {
-    let posts = searchQuery 
+    let posts = searchQuery
       ? searchBlogPosts(searchQuery)
       : getBlogPostsByCategory(selectedCategory);
 
@@ -271,7 +269,7 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                 <Card 
                   key={post.id}
                   className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group overflow-hidden"
-                  onClick={() => onSelectPost(post.slug)}
+                  onClick={() => router.push(`/blog/${post.slug}`)}
                 >
                   <div className="relative overflow-hidden">
                     <ImageWithFallback
@@ -356,7 +354,7 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                 <Card 
                   key={post.id}
                   className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group overflow-hidden"
-                  onClick={() => onSelectPost(post.slug)}
+                  onClick={() => router.push(`/blog/${post.slug}`)}
                 >
                   <div className="relative overflow-hidden">
                     <ImageWithFallback

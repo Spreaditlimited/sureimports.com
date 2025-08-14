@@ -1,4 +1,4 @@
-import ijeomaAvatar from '../public/images/affiliate-ashboard.png';
+import ijeomaAvatar from '../public/images/ijeoma-tdaniels.jpg';
 import avoidMistakesImage from '../public/images/affiliate-ashboard.png';
 import londonUsedImage from '../public/images/affiliate-ashboard.png';
 import Image from "next/image";

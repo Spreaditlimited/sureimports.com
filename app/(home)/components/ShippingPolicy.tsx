@@ -1,3 +1,4 @@
+'use client';
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Truck, Plane, Ship, Zap, MapPin, Clock, AlertCircle } from "lucide-react";
 

@@ -3,8 +3,10 @@ import './globals.css';
 import { ReactNode } from 'react';
 import { CookieConsent } from '@/components/home/CookieConsent';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import Footer from '@/components/home/Footer';
+//import Footer from '@/components/home/Footer';
 import ScrollToTopButton from '@/components/home/scrollToTopButton';
+import Header from '@/app/(home)/components/Navigation';
+import Footer from '@/app/(home)/components/Footer';
 
 export const metadata = {
   title: 'sure imports',
@@ -19,7 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
       <div className="relative">
-        <NavBar />
+        <Header />
         {/* <LiveChatWidgetComponent /> */}
         {children}
         <CookieConsent />

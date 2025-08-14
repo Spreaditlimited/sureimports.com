@@ -5,8 +5,9 @@ import { Input } from "./ui/input";
 import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react";
 import TikTokIcon from "./icons/TikTokIcon";
 import { useState } from "react";
-import logo from '../public/images/logo2.png';
+import logo from '../public/images/logo.png';
 import Image from "next/image";
+import { useRouter } from 'next/navigation';
 
 interface FooterProps {
   onNavigateToShippingPolicy?: () => void;
@@ -20,6 +21,8 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const router = useRouter();
 
   // Email validation function
   const isValidEmail = (email: string): boolean => {
@@ -68,14 +71,16 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <Image
-                src="/images/logo.png"
-                alt="SURE IMPORTS"
-                width={120}
-                height={24}
-                className="h-6 w-auto opacity-90"
-                priority
-              />
+                              <Image 
+                                src={logo} 
+                                alt="Sure Imports Logo"
+                                width={120}
+                                height={24}
+                                // priority
+                                // loading="eager"
+                                draggable={false}
+                                // className="w-full h-full object-contain"
+                              />
             </div>
             <p className="text-gray-400 text-sm leading-relaxed">
               Your trusted partner for China product sourcing. We connect businesses with verified Chinese suppliers and manufacturers, ensuring quality and reliability.
@@ -133,31 +138,31 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
             <h3 className="text-white font-semibold">Legal & Support</h3>
             <div className="space-y-2">
               <button 
-                onClick={onNavigateToAbout}
+                onClick={() => router.push("/about")}
                 className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
               >
                 About
               </button>
               <button 
-                onClick={onNavigateToTermsConditions}
+                onClick={() => router.push("/terms-and-conditions")}
                 className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
               >
                 Terms & Conditions
               </button>
               <button 
-                onClick={onNavigateToPrivacyPolicy}
+                onClick={() => router.push("/privacy-policy")}
                 className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
               >
                 Privacy Policy
               </button>
               <button 
-                onClick={onNavigateToWarrantyPolicy}
+                onClick={() => router.push("/warranty-policy")}
                 className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
               >
                 Warranty Policy
               </button>
               <button 
-                onClick={onNavigateToShippingPolicy}
+                onClick={() => router.push("/shipping-policy")}
                 className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
               >
                 Shipping Policy
@@ -263,26 +268,27 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
               © 2025 Sure Imports Limited. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center sm:justify-end gap-x-6 gap-y-2">
-              <button 
-                onClick={onNavigateToTermsConditions}
+                <button
+                onClick={() => router.push("/terms-and-conditions")}
                 className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
-              >
+                >
                 Terms & Conditions
-              </button>
+                </button>
               <button 
-                onClick={onNavigateToPrivacyPolicy}
+                onClick={() => router.push("/privacy-policy")}
                 className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
               >
                 Privacy Policy
               </button>
               <button 
-                onClick={onNavigateToShippingPolicy}
+                onClick={() => router.push("/shipping-policy")}
                 className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
               >
                 Shipping Policy
               </button>
               <button 
-                onClick={onNavigateToWarrantyPolicy}
+                //onClick={onNavigateToWarrantyPolicy}
+                onClick={() => router.push("/warranty-policy")}
                 className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
               >
                 Warranty Policy

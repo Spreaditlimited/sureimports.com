@@ -1,3 +1,4 @@
+'use client';
 import { useState, useEffect } from "react";
 import { ArrowLeft, Calendar, Clock, User, Tag, Share2, BookOpen, Eye } from "lucide-react";
 import { Button } from "./ui/button";
@@ -6,12 +7,8 @@ import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
 // ImageWithFallback component defined locally below
 import { getBlogPostBySlug, blogPosts, type BlogPost } from "./BlogData";
-
-interface BlogDetailProps {
-  slug: string;
-  onBack: () => void;
-  onSelectPost: (slug: string) => void;
-}
+// ADD: router fallback
+import { useRouter } from "next/navigation";
 
 // Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
 const ImageWithFallback = ({ src, alt, className }: { src: string | { src: string }; alt: string; className?: string }) => {
@@ -23,9 +20,14 @@ const ImageWithFallback = ({ src, alt, className }: { src: string | { src: strin
   return <img src={resolvedSrc} alt={alt} className={className} onError={() => setHasError(true)} />;
 };
 
-export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailProps) {
+export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const router = useRouter();
+
+  // Fallback handlers if none provided
+  const handleBackClick = onBack ?? (() => router.back());
+  const handleSelectPostClick = onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
 
   useEffect(() => {
     const foundPost = getBlogPostBySlug(slug);
@@ -71,10 +73,12 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl text-white mb-4">Article not found</h1>
-          <Button onClick={onBack} className="bg-blue-600 hover:bg-blue-700 text-white">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Blog
-          </Button>
+            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+            <a href="/blog">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Blog
+            </a>
+            </Button>
         </div>
       </div>
     );
@@ -139,7 +143,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Button 
-            onClick={onBack}
+            onClick={handleBackClick}
             variant="ghost" 
             className="text-slate-300 hover:text-white hover:bg-white/10 mb-6"
           >
@@ -278,7 +282,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
                 <Card 
                   key={relatedPost.id}
                   className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group"
-                  onClick={() => onSelectPost(relatedPost.slug)}
+                  onClick={() => handleSelectPostClick(relatedPost.slug)}
                 >
                   <div className="relative overflow-hidden rounded-t-lg">
                     <ImageWithFallback

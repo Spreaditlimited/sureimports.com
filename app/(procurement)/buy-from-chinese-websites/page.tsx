@@ -17,7 +17,9 @@ import Faq from './componenets/ui/faq';
 import HowWorks from './componenets/ui/howWorks';
 import ReadyToStart from './buy/readyToStart';
 import NavBar from '@/components/home/NavBar';
-import Footer from '@/components/home/Footer';
+//import Footer from '@/components/home/Footer';
+import Header from '@/app/(home)/components/Navigation';
+import Footer from '@/app/(home)/components/Footer';
 const Buy = () => {
   const steps = [
     {
@@ -101,7 +103,8 @@ const Buy = () => {
   ];
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
+      <Header />
       <Banner />
       <div>
         <HowBuy />
@@ -117,6 +120,8 @@ const Buy = () => {
           />
         </div>
       </div>
+
+      
       {/* <Works /> */}
       <HowWorks
         title="How It Works"
