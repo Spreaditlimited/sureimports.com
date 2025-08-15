@@ -72,7 +72,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
                               <Image 
-                                src="/images/new/images/logo.jpg"
+                                src="/images/new/images/logo.png"
                                 alt="Sure Imports Logo"
                                 width={120}
                                 height={24}

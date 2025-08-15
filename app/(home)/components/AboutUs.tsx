@@ -140,9 +140,12 @@ export default function AboutUs() {
                         src="/images/new/images/sureimports-ceo.jpg"
                         height={320}
                         width={256}
+                        priority
+                        draggable={false}
                         alt="Tochukwu Nkwocha - Founder & CEO of Sure Imports"
                         className="w-full h-full object-contain"
                       />
+
                     </div>
                     <div className="absolute -bottom-4 -right-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
                       Founder & CEO

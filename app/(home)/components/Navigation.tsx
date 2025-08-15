@@ -26,27 +26,18 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
           {/* Logo */}
           <div className="flex items-center">
             <button 
-              onClick={onNavigateHome}
+              onClick={() => (onNavigateHome ? onNavigateHome() : router.push("/"))}
               className="hover:opacity-80 transition-opacity"
+              aria-label="Go to home page"
             >
-                <Image 
-                  src="/images/new/images/logo.png"
-                  alt="Sure Imports Logo"
-                  width={140}
-                  height={24}
-                  priority
-                  // loading="eager"
-                  draggable={false}
-                  // className="w-full h-full object-contain"
-                />
-              {/* <Image
-                src="../public/images/logo.png"
-                alt="SURE IMPORTS"
-                width={120}
-                height={24}
-                className="h-6 w-auto opacity-90"
-                priority
-              /> */}
+              <Image 
+              src="/images/new/images/logo.png"
+              alt="Sure Imports Logo"
+              width={190}
+              height={40}
+              priority
+              draggable={false}
+              />
             </button>
           </div>
 
@@ -195,6 +186,10 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
             </Button>
           </div>
 
+
+
+
+
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -209,13 +204,13 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-slate-800/50 py-4 space-y-4">
             <button 
-              onClick={onNavigateHome}
+              onClick={() => router.push("/")}
               className="block text-white hover:text-blue-400 transition-colors duration-200 text-left w-full"
             >
               Home
             </button>
             <button 
-              onClick={onNavigateBlog}
+              onClick={() => router.push("/blog")}
               className="flex items-center space-x-2 text-gray-300 hover:text-blue-400 transition-colors duration-200 text-left w-full"
             >
               <BookOpen className="w-4 h-4" />
@@ -255,7 +250,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
               <div className="pl-4 space-y-3">
                 <a 
                   href="https://www.sureimports.com/buy-from-chinese-websites"
-                  target="_blank"
+                  //target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
                 >
@@ -269,7 +264,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 </a>
                 <a 
                   href="https://www.sureimports.com/source-products-from-china"
-                  target="_blank"
+                  //target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
                 >
@@ -288,7 +283,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
               <div className="pl-4 space-y-3">
                 <a 
                   href="https://www.sureimports.com/buy-phones-from-china"
-                  target="_blank"
+                  //target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
                 >
@@ -302,7 +297,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 </a>
                 <a 
                   href="https://www.sureimports.com/faya"
-                  target="_blank"
+                  //target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
                 >
@@ -319,7 +314,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
 
             {/* Mobile Sign In Button */}
             <Button 
-              onClick={onNavigateSignIn}
+              onClick={() => router.push("/auth/signin")}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg transition-all duration-200"
             >
               Sign In
