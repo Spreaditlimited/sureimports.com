@@ -16,6 +16,23 @@ datasource db {
 }
 
 
+model sub {
+  id            Int       @id @default(autoincrement())
+  pidBlog       String    @unique(map: "Blog_pidBlog_key")
+  blogTitle     String    @db.VarChar(255)
+  blogContent   String?
+  blogSlug      String?
+  blogPublished Boolean   @default(false)
+  blogImage     String?
+  blogBy        String?
+  blogExt1      String? 
+  blogExt2      String?
+  xStaus        String?
+  createdAt     DateTime?  @default(now())
+  updatedAt     DateTime?
+}
+
+
 
 model blog {
   id            Int       @id @default(autoincrement())
@@ -290,6 +307,7 @@ model subscriptions {
   id                 Int       @id @default(autoincrement())
   pidSubscription    String    @unique()
   subEmail           String?
+  subService         String?
   subStatus          String?
   subExt1            String?
   subExt2            String?

@@ -4,11 +4,35 @@ import { Label } from "./ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Shield, Users, CheckCircle } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/app/context/AuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
+import React from "react";
 
 interface HeroSectionProps {
   onNavigateToSignUp?: () => void;
   onNavigateToTerms?: () => void;
   onNavigateToPrivacy?: () => void;
+}
+
+
+
+//USER DATA
+interface User {
+  userFirstname: string;
+  userLastname: string;
+  email: string;
+  phone: string;
+  password: string;
+  userAffiliateRef: string;
+}
+
+//API RESPONSE
+interface ApiResponse {
+  messagex: any;
+  statusx: string;
+  successx: boolean;
+  userx: User;
+  // Add other properties as needed
 }
 
 export default function HeroSection({ 
@@ -27,6 +51,15 @@ export default function HeroSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+    const { user, logout } = useAuth();
+    const router = useRouter();
+    const [isLoadingx, setIsLoadingx] = React.useState(true);
+  
+    const searchParams = useSearchParams();
+  
+    const userAffiliateRefx =
+      (new URLSearchParams(searchParams).get('affRef') as any) || 'NO_REF';
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -98,33 +131,79 @@ export default function HeroSection({
     }
 
     setIsSubmitting(true);
-    
+
+
+
+    const userFirstname = formData.firstName;
+    const userLastname = formData.lastName;
+    const email = formData.email;
+    const phone = formData.phone;
+    const password = formData.password;
+    const confirmPassword = formData.confirmPassword;
+    const userAffiliateRef = userAffiliateRefx;
+
+    //MAKE REQUEST ATTEMPT
     try {
-      // Simulate form submission
-      console.log("Form submitted:", formData);
-      
-      // Here you would typically send the data to your backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      alert("Thank you for signing up! We'll be in touch soon.");
-      
-      // Reset form
-      setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: ""
+      //MAKE REQUEST
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userFirstname,
+          userLastname,
+          email,
+          phone,
+          password,
+          confirmPassword,
+          userAffiliateRef,
+        }),
       });
-      setEmailError("");
-      setPasswordError("");
+      const data: ApiResponse = await res.json();
+      if (data.successx) {
+        router.push('/auth/account-creation-success');
+        setIsSubmitting(false);
+      } else {
+        setEmailError(data.messagex.message1);
+        setIsSubmitting(false);
+      }
+      setEmailError(data.messagex.message1);
+      //setPasswordError(data.messagex.message1);
     } catch (error) {
       console.error("Form submission error:", error);
       alert("There was an error submitting your information. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
+    
+    // try {
+    //   // Simulate form submission
+    //   console.log("Form submitted:", formData);
+      
+    //   // Here you would typically send the data to your backend
+    //   await new Promise(resolve => setTimeout(resolve, 1000));
+      
+    //   alert("Thank you for signing up! We'll be in touch soon.");
+      
+    //   // Reset form
+    //   setFormData({
+    //     firstName: "",
+    //     lastName: "",
+    //     email: "",
+    //     phone: "",
+    //     password: "",
+    //     confirmPassword: ""
+    //   });
+    //   setEmailError("");
+    //   setPasswordError("");
+    // } catch (error) {
+    //   console.error("Form submission error:", error);
+    //   alert("There was an error submitting your information. Please try again.");
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
+
+
+
   };
 
   return (

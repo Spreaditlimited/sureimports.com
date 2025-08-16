@@ -8,6 +8,7 @@ import { useState } from "react";
 import logo from '../public/images/logo.png';
 import Image from "next/image";
 import { useRouter } from 'next/navigation';
+import { toast } from "sonner";
 
 interface FooterProps {
   onNavigateToShippingPolicy?: () => void;
@@ -17,17 +18,40 @@ interface FooterProps {
   onNavigateToAbout?: () => void;
 }
 
+//USER DATA
+interface User {
+  userFirstname: string;
+  userLastname: string;
+  email: string;
+  phone: string;
+  password: string;
+  userAffiliateRef: string;
+}
+
+//API RESPONSE
+interface ApiResponse {
+  messagex: any;
+  statusx: string;
+  successx: boolean;
+  userx: User;
+  // Add other properties as needed
+}
+
 export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrantyPolicy, onNavigateToTermsConditions, onNavigateToPrivacyPolicy, onNavigateToAbout }: FooterProps) {
   const [email, setEmail] = useState("");
+  const [service, setService] = useState("SUREIMPORTS");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [message, setMessage] = useState("");
+  const [messageStatus, setMessageStatus] = useState("");
+  
 
   const router = useRouter();
 
   // Email validation function
   const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email.trim());
   };
 
   const handleEmailChange = (value: string) => {
@@ -35,34 +59,82 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
     
-    // Only proceed if email is valid (button should be disabled if not)
-    if (!email.trim() || !isValidEmail(email)) {
-      return;
-    }
+          e.preventDefault();
+          toast.info("Subscribing to email list...");
+          // Only proceed if email is valid (button should be disabled if not)
+          if (!email.trim() || !isValidEmail(email)) {
+            return;
+          }
 
-    setIsSubmitting(true);
-    
-    // Simulate API call to email list service
+
+
+              //MAKE REQUEST ATTEMPT
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Simulate successful subscription
-      setIsSubscribed(true);
-      setEmail("");
-      
-      // Reset success message after 3 seconds
-      setTimeout(() => {
+      setIsSubmitting(true);
+      //MAKE REQUEST
+      const res = await fetch('/api/subscriptions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          service,
+        }),
+      });
+
+
+      const data: ApiResponse = await res.json();
+      if (data.statusx === 'SUCCESS') {
+        //router.push('/auth/account-creation-success');
+        setMessageStatus('SUCCESS');
+        setIsSubscribed(true);
+        setIsSubmitting(false);
+
+        //toast.success(data.messagex);
+        
+      } else {
+        setIsSubscribed(true);
+        //toast.error(data.messagex);
+        setMessageStatus('FAILED');
+        setMessage(data.messagex);
         setIsSubscribed(false);
-      }, 3000);
-      
-    } catch (error) {
-      console.error("Subscription error:", error);
+        
+      }
+    } catch (error: any) {
+      //setError(error.message);
+      setMessage(error);
+      setIsSubscribed(false);
+      setIsSubmitting(false);
     } finally {
+      //setIsLoading(false);
+      //alert('Taking Final Action');
+      setIsSubscribed(false);
       setIsSubmitting(false);
     }
+          
+          // Simulate API call to email list service
+          // try {
+          //   //await new Promise(resolve => setTimeout(resolve, 1000));
+            
+          //   setIsSubmitting(true);
+          //   // Simulate successful subscription
+          //   setIsSubscribed(true);
+          //   setEmail("");
+            
+          //   // Reset success message after 3 seconds
+          //   setTimeout(() => {
+          //     setIsSubscribed(false);
+          //   }, 3000);
+            
+          // } catch (error) {
+          //     console.error("Subscription error:", error);
+          // } finally {
+          //     setIsSubmitting(false);
+          // }
   };
+
+
+
   return (
     <footer className="bg-slate-950 border-t border-slate-800">
       {/* Main Footer Content */}
@@ -74,7 +146,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
                               <Image 
                                 src="/images/new/images/logo.png"
                                 alt="Sure Imports Logo"
-                                width={120}
+                                width={170}
                                 height={24}
                                 // priority
                                 // loading="eager"
@@ -187,6 +259,23 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
             
             {/* Email Subscription */}
             <div className="space-y-2">
+              {
+                messageStatus === 'SUCCESS' && (
+                  <p className="text-green-500 text-sm text-center">
+                    {message}
+                  </p>
+                )
+              }
+
+              {
+                messageStatus === 'FAILED' && (
+                  <p className="text-red-500 text-sm text-center">
+                    {message}
+                  </p>
+                )
+              }
+
+
               {isSubscribed ? (
                 <div className="bg-green-600/10 border border-green-600/20 rounded-lg p-3">
                   <p className="text-green-400 text-sm text-center">
@@ -211,7 +300,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
                       disabled={isSubmitting || !email.trim() || !isValidEmail(email)}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
                     >
-                      {isSubmitting ? "..." : "Subscribe"}
+                      {isSubmitting ? "Submitting..." : "Subscribe"}
                     </Button>
                   </form>
                 </div>

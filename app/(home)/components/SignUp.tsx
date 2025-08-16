@@ -89,6 +89,7 @@ export default function SignUp({
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md space-y-6">
+        
         {/* Logo */}
         <div className="text-center space-y-2">
           <div className="flex justify-center">

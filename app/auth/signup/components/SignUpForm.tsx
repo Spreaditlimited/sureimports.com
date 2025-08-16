@@ -385,7 +385,7 @@ const SignupPageContainer: React.FC = () => {
   React.useEffect(() => {
     // Check if user data is not loaded
     if (!user?.userEmail) {
-      setIsLoadingx(false);
+        setIsLoadingx(false);
       if (!user?.userEmail) {
         //do nothing
       }

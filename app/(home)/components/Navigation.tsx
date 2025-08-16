@@ -314,7 +314,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
 
             {/* Mobile Sign In Button */}
             <Button 
-              onClick={() => router.push("/auth/signup")}
+              onClick={() => router.push("/auth/login")}
               className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg transition-all duration-200"
             >
               Sign In
