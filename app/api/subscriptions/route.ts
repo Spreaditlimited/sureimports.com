@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
   const user = await prisma.subscriptions.findFirst({
     where: {
       subEmail: email,
+      subService: 'SUREIMPORTS',
     },
   });
 
@@ -162,7 +163,7 @@ See you inside.<br /><br />
   // Redirect to login if success
   if (create) {
     return NextResponse.json(
-      { messagex: 'Subscription was Successful!', statusx: 'SUCCESS', successx: true, userx: null },
+      { messagex: 'Thank you for subscribing! 🎉', statusx: 'SUCCESS', successx: true, userx: null },
       { status: 200 },
     );
 

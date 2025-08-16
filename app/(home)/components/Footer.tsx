@@ -61,12 +61,13 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
   const handleSubscribe = async (e: React.FormEvent) => {
     
           e.preventDefault();
+
           toast.info("Subscribing to email list...");
+
           // Only proceed if email is valid (button should be disabled if not)
           if (!email.trim() || !isValidEmail(email)) {
             return;
           }
-
 
 
               //MAKE REQUEST ATTEMPT
@@ -84,16 +85,18 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
 
 
       const data: ApiResponse = await res.json();
+
       if (data.statusx === 'SUCCESS') {
         //router.push('/auth/account-creation-success');
         setMessageStatus('SUCCESS');
+        setMessage(data.messagex);
         setIsSubscribed(true);
         setIsSubmitting(false);
 
         //toast.success(data.messagex);
         
       } else {
-        setIsSubscribed(true);
+        
         //toast.error(data.messagex);
         setMessageStatus('FAILED');
         setMessage(data.messagex);
@@ -260,7 +263,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
             {/* Email Subscription */}
             <div className="space-y-2">
               {
-                messageStatus === 'SUCCESS' && (
+                messageStatus == 'SUCCESS' && (
                   <p className="text-green-500 text-sm text-center">
                     {message}
                   </p>
@@ -268,7 +271,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
               }
 
               {
-                messageStatus === 'FAILED' && (
+                messageStatus == 'FAILED' && (
                   <p className="text-red-500 text-sm text-center">
                     {message}
                   </p>
@@ -276,7 +279,8 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
               }
 
 
-              {isSubscribed ? (
+              {
+              isSubscribed ? (
                 <div className="bg-green-600/10 border border-green-600/20 rounded-lg p-3">
                   <p className="text-green-400 text-sm text-center">
                     Thank you for subscribing! 🎉
@@ -285,6 +289,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
               ) : (
                 <div className="space-y-2">
                   <form onSubmit={handleSubscribe} className="flex space-x-2">
+
                     <div className="flex-1 min-w-0">
                       <Input 
                         type="email" 
@@ -295,6 +300,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
                         className="bg-slate-900 border-slate-700 text-white placeholder:text-gray-500 text-sm disabled:opacity-50 w-full"
                       />
                     </div>
+
                     <Button 
                       type="submit"
                       disabled={isSubmitting || !email.trim() || !isValidEmail(email)}
@@ -302,6 +308,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
                     >
                       {isSubmitting ? "Submitting..." : "Subscribe"}
                     </Button>
+
                   </form>
                 </div>
               )}
