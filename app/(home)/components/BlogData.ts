@@ -1,4 +1,4 @@
-import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.jpg";
+import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.JPG";
 import avoidMistakesImage from "/images/new/images/logo.png";
 import londonUsedImage from "/images/new/images/logo.png";
 import Image from "next/image";
@@ -140,7 +140,7 @@ Remember to always prioritize quality, compliance, and customer satisfaction. St
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Import Guide",
@@ -362,7 +362,7 @@ Remember to start with thorough market research, validate demand before large in
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Business Tips",
@@ -545,7 +545,7 @@ Invest time in understanding your suppliers' businesses, challenges, and goals. 
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Business Tips",
@@ -680,7 +680,7 @@ Ready to get started?
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -805,7 +805,7 @@ Ready to experience the smarter way to buy?
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -906,7 +906,7 @@ With Sure Imports, you're not just buying a phone or laptop — you're buying pe
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -1015,7 +1015,7 @@ Every device we deliver is genuine, tested, warranted, and ready to use. No fake
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg" as any,
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -1173,7 +1173,7 @@ Which part of London? 😂
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg",
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG",
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -1292,7 +1292,7 @@ Sourcing directly from China doesn't have to be risky, complicated, or stressful
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.jpg",
+      avatar: "/images/new/images/ijeoma-tdaniels.JPG",
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",

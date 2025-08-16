@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Users, Globe, Award, TrendingUp, Zap, Code, Heart, Target } from "lucide-react";
 import Image from "next/image";
+import tochukwuImage from '../images/new/images/sureimports-ceo.jpg';
 
 export default function AboutUs() {
   const achievements = [
