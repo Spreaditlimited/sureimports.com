@@ -2,11 +2,11 @@ import { Star, Quote, User } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 // Use string paths from the public folder to avoid StaticImageData in <img> src
-const chiomaImage = '/images/affiliate-ashboard.png';
-const chukwuedozieImage = '/images/affiliate-ashboard.png';
+const chiomaImage = '/images/new/images/img1.jpg';
+const chukwuedozieImage = '/images/new/images/img2.jpg';
 
 // Use the public URL for images placed in the /public folder to keep src a string
-const amarachiImage = '/images/affiliate-ashboard.png';
+const amarachiImage = '/images/new/images/img3.jpg';
 
 interface CustomerReviewsProps {
   onNavigateToSignUp?: () => void;
