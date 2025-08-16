@@ -136,7 +136,7 @@ export default function AboutUs() {
                   <div className="relative inline-block">
                     <div className="w-64 h-80 bg-slate-800/50 rounded-2xl shadow-2xl mx-auto lg:mx-0 overflow-hidden">
                       <Image 
-                        src="/images/new/images/sureimports-ceo.jpg"
+                        src="/images/new/images/sureimports-ceo.JPG"
                         height={320}
                         width={256}
                         priority
