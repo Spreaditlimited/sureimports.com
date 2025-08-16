@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Users, Globe, Award, TrendingUp, Zap, Code, Heart, Target } from "lucide-react";
 import Image from "next/image";
-import tochukwuImage from '../images/new/images/sureimports-ceo.jpg';
 
 export default function AboutUs() {
   const achievements = [
@@ -137,7 +136,7 @@ export default function AboutUs() {
                   <div className="relative inline-block">
                     <div className="w-64 h-80 bg-slate-800/50 rounded-2xl shadow-2xl mx-auto lg:mx-0 overflow-hidden">
                       <Image 
-                        src="images/new/images/sureimports-ceo.jpg"
+                        src="/images/new/images/sureimports-ceo.jpg"
                         height={320}
                         width={256}
                         priority
@@ -145,7 +144,6 @@ export default function AboutUs() {
                         alt="Tochukwu Nkwocha - Founder & CEO of Sure Imports"
                         className="w-full h-full object-contain"
                       />
-
                     </div>
                     <div className="absolute -bottom-4 -right-4 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">
                       Founder & CEO
