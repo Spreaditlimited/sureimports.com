@@ -20,6 +20,7 @@ import UnverifiedAccount from "../components/UnverifiedAccount";
 import CookieConsent from "../components/CookieConsent";
 import BlogList from "../components/BlogList";
 import BlogDetail from "../components/BlogDetail";
+import { useRouter } from 'next/navigation';
 
 type Page = 
   | "home" 
@@ -40,7 +41,7 @@ type Page =
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>("");
-
+  const router = useRouter();
   const navigateToPage = (page: Page) => {
     setCurrentPage(page);
     window.scrollTo(0, 0);

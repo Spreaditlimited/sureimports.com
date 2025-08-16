@@ -393,7 +393,7 @@ export default function HeroSection({
                     By signing up, you agree to our{" "}
                     <button 
                       type="button"
-                      onClick={onNavigateToTerms}
+                      onClick={() => router.push("/terms-and-conditions")}
                       className="text-blue-400 hover:text-blue-300 transition-colors"
                     >
                       Terms of Service
@@ -401,7 +401,7 @@ export default function HeroSection({
                     and{" "}
                     <button 
                       type="button"
-                      onClick={onNavigateToPrivacy}
+                      onClick={() => router.push("/privacy-policy")}
                       className="text-blue-400 hover:text-blue-300 transition-colors"
                     >
                       Privacy Policy

@@ -1,4 +1,4 @@
-import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.JPG";
+//import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.JPG";
 import avoidMistakesImage from "/images/new/images/logo.png";
 import londonUsedImage from "/images/new/images/logo.png";
 import Image from "next/image";
@@ -1023,7 +1023,7 @@ Every device we deliver is genuine, tested, warranted, and ready to use. No fake
     publishDate: "2025-08-07",
     readTime: 6,
     featured: false,
-    image: "/images/new/images/logo.png" as any,
+    image: "/images/new/images/imga.JPG" as any,
     slug: "avoid-5-costly-mistakes-sourcing-second-hand-iphones-laptops-china"
   },
   {
@@ -1181,7 +1181,7 @@ Which part of London? 😂
     publishDate: "2025-08-11",
     readTime: 8,
     featured: false,
-    image: "/images/new/images/logo.png",
+    image: "/images/new/images/imgc.JPG",
     slug: "what-exactly-is-london-used-iphone"
   },
   {
@@ -1300,7 +1300,7 @@ Sourcing directly from China doesn't have to be risky, complicated, or stressful
     publishDate: "2025-08-06",
     readTime: 6,
     featured: false,
-    image: "/images/new/images/logo.png",
+    image: "/images/new/images/imgb.JPG",
     slug: "from-china-to-your-door-sure-imports-makes-sourcing-simple"
   }
 ];
