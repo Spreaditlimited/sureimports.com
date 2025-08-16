@@ -369,6 +369,7 @@ export default function BlogList() {
                     )}
                   </div>
                   
+                  
                   <CardContent className="p-4 sm:p-6">
                     <div className="flex items-center gap-3 sm:gap-4 mb-3 text-xs sm:text-sm text-slate-400">
                       <span className="flex items-center gap-1">
