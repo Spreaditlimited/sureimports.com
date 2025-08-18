@@ -170,7 +170,7 @@ export default function HeroSection({
       //setPasswordError(data.messagex.message1);
     } catch (error) {
       console.error("Form submission error:", error);
-      alert("There was an error submitting your information. Please try again.");
+      //alert("There was an error submitting your information. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
