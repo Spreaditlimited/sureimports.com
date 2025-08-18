@@ -310,6 +310,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                   </div>
                 </a>
               </div>
+              
             </div>
 
             {/* Mobile Sign In Button */}
