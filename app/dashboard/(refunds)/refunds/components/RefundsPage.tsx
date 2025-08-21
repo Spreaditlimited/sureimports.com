@@ -1,12 +1,12 @@
 'use client';
-import svgPaths from "./imports/svg-yux5hd1wil";
+import svgPaths from "../imports/svg-yux5hd1wil";
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Filter, ChevronDown, Plus, CheckCircle, X, Wallet } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../components/ui/dialog";
 
 // Using Lucide icons for better reliability
 
-const refundData = [
+const refundDatax = [
   {
     id: "#REF-2025-001",
     orderId: "#ORD-2025-001",
@@ -131,9 +131,13 @@ function StatusTag({ status, color }: { status: string; color: string }) {
 }
 
 
+//export default function RefundsPage() {
+export default function RefundsPage({records}: any) {
 
-export default function App() {
+  //show records data
+  //alert(`Records: ${JSON.stringify(records)}`);
 
+  const [refundData, setRefundData] = useState(records || []) as any;
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -144,7 +148,7 @@ export default function App() {
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  const filterOptions = ["All", "Pending", "Approved", "Rejected"];
+  const filterOptions = ["All", "Pending", "Requested", "Paid"];
   const itemsPerPage = 5;
 
   // Initialize theme from localStorage (default to light)
@@ -183,13 +187,23 @@ export default function App() {
   };
 
   const handleRefundToBankAccount = () => {
+    if(totalAmount <= 5000) {
+      alert("You have no refunds to process at this time.");
+      return;
+    }else{
     setShowRefundDestinationModal(false);
     setShowRefundModal(true);
+    }
   };
 
   const handleRefundToWallet = () => {
+    // if(totalAmount <= 5000) {
+    //   alert("You have no refunds to process at this time.");
+    //   return;
+    // }else{
     setShowRefundDestinationModal(false);
     setShowWalletModal(true);
+    // }
   };
 
   const handleFilterChange = (filter: string) => {
@@ -201,6 +215,10 @@ export default function App() {
   const filteredData = selectedFilter === "All" 
     ? refundData 
     : refundData.filter(item => item.status === selectedFilter);
+
+  // const filteredData = selectedFilter === "All" 
+  //   ? refundData 
+  //   : refundData.filter(item => item.status === selectedFilter);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -221,9 +239,14 @@ export default function App() {
   };
 
   // Calculate total amount for filtered data
-  const totalAmount = filteredData.reduce((sum, item) => {
+  const totalAmount = filteredData.reduce((sum:any, item:any) => {
     return sum + parseFloat(item.amount.replace('₦', ''));
   }, 0);
+
+
+
+
+
 
   // Check if there are any refunds with amounts greater than ₦0
   const hasRefundableAmounts = filteredData.some(item => parseFloat(item.amount.replace('₦', '')) > 0);
@@ -334,7 +357,7 @@ export default function App() {
           <div className="bg-card rounded-[20px] border border-border shadow-sm">
             {/* Table Header */}
             <div className="bg-muted/50 border-b border-border rounded-t-[20px] p-4 sm:p-6">
-              <div className="font-semibold text-foreground">Refunds</div>
+              <div className="font-semibold text-foreground text-black dark:text-slate-400">Refunds</div>
             </div>
 
 
@@ -354,13 +377,15 @@ export default function App() {
                 {/* Table Content */}
                 <div className="divide-y divide-border text-black dark:text-slate-400">
                   {currentPageData.length > 0 ? (
-                    currentPageData.map((item, index) => (
+                    currentPageData.map((item:any, index:any) => (
                       <div key={item.id} className="grid grid-cols-5 gap-4 lg:gap-6 xl:gap-8 p-4 sm:p-6 xl:p-8 hover:bg-muted/30 transition-colors duration-150 items-center">
-                        <div className="text-foreground font-medium break-all  text-black dark:text-slate-400">{item.id}</div>
-                        <div className="text-foreground break-all  text-black dark:text-slate-400">{item.orderId}</div>
-                        <div className="font-medium text-foreground  text-black dark:text-slate-400">{item.amount}</div>
+                        <div className="text-foreground font-medium break-all  text-black dark:text-slate-400">{index + 1}</div>
+                        <div className="text-foreground break-all  text-black dark:text-slate-400">{item.pidRefund}</div>
+                        <div className="font-medium text-foreground  text-black dark:text-slate-400">{(parseFloat(item.amount)).toFixed(2)}</div>
                         <div className="flex items-center">
-                          <StatusTag status={item.status} color={item.statusColor} />
+
+                          <StatusTag status={item.refundStatus} color={'green'} />
+
                         </div>
                         <div className="text-foreground  text-black dark:text-slate-400">{item.serviceType}</div>
                       </div>
@@ -545,7 +570,25 @@ export default function App() {
       {/* Wallet Refund Confirmation Modal */}
       <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader className="text-center">
+
+        <DialogHeader className="text-center">
+            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <Wallet className="size-8 text-red-600 dark:text-green-400" />
+            </div>
+            <DialogTitle className="text-xl font-semibold text-center">
+              Wallet Refund is not available at the moment
+            </DialogTitle>
+            <div className="pt-4">
+              <button
+                onClick={() => setShowWalletModal(false)}
+                className="w-full bg-primary hover:bg-primary/90 active:bg-primary/80 transition-colors duration-200 flex items-center justify-center gap-2 px-6 py-3 rounded-[10px] text-primary-foreground font-medium"
+              >
+                Got it
+              </button>
+            </div>
+          </DialogHeader>
+          
+          {/* <DialogHeader className="text-center">
             <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
               <Wallet className="size-8 text-green-600 dark:text-green-400" />
             </div>
@@ -570,7 +613,7 @@ export default function App() {
                 Got it
               </button>
             </div>
-          </div>
+          </div> */}
           
           <button
             onClick={() => setShowWalletModal(false)}
