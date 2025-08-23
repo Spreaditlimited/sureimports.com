@@ -45,7 +45,7 @@ export default function Sidebar({ className }: SidebarProps) {
         className,
       )}
     >
-      <div className="">
+      <div className="bg-black/100 backdrop-blur-[151.85px]">
         {isOpen && (
           <div
             className="flex h-[90px] items-center hover:cursor-pointer"
@@ -77,7 +77,7 @@ export default function Sidebar({ className }: SidebarProps) {
         )}
         <button
           className={cn(
-            'fixed top-[25px] ml-[218px] flex h-[40px] w-[40px] cursor-pointer justify-center rounded-full border bg-background pt-2.5 text-3xl text-foreground duration-500 dark:bg-gray-800 dark:text-white',
+            'fixed top-[25px] ml-[218px] flex h-[40px] w-[40px] cursor-pointer justify-center rounded-full border bg-background pt-2.5 text-3xl text-foreground duration-500 dark:bg-black dark:text-white',
             !isOpen &&
               'top-[25px] z-10 ml-[58px] h-[40px] w-[40px] rotate-180 pt-2.5 text-3xl',
           )}
@@ -87,7 +87,7 @@ export default function Sidebar({ className }: SidebarProps) {
         </button>
       </div>
 
-      <div className="hide-scrollbar h-full space-y-4 overflow-x-visible overflow-y-scroll bg-[#161629] pb-24 pt-[25px] backdrop-blur-[151.85px]">
+      <div className="hide-scrollbar h-full space-y-4 overflow-x-visible overflow-y-scroll bg-black/100 pb-24 pt-[25px] backdrop-blur-[151.85px]">
         <div className="px-3">
           <div className="mt-3 space-y-1">
             <SideNav

@@ -30,7 +30,7 @@ export default function Header() {
     <div
       className={cn(
         'fixed left-0 right-0 top-0 z-10 h-[90px] backdrop-blur lg:ml-[78px]',
-        'bg-white dark:bg-[#0E0E1F] dark:text-white',
+        'bg-white dark:bg-[#000000] dark:text-white',
         'supports-backdrop-blur:bg-white/60 dark:supports-backdrop-blur:bg-gray-800/60',
         isOpen && 'transition-all duration-200 lg:ml-[236px]',
       )}
