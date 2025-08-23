@@ -252,7 +252,7 @@ export default function RefundsPage({records}: any) {
   const hasRefundableAmounts = filteredData.some(item => parseFloat(item.amount.replace('₦', '')) > 0);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background dark:bg-black">
       <div className="w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {/* Header Section */}
@@ -260,14 +260,14 @@ export default function RefundsPage({records}: any) {
             <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6">
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-3">
-                  <h1 className=" text-black dark:text-slate-700 text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground leading-tight">
+                  <h1 className=" text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground leading-tight">
                     Refunds
                   </h1>
                   <span className="text-sm sm:text-base text-muted-foreground leading-relaxed text-black dark:text-slate-400">
                     Refunds (Transactions)
                   </span>
                 </div>
-                <p className="text-base sm:text-lg text-foreground leading-relaxed">
+                <p className="text-base sm:text-lg text-foreground leading-relaxed dark:text-white">
                   Track Refunds & Requests across all services
                 </p>
               </div>
