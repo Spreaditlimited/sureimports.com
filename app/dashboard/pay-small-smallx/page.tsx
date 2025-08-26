@@ -6,8 +6,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
-import PaySmallSmall from './components/PaySmallSmall';
-//import ProductClaim from './components/ProductClaim';
+import ProductClaim from './components/ProductClaim';
 
 const Page = async ({
   searchParams,
@@ -64,9 +63,7 @@ const Page = async ({
 
   return (
     <div>
-      {/* <PaySmallSmall /> */}
-      <PaySmallSmall product={product} status={statusz} />
-      {/* <ProductClaim product={product} status={statusz} /> */}
+      <ProductClaim product={product} status={statusz} />
     </div>
   );
 };

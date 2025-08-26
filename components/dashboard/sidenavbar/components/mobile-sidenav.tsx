@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -28,7 +29,8 @@ export const MobileSidebar = () => {
           <MenuIcon />
         </div>
       </SheetTrigger>
-      <SheetContent side="left" className="w-[256px] bg-[#0E0E1F]">
+      
+      <SheetContent side="left" className="w-[256px]  bg-black">
         <div className="pb-6">
           <Image
             loading="lazy"
@@ -41,9 +43,11 @@ export const MobileSidebar = () => {
               router.push('/');
             }}
           />
-          <div className="hide-scrollbar h-screen w-[256px] overflow-y-auto pb-24 pt-[25px]">
+          
+          {/* <div className="hide-scrollbar h-screen w-[256px] overflow-y-auto pb-24 pt-[25px]"> */}
             <SideNav items={MobileNavItems} setOpen={setOpen} />
-          </div>
+          {/* </div> */}
+
         </div>
       </SheetContent>
     </Sheet>
