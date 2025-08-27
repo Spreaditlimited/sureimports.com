@@ -355,6 +355,8 @@ export default function App({productx, status}: {productx: any, status: string})
     </div>
   ))
 
+
+  
   const ProductCard = React.memo(({ product }: { product: any }) => {
     // Get the appropriate checkbox label based on status
     const getCheckboxLabel = (status: Status) => {
@@ -381,15 +383,16 @@ export default function App({productx, status}: {productx: any, status: string})
           <ProductImage image={product.store.productImage} title={product.productName} />
           
           <div className="flex-1 flex flex-col space-y-4 mt-6">
+            
             <div className="space-y-3">
               <h3 className="text-foreground font-semibold leading-tight dark:text-white">{product.productName}</h3>
               <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{1234}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{product.price}</p>
                 <div className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md text-xs font-medium">
                   NGN
                 </div>
               </div>
-              {/* <p className="text-base sm:text-sm text-muted-foreground">{String(product.createdAt)}</p> */}
+              <p className="text-base sm:text-sm text-muted-foreground">{String(product.createdAt)}</p>
             </div>
             
             <div className="border-t border-border/30 pt-4">
