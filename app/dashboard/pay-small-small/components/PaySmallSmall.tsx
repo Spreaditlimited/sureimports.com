@@ -99,41 +99,41 @@ export default function App({productx, status}: {productx: any, status: string})
   
     //const [message, setMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-      const fetchCustomer = async () => {
-        try {
-          const response = await fetch(`/api/paystack/get-customer/${email}`);
+    // useEffect(() => {
+    //   const fetchCustomer = async () => {
+    //     try {
+    //       const response = await fetch(`/api/paystack/get-customer/${email}`);
   
-          // if (!response.ok) {
-          //   throw new Error('Failed to fetch customer data');
-          // }
+    //       // if (!response.ok) {
+    //       //   throw new Error('Failed to fetch customer data');
+    //       // }
   
-          const data: any = await response.json();
+    //       const data: any = await response.json();
   
-          //alert(data.statusx+' '+data.message);
-          // setStatus(data.statusx);
-          // setMessage(data.message);
-          // setCustomer(data.customerDetails);
-          // setTransaction(data.transactionDetails);
-        } catch (status) {
-          //setError(error instanceof Error ? error.message : 'Unknown error');
-          //setStatus(statusx as string);
-        } finally {
-          //setLoading(false);
-        }
-      };
-      
+    //       //alert(data.statusx+' '+data.message);
+    //       // setStatus(data.statusx);
+    //       // setMessage(data.message);
+    //       // setCustomer(data.customerDetails);
+    //       // setTransaction(data.transactionDetails);
+    //     } catch (status) {
+    //       //setError(error instanceof Error ? error.message : 'Unknown error');
+    //       //setStatus(statusx as string);
+    //     } finally {
+    //       setLoading(false);
+    //     }
+    //   };
+
   
-      fetchCustomer();
-    }, [email]);
+      //fetchCustomer();
+    // }, [email]);
   
     
-      if(loading)
-      return (
-        <div>
-          <Loading />
-        </div>
-      );
+      // if(loading)
+      // return (
+      //   <div>
+      //     <Loading />
+      //   </div>
+      // );
 
 //alert(JSON.stringify(products));
 
@@ -390,7 +390,14 @@ export default function App({productx, status}: {productx: any, status: string})
             <div className="space-y-3">
               <h3 className="text-foreground font-semibold leading-tight dark:text-white">{product.productName}</h3>
               <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{product.price}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">
+                  {
+                  parseFloat(product.amount as any)
+                  .toFixed(2)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                </p>
                 <div className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md text-xs font-medium">
                   NGN
                 </div>
