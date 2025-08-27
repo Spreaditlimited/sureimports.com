@@ -84,54 +84,56 @@ export default function App({productx, status}: {productx: any, status: string})
     const { user } = useAuth();
     const navigateWithAlert = useNavigationWithAlert();
   
-    const [pidUser, setPidUser] = useState(user?.pidUser);
+    //const [pidUser, setPidUser] = useState(user?.pidUser);
     const [email, setEmail] = useState(user?.userEmail);
-    const [amount, setAmount] = useState<number>(0);
-    const [quantity, setQuantity] = useState<number>(1);
-    const [refreshKey, setRefreshKey] = useState(0);
+    // const [amount, setAmount] = useState<number>(0);
+    // const [quantity, setQuantity] = useState<number>(1);
+    // const [refreshKey, setRefreshKey] = useState(0);
   
-    const [customer, setCustomer] = useState<any | null>(null);
-    const [transactions, setTransaction] = useState<any | null>(null);
+    // const [customer, setCustomer] = useState<any | null>(null);
+    // const [transactions, setTransaction] = useState<any | null>(null);
   
     const [loading, setLoading] = useState(true);
-    const [statusx, setStatus] = useState<string | null>(null);
-    const [statusz, setStatusz] = useState<string | null>('');
+    // const [statusx, setStatus] = useState<string | null>(null);
+    // const [statusz, setStatusz] = useState<string | null>('');
   
-    const [message, setMessage] = useState<string | null>(null);
+    //const [message, setMessage] = useState<string | null>(null);
 
-    // useEffect(() => {
-    //   const fetchCustomer = async () => {
-    //     try {
-    //       const response = await fetch(`/api/paystack/get-customer/${email}`);
+    useEffect(() => {
+      const fetchCustomer = async () => {
+        try {
+          const response = await fetch(`/api/paystack/get-customer/${email}`);
   
-    //       // if (!response.ok) {
-    //       //   throw new Error('Failed to fetch customer data');
-    //       // }
+          // if (!response.ok) {
+          //   throw new Error('Failed to fetch customer data');
+          // }
   
-    //       const data: any = await response.json();
+          const data: any = await response.json();
   
-    //       //alert(data.statusx+' '+data.message);
-    //       setStatus(data.statusx);
-    //       setMessage(data.message);
-    //       setCustomer(data.customerDetails);
-    //       setTransaction(data.transactionDetails);
-    //     } catch (statusx) {
-    //       //setError(error instanceof Error ? error.message : 'Unknown error');
-    //       //setStatus(statusx as string);
-    //     } finally {
-    //       setLoading(false);
-    //     }
-    //   };
+          //alert(data.statusx+' '+data.message);
+          // setStatus(data.statusx);
+          // setMessage(data.message);
+          // setCustomer(data.customerDetails);
+          // setTransaction(data.transactionDetails);
+        } catch (status) {
+          //setError(error instanceof Error ? error.message : 'Unknown error');
+          //setStatus(statusx as string);
+        } finally {
+          //setLoading(false);
+        }
+      };
+      
   
-    //   fetchCustomer();
-    // }, [email]);
+      fetchCustomer();
+    }, [email]);
   
-    // if (loading)
-    //   return (
-    //     <div>
-    //       <Loading />
-    //     </div>
-    //   );
+    
+      if(loading)
+      return (
+        <div>
+          <Loading />
+        </div>
+      );
 
 //alert(JSON.stringify(products));
 
@@ -333,7 +335,7 @@ export default function App({productx, status}: {productx: any, status: string})
     return status.toLowerCase().charAt(0).toUpperCase() + status.toLowerCase().slice(1);  
   }
 
-
+  
   const ProductImage = React.memo(({ image, title }: { image: string; title: string }) => (
     <div className="relative w-full h-[280px] sm:h-[240px] bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 rounded-[24px] overflow-hidden shadow-inner group-hover:shadow-lg transition-all duration-300">
       <div className="absolute border-2 border-neutral-200/50 dark:border-neutral-600/50 inset-0 pointer-events-none rounded-[24px]" />
