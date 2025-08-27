@@ -48,7 +48,7 @@ const Page = async ({
   const product = await db.paysmallsmall.findMany({
     where: {
       pidUser: userId, // Now you can use the userId
-      status: statusz as any,
+      //status: statusz as any,
     },
     include: {
       store: true,

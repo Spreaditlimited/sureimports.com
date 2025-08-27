@@ -18,6 +18,8 @@ import { imgImage1, imgGroup } from "../imports/svg-2dlsy"
 import { useAuth } from '@/app/context/AuthContext'
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert'
 import Loading from '../../loading';
+import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 type Status = 'SAVED' | 'STARTED' | 'COMPLETED' | 'CANCELLED'
 
@@ -72,8 +74,11 @@ const CheckboxIcon = React.memo(({ checked }: { checked: boolean }) => (
 
 export default function App({productx, status}: {productx: any, status: string}) {
 
+  const router = useRouter();
+  const { user } = useAuth();
+  const navigateWithAlert = useNavigationWithAlert();
+
   const [products, setProducts] = useState<any[]>(productx);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [selectedStatus, setSelectedStatus] = useState<Status>('SAVED')
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
@@ -81,171 +86,272 @@ export default function App({productx, status}: {productx: any, status: string})
   const [isProcessing, setIsProcessing] = useState(false)
   const [walletBalance] = useState('₦120.00') // Wallet balance
 
-    const { user } = useAuth();
-    const navigateWithAlert = useNavigationWithAlert();
-  
-    //const [pidUser, setPidUser] = useState(user?.pidUser);
+    const [pidUser, setPidUser] = useState(user?.pidUser);
     const [email, setEmail] = useState(user?.userEmail);
-    // const [amount, setAmount] = useState<number>(0);
-    // const [quantity, setQuantity] = useState<number>(1);
-    // const [refreshKey, setRefreshKey] = useState(0);
+    const [amount, setAmount] = useState<number>(0);
+    const [quantity, setQuantity] = useState<number>(1);
+    const [refreshKey, setRefreshKey] = useState(0);
   
-    // const [customer, setCustomer] = useState<any | null>(null);
-    // const [transactions, setTransaction] = useState<any | null>(null);
+    const [customer, setCustomer] = useState<any | null>(null);
+    const [transactions, setTransaction] = useState<any | null>(null);
   
     const [loading, setLoading] = useState(true);
-    // const [statusx, setStatus] = useState<string | null>(null);
-    // const [statusz, setStatusz] = useState<string | null>('');
+    const [statusx, setStatus] = useState<string | null>(null);
+    const [statusz, setStatusz] = useState<string | null>('');
   
-    //const [message, setMessage] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
 
-    // useEffect(() => {
-    //   const fetchCustomer = async () => {
-    //     try {
-    //       const response = await fetch(`/api/paystack/get-customer/${email}`);
+
+    useEffect(() => {
+      const fetchCustomer = async () => {
+        try {
+          
+          const response = await fetch(`/api/paystack/get-customer/${email}`);
   
-    //       // if (!response.ok) {
-    //       //   throw new Error('Failed to fetch customer data');
-    //       // }
+          if (!response.ok) {
+            throw new Error('Failed to fetch customer data');
+          }
   
-    //       const data: any = await response.json();
+          const data: any = await response.json();
   
-    //       //alert(data.statusx+' '+data.message);
-    //       // setStatus(data.statusx);
-    //       // setMessage(data.message);
-    //       // setCustomer(data.customerDetails);
-    //       // setTransaction(data.transactionDetails);
-    //     } catch (status) {
-    //       //setError(error instanceof Error ? error.message : 'Unknown error');
-    //       //setStatus(statusx as string);
-    //     } finally {
-    //       setLoading(false);
-    //     }
-    //   };
+          //alert(data.statusx+' '+data.message);
+          setStatus(data.statusx);
+          setMessage(data.message);
+          setCustomer(data.customerDetails);
+          setTransaction(data.transactionDetails);
+        } catch (statusx) {
+          setStatus(statusx as string);
+        } finally {
+          setLoading(false);
+        }
+      };
 
   
-      //fetchCustomer();
-    // }, [email]);
+      fetchCustomer();
+    }, [email]);
   
     
-      // if(loading)
-      // return (
-      //   <div>
-      //     <Loading />
-      //   </div>
-      // );
+      if(loading)
+      return (
+          <div>
+            <Loading />
+          </div>
+      );
 
-//alert(JSON.stringify(products));
+  //////////// WALLET ACTIVATION //////////
+  function walletActivation() {
+    toast.info('Activating Wallet, please wait . . .');
 
-// model paysmallsmall {
-//   id                Int       @id @default(autoincrement())
-//   pidPaySmallSmall  String    @unique()
-//   pidUser           String   
-//   pidProduct        String?  
-//   productName       String?   
-//   productDescription String? 
-//   amount            Float
-//   quantity          Int
-//   status            PayStatus
-//   ext1              String?
-//   ext2              String?
-//   statusx           String?
-//   createdAt         DateTime? @default(now())
-//   updatedAt         DateTime? @default(now())
-//   store             store?    @relation(fields: [pidProduct], references: [pidProduct]) // Add this relation
-// }
+    const activateWallet = async () => {
+      try {
+        const response = await fetch(
+          '/api/paystack/wallet-customer-activation?pidUser=' + user?.pidUser,
+        );
+
+        // if (!response.ok) {
+        //   throw new Error('Failed to fetch customer data');
+        // }
+
+        const data: any = await response.json();
+
+        const customerID = data.customerID;
+
+        if (data.statusx == 'SUCCESS') {
+          toast.success(data.message);
+
+          try {
+            const response = await fetch(
+              '/api/paystack/wallet-bank-activation',
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  customer: customerID,
+                  preferred_bank: 'wema-bank',
+                }),
+              },
+            );
+
+            const data: any = await response.json();
+
+            if (!data.status) {
+              //throw new Error(data.message || 'Failed to create dedicated account');
+              toast.warning(
+                'Account Activation Failed, please try again or contact support. Error-Msg: ' +
+                  data.message,
+              );
+            } else {
+              navigateWithAlert(
+                '/dashboard/wallet?status=SUCCESS',
+                'success',
+                'Wallet was successfully Activated!',
+              );
+              router.push('/dashboard/pay-small-small?status=SAVED');
+              //refreshComponent();
+              window.location.reload();
+            }
+          } catch (err) {
+            // setError(
+            //   err instanceof Error ? err.message : 'An unknown error occurred',
+            // );
+            toast.warning(
+              'Account Activation Failed, please try again or contact support. Error: ' +
+                err,
+            );
+          } finally {
+            setLoading(false);
+          }
+        }
+      } catch (statusx) {
+        //setError(error instanceof Error ? error.message : 'Unknown error');
+        //setStatus(statusx as string);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    activateWallet();
+  }
 
 
-// const [products, setProducts] = useState<any[]>
-// (
-//   [
-//       {
-//         id: 1,
-//         productName: 'MacBook Air 13.3" (2015, i5, 4GB RAM, 128GB SSD) – Classic Mac, Ultra Portable',
-//         amount: '₦378,000.00',
-//         createdAt: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-//         productDescription: 'A perfect entry-level MacBook for students, writers, and everyday users. The 2015 MacBook Air...',
-//         image: "./imports/logo.png",
-//         status: "SAVED" as Status,
-//         checked: false
-//       },
-//   ]
-// );
 
-//alert(JSON.stringify(products));
-//[{"id":1,"productName":"MacBook Air 13.3\" (2015, i5, 4GB RAM, 128GB SSD) – Classic Mac, Ultra Portable","amount":"₦378,000.00","createdAt":"Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)","productDescription":"A perfect entry-level MacBook for students, writers, and everyday users. The 2015 MacBook Air...","image":"./imports/logo.png","status":"SAVED","checked":false}]
 
-  const [productsx, setProductsx] = useState<Product[]>([
-    {
-      id: 1,
-      title: 'MacBook Air 13.3" (2015, i5, 4GB RAM, 128GB SSD) – Classic Mac, Ultra Portable',
-      price: '₦378,000.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'A perfect entry-level MacBook for students, writers, and everyday users. The 2015 MacBook Air...',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false
-    },
-    {
-      id: 2,
-      title: 'HP EliteBook x360 1040 G8 – Power Meets Elegance',
-      price: '₦1,015,875.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'Experience elite performance in a sleek, convertible design with the HP EliteBook...',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false
-    },
-    {
-      id: 3,
-      title: 'iPhone 15 Pro Max – Titanium Power. Ultimate Performance. Pro Beyond.',
-      price: '₦1,299,000.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'Experience next-level performance with the iPhone 15 Pro Max – built with aerospace-grade titanium construction.',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false
-    },
-    {
-      id: 4,
-      title: 'Samsung Galaxy S24 Ultra – Epic Performance. Ultra Clarity. Built to Lead.',
-      price: '₦1,179,500.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'Push boundaries with the Galaxy S24 Ultra – featuring a sleek armor aluminum body...',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false,
-      startDate: 'Fri Mar 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)' // Started 5.5 months ago for demo
-    },
-    {
-      id: 5,
-      title: 'iPad Pro 12.9" (2022) – M2 Chip, 256GB, Wi-Fi + Cellular',
-      price: '₦850,000.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'The ultimate iPad experience with M2 chip performance and stunning Liquid Retina XDR display.',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false
-    },
-    {
-      id: 6,
-      title: 'Apple Watch Series 9 – Advanced Health Monitoring',
-      price: '₦320,000.00',
-      date: 'Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)',
-      description: 'Stay connected and monitor your health with the most advanced Apple Watch yet.',
-      image: "./imports/logo.png",
-      status: 'SAVED',
-      checked: false
-    }
-  ])
+    //DELETE PAY SMALL SMALL
+    const startPaySmallSmall = async (
+      pidUser: any,
+      pidPaySmallSmall: any,
+      pidProduct: any,
+      amount: any,
+    ) => {
+      // Check if the users account is ready
+      if (statusx == 'NO_ACCOUNT' || statusx == 'NO_CUSTOMER') {
+        toast.warning(
+          'You do not have a wallet account. Please activate your wallet to start paying small small.',
+        );
+        return;
+      }
+  
+      // Check if the user has sufficient funds
+      if (transactions.totalAmount < 5000) {
+        toast.warning(
+          'You do not have sufficient funds to activate pay small small. Fund your wallet with a minimum of N5,000 to Activate this product.',
+        );
+        return;
+      }
+  
+      toast.info('Processing . . .');
+      // Perform the action based on the button clicked
+  
+      try {
+        const response = await fetch(
+          '/api/pay-small-small/start?' +
+            'pidUser=' +
+            user?.pidUser +
+            '&pidPaySmallSmall=' +
+            pidPaySmallSmall +
+            '&pidProduct=' +
+            pidProduct,
+        );
+  
+        const data: any = await response.json();
+  
+        if (data.statusx == 'SUCCESS') {
+          toast.success(data.message);
+          router.push('/dashboard/pay-small-small?status=STARTED');
+          //refreshComponent();
+          //refreshComponent();
+          //window.location.reload();
+        }
+        if (data.statusx == 'FAILED') {
+          toast.warning(data.message);
+        }
+      } catch (statusx) {
+        toast.warning('Action failed! Error: ' + statusx);
+        //setError(error instanceof Error ? error.message : 'Unknown error');
+        //setStatus(statusx as string);
+      } finally {
+        setLoading(false);
+      }
+      // You can perform other actions here like opening a modal
+    };
+  
+    //CANCEL PAY SMALL SMALL
+    const cancelPaySmallSmall = async (
+      pidUser: any,
+      pidPaySmallSmall: any,
+      pidProduct: any,
+      amount: any,
+    ) => {
+      toast.info('Cancelling Pay Small Small . . .');
+      // Perform the action based on the button clicked
+  
+      try {
+        const response = await fetch(
+          '/api/pay-small-small/cancel?' +
+            'pidUser=' +
+            user?.pidUser +
+            '&pidPaySmallSmall=' +
+            pidPaySmallSmall +
+            '&pidProduct=' +
+            pidProduct,
+        );
+  
+        const data: any = await response.json();
+  
+        if (data.statusx == 'SUCCESS') {
+          toast.success(data.message);
+          router.push('/dashboard/pay-small-small?status=CANCELLED');
+          //refreshComponent();
+          //window.location.reload();
+        }
+        if (data.statusx == 'FAILED') {
+          toast.warning(data.message);
+        }
+      } catch (statusx) {
+        toast.warning('Action failed! Error: ' + statusx);
+        //setError(error instanceof Error ? error.message : 'Unknown error');
+        //setStatus(statusx as string);
+      } finally {
+        setLoading(false);
+      }
+      // You can perform other actions here like opening a modal
+    };
+  
+    // CLAIM PAY SMALL SMALL
+    const claimPaySmallSmall = (
+      pidUser: any,
+      pidPaySmallSmall: any,
+      pidProduct: any,
+      amount: any,
+    ) => {
+      if (parseFloat(transactions.totalAmount) < parseFloat(amount)) {
+        toast.warning(
+          (('You do not have suffient funds to claim this product. Fund your wallet with a minimum of ₦' +
+            parseFloat(amount as any)
+              .toFixed(2)
+              .toString()
+              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string) +
+            ' to Claim this product.',
+        );
+        return;
+      }
+  
+      toast.info('Processing Claim . . .');
+      // Perform the action based on the button clicked
+    };
 
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [theme])
+
+
+
+
+
+
+
+
+      
+
 
   // Utility function to parse price string to number
   const parsePrice = (priceString: string): number => {
@@ -256,15 +362,27 @@ export default function App({productx, status}: {productx: any, status: string})
     return parseFloat(priceString.replace(/[₦,]/g, ''));
   }
 
+  // Deterministic date formatting (UTC) to prevent SSR/CSR mismatches
+  const formatDateForSSR = (input: unknown): string => {
+    if (!input) return '';
+    const d = new Date(input as any);
+    if (isNaN(d.getTime())) return String(input ?? '');
+    return new Intl.DateTimeFormat('en-GB', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'UTC',
+    }).format(d) + ' UTC';
+  }
+
   // Check if wallet balance is sufficient for a product
   const hasSufficientBalance = (productPrice: string): boolean => {
     const balance = parsePrice(walletBalance)
     const price = parsePrice(productPrice)
     return balance >= price
-  }
-
-  const toggleTheme = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light')
   }
 
   const handleStatusChange = (value: Status) => {
@@ -280,11 +398,14 @@ export default function App({productx, status}: {productx: any, status: string})
   }
 
   const handleActivate = (productId: number) => {
+    toast.info('Activating Pay Small Small . . .');
     setProducts(products.map(product => 
       product.id === productId 
         ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toString() }
         : product
-    ))
+    ));
+
+    
   }
 
   const handleClaim = (productId: number) => {
@@ -402,7 +523,7 @@ export default function App({productx, status}: {productx: any, status: string})
                   NGN
                 </div>
               </div>
-              <p className="text-base sm:text-sm text-muted-foreground">{String(product.createdAt)}</p>
+              <p className="text-base sm:text-sm text-muted-foreground">{formatDateForSSR(product.createdAt)}</p>
             </div>
             
             <div className="border-t border-border/30 pt-4">
@@ -486,9 +607,9 @@ export default function App({productx, status}: {productx: any, status: string})
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-lg">✕</span></div>
-                    <p className="text-red-800 dark:text-red-400 text-base font-semibold">
-                      Payment Plan Cancelled
-                    </p>
+                        <p className="text-red-800 dark:text-red-400 text-base font-semibold">
+                          Payment Plan Cancelled
+                        </p>
                   </div>
                 </div>
               )}
@@ -503,6 +624,7 @@ export default function App({productx, status}: {productx: any, status: string})
     <div className="min-h-screen dark:bg-black text-foreground index-0">
       {/* Main Content */}
       <div className="relative z-10x container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+        
         {/* Header */}
         <div className="text-center sm:text-left">
           <h1 className="text-3xl sm:text-4xl font-bold text-black dark:text-white">
@@ -525,22 +647,22 @@ export default function App({productx, status}: {productx: any, status: string})
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800/30">
                     <span className="text-muted-foreground font-medium">Bank</span>
-                    <div className="font-bold text-foreground text-lg dark:text-white">Wema Bank</div>
+                    <div className="font-bold text-foreground text-lg dark:text-white">{customer.bankName}</div>
                   </div>
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800/30">
                     <span className="text-muted-foreground font-medium">Account Name</span>
-                    <div className="font-bold text-foreground text-lg break-all dark:text-white">SUREIMPORTERS/ATSU EMMANUEL</div>
+                    <div className="font-bold text-foreground text-lg break-all dark:text-white">{customer.bankAccountName}</div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-100 dark:border-green-800/30">
                     <span className="text-muted-foreground font-medium">Account Number</span>
-                    <div className="font-bold text-foreground text-xl font-mono tracking-wider dark:text-white">9322401979</div>
+                    <div className="font-bold text-foreground text-xl font-mono tracking-wider dark:text-white">{customer.bankAccountNumber}</div>
                   </div>
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800/30">
                     <span className="text-muted-foreground font-medium">Currency</span>
-                    <div className="font-bold text-foreground text-lg dark:text-white">NGN</div>
+                    <div className="font-bold text-foreground text-lg dark:text-white">{customer.currency}</div>
                   </div>
                 </div>
               </CardContent>
@@ -549,10 +671,41 @@ export default function App({productx, status}: {productx: any, status: string})
             {/* Wallet Balance */}
             <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-purple-500 via-indigo-600 to-purple-700 text-white overflow-hidden relative">
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600/80 to-indigo-600/80"></div>
+              
+              {(statusx == 'NO_ACCOUNT' || statusx == 'NO_CUSTOMER') && (
+                    <CardContent className="p-8 flex items-start justify-between relative z-10x">
+                    <div className="space-y-3">
+                      <p className="text-purple-100 font-medium">Wallet Balance</p>
+
+                      <p className="text-3xl font-bold text-white">
+                      ₦0.00
+                      </p>
+
+                      <div className="flex items-center gap-2 text-purple-100">
+                        <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                        <span className="text-sm">No Wallet Account </span>
+                      </div>
+                    </div>
+                    <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                      <Wallet className="h-8 w-8 text-white" />
+                    </div>
+                  </CardContent>
+              )}
+
+              {statusx == 'WALLET_READY' && (
               <CardContent className="p-8 flex items-start justify-between relative z-10x">
                 <div className="space-y-3">
                   <p className="text-purple-100 font-medium">Wallet Balance</p>
-                  <p className="text-3xl font-bold text-white">{walletBalance}</p>
+                  <p className="text-3xl font-bold text-white">
+                  ₦
+                  
+                  {
+                    parseFloat(transactions.totalAmount as any)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                  </p>
                   <div className="flex items-center gap-2 text-purple-100">
                     <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <span className="text-sm">Active</span>
@@ -562,6 +715,8 @@ export default function App({productx, status}: {productx: any, status: string})
                   <Wallet className="h-8 w-8 text-white" />
                 </div>
               </CardContent>
+          )}
+              
             </Card>
           </div>
         </div>
@@ -722,78 +877,4 @@ const CountdownTimer = React.memo(({ startDate }: { startDate: string }) => {
   }
 
   const formatNumber = (num: number) => num.toString().padStart(2, '0')
-
-  // return (
-  //   <div className="relative overflow-hidden bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 dark:from-orange-900/20 dark:via-amber-900/20 dark:to-yellow-900/20 rounded-2xl border border-orange-200 dark:border-orange-800 shadow-lg">
-  //     {/* Header */}
-  //     <div className="px-4 py-3 sm:px-5 sm:py-4 text-center border-b border-orange-200/50 dark:border-orange-700/50">
-  //       <div className="flex items-center justify-center gap-2">
-  //         <div className="w-2.5 h-2.5 bg-orange-500 rounded-full animate-pulse"></div>
-  //         <h4 className="text-orange-900 dark:text-orange-300 font-bold">
-  //           ⏰ Payment Deadline
-  //         </h4>
-  //       </div>
-  //     </div>
-
-  //     {/* Countdown Grid */}
-  //     <div className="p-4 sm:p-5">
-  //       <div className="grid grid-cols-5 gap-2 sm:gap-3 mb-4">
-  //         <div className="flex flex-col items-center space-y-2">
-  //           <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-all duration-200 w-full aspect-square flex items-center justify-center min-h-[44px] sm:min-h-[52px]">
-  //             <span className="text-orange-800 dark:text-orange-400 font-bold text-base sm:text-xl">
-  //               {formatNumber(timeLeft.months)}
-  //             </span>
-  //           </div>
-  //           <span className="text-orange-600 dark:text-orange-500 text-xs font-medium">Mo</span>
-  //         </div>
-
-  //         <div className="flex flex-col items-center space-y-2">
-  //           <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-all duration-200 w-full aspect-square flex items-center justify-center min-h-[44px] sm:min-h-[52px]">
-  //             <span className="text-orange-800 dark:text-orange-400 font-bold text-base sm:text-xl">
-  //               {formatNumber(timeLeft.days)}
-  //             </span>
-  //           </div>
-  //           <span className="text-orange-600 dark:text-orange-500 text-xs font-medium">Days</span>
-  //         </div>
-
-  //         <div className="flex flex-col items-center space-y-2">
-  //           <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-all duration-200 w-full aspect-square flex items-center justify-center min-h-[44px] sm:min-h-[52px]">
-  //             <span className="text-orange-800 dark:text-orange-400 font-bold text-base sm:text-xl">
-  //               {formatNumber(timeLeft.hours)}
-  //             </span>
-  //           </div>
-  //           <span className="text-orange-600 dark:text-orange-500 text-xs font-medium">Hrs</span>
-  //         </div>
-
-  //         <div className="flex flex-col items-center space-y-2">
-  //           <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-all duration-200 w-full aspect-square flex items-center justify-center min-h-[44px] sm:min-h-[52px]">
-  //             <span className="text-orange-800 dark:text-orange-400 font-bold text-base sm:text-xl">
-  //               {formatNumber(timeLeft.minutes)}
-  //             </span>
-  //           </div>
-  //           <span className="text-orange-600 dark:text-orange-500 text-xs font-medium">Min</span>
-  //         </div>
-
-  //         <div className="flex flex-col items-center space-y-2">
-  //           <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-orange-200 dark:border-orange-700 shadow-sm hover:shadow-md transition-all duration-200 w-full aspect-square flex items-center justify-center min-h-[44px] sm:min-h-[52px]">
-  //             <span className="text-orange-800 dark:text-orange-400 font-bold text-base sm:text-xl animate-pulse">
-  //               {formatNumber(timeLeft.seconds)}
-  //             </span>
-  //           </div>
-  //           <span className="text-orange-600 dark:text-orange-500 text-xs font-medium">Sec</span>
-  //         </div>
-  //       </div>
-
-  //       {/* Warning Message */}
-  //       <div className="bg-orange-100/80 dark:bg-orange-900/30 rounded-xl p-3 sm:p-4 border border-orange-200/60 dark:border-orange-700/60">
-  //         <div className="flex items-start gap-2">
-  //           <span className="text-orange-600 dark:text-orange-400 text-sm flex-shrink-0 mt-0.5">⚡</span>
-  //           <p className="text-orange-800 dark:text-orange-400 text-xs sm:text-sm font-medium leading-relaxed">
-  //             Complete payments before this time or plan will be auto-cancelled
-  //           </p>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   </div>
-  // )
 })
