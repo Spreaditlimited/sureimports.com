@@ -67,9 +67,9 @@ const CheckboxIcon = React.memo(({ checked }: { checked: boolean }) => (
   </div>
 ))
 
-export default function App({product, status}: {product: any, status: string}) {
+export default function App({productx, status}: {productx: any, status: string}) {
 
-  const [products, setProducts] = useState<any[]>(product);
+  const [products, setProducts] = useState<any[]>(productx);
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [selectedStatus, setSelectedStatus] = useState<Status>('SAVED')
   const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -115,6 +115,8 @@ export default function App({product, status}: {product: any, status: string}) {
 //   ]
 // );
 
+//alert(JSON.stringify(products));
+//[{"id":1,"productName":"MacBook Air 13.3\" (2015, i5, 4GB RAM, 128GB SSD) – Classic Mac, Ultra Portable","amount":"₦378,000.00","createdAt":"Fri Aug 01 2025 12:17:17 GMT+0100 (West Africa Standard Time)","productDescription":"A perfect entry-level MacBook for students, writers, and everyday users. The 2015 MacBook Air...","image":"./imports/logo.png","status":"SAVED","checked":false}]
 
   const [productsx, setProductsx] = useState<Product[]>([
     {
@@ -190,7 +192,11 @@ export default function App({product, status}: {product: any, status: string}) {
 
   // Utility function to parse price string to number
   const parsePrice = (priceString: string): number => {
-    return parseFloat(priceString.replace(/[₦,]/g, ''))
+    if (typeof priceString !== 'string') {
+      console.error('Invalid priceString:', priceString);
+      return 0; // Return 0 if priceString is not a valid string
+    }
+    return parseFloat(priceString.replace(/[₦,]/g, ''));
   }
 
   // Check if wallet balance is sufficient for a product
@@ -219,7 +225,7 @@ export default function App({product, status}: {product: any, status: string}) {
   const handleActivate = (productId: number) => {
     setProducts(products.map(product => 
       product.id === productId 
-        ? { ...product, status: 'STARTED', checked: false, createdAt: 'date' }
+        ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toString() }
         : product
     ))
   }
@@ -269,7 +275,7 @@ export default function App({product, status}: {product: any, status: string}) {
   const filteredProducts = products.filter(product => product.status === selectedStatus)
 
   const getStatusDisplayName = (status: Status) => {
-    return status
+    return status.toLowerCase().charAt(0).toUpperCase() + status.toLowerCase().slice(1);  
   }
 
   const ProductImage = React.memo(({ image, title }: { image: string; title: string }) => (
@@ -277,7 +283,11 @@ export default function App({product, status}: {product: any, status: string}) {
       <div className="absolute border-2 border-neutral-200/50 dark:border-neutral-600/50 inset-0 pointer-events-none rounded-[24px]" />
       <div className="absolute inset-0 p-6 flex items-center justify-center">
         <img
-          src={image}
+          src={
+            (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+              '/' +
+              `${image}`) as string
+          }
           alt={title}
           className="max-w-full max-h-full object-contain transform group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
@@ -313,7 +323,7 @@ export default function App({product, status}: {product: any, status: string}) {
     return (
       <Card className="bg-card border-0 w-full h-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card via-card to-accent/10 overflow-hidden group">
         <CardContent className="p-6 h-full flex flex-col relative">
-          <ProductImage image={product.image} title={product.productName} />
+          <ProductImage image={product.store.productImage} title={product.productName} />
           
           <div className="flex-1 flex flex-col space-y-4 mt-6">
             <div className="space-y-3">
@@ -324,7 +334,7 @@ export default function App({product, status}: {product: any, status: string}) {
                   NGN
                 </div>
               </div>
-              <p className="text-base sm:text-sm text-muted-foreground">{"product.createdAt"}</p>
+              <p className="text-base sm:text-sm text-muted-foreground">{String(product.createdAt)}</p>
             </div>
             
             <div className="border-t border-border/30 pt-4">
@@ -333,8 +343,8 @@ export default function App({product, status}: {product: any, status: string}) {
             
             <div className="space-y-4 mt-auto">
               {/* Countdown Timer - only for Started status */}
-              {product.status === 'Started' && "product.createdAt" && (
-                <CountdownTimer startDate={"product.createdAt"} />
+              {product.status === 'Started' && product.createdAt && (
+                <CountdownTimer startDate={product.createdAt} />
               )}
               
               {/* Checkbox - only for Saved and Started status */}
@@ -395,8 +405,7 @@ export default function App({product, status}: {product: any, status: string}) {
                 <div className="p-5 bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 dark:from-green-900/20 dark:via-emerald-900/20 dark:to-green-900/20 rounded-xl border-2 border-green-200 dark:border-green-800 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-lg">✓</span>
-                    </div>
+                      <span className="text-white text-lg">✓</span></div>
                     <p className="text-green-800 dark:text-green-400 text-base font-semibold">
                       Payment Completed Successfully! 🎉
                     </p>
@@ -408,8 +417,7 @@ export default function App({product, status}: {product: any, status: string}) {
                 <div className="p-5 bg-gradient-to-r from-red-50 via-pink-50 to-red-50 dark:from-red-900/20 dark:via-pink-900/20 dark:to-red-900/20 rounded-xl border-2 border-red-200 dark:border-red-800 shadow-sm">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-lg">✕</span>
-                    </div>
+                      <span className="text-white text-lg">✕</span></div>
                     <p className="text-red-800 dark:text-red-400 text-base font-semibold">
                       Payment Plan Cancelled
                     </p>

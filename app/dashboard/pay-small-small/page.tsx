@@ -65,7 +65,7 @@ const Page = async ({
   return (
     <div>
       {/* <PaySmallSmall /> */}
-      <PaySmallSmall product={product} status={statusz} />
+      <PaySmallSmall productx={product} status={statusz} />
       {/* <ProductClaim product={product} status={statusz} /> */}
     </div>
   );
