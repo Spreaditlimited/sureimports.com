@@ -15,6 +15,9 @@ import imgAdobeExpressFile41 from "figma:asset/de3ce56cf2aad05726683d46c461a2161
 import imgImage3 from "figma:asset/ea715f49495dbfc812bf1773fc538cb0cbd3f088.png"
 import imgSubtract from "figma:asset/4964a0ebe3d64b53b49b697a91f64216e204411f.png"
 import { imgImage1, imgGroup } from "../imports/svg-2dlsy"
+import { useAuth } from '@/app/context/AuthContext'
+import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert'
+import Loading from '../../loading';
 
 type Status = 'SAVED' | 'STARTED' | 'COMPLETED' | 'CANCELLED'
 
@@ -77,6 +80,58 @@ export default function App({productx, status}: {productx: any, status: string})
   const [cancellingProductId, setCancellingProductId] = useState<number | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [walletBalance] = useState('₦120.00') // Wallet balance
+
+    const { user } = useAuth();
+    const navigateWithAlert = useNavigationWithAlert();
+  
+    const [pidUser, setPidUser] = useState(user?.pidUser);
+    const [email, setEmail] = useState(user?.userEmail);
+    const [amount, setAmount] = useState<number>(0);
+    const [quantity, setQuantity] = useState<number>(1);
+    const [refreshKey, setRefreshKey] = useState(0);
+  
+    const [customer, setCustomer] = useState<any | null>(null);
+    const [transactions, setTransaction] = useState<any | null>(null);
+  
+    const [loading, setLoading] = useState(true);
+    const [statusx, setStatus] = useState<string | null>(null);
+    const [statusz, setStatusz] = useState<string | null>('');
+  
+    const [message, setMessage] = useState<string | null>(null);
+
+    useEffect(() => {
+      const fetchCustomer = async () => {
+        try {
+          const response = await fetch(`/api/paystack/get-customer/${email}`);
+  
+          // if (!response.ok) {
+          //   throw new Error('Failed to fetch customer data');
+          // }
+  
+          const data: any = await response.json();
+  
+          //alert(data.statusx+' '+data.message);
+          setStatus(data.statusx);
+          setMessage(data.message);
+          setCustomer(data.customerDetails);
+          setTransaction(data.transactionDetails);
+        } catch (statusx) {
+          //setError(error instanceof Error ? error.message : 'Unknown error');
+          //setStatus(statusx as string);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchCustomer();
+    }, [email]);
+  
+    if (loading)
+      return (
+        <div>
+          <Loading />
+        </div>
+      );
 
 //alert(JSON.stringify(products));
 
@@ -329,7 +384,7 @@ export default function App({productx, status}: {productx: any, status: string})
             <div className="space-y-3">
               <h3 className="text-foreground font-semibold leading-tight dark:text-white">{product.productName}</h3>
               <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{product.price}</p>
+                <p className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 dark:from-green-400 dark:to-emerald-400 bg-clip-text text-transparent">{product.amount}</p>
                 <div className="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-md text-xs font-medium">
                   NGN
                 </div>
