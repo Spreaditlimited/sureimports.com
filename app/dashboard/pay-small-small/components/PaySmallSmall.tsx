@@ -99,39 +99,39 @@ export default function App({productx, status}: {productx: any, status: string})
   
     const [message, setMessage] = useState<string | null>(null);
 
-    useEffect(() => {
-      const fetchCustomer = async () => {
-        try {
-          const response = await fetch(`/api/paystack/get-customer/${email}`);
+    // useEffect(() => {
+    //   const fetchCustomer = async () => {
+    //     try {
+    //       const response = await fetch(`/api/paystack/get-customer/${email}`);
   
-          // if (!response.ok) {
-          //   throw new Error('Failed to fetch customer data');
-          // }
+    //       // if (!response.ok) {
+    //       //   throw new Error('Failed to fetch customer data');
+    //       // }
   
-          const data: any = await response.json();
+    //       const data: any = await response.json();
   
-          //alert(data.statusx+' '+data.message);
-          setStatus(data.statusx);
-          setMessage(data.message);
-          setCustomer(data.customerDetails);
-          setTransaction(data.transactionDetails);
-        } catch (statusx) {
-          //setError(error instanceof Error ? error.message : 'Unknown error');
-          //setStatus(statusx as string);
-        } finally {
-          setLoading(false);
-        }
-      };
+    //       //alert(data.statusx+' '+data.message);
+    //       setStatus(data.statusx);
+    //       setMessage(data.message);
+    //       setCustomer(data.customerDetails);
+    //       setTransaction(data.transactionDetails);
+    //     } catch (statusx) {
+    //       //setError(error instanceof Error ? error.message : 'Unknown error');
+    //       //setStatus(statusx as string);
+    //     } finally {
+    //       setLoading(false);
+    //     }
+    //   };
   
-      fetchCustomer();
-    }, [email]);
+    //   fetchCustomer();
+    // }, [email]);
   
-    if (loading)
-      return (
-        <div>
-          <Loading />
-        </div>
-      );
+    // if (loading)
+    //   return (
+    //     <div>
+    //       <Loading />
+    //     </div>
+    //   );
 
 //alert(JSON.stringify(products));
 
@@ -333,6 +333,7 @@ export default function App({productx, status}: {productx: any, status: string})
     return status.toLowerCase().charAt(0).toUpperCase() + status.toLowerCase().slice(1);  
   }
 
+
   const ProductImage = React.memo(({ image, title }: { image: string; title: string }) => (
     <div className="relative w-full h-[280px] sm:h-[240px] bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 rounded-[24px] overflow-hidden shadow-inner group-hover:shadow-lg transition-all duration-300">
       <div className="absolute border-2 border-neutral-200/50 dark:border-neutral-600/50 inset-0 pointer-events-none rounded-[24px]" />
@@ -356,7 +357,7 @@ export default function App({productx, status}: {productx: any, status: string})
   ))
 
 
-  
+
   const ProductCard = React.memo(({ product }: { product: any }) => {
     // Get the appropriate checkbox label based on status
     const getCheckboxLabel = (status: Status) => {
