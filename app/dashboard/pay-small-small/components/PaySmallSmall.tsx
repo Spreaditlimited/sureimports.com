@@ -85,6 +85,7 @@ export default function App({productx, status}: {productx: any, status: string})
   const [cancellingProductId, setCancellingProductId] = useState<number | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const [walletBalance] = useState('₦120.00') // Wallet balance
+  const [pidPaySmallSmall, setPidPaySmallSmall] = useState<string>('');
 
     const [pidUser, setPidUser] = useState(user?.pidUser);
     const [email, setEmail] = useState(user?.userEmail);
@@ -101,20 +102,29 @@ export default function App({productx, status}: {productx: any, status: string})
   
     const [message, setMessage] = useState<string | null>(null);
 
+    // Client-only render to avoid SSR/CSR mismatches from auth/theme/locale
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => {
+      setMounted(true)
+    }, [])
+
 
     useEffect(() => {
       const fetchCustomer = async () => {
         try {
-          
+          // Do not fetch until we have an email
+          if (!email) {
+            setLoading(false)
+            return
+          }
+
           const response = await fetch(`/api/paystack/get-customer/${email}`);
-  
           if (!response.ok) {
             throw new Error('Failed to fetch customer data');
           }
-  
+
           const data: any = await response.json();
-  
-          //alert(data.statusx+' '+data.message);
+
           setStatus(data.statusx);
           setMessage(data.message);
           setCustomer(data.customerDetails);
@@ -126,17 +136,29 @@ export default function App({productx, status}: {productx: any, status: string})
         }
       };
 
-  
       fetchCustomer();
     }, [email]);
-  
+
+
     
-      if(loading)
+    // Do not render on server; mount on client to prevent hydration mismatch
+    if (!mounted) return null
+
+    if(loading)
       return (
           <div>
             <Loading />
           </div>
       );
+
+
+      if(!products)
+        return (
+            <div>
+              <Loading />
+            </div>
+        );
+    
 
   //////////// WALLET ACTIVATION //////////
   function walletActivation() {
@@ -214,7 +236,6 @@ export default function App({productx, status}: {productx: any, status: string})
 
     activateWallet();
   }
-
 
 
 
@@ -349,7 +370,7 @@ export default function App({productx, status}: {productx: any, status: string})
 
 
 
-
+  
       
 
 
@@ -361,6 +382,9 @@ export default function App({productx, status}: {productx: any, status: string})
     }
     return parseFloat(priceString.replace(/[₦,]/g, ''));
   }
+
+
+
 
   // Deterministic date formatting (UTC) to prevent SSR/CSR mismatches
   const formatDateForSSR = (input: unknown): string => {
@@ -377,6 +401,9 @@ export default function App({productx, status}: {productx: any, status: string})
       timeZone: 'UTC',
     }).format(d) + ' UTC';
   }
+
+    
+
 
   // Check if wallet balance is sufficient for a product
   const hasSufficientBalance = (productPrice: string): boolean => {
@@ -399,9 +426,15 @@ export default function App({productx, status}: {productx: any, status: string})
 
   const handleActivate = (productId: number) => {
     toast.info('Activating Pay Small Small . . .');
+    // startPaySmallSmall(
+    //   pidUser,
+    //   pidPaySmallSmall,
+    //   pidProduct,
+    //   amount,
+    // );
     setProducts(products.map(product => 
       product.id === productId 
-        ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toString() }
+        ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toISOString() }
         : product
     ));
 
@@ -456,6 +489,8 @@ export default function App({productx, status}: {productx: any, status: string})
     return status.toLowerCase().charAt(0).toUpperCase() + status.toLowerCase().slice(1);  
   }
 
+
+
   
   const ProductImage = React.memo(({ image, title }: { image: string; title: string }) => (
     <div className="relative w-full h-[280px] sm:h-[240px] bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 rounded-[24px] overflow-hidden shadow-inner group-hover:shadow-lg transition-all duration-300">
@@ -501,10 +536,16 @@ export default function App({productx, status}: {productx: any, status: string})
     const canClaim = hasSufficientBalance(product.amount)
     
 
+  //   return (
+  //     <div>
+  //       6.......................................................................................
+  //     </div>
+  // );
+
     return (
       <Card className="bg-card border-0 w-full h-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card via-card to-accent/10 overflow-hidden group">
         <CardContent className="p-6 h-full flex flex-col relative">
-          <ProductImage image={product.store.productImage} title={product.productName} />
+          {/* <ProductImage image={product.store.productImage} title={product.productName} /> */}
           
           <div className="flex-1 flex flex-col space-y-4 mt-6">
             
@@ -531,9 +572,9 @@ export default function App({productx, status}: {productx: any, status: string})
             </div>
             
             <div className="space-y-4 mt-auto">
-              {/* Countdown Timer - only for Started status */}
-              {product.status === 'Started' && product.createdAt && (
-                <CountdownTimer startDate={product.createdAt} />
+              {/* Countdown Timer - only for STARTED status */}
+              {product.status === 'STARTED' && product.createdAt && (
+                <CountdownTimer startDate={String(product.createdAt)} />
               )}
               
               {/* Checkbox - only for Saved and Started status */}
@@ -621,7 +662,7 @@ export default function App({productx, status}: {productx: any, status: string})
   })
 
   return (
-    <div className="min-h-screen dark:bg-black text-foreground index-0">
+    <div className="min-h-screen dark:bg-black text-foreground index-0" suppressHydrationWarning>
       {/* Main Content */}
       <div className="relative z-10x container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         
@@ -647,22 +688,22 @@ export default function App({productx, status}: {productx: any, status: string})
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800/30">
                     <span className="text-muted-foreground font-medium">Bank</span>
-                    <div className="font-bold text-foreground text-lg dark:text-white">{customer.bankName}</div>
+                    <div className="font-bold text-foreground text-lg dark:text-white">{customer?.bankName ?? ''}</div>
                   </div>
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border border-purple-100 dark:border-purple-800/30">
                     <span className="text-muted-foreground font-medium">Account Name</span>
-                    <div className="font-bold text-foreground text-lg break-all dark:text-white">{customer.bankAccountName}</div>
+                    <div className="font-bold text-foreground text-lg break-all dark:text-white">{customer?.bankAccountName ?? ''}</div>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border border-green-100 dark:border-green-800/30">
                     <span className="text-muted-foreground font-medium">Account Number</span>
-                    <div className="font-bold text-foreground text-xl font-mono tracking-wider dark:text-white">{customer.bankAccountNumber}</div>
+                    <div className="font-bold text-foreground text-xl font-mono tracking-wider dark:text-white">{customer?.bankAccountNumber ?? ''}</div>
                   </div>
                   <div className="space-y-2 p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-100 dark:border-amber-800/30">
                     <span className="text-muted-foreground font-medium">Currency</span>
-                    <div className="font-bold text-foreground text-lg dark:text-white">{customer.currency}</div>
+                    <div className="font-bold text-foreground text-lg dark:text-white">{customer?.currency ?? ''}</div>
                   </div>
                 </div>
               </CardContent>
@@ -700,10 +741,10 @@ export default function App({productx, status}: {productx: any, status: string})
                   ₦
                   
                   {
-                    parseFloat(transactions.totalAmount as any)
+                    Number(transactions?.totalAmount ?? 0)
                       .toFixed(2)
                       .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
                   }
                   </p>
                   <div className="flex items-center gap-2 text-purple-100">
