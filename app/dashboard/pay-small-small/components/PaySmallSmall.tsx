@@ -82,7 +82,7 @@ export default function App({productx, status}: {productx: any, status: string})
   const [selectedStatus, setSelectedStatus] = useState<Status>('SAVED')
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
-  const [cancellingProductId, setCancellingProductId] = useState<number | null>(null)
+  const [cancellingProductId, setCancellingProductId] = useState<any[] | null>([]) as any
   const [isProcessing, setIsProcessing] = useState(false)
   const [walletBalance] = useState('₦120.00') // Wallet balance
   const [pidPaySmallSmall, setPidPaySmallSmall] = useState<string>('');
@@ -300,24 +300,24 @@ export default function App({productx, status}: {productx: any, status: string})
   
     //CANCEL PAY SMALL SMALL
     const cancelPaySmallSmall = async (
-      pidUser: any,
-      pidPaySmallSmall: any,
-      pidProduct: any,
-      amount: any,
+        pidUser: any,
+        pidPaySmallSmall: any,
+        pidProduct: any,
+        amount: any,
     ) => {
-      toast.info('Cancelling Pay Small Small . . .');
-      // Perform the action based on the button clicked
-  
-      try {
-        const response = await fetch(
-          '/api/pay-small-small/cancel?' +
-            'pidUser=' +
-            user?.pidUser +
-            '&pidPaySmallSmall=' +
-            pidPaySmallSmall +
-            '&pidProduct=' +
-            pidProduct,
-        );
+        toast.info('Cancelling Pay Small Small . . .');
+        // Perform the action based on the button clicked
+    
+        try {
+          const response = await fetch(
+            '/api/pay-small-small/cancel?' +
+              'pidUser=' +
+              user?.pidUser +
+              '&pidPaySmallSmall=' +
+              pidPaySmallSmall +
+              '&pidProduct=' +
+              pidProduct,
+          );
   
         const data: any = await response.json();
   
@@ -424,38 +424,64 @@ export default function App({productx, status}: {productx: any, status: string})
     ))
   }
 
-  const handleActivate = (productId: number) => {
-    toast.info('Activating Pay Small Small . . .');
-    // startPaySmallSmall(
-    //   pidUser,
-    //   pidPaySmallSmall,
-    //   pidProduct,
-    //   amount,
-    // );
-    setProducts(products.map(product => 
-      product.id === productId 
-        ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toISOString() }
-        : product
-    ));
+  const handleActivate = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
+    //toast.info('Activating Pay Small Small . . .');
+
+    startPaySmallSmall(
+      pidUser,
+      pidPaySmallSmall,
+      pidProduct,
+      amount,
+    );
+    
+    // setProducts(products.map(product => 
+    //   product.id === productId 
+    //     ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toISOString() }
+    //     : product
+    // ));
 
     
   }
 
-  const handleClaim = (productId: number) => {
-    setProducts(products.map(product => 
-      product.id === productId 
-        ? { ...product, status: 'COMPLETED', checked: false }
-        : product
-    ))
+  const handleClaim = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
+    
+    claimPaySmallSmall(
+      pidUser,
+      pidPaySmallSmall,
+      pidProduct,
+      amount,
+    );
+    // setProducts(products.map(product => 
+    //   product.id === productId 
+    //     ? { ...product, status: 'COMPLETED', checked: false }
+    //     : product
+    // ))
   }
 
-  const handleCancelRequest = (productId: number) => {
-    setCancellingProductId(productId)
+
+
+  const handleCancelRequest = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
+    setCancellingProductId([productId, pidPaySmallSmall, pidUser, pidProduct, amount])
     setShowCancelDialog(true)
   }
 
   const handleCancelConfirm = async () => {
+
     if (cancellingProductId === null) return
+
+    let productId = cancellingProductId[0];
+    let pidUser = cancellingProductId[1];
+    let pidPaySmallSmall = cancellingProductId[2];
+    let pidProduct = cancellingProductId[3];
+    let amount = cancellingProductId[4];
+
+    cancelPaySmallSmall(
+      pidUser,
+      pidPaySmallSmall,
+      pidProduct,
+      amount,
+    );
+
 
     setIsProcessing(true)
     setShowCancelDialog(false)
@@ -492,29 +518,35 @@ export default function App({productx, status}: {productx: any, status: string})
 
 
   
-  const ProductImage = React.memo(({ image, title }: { image: string; title: string }) => (
-    <div className="relative w-full h-[280px] sm:h-[240px] bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 rounded-[24px] overflow-hidden shadow-inner group-hover:shadow-lg transition-all duration-300">
-      <div className="absolute border-2 border-neutral-200/50 dark:border-neutral-600/50 inset-0 pointer-events-none rounded-[24px]" />
-      <div className="absolute inset-0 p-6 flex items-center justify-center">
-        <img
-          src={
-            (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
-              '/' +
-              `${image}`) as string
-          }
-          alt={title}
-          className="max-w-full max-h-full object-contain transform group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            // Fallback if image fails to load
-            e.currentTarget.style.display = 'none'
-          }}
-        />
+  const ProductImage = React.memo(({ image, title }: { image?: string | null; title?: string }) => {
+    const base = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
+    const hasImage = Boolean(image && base)
+    const src = hasImage ? `${base}/${image}` : undefined
+
+    return (
+      <div className="relative w-full h-[280px] sm:h-[240px] bg-gradient-to-br from-neutral-50 via-white to-neutral-100 dark:from-neutral-800 dark:via-neutral-700 dark:to-neutral-800 rounded-[24px] overflow-hidden shadow-inner group-hover:shadow-lg transition-all duration-300">
+        <div className="absolute border-2 border-neutral-200/50 dark:border-neutral-600/50 inset-0 pointer-events-none rounded-[24px]" />
+        <div className="absolute inset-0 p-6 flex items-center justify-center">
+          {hasImage ? (
+            <img
+              src={src}
+              alt={title || 'Product image'}
+              className="max-w-full max-h-full object-contain transform group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                // Hide broken images gracefully
+                e.currentTarget.style.display = 'none'
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              <span className="text-sm">No image available</span>
+            </div>
+          )}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
       </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent pointer-events-none"></div>
-    </div>
-  ))
-
-
+    )
+  })
 
   const ProductCard = React.memo(({ product }: { product: any }) => {
     // Get the appropriate checkbox label based on status
@@ -536,16 +568,17 @@ export default function App({productx, status}: {productx: any, status: string})
     const canClaim = hasSufficientBalance(product.amount)
     
 
-  //   return (
-  //     <div>
-  //       6.......................................................................................
-  //     </div>
-  // );
+
 
     return (
       <Card className="bg-card border-0 w-full h-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card via-card to-accent/10 overflow-hidden group">
         <CardContent className="p-6 h-full flex flex-col relative">
-          {/* <ProductImage image={product.store.productImage} title={product.productName} /> */}
+          
+          {/* Use null-safe access with fallback */}
+          <ProductImage
+            image={product?.store?.productImage ?? product?.productImage ?? null}
+            title={product?.productName ?? 'Product'}
+          />
           
           <div className="flex-1 flex flex-col space-y-4 mt-6">
             
@@ -573,9 +606,11 @@ export default function App({productx, status}: {productx: any, status: string})
             
             <div className="space-y-4 mt-auto">
               {/* Countdown Timer - only for STARTED status */}
-              {product.status === 'STARTED' && product.createdAt && (
-                <CountdownTimer startDate={String(product.createdAt)} />
-              )}
+              {
+                product.status === 'STARTED' && product.createdAt && (
+                  <CountdownTimer startDate={String(product.createdAt)} />
+                )
+              }
               
               {/* Checkbox - only for Saved and Started status */}
               {showCheckbox && (
@@ -593,7 +628,10 @@ export default function App({productx, status}: {productx: any, status: string})
               {product.status === 'SAVED' && (
                 <div className="space-y-3 w-full">
                   <Button 
-                    onClick={() => handleActivate(product.id)}
+                    onClick={() => handleActivate(
+                      //productId, pidPaySmallSmall, pidUser, pidProduct
+                      product.id, product.pidPaySmallSmall, product.pidUser, product.pidProduct, product.amount
+                    )}
                     className="w-full h-12 bg-gradient-to-r from-indigo-600 via-indigo-700 to-indigo-800 hover:from-indigo-700 hover:via-indigo-800 hover:to-indigo-900 text-white disabled:from-gray-300 disabled:via-gray-300 disabled:to-gray-300 disabled:text-gray-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] font-semibold"
                     disabled={!product.checked}
                   >
@@ -607,19 +645,20 @@ export default function App({productx, status}: {productx: any, status: string})
               {/* Buttons for Started status */}
               {product.status === 'STARTED' && (
                 <div className="space-y-3 w-full">
+
                   <Button 
-                    onClick={() => handleCancelRequest(product.id)}
+                    onClick={() => handleCancelRequest(product.id, product.pidPaySmallSmall, product.pidUser, product.pidProduct, product.amount)}
                     variant="outline" 
                     className="w-full h-12 border-2 border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20 disabled:border-gray-300 disabled:text-gray-300 disabled:hover:bg-transparent shadow-md hover:shadow-lg transition-all duration-300 font-semibold"
                     disabled={!product.checked}
                   >
-                    <span className="flex items-center gap-2">
-                      ⚠️ Cancel Pay Small Small
-                    </span>
+                        <span className="flex items-center gap-2">
+                          ⚠️ Cancel Pay Small Small
+                        </span>
                   </Button>
                   
                   <Button 
-                    onClick={() => handleClaim(product.id)}
+                    onClick={() => handleClaim(product.id, product.pidPaySmallSmall, product.pidUser, product.pidProduct, product.amount)}
                     className="w-full h-12 bg-gradient-to-r from-green-600 via-green-700 to-emerald-700 hover:from-green-700 hover:via-green-800 hover:to-emerald-800 text-white disabled:from-gray-300 disabled:via-gray-300 disabled:to-gray-300 disabled:text-gray-500 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] font-semibold"
                     disabled={!canClaim}
                   >
