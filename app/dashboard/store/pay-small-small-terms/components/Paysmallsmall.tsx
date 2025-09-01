@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import svgPaths from "../imports/svg-htimv6y8us"
 import svgPathsMobile from "../imports/svg-xie0mhws6u"
-import imgImage from "../../../../app/public/images/new/images/logo.png"
-import imgSubtract from "../../../../app/public/images/new/images/logo.png"
+import imgImage from "../../../../../app/public/images/new/images/logo.png"
+import imgSubtract from "../../../../../app/public/images/new/images/logo.png"
 import imgSureimportsReverse from "../../favicon.ico"
 import { imgImage1 } from "../imports/svg-znnzx"
 import { imgImage1 as imgImage1Mobile } from "../imports/svg-a31k4"
@@ -14,19 +14,35 @@ import { Label } from "./ui/label"
 import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
 import { toast } from "sonner"
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/app/context/AuthContext'
 
 // Desktop Components
-interface ProductImageProps {}
+interface ProductImageProps {
+  product: any
+}
 
-function ProductImage({}: ProductImageProps) {
+function ProductImage({product}: ProductImageProps) {
   return (
     <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
+      
+
+
       <div className="[grid-area:1_/_1] bg-neutral-50 h-[300px] md:h-[456px] ml-0 mt-0 relative rounded-[20px] w-full max-w-[560px]">
         <div
           aria-hidden="true"
           className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
         />
       </div>
+      <img
+              src={
+                (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                  '/' +
+                  `${product.productImage}`) as string
+              }
+              alt="Product Image"
+              className="h-full w-full object-cover"
+            />
       <div
         className="[grid-area:1_/_1] bg-[100%_49.4%] bg-no-repeat bg-size-[101.62%_159.91%] h-[270px] md:h-[425px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-20px_-10px] md:mask-position-[-36px_-15px] mask-size-[300px_300px] md:mask-size-[560px_456px] ml-4 md:ml-9 mt-[10px] md:mt-[15px] w-[280px] md:w-[489px]"
         style={{
@@ -38,28 +54,34 @@ function ProductImage({}: ProductImageProps) {
   )
 }
 
-function ProductCard({}: {}) {
+function ProductCard({product}: any) {
   return (
     <Card className="w-full max-w-[560px] p-0 border-none shadow-none">
-      <ProductImage />
+      <ProductImage product={product} />
     </Card>
   )
 }
 
-function ProductInfo({}: {}) {
+function ProductInfo({product, amount}:any) {
   return (
     <div className="absolute bottom-0 left-0 right-0 p-4 md:p-[30px] bg-white/80 backdrop-blur-sm rounded-b-[20px]">
       <div className="space-y-2.5">
         <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm">
-          HP
+        {product.productBrand}
         </Badge>
         <div className="space-y-1">
           <h2 className="text-xl md:text-[28px] font-semibold text-slate-800 leading-tight">
-            HP EliteBook x360 1040 G8 – Power Meets Elegance
+          {product.productName}
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span className="text-lg md:text-[20px] font-semibold text-indigo-800">
-              ₦1,015,875.00
+              ₦
+              {
+                parseFloat(amount)
+                  .toFixed(2)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+              }
             </span>
             <span className="text-sm md:text-base text-slate-800">
               Inclusive of 5% PSS Fee
@@ -114,7 +136,7 @@ function HowItWorks({}: {}) {
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
       {steps.map((step) => (
         <StepCard key={step.number} number={step.number}>
           {step.content}
@@ -436,7 +458,22 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
   )
 }
 
-export default function App() {
+export default function App({ product }: any) {
+
+    const router = useRouter();
+  
+    const { user } = useAuth();
+  
+    //calculate 5% of product price
+    let price = product.productPrice + product.productPrice * 0.05;
+  
+    const [pidUser, setPidUser] = useState(user?.pidUser);
+    const [email, setEmail] = useState(user?.userEmail);
+    const [pidProduct, setPidProduct] = useState(product.pidProduct);
+    const [phone, setPhone] = useState<number>(0);
+    const [amount, setAmount] = useState(price);
+    const [quantity, setQuantity] = useState(1);
+    
   const [phoneNumber, setPhoneNumber] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
@@ -556,8 +593,8 @@ export default function App() {
             {/* Product Section */}
             <div className="flex-shrink-0 w-full lg:w-auto flex justify-center lg:justify-start">
               <div className="relative">
-                <ProductCard />
-                <ProductInfo />
+                <ProductCard product={product} />
+                <ProductInfo product={product} amount={amount} />
               </div>
             </div>
 
