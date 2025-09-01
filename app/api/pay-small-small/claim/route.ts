@@ -101,28 +101,28 @@ export async function GET(request: NextRequest) {
 
     ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
     //import { xMail } from '@/lib/email/xMail';
-    // const xEmail_B = 'hello@sureimports.com';
-    // const xTitle_B = `New Pay Small Small Purchase Successful!`;
-    // const xBodyTitle_B = `Pay Small Small Purchase Successful!`;
-    // const xBody_B = `Hi Admin, <br />A Pay Small Small order has been completed successfully on sureimports.com shop.</b><br />
-    //                     Here are the details of the order: <br />
-    //                     <h4>Order ID: <b>${pidProduct}</b></h4><hr />
-    //                     <h4>Order Type: <b>Pay Small Small</b></h4><hr />
-    //                     <h4>Customer name: <b>${first_name+' '+last_name}</b></h4><hr />
-    //                     <h4>Phone Number: <b>${user?.phone}</b></h4><hr />
-    //                     <h4>Product Name: <b>${pss?.productName}</b></h4><hr />
-    //                     <h4>Quantity: <b>${pss?.quantity}</b></h4><hr />
-    //                     <h4>Amount: <b>N${pss?.amount}</b> (NGN)</h4><hr />
-    //                     <h4>Address: <b>${user?.address}</b></h4><hr />
-    //                     Kind regards,<br />
-    //                     Sureimports.com Automated System`;
+    const xEmail_B = 'hello@sureimports.com';
+    const xTitle_B = `New Pay Small Small Purchase Successful!`;
+    const xBodyTitle_B = `Pay Small Small Purchase Successful!`;
+    const xBody_B = `Hi Admin, <br />A Pay Small Small order has been completed successfully on sureimports.com shop.</b><br />
+                        Here are the details of the order: <br />
+                        <h4>Order ID: <b>${pidProduct}</b></h4><hr />
+                        <h4>Order Type: <b>Pay Small Small</b></h4><hr />
+                        <h4>Customer name: <b>${first_name+' '+last_name}</b></h4><hr />
+                        <h4>Phone Number: <b>${user?.phone}</b></h4><hr />
+                        <h4>Product Name: <b>${pss?.productName}</b></h4><hr />
+                        <h4>Quantity: <b>${pss?.quantity}</b></h4><hr />
+                        <h4>Amount: <b>N${pss?.amount}</b> (NGN)</h4><hr />
+                        <h4>Address: <b>${user?.address}</b></h4><hr />
+                        Kind regards,<br />
+                        Sureimports.com Automated System`;
 
-    // await xMail({
-    //   xEmail: xEmail_B,
-    //   xTitle: xTitle_B,
-    //   xBodyTitle: xBodyTitle_B,
-    //   xBody: xBody_B,
-    // });
+    await xMail({
+      xEmail: xEmail_B,
+      xTitle: xTitle_B,
+      xBodyTitle: xBodyTitle_B,
+      xBody: xBody_B,
+    });
     ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
 
 
