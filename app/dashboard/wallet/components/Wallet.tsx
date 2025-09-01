@@ -37,6 +37,8 @@ const formatCurrency = (amount: number): string => {
   return "0.00"
 };
 
+
+
 export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWithdrawal, transactions, onWithdrawalConfirmed }: WalletProps) {
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showTopUpDialog, setShowTopUpDialog] = useState(false);
@@ -44,7 +46,6 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   const handleWithdraw = () => {
     setShowWithdrawDialog(true);
   };
-
 
 
 
@@ -295,7 +296,9 @@ const allTransactions: any[] = [
         <div className="relative h-[42px] flex items-center">
           {/* Back Button */}
           <button
-            onClick={onBackToStore}
+            onClick={() =>
+              router.push('/dashboard/store?id=laptop')
+            }
             className="absolute left-4 w-8 h-8 flex items-center justify-center"
           >
             <svg className="w-6 h-6 text-white dark:text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -321,7 +324,9 @@ const allTransactions: any[] = [
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick={onBackToStore}
+                onClick={() =>
+                  router.push('/dashboard/store?id=laptop')
+                }
                 className="p-2 hover:bg-accent rounded-lg transition-colors"
               >
                 <svg className="w-6 h-6 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,7 +337,7 @@ const allTransactions: any[] = [
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              <button
+              {/* <button
                 onClick={onBulkBuyer}
                 className="bg-purple-600 hover:bg-purple-700 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg"
               >
@@ -345,9 +350,11 @@ const allTransactions: any[] = [
                   </svg>
                 </div>
                 <span className="font-medium text-white text-sm">Bulk Buyer?</span>
-              </button>
+              </button> */}
               <button
-                onClick={onBackToStore}
+                onClick={() =>
+                  router.push('/dashboard/store?id=laptop')
+                }
                 className="bg-slate-600 hover:bg-slate-700 dark:bg-muted dark:hover:bg-muted/80 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg"
               >
                 <div className="w-5 h-5">
@@ -442,7 +449,10 @@ const allTransactions: any[] = [
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={onBackToStore}>
+          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" 
+          onClick={() =>
+            router.push('/dashboard/store?id=laptop')
+          }>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -456,7 +466,10 @@ const allTransactions: any[] = [
             </div>
           </Card>
 
-          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={onBackToStore}>
+          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" 
+          onClick={() =>
+            router.push('/dashboard/store?id=laptop')
+          }>
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -532,15 +545,19 @@ const allTransactions: any[] = [
                       </div>
                     </div>
                   </div>
+
+
                   <div className={`font-semibold ${
-                    transaction.id === 'pending'
-                      ? 'text-amber-600 dark:text-amber-400'
-                      : transaction.type === 'credit' 
-                      ? 'text-green-600 dark:text-green-400' 
-                      : 'text-red-600 dark:text-red-400'
-                  }`}>
+                        transaction.id === 'pending'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : transaction.type === 'credit' 
+                        ? 'text-green-600 dark:text-green-400' 
+                        : 'text-red-600 dark:text-red-400'
+                    }`}>
                     {transaction.id === 'pending' ? 'Pending ' : transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
                   </div>
+
+
                 </div>
               ))}
             </div>
