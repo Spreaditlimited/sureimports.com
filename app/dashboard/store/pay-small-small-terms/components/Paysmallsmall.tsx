@@ -203,11 +203,21 @@ function PaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: 
 }
 
 // Mobile Components
-function MobileProductImage() {
+function MobileProductImage({product}:any) {
   return (
     <div className="relative w-full max-w-[350px] aspect-square">
-      <div className="absolute inset-0 bg-neutral-50 rounded-[15px] border border-[rgba(0,0,0,0.05)]">
-      </div>
+      {/* <div className="absolute inset-0 bg-neutral-50 rounded-[15px] border border-[rgba(0,0,0,0.05)]">
+      </div> */}
+
+      <img
+              src={
+                (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                  '/' +
+                  `${product.productImage}`) as string
+              }
+              alt="Product Image"
+              className="h-full w-full object-cover"
+            />
       <div
         className="absolute inset-[15%] bg-[100%_49.4%] bg-no-repeat bg-size-[101.62%_159.91%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-center mask-size-contain"
         style={{
@@ -521,7 +531,7 @@ export default function App({ product }: any) {
           {/* Product Section */}
           <div className="flex flex-col gap-2.5 w-full max-w-[390px] mx-auto">
             <div className="w-full flex justify-center">
-              <MobileProductImage />
+              <MobileProductImage product={product} />
             </div>
             <MobileProductInfo />
           </div>
