@@ -26,14 +26,6 @@ function ProductImage({product}: ProductImageProps) {
   return (
     <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
       
-
-
-      <div className="[grid-area:1_/_1] bg-neutral-50 h-[300px] md:h-[456px] ml-0 mt-0 relative rounded-[20px] w-full max-w-[560px]">
-        <div
-          aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
-        />
-      </div>
       <img
               src={
                 (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
@@ -43,13 +35,21 @@ function ProductImage({product}: ProductImageProps) {
               alt="Product Image"
               className="h-full w-full object-cover"
             />
-      <div
+
+      {/* <div className="[grid-area:1_/_1] bg-neutral-50 h-[300px] md:h-[456px] ml-0 mt-0 relative rounded-[20px] w-full max-w-[560px]">
+        <div
+          aria-hidden="true"
+          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+        />
+      </div> */}
+
+      {/* <div
         className="[grid-area:1_/_1] bg-[100%_49.4%] bg-no-repeat bg-size-[101.62%_159.91%] h-[270px] md:h-[425px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-20px_-10px] md:mask-position-[-36px_-15px] mask-size-[300px_300px] md:mask-size-[560px_456px] ml-4 md:ml-9 mt-[10px] md:mt-[15px] w-[280px] md:w-[489px]"
         style={{
           backgroundImage: `url('${imgImage}')`,
           maskImage: `url('${imgImage1}')`,
         }}
-      />
+      /> */}
     </div>
   )
 }
