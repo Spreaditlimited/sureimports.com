@@ -13,22 +13,21 @@ import { Card } from "./ui/card";
 import { useState } from "react";
 
 interface TopUpDialogProps {
-  bankData?: any;
+  bankName?: any; 
+  accountName?: any; 
+  accountNumber?: any;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function TopUpDialog({ bankData, isOpen, onClose }: TopUpDialogProps) {
+export default function TopUpDialog({ bankName, accountName, accountNumber, isOpen, onClose }: TopUpDialogProps) {
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const bankDetails = {
-    // bankName: bankData.customer.bankName,
-    // accountName: bankData.customer.bankName,
-    // accountNumber: bankData.customer.bankName,
-    bankName: "First Bank of Nigeria",
-    accountName: "SureImports Limited",
-    accountNumber: "3087654321",
-    sortCode: "011151003",
+    bankName: bankName,
+    accountName: accountName,
+    accountNumber: accountNumber,
+    sortCode: "Not Applicable",
     transferReference: "WALLET-TOPUP"
   };
 
@@ -81,7 +80,7 @@ export default function TopUpDialog({ bankData, isOpen, onClose }: TopUpDialogPr
               <div className="flex items-center justify-between p-2 bg-background rounded border">
                 <div>
                   <p className="text-xs text-muted-foreground">Bank Name</p>
-                  <p className="text-sm font-medium text-foreground">{bankDetails.bankName}</p>
+                  <p className="text-sm font-medium text-foreground">{bankName}</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -105,7 +104,7 @@ export default function TopUpDialog({ bankData, isOpen, onClose }: TopUpDialogPr
               <div className="flex items-center justify-between p-2 bg-background rounded border">
                 <div>
                   <p className="text-xs text-muted-foreground">Account Name</p>
-                  <p className="text-sm font-medium text-foreground">{bankDetails.accountName}</p>
+                  <p className="text-sm font-medium text-foreground">{accountName}</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -129,12 +128,12 @@ export default function TopUpDialog({ bankData, isOpen, onClose }: TopUpDialogPr
               <div className="flex items-center justify-between p-2 bg-background rounded border">
                 <div>
                   <p className="text-xs text-muted-foreground">Account Number</p>
-                  <p className="text-sm font-medium text-foreground tracking-wider">{bankDetails.accountNumber}</p>
+                  <p className="text-sm font-medium text-foreground tracking-wider">{accountNumber}</p>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => copyToClipboard(bankDetails.accountNumber, 'accountNumber')}
+                  onClick={() => copyToClipboard(accountNumber, 'accountNumber')}
                   className="text-blue-600 dark:text-blue-400 h-8 w-8 p-0"
                 >
                   {copiedField === 'accountNumber' ? (

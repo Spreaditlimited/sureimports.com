@@ -45,28 +45,6 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     setShowWithdrawDialog(true);
   };
 
-  // Calculate available balance (total minus pending withdrawal)
-  const availableBalance = balance - pendingWithdrawal;
-  const availableBalanceText = formatCurrency(availableBalance);
-  const pendingBalanceText = formatCurrency(pendingWithdrawal);
-
-const allTransactions: any[] = [
-  ...(pendingWithdrawal > 0
-    ? [{
-        id: "pending",
-        type: 'debit' as const,
-        amount: pendingBalanceText,
-        description: "Pending withdrawal request",
-        date: "September 25, 2025"
-      }]
-    : []),
-  ...(transactions ?? [])
-];
-
-
-  const handleTopUp = () => {
-    setShowTopUpDialog(true);
-  };
 
 
 
@@ -281,9 +259,32 @@ const allTransactions: any[] = [
 
 
 
+  // Calculate available balance (total minus pending withdrawal)
+  // const availableBalance = balance - pendingWithdrawal;
+  const availableBalance = transactionsx.totalAmount;
+  const availableBalanceText = formatCurrency(availableBalance);
+  const pendingBalanceText = formatCurrency(pendingWithdrawal);
+
+const allTransactions: any[] = [
+  ...(pendingWithdrawal > 0
+    ? [{
+        id: "pending",
+        type: 'debit' as const,
+        amount: pendingBalanceText,
+        description: "Pending withdrawal request",
+        date: "September 25, 2025"
+      }]
+    : []),
+  ...(transactions ?? [])
+];
 
 
+  const handleTopUp = () => {
+    setShowTopUpDialog(true);
+  };
 
+
+//alert(customer.bankName);
 
 
 
@@ -371,7 +372,16 @@ const allTransactions: any[] = [
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <p className="text-white/80 text-sm">Available Balance</p>
-              <h2 className="text-3xl font-bold text-white">{availableBalanceText}</h2>
+              <h2 className="text-3xl font-bold text-white">
+                {
+              
+              ('₦' +
+                (availableBalance as number)
+                  .toFixed(2)
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string
+              }
+              </h2>
               {pendingWithdrawal > 0 && (
                 <div className="mt-2">
                   <p className="text-white/60 text-xs">Pending Withdrawal</p>
@@ -550,8 +560,11 @@ const allTransactions: any[] = [
 
       {/* Top Up Dialog */}
       <TopUpDialog
-        isOpen={showTopUpDialog}
-        onClose={() => setShowTopUpDialog(false)}
+          bankName={customer.bankName}
+          accountName={customer.bankAccountName}
+          accountNumber={customer.bankAccountNumber}
+          isOpen={showTopUpDialog}
+          onClose={() => setShowTopUpDialog(false)}
       />
 
       {/* Withdraw Dialog */}
