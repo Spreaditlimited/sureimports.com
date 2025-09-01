@@ -1,3 +1,4 @@
+import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 type PaystackDedicatedAccountResponse = {
@@ -15,6 +16,32 @@ export async function GET(
   request: Request,
   { params }: { params: { email: string } },
 ) {
+
+  //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID' 
+  // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
+  const emailx = params.email; // change this if pidUser is not the email
+
+
+    const user:any = await prisma.users.findUnique({
+      where: {
+        userEmail: emailx as string | undefined,
+      },
+    });
+
+  const debitAggregate = await prisma.debits.aggregate({
+    where: {
+      pidUser: user?.pidUser,
+      paymentStatus: 'DEBITED',
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+  const totalDebit = debitAggregate._sum.amount ?? 0;
+
+  console.log('Total Debit Amount:', totalDebit);
+
+
   try {
     const { email } = await params; // Properly destructure params
 
@@ -119,7 +146,8 @@ export async function GET(
     //initialize transaction data
     let transactionData = {
       transactions: [],
-      totalAmount: 0,
+      totalAmount: 0  - totalDebit,
+      totalDebit: totalDebit,
     };
     if (
       filteredTransaction.length > 0 ||
@@ -127,7 +155,8 @@ export async function GET(
     ) {
       transactionData = {
         transactions: filteredTransaction,
-        totalAmount: totalAmount / 100,
+        totalAmount: (totalAmount / 100) - totalDebit,
+        totalDebit: totalDebit,
       };
     } else {
     }

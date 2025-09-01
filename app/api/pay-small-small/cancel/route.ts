@@ -2,10 +2,17 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+
   const pidUser = request.nextUrl.searchParams.get('pidUser');
   const pidPaySmallSmall = request.nextUrl.searchParams.get('pidPaySmallSmall');
   const pidProduct = request.nextUrl.searchParams.get('pidProduct');
   const amount = request.nextUrl.searchParams.get('amount');
+
+  // console.log('pidUser:', pidUser);
+  // console.log('pidPaySmallSmall:', pidPaySmallSmall);
+  // console.log('pidProduct:', pidProduct);
+  // console.log('amount:', amount);
+  // return;
 
   const user: any = await prisma.users.findUnique({
     where: {
@@ -35,11 +42,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+
   // Update single
   const updatex = await prisma.paysmallsmall.update({
     where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
     data: { status: 'CANCELLED' },
   });
+  
 
   if (updatex) {
     //console.log('Deleted successfully');

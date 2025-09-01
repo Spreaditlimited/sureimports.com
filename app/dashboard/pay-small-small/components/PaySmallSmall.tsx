@@ -9,11 +9,7 @@ import { Checkbox } from './ui/checkbox'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from './ui/dialog'
 import  imgx  from './imports/logo.png'
 import svgPaths from "../imports/svg-vry8tcjx11"
-import imgImage from "asset/f92fee668398ade3037049641a93d24fd459fa68.png"
-import imgImage2 from "figma:asset/27d4ec04ddb84fba75591233e680f165d5cb6726.png"
-import imgAdobeExpressFile41 from "figma:asset/de3ce56cf2aad05726683d46c461a21611e2b82b.png"
-import imgImage3 from "figma:asset/ea715f49495dbfc812bf1773fc538cb0cbd3f088.png"
-import imgSubtract from "figma:asset/4964a0ebe3d64b53b49b697a91f64216e204411f.png"
+
 import { imgImage1, imgGroup } from "../imports/svg-2dlsy"
 import { useAuth } from '@/app/context/AuthContext'
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert'
@@ -300,11 +296,13 @@ export default function App({productx, status}: {productx: any, status: string})
   
     //CANCEL PAY SMALL SMALL
     const cancelPaySmallSmall = async (
+        productId: any,
         pidUser: any,
         pidPaySmallSmall: any,
         pidProduct: any,
         amount: any,
     ) => {
+
         toast.info('Cancelling Pay Small Small . . .');
         // Perform the action based on the button clicked
     
@@ -324,6 +322,7 @@ export default function App({productx, status}: {productx: any, status: string})
         if (data.statusx == 'SUCCESS') {
           toast.success(data.message);
           router.push('/dashboard/pay-small-small?status=CANCELLED');
+          setShowCancelDialog(false)
           //refreshComponent();
           //window.location.reload();
         }
@@ -340,13 +339,19 @@ export default function App({productx, status}: {productx: any, status: string})
       // You can perform other actions here like opening a modal
     };
   
+
+
+    
     // CLAIM PAY SMALL SMALL
-    const claimPaySmallSmall = (
+    const claimPaySmallSmall = async (
+      productId:any,
       pidUser: any,
       pidPaySmallSmall: any,
       pidProduct: any,
       amount: any,
     ) => {
+
+      //check if amount is valid for product claim
       if (parseFloat(transactions.totalAmount) < parseFloat(amount)) {
         toast.warning(
           (('You do not have suffient funds to claim this product. Fund your wallet with a minimum of ₦' +
@@ -358,8 +363,43 @@ export default function App({productx, status}: {productx: any, status: string})
         );
         return;
       }
-  
+
       toast.info('Processing Claim . . .');
+      
+      try {
+        const response = await fetch(
+          '/api/pay-small-small/claim?' +
+            'pidUser=' +
+            user?.pidUser +
+            '&pidPaySmallSmall=' +
+            pidPaySmallSmall +
+            '&pidProduct=' +
+            pidProduct +
+            '&amount=' +
+            amount,
+        );
+
+      const data: any = await response.json();
+
+      if (data.statusx == 'SUCCESS') {
+        toast.success(data.message);
+        router.push('/dashboard/pay-small-small?status=COMPLETED');
+        setShowCancelDialog(false)
+        //refreshComponent();
+        //window.location.reload();
+      }
+      if (data.statusx == 'FAILED') {
+        toast.warning(data.message);
+      }
+    } catch (statusx) {
+      toast.warning('Action failed! Error: ' + statusx);
+      //setError(error instanceof Error ? error.message : 'Unknown error');
+      //setStatus(statusx as string);
+    } finally {
+      setLoading(false);
+    }
+  
+
       // Perform the action based on the button clicked
     };
 
@@ -446,6 +486,7 @@ export default function App({productx, status}: {productx: any, status: string})
   const handleClaim = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
     
     claimPaySmallSmall(
+      productId,
       pidUser,
       pidPaySmallSmall,
       pidProduct,
@@ -469,13 +510,18 @@ export default function App({productx, status}: {productx: any, status: string})
 
     if (cancellingProductId === null) return
 
+    //alert(cancellingProductId);
+
     let productId = cancellingProductId[0];
-    let pidUser = cancellingProductId[1];
-    let pidPaySmallSmall = cancellingProductId[2];
+    let pidPaySmallSmall = cancellingProductId[1];
+    let pidUser = cancellingProductId[2];
     let pidProduct = cancellingProductId[3];
     let amount = cancellingProductId[4];
 
+    //alert(`Cancelling Pay Small Small for Product ID: ${productId}, pidUser: ${pidUser}, pidPaySmallSmall: ${pidPaySmallSmall}, pidProduct: ${pidProduct}, amount: ${amount}`);
+
     cancelPaySmallSmall(
+      productId,
       pidUser,
       pidPaySmallSmall,
       pidProduct,
@@ -484,7 +530,7 @@ export default function App({productx, status}: {productx: any, status: string})
 
 
     setIsProcessing(true)
-    setShowCancelDialog(false)
+    
 
     // Simulate processing time
     await new Promise(resolve => setTimeout(resolve, 1500))
@@ -566,8 +612,6 @@ export default function App({productx, status}: {productx: any, status: string})
 
     // Check if user can claim this product based on wallet balance
     const canClaim = hasSufficientBalance(product.amount)
-    
-
 
 
     return (
