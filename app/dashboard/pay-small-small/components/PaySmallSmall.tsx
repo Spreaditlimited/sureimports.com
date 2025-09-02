@@ -750,12 +750,12 @@ export default function App({productx, status}: {productx: any, status: string})
       <div className="relative z-10x container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
         
         {/* Header */}
-        <div className="text-center sm:text-left">
+        {/* <div className="text-center sm:text-left">
           <h1 className="text-3xl sm:text-4xl font-bold text-black dark:text-white">
             Pay Small Small
           </h1>
           <p className="text-muted-foreground mt-2 text-lg">Manage your installment payments with ease</p>
-        </div>
+        </div> */}
 
         {/* Virtual Account Details */}
         <div className="space-y-6">

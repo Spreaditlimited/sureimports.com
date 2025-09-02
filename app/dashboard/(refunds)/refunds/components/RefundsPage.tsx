@@ -258,7 +258,7 @@ export default function RefundsPage({records}: any) {
           {/* Header Section */}
           <div className="mb-6 sm:mb-8">
             <div className="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-6">
-              <div className="flex-1 min-w-0">
+              {/* <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-3">
                   <h1 className=" text-black dark:text-white text-2xl sm:text-3xl lg:text-4xl font-semibold text-foreground leading-tight">
                     Refunds
@@ -270,7 +270,7 @@ export default function RefundsPage({records}: any) {
                 <p className="text-base sm:text-lg text-foreground leading-relaxed dark:text-white">
                   Track Refunds & Requests across all services
                 </p>
-              </div>
+              </div> */}
               
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <button

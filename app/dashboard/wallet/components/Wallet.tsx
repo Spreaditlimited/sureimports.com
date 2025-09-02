@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import ImageWithFallback from "../../favicon.ico";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
@@ -12,6 +12,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
 import Loading from "../../loading";
 import { toast } from "sonner";
+import WalletTransactionTable from "../component/WalletTransactionTable";
 
 interface WalletProps {
   onBackToStore: () => void;
@@ -290,11 +291,11 @@ const allTransactions: any[] = [
 
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="bg-background min-h-screen md:pt-7">
       {/* Mobile Header */}
-      <div className="md:hidden bg-[#0e0e1f] dark:bg-card w-full pt-12 pb-4">
+      {/* <div className="md:hidden bg-[#0e0e1f] dark:bg-card w-full pt-12 pb-4">
         <div className="relative h-[42px] flex items-center">
-          {/* Back Button */}
+
           <button
             onClick={() =>
               router.push('/dashboard/store?id=laptop')
@@ -306,20 +307,20 @@ const allTransactions: any[] = [
             </svg>
           </button>
           
-          {/* Title */}
+
           <div className="absolute left-1/2 transform -translate-x-1/2">
             <h1 className="text-white dark:text-foreground font-medium">My Wallet</h1>
           </div>
           
-          {/* Theme Toggle */}
+
           <div className="absolute right-4">
             <ThemeToggle />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Desktop Header */}
-      <div className="hidden md:block bg-background mx-auto max-w-7xl px-8 py-12">
+      {/* <div className="hidden md:block bg-background mx-auto max-w-7xl px-8 py-12">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -337,7 +338,7 @@ const allTransactions: any[] = [
             </div>
             <div className="flex items-center gap-3">
               <ThemeToggle />
-              {/* <button
+               <button
                 onClick={onBulkBuyer}
                 className="bg-purple-600 hover:bg-purple-700 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg"
               >
@@ -350,7 +351,7 @@ const allTransactions: any[] = [
                   </svg>
                 </div>
                 <span className="font-medium text-white text-sm">Bulk Buyer?</span>
-              </button> */}
+              </button> 
               <button
                 onClick={() =>
                   router.push('/dashboard/store?id=laptop')
@@ -370,7 +371,7 @@ const allTransactions: any[] = [
             Manage your wallet balance, view transactions, and withdraw funds.
           </p>
         </div>
-      </div>
+      </div> */}
 
       {/* Content */}
       <div className="px-5 md:px-8 pb-8 md:max-w-7xl md:mx-auto pt-6 md:pt-0">
@@ -460,7 +461,7 @@ const allTransactions: any[] = [
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-foreground">Shop Now</p>
+                <p className="font-medium text-foreground dark:text-white">Shop Now</p>
                 <p className="text-sm text-muted-foreground">Use wallet balance</p>
               </div>
             </div>
@@ -477,7 +478,7 @@ const allTransactions: any[] = [
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-foreground">My Orders</p>
+                <p className="font-medium text-foreground dark:text-white">My Orders</p>
                 <p className="text-sm text-muted-foreground">Track purchases</p>
               </div>
             </div>
@@ -491,7 +492,7 @@ const allTransactions: any[] = [
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-foreground">Add Funds</p>
+                <p className="font-medium text-foreground dark:text-white">Add Funds</p>
                 <p className="text-sm text-muted-foreground">Top up wallet</p>
               </div>
             </div>
@@ -502,65 +503,88 @@ const allTransactions: any[] = [
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Recent Transactions</h3>
           
-          {allTransactions.length > 0 ? (
-            <div className="space-y-4">
-              {allTransactions.map((transaction) => (
-                <div key={transaction.id} className={`flex items-center justify-between p-4 border rounded-lg ${
-                  transaction.id === 'pending' 
-                    ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20' 
-                    : 'border-border'
-                }`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                      transaction.id === 'pending'
-                        ? 'bg-amber-100 dark:bg-amber-900/30'
-                        : transaction.type === 'credit' 
-                        ? 'bg-green-100 dark:bg-green-900/30' 
-                        : 'bg-red-100 dark:bg-red-900/30'
-                    }`}>
-                      {transaction.id === 'pending' ? (
-                        <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
-                        </svg>
-                      ) : transaction.type === 'credit' ? (
-                        <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16L3 12L7 8M21 12H3" />
-                        </svg>
-                      ) : (
-                        <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8L21 12L17 16M3 12H21" />
-                        </svg>
-                      )}
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">{transaction.description}</p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span>{transaction.date}</span>
-                        {transaction.orderNumber && (
-                          <>
-                            <span>•</span>
-                            <span>{transaction.orderNumber}</span>
-                          </>
-                        )}
+          {transactionsx.transactions.length > 0 ? (
+
+                  <div className="p-4">
+                    <div className="space-y-4">
+                      <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-gray-500">
+                        <Suspense fallback={<Loading />}>
+                          {transactionsx.transactions.length > 0 && (
+                            <WalletTransactionTable
+                              transactions={transactionsx.transactions}
+                            />
+                          )}
+                          {transactionsx.transactions.length == 0 && (
+                            <div className="flex items-center justify-center p-4">
+                              <p className="text-sm text-gray-600 dark:text-gray-800">
+                                No transactions available
+                              </p>
+                            </div>
+                          )}
+                        </Suspense>
                       </div>
                     </div>
                   </div>
 
+            // {allTransactions.length > 0 ? (
+            // <div className="space-y-4">
+            //   {allTransactions.map((transaction) => (
+            //     <div key={transaction.id} className={`flex items-center justify-between p-4 border rounded-lg ${
+            //       transaction.id === 'pending' 
+            //         ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20' 
+            //         : 'border-border'
+            //     }`}>
+            //       <div className="flex items-center gap-3">
+            //         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+            //           transaction.id === 'pending'
+            //             ? 'bg-amber-100 dark:bg-amber-900/30'
+            //             : transaction.type === 'credit' 
+            //             ? 'bg-green-100 dark:bg-green-900/30' 
+            //             : 'bg-red-100 dark:bg-red-900/30'
+            //         }`}>
+            //           {transaction.id === 'pending' ? (
+            //             <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+            //             </svg>
+            //           ) : transaction.type === 'credit' ? (
+            //             <svg className="w-5 h-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16L3 12L7 8M21 12H3" />
+            //             </svg>
+            //           ) : (
+            //             <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            //               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8L21 12L17 16M3 12H21" />
+            //             </svg>
+            //           )}
+            //         </div>
+            //         <div>
+            //           <p className="font-medium text-foreground">{transaction.description}</p>
+            //           <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            //             <span>{transaction.date}</span>
+            //             {transaction.orderNumber && (
+            //               <>
+            //                 <span>•</span>
+            //                 <span>{transaction.orderNumber}</span>
+            //               </>
+            //             )}
+            //           </div>
+            //         </div>
+            //       </div>
 
-                  <div className={`font-semibold ${
-                        transaction.id === 'pending'
-                        ? 'text-amber-600 dark:text-amber-400'
-                        : transaction.type === 'credit' 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
-                    {transaction.id === 'pending' ? 'Pending ' : transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
-                  </div>
+
+            //       <div className={`font-semibold ${
+            //             transaction.id === 'pending'
+            //             ? 'text-amber-600 dark:text-amber-400'
+            //             : transaction.type === 'credit' 
+            //             ? 'text-green-600 dark:text-green-400' 
+            //             : 'text-red-600 dark:text-red-400'
+            //         }`}>
+            //         {transaction.id === 'pending' ? 'Pending ' : transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
+            //       </div>
 
 
-                </div>
-              ))}
-            </div>
+            //     </div>
+            //   ))}
+            // </div>
           ) : (
             <div className="text-center py-8">
               <div className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground">
@@ -568,7 +592,7 @@ const allTransactions: any[] = [
                   <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">No transactions yet</h3>
+              <h3 className="text-lg font-medium text-foreground mb-2 dark:text-white">No transactions yet</h3>
               <p className="text-muted-foreground">Your transaction history will appear here</p>
             </div>
           )}

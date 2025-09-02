@@ -183,7 +183,7 @@ export default function ProductDetails({ product }: any) {
               onClick={() =>
                 //alert('Pay Small Small is Coming Soon, check back later')
                 router.push(
-                  '/dashboard/store/pay-small-small?id=' + product.pidProduct,
+                  '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
                 )
               }
               className="mt-5 flex w-full flex-1 items-center justify-center rounded-md bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-700 xl:mt-0"
