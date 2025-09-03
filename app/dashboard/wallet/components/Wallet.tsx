@@ -501,13 +501,13 @@ const allTransactions: any[] = [
 
         {/* Transaction History */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Recent Transactions</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Recent Transactions</h3>
           
           {transactionsx.transactions.length > 0 ? (
 
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-gray-500">
+                  <div className="p-1">
+                    <div className="space-y-1">
+                      <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-black-500">
                         <Suspense fallback={<Loading />}>
                           {transactionsx.transactions.length > 0 && (
                             <WalletTransactionTable

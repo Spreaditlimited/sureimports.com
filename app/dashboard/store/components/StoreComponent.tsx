@@ -38,6 +38,7 @@ function Procurement({ products, categories, brands, id, id2 }: any) {
   return (
     <>
       <div className="bg-slate-100 px-4 py-[25px] text-slate-800 dark:bg-slate-900 dark:text-white">
+        {/* 
         <div className="flex flex-col gap-[8px] xl:w-[704px]">
           <div className="text-[22px] font-bold capitalize text-slate-800 dark:text-white">
             Buy Phones and Laptops
@@ -49,7 +50,8 @@ function Procurement({ products, categories, brands, id, id2 }: any) {
           complete with all accessories, and includes a one-year warranty for
           your peace of mind. Laptops are pre-owned and come with a bag and
           charger and a 3-month warranty.
-        </p>
+        </p> 
+        */}
 
         <div className="flex flex-col gap-[25px]">
           <div className="flex flex-col justify-start xl:flex-row xl:items-center xl:justify-between">

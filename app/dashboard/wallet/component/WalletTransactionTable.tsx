@@ -42,9 +42,9 @@ const WalletTransactionTable: React.FC<any> = ({ transactions }) => {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg bg-white shadow dark:text-gray-100">
-      <table className="min-w-full divide-y divide-gray-200 dark:text-gray-100">
-        <thead className="text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+    <div className="overflow-x-auto rounded-lg bg-white shadow dark:text-black-100">
+      <table className="min-w-full divide-y divide-dark-200 dark:text-black-100">
+        <thead className="text-black-800 dark:bg-black dark:text-black-200">
           <tr>
             <th
               scope="col"
@@ -79,15 +79,16 @@ const WalletTransactionTable: React.FC<any> = ({ transactions }) => {
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-gray-200 bg-white dark:bg-gray-600 dark:text-gray-100">
+        <tbody className="divide-y divide-gray-200 dark:bg-black dark:bg-black-600 dark:text-gray-100">
           {transactions.map((transaction: any) => (
             <tr
               key={transaction.id}
-              className="hover:bg-gray-200 dark:text-gray-100 dark:hover:bg-gray-700"
+              className="hover:bg-black dark:text-gray-100 dark:hover:bg-black-700"
             >
               <td className="whitespace-nowrap px-6 py-4">
                 <div className="flex items-center">
                   <div className="ml-4">
+
                     <div className="text-sm font-medium">
                       {transaction.reference}
                     </div>
@@ -96,6 +97,7 @@ const WalletTransactionTable: React.FC<any> = ({ transactions }) => {
                       {transaction.customer.first_name}{' '}
                       {transaction.customer.last_name}
                     </div>
+
                   </div>
                 </div>
               </td>

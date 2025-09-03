@@ -23,7 +23,7 @@ function VerifySupplier(props: UserLayoutProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
-      <div className="p-4">
+      <div className="p-4 dark:bg-black">
         <div className="flex justify-between max-sm:flex-col">
           <div
             className="text-[28px] font-bold text-slate-800 dark:text-slate-200 max-sm:pb-4"
@@ -44,7 +44,7 @@ function VerifySupplier(props: UserLayoutProps) {
           </Button>
         </div>
 
-        <div className="mt-[20px] items-start justify-center gap-2 rounded-xl bg-white p-5 py-[15px] text-base font-normal text-slate-600 dark:bg-[#161629] dark:text-white max-sm:pl-4 md:flex-row">
+        <div className="mt-[7px] items-start justify-center gap-2 rounded-xl bg-white p-2 py-[10px] text-base font-normal text-slate-600 dark:bg-black dark:text-white max-sm:pl-4 md:flex-row">
           We carry out <b>on-site verification</b> of your supplier in China.
         </div>
       </div>

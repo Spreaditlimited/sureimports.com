@@ -115,8 +115,10 @@ function Procurement() {
         </div> */}
       </Modal>
 
-      <div className="bg-slate-50 px-4 py-[25px] text-slate-800 dark:bg-slate-900 dark:text-white">
+      <div className="dark:bg-black bg-slate-50 px-4 py-[25px] text-slate-800 dark:text-white">
         <div className="flex flex-col gap-[25px]">
+          
+          
           <div className="flex flex-col justify-start xl:flex-row xl:items-center xl:justify-between">
             <div className="flex flex-col gap-[8px] xl:w-[704px]">
               <div className="text-[22px] font-bold capitalize text-slate-800 dark:text-white">
@@ -152,8 +154,10 @@ function Procurement() {
               <CreateOrder />
             </div>
           </div>
-          <div className="mb-[20px] flex w-full justify-center">
-            <div className="flex h-[60px] w-full items-center justify-center rounded-xl bg-white px-3 text-sm font-semibold uppercase leading-[21px] text-slate-950 shadow dark:bg-gray-800 dark:text-white dark:shadow-gray-700">
+
+
+          <div className="mb-[20px] flex w-full justify-center bg-card rounded-[20px] border border-border shadow-sm">
+            <div className="dark:bg-black flex h-[60px] w-full items-center justify-center rounded-xl bg-white px-3 text-sm font-semibold uppercase leading-[21px] text-slate-950 shadow  dark:text-white dark:shadow-gray-700">
               These are some of the stores we can buy products from…
             </div>
           </div>
