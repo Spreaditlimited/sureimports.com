@@ -5,6 +5,7 @@ import Wallet from "./components/Wallet";
 export default function Home() {
   return (
     <>
+    <div className="dark:bg-black">
           <div className="p-4 dark:bg-black">
             <div className="flex justify-between max-sm:flex-col">
               <div
@@ -20,6 +21,7 @@ export default function Home() {
             </div>
           </div>
       <Wallet />
+      </div>
     </>
   );
 }

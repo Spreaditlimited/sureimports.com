@@ -120,7 +120,7 @@ export function OrderList({ params }: orderStatus) {
   if (!productData) return <Loader />;
   if (countRecords.length == 0)
     return (
-      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold">
+      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold dark:bg-black">
         <div className="rounded border-2 border-dotted border-gray-500 p-4">
           <p className="text-center text-gray-500">
             No {statusx} request available
@@ -131,7 +131,7 @@ export function OrderList({ params }: orderStatus) {
 
   return (
     <>
-      <div>
+      <div className='dark:bg-black'>
         <Orders initialOrders={productData as any} statusx={statusx} />
       </div>
     </>

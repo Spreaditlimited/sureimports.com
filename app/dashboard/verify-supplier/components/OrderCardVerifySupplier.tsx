@@ -110,7 +110,7 @@ const OrderCard: React.FC<ProductsProps> = ({
   const { isModalOpen, openModal, closeModal } = useModal();
 
   //initialize alert system
-  const [userEmail, setEmail] = useState(user?.email);
+  const [userEmail, setEmail] = useState(user?.userEmail);
   const [isLoading, setLoading] = React.useState(false);
   const [message, setMessage] = React.useState('');
   const [isAgreed, setIsAgreed] = useState(false);
@@ -236,7 +236,7 @@ const OrderCard: React.FC<ProductsProps> = ({
 
   return (
     <>
-      <div className="pl-4 pr-4">
+      <div className="pl-4 pr-4 dark:bg-black">
         <Accordion type="single" collapsible>
           <AccordionItem value="item-1">
             <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-[#161629] sm:flex-row xl:h-[100px] xl:items-center">
@@ -577,25 +577,20 @@ const OrderCard: React.FC<ProductsProps> = ({
 
                             {/* *********************************************************************************************************** */}
                             <FlutterwavePaymentButton
-                              amount={amount}
-                              email={user?.email as string}
-                              name={user?.name as string}
-                              phone_number={''}
-                              currency={currency}
-                              payment_type={'CARD'}
-                              consumer_id={user?.pidUser as string}
-                              service_id={pidVerifySupplier}
-                              service_name={'PROCUREMENT'}
-                              description={
-                                'This is General Procuremnt & Shipping Service'
-                              }
-                              isDisabled={isDisabled}
-                              className={
-                                isDisabled
+                                amount={amount}
+                                email={user?.userEmail as string}
+                                name={user?.userFirstname as string}
+                                phone_number={''}
+                                currency={currency}
+                                payment_type={'CARD'}
+                                consumer_id={user?.pidUser as string}
+                                service_id={pidVerifySupplier}
+                                service_name={'PROCUREMENT'}
+                                description={'This is General Procuremnt & Shipping Service'}
+                                isDisabled={isDisabled}
+                                className={isDisabled
                                   ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
-                              }
-                            />
+                                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'} destinationCountry={''}                            />
                             {/* *********************************************************************************************************** */}
                           </Modal>
                         </div>

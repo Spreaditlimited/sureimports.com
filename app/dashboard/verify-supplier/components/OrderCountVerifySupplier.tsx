@@ -75,7 +75,7 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
 
   return (
     <>
-      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-slate-800 xl:flex-row xl:items-start">
+      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-black xl:flex-row xl:items-start">
         <div className="my-[20px] grid w-full justify-between gap-3 max-sm:justify-center md:grid-cols-2 xl:flex">
           {cards.map((card, index) => (
             <div
@@ -88,7 +88,7 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
                 router.push(card.href);
               }}
             >
-              <div className="m-3 rounded-lg bg-slate-100 dark:bg-slate-800">
+              <div className="m-3 rounded-lg bg-slate-100 dark:bg-black">
                 <Image
                   src={card.image}
                   alt={card.title}

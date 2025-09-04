@@ -26,7 +26,7 @@ function VerifySupplier() {
   return (
     <div className="h-full">
       <div className="p-[25px]">
-        <div className="text-[28px] font-bold text-slate-800 dark:text-white max-sm:pb-4">
+        <div className="text-[28px] font-bold text-slate-800 dark:text-white max-sm:pb-4 dark:bg-black">
           Request to Verify a Supplier
         </div>
         <div className="text-base font-normal text-slate-600 dark:text-slate-300 xl:w-[930px]">
@@ -35,7 +35,7 @@ function VerifySupplier() {
           business days.
         </div>
       </div>
-      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-slate-800 lg:flex-row xl:items-start">
+      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-black lg:flex-row xl:items-start">
         <div className="w-full">
           <VerifySupplierForm />
         </div>

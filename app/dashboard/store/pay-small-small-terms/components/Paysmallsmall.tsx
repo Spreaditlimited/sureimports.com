@@ -64,13 +64,13 @@ function ProductCard({product}: any) {
 
 function ProductInfo({product, amount}:any) {
   return (
-    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-[30px] bg-white/80 backdrop-blur-sm rounded-b-[20px]">
+    <div className="absolute bottom-0 left-0 right-0 p-4 md:p-[30px] bg-white/80 backdrop-blur-sm rounded-b-[20px] dark:bg-black border-slate-600">
       <div className="space-y-2.5">
         <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm">
         {product.productBrand}
         </Badge>
         <div className="space-y-1">
-          <h2 className="text-xl md:text-[28px] font-semibold text-slate-800 leading-tight">
+          <h2 className="text-xl md:text-[28px] font-semibold text-slate-800 leading-tight dark:text-white">
           {product.productName}
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
@@ -83,7 +83,7 @@ function ProductInfo({product, amount}:any) {
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
               }
             </span>
-            <span className="text-sm md:text-base text-slate-800">
+            <span className="text-sm md:text-base text-slate-800 dark:text-white">
               Inclusive of 5% PSS Fee
             </span>
           </div>
@@ -104,7 +104,7 @@ function StepCard({ number, children }: StepCardProps) {
       <Badge className="absolute top-4 left-4 bg-indigo-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold p-0">
         {number}
       </Badge>
-      <div className="mt-8 text-xs md:text-sm text-slate-800 leading-relaxed">
+      <div className="mt-8 text-xs md:text-sm text-slate-800 leading-relaxed dark:text-white">
         {children}
       </div>
     </Card>
@@ -159,7 +159,7 @@ function PaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: 
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="phone" className="text-sm text-slate-800">
+        <Label htmlFor="phone" className="text-sm text-slate-800 dark:text-white">
           Phone Number
         </Label>
         <Input
@@ -171,7 +171,7 @@ function PaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: 
           className="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-800 focus:border-transparent"
         />
       </div>
-      <p className="text-sm text-slate-800">
+      <p className="text-sm text-slate-800 dark:text-white">
         Once ready, click the button below to begin.
       </p>
       <Button
@@ -231,20 +231,20 @@ function MobileProductImage({product}:any) {
 
 function MobileProductInfo() {
   return (
-    <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full">
+    <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full dark:bg-black">
       <div className="flex flex-col gap-2.5">
         <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm w-fit">
           HP
         </Badge>
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-slate-800 leading-tight">
+          <h2 className="text-lg font-semibold text-slate-800 leading-tight dark:text-white">
             HP EliteBook x360 1040 G8 – Power Meets Elegance
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span className="text-base font-semibold text-indigo-800">
               ₦1,015,875.00
             </span>
-            <span className="text-sm text-slate-800">
+            <span className="text-sm text-slate-800 dark:text-white">
               Inclusive of 5% PSS Fee
             </span>
           </div>
@@ -362,7 +362,7 @@ function MobileHowItWorks({ currentStep, onStepChange }: MobileHowItWorksProps) 
               <Badge className="bg-indigo-800 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold p-0 mb-4">
                 {step.number}
               </Badge>
-              <p className="text-sm text-slate-800 leading-relaxed">
+              <p className="text-sm text-slate-800 leading-relaxed dark:text-white">
                 {step.content}
               </p>
             </Card>
@@ -424,7 +424,7 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
 
   return (
     <div className="flex flex-col gap-2.5 w-full">
-      <Label htmlFor="phone-mobile" className="text-sm text-slate-800">
+      <Label htmlFor="phone-mobile" className="text-sm text-slate-800 dark:text-white">
         Phone Number
       </Label>
       <Input
@@ -435,7 +435,7 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
         onChange={(e) => onPhoneNumberChange(e.target.value)}
         className="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-800 focus:border-transparent"
       />
-      <p className="text-sm text-slate-800">
+      <p className="text-sm text-slate-800 dark:text-white">
         Once ready, click the button below to begin.
       </p>
       <Button
@@ -519,14 +519,14 @@ export default function App({ product }: any) {
   return (
     <>
       {/* Mobile Layout */}
-      <div className="sm:hidden bg-slate-50 w-full min-h-screen">
+      <div className="sm:hidden bg-slate-50 w-full min-h-screen dark:bg-black">
         <div className="flex flex-col px-5 py-6 gap-6 w-full">
           {/* Page Title */}
-          <div className="w-full">
+          {/* <div className="w-full">
             <h1 className="text-lg font-semibold text-slate-800">
               Pay Small Small Terms
             </h1>
-          </div>
+          </div> */}
 
           {/* Product Section */}
           <div className="flex flex-col gap-2.5 w-full max-w-[390px] mx-auto">
@@ -537,13 +537,13 @@ export default function App({ product }: any) {
           </div>
 
           {/* Content Section */}
-          <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full max-w-[390px] mx-auto">
+          <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full max-w-[390px] mx-auto dark:bg-black dark:text-white">
             <div className="flex flex-col gap-2.5 w-full">
-              <h2 className="text-base font-semibold text-slate-800">
-                Pay Small Small
+              <h2 className="text-base font-semibold text-slate-800 dark:text-white">
+                Pay Small Small Terms
               </h2>
               
-              <div className="flex flex-col gap-1 text-sm text-slate-800">
+              <div className="flex flex-col gap-1 text-sm text-slate-800 dark:text-white">
                 <p>Thank you for choosing the "Pay Small Small" option on Sure Imports.</p>
                 <p>
                   This flexible payment plan allows you to pay for your selected product
@@ -553,7 +553,7 @@ export default function App({ product }: any) {
                 </p>
               </div>
               
-              <h3 className="text-base font-semibold text-slate-800 mt-2">
+              <h3 className="text-base font-semibold text-slate-800 mt-2 dark:text-white">
                 Here's how it works:
               </h3>
               
@@ -573,7 +573,7 @@ export default function App({ product }: any) {
               </div>
               
               <div className="flex flex-col gap-2.5 mt-4">
-                <p className="text-sm text-slate-800">
+                <p className="text-sm text-slate-800 dark:text-white">
                   To proceed, please ensure your Sure Imports account profile includes your phone number. If it's missing, kindly enter it below.
                 </p>
                 <MobilePaymentForm
@@ -589,15 +589,15 @@ export default function App({ product }: any) {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden sm:block min-h-screen bg-slate-50 relative overflow-x-hidden">
+      <div className="hidden sm:block min-h-screen bg-slate-50 relative overflow-x-hidden dark:bg-black">
         {/* Content */}
         <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 max-w-7xl">
           {/* Header */}
-          <div className="mb-8 md:mb-16">
+          {/* <div className="mb-8 md:mb-16">
             <h1 className="text-xl md:text-[22px] font-semibold text-slate-800">
               Pay Small Small Terms
             </h1>
-          </div>
+          </div> */}
 
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
             {/* Product Section */}
@@ -610,13 +610,13 @@ export default function App({ product }: any) {
 
             {/* Information Section */}
             <div className="flex-1">
-              <Card className="w-full bg-neutral-50 border border-[rgba(0,0,0,0.05)]">
+              <Card className="w-full bg-neutral-50 border border-[rgba(0,0,0,0.05)] dark:bg-black ">
                 <CardContent className="p-4 md:p-8 space-y-6">
                   <div>
-                    <h2 className="text-lg md:text-[18px] font-semibold text-slate-800 mb-4">
+                    <h2 className="text-lg md:text-[18px] font-semibold text-slate-800 mb-4 dark:text-white">
                       Pay Small Small
                     </h2>
-                    <div className="space-y-4 text-sm md:text-[14px] text-slate-800">
+                    <div className="space-y-4 text-sm md:text-[14px] text-slate-800 dark:text-white">
                       <p>Thank you for choosing the "Pay Small Small" option on Sure Imports.</p>
                       <p>
                         This flexible payment plan allows you to pay for your selected product
@@ -628,14 +628,14 @@ export default function App({ product }: any) {
                   </div>
 
                   <div>
-                    <h3 className="text-base md:text-[16px] font-semibold text-slate-800 mb-4">
+                    <h3 className="text-base md:text-[16px] font-semibold text-slate-800 mb-4 dark:text-white">
                       Here's how it works:
                     </h3>
                     <HowItWorks />
                   </div>
 
                   <div>
-                    <h3 className="text-base md:text-[16px] text-slate-800 mb-4">
+                    <h3 className="text-base md:text-[16px] text-slate-800 mb-4 dark:text-white">
                       To proceed, please ensure your Sure Imports account profile includes your phone number. If it's missing, kindly enter it below.
                     </h3>
                     <PaymentForm

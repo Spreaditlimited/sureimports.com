@@ -22,7 +22,7 @@ function VerifySupplier(props: UserLayoutProps) {
   const path = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
+    <div className="min-h-screen bg-slate-50 dark:bg-black">
       <div className="p-4 dark:bg-black">
         <div className="flex justify-between max-sm:flex-col">
           <div

@@ -4,7 +4,7 @@ import Image from 'next/image';
 function SpecialInstructions() {
   return (
     <div className="relative flex justify-center xl:h-[860px] xl:w-[567px]">
-      <div className="absolute mx-2 my-3 rounded-[10px] bg-white backdrop-blur-3xl dark:bg-slate-800 max-xl:w-[340px] max-sm:px-2 sm:h-[320px] md:bottom-0 md:mx-0 md:ml-2 lg:ml-0 xl:w-[527px]">
+      <div className="absolute mx-2 my-3 rounded-[10px] bg-white backdrop-blur-3xl dark:bg-black max-xl:w-[340px] max-sm:px-2 sm:h-[320px] md:bottom-0 md:mx-0 md:ml-2 lg:ml-0 xl:w-[527px]">
         <div className="m-5">
           <div className="text-xl font-bold text-slate-800 dark:text-white">
             Special Instructions

@@ -37,7 +37,7 @@ function Procurement({ products, categories, brands, id, id2 }: any) {
 
   return (
     <>
-      <div className="bg-slate-100 px-4 py-[25px] text-slate-800 dark:bg-slate-900 dark:text-white">
+      <div className="bg-slate-100 px-4 py-[25px] text-slate-800 dark:bg-black dark:text-white">
         {/* 
         <div className="flex flex-col gap-[8px] xl:w-[704px]">
           <div className="text-[22px] font-bold capitalize text-slate-800 dark:text-white">

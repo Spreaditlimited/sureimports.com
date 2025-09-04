@@ -291,7 +291,7 @@ const allTransactions: any[] = [
 
 
   return (
-    <div className="bg-background min-h-screen md:pt-7">
+    <div className="bg-background dark:bg-black min-h-screen md:pt-7">
       {/* Mobile Header */}
       {/* <div className="md:hidden bg-[#0e0e1f] dark:bg-card w-full pt-12 pb-4">
         <div className="relative h-[42px] flex items-center">
@@ -416,8 +416,10 @@ const allTransactions: any[] = [
               Top Up
             </Button>
             <Button
+            disabled
               onClick={handleWithdraw}
-              disabled={availableBalance <= 0 || pendingWithdrawal > 0}
+              //disabled={availableBalance <= 0 || pendingWithdrawal > 0}
+              //disabled={true}
               className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
               variant="outline"
             >
@@ -467,6 +469,7 @@ const allTransactions: any[] = [
             </div>
           </Card>
 
+          {/*
           <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" 
           onClick={() =>
             router.push('/dashboard/store?id=laptop')
@@ -482,21 +485,26 @@ const allTransactions: any[] = [
                 <p className="text-sm text-muted-foreground">Track purchases</p>
               </div>
             </div>
-          </Card>
+          </Card> 
+          */}
 
           <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={handleTopUp}>
             <div className="flex items-center gap-3">
+              
               <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V12M12 12V18M12 12H18M12 12H6" />
                 </svg>
               </div>
+
               <div>
                 <p className="font-medium text-foreground dark:text-white">Add Funds</p>
                 <p className="text-sm text-muted-foreground">Top up wallet</p>
               </div>
+
             </div>
           </Card>
+
         </div>
 
         {/* Transaction History */}

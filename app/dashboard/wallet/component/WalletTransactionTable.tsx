@@ -83,7 +83,7 @@ const WalletTransactionTable: React.FC<any> = ({ transactions }) => {
           {transactions.map((transaction: any) => (
             <tr
               key={transaction.id}
-              className="hover:bg-black dark:text-gray-100 dark:hover:bg-black-700"
+              className="hover:bg-slate-200 dark:text-gray-100 dark:hover:bg-black"
             >
               <td className="whitespace-nowrap px-6 py-4">
                 <div className="flex items-center">
