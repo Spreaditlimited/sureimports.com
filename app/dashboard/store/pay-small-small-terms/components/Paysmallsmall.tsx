@@ -591,7 +591,7 @@ export default function App({ product }: any) {
       {/* Desktop Layout */}
       <div className="hidden sm:block min-h-screen bg-slate-50 relative overflow-x-hidden dark:bg-black">
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+        <div className="relative z-10x container mx-auto px-4 py-8 md:py-16 max-w-7xl">
           {/* Header */}
           {/* <div className="mb-8 md:mb-16">
             <h1 className="text-xl md:text-[22px] font-semibold text-slate-800">
