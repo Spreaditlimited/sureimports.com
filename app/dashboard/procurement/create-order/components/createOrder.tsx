@@ -22,7 +22,7 @@ function CreateOrder() {
   return (
     <Dialog open={isOpen.isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="h-[49px] py-[15px] font-normal max-md:w-full md:px-[30px] xl:w-[162px]">
+        <Button className="h-[49px] py-[15px] font-normal max-md:w-full md:px-[30px] xl:w-[162px] dark:bg-black">
           Create Order
         </Button>
       </DialogTrigger>
@@ -32,7 +32,7 @@ function CreateOrder() {
             Create New Order
           </DialogTitle>
         </DialogHeader>
-        <div className="max-h-[calc(90vh-80px)] overflow-y-auto px-6 py-4">
+        <div className="max-h-[calc(90vh-80px)] overflow-y-auto px-6 py-4 dark:bg-black">
           <CreateOrderForm setIsOpen={setIsOpen} />
           {/* <CreateOrderForm /> */}
         </div>
