@@ -230,10 +230,10 @@ function OrderCard({ id, order, onDelete }: OrderCardProps) {
   //if (countRecords.length == 0)
 
   return (
-    <div key={reloadKey} className="">
+    <div key={reloadKey} className="dark:bg-black">
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
-          <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-[#161629] lg:flex-row xl:h-[100px] xl:items-center">
+          <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-black lg:flex-row xl:h-[100px] xl:items-center">
             <div>
               <div className="flex flex-row gap-4">
                 <div className="flex h-[60px] w-[60px] items-center justify-center rounded-lg bg-slate-100 text-center text-4xl capitalize text-slate-300 dark:bg-slate-800 dark:text-white">

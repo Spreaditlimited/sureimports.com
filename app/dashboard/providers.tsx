@@ -71,16 +71,16 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
         disableTransitionOnChange
       >
         <ModalProvider>
-          <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-gray-800 dark:text-white">
+          <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-black dark:text-white">
             <div className="a-auto z-20 flex">
               <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />
             </div>
             <Header />
 
-            <div className="mt-[90px] flex h-full min-h-screen flex-col overflow-hidden bg-slate-50 dark:bg-slate-800 lg:ml-[80px]">
+            <div className="mt-[90px] flex h-full min-h-screen flex-col overflow-hidden bg-slate-50 dark:bg-black lg:ml-[80px]">
               <main
                 className={cn(
-                  'hide-scrollbar h-full overflow-x-hidden overflow-y-scroll bg-slate-50 pb-1 transition-all duration-200 dark:bg-slate-800',
+                  'hide-scrollbar h-full overflow-x-hidden overflow-y-scroll bg-slate-50 pb-1 transition-all duration-200 dark:bg-black',
                   isOpen && 'lg:ml-[156px]',
                 )}
               >

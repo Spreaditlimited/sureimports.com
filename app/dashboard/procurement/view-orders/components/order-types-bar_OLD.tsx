@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { OrderTypeItems } from './order-types';
+
 import { buttonVariants } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/_lib/utils';

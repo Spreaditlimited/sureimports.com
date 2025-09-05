@@ -12,7 +12,7 @@ type UserLayoutProps = {
 
 const ProcurementLayout = (props: UserLayoutProps) => {
   return (
-    <main className="bg-slate-50 dark:bg-slate-800">
+    <main className="bg-slate-50 dark:bg-black">
       <AuthProvider>
         <RecordCountProcurementProvider>
           <Header />

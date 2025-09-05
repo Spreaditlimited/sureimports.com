@@ -37,10 +37,11 @@ function Procurement() {
 
   return (
     <>
+    <div className='dark:bg-black'>
       {/* MODAL VIEW STARTS */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <hr />
-        <h2 className="p-3 text-3xl font-bold text-gray-700">
+        <h2 className="p-3 text-3xl font-bold text-gray-700 dark:bg-black dark:text-white">
           (1) How to create Orders on SureImports
         </h2>
         <hr />
@@ -93,12 +94,12 @@ function Procurement() {
         <br />
         <hr />
 
-        <h2 className="p-3 text-3xl font-bold text-gray-700">
+        <h2 className="p-3 text-3xl font-bold text-gray-700 dark:bg-black dark:text-white">
           (3) Import from 1688.com to the UK
         </h2>
         <hr />
         <br />
-        <div className="relative h-0 w-full pb-[56.25%]">
+        <div className="relative h-0 w-full pb-[56.25%] dark:bg-black">
           <iframe
             className="absolute left-0 top-0 h-full w-full"
             src={`https://www.youtube.com/embed/${'nX5S-SIr_To'}`}
@@ -163,7 +164,7 @@ function Procurement() {
           </div>
         </div>
         <Stores />
-      </div>
+      </div></div> 
     </>
   );
 }

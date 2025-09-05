@@ -88,7 +88,7 @@ function OrderSection({ initialOrders }: OrderSectionProps) {
   }, [orders, reloadKey]);
 
   return (
-    <div key={reloadKey} className="flex w-full flex-col gap-3">
+    <div key={reloadKey} className="flex w-full flex-col gap-3 dark:bg-black">
       {orders.map((order: any, index: any) => (
         <OrderCard
           key={order.id}

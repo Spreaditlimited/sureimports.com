@@ -8,6 +8,7 @@ import { useModal } from '@/app/context/ModalContext';
 import { useAuth } from '@/lib/AuthContext';
 import ProductsList from './ProductsList';
 import { BiMobile } from 'react-icons/bi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 let titlex = 'Dashboard: General Procurement';
 let descriptionx =
@@ -54,57 +55,100 @@ function Procurement({ products, categories, brands, id, id2 }: any) {
         */}
 
         <div className="flex flex-col gap-[25px]">
-          <div className="flex flex-col justify-start xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex items-start gap-3 pt-3 md:flex-row xl:pt-0">
-              {categories.map((category: any) => (
-                <Button
-                  onClick={() => {
-                    router.push(
-                      '/dashboard/store/?id=' + category['productCategory'],
-                    );
-                  }}
-                  className={
-                    'hover:text-w inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl px-4 py-[15px] text-gray-800 dark:bg-slate-300 dark:text-gray-800 md:px-[50px]' +
-                    (id == category['productCategory']
-                      ? 'bg-indigo-800 text-white dark:bg-indigo-800 dark:text-gray-300'
-                      : ' bg-slate-200 hover:text-white dark:bg-gray-600 dark:text-gray-300')
-                  }
-
-                  //className="inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl bg-white py-[15px] text-base text-slate-600 hover:bg-[#161629]/10 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 md:px-[30px] xl:w-[201px]"
+          {/* Filters */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start">
+            {/* Category Filter */}
+            <div className="w-full md:w-[28rem]">
+              <div className="flex w-full items-center gap-3">
+                <span
+                  id="category-label"
+                  className="whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  {category['productCategory'].toUpperCase()}
-                </Button>
-              ))}
+                  Product Category
+                </span>
+                <Select
+                  value={id || undefined}
+                  onValueChange={(value) => {
+                    if (!value || value === 'all') {
+                      router.push('/dashboard/store');
+                    } else {
+                      router.push('/dashboard/store/?id=' + encodeURIComponent(value));
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    aria-label="Filter by category"
+                    aria-labelledby="category-label"
+                    className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
+                  >
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64">
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {categories.map((category: any) => {
+                      const value = category['productCategory'];
+                      return (
+                        <SelectItem key={value} value={value}>
+                          {String(value).toUpperCase()}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
 
-          {/* BRANDS */}
-          <div className="justify-centerx flex w-full">
-            <div className="flex items-start gap-3 pt-3 md:flex-row xl:pt-0">
-              {brands.map((brand: any) => (
-                <Button
-                  onClick={() => {
-                    router.push(
-                      '/dashboard/store/?id=' +
-                        id +
-                        '&id2=' +
-                        brand['productBrand'],
-                    );
-                  }}
-                  className={
-                    'hover:text-w inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl px-4 py-[15px] text-gray-800 dark:bg-slate-300 dark:text-gray-800 md:px-[50px]' +
-                    (id2 == brand['productBrand']
-                      ? 'bg-indigo-800 text-white dark:bg-indigo-800 dark:text-gray-300'
-                      : ' bg-slate-200 hover:text-white dark:bg-gray-600 dark:text-gray-300')
-                  }
-                  //className="m-1 inline-flex h-[15px] items-center justify-center gap-1 rounded-xl bg-white p-[5px] py-[10px] text-xs text-slate-800 hover:bg-[#161629]/10 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 md:px-[30px] xl:w-[201px]"
-                  //className="inline-flex h-[30px] items-center justify-center gap-2.5 rounded-xl bg-white py-[15px] text-base text-slate-600 hover:bg-[#161629]/10 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 md:px-[30px] xl:w-[201px]"
-                  //className="inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl bg-white py-[15px] text-base text-slate-600 hover:bg-[#161629]/10 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 md:px-[30px] xl:w-[201px]"
+            {/* Brand Filter */}
+            <div className="w-full md:w-[28rem]">
+              <div className="flex w-full items-center gap-3">
+                <span
+                  id="brand-label"
+                  className="whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200"
                 >
-                  {/* <Laptop />  */}
-                  {brand['productBrand'].toUpperCase()}
-                </Button>
-              ))}
+                  Product Brand
+                </span>
+                <Select
+                  disabled={!id}
+                  value={id2 || undefined}
+                  onValueChange={(value) => {
+                    if (!id) {
+                      if (!value || value === 'all') router.push('/dashboard/store');
+                      else router.push('/dashboard/store/?id2=' + encodeURIComponent(value));
+                      return;
+                    }
+
+                    if (!value || value === 'all') {
+                      router.push('/dashboard/store/?id=' + encodeURIComponent(id));
+                    } else {
+                      router.push(
+                        '/dashboard/store/?id=' +
+                          encodeURIComponent(id) +
+                          '&id2=' +
+                          encodeURIComponent(value),
+                      );
+                    }
+                  }}
+                >
+                  <SelectTrigger
+                    aria-label="Filter by brand"
+                    aria-labelledby="brand-label"
+                    className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 data-[disabled=true]:opacity-60 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
+                  >
+                    <SelectValue placeholder="Select brand" />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-64">
+                    <SelectItem value="all">All Brands</SelectItem>
+                    {brands.map((brand: any) => {
+                      const value = brand['productBrand'];
+                      return (
+                        <SelectItem key={value} value={value}>
+                          {String(value).toUpperCase()}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
         </div>

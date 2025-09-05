@@ -122,8 +122,8 @@ export function ViewOrders({ params }: orderStatus) {
 
   if (countRecords.length == 0)
     return (
-      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold">
-        <div className="rounded border-2 border-dotted border-gray-500 p-4">
+      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold dark:bg-black">
+        <div className="rounded border-2 border-dotted border-gray-500 p-4 dark:bg-black">
           <p className="text-center text-gray-500">
             No {statusx} request available
           </p>
@@ -132,7 +132,7 @@ export function ViewOrders({ params }: orderStatus) {
     ); //CHECK IF RECORD IS EMPTY
 
   return (
-    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center">
+    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center dark:bg-black">
       <OrderSection initialOrders={orderData} />
     </div>
   );

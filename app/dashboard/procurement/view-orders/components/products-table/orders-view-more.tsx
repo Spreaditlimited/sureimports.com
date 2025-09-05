@@ -525,7 +525,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
     <>
       <div
         suppressHydrationWarning
-        className="flex flex-col bg-white dark:bg-[#161629]"
+        className="flex flex-col bg-white dark:bg-black"
       >
         <Button
           className="m-7 h-[49px] rounded-xl font-normal md:px-[30px] md:py-[15px] xl:w-[162px]"

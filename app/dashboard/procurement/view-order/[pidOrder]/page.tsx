@@ -425,7 +425,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
   };
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#161629]">
+    <div className="flex flex-col bg-white dark:bg-black">
       <div className="flex flex-row items-center justify-between p-[25px] max-md:flex-col max-md:items-start max-md:gap-3">
         <div className="text-center text-xl font-bold text-slate-800 dark:text-slate-200">
           {/* {products.length} Products */}
@@ -1069,8 +1069,8 @@ function MoreOrders({ products }: MoreOrdersProps) {
 
               <FlutterwavePaymentButton
                 amount={10}
-                email={user?.email as string}
-                name={user?.name as string}
+                email={user?.userEmail as string}
+                name={user?.userFirstname as string}
                 phone_number={''}
                 currency={currencyType}
                 payment_type={'CARD'}
@@ -1079,12 +1079,9 @@ function MoreOrders({ products }: MoreOrdersProps) {
                 service_name={'PROCUREMENT'}
                 description={'This is General Procuremnt & Shipping Service'}
                 isDisabled={isDisabled}
-                className={
-                  isDisabled
-                    ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                    : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
-                }
-              />
+                className={isDisabled
+                  ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
+                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'} destinationCountry={''}              />
               {/* *********************************************************************************************************** */}
               <Button
                 className={
