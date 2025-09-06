@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Laptop, Phone, Tag, VideoIcon, Search as SearchIcon, X } from 'lucide-react';
+import { Laptop, Phone, Tag, VideoIcon, Search as SearchIcon, X, ChevronUp } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import { useAuth } from '@/lib/AuthContext';
 import ProductsList from './ProductsList';
@@ -50,6 +50,21 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
     if (products) setLoading(false);
   }, [products]);
 
+  // Scroll to top button state
+  const [showScrollTop, setShowScrollTop] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const submitSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
     if (query.trim()) params.set('q', query.trim());
@@ -66,16 +81,6 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
     if (!params.get('id')) params.set('id', id || 'all');
     router.push('/dashboard/store/?' + params.toString());
   };
-
-  const [showBackToTop, setShowBackToTop] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setShowBackToTop(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <>
@@ -230,14 +235,16 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
           )}
         </div>
       </div>
-      {showBackToTop && (
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-4 right-4 z-50 rounded-full bg-indigo-500 p-3 text-white shadow-lg hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700"
-          aria-label="Back to top"
+
+      {/* Scroll to Top Button */}
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 dark:bg-slate-500 dark:hover:bg-slate-600"
+          aria-label="Scroll to top"
         >
-          ↑
-        </button>
+          <ChevronUp className="h-6 w-6" />
+        </Button>
       )}
     </>
   );
