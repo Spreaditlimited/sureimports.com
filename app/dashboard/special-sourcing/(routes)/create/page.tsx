@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 
 function SpecialSourcing() {
   return (
-    <div className="h-full">
-      <div className="p-[25px]">
+    <div className="h-full dark:bg-black">
+      <div className="p-[25px] dark:bg-black">
         <div className="text-[28px] font-bold text-slate-800 dark:text-white max-sm:pb-4">
           Request for Special Sourcing
         </div>
@@ -36,7 +36,7 @@ function SpecialSourcing() {
           you go ahead with the order.{' '}
         </div>
       </div>
-      <div className="bg-slate-50x flex w-full flex-col items-center bg-[#ffffff] px-4 dark:bg-slate-800 lg:flex-row xl:items-start">
+      <div className="bg-slate-50x flex w-full flex-col items-center bg-[#ffffff] px-4  dark:bg-black lg:flex-row xl:items-start">
         <div className="w-full">
           <SpecialSourcingForm />
         </div>
