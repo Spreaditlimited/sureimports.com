@@ -1,14 +1,15 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Laptop, Phone, Tag, VideoIcon } from 'lucide-react';
+import { Laptop, Phone, Tag, VideoIcon, Search as SearchIcon, X } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import { useAuth } from '@/lib/AuthContext';
 import ProductsList from './ProductsList';
 import { BiMobile } from 'react-icons/bi';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 
 let titlex = 'Dashboard: General Procurement';
 let descriptionx =
@@ -30,131 +31,214 @@ export const metadata: Metadata = {
   },
 };
 
-//const DashBoard = async ({product:any}) => {
-function Procurement({ products, categories, brands, id, id2 }: any) {
+function Procurement({ products, categories, brands, id, id2, q }: any) {
   const { user } = useAuth();
   const router = useRouter();
   const { isModalOpen, openModal, closeModal } = useModal();
 
+  // Search state
+  const searchParams = useSearchParams();
+  const qParam = searchParams.get('q') || '';
+  //const qParam = q;
+  const [query, setQuery] = React.useState(qParam);
+  React.useEffect(() => setQuery(qParam), [qParam]);
+
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    // Simulate loading or wait for products
+    if (products) setLoading(false);
+  }, [products]);
+
+  const submitSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (query.trim()) params.set('q', query.trim());
+    else params.delete('q');
+    // ensure id param exists for consistency
+    if (!params.get('id')) params.set('id', id || 'all');
+    router.push('/dashboard/store/?' + params.toString());
+  };
+
+  const clearSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+
+    if (!params.get('id')) params.set('id', id || 'all');
+    router.push('/dashboard/store/?' + params.toString());
+  };
+
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
       <div className="bg-slate-100 px-4 py-[25px] text-slate-800 dark:bg-black dark:text-white">
-        {/* 
-        <div className="flex flex-col gap-[8px] xl:w-[704px]">
-          <div className="text-[22px] font-bold capitalize text-slate-800 dark:text-white">
-            Buy Phones and Laptops
-          </div>
-        </div>
-
-        <p className="p-5 text-base text-slate-800 dark:text-white">
-          Every phone from Sure Imports comes sealed in its original box,
-          complete with all accessories, and includes a one-year warranty for
-          your peace of mind. Laptops are pre-owned and come with a bag and
-          charger and a 3-month warranty.
-        </p> 
-        */}
-
         <div className="flex flex-col gap-[25px]">
-          {/* Filters */}
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start">
-            {/* Category Filter */}
-            <div className="w-full md:w-[28rem]">
-              <div className="flex w-full items-center gap-3">
-                <span
-                  id="category-label"
-                  className="whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
-                  Product Category
-                </span>
-                <Select
-                  value={id || undefined}
-                  onValueChange={(value) => {
-                    if (!value || value === 'all') {
-                      router.push('/dashboard/store');
-                    } else {
-                      router.push('/dashboard/store/?id=' + encodeURIComponent(value));
-                    }
-                  }}
-                >
-                  <SelectTrigger
-                    aria-label="Filter by category"
-                    aria-labelledby="category-label"
-                    className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
-                  >
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    <SelectItem value="all">All Categories</SelectItem>
-                    {categories.map((category: any) => {
-                      const value = category['productCategory'];
-                      return (
-                        <SelectItem key={value} value={value}>
-                          {String(value).toUpperCase()}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+          {/* Filter Area (now local sticky inside product area) */}
+          <div className="mx-auto w-full max-w-7xl">
 
-            {/* Brand Filter */}
-            <div className="w-full md:w-[28rem]">
-              <div className="flex w-full items-center gap-3">
-                <span
-                  id="brand-label"
-                  className="whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-200"
-                >
-                  Product Brand
-                </span>
-                <Select
-                  disabled={!id}
-                  value={id2 || undefined}
-                  onValueChange={(value) => {
-                    if (!id) {
-                      if (!value || value === 'all') router.push('/dashboard/store');
-                      else router.push('/dashboard/store/?id2=' + encodeURIComponent(value));
-                      return;
-                    }
+            <div
+              /* Sticky bar locks below nav bar (adjust --nav-height in your layout's <body> or root) */
+              className="sticky top-16 z-700 rounded-xl border border-slate-300/60 bg-slate-100/90 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-slate-100/70 dark:border-gray-700/60 dark:bg-gray-900/80 dark:backdrop-blur"
+              style={{ top: 'calc(var(--nav-height, 4rem) + 0.5rem)' }}
+              role="region"
+              aria-label="Product filters"
+            >
 
-                    if (!value || value === 'all') {
-                      router.push('/dashboard/store/?id=' + encodeURIComponent(id));
-                    } else {
-                      router.push(
-                        '/dashboard/store/?id=' +
-                          encodeURIComponent(id) +
-                          '&id2=' +
-                          encodeURIComponent(value),
-                      );
-                    }
-                  }}
-                >
-                  <SelectTrigger
-                    aria-label="Filter by brand"
-                    aria-labelledby="brand-label"
-                    className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 data-[disabled=true]:opacity-60 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
-                  >
-                    <SelectValue placeholder="Select brand" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    <SelectItem value="all">All Brands</SelectItem>
-                    {brands.map((brand: any) => {
-                      const value = brand['productBrand'];
-                      return (
-                        <SelectItem key={value} value={value}>
-                          {String(value).toUpperCase()}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start">
+                {/* Search */}
+                <div className="w-full md:w-[28rem]">
+                  <div className="flex w-full items-center gap-3">
+                    <div className="flex w-full items-center gap-2">
+                      <Input
+                        aria-labelledby="search-label"
+                        value={query}
+                        placeholder="Search products..."
+                        onChange={(e) => setQuery(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') submitSearch();
+                        }}
+                        className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400 dark:focus-visible:ring-indigo-400"
+                      />
+                      {qParam && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          aria-label="Clear search"
+                          onClick={clearSearch}
+                          className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-3 text-gray-800 hover:bg-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                      <Button
+                        type="button"
+                        onClick={submitSearch}
+                        aria-label="Search products"
+                        className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-4 text-gray-800 hover:bg-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      >
+                        <SearchIcon className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Category and Brand in one row on mobile and desktop */}
+                <div className="flex flex-row gap-4">
+                  {/* Category Filter */}
+                  <div className="w-full md:w-[28rem]">
+                    <div className="flex w-full items-center gap-3">
+                      <Select
+                        value={id || 'all'}
+                        onValueChange={(value) => {
+                          const params = new URLSearchParams(searchParams.toString());
+                          if (!value || value === 'all') {
+                            params.set('id', 'all');
+                            params.delete('id2');
+                          } else {
+                            params.set('id', value);
+                            params.delete('id2');
+                          }
+                          if (query.trim()) params.set('q', query.trim());
+                          router.push('/dashboard/store/?' + params.toString());
+                        }}
+                      >
+                        <SelectTrigger
+                          aria-label="Filter by category"
+                          aria-labelledby="category-label"
+                          className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
+                        >
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          <SelectItem value="all">All Categories</SelectItem>
+                          {categories.map((category: any) => {
+                            const value = category['productCategory'];
+                            return (
+                              <SelectItem key={value} value={value}>
+                                {String(value).toUpperCase()}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Brand Filter */}
+                  <div className="w-full md:w-[28rem]">
+                    <div className="flex w-full items-center gap-3">
+                      <Select
+                        disabled={!id || id === 'all'}
+                        value={id2 || 'all'}
+                        onValueChange={(value) => {
+                          const params = new URLSearchParams(searchParams.toString());
+                          params.set('id', id || 'all');
+                          if (!value || value === 'all') {
+                            params.delete('id2');
+                          } else {
+                            params.set('id2', value);
+                          }
+                          if (query.trim()) params.set('q', query.trim());
+                          router.push('/dashboard/store/?' + params.toString());
+                        }}
+                      >
+                        <SelectTrigger
+                          aria-label="Filter by brand"
+                          aria-labelledby="brand-label"
+                          className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 data-[disabled=true]:opacity-60 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
+                        >
+                          <SelectValue placeholder="Select brand" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-64">
+                          <SelectItem value="all">All Brands</SelectItem>
+                          {brands.map((brand: any) => {
+                            const value = brand['productBrand'];
+                            return (
+                              <SelectItem key={value} value={value}>
+                                {String(value).toUpperCase()}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <ProductsList products={products} />
+          {/* Products List */}
+          {loading ? (
+            <div className="mx-auto w-full max-w-7xl px-4 py-8 text-center text-slate-600 dark:text-slate-400">
+              Loading products...
+            </div>
+          ) : products.length === 0 ? (
+            <div className="mx-auto w-full max-w-7xl px-4 py-8 text-center text-slate-600 dark:text-slate-400">
+              No products found. Try adjusting your search or filters.
+            </div>
+          ) : (
+            <ProductsList products={products} />
+          )}
+        </div>
       </div>
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-4 right-4 z-50 rounded-full bg-indigo-500 p-3 text-white shadow-lg hover:bg-indigo-600 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+          aria-label="Back to top"
+        >
+          ↑
+        </button>
+      )}
     </>
   );
 }
