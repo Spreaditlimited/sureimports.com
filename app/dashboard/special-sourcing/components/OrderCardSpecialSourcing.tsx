@@ -190,9 +190,9 @@ const OrderCard: React.FC<ProductsProps> = ({
 
   return (
     <>
-      <div className="pl-4 pr-4">
+      <div className="pl-4 pr-4 dark:bg-black">
         <Accordion type="single" collapsible>
-          <AccordionItem value="item-1">
+          <AccordionItem value="item-1 dark:bg-black">
             <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-[#161629] sm:flex-row xl:h-[100px] xl:items-center">
               <div>
                 <div className="flex flex-row gap-4">
@@ -281,7 +281,7 @@ const OrderCard: React.FC<ProductsProps> = ({
               </div>
             </div>
 
-            <AccordionContent className="hide-scrollbar rounded-2xl bg-white dark:bg-[#161629]">
+            <AccordionContent className="hide-scrollbar rounded-2xl bg-white  dark:bg-black">
               {/* <BankDepositForm /> */}
               {/*.................................. FORM BLOCK STARTS.................................... */}
               <RadFormLayout

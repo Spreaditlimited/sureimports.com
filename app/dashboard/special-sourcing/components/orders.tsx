@@ -34,7 +34,7 @@ function Orders({ initialOrders }: PaymentSectionProps) {
   //special update
   return (
     <>
-      <div className="flex w-full flex-col gap-3">
+      <div className="flex w-full flex-col gap-3 dark:bg-black">
         {orders &&
           orders.map((order, index) => {
             const serialNumber = index + 1; // Auto-incrementing serial number
