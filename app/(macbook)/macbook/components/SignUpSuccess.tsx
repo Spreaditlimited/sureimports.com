@@ -27,6 +27,7 @@ export default function SignUpSuccess({ onNavigateToSignIn, onNavigateHome }: Si
             </button>
           </div>
         </div>
+        
 
         {/* Success Message */}
         <Card className="bg-slate-800/50 border-slate-700 backdrop-blur-sm">
