@@ -30,9 +30,9 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import macBooksStoreImage from "../assets/laptops.png";
-import obidimmaPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
-import innocentPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
+import macBooksStoreImage from "../../images/laptops.png";
+import obidimmaPhoto from "../../../../public/images/reviewprofile5.png";
+import innocentPhoto from "../assets/user2.png";
 
 interface MacBookSalesProps {
   onNavigateToSignUp?: () => void;
@@ -131,7 +131,7 @@ export default function MacBookSales({
             <div className="hidden lg:block lg:order-2">
               <div className="relative">
                 <img
-                  src={macBooksStoreImage as any}
+                  src={"/images/laptops.png"}
                   alt="Laptops display in our verified supplier store in China"
                   className="w-full h-[500px] object-cover rounded-2xl shadow-2xl"
                 />
@@ -776,7 +776,7 @@ export default function MacBookSales({
                     </p>
                     <div className="flex items-center justify-center md:justify-start space-x-3">
                       <img
-                        src={obidimmaPhoto as any}
+                        src={"/images/user1.png"}
                         alt="Obidimma C"
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0"
                       />
@@ -810,7 +810,7 @@ export default function MacBookSales({
                     </p>
                     <div className="flex items-center justify-center md:justify-start space-x-3">
                       <img
-                        src={innocentPhoto as any}
+                        src={"/images/user2.png"}
                         alt="Innocent Waziri"
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0"
                       />

@@ -9,6 +9,7 @@ export default function Home() {
       <main>
         {/* <MacBookPage /> */}
         <MacBookSales />
+        laptops-for-business
       </main>
     </>
   );
