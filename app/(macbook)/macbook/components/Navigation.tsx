@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { ChevronDown, Menu, X, Smartphone, Headphones, BookOpen, Laptop } from "lucide-react";
 import { useState } from "react";
-import sureImportsLogo from "figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png";
+import sureImportsLogo from "../../../public/images/new/images/logo.png";
 import YouTubeIcon from "./icons/YouTubeIcon";
 import TikTokIcon from "./icons/TikTokIcon";
 
@@ -27,7 +27,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
               className="hover:opacity-80 transition-opacity"
             >
               <img 
-                src={sureImportsLogo} 
+                src={sureImportsLogo as any} 
                 alt="SURE IMPORTS" 
                 className="h-6 w-auto opacity-90"
               />

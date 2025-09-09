@@ -10,7 +10,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "./ui/dropdown-menu";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import Image from "next/image";
 import { 
   blogPosts, 
   blogCategories, 
@@ -249,9 +249,11 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                   onClick={() => onSelectPost(post.slug)}
                 >
                   <div className="relative overflow-hidden">
-                    <ImageWithFallback
+                    <Image
                       src={post.image}
                       alt={post.title}
+                      width={400}
+                      height={200}
                       className="w-full h-48 sm:h-52 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute top-4 left-4">
@@ -288,9 +290,11 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 sm:gap-3">
-                        <ImageWithFallback
+                        <Image
                           src={post.author.avatar}
                           alt={post.author.name}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full"
                         />
                         <div>
@@ -334,9 +338,11 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                   onClick={() => onSelectPost(post.slug)}
                 >
                   <div className="relative overflow-hidden">
-                    <ImageWithFallback
+                    <Image
                       src={post.image}
                       alt={post.title}
+                      width={400}
+                      height={200}
                       className="w-full h-48 sm:h-52 lg:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     {post.featured && (
@@ -376,9 +382,11 @@ export default function BlogList({ onSelectPost, onNavigateHome }: BlogListProps
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <ImageWithFallback
+                        <Image
                           src={post.author.avatar}
                           alt={post.author.name}
+                          width={32}
+                          height={32}
                           className="w-8 h-8 rounded-full"
                         />
                         <div>

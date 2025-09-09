@@ -29,9 +29,9 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import macBooksStoreImage from "figma:asset/a2f7e6729c006495ba0c803becaa591f613420b0.png";
-import obidimmaPhoto from "figma:asset/9e6c633bc27f8e92c1c36b6d2d6e4fa1c8ca8d3a.png";
-import innocentPhoto from "figma:asset/0a227de1c1ed435dd7d5c9c6f3960382b235f364.png";
+import macBooksStoreImage from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
+import obidimmaPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
+import innocentPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
 
 interface MacBookSalesProps {
   onNavigateToSignUp?: () => void;
@@ -130,7 +130,7 @@ export default function MacBookSales({
             <div className="hidden lg:block lg:order-2">
               <div className="relative">
                 <img
-                  src={macBooksStoreImage}
+                  src={macBooksStoreImage as any}
                   alt="Laptops display in our verified supplier store in China"
                   className="w-full h-[500px] object-cover rounded-2xl shadow-2xl"
                 />
@@ -775,7 +775,7 @@ export default function MacBookSales({
                     </p>
                     <div className="flex items-center justify-center md:justify-start space-x-3">
                       <img
-                        src={obidimmaPhoto}
+                        src={obidimmaPhoto as any}
                         alt="Obidimma C"
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0"
                       />
@@ -809,7 +809,7 @@ export default function MacBookSales({
                     </p>
                     <div className="flex items-center justify-center md:justify-start space-x-3">
                       <img
-                        src={innocentPhoto}
+                        src={innocentPhoto as any}
                         alt="Innocent Waziri"
                         className="w-10 h-10 md:w-12 md:h-12 rounded-full object-cover flex-shrink-0"
                       />

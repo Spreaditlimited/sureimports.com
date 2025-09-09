@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import Navigation from "./components/Navigation";
 import HeroSection from "./components/HeroSection";
@@ -38,7 +39,7 @@ type Page =
   | "blog-detail"
   | "macbook-sales";
 
-export default function App() {
+export default function Page() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>("");
 

@@ -4,8 +4,9 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
+import Image from "next/image";
 import { getBlogPostBySlug, blogPosts, type BlogPost } from "./BlogData";
+
 
 interface BlogDetailProps {
   slug: string;
@@ -143,9 +144,11 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
       <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Image */}
         <div className="relative overflow-hidden rounded-xl mb-8">
-          <ImageWithFallback
+          <Image
             src={post.image}
             alt={post.title}
+            width={800}
+            height={400}
             className="w-full h-64 md:h-96 object-cover"
           />
           {post.featured && (
@@ -182,9 +185,11 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
           {/* Author and Actions */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
             <div className="flex items-center gap-3">
-              <ImageWithFallback
+              <Image
                 src={post.author.avatar}
                 alt={post.author.name}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full"
               />
               <div>
@@ -237,9 +242,11 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
 
           <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
             <div className="flex items-center gap-4">
-              <ImageWithFallback
+              <Image
                 src={post.author.avatar}
                 alt={post.author.name}
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full"
               />
               <div>
@@ -271,9 +278,11 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
                   onClick={() => onSelectPost(relatedPost.slug)}
                 >
                   <div className="relative overflow-hidden rounded-t-lg">
-                    <ImageWithFallback
+                    <Image
                       src={relatedPost.image}
                       alt={relatedPost.title}
+                      width={400}
+                      height={200}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
@@ -300,9 +309,11 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: BlogDetailPro
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <ImageWithFallback
+                        <Image
                           src={relatedPost.author.avatar}
                           alt={relatedPost.author.name}
+                          width={24}
+                          height={24}
                           className="w-6 h-6 rounded-full"
                         />
                         <span className="text-xs text-slate-400">{relatedPost.author.name}</span>
