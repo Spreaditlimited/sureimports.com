@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react";
 import TikTokIcon from "./icons/TikTokIcon";
-import sureImportsLogo from "figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png";
+import sureImportsLogo from "../../../public/images/new/images/logo.png";
 import { useState } from "react";
 
 interface FooterProps {
@@ -66,7 +66,7 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <img 
-                src={sureImportsLogo} 
+                src={sureImportsLogo as any} 
                 alt="Sure Imports" 
                 className="h-6 opacity-90"
               />

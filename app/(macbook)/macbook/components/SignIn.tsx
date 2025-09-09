@@ -4,7 +4,7 @@ import { Input } from "./ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Label } from "./ui/label";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import sureImportsLogo from "figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png";
+import sureImportsLogo from "../../../public/images/new/images/logo.png";
 
 interface SignInProps {
   onNavigateToSignUp?: () => void;
@@ -52,7 +52,7 @@ export default function SignIn({
               className="transition-opacity hover:opacity-80"
             >
               <img 
-                src={sureImportsLogo} 
+                src={sureImportsLogo as any} 
                 alt="Sure Imports" 
                 className="h-8 opacity-90"
               />

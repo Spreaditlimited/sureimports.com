@@ -1,9 +1,9 @@
 import { Star, Quote, User } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import chiomaImage from 'figma:asset/5071b91f596ce15142b2bbe01dcb4e5397753346.png';
-import chukwuedozieImage from 'figma:asset/534da77b3a7b82170fc3672c476d8837d4928521.png';
-import amarachiImage from 'figma:asset/70cd3d5231f5372b654245012c560bbacdc35ded.png';
+import chiomaImage from "../../../public/images/new/images/logo.png";
+import chukwuedozieImage from "../../../public/images/new/images/logo.png";
+import amarachiImage from "../../../public/images/new/images/logo.png";
 
 interface CustomerReviewsProps {
   onNavigateToSignUp?: () => void;
@@ -108,7 +108,7 @@ export default function CustomerReviews({ onNavigateToSignUp }: CustomerReviewsP
                       {review.hasImage ? (
                         <AvatarImage 
                           src={
-                            review.name === "Chioma Ifeanyi-Eze" ? chiomaImage :
+                            review.name === "Chioma Ifeanyi-Eze" ? chiomaImage as any :
                             review.name === "Chukwuedozie Nwokoye" ? chukwuedozieImage : amarachiImage
                           } 
                           alt={review.name} 

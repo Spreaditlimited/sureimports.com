@@ -1,7 +1,7 @@
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { CheckCircle, UserCheck, ArrowRight } from "lucide-react";
-import sureImportsLogo from "figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png";
+import sureImportsLogo from "../../../public/images/new/images/logo.png";
 
 interface EmailVerificationSuccessProps {
   onNavigateToSignIn?: () => void;
@@ -20,7 +20,7 @@ export default function EmailVerificationSuccess({ onNavigateToSignIn, onNavigat
               className="transition-opacity hover:opacity-80"
             >
               <img 
-                src={sureImportsLogo} 
+                src={sureImportsLogo as any} 
                 alt="Sure Imports" 
                 className="h-8 opacity-90"
               />

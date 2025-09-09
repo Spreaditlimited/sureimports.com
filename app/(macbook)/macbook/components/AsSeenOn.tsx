@@ -1,4 +1,4 @@
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import Image from "next/image";
 
 export default function AsSeenOn() {
   const mediaLogos = [
@@ -48,9 +48,11 @@ export default function AsSeenOn() {
               key={index}
               className="flex items-center justify-center p-4 rounded-lg bg-white/5 backdrop-blur-sm border border-slate-700/30 hover:border-slate-600/50 transition-all duration-300 group"
             >
-              <ImageWithFallback
+              <Image
                 src={media.logo}
                 alt={media.alt}
+                width={120}
+                height={32}
                 className="h-8 w-auto max-w-[120px] object-contain opacity-70 group-hover:opacity-90 transition-opacity duration-300 filter grayscale hover:grayscale-0"
               />
             </div>

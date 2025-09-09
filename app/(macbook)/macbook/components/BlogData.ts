@@ -1,7 +1,7 @@
-import ijeomaAvatar from 'figma:asset/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png';
-import avoidMistakesImage from 'figma:asset/c77da4d426d2abed9e9d3a22d251fda7019a2fda.png';
-import londonUsedImage from 'figma:asset/cd2f4181933b1ca04df9560743683e892b5c2110.png';
-import chinaToYourDoorImage from 'figma:asset/b5f9e70d04346b44f752829f04848b927d7dfd04.png';
+import ijeomaAvatar from "../../../public/images/new/images/logo.png";
+import avoidMistakesImage from "../../../public/images/new/images/logo.png";
+import londonUsedImage from "../../../public/images/new/images/logo.png";
+import chinaToYourDoorImage from "../../../public/images/new/images/logo.png";
 
 export interface BlogPost {
   id: string;
@@ -139,7 +139,7 @@ Remember to always prioritize quality, compliance, and customer satisfaction. St
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Import Guide",
@@ -361,7 +361,7 @@ Remember to start with thorough market research, validate demand before large in
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Business Tips",
@@ -544,7 +544,7 @@ Invest time in understanding your suppliers' businesses, challenges, and goals. 
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Business Tips",
@@ -679,7 +679,7 @@ Ready to get started?
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -804,7 +804,7 @@ Ready to experience the smarter way to buy?
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -905,7 +905,7 @@ With Sure Imports, you're not just buying a phone or laptop — you're buying pe
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -1014,7 +1014,7 @@ Every device we deliver is genuine, tested, warranted, and ready to use. No fake
     `,
     author: {
       name: "Ijeoma TDaniels",
-      avatar: ijeomaAvatar,
+      avatar: ijeomaAvatar as any,
       role: "Content Lead"
     },
     category: "Sourcing Gadgets",
@@ -1022,7 +1022,7 @@ Every device we deliver is genuine, tested, warranted, and ready to use. No fake
     publishDate: "2025-08-07",
     readTime: 6,
     featured: false,
-    image: avoidMistakesImage,
+    image: avoidMistakesImage as any,
     slug: "avoid-5-costly-mistakes-sourcing-second-hand-iphones-laptops-china"
   },
   {
