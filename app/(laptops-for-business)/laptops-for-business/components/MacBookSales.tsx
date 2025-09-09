@@ -850,7 +850,7 @@ export default function MacBookSales({
             </h2>
             <p className="text-lg md:text-xl text-gray-300">
               Everything you need to know about sourcing
-              MacBooks at scale
+              Laptops at scale
             </p>
           </div>
 
