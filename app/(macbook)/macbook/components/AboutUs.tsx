@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Users, Globe, Award, TrendingUp, Zap, Code, Heart, Target } from "lucide-react";
-import tochukwuImage from 'figma:asset/ce89148c85ca46396ed1514bbbbc303c98e8fc20.png';
+import tochukwuImage from "../../../public/images/new/images/logo.png";
 
 export default function AboutUs() {
   const achievements = [
@@ -135,7 +135,7 @@ export default function AboutUs() {
                   <div className="relative inline-block">
                     <div className="w-64 h-80 bg-slate-800/50 rounded-2xl shadow-2xl mx-auto lg:mx-0 overflow-hidden">
                       <img 
-                        src={tochukwuImage} 
+                        src={tochukwuImage as any} 
                         alt="Tochukwu Nkwocha - Founder & CEO of Sure Imports"
                         className="w-full h-full object-contain"
                       />
