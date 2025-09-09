@@ -1,3 +1,4 @@
+'use client';
 import { Button } from "./ui/button";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
@@ -29,7 +30,7 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import macBooksStoreImage from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
+import macBooksStoreImage from "../assets/5071b91f596ce15142b2bbe01dcb4e5397753346.png";
 import obidimmaPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
 import innocentPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
 
@@ -64,7 +65,7 @@ export default function MacBookSales({
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screenx">
       {/* Hero Section - White Background */}
       <section className="bg-white pt-20 pb-16 md:pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -72,10 +73,10 @@ export default function MacBookSales({
             <div className="order-1">
               <div className="mb-6">
                 <Badge className="bg-blue-50 text-blue-600 border-blue-200 mb-4">
-                  Laptops for Business X
+                  Laptops for Business
                 </Badge>
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-4 md:mb-6">
-                  Sourced in China X,
+                  Sourced in China,
                   <br />
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Delivered with Confidence
