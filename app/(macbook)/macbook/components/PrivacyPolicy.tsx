@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Shield, Database, Eye, Share2, Cookie, Link, Baby, User, FileText, Mail } from "lucide-react";
 
 export default function PrivacyPolicy() {
+  
   const informationTypes = [
     "Contact information (such as name, email address, phone number)",
     "Billing and shipping address",
@@ -9,6 +10,7 @@ export default function PrivacyPolicy() {
     "Order details and preferences",
     "Communications and correspondence with us"
   ];
+
 
   const informationUses = [
     "To process and fulfill orders for products and services.",
@@ -19,6 +21,7 @@ export default function PrivacyPolicy() {
     "To send periodic emails and updates regarding our products, services, promotions, or other relevant information."
   ];
 
+
   const securityMeasures = [
     "Encryption",
     "Secure socket layer (SSL) technology",
@@ -26,11 +29,13 @@ export default function PrivacyPolicy() {
     "Regular security audits"
   ];
 
+
   const userRights = [
     "Access your personal information",
     "Update your personal information", 
     "Delete your personal information"
   ];
+
 
   return (
     <div className="bg-slate-900">
