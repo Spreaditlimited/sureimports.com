@@ -21,6 +21,7 @@ export default function ProductDetails({ product }: any) {
   const [amount, setAmount] = useState(product.productPrice as number);
 
   const [activeTab, setActiveTab] = useState('description');
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const incrementQuantity = () => {
     setQuantity((prev) => prev + 1);
@@ -179,18 +180,33 @@ export default function ProductDetails({ product }: any) {
               }}
             />
 
-            <button
-              onClick={() =>
-                //alert('Pay Small Small is Coming Soon, check back later')
-                router.push(
-                  '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
-                )
-              }
-              className="mt-5 flex w-full flex-1 items-center justify-center rounded-md bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-700 xl:mt-0"
-            >
-              <BiMoney className="mr-2 h-6 w-6" />
-              Pay Small Small
-            </button>
+            <div className="relative">
+              <button
+                disabled
+                onClick={() =>
+                  //alert('Pay Small Small is Coming Soon, check back later')
+                  router.push(
+                    '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
+                  )
+                }
+                onMouseEnter={() => setShowTooltip(true)}
+                onMouseLeave={() => setShowTooltip(false)}
+                className="mt-5 flex w-full flex-1 items-center justify-center rounded-md bg-purple-600 px-4 py-2 font-medium text-white transition-colors hover:bg-purple-700 disabled:cursor-not-allowed disabled:opacity-50 xl:mt-0"
+              >
+                <BiMoney className="mr-2 h-6 w-6" />
+                Pay Small Small
+              </button>
+              
+              {/* Tooltip */}
+              {showTooltip && (
+                <div className="absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 transform rounded-lg bg-gray-900 px-3 py-2 text-sm text-white shadow-lg dark:bg-gray-700">
+                  <div className="whitespace-nowrap">
+                    Pay Small Small is Coming Soon, check back later
+                  </div>
+                  <div className="absolute left-1/2 top-full h-0 w-0 -translate-x-1/2 transform border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-gray-900 dark:border-t-gray-700"></div>
+                </div>
+              )}
+            </div>
 
             {/* <button className="p-2 border border-gray-300 dark:border-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300">
               <Heart className="h-4 w-4" />
