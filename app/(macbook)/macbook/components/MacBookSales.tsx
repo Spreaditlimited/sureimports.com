@@ -30,7 +30,7 @@ import {
   ArrowRight,
   Check,
 } from "lucide-react";
-import macBooksStoreImage from "../assets/5071b91f596ce15142b2bbe01dcb4e5397753346.png";
+import macBooksStoreImage from "../assets/laptops.png";
 import obidimmaPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
 import innocentPhoto from "../assets/776c1453c5ce6f351ee5b84b8c61e975eb00861f.png";
 
