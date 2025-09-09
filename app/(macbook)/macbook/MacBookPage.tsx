@@ -38,12 +38,13 @@ type Page =
   | "blog"
   | "blog-detail"
   | "macbook-sales";
-  
+
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
   const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>("");
 
+  
   const navigateToPage = (page: Page) => {
     setCurrentPage(page);
     window.scrollTo(0, 0);
