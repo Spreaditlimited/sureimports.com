@@ -2,7 +2,7 @@
 
 import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { ChevronDown, Menu, X, Smartphone, Headphones, BookOpen } from "lucide-react";
+import { ChevronDown, Menu, X, Smartphone, Headphones, BookOpen, Laptop } from "lucide-react";
 import { useState } from "react";
 import Image from "next/image";
 import YouTubeIcon from "./icons/YouTubeIcon";
@@ -140,6 +140,20 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 <ChevronDown className="w-4 h-4" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-slate-800 border-slate-700 shadow-xl w-80">
+                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
+                  <button 
+                    onClick={() => router.push("/laptops-for-business")}
+                    className="flex items-start space-x-3 w-full text-left"
+                  >
+                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
+                      <Laptop className="w-3 h-3 text-white" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">Laptops for Business</span>
+                      <span className="text-xs text-gray-400 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
+                    </div>
+                  </button>
+                </DropdownMenuItem>
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/buy-phones-from-china"
