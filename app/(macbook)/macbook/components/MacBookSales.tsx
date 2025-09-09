@@ -72,10 +72,10 @@ export default function MacBookSales({
             <div className="order-1">
               <div className="mb-6">
                 <Badge className="bg-blue-50 text-blue-600 border-blue-200 mb-4">
-                  Laptops for Business
+                  Laptops for Business X
                 </Badge>
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-4 md:mb-6">
-                  Sourced in China,
+                  Sourced in China X,
                   <br />
                   <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                     Delivered with Confidence

@@ -38,6 +38,7 @@ type Page =
   | "blog"
   | "blog-detail"
   | "macbook-sales";
+  
 
 export default function Page() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
