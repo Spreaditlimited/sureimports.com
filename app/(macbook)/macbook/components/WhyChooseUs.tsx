@@ -1,6 +1,7 @@
 import { Shield, Users, Calendar, Star, CheckCircle, Globe, Clock, Award } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 
+
 export default function WhyChooseUs() {
   const features = [
     {
