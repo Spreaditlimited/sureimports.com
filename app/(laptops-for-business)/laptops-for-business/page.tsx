@@ -1,15 +1,16 @@
 
 import MacBookSales from './components/MacBookSales';
-import MacBookPage from './MacBookPage';
+import Header from '@/app/(home)/components/Navigation';
+import Footer from '@/app/(home)/components/Footer';
 
 export default function Home() {
 
   return (
     <>
       <main>
-        {/* <MacBookPage /> */}
-        <MacBookSales />
-        laptops-for-business
+        <Header />
+          <MacBookSales />
+        <Footer />
       </main>
     </>
   );
