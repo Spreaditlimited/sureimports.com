@@ -134,12 +134,18 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+
             <DropdownMenu>
+              
               <DropdownMenuTrigger className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center space-x-1 bg-transparent border-none outline-none">
                 <span>Shop</span>
                 <ChevronDown className="w-4 h-4" />
               </DropdownMenuTrigger>
+
               <DropdownMenuContent className="bg-slate-800 border-slate-700 shadow-xl w-80">
+                
+                
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <button 
                     onClick={() => router.push("/laptops-for-business")}
@@ -154,6 +160,8 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                     </div>
                   </button>
                 </DropdownMenuItem>
+
+
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/buy-phones-from-china"
@@ -170,6 +178,8 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                     </div>
                   </a>
                 </DropdownMenuItem>
+
+
                 <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
                   <a 
                     href="https://www.sureimports.com/faya"
@@ -180,6 +190,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                     <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-md flex items-center justify-center">
                       <Headphones className="w-3 h-3 text-white" />
                     </div>
+
                     <div className="flex flex-col">
                       <span className="font-medium">FAYA Phone & Laptop Accessories</span>
                       <span className="text-xs text-gray-400 mt-1">Premium accessories for phones, laptops, and devices</span>
@@ -193,7 +204,7 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
           {/* Desktop Sign In Button */}
           <div className="hidden md:block">
             <Button 
-              onClick={onNavigateSignIn}
+              onClick={() => router.push("/auth/login")}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
             >
               Sign In
@@ -262,6 +273,23 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
             <div className="space-y-2">
               <span className="block text-gray-300 font-medium">Services</span>
               <div className="pl-4 space-y-3">
+
+
+                <a 
+                  href="/laptops-for-business"
+                  //target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  >
+                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+                    <span className="text-white text-xs"><Laptop className="w-3 h-3 text-white" /></span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">Laptops for Business</span>
+                    <span className="text-xs text-gray-500 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
+                  </div>
+                </a>
+
                 <a 
                   href="https://www.sureimports.com/buy-from-chinese-websites"
                   //target="_blank"
