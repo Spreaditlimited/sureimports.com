@@ -276,21 +276,6 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
 
 
                 <a 
-                  href="/laptops-for-business"
-                  //target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
-                  >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
-                    <span className="text-white text-xs"><Laptop className="w-3 h-3 text-white" /></span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-medium">Laptops for Business</span>
-                    <span className="text-xs text-gray-500 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
-                  </div>
-                </a>
-
-                <a 
                   href="https://www.sureimports.com/buy-from-chinese-websites"
                   //target="_blank"
                   rel="noopener noreferrer"
@@ -304,6 +289,8 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                     <span className="text-xs text-gray-500 mt-1">Direct purchasing with quality assurance</span>
                   </div>
                 </a>
+
+
                 <a 
                   href="https://www.sureimports.com/source-products-from-china"
                   //target="_blank"
@@ -318,11 +305,28 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
                     <span className="text-xs text-gray-500 mt-1">Custom sourcing and supplier verification</span>
                   </div>
                 </a>
+
               </div>
             </div>
             <div className="space-y-2">
               <span className="block text-gray-300 font-medium">Shop</span>
               <div className="pl-4 space-y-3">
+
+              <a 
+                  href="/laptops-for-business"
+                  //target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  >
+                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+                    <span className="text-white text-xs"><Laptop className="w-3 h-3 text-white" /></span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">Laptops for Business</span>
+                    <span className="text-xs text-gray-500 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
+                  </div>
+                </a>
+                
                 <a 
                   href="https://www.sureimports.com/buy-phones-from-china"
                   //target="_blank"
