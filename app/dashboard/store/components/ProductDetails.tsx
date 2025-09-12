@@ -207,10 +207,11 @@ export default function ProductDetails({ product }: any) {
           <button
                 //disabled
                 onClick={() =>
+                  toast.warning('You do not have sufficient funds in your wallet to make this payment')
                   //alert('Pay Small Small is Coming Soon, check back later')
-                  router.push(
-                    '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
-                  )
+                  // router.push(
+                  //   '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
+                  // )
                 }
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
@@ -218,7 +219,7 @@ export default function ProductDetails({ product }: any) {
               >
                 <Wallet className="mr-2 h-6 w-6" />
                 Pay from Wallet
-              </button>
+          </button>
 
           <button
             onClick={() => router.push('/dashboard/store?id=laptop')}
@@ -227,6 +228,7 @@ export default function ProductDetails({ product }: any) {
             <ShoppingCart className="mr-2 h-4 w-4" />
             Back to Store
           </button>
+
         </div>
       </div>
 
