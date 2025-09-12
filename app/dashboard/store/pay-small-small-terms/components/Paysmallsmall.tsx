@@ -640,8 +640,8 @@ export default function App({ product }: any) {
                   To proceed, please ensure your Sure Imports account profile includes your phone number. If it's missing, kindly enter it below.
                 </p>
                 <MobilePaymentForm
-                  phoneNumber={phoneNumber}
-                  onPhoneNumberChange={setPhoneNumber}
+                  phoneNumber={phone as any}
+                  onPhoneNumberChange={setPhoneNumber as any}
                   onSubmit={handleSubmit as any}
                   isLoading={isLoading}
                 />
@@ -702,8 +702,8 @@ export default function App({ product }: any) {
                       To proceed, please ensure your Sure Imports account profile includes your phone number. If it's missing, kindly enter it below.
                     </h3>
                     <PaymentForm
-                      phoneNumber={phoneNumber}
-                      onPhoneNumberChange={setPhoneNumber}
+                      phoneNumber={phone as any}
+                      onPhoneNumberChange={setPhoneNumber as any}
                       onSubmit={handleSubmit as any}
                       isLoading={isLoading}
                     />
