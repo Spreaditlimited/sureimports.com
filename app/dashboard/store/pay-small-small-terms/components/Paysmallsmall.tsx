@@ -508,9 +508,8 @@ export default function App({ product }: any) {
       formData.append('phone', phone);
       formData.append('amount', amount);
       formData.append('quantity', quantity);
-      toast.info('XDATA: '+formData);
+      //toast.info('XDATA: '+JSON.stringify(formData.pidUser)+formData['pidUser']);
 
-      return;
   
       //MAKE REQUEST ATTEMPT
       try {
