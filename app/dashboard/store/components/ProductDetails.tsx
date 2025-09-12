@@ -219,7 +219,7 @@ export default function ProductDetails({ product }: any) {
                 }
                 onMouseEnter={() => setShowTooltip(true)}
                 onMouseLeave={() => setShowTooltip(false)}
-                className="mt-5 flex w-full flex-1 items-center justify-center rounded-md bg-blue-600 px-4 py-2 font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50 xl:mt-0"
+                className="mt-5 flex w-full flex-1 items-center justify-center rounded-md bg-green-600 px-4 py-2 font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 xl:mt-0"
               >
                 <Wallet className="mr-2 h-6 w-6" />
                 Pay from Wallet
