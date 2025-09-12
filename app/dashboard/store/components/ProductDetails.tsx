@@ -207,10 +207,12 @@ export default function ProductDetails({ product }: any) {
           <button
                 //disabled
                 onClick={() =>
+                {
+                  toast.info('Processing . . .')
                   setTimeout(() => {
                     toast.warning('You do not have sufficient funds in your wallet to make this payment')
                   }, 3000)
-                  
+                }
                   //qtoast.warning('You do not have sufficient funds in your wallet to make this payment')
                   //alert('Pay Small Small is Coming Soon, check back later')
                   // router.push(
