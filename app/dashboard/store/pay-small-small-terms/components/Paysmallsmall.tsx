@@ -16,6 +16,7 @@ import { Badge } from "./ui/badge"
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
+import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 
 // Desktop Components
 interface ProductImageProps {
@@ -480,33 +481,95 @@ export default function App({ product }: any) {
     const [pidUser, setPidUser] = useState(user?.pidUser);
     const [email, setEmail] = useState(user?.userEmail);
     const [pidProduct, setPidProduct] = useState(product.pidProduct);
-    const [phone, setPhone] = useState<number>(0);
+    const [phone, setPhoneNumber] = useState<number>(0);
     const [amount, setAmount] = useState(price);
     const [quantity, setQuantity] = useState(1);
     
-  const [phoneNumber, setPhoneNumber] = useState("")
+  //const [phoneNumber, setPhoneNumber] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
 
-  const handleSubmit = async () => {
-    if (phoneNumber.length < 10) {
-      toast.error("Please enter a valid phone number")
-      return
+    const navigateWithAlert = useNavigationWithAlert();
+
+
+    //FORM DATA SUBMISSION
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      //console.log(file);
+      //setLoading(true);
+  
+      //await new Promise((resolve) => setTimeout(resolve, 3000));
+  
+      const formData = new FormData() as any;
+  
+      formData.append('pidUser', pidUser);
+      formData.append('userEmail', email);
+      formData.append('pidProduct', pidProduct);
+      formData.append('phone', phone);
+      formData.append('amount', amount);
+      formData.append('quantity', quantity);
+      toast.info('XDATA: '+formData);
+
+      return;
+  
+      //MAKE REQUEST ATTEMPT
+      try {
+        toast.info('Processing . . .');
+        //MAKE REQUEST
+        const res = await fetch('/api/crud/pay-small-small/add-product', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        // GET & PROCESS RESPONSE FROM API
+        const data: any = await res.json();
+  
+        if (data.statusx == 'SUCCESS') {
+          navigateWithAlert(
+            '/dashboard/pay-small-small?status=SAVED',
+            'success',
+            data.message,
+          );
+        }
+        
+  
+        // if (data.responsex.status == 'SUCCESS') {
+        //   openModal();
+        //   toast.success(data.responsex.message);
+        // }
+        if (data.statusx == 'NO_PHONE_NUMBER') {
+          toast.warning(data.message);
+        }
+        if (data.statusx == 'FAILED') {
+          toast.error(data.message);
+        }
+      } catch (error: any) {
+        console.log(error.message);
+      } finally {
+        //setLoading(false);
+      }
     }
 
-    setIsLoading(true)
+
+  // const handleSubmit = async () => {
+  //   if (phoneNumber.length < 10) {
+  //     toast.error("Please enter a valid phone number")
+  //     return
+  //   }
+
+  //   setIsLoading(true)
     
-    // Simulate API call
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      toast.success("Successfully added to Pay Small Small! Check your email for virtual account details.")
-      setPhoneNumber("")
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  //   // Simulate API call
+  //   try {
+  //     await new Promise(resolve => setTimeout(resolve, 2000))
+  //     toast.success("Successfully added to Pay Small Small! Check your email for virtual account details.")
+  //     setPhoneNumber("")
+  //   } catch (error) {
+  //     toast.error("Something went wrong. Please try again.")
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
 
   const handleStepChange = (step: number) => {
     setCurrentStep(step)
@@ -579,7 +642,7 @@ export default function App({ product }: any) {
                 <MobilePaymentForm
                   phoneNumber={phoneNumber}
                   onPhoneNumberChange={setPhoneNumber}
-                  onSubmit={handleSubmit}
+                  onSubmit={handleSubmit as any}
                   isLoading={isLoading}
                 />
               </div>
@@ -641,7 +704,7 @@ export default function App({ product }: any) {
                     <PaymentForm
                       phoneNumber={phoneNumber}
                       onPhoneNumberChange={setPhoneNumber}
-                      onSubmit={handleSubmit}
+                      onSubmit={handleSubmit as any}
                       isLoading={isLoading}
                     />
                   </div>
