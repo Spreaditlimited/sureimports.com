@@ -201,8 +201,11 @@ export default function ProductDetails({ product }: any) {
             </div>
 
 
+          </div>
 
-            <button
+          <hr />
+
+          <button
                 //disabled
                 onClick={() =>
                 {
@@ -224,9 +227,6 @@ export default function ProductDetails({ product }: any) {
                 <Wallet className="mr-2 h-6 w-6" />
                 Pay from Wallet
             </button>
-
-
-          </div>
 
           <hr />
 
