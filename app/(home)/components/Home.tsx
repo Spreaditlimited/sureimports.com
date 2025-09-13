@@ -299,7 +299,7 @@ export default function Home() {
           onNavigateBlog={handleNavigateToBlog}
         />
         <BlogList 
-          onSelectPost={handleSelectBlogPost}
+          onSelectPost={handleSelectBlogPost as any}
           onNavigateHome={() => navigateToPage("home")}
         />
         <Footer 

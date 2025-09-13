@@ -28,6 +28,8 @@ import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Metadata } from 'next';
 import { useAuth } from '@/app/context/AuthContext';
+import { getAffiliateReference } from '@/utils/affiliateUtils';
+import { toast } from 'sonner';
 
 ////////////////////// ZOD FORM SCHEMA //////////////////////
 const formSchema = z
@@ -119,10 +121,10 @@ const InputField: React.FC<InputFieldProps> = ({
               />
             )}
             <Input
-              type={isPasswordVisible ? 'text' : type}
+              type={type === 'hidden' ? 'hidden' : (isPasswordVisible ? 'text' : type)}
               placeholder={placeholder}
               aria-label={label}
-              className="mt-2 flex h-[60px] items-center rounded-[10px] border-none px-[50px]"
+              className={type === 'hidden' ? 'hidden' : "mt-2 flex h-[60px] items-center rounded-[10px] border-none px-[50px]"}
               {...field}
               value={field.value}
               defaultValue={field.value}
@@ -191,16 +193,15 @@ const SignupPage: React.FC<SignupPageProps> = ({
               className="flex flex-col space-y-5"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              {/* <InputField
+              {/* Hidden affiliate reference field */}
+              <InputField
                 name="userAffiliateRef"
                 control={form.control}
-                //label="First Name"
                 type="hidden"
                 defaultValue={form.getValues('userAffiliateRef')}
-                defaultValuevalue={userAffiliateRef}
-                placeholder="Enter Your Firstname"
-                iconSrc="/icons/user.svg"
-              /> */}
+                placeholder=""
+                iconSrc=""
+              />
 
               <InputField
                 name="userFirstname"
@@ -285,32 +286,6 @@ const SignupPage: React.FC<SignupPageProps> = ({
               Login
             </Link>
           </div>
-
-          {/* <div className="flex h-[20px] w-full items-center text-slate-600">
-            <div className="w-full">
-              <Separator className="" />
-            </div>
-            <div className="mx-4 w-6 text-base font-normal text-slate-600">
-              OR
-            </div>
-            <div className="w-full">
-              <Separator className="" />
-            </div>
-          </div> */}
-
-          {/* <Button className="flex h-14 w-full items-center rounded-xl bg-slate-100 py-3.5 hover:bg-slate-200">
-            <Image
-              loading="lazy"
-              src="/icons/google.svg"
-              alt="Google icon"
-              width={24}
-              height={24}
-              className="mr-2 h-6 w-6"
-            />
-            <span className="text-base font-semibold text-black">
-              Sign Up with Google
-            </span>
-          </Button> */}
         </CardFooter>
 
         <CardFooter className="mt-5 flex w-full flex-col items-center space-y-5 px-0 py-0">
@@ -377,10 +352,32 @@ const SignupPageContainer: React.FC = () => {
 
   const searchParams = useSearchParams();
 
-  const userAffiliateRefx =
-    (new URLSearchParams(searchParams).get('affRef') as any) || 'NO_REF';
+  // Get affiliate reference from multiple sources
+  const getAffiliateRef = React.useCallback(() => {
+    // First, check URL parameters
+    const urlAffRef = new URLSearchParams(searchParams).get('affRef');
+    if (urlAffRef) {
+      return urlAffRef;
+    }
 
-  //const affiliateLink = '/auth/signup-store?affRef='+userAffiliateRefx;
+
+    //alert('AFFREF1: ' + urlAffRef);
+
+    // Second, check stored affiliate reference (cookie/localStorage)
+    const storedAffRef = getAffiliateReference();
+    if (storedAffRef) {
+      return storedAffRef;
+    }
+
+    //alert('AFFREF2: ' + storedAffRef);
+
+    // Default fallback
+    return 'NO_REF';
+  }, [searchParams]);
+
+  const userAffiliateRefx = getAffiliateRef();
+
+  //alert('Affiliate Reference Used: ' + userAffiliateRefx);
 
   React.useEffect(() => {
     // Check if user data is not loaded
@@ -408,6 +405,14 @@ const SignupPageContainer: React.FC = () => {
     },
   });
 
+  // Update the affiliate reference if it changes
+  React.useEffect(() => {
+    const currentAffRef = getAffiliateRef();
+    if (currentAffRef && currentAffRef !== form.getValues('userAffiliateRef')) {
+      form.setValue('userAffiliateRef', currentAffRef);
+    }
+  }, [searchParams, form, getAffiliateRef]);
+
   const [message, setMessage] = React.useState('') as any;
   const [isPasswordVisible, setPasswordVisible] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
@@ -418,9 +423,8 @@ const SignupPageContainer: React.FC = () => {
 
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
-    console.log(data);
-    //await new Promise((resolve) => setTimeout(resolve, 3000));
-
+    console.log('Form data with affiliate ref:', data);
+    
     const userFirstname = data.userFirstname;
     const userLastname = data.userLastname;
     const email = data.email;
@@ -454,14 +458,10 @@ const SignupPageContainer: React.FC = () => {
         setLoading(false);
       }
     } catch (error: any) {
-      //setError(error.message);
+      console.error('Registration error:', error);
     } finally {
-      //setIsLoading(false);
-      //alert('Taking Final Action');
       setLoading(false);
     }
-    //router.push('/auth/account-creation-success');
-    //alert(data.email);
   };
 
   return (

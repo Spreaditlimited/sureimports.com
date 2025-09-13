@@ -200,11 +200,9 @@ export default function ProductDetails({ product }: any) {
 
             </div>
 
-          </div>
 
-          <hr />
 
-          <button
+            <button
                 //disabled
                 onClick={() =>
                 {
@@ -225,7 +223,49 @@ export default function ProductDetails({ product }: any) {
               >
                 <Wallet className="mr-2 h-6 w-6" />
                 Pay from Wallet
-          </button>
+            </button>
+
+
+            <div className="flex flex-col min-h-screen p-4 bg-gray-100">
+          {/* First Row: Two Column Layout */}
+          <div className="flex flex-row gap-4 mb-4">
+            <div className="flex-1 bg-white p-4 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-2">Column 1</h2>
+              <p className="text-gray-700 mb-4">
+                This is the first column in the two-column layout. It takes up half the width of the row.
+              </p>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Click Me
+              </button>
+            </div>
+            <div className="flex-1 bg-white p-4 rounded-lg shadow">
+              <h2 className="text-xl font-bold mb-2">Column 2</h2>
+              <p className="text-gray-700 mb-4">
+                This is the second column in the two-column layout. It also takes up half the width.
+              </p>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Click Me
+              </button>
+            </div>
+          </div>
+
+          {/* Second Row: One Column Layout */}
+          <div className="bg-white p-4 rounded-lg shadow">
+            <h2 className="text-xl font-bold mb-2">Single Column</h2>
+            <p className="text-gray-700 mb-4">
+              This is the single column in the second row. It spans the full width of the container.
+            </p>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+              Click Me
+            </button>
+          </div>
+        </div>
+
+
+
+          </div>
+
+          <hr />
 
           <button
             onClick={() => router.push('/dashboard/store?id=laptop')}
