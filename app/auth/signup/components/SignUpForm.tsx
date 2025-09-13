@@ -374,6 +374,7 @@ const SignupPageContainer: React.FC = () => {
     // Default fallback
     return 'NO_REF';
   }, [searchParams]);
+  
 
   const userAffiliateRefx = getAffiliateRef();
 
