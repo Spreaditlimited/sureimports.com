@@ -431,6 +431,28 @@ const allTransactions: any[] = [
           </div>
         </Card>
 
+
+        {availableBalance <= 0 && (
+        <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+            <div className="flex items-start gap-3">
+              <div className="w-5 h-5 rounded-full bg-amber-600 dark:bg-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-3 h-3 text-white dark:text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-amber-800 dark:text-amber-200">Important Notice</h4>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  Wallet not funded within <b>10 days</b> of activation will be automatically deactivated. Ignore message if wallet had been previously funded.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
+
+
+
+
         {/* Pending Withdrawal Notice */}
         {pendingWithdrawal > 0 && (
           <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">

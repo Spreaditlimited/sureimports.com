@@ -183,8 +183,7 @@ export default function ProductDetails({ product }: any) {
             <div className="relative">
               <button
                 //disabled
-                onClick={
-                  () =>
+                onClick={() =>
                   //alert('Pay Small Small is Coming Soon, check back later')
                   router.push(
                     '/dashboard/store/pay-small-small-terms?id=' + product.pidProduct,
@@ -198,13 +197,12 @@ export default function ProductDetails({ product }: any) {
                 Pay Small Small
               </button>
               
-            </div>
 
+            </div>
 
           </div>
 
           <hr />
-
           <button
                 //disabled
                 onClick={() =>
@@ -227,7 +225,6 @@ export default function ProductDetails({ product }: any) {
                 <Wallet className="mr-2 h-6 w-6" />
                 Pay from Wallet
             </button>
-
           <hr />
 
           <button
@@ -237,6 +234,8 @@ export default function ProductDetails({ product }: any) {
             <ShoppingCart className="mr-2 h-4 w-4" />
             Back to Store
           </button>
+
+<hr />
 
         </div>
       </div>
@@ -255,6 +254,8 @@ export default function ProductDetails({ product }: any) {
             >
               Description
             </button>
+
+
             <button
               onClick={() => setActiveTab('features')}
               className={`inline-block p-4 text-center ${
@@ -265,6 +266,8 @@ export default function ProductDetails({ product }: any) {
             >
               Features
             </button>
+
+
             <button
               onClick={() => setActiveTab('specifications')}
               //onClick={() => router.push('/dashboard/store/pay-small-small?id=laptop')}

@@ -51,17 +51,25 @@ const VuesaxOutlineArrowDown = React.memo(() => (
 
 const CheckboxIcon = React.memo(({ checked }: { checked: boolean }) => (
   <div className="relative shrink-0 size-[18px] overflow-clip">
-    <div className="absolute inset-0 bg-gray-200 dark:bg-gray-600 border-2 border-gray-300 dark:border-gray-500 rounded-sm" />
+    <div className={`absolute inset-0 border-2 rounded-sm transition-colors ${
+      checked 
+        ? 'bg-blue-600 border-blue-600' 
+        : 'bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500'
+    }`} />
     {checked && (
-      <div
-        className="absolute inset-[5.208%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-0.938px] mask-size-[18px_18px]"
-        style={{ maskImage: `url('${imgGroup}')` }}
-      >
-        <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 17 17">
-          <g id="Group">
-            <path d={svgPaths.p1ce82000} fill="var(--color-primary)" />
-            <path d={svgPaths.p25628e20} fill="var(--color-primary)" />
-          </g>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <svg 
+          className="w-3 h-3 text-white" 
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={3} 
+            d="M5 13l4 4L19 7" 
+          />
         </svg>
       </div>
     )}
@@ -321,10 +329,10 @@ export default function App({productx, status}: {productx: any, status: string})
   
         if (data.statusx == 'SUCCESS') {
           toast.success(data.message);
-          router.push('/dashboard/pay-small-small?status=CANCELLED');
-          setShowCancelDialog(false)
-          //refreshComponent();
-          //window.location.reload();
+          await router.push('/dashboard/pay-small-small?status=CANCELLED');
+          window.location.reload();
+          setShowCancelDialog(false);
+          
         }
         if (data.statusx == 'FAILED') {
           toast.warning(data.message);

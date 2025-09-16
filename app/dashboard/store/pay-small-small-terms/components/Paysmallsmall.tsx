@@ -17,11 +17,30 @@ import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
+import Loader from '@/components/uix/Loader'
 
 // Desktop Components
 interface ProductImageProps {
   product: any
 }
+
+interface userData {
+  address: unknown;
+  id: number;
+  pidUser: string;
+  userEmail: string;
+  userFirstname: string;
+  gender: string;
+  dob: Date | undefined;
+  phone: string;
+  country: string;
+  userImage: string;
+  // bank_name: string;
+  // bank_account_number: string;
+  // bank_account_name: string;
+}
+
+
 
 function ProductImage({product}: ProductImageProps) {
   return (
@@ -474,6 +493,8 @@ export default function App({ product }: any) {
     const router = useRouter();
   
     const { user } = useAuth();
+   // const [userData, setUserData] = useState<userData>(); //DATA FROM API CALL
+
   
     //calculate 5% of product price
     let price = product.productPrice + product.productPrice * 0.05;
@@ -481,7 +502,8 @@ export default function App({ product }: any) {
     const [pidUser, setPidUser] = useState(user?.pidUser);
     const [email, setEmail] = useState(user?.userEmail);
     const [pidProduct, setPidProduct] = useState(product.pidProduct);
-    const [phone, setPhoneNumber] = useState<number>(0);
+    //const [phone, setPhoneNumber] = useState<number>(0);
+    const [phone, setPhoneNumber] = useState(0);
     const [amount, setAmount] = useState(price);
     const [quantity, setQuantity] = useState(1);
     
@@ -577,6 +599,56 @@ export default function App({ product }: any) {
   const handleStepClick = (step: number) => {
     setCurrentStep(step)
   }
+
+
+
+
+
+  //GET USER PROFILE RECORDS
+  const fetchUser = async (pidUser: string) => {
+    try {
+      //request for users
+      const res = await fetch(`/api/user/${pidUser}`);
+
+      //check if request was successful
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch user');
+      }
+
+      //fetch json records into userData
+      const data: userData = await res.json();
+
+      //update user records variables
+      //setUserData(data);
+      //setPidUser(data.pidUser);
+      // setFullName(data.userFirstname);
+      // setGender(data.gender);
+      // setDOB(data.dob);
+      setPhoneNumber(data.phone as any);
+      // setCountry(data.country);
+      // setAddress(data.address);
+      // setImagex(data.userImage);
+    } catch (err: any) {
+      //setError(err.message || 'An error occurred');
+    } finally {
+      //setLoading(false);
+    }
+  };
+
+  //run fetchUser function to get user records
+  useEffect(() => {
+    if (pidUser) {
+      fetchUser(pidUser);
+    }
+  }, [pidUser]);
+
+  //CHECK IF USER DATA HAS BEEN FULLY LOADED TO DOM
+  //if (!userData) return <Loader />;
+
+
+
+
 
   return (
     <>
