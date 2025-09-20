@@ -415,8 +415,10 @@ const allTransactions: any[] = [
               </svg>
               Top Up
             </Button>
+
+            
             <Button
-            disabled
+              //disabled
               onClick={handleWithdraw}
               //disabled={availableBalance <= 0 || pendingWithdrawal > 0}
               //disabled={true}

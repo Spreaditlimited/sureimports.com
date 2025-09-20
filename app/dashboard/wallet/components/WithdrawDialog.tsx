@@ -13,6 +13,7 @@ import { Card } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface WithdrawDialogProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ interface WithdrawDialogProps {
 }
 
 export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithdrawalConfirmed }: WithdrawDialogProps) {
+  
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [withdrawalRequested, setWithdrawalRequested] = useState(false);
   const [withdrawalType, setWithdrawalType] = useState<'full' | 'partial'>('full');
@@ -45,19 +47,24 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
   };
 
   const validatePartialAmount = (): boolean => {
+
+
     if (withdrawalType === 'full') {
       return true; // No validation needed for full withdrawal
     }
     
     const amount = parseFloat(partialAmount);
+
     if (!partialAmount || isNaN(amount) || amount <= 0) {
       setError('Please enter a valid amount');
       return false;
     }
+
     if (amount > availableBalance) {
       setError('Amount exceeds available balance');
       return false;
     }
+
     if (amount < 1000) {
       setError('Minimum withdrawal amount is ₦1,000');
       return false;
@@ -66,7 +73,21 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
     return true;
   };
 
+
+
+
   const handleProceedToConfirmation = () => {
+
+
+    toast.success('Withdrawal request submitted successfully');
+    setShowConfirmation(false);
+    setWithdrawalRequested(false);
+    setWithdrawalType('full');
+    setPartialAmount('');
+    setError('');
+    onClose();
+    return;
+
     if (!validatePartialAmount()) {
       return;
     }
