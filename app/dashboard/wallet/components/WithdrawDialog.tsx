@@ -79,7 +79,7 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
   const handleProceedToConfirmation = () => {
 
 
-    toast.success('Withdrawal request submitted successfully');
+    toast.success('Processing withdrawal request...');
     setShowConfirmation(false);
     setWithdrawalRequested(false);
     setWithdrawalType('full');
