@@ -53,7 +53,7 @@ function ProductImage({product}: ProductImageProps) {
                   `${product.productImage}`) as string
               }
               alt="Product Image"
-              className="h-full w-full object-cover"
+              className="p-7 rounded-lg h-96 h-fullx w-fullx object-coverx"
             />
 
       {/* <div className="[grid-area:1_/_1] bg-neutral-50 h-[300px] md:h-[456px] ml-0 mt-0 relative rounded-[20px] w-full max-w-[560px]">
@@ -236,7 +236,7 @@ function MobileProductImage({product}:any) {
                   `${product.productImage}`) as string
               }
               alt="Product Image"
-              className="h-full w-full object-cover"
+              className="p-7 h-full w-full object-cover"
             />
       <div
         className="absolute inset-[15%] bg-[100%_49.4%] bg-no-repeat bg-size-[101.62%_159.91%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-center mask-size-contain"

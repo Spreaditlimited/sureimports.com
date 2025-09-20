@@ -78,15 +78,14 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
 
   const handleProceedToConfirmation = () => {
 
-
-    toast.success('Processing withdrawal request...');
-    setShowConfirmation(false);
-    setWithdrawalRequested(false);
-    setWithdrawalType('full');
-    setPartialAmount('');
-    setError('');
-    onClose();
-    return;
+        toast.success('Processing withdrawal request...');
+        setShowConfirmation(false);
+        setWithdrawalRequested(false);
+        setWithdrawalType('full');
+        setPartialAmount('');
+        setError('');
+        onClose();
+        return;
 
     if (!validatePartialAmount()) {
       return;
