@@ -47,8 +47,6 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
   };
 
   const validatePartialAmount = (): boolean => {
-
-
     if (withdrawalType === 'full') {
       return true; // No validation needed for full withdrawal
     }
@@ -73,32 +71,82 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
     return true;
   };
 
+  // Example of how to call this API route from your frontend
+  const initiateRefund = async (transactionId: string, amount?: number) => {
+    try {
+      toast.info('Now Processing...');
+      
+      // Convert amount to kobo (multiply by 100 for Nigerian Naira)
+      const amountInKobo = amount ? Math.round(amount * 100) : undefined;
+      
+      const response = await fetch('/api/paystack/refund', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          transaction: transactionId,
+          amount: amountInKobo, // Amount in kobo (subunit of NGN)
+          currency: 'NGN', // Nigerian Naira
+          customer_note: 'Wallet withdrawal refund processed as requested',
+          merchant_note: `Customer service withdrawal refund - Amount: ₦${amount?.toLocaleString()}`
+        }),
+      });
 
-
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log('Refund initiated:', result.data);
+        toast.success(`Withdrawal of ₦${amount?.toLocaleString()} initiated successfully. You will receive the funds in your bank account within 3 business days.`);
+        return result.data;
+      } else {
+        console.error('Refund failed:', result.error);
+        toast.error(`Withdrawal failed: ${result.error}`);
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Error initiating refund:', error);
+      toast.error('Failed to process withdrawal. Please try again later.');
+      throw error;
+    }
+  };
 
   const handleProceedToConfirmation = () => {
-
-        toast.success('Processing withdrawal request...');
-        setShowConfirmation(false);
-        setWithdrawalRequested(false);
-        setWithdrawalType('full');
-        setPartialAmount('');
-        setError('');
-        onClose();
-        return;
-
-    if (!validatePartialAmount()) {
-      return;
-    }
-    
-    // Double-check the withdrawal amount before proceeding
     const withdrawalAmount = getWithdrawalAmount();
+    
     if (withdrawalAmount <= 0) {
-      setError('Invalid withdrawal amount');
+      toast.error('Invalid withdrawal amount');
       return;
     }
-    
-    setShowConfirmation(true);
+
+    toast.success('Processing withdrawal request...');
+
+    // Call the refund API with the proper amount and currency
+    initiateRefund('CUS_narnc5iqophohry', withdrawalAmount)
+      .then((data) => {
+        console.log('Withdrawal successful:', data);
+        
+        // Update UI to show success
+        setShowConfirmation(false);
+        setWithdrawalRequested(true);
+        
+        // Auto close after 5 seconds
+        setTimeout(() => {
+          setWithdrawalRequested(false);
+          setWithdrawalType('full');
+          setPartialAmount('');
+          setError('');
+          onClose();
+        }, 5000);
+      })
+      .catch((error) => {
+        console.error('Withdrawal error:', error);
+        toast.error('Failed to process withdrawal. Please try again later.');
+        
+        // Reset form state on error
+        setShowConfirmation(false);
+        setError('Withdrawal failed. Please try again.');
+      });
   };
 
   const handleConfirmWithdrawal = () => {
