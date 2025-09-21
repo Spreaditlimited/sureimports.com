@@ -43,7 +43,9 @@ export async function GET(
 
 
   try {
-    const { email } = await params; // Properly destructure params
+    //const { email } = await params; // Properly destructure params
+
+    const email = 'sureimporters@gmail.com';
 
     //////////////////// GET CUSTOMER PROFILE DETAILS ////////////////////
     const data = await fetch(`https://api.paystack.co/customer/${email}`, {
@@ -54,10 +56,10 @@ export async function GET(
       },
     });
 
-    //console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::'+data.ok);
+    //console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::'+data);
 
     const response_customer_details = await data.json();
-
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::1'+JSON.stringify(response_customer_details));
     if (
       data.ok == false ||
       response_customer_details.data.dedicated_accounts == undefined ||
