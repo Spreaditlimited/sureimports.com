@@ -31,13 +31,17 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
   const [error, setError] = useState('');
 
   // Extract numeric value from wallet balance string
-  const availableBalance = parseFloat(walletBalance.replace(/[₦,\s]/g, '').split('.')[0]);
+  //const availableBalance = parseFloat(walletBalance.replace(/[₦,\s]/g, '').split('.')[0]);
   
+  const availableBalance = parseFloat(walletBalance);
+  
+  //alert(availableBalance);
   const formatCurrency = (amount: number): string => {
     return `₦${amount.toLocaleString()}.00`;
   };
 
   const getWithdrawalAmount = (): number => {
+    //return 5;
     if (withdrawalType === 'full') {
       return availableBalance;
     } else {
@@ -74,7 +78,7 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
   // Example of how to call this API route from your frontend
   const initiateRefund = async (transactionId: string, amount?: number) => {
     try {
-      toast.info('Now Processing...');
+      toast.info('Now Processing...'+amount);
       
       // Convert amount to kobo (multiply by 100 for Nigerian Naira)
       const amountInKobo = amount ? Math.round(amount * 100) : undefined;
@@ -289,7 +293,16 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
             <div className="bg-muted rounded-lg p-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-muted-foreground">Available Balance:</span>
-                <span className="font-medium text-foreground">{walletBalance}</span>
+                <span className="font-medium text-foreground">
+                {
+                  ('₦' +
+                    (availableBalance as number)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                  ) as string
+                }
+                </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Withdrawal Amount:</span>
@@ -368,7 +381,16 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
           <Card className="p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground text-sm">Available Balance:</span>
-              <span className="font-bold text-foreground text-lg">{walletBalance}</span>
+              <span className="font-bold text-foreground text-lg">
+              {
+                  ('₦' +
+                    (availableBalance as number)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                  ) as string
+                }
+              </span>
             </div>
           </Card>
 

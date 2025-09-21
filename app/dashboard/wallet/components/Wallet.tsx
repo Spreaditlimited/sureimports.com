@@ -644,7 +644,7 @@ const allTransactions: any[] = [
       <WithdrawDialog
         isOpen={showWithdrawDialog}
         onClose={() => setShowWithdrawDialog(false)}
-        walletBalance={availableBalanceText} // Pass the available balance, not total balance
+        walletBalance={availableBalance} // Pass the available balance, not total balance
         onWithdrawalConfirmed={onWithdrawalConfirmed}
       />
     </div>
