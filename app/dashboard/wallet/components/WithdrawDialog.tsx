@@ -122,7 +122,7 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
     toast.success('Processing withdrawal request...');
 
     // Call the refund API with the proper amount and currency
-    initiateRefund('CUS_narnc5iqophohry', withdrawalAmount)
+    initiateRefund('sureimporters@gmail.com', withdrawalAmount)
       .then((data) => {
         console.log('Withdrawal successful:', data);
         
