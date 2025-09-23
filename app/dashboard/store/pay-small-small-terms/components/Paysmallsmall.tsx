@@ -249,20 +249,29 @@ function MobileProductImage({product}:any) {
   )
 }
 
-function MobileProductInfo() {
+function MobileProductInfo(product:any) {
   return (
     <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full dark:bg-black">
       <div className="flex flex-col gap-2.5">
         <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm w-fit">
-          HP
+          {product.productBrand}
         </Badge>
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold text-slate-800 leading-tight dark:text-white">
-            HP EliteBook x360 1040 G8 – Power Meets Elegance
+            {product.productName}
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span className="text-base font-semibold text-indigo-800">
-              ₦1,015,875.00
+
+                {
+                  ('₦' +
+                    (product.amount as number/1)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+                  ) as string
+                }
+
             </span>
             <span className="text-sm text-slate-800 dark:text-white">
               Inclusive of 5% PSS Fee
@@ -487,6 +496,7 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
     </div>
   )
 }
+
 
 export default function App({ product }: any) {
 
