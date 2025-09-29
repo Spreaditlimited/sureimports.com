@@ -37,6 +37,10 @@ export async function GET(request: NextRequest) {
     );
   }
 
+
+
+
+
   //create a random 10 digit reference for the pidDebit
   const pidDebit = `DEB${Math.floor(1000000000 + Math.random() * 9000000000)}`; // Generate a random 10-digit number
 
@@ -141,7 +145,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
        {
          statusx: 'SUCCESS',
-         message: 'Debit Record was Successfully Created',
+         message: 'Payment was Successful',
        },
        { status: 200 },
       );
@@ -150,7 +154,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           statusx: 'FAILED',
-          message: 'Debit Record was NOT Created',
+          message: 'Payment was not Successful',
         },
         { status: 200 },
       );
