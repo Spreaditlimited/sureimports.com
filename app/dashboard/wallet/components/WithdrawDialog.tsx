@@ -382,7 +382,7 @@ export default function WithdrawDialog({ isOpen, onClose, walletBalance, onWithd
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground text-sm">Available Balance:</span>
               <span className="font-bold text-foreground text-lg">
-              {
+                {
                   ('₦' +
                     (availableBalance as number)
                       .toFixed(2)

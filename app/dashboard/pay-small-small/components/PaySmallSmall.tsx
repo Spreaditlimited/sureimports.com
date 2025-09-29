@@ -896,7 +896,7 @@ export default function App({productx, status}: {productx: any, status: string})
                 <div className="w-24 h-24 mx-auto bg-gradient-to-br from-muted to-muted/50 rounded-full flex items-center justify-center">
                   <span className="text-4xl">📦</span>
                 </div>
-                <h3 className="text-xl font-semibold text-foreground">No Products Found</h3>
+                <h3 className="text-xl font-semibold text-foreground dark:text-white">No Products Found</h3>
                 <p className="text-muted-foreground">No products found for the "{selectedStatus}" status.</p>
               </div>
             </div>
