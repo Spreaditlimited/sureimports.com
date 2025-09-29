@@ -138,7 +138,7 @@ function WalletPaymentDialog({
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Processing...
-                </div>
+                </div> 
               ) : (
                 `Pay ₦${formatAmount(totalAmount)}`
               )}
@@ -162,8 +162,10 @@ export default function ProductDetails({ product }: any) {
   const [pidUser, setPidUser] = useState(user?.pidUser as string);
   const [email, setEmail] = useState(user?.userEmail as string);
   const [quantity, setQuantity] = useState(1);
-  const [price, setPrice] = useState(product.productPrice as number);
-  const [amount, setAmount] = useState(product.productPrice as number);
+
+  // Calculate price based on quantity
+  const price = quantity * (product.productPrice as number);
+  const amount = price;
 
   const [activeTab, setActiveTab] = useState('description');
   const [showTooltip, setShowTooltip] = useState(false);
@@ -191,12 +193,10 @@ export default function ProductDetails({ product }: any) {
 
   const incrementQuantity = () => {
     setQuantity((prev) => prev + 1);
-    setPrice((quantity + 1) * (product.productPrice as number));
   };
 
   const decrementQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-    setPrice((quantity - 1) * (product.productPrice as number));
   };
 
   const handlePaymentSuccess = (reference: string) => {
@@ -265,14 +265,15 @@ export default function ProductDetails({ product }: any) {
     
     try {
       await payFromWallet(
-        product.pidProduct,
-        pidUser,
-        pidPaySmallSmall,
-        product.pidProduct,
-        price * quantity
+        product.pidProduct,     // productId
+        pidUser,               // pidUser
+        pidPaySmallSmall,      // pidPaySmallSmall (this might be empty/undefined)
+        product.pidProduct,    // pidProduct
+        price                  // amount (already includes quantity)
       );
     } catch (error) {
       console.error('Wallet payment error:', error);
+      toast.error('Payment failed. Please try again.');
     } finally {
       setIsWalletPaymentProcessing(false);
       setShowWalletDialog(false);
@@ -287,16 +288,13 @@ export default function ProductDetails({ product }: any) {
     pidProduct: any,
     amount: any,
   ) => {
-
-    //check if amount is valid for product claim
+    // Check if amount is valid for product claim
     if (parseFloat(transactions.totalAmount) < parseFloat(amount)) {
       toast.warning(
-        (('You do not have sufficient funds to claim this product. Fund your wallet with a minimum of ₦' +
-          parseFloat(amount as any)
-            .toFixed(2)
-            .toString()
-            .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string) +
-          ' to Claim this product.',
+        `You do not have sufficient funds to claim this product. Fund your wallet with a minimum of ₦${parseFloat(amount)
+          .toFixed(2)
+          .toString()
+          .replace(/\B(?=(\d{3})+(?!\d))/g, ',')} to claim this product.`
       );
       return;
     }
@@ -304,39 +302,34 @@ export default function ProductDetails({ product }: any) {
     toast.info('Processing Purchase...');
     
     try {
-      const response = await fetch(
-        '/api/pay-from-wallet/?' +
-          'pidUser=' +
-          user?.pidUser +
-          '&pidPaySmallSmall=' +
-          pidPaySmallSmall +
-          '&pidProduct=' +
-          pidProduct +
-          '&amount=' +
-          amount,
-      );
+      // Build the API URL with proper parameters
+      const apiUrl = new URL('/api/pay-from-wallet/', window.location.origin);
+      apiUrl.searchParams.append('pidUser', user?.pidUser || '');
+      apiUrl.searchParams.append('pidPaySmallSmall', pidPaySmallSmall || '');
+      apiUrl.searchParams.append('pidProduct', pidProduct);
+      apiUrl.searchParams.append('amount', amount.toString());
+      apiUrl.searchParams.append('quantity', quantity.toString());
 
-    const data: any = await response.json();
+      const response = await fetch(apiUrl.toString());
+      const data: any = await response.json();
 
-    if (data.statusx == 'SUCCESS') {
-      toast.success(data.message);
-      router.push('/dashboard/success/payment');
-      setShowCancelDialog(false)
-      //refreshComponent();
-      //window.location.reload();
+      if (data.statusx === 'SUCCESS') {
+        toast.success(data.message);
+        router.push('/dashboard/success/payment');
+        setShowWalletDialog(false);
+        // Optionally refresh the page or update the wallet balance
+        // window.location.reload();
+      } else if (data.statusx === 'FAILED') {
+        toast.warning(data.message);
+      } else {
+        toast.warning('Payment failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.warning('Action failed! Error: ' + error);
+    } finally {
+      setIsWalletPaymentProcessing(false);
     }
-    if (data.statusx == 'FAILED') {
-      toast.warning(data.message);
-    }
-  } catch (statusx) {
-    toast.warning('Action failed! Error: ' + statusx);
-    //setError(error instanceof Error ? error.message : 'Unknown error');
-    //setStatus(statusx as string);
-  } finally {
-    setLoading(false);
-  }
-
-    // Perform the action based on the button clicked
   };
 
   return (
@@ -385,7 +378,7 @@ export default function ProductDetails({ product }: any) {
             <p className="text-2xl font-bold text-gray-900 dark:text-white">
               ₦
               {
-                parseFloat(price as any)
+                parseFloat(price.toString())
                   .toFixed(2)
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
@@ -499,7 +492,7 @@ export default function ProductDetails({ product }: any) {
         isOpen={showWalletDialog}
         onClose={() => setShowWalletDialog(false)}
         walletBalance={transactions?.totalAmount || 0}
-        totalAmount={price * quantity}
+        totalAmount={price} // Already includes quantity
         productName={product.productName}
         quantity={quantity}
         onPaymentConfirmed={handleWalletPaymentConfirmed}

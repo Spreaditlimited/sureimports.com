@@ -5,7 +5,7 @@ import xMail from '@/lib/email/xMail3';
 
 export async function GET(request: NextRequest) {
   const pidUser = request.nextUrl.searchParams.get('pidUser');
-  const pidPaySmallSmall = request.nextUrl.searchParams.get('pidPaySmallSmall');
+  //const pidPaySmallSmall = request.nextUrl.searchParams.get('pidPaySmallSmall');
   const pidProduct = request.nextUrl.searchParams.get('pidProduct');
   const amount = request.nextUrl.searchParams.get('amount');
 
@@ -57,30 +57,40 @@ export async function GET(request: NextRequest) {
 
     if (create_debits) {
 
-      const update_status = await prisma.paysmallsmall.update({
-        where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
-        data: { status: 'COMPLETED' },
+
+      
+      const product: any = await prisma.store.findUnique({
+        where: {
+          pidProduct: pidProduct as string | undefined,
+        },
+        // select: {
+        //   countryName: true,
+        // },
       });
+      // const update_status = await prisma.paysmallsmall.update({
+      //   where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
+      //   data: { status: 'COMPLETED' },
+      // });
 
 
-      const pss = await prisma.paysmallsmall.findUnique({
-        where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
-      });
+      // const pss = await prisma.paysmallsmall.findUnique({
+      //   where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
+      // });
 
 
 
      ////////////////////// SEND CUSTOMER PAYMENT RECEIPT EMAIL BLOCK STARTS //////////////////////
       //import { xMail } from '@/lib/email/xMail';
       const xEmail_A = email; //hello@sureimports.com
-      const xTitle_A = `Thank you for completing your Pay Small Small order`;
+      const xTitle_A = `Thank you for placing an order`;
       const xBodyTitle_A = `Your Purchase was Successful!`;
       const xBody_A = `Dear ${first_name}, <br />
-                            This is to confirm your Pay Small Small Order Completion on the <b>sureimports.com</b> website.<br /><br />
+                            This is to confirm your Payment on the <b>sureimports.com</b> website.<br /><br />
                             Here are the details of your order: <br />
                             <h4>Order type: <b>Pay Small Small</b></h4><hr />
-                            <h4>Product: <b>${pss?.productName}</b></h4><hr />
-                            <h4>Quantity: <b>${pss?.quantity}</b></h4><hr />
-                            <h4>Amount: <b>N${pss?.amount}</b> (NGN)</h4><hr />
+                            <h4>Product: <b>${product?.productName}</b></h4><hr />
+                            <h4>Quantity: <b>${product?.quantity}</b></h4><hr />
+                            <h4>Amount: <b>N${product?.amount}</b> (NGN)</h4><hr />
                             <h4>Name: <b>${first_name+' '+last_name}</b></h4><hr />
                             <h4>Phone: <b>${user.phone}</b></h4><hr />
                             <h4>Email: <b>${email}</b></h4><hr />
@@ -102,17 +112,17 @@ export async function GET(request: NextRequest) {
     ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
     //import { xMail } from '@/lib/email/xMail';
     const xEmail_B = 'hello@sureimports.com';
-    const xTitle_B = `New Pay Small Small Purchase Successful!`;
-    const xBodyTitle_B = `Pay Small Small Purchase Successful!`;
-    const xBody_B = `Hi Admin, <br />A Pay Small Small order has been completed successfully on sureimports.com shop.</b><br />
+    const xTitle_B = `New Pay from Wallet Purchase Successful!`;
+    const xBodyTitle_B = `Pay from Wallet Purchase Successful!`;
+    const xBody_B = `Hi Admin, <br />A Pay from wallet order has been completed successfully on sureimports.com shop.</b><br />
                         Here are the details of the order: <br />
                         <h4>Order ID: <b>${pidProduct}</b></h4><hr />
                         <h4>Order Type: <b>Pay Small Small</b></h4><hr />
                         <h4>Customer name: <b>${first_name+' '+last_name}</b></h4><hr />
                         <h4>Phone Number: <b>${user?.phone}</b></h4><hr />
-                        <h4>Product Name: <b>${pss?.productName}</b></h4><hr />
-                        <h4>Quantity: <b>${pss?.quantity}</b></h4><hr />
-                        <h4>Amount: <b>N${pss?.amount}</b> (NGN)</h4><hr />
+                        <h4>Product Name: <b>${product?.productName}</b></h4><hr />
+                        <h4>Quantity: <b>${product?.quantity}</b></h4><hr />
+                        <h4>Amount: <b>N${product?.amount}</b> (NGN)</h4><hr />
                         <h4>Address: <b>${user?.address}</b></h4><hr />
                         Kind regards,<br />
                         Sureimports.com Automated System`;
