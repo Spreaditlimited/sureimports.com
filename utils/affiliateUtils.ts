@@ -27,12 +27,17 @@ export const getAffiliateReference = (): string | null => {
 };
 
 export const clearAffiliateReference = (): void => {
+
   if (typeof document !== 'undefined') {
-    // Clear cookie
+
+    // Clear cookie 
     document.cookie = 'affRef=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.sureimports.com;';
     
     // Clear localStorage
     localStorage.removeItem('affRef');
+ 
+    // 
     localStorage.removeItem('affRefTimestamp');
+
   }
 };

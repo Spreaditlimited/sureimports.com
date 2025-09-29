@@ -83,6 +83,12 @@ function ProductCard({product}: any) {
 }
 
 function ProductInfo({product, amount}:any) {
+  const formatAmount = (value: any) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue <= 0) return '0.00';
+    return numValue.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <div className="absolute bottom-0 left-0 right-0 p-4 md:p-[30px] bg-white/80 backdrop-blur-sm rounded-b-[20px] dark:bg-black border-slate-600">
       <div className="space-y-2.5">
@@ -95,13 +101,7 @@ function ProductInfo({product, amount}:any) {
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span className="text-lg md:text-[20px] font-semibold text-indigo-800">
-              ₦
-              {
-                parseFloat(amount)
-                  .toFixed(2)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-              }
+              ₦{formatAmount(amount)}
             </span>
             <span className="text-sm md:text-base text-slate-800 dark:text-white">
               Inclusive of 5% PSS Fee
@@ -174,7 +174,7 @@ interface PaymentFormProps {
 }
 
 function PaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: PaymentFormProps) {
-  const isValidPhone = phoneNumber.length >= 10 && /^\+?[0-9\s-()]+$/.test(phoneNumber)
+  const isValidPhone = phoneNumber && phoneNumber.length >= 10 && /^\+?[0-9\s-()]+$/.test(phoneNumber)
 
   return (
     <div className="space-y-4">
@@ -186,7 +186,7 @@ function PaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: 
           id="phone"
           type="tel"
           placeholder="Enter a Valid Phone Number"
-          value={phoneNumber}
+          value={phoneNumber || ''}
           onChange={(e) => onPhoneNumberChange(e.target.value)}
           className="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-800 focus:border-transparent"
         />
@@ -249,7 +249,13 @@ function MobileProductImage({product}:any) {
   )
 }
 
-function MobileProductInfo(product:any) {
+function MobileProductInfo({product, amount}:any) {
+  const formatAmount = (value: any) => {
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue <= 0) return '0.00';
+    return numValue.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full dark:bg-black">
       <div className="flex flex-col gap-2.5">
@@ -262,16 +268,7 @@ function MobileProductInfo(product:any) {
           </h2>
           <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
             <span className="text-base font-semibold text-indigo-800">
-
-                {
-                  ('₦' +
-                    (product.amount as number/1)
-                      .toFixed(2)
-                      .toString()
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-                  ) as string
-                }
-
+            ₦{formatAmount(amount)}
             </span>
             <span className="text-sm text-slate-800 dark:text-white">
               Inclusive of 5% PSS Fee
@@ -449,7 +446,7 @@ function MobilePagination({ totalSteps, currentStep, onStepClick }: MobilePagina
 }
 
 function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoading }: PaymentFormProps) {
-  const isValidPhone = phoneNumber.length >= 10 && /^\+?[0-9\s-()]+$/.test(phoneNumber)
+  const isValidPhone = phoneNumber && phoneNumber.length >= 10 && /^\+?[0-9\s-()]+$/.test(phoneNumber)
 
   return (
     <div className="flex flex-col gap-2.5 w-full">
@@ -460,7 +457,7 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
         id="phone-mobile"
         type="tel"
         placeholder="Enter a Valid Phone Number"
-        value={phoneNumber}
+        value={phoneNumber || ''}
         onChange={(e) => onPhoneNumberChange(e.target.value)}
         className="w-full h-12 px-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-800 focus:border-transparent"
       />
@@ -499,30 +496,99 @@ function MobilePaymentForm({ phoneNumber, onPhoneNumberChange, onSubmit, isLoadi
 
 
 export default function App({ product }: any) {
+  const router = useRouter();
+  const { user } = useAuth();
 
-    const router = useRouter();
-  
-    const { user } = useAuth();
-   // const [userData, setUserData] = useState<userData>(); //DATA FROM API CALL
+  // Fix: Ensure product.productPrice is a valid number before calculation
+  const calculateAmount = () => {
+    const basePrice = parseFloat(product?.productPrice) || 0;
+    if (basePrice <= 0) return 0;
+    return basePrice + (basePrice * 0.05);
+  };
 
-  
-    //calculate 5% of product price
-    let price = product.productPrice + product.productPrice * 0.05;
-  
-    const [pidUser, setPidUser] = useState(user?.pidUser);
-    const [email, setEmail] = useState(user?.userEmail);
-    const [pidProduct, setPidProduct] = useState(product.pidProduct);
-    //const [phone, setPhoneNumber] = useState<number>(0);
-    const [phone, setPhoneNumber] = useState(0);
-    const [amount, setAmount] = useState(price);
-    const [quantity, setQuantity] = useState(1);
-    
-  //const [phoneNumber, setPhoneNumber] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [currentStep, setCurrentStep] = useState(0)
+  const [pidUser, setPidUser] = useState(user?.pidUser);
+  const [email, setEmail] = useState(user?.userEmail);
+  const [pidProduct, setPidProduct] = useState(product.pidProduct);
+  const [phone, setPhoneNumber] = useState<string>('');
+  const [amount, setAmount] = useState(calculateAmount()); // Use the calculated amount
+  const [quantity, setQuantity] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
 
-    const navigateWithAlert = useNavigationWithAlert();
+  const navigateWithAlert = useNavigationWithAlert();
 
+  // Also update the MobileProductInfo component to handle NaN
+  function MobileProductInfo({product, amount}:any) {
+    const formatAmount = (value: any) => {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue <= 0) return '0.00';
+      return numValue.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    return (
+      <div className="bg-neutral-50 border border-[rgba(0,0,0,0.05)] rounded-[15px] p-5 w-full dark:bg-black">
+        <div className="flex flex-col gap-2.5">
+          <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm w-fit">
+            {product.productBrand}
+          </Badge>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg font-semibold text-slate-800 leading-tight dark:text-white">
+              {product.productName}
+            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span className="text-base font-semibold text-indigo-800">
+                ₦{formatAmount(amount)}
+              </span>
+              <span className="text-sm text-slate-800 dark:text-white">
+                Inclusive of 5% PSS Fee
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Also update the ProductInfo component for desktop
+  function ProductInfo({product, amount}:any) {
+    const formatAmount = (value: any) => {
+      const numValue = parseFloat(value);
+      if (isNaN(numValue) || numValue <= 0) return '0.00';
+      return numValue.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    };
+
+    return (
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-[30px] bg-white/80 backdrop-blur-sm rounded-b-[20px] dark:bg-black border-slate-600">
+        <div className="space-y-2.5">
+          <Badge className="bg-indigo-800 text-white px-5 py-1.5 rounded-[30px] text-sm">
+            {product.productBrand}
+          </Badge>
+          <div className="space-y-1">
+            <h2 className="text-xl md:text-[28px] font-semibold text-slate-800 leading-tight dark:text-white">
+              {product.productName}
+            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+              <span className="text-lg md:text-[20px] font-semibold text-indigo-800">
+                ₦{formatAmount(amount)}
+              </span>
+              <span className="text-sm md:text-base text-slate-800 dark:text-white">
+                Inclusive of 5% PSS Fee
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Add debugging to see what's happening with the product data
+  useEffect(() => {
+    console.log('Product data:', product);
+    console.log('Product price:', product?.productPrice);
+    console.log('Calculated amount:', calculateAmount());
+  }, [product]);
+
+  // Rest of your component code...
 
     //FORM DATA SUBMISSION
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -677,7 +743,7 @@ export default function App({ product }: any) {
             <div className="w-full flex justify-center">
               <MobileProductImage product={product} />
             </div>
-            <MobileProductInfo />
+            <MobileProductInfo product={product} amount={amount} />
           </div>
 
           {/* Content Section */}

@@ -361,15 +361,16 @@ const SignupPageContainer: React.FC = () => {
     }
 
 
-    //alert('AFFREF1: ' + urlAffRef);
+    alert('AFFREF1: ' + urlAffRef);
 
     // Second, check stored affiliate reference (cookie/localStorage)
     const storedAffRef = getAffiliateReference();
+
     if (storedAffRef) {
       return storedAffRef;
     }
 
-    //alert('AFFREF2: ' + storedAffRef);
+    alert('AFFREF2: ' + storedAffRef);
 
     // Default fallback
     return 'NO_REF';
