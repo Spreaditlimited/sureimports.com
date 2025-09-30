@@ -91,10 +91,10 @@ export async function GET(request: NextRequest) {
       const xBody_A = `Dear ${first_name}, <br />
                             This is to confirm your Payment on the <b>sureimports.com</b> website.<br /><br />
                             Here are the details of your order: <br />
-                            <h4>Order type: <b>Pay Small Small</b></h4><hr />
+                            <h4>Order type: <b>Store Purchase</b></h4><hr />
                             <h4>Product: <b>${product?.productName}</b></h4><hr />
-                            <h4>Quantity: <b>${product?.quantity}</b></h4><hr />
-                            <h4>Amount: <b>N${product?.amount}</b> (NGN)</h4><hr />
+                            <h4>Quantity: <b>${1}</b></h4><hr />
+                            <h4>Amount: <b>N${amount}</b> (NGN)</h4><hr />
                             <h4>Name: <b>${first_name+' '+last_name}</b></h4><hr />
                             <h4>Phone: <b>${user.phone}</b></h4><hr />
                             <h4>Email: <b>${email}</b></h4><hr />

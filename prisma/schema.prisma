@@ -307,6 +307,7 @@ model debits {
   id                   Int       @id @default(autoincrement())
   pidDebit             String    @unique()
   pidUser              String
+  email                String
   payerName            String
   txID                 String
   txRef                String
