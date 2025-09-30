@@ -30,7 +30,7 @@ export async function GET(
 
   const debitAggregate = await prisma.debits.aggregate({
     where: {
-      pidUser: user?.email,
+      email: user?.email,
       paymentStatus: 'DEBITED',
     },
     _sum: {
