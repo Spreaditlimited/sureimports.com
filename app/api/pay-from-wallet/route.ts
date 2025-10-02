@@ -50,6 +50,7 @@ export async function GET(request: NextRequest) {
       data: { 
         pidDebit: pidDebit as any,
         pidUser: pidUser as any,
+        email: email,
         payerName: `${first_name} ${last_name}`,
         txID: `DEB${Math.floor(100000 + Math.random() * 900000)}`, // Generate a random 6-digit number
         txRef: `REF${Math.floor(100000 + Math.random() * 900000)}`, // Generate a random 6-digit number
