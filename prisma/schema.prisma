@@ -194,6 +194,10 @@ model store {
   productImage        String?
   productImageType    String?
   productImageExt     String?
+  productCondition    ProductCondition?
+  warrantyPeriod      WarrantyPeriod?
+  affiliatePayout     Float?
+  superAffiliatePayout     Float?
   ext1                String?
   ext2                String?
   xStatus             String?
@@ -285,11 +289,21 @@ model payments {
   serviceID            String?
   serviceName          String?
   serviceDescription   String?
+
+  affiliate_payout_amount             String?
+  affiliate_payout_percentage           String?
+  superAffiliate_payout_amount        String?
+  superAffiliate_payout_percentage   String?
+
   bankName             String?
   bankNumber           String?
   depositorName        String?
   affiliatePayStatus   String?
   affiliateRefId       String?
+
+  superAffiliatePayStatus   String?
+  superAffiliateRefId       String?
+
   txDateProcesser      String?
   txDateServer         String?
   status1              String?
@@ -980,4 +994,21 @@ enum PayStatus {
   STARTED
   COMPLETED
   CANCELLED
+}
+
+
+enum ProductCondition {
+  BRAND_NEW
+  PRE_OWNED
+  REFURBISHED
+  OPEN_BOX
+}
+
+
+enum WarrantyPeriod {
+  MONTHS3
+  MONTHS6
+  MONTHS12
+  MONTHS24
+  MONTHS36
 }
