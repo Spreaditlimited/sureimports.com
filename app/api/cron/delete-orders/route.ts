@@ -170,24 +170,57 @@ The Sure Imports Team
           //(daysPending >= 12) && (daysPending <= 14)
           if('email'==='email'){
 
-            //Delete Products and Orders that are tied or ordered with this order
-            const orderProducts = await prisma.products.findMany({
-              where: {
-                pidOrder: order.pidOrder,
-              },
-            });
+            //DELETE ORDER AND PRODUCTS TIED TO IT
 
-            //Iterate through the products and delete records
-            for (const op of orderProducts) {
-              await prisma.products.delete({where: { pidOrder: op.pidOrder} as any});
-            }
+            // First, find all products associated with this order
+const orderProducts = await prisma.products.findMany({
+  where: {
+    pidOrder: order.pidOrder,
+  },
+});
 
-            //Now delete the order itself after deleting the products tied to it  
-            await prisma.orders.deleteMany({
-              where: {
-                status: 'testing',
-              },
-            });
+// Log the products found for this order
+console.log(`Found ${orderProducts.length} products for order ${order.pidOrder}`);
+
+// Delete all products associated with this order
+if (orderProducts.length > 0) {
+  const deletedProducts = await prisma.products.deleteMany({
+    where: {
+      pidOrder: order.pidOrder,
+    },
+  });
+  console.log(`Deleted ${deletedProducts.count} products for order ${order.pidOrder}`);
+}
+
+// Now delete the order itself
+const deletedOrder = await prisma.orders.delete({
+  where: {
+    pidOrder: order.pidOrder,
+    status: 'testing', // Ensure we only delete if still 'testing'
+  },
+});
+
+console.log(`Deleted order ${order.pidOrder} successfully`);
+
+
+            // //Delete Products and Orders that are tied or ordered with this order
+            // const orderProducts = await prisma.products.findMany({
+            //   where: {
+            //     pidOrder: order.pidOrder,
+            //   },
+            // });
+
+            // //Iterate through the products and delete records
+            // for (const op of orderProducts) {
+            //   await prisma.products.delete({where: { pidOrder: op.pidOrder} as any});
+            // }
+
+            // //Now delete the order itself after deleting the products tied to it  
+            // await prisma.orders.deleteMany({
+            //   where: {
+            //     status: 'testing',
+            //   },
+            // });
 
 
           }
