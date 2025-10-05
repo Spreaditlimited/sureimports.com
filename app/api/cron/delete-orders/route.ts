@@ -179,13 +179,13 @@ The Sure Imports Team
 
             //Iterate through the products and delete records
             for (const op of orderProducts) {
-              await prisma.products.delete({where: { pidOrder: op.pidOrder } as any,});
+              await prisma.products.delete({where: { pidOrder: op.pidOrder} as any});
             }
 
             //Now delete the order itself after deleting the products tied to it  
-            const deletedOrders = await prisma.orders.deleteMany({
+            await prisma.orders.deleteMany({
               where: {
-                status: 'pending',
+                status: 'testing',
               },
             });
 
