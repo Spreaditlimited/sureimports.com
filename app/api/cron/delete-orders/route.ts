@@ -79,12 +79,14 @@ The Sure Imports Team
   // Fetch orders with 'pending' status
   const pendingOrders = await prisma.orders.findMany({
     where: {
-      status: 'saved', // Change 'pending' to 'testing' for testing purposes
+      status: 'testing', // Change 'pending' to 'testing' for testing purposes
     },
   });
 
   // Loop through each pending order and send reminder email
   for (const order of pendingOrders) {
+
+
     try {
 
       const daysPending = getDaysDifference(order.updatedAt as any);
@@ -99,8 +101,8 @@ The Sure Imports Team
 
 
         //EMAIL 1: Send email at 3 days
-        //(daysPending >= 3) && (daysPending <= 3)
-        if('email'==='email'){
+        //(daysPending >= 3) && (daysPending <= 4)
+        if(xEmail==='email'){
             const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody1
                 .replace('[First Name]', user.userFirstname as any)
@@ -121,7 +123,7 @@ The Sure Imports Team
 
 
         //EMAIL 2: Send email at 6 days
-        //(daysPending >= 208) && (daysPending <= 209)
+        //(daysPending >= 6) && (daysPending <= 7)
         if(xEmail==='email'){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
@@ -143,7 +145,7 @@ The Sure Imports Team
 
 
         //EMAIL 3: Send email at 2 days
-        //(daysPending >= 208) && (daysPending <= 209)
+        //(daysPending >= 9) && (daysPending <= 10)
         if(xEmail==='email'){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
@@ -163,21 +165,48 @@ The Sure Imports Team
             }
 
 
+          
+          // After sending reminders, delete orders that are still pending
+          //(daysPending >= 12) && (daysPending <= 14)
+          if('email'==='email'){
+
+            //Delete Products and Orders that are tied or ordered with this order
+            const orderProducts = await prisma.products.findMany({
+              where: {
+                pidOrder: order.pidOrder,
+              },
+            });
+
+            //Iterate through the products and delete records
+            for (const op of orderProducts) {
+              await prisma.products.delete({where: { pidOrder: op.pidOrder } as any,});
+            }
+
+            //Now delete the order itself after deleting the products tied to it  
+            const deletedOrders = await prisma.orders.deleteMany({
+              where: {
+                status: 'pending',
+              },
+            });
 
 
-      }
+          }
+
+          }
+
+
+
+
+
+
+
     } catch (error) {
       console.error(`Failed to send email for order ${order.pidOrder}:`, error);
       return NextResponse.json({ ok: false, error: error });//you can also log the error to a file or monitoring service
     }
   }
 
-  // After sending reminders, delete orders that are still pending
-  // const deletedOrders = await prisma.orders.deleteMany({
-  //   where: {
-  //     status: 'pending',
-  //   },
-  // });
+
 
 
 
