@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET() {
 
-  
+
 // Function to calculate days difference between two dates
 const getDaysDifference = (dateString: string): number => {
   const orderDate = new Date(dateString);
@@ -96,8 +96,8 @@ The Sure Imports Team
         const xEmail = user.userEmail as string;
 
 
-        //EMAIL 1: Send email at 2 days
-        if(daysPending === 1){
+        //EMAIL 1: Send email at 3 days
+        if(xEmail==='email'){
             const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody1
                 .replace('[First Name]', user.userFirstname as any)
@@ -117,8 +117,8 @@ The Sure Imports Team
 
 
 
-        //EMAIL 2: Send email at 7 days
-        if(daysPending === 2){
+        //EMAIL 2: Send email at 6 days
+        if((daysPending >= 208) && (daysPending <= 209)){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
                   .replace('[First Name]', user.userFirstname as any)
@@ -139,7 +139,7 @@ The Sure Imports Team
 
 
         //EMAIL 3: Send email at 2 days
-        if(daysPending === 208){
+        if(xEmail==='email'){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
                   .replace('[First Name]', user.userFirstname as any)
