@@ -1,3 +1,4 @@
+import xMail from '@/lib/email/xMail';
 import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
@@ -43,7 +44,7 @@ The Sure Imports Team
           .replace('[First Name]', user.userFirstname as any)
           .replace('[Order ID]', order.pidOrder);
 
-        await xMail2({
+        await xMail({
           xEmail,
           xTitle,
           xBodyTitle: xTitle,
