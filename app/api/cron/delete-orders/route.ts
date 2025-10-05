@@ -6,6 +6,8 @@ import { NextResponse } from 'next/server';
 export async function GET() {
 
 
+
+
 // Function to calculate days difference between two dates
 const getDaysDifference = (dateString: string): number => {
   const orderDate = new Date(dateString);
@@ -77,7 +79,7 @@ The Sure Imports Team
   // Fetch orders with 'pending' status
   const pendingOrders = await prisma.orders.findMany({
     where: {
-      status: 'testing', // Change 'pending' to 'testing' for testing purposes
+      status: 'saved', // Change 'pending' to 'testing' for testing purposes
     },
   });
 
@@ -97,7 +99,8 @@ The Sure Imports Team
 
 
         //EMAIL 1: Send email at 3 days
-        if(xEmail==='email'){
+        //(daysPending >= 3) && (daysPending <= 3)
+        if('email'==='email'){
             const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody1
                 .replace('[First Name]', user.userFirstname as any)
@@ -118,7 +121,8 @@ The Sure Imports Team
 
 
         //EMAIL 2: Send email at 6 days
-        if((daysPending >= 208) && (daysPending <= 209)){
+        //(daysPending >= 208) && (daysPending <= 209)
+        if(xEmail==='email'){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
                   .replace('[First Name]', user.userFirstname as any)
@@ -139,6 +143,7 @@ The Sure Imports Team
 
 
         //EMAIL 3: Send email at 2 days
+        //(daysPending >= 208) && (daysPending <= 209)
         if(xEmail==='email'){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
