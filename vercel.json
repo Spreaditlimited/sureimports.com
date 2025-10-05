@@ -11,6 +11,10 @@
       {
         "path": "/api/cron/special-sourcing",
         "schedule": "0 0 1,8,15,22,29 * *"
+      },
+      {
+        "path": "/api/cron/delete-orders",
+        "schedule": "1 * * *"
       }
   ]
   }
