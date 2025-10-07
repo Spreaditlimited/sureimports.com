@@ -86,6 +86,7 @@ export async function GET(request: NextRequest) {
 
 
 
+    // If debit creation is successful, create payment record and send emails
     if (create_debits) {
 
     // Create payment record
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
         payerEmail: email,
         txID: txID,
         txRef: txREF,
-        paymentStatus: 'PENDING',
+        paymentStatus: 'PAID',
         paymentType: 'UNKNOWN',
         currency: 'NGN',
         amount: parseFloat(amount as string),
@@ -105,10 +106,10 @@ export async function GET(request: NextRequest) {
         serviceName: 'SURESTORE',
         serviceDescription: 'Online Purchase',
 
-        affiliate_payout_amount: affiliatePayoutAmount as any,
-        affiliate_payout_percentage: affiliatePayoutPercentage as any,
-        superAffiliate_payout_amount: superAffiliatePayoutAmount as any,
-        superAffiliate_payout_percentage: superAffiliatePayoutPercentage as any,
+        affiliate_payout_amount: affiliatePayoutAmount,
+        affiliate_payout_percentage: affiliatePayoutPercentage,
+        superAffiliate_payout_amount: superAffiliatePayoutAmount,
+        superAffiliate_payout_percentage: superAffiliatePayoutPercentage,
 
         affiliatePayStatus: 'pending',
         affiliateRefId: affiliateRefId || 'NO_REF',
@@ -126,15 +127,6 @@ export async function GET(request: NextRequest) {
         //   countryName: true,
         // },
       });
-      // const update_status = await prisma.paysmallsmall.update({
-      //   where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
-      //   data: { status: 'COMPLETED' },
-      // });
-
-
-      // const pss = await prisma.paysmallsmall.findUnique({
-      //   where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
-      // });
 
 
 
@@ -168,23 +160,26 @@ export async function GET(request: NextRequest) {
       ////////////////////// SEND PAYMENT RECEIPT EMAIL BLOCK STARTS //////////////////////
     
 
-    ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
-    //import { xMail } from '@/lib/email/xMail';
-    const xEmail_B = 'hello@sureimports.com';
-    const xTitle_B = `New Pay from Wallet Purchase Successful!`;
-    const xBodyTitle_B = `Pay from Wallet Purchase Successful!`;
-    const xBody_B = `Hi Admin, <br />A Pay from wallet order has been completed successfully on sureimports.com shop.</b><br />
-                        Here are the details of the order: <br />
-                        <h4>Order ID: <b>${pidProduct}</b></h4><hr />
-                        <h4>Order Type: <b>Pay Small Small</b></h4><hr />
-                        <h4>Customer name: <b>${first_name+' '+last_name}</b></h4><hr />
-                        <h4>Phone Number: <b>${user?.phone}</b></h4><hr />
-                        <h4>Product Name: <b>${product?.productName}</b></h4><hr />
-                        <h4>Quantity: <b>${product?.quantity}</b></h4><hr />
-                        <h4>Amount: <b>N${product?.amount}</b> (NGN)</h4><hr />
-                        <h4>Address: <b>${user?.address}</b></h4><hr />
-                        Kind regards,<br />
-                        Sureimports.com Automated System`;
+
+
+
+      ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
+      //import { xMail } from '@/lib/email/xMail';
+      const xEmail_B = 'hello@sureimports.com';
+      const xTitle_B = `New Pay from Wallet Purchase Successful!`;
+      const xBodyTitle_B = `Pay from Wallet Purchase Successful!`;
+      const xBody_B = `Hi Admin, <br />A Pay from wallet order has been completed successfully on sureimports.com shop.</b><br />
+                          Here are the details of the order: <br />
+                          <h4>Order ID: <b>${pidProduct}</b></h4><hr />
+                          <h4>Order Type: <b>Pay Small Small</b></h4><hr />
+                          <h4>Customer name: <b>${first_name+' '+last_name}</b></h4><hr />
+                          <h4>Phone Number: <b>${user?.phone}</b></h4><hr />
+                          <h4>Product Name: <b>${product?.productName}</b></h4><hr />
+                          <h4>Quantity: <b>${product?.quantity}</b></h4><hr />
+                          <h4>Amount: <b>N${product?.amount}</b> (NGN)</h4><hr />
+                          <h4>Address: <b>${user?.address}</b></h4><hr />
+                          Kind regards,<br />
+                          Sureimports.com Automated System`;
 
     await xMail({
       xEmail: xEmail_B,
@@ -193,6 +188,8 @@ export async function GET(request: NextRequest) {
       xBody: xBody_B,
     });
     ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
+
+
 
 
       

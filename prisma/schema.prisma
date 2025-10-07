@@ -291,10 +291,10 @@ model payments {
   serviceName          String?
   serviceDescription   String?
 
-  affiliate_payout_amount             String?
-  affiliate_payout_percentage           String?
-  superAffiliate_payout_amount        String?
-  superAffiliate_payout_percentage   String?
+  affiliate_payout_amount             Float?
+  affiliate_payout_percentage         Float?
+  superAffiliate_payout_amount        Float?
+  superAffiliate_payout_percentage    Float?
 
   bankName             String?
   bankNumber           String?

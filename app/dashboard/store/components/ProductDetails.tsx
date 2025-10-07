@@ -416,6 +416,7 @@ export default function ProductDetails({ product }: any) {
               </button>
             </div>
 
+
             <PaystackButton
               title={' Pay '}
               email={email}
