@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
   const superAffiliatePayoutAmount = product.superAffiliatePayout;
   const superAffiliatePayoutPercentage = 0.2; //hard coded
 
-  const affiliateRefId = user.affiliateRefId;
+  const affiliateRefId = user.userAffiliateRef || 'NO_REF';
   ////////////////// PAYMENT PARAMS ENDS //////////////////////
 
 
