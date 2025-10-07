@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import xMail from '@/lib/email/xMail3';
+import randomGenerator from '@/lib/helpers/randomGenerator';
 
 export async function GET(request: NextRequest) {
   const pidUser = request.nextUrl.searchParams.get('pidUser');
@@ -17,6 +18,17 @@ export async function GET(request: NextRequest) {
     //   countryName: true,
     // },
   });
+
+  //get product details
+  const product: any = await prisma.store.findUnique({
+    where: {
+      pidProduct: pidProduct as string | undefined,
+    },
+    // select: {
+    //   countryName: true,
+    // },
+  });
+
 
   const email = user.userEmail;
   const first_name = user.userFirstname;
@@ -37,8 +49,20 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  ////////////////// PAYMENT PARAMS STARTS //////////////////////
+  const randomValue = randomGenerator(10);
+  const pidPayment = 'PAY' + randomValue;
+  const txID = 'DEB' + randomValue;
+  const txREF = 'REF' + randomValue;
+  const serviceID = 'STORE' + randomValue;
 
+  const affiliatePayoutAmount = product.affiliatePayout;
+  const affiliatePayoutPercentage = 2.5; //hard coded
+  const superAffiliatePayoutAmount = product.superAffiliatePayout;
+  const superAffiliatePayoutPercentage = 0.2; //hard coded
 
+  const affiliateRefId = user.affiliateRefId;
+  ////////////////// PAYMENT PARAMS ENDS //////////////////////
 
 
   //create a random 10 digit reference for the pidDebit
@@ -52,18 +76,48 @@ export async function GET(request: NextRequest) {
         pidUser: pidUser as any,
         email: email,
         payerName: `${first_name} ${last_name}`,
-        txID: `DEB${Math.floor(100000 + Math.random() * 900000)}`, // Generate a random 6-digit number
-        txRef: `REF${Math.floor(100000 + Math.random() * 900000)}`, // Generate a random 6-digit number
+        txID: txID, // Generate a random 6-digit number
+        txRef: txREF, // Generate a random 6-digit number
         paymentStatus: 'DEBITED',
         amount: parseFloat(amount as string),
         currency: 'NGN',
        },
     });
 
+
+
     if (create_debits) {
 
+    // Create payment record
+    await prisma.payments.create({
+      data: {
+        pidPayment: pidPayment,
+        pidUser: pidUser as any,
+        payerName: `${first_name} ${last_name}` || 'Unknown User',
+        payerEmail: email,
+        txID: txID,
+        txRef: txREF,
+        paymentStatus: 'PENDING',
+        paymentType: 'UNKNOWN',
+        currency: 'NGN',
+        amount: parseFloat(amount as string),
+        serviceID: serviceID,
+        serviceName: 'SURESTORE',
+        serviceDescription: 'Online Purchase',
 
+        affiliate_payout_amount: affiliatePayoutAmount as any,
+        affiliate_payout_percentage: affiliatePayoutPercentage as any,
+        superAffiliate_payout_amount: superAffiliatePayoutAmount as any,
+        superAffiliate_payout_percentage: superAffiliatePayoutPercentage as any,
+
+        affiliatePayStatus: 'pending',
+        affiliateRefId: affiliateRefId || 'NO_REF',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
       
+
       const product: any = await prisma.store.findUnique({
         where: {
           pidProduct: pidProduct as string | undefined,

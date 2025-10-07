@@ -280,6 +280,7 @@ model payments {
   pidPayment           String    @unique()
   pidUser              String
   payerName            String
+  payerEmail           String
   txID                 String
   txRef                String
   paymentStatus        String?
@@ -298,6 +299,7 @@ model payments {
   bankName             String?
   bankNumber           String?
   depositorName        String?
+
   affiliatePayStatus   String?
   affiliateRefId       String?
 

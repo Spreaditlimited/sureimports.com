@@ -63,7 +63,8 @@ export async function POST(request: Request) {
       data: {
         pidPayment: pidPayment,
         pidUser: pidUser,
-        payerName: email || 'Unknown User',
+        payerName: fullName || 'Unknown User',
+        payerEmail: email,
         txID: pidStore || 'FAYA',
         txRef: reference || 'FAYA',
         paymentStatus: 'PENDING',
