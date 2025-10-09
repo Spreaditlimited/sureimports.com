@@ -237,8 +237,8 @@ export async function GET(request: NextRequest) {
       ////////////////////// SEND CUSTOMER PAYMENT RECEIPT EMAIL BLOCK ENDS //////////////////////
 
       ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK STARTS //////////////////////
-      //const xEmail_B = 'hello@sureimports.com';
-      const xEmail_B = 'atsuemmanuel@gmail.com';
+      const xEmail_B = 'hello@sureimports.com';
+      //const xEmail_B = 'atsuemmanuel@gmail.com';
       const xTitle_B = `New Wallet Purchase - ${product?.productName}`;
       const xBodyTitle_B = `Wallet Purchase Successful!`;
       const xBody_B = `Hi Admin, <br />A wallet purchase has been completed successfully on sureimports.com.<br /><br />
