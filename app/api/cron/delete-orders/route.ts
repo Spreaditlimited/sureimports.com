@@ -109,6 +109,7 @@ The Sure Imports Team
       if (user) {
         const xEmail = user.userEmail as string;
 
+        
 
         //EMAIL 1: Send email at 3 days
         //(daysPending >= 1) && (daysPending <= 2)
@@ -134,7 +135,7 @@ The Sure Imports Team
 
         //EMAIL 2: Send email at 6 days
         //(daysPending >= 4) && (daysPending <= 5)
-        if('email'==='email'){
+        if(xEmail==='email'){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
                   .replace('[First Name]', user.userFirstname as any)
