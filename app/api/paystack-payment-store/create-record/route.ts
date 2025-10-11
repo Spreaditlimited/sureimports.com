@@ -33,6 +33,35 @@ export async function POST(request: Request) {
     const pidPayment = 'PAY' + randomValue;
     const reference = `FAYASTORE_${Date.now()}`;
 
+
+    const user: any = await prisma.users.findUnique({
+      where: {
+        pidUser: pidUser as string,
+      },
+    });
+    
+
+
+    
+        // Get product details
+        const product: any = await prisma.store.findUnique({
+          where: {
+            pidProduct: pidProduct as string,
+          },
+        });
+
+        ////////////////// PAYMENT PARAMS STARTS //////////////////////
+        const txID = 'DEB' + randomValue;
+        const txREF = 'REF' + randomValue;
+    
+        const affiliatePayoutAmount = product.affiliatePayout || 0;
+        const affiliatePayoutPercentage = 2.5; // hard coded
+        const superAffiliatePayoutAmount = product.superAffiliatePayout || 0;
+        const superAffiliatePayoutPercentage = 0.2; // hard coded
+    
+        const affiliateRefId = user.userAffiliateRef || 'NO_REF';
+        ////////////////// PAYMENT PARAMS ENDS //////////////////////
+
     // Get user details
     // const user = await prisma.users.findUnique({
     //   where: { pidUser: pidUser },
@@ -49,9 +78,9 @@ export async function POST(request: Request) {
         pidStore: `SALE${Math.floor(1000000000 + Math.random() * 9000000000)}`,
         pidProduct: pidProduct as string,
         pidUser: pidUser as string,
-        product_name: product.productName,
-        unit_price: (purchaseAmount / parseInt(quantity)).toFixed(2),
-        total_price: purchaseAmount.toFixed(2),
+        product_name: productName,
+        unit_price: (amount / parseInt(quantity)).toFixed(2),
+        total_price: amount.toFixed(2),
         quantity: quantity.toString(),
         status: 'COMPLETED',
         ext1: txREF, // Store transaction reference
@@ -99,14 +128,14 @@ export async function POST(request: Request) {
       data: {
         pidPayment: pidPayment,
         pidUser: pidUser as any,
-        payerName: `${first_name} ${last_name}` || 'Unknown User',
+        payerName: fullName || 'Unknown User',
         payerEmail: email,
-        txID: txID,
-        txRef: txREF,
+        txID: pidPayment,
+        txRef: pidPayment,
         paymentStatus: 'PAID',
         paymentType: 'WALLET',
         currency: 'NGN',
-        amount: purchaseAmount,
+        amount: amount,
         serviceID: serviceID,
         serviceName: 'SURESTORE',
         serviceDescription: 'Online Purchase',
