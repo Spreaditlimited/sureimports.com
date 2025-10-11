@@ -287,7 +287,7 @@ const PaystackButtonStore: React.FC<PaystackButtonProps> = ({
     <button
       onClick={initializePayment}
       disabled={loading}
-      className={`w-full rounded-[50px] bg-[#3730A3] px-[30px] py-2.5 text-[16px] font-medium leading-[150%] text-white transition-all duration-200 ease-linear hover:opacity-90 disabled:!cursor-not-allowed disabled:opacity-50 md:text-[18px] md:leading-[200%] ${
+      className={`flex w-full flex-1 items-center justify-center rounded-md bg-blue-600 py-2 font-medium text-white hover:bg-blue-700 ${
         loading ? 'cursor-not-allowed opacity-50' : ''
       }`}
     >
