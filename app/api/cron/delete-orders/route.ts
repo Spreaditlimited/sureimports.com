@@ -109,10 +109,10 @@ The Sure Imports Team
       if (user) {
         const xEmail = user.userEmail as string;
 
-        
+
 
         //EMAIL 1: Send email at 3 days
-        //(daysPending >= 1) && (daysPending <= 2)
+        //(daysPending == 1)
         if(xEmail==='email'){
             const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody1
@@ -134,7 +134,7 @@ The Sure Imports Team
 
 
         //EMAIL 2: Send email at 6 days
-        //(daysPending >= 4) && (daysPending <= 5)
+        //(daysPending == 4)
         if(xEmail==='email'){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
@@ -156,7 +156,7 @@ The Sure Imports Team
 
 
         //EMAIL 3: Send email at 2 days
-        //(daysPending >= 7) && (daysPending <= 8)
+        //(daysPending == 7)
         if(xEmail==='email'){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
@@ -178,7 +178,7 @@ The Sure Imports Team
 
           
           //DELETE ORDER AND PRODUCTS TIED TO IT
-          //(daysPending >= 8) && (daysPending <= 9)
+          //(daysPending == 8)
           if(xEmail==='email'){
       
             // First, find all products associated with this order

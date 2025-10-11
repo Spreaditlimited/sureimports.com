@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { BiMoney } from 'react-icons/bi';
 import Paystack from '@/components/uix/Paystack';
 import { useAuth } from '@/app/context/AuthContext';
-import PaystackButton from '@/components/paystack/PaystackButton';
+import PaystackButton from '@/components/paystack/PaystackButtonStore';
 import { toast } from 'sonner';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 import { Button } from '@/components/ui/button';
@@ -434,6 +434,13 @@ export default function ProductDetails({ product }: any) {
               onSuccess={handlePaymentSuccess}
               onClose={handlePaymentClose}
               onVerificationComplete={handleVerificationComplete}
+
+              fullName={user?.userFirstname}
+              // phone={user?.userPhone || ''}
+              // address={user?.userAddress || ''}
+              deliveryOption={'N/A'}
+              deliveryLocation={'N/A'}
+              
               metadata={{
                 custom_fields: [
                   {
