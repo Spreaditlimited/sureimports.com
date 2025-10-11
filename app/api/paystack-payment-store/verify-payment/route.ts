@@ -5,6 +5,7 @@ import xMail from '@/lib/email/xMail';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
+
 export async function POST(request: Request) {
   try {
     const {
