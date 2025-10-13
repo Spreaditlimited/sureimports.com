@@ -183,7 +183,7 @@ const PaystackButtonStore: React.FC<PaystackButtonProps> = ({
           },
 
           callback: (response: any) => {
-            alert('ON-SUCCESS REFERENCE: ' + reference);
+            //alert('ON-SUCCESS REFERENCE: ' + reference); return;
 
             if (onSuccess) onSuccess(reference);
             verifyPayment(
