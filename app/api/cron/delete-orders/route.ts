@@ -157,7 +157,7 @@ The Sure Imports Team
 
         //EMAIL 3: Send email at 2 days
         //(daysPending == 7)
-        if('email'==='email'){
+        if(xEmail==='email'){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
                   .replace('[First Name]', user.userFirstname as any)
