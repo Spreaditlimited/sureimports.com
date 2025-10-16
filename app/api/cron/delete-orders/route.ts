@@ -155,6 +155,7 @@ The Sure Imports Team
 
 
 
+            
         //EMAIL 3: Send email at 2 days
         //(daysPending == 7)
         if(xEmail==='email'){
@@ -179,7 +180,7 @@ The Sure Imports Team
           
           //DELETE ORDER AND PRODUCTS TIED TO IT
           //(daysPending == 8)
-          if(xEmail==='email'){
+          if('email'==='email'){
       
             // First, find all products associated with this order
             const orderProducts = await prisma.products.findMany({
