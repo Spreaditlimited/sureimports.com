@@ -76,6 +76,144 @@ const CheckboxIcon = React.memo(({ checked }: { checked: boolean }) => (
   </div>
 ))
 
+interface WalletPaymentDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  walletBalance: number;
+  totalAmount: number;
+  productName: string;
+  onPaymentConfirmed: () => void;
+  isProcessing: boolean;
+}
+
+function WalletPaymentDialog({
+  isOpen,
+  onClose,
+  walletBalance,
+  totalAmount,
+  productName,
+  onPaymentConfirmed,
+  isProcessing
+}: WalletPaymentDialogProps) {
+  const formatAmount = (amount: number) => {
+    return amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const hasInsufficientFunds = walletBalance < totalAmount;
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-green-600" />
+            Claim Product from Wallet
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-6 py-4">
+          {/* Product Info */}
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+            <h3 className="font-medium text-gray-900 dark:text-white">Product Details</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{productName}</p>
+          </div>
+
+          {/* Balance and Amount Breakdown */}
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Current Wallet Balance
+              </span>
+              <span className="text-lg font-semibold text-green-600 dark:text-green-400">
+                ₦{formatAmount(walletBalance)}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Total Amount to Pay
+              </span>
+              <span className="text-lg font-semibold text-blue-600 dark:text-blue-400">
+                ₦{formatAmount(totalAmount)}
+              </span>
+            </div>
+
+            <div className={`flex justify-between items-center p-3 rounded-lg ${
+              hasInsufficientFunds 
+                ? 'bg-red-50 dark:bg-red-900/20' 
+                : 'bg-gray-50 dark:bg-gray-800'
+            }`}>
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Remaining Balance
+              </span>
+              <span className={`text-lg font-semibold ${
+                hasInsufficientFunds 
+                  ? 'text-red-600 dark:text-red-400' 
+                  : 'text-gray-600 dark:text-gray-400'
+              }`}>
+                ₦{formatAmount(walletBalance - totalAmount)}
+              </span>
+            </div>
+          </div>
+
+          {/* Insufficient Funds Warning */}
+          {hasInsufficientFunds && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
+                    Insufficient Funds
+                  </h4>
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                    You need an additional ₦{formatAmount(totalAmount - walletBalance)} to claim this product.
+                    Please fund your wallet first.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800"
+              disabled={isProcessing}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={onPaymentConfirmed}
+              disabled={hasInsufficientFunds || isProcessing}
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Processing...
+                </div> 
+              ) : (
+                `Claim Product - ₦${formatAmount(totalAmount)}`
+              )}
+            </Button>
+          </div>
+
+          {/* Additional Info */}
+          <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-2 border-t border-gray-200 dark:border-gray-700">
+            Payment will be deducted from your wallet balance immediately
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function App({productx, status}: {productx: any, status: string}) {
 
   const router = useRouter();
@@ -88,80 +226,83 @@ export default function App({productx, status}: {productx: any, status: string})
   const [showSuccessDialog, setShowSuccessDialog] = useState(false)
   const [cancellingProductId, setCancellingProductId] = useState<any[] | null>([]) as any
   const [isProcessing, setIsProcessing] = useState(false)
-  const [walletBalance] = useState('₦120.00') // Wallet balance
   const [pidPaySmallSmall, setPidPaySmallSmall] = useState<string>('');
 
-    const [pidUser, setPidUser] = useState(user?.pidUser);
-    const [email, setEmail] = useState(user?.userEmail);
-    const [amount, setAmount] = useState<number>(0);
-    const [quantity, setQuantity] = useState<number>(1);
-    const [refreshKey, setRefreshKey] = useState(0);
-  
-    const [customer, setCustomer] = useState<any | null>(null);
-    const [transactions, setTransaction] = useState<any | null>(null);
-  
-    const [loading, setLoading] = useState(true);
-    const [statusx, setStatus] = useState<string | null>(null);
-    const [statusz, setStatusz] = useState<string | null>('');
-  
-    const [message, setMessage] = useState<string | null>(null);
+  const [pidUser, setPidUser] = useState(user?.pidUser);
+  const [email, setEmail] = useState(user?.userEmail);
+  const [amount, setAmount] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-    // Client-only render to avoid SSR/CSR mismatches from auth/theme/locale
-    const [mounted, setMounted] = useState(false)
-    useEffect(() => {
-      setMounted(true)
-    }, [])
+  const [customer, setCustomer] = useState<any | null>(null);
+  const [transactions, setTransaction] = useState<any | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [statusx, setStatus] = useState<string | null>(null);
+  const [statusz, setStatusz] = useState<string | null>('');
+
+  const [message, setMessage] = useState<string | null>(null);
+
+  const [showWalletDialog, setShowWalletDialog] = useState(false);
+  const [isWalletPaymentProcessing, setIsWalletPaymentProcessing] = useState(false);
+  const [claimingProduct, setClaimingProduct] = useState<any>(null);
+
+  // Client-only render to avoid SSR/CSR mismatches from auth/theme/locale
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
 
-    useEffect(() => {
-      const fetchCustomer = async () => {
-        try {
-          // Do not fetch until we have an email
-          if (!email) {
-            setLoading(false)
-            return
-          }
-
-          const response = await fetch(`/api/paystack/get-customer/${email}`);
-          if (!response.ok) {
-            throw new Error('Failed to fetch customer data');
-          }
-
-          const data: any = await response.json();
-
-          setStatus(data.statusx);
-          setMessage(data.message);
-          setCustomer(data.customerDetails);
-          setTransaction(data.transactionDetails);
-        } catch (statusx) {
-          setStatus(statusx as string);
-        } finally {
-          setLoading(false);
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        // Do not fetch until we have an email
+        if (!email) {
+          setLoading(false)
+          return
         }
-      };
 
-      fetchCustomer();
-    }, [email]);
+        const response = await fetch(`/api/paystack/get-customer/${email}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch customer data');
+        }
+
+        const data: any = await response.json();
+
+        setStatus(data.statusx);
+        setMessage(data.message);
+        setCustomer(data.customerDetails);
+        setTransaction(data.transactionDetails);
+      } catch (statusx) {
+        setStatus(statusx as string);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCustomer();
+  }, [email]);
 
 
     
-    // Do not render on server; mount on client to prevent hydration mismatch
-    if (!mounted) return null
+  // Do not render on server; mount on client to prevent hydration mismatch
+  if (!mounted) return null
 
-    if(loading)
+  if(loading)
+    return (
+        <div>
+          <Loading />
+        </div>
+    );
+
+
+    if(!products)
       return (
           <div>
             <Loading />
           </div>
       );
-
-
-      if(!products)
-        return (
-            <div>
-              <Loading />
-            </div>
-        );
     
 
   //////////// WALLET ACTIVATION //////////
@@ -173,10 +314,6 @@ export default function App({productx, status}: {productx: any, status: string})
         const response = await fetch(
           '/api/paystack/wallet-customer-activation?pidUser=' + user?.pidUser,
         );
-
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch customer data');
-        // }
 
         const data: any = await response.json();
 
@@ -203,7 +340,6 @@ export default function App({productx, status}: {productx: any, status: string})
             const data: any = await response.json();
 
             if (!data.status) {
-              //throw new Error(data.message || 'Failed to create dedicated account');
               toast.warning(
                 'Account Activation Failed, please try again or contact support. Error-Msg: ' +
                   data.message,
@@ -215,13 +351,9 @@ export default function App({productx, status}: {productx: any, status: string})
                 'Wallet was successfully Activated!',
               );
               router.push('/dashboard/pay-small-small?status=SAVED');
-              //refreshComponent();
               window.location.reload();
             }
           } catch (err) {
-            // setError(
-            //   err instanceof Error ? err.message : 'An unknown error occurred',
-            // );
             toast.warning(
               'Account Activation Failed, please try again or contact support. Error: ' +
                 err,
@@ -231,8 +363,6 @@ export default function App({productx, status}: {productx: any, status: string})
           }
         }
       } catch (statusx) {
-        //setError(error instanceof Error ? error.message : 'Unknown error');
-        //setStatus(statusx as string);
       } finally {
         setLoading(false);
       }
@@ -285,21 +415,15 @@ export default function App({productx, status}: {productx: any, status: string})
         if (data.statusx == 'SUCCESS') {
           toast.success(data.message);
           router.push('/dashboard/pay-small-small?status=STARTED');
-          //refreshComponent();
-          //refreshComponent();
-          //window.location.reload();
         }
         if (data.statusx == 'FAILED') {
           toast.warning(data.message);
         }
       } catch (statusx) {
         toast.warning('Action failed! Error: ' + statusx);
-        //setError(error instanceof Error ? error.message : 'Unknown error');
-        //setStatus(statusx as string);
       } finally {
         setLoading(false);
       }
-      // You can perform other actions here like opening a modal
     };
   
     //CANCEL PAY SMALL SMALL
@@ -339,12 +463,9 @@ export default function App({productx, status}: {productx: any, status: string})
         }
       } catch (statusx) {
         toast.warning('Action failed! Error: ' + statusx);
-        //setError(error instanceof Error ? error.message : 'Unknown error');
-        //setStatus(statusx as string);
       } finally {
         setLoading(false);
       }
-      // You can perform other actions here like opening a modal
     };
   
 
@@ -352,71 +473,62 @@ export default function App({productx, status}: {productx: any, status: string})
     
     // CLAIM PAY SMALL SMALL
     const claimPaySmallSmall = async (
-      productId:any,
+      productId: any,
       pidUser: any,
       pidPaySmallSmall: any,
       pidProduct: any,
       amount: any,
     ) => {
-
-      //check if amount is valid for product claim
-      if (parseFloat(transactions.totalAmount) < parseFloat(amount)) {
-        toast.warning(
-          (('You do not have suffient funds to claim this product. Fund your wallet with a minimum of ₦' +
-            parseFloat(amount as any)
-              .toFixed(2)
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string) +
-            ' to Claim this product.',
-        );
-        return;
-      }
-
-      toast.info('Processing Claim . . .');
-      
-      try {
-        const response = await fetch(
-          '/api/pay-small-small/claim?' +
-            'pidUser=' +
-            user?.pidUser +
-            '&pidPaySmallSmall=' +
-            pidPaySmallSmall +
-            '&pidProduct=' +
-            pidProduct +
-            '&amount=' +
-            amount,
-        );
-
-      const data: any = await response.json();
-
-      if (data.statusx == 'SUCCESS') {
-        toast.success(data.message);
-        router.push('/dashboard/pay-small-small?status=COMPLETED');
-        setShowCancelDialog(false)
-        //refreshComponent();
-        //window.location.reload();
-      }
-      if (data.statusx == 'FAILED') {
-        toast.warning(data.message);
-      }
-    } catch (statusx) {
-      toast.warning('Action failed! Error: ' + statusx);
-      //setError(error instanceof Error ? error.message : 'Unknown error');
-      //setStatus(statusx as string);
-    } finally {
-      setLoading(false);
-    }
-  
-
-      // Perform the action based on the button clicked
+      // Set the product being claimed and show dialog
+      setClaimingProduct({
+        productId,
+        pidUser,
+        pidPaySmallSmall,
+        pidProduct,
+        amount
+      });
+      setShowWalletDialog(true);
     };
 
-
-
-
-
-
-
+    const handleWalletPaymentConfirmed = async () => {
+      if (!claimingProduct) return;
+  
+      setIsWalletPaymentProcessing(true);
+      
+      try {
+        const { productId, pidUser, pidPaySmallSmall, pidProduct, amount } = claimingProduct;
+  
+        // Build the API URL with proper parameters
+        const apiUrl = new URL('/api/pay-from-wallet-pss', window.location.origin);
+        apiUrl.searchParams.append('pidUser', pidUser);
+        apiUrl.searchParams.append('pidPaySmallSmall', pidPaySmallSmall);
+        apiUrl.searchParams.append('pidProduct', pidProduct);
+        apiUrl.searchParams.append('amount', amount.toString());
+  
+        const response = await fetch(apiUrl.toString());
+        const data: any = await response.json();
+  
+        if (data.statusx === 'SUCCESS') {
+          toast.success(data.message);
+          setShowWalletDialog(false);
+          setClaimingProduct(null);
+          router.push('/dashboard/pay-small-small?status=COMPLETED');
+          window.location.reload();
+        } else if (data.statusx === 'FAILED') {
+          toast.warning(data.message);
+          setShowWalletDialog(false);
+        } else {
+          toast.warning('Claim failed. Please try again.');
+          setShowWalletDialog(false);
+        }
+      } catch (error) {
+        console.error('Wallet claim error:', error);
+        toast.warning('Action failed! Error: ' + error);
+        setShowWalletDialog(false);
+      } finally {
+        setIsWalletPaymentProcessing(false);
+      }
+    };
 
   
       
@@ -455,9 +567,10 @@ export default function App({productx, status}: {productx: any, status: string})
 
   // Check if wallet balance is sufficient for a product
   const hasSufficientBalance = (productPrice: string): boolean => {
-    const balance = parsePrice(walletBalance)
-    const price = parsePrice(productPrice)
-    return balance >= price
+    // Use actual wallet balance from transactions instead of hardcoded walletBalance
+    const balance = transactions?.totalAmount || 0;
+    const price = parseFloat(productPrice);
+    return balance >= price;
   }
 
   const handleStatusChange = (value: Status) => {
@@ -473,26 +586,15 @@ export default function App({productx, status}: {productx: any, status: string})
   }
 
   const handleActivate = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
-    //toast.info('Activating Pay Small Small . . .');
-
     startPaySmallSmall(
       pidUser,
       pidPaySmallSmall,
       pidProduct,
       amount,
     );
-    
-    // setProducts(products.map(product => 
-    //   product.id === productId 
-    //     ? { ...product, status: 'STARTED', checked: false, createdAt: new Date().toISOString() }
-    //     : product
-    // ));
-
-    
   }
 
   const handleClaim = (productId:any, pidPaySmallSmall:any, pidUser:any, pidProduct:any, amount:any) => {
-    
     claimPaySmallSmall(
       productId,
       pidUser,
@@ -500,11 +602,6 @@ export default function App({productx, status}: {productx: any, status: string})
       pidProduct,
       amount,
     );
-    // setProducts(products.map(product => 
-    //   product.id === productId 
-    //     ? { ...product, status: 'COMPLETED', checked: false }
-    //     : product
-    // ))
   }
 
 
@@ -518,15 +615,11 @@ export default function App({productx, status}: {productx: any, status: string})
 
     if (cancellingProductId === null) return
 
-    //alert(cancellingProductId);
-
     let productId = cancellingProductId[0];
     let pidPaySmallSmall = cancellingProductId[1];
     let pidUser = cancellingProductId[2];
     let pidProduct = cancellingProductId[3];
     let amount = cancellingProductId[4];
-
-    //alert(`Cancelling Pay Small Small for Product ID: ${productId}, pidUser: ${pidUser}, pidPaySmallSmall: ${pidPaySmallSmall}, pidProduct: ${pidProduct}, amount: ${amount}`);
 
     cancelPaySmallSmall(
       productId,
@@ -619,8 +712,8 @@ export default function App({productx, status}: {productx: any, status: string})
     const showCheckbox = product.status === 'SAVED' || product.status === 'STARTED'
 
     // Check if user can claim this product based on wallet balance
-    const canClaim = hasSufficientBalance(product.amount)
-
+    // Use transactions.totalAmount instead of walletBalance string
+    const canClaim = transactions?.totalAmount >= parseFloat(product.amount);
 
     return (
       <Card className="bg-card border-0 w-full h-full shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-card via-card to-accent/10 overflow-hidden group">
@@ -954,6 +1047,22 @@ export default function App({productx, status}: {productx: any, status: string})
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Wallet Payment Dialog */}
+      {claimingProduct && (
+        <WalletPaymentDialog
+          isOpen={showWalletDialog}
+          onClose={() => {
+            setShowWalletDialog(false);
+            setClaimingProduct(null);
+          }}
+          walletBalance={transactions?.totalAmount || 0}
+          totalAmount={parseFloat(claimingProduct.amount)}
+          productName={products.find(p => p.id === claimingProduct.productId)?.productName || 'Product'}
+          onPaymentConfirmed={handleWalletPaymentConfirmed}
+          isProcessing={isWalletPaymentProcessing}
+        />
+      )}
     </div>
   )
 }

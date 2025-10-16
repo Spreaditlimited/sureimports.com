@@ -78,6 +78,7 @@ const Page = async ({
         <div className="mt-[7px] items-start justify-center gap-2 rounded-xl bg-white p-2 py-[10px] text-base font-normal text-slate-600 dark:bg-black dark:text-white max-sm:pl-4 md:flex-row">
         Manage your installment payments with ease
         </div>
+        
       </div>
       <PaySmallSmall productx={product} status={statusz} />
       {/* <ProductClaim product={product} status={statusz} /> */}
