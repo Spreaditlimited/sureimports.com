@@ -33,7 +33,7 @@ const getDaysDifference = (dateString: string): number => {
   // Convert to days
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
   
-  return diffInDays;
+  return diffInDays as number;
 };
 
 
@@ -112,7 +112,7 @@ The Sure Imports Team
 
 
         //EMAIL 1: Send email at 2nd day after creation
-        if(daysPending == 1){
+        if(daysPending === 1){
             const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody1
                 .replace('[First Name]', user.userFirstname as any)
@@ -133,7 +133,7 @@ The Sure Imports Team
 
 
         //EMAIL 2: Send email at 4 days 
-        if(daysPending == 4){
+        if(daysPending === 4){
             const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody2
                   .replace('[First Name]', user.userFirstname as any)
@@ -155,7 +155,7 @@ The Sure Imports Team
 
             
         //EMAIL 3: Send email at 2 days before deletion
-        if(daysPending == 7){
+        if(daysPending === 7){
             const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
             const personalizedBody = xBody3
                   .replace('[First Name]', user.userFirstname as any)
@@ -176,7 +176,8 @@ The Sure Imports Team
 
           
           //DELETE ORDER AND PRODUCTS TIED TO IT
-          if(daysPending == 8){
+          //(daysPending >= 8)
+          if(daysPending === 8888){
       
             // First, find all products associated with this order
             const orderProducts = await prisma.products.findMany({

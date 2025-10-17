@@ -508,25 +508,35 @@ export default function App({productx, status}: {productx: any, status: string})
         const response = await fetch(apiUrl.toString());
         const data: any = await response.json();
   
+        // Reset processing state and close dialog immediately for all cases
+        setIsWalletPaymentProcessing(false);
+        setShowWalletDialog(false);
+        setClaimingProduct(null);
+  
         if (data.statusx === 'SUCCESS') {
+          // Show success message
           toast.success(data.message);
-          setShowWalletDialog(false);
-          setClaimingProduct(null);
-          router.push('/dashboard/pay-small-small?status=COMPLETED');
-          window.location.reload();
-        } else if (data.statusx === 'FAILED') {
-          toast.warning(data.message);
-          setShowWalletDialog(false);
+          
+          // Redirect after a short delay
+          setTimeout(() => {
+            router.push('/dashboard/pay-small-small?status=COMPLETED');
+          }, 1500);
+        } else if (data.statusx === 'FAILED' || data.statusx === 'NO_CUSTOMER') {
+          // Show error message
+          toast.warning(data.message || 'Claim failed. Please try again.');
         } else {
+          // Handle unexpected response
           toast.warning('Claim failed. Please try again.');
-          setShowWalletDialog(false);
         }
       } catch (error) {
         console.error('Wallet claim error:', error);
-        toast.warning('Action failed! Error: ' + error);
-        setShowWalletDialog(false);
-      } finally {
+        
+        // Reset states on error
         setIsWalletPaymentProcessing(false);
+        setShowWalletDialog(false);
+        setClaimingProduct(null);
+        
+        toast.error('Action failed! Please check your connection and try again.');
       }
     };
 
