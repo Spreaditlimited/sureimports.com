@@ -40,7 +40,9 @@ export default async function xMail({
 
   try {
     await sendEmail(xEmail, xTitle, mail);
+    return { success: true };
   } catch (error) {
-    //console.error("myThrowingFunction failed", error);
+    console.error('xMail failed to send email:', error);
+    throw error; // Propagate error instead of silently catching
   }
 }

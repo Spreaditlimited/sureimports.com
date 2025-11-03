@@ -15,6 +15,7 @@ export async function POST(request: Request) {
     const email = formData.get('email') as string;
     const verificationCode = formData.get('verificationCode') as string;
     const bank_name = formData.get('bank_name') as string;
+    const bank_code = formData.get('bank_code') as string;
     const bank_account_number = formData.get('bank_account_number') as string;
     const bank_account_name = formData.get('bank_account_name') as string;
 
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Validate bank details
-    if (!bank_name || !bank_account_number || !bank_account_name) {
+    if (!bank_name || !bank_code || !bank_account_number || !bank_account_name) {
       return NextResponse.json(
         {
           responsex: {
@@ -149,6 +150,7 @@ export async function POST(request: Request) {
       where: { pidUser: pidUser, userEmail: email },
       data: {
         bank_name: bank_name,
+        bank_code: bank_code,
         bank_account_number: bank_account_number,
         bank_account_name: bank_account_name,
         userExt2: null, // Clear the verification code after successful use
@@ -163,7 +165,7 @@ export async function POST(request: Request) {
         const xTitle = 'Bank Details Updated Successfully';
         const xBodyTitle = 'Bank Details Update Confirmation';
         const xBody1 = `Your bank details have been successfully updated.`;
-        const xBody2 = `Bank Name: ${bank_name}<br/>Account Number: ${bank_account_number}<br/>Account Name: ${bank_account_name}<br/><br/>If you did not make this change, please contact support immediately.`;
+        const xBody2 = `Bank Name: ${bank_name}<br/>Bank Code: ${bank_code}<br/>Account Number: ${bank_account_number}<br/>Account Name: ${bank_account_name}<br/><br/>If you did not make this change, please contact support immediately.`;
         const xButtonTitle = 'Go to Dashboard';
         const xButtonLink = process.env.ROOT_URL + '/dashboard';
 

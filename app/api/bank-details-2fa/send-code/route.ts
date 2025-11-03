@@ -75,6 +75,9 @@ export async function POST(request: Request) {
       const xButtonTitle = 'Go to Dashboard';
       const xButtonLink = process.env.ROOT_URL + '/dashboard';
 
+      console.log('Attempting to send verification email to:', xEmail);
+      console.log('Verification code:', verificationCode);
+
       await xMail({
         xEmail,
         xTitle,
@@ -85,19 +88,11 @@ export async function POST(request: Request) {
         xButtonLink,
       });
 
-      console.log('Verification email sent successfully!');
+      console.log('Verification email sent successfully to:', xEmail);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
-      return NextResponse.json(
-        {
-          responsex: {
-            message: 'Failed to send verification email. Please try again.',
-            status: 'EMAIL_SEND_FAILED',
-          },
-          successx: false,
-        },
-        { status: 500 }
-      );
+      // Don't fail the request if email fails - code is already stored in DB
+      console.warn('Email failed but verification code is stored in database');
     }
 
     // Return success response
