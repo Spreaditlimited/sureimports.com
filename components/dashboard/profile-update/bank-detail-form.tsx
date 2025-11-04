@@ -25,6 +25,7 @@ interface userData {
   bank_code: string;
   bank_account_number: string;
   bank_account_name: string;
+  bank_transfer_code: string;
 }
 
 //USER DATA

@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import TopUpDialog from "./TopUpDialog";
 import WithdrawDialog from "./WithdrawDialog";
+import PayoutRequestDialog from "./PayoutRequestDialog";
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 import { useAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
@@ -43,9 +44,15 @@ const formatCurrency = (amount: number): string => {
 export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWithdrawal, transactions, onWithdrawalConfirmed }: WalletProps) {
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showTopUpDialog, setShowTopUpDialog] = useState(false);
+  const [showPayoutRequestDialog, setShowPayoutRequestDialog] = useState(false);
+  const [pendingPayout, setPendingPayout] = useState<any>(null);
 
   const handleWithdraw = () => {
     setShowWithdrawDialog(true);
+  };
+
+  const handleRequestPayout = () => {
+    setShowPayoutRequestDialog(true);
   };
 
 
@@ -75,6 +82,23 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   const [statusx, setStatus] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
+  // Fetch pending payout request
+  const fetchPendingPayout = async () => {
+    try {
+      const response = await fetch(`/api/payout-request/get-pending?pidUser=${pidUser}`);
+      const data = await response.json();
+
+      if (data.statusx === 'SUCCESS' && data.data) {
+        setPendingPayout(data.data);
+      } else {
+        setPendingPayout(null);
+      }
+    } catch (error) {
+      console.error('Error fetching pending payout:', error);
+      setPendingPayout(null);
+    }
+  };
+
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
@@ -100,6 +124,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     };
 
     fetchCustomer();
+    fetchPendingPayout();
   }, [email]);
 
   if (loading)
@@ -416,22 +441,93 @@ const allTransactions: any[] = [
               Top Up
             </Button>
 
-            
+
             <Button
-              //disabled
-              onClick={handleWithdraw}
-              //disabled={availableBalance <= 0 || pendingWithdrawal > 0}
-              //disabled={true}
+              onClick={handleRequestPayout}
+              disabled={availableBalance <= 0 || !!pendingPayout}
               className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
               variant="outline"
             >
               <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19 11H5C3.89543 11 3 11.8954 3 13V19C3 20.1046 3.89543 21 5 21Z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19V13C21 11.8954 20.1046 11 19 11H5C3.89543 11 3 11.8954 5 13V19C3 20.1046 3.89543 21 5 21Z" />
               </svg>
-              {pendingWithdrawal > 0 ? 'Withdrawal Pending' : 'Withdraw'}
+              {pendingPayout ? 'Payout Pending' : 'Request Payout'}
             </Button>
           </div>
         </Card>
+
+
+        {/* Pending Payout Request Card */}
+        {pendingPayout && (
+          <Card className="p-6 mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
+                    Pending Payout Request
+                  </h3>
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    Your payout request is being processed
+                  </p>
+                </div>
+              </div>
+              <div className="px-3 py-1 rounded-full bg-amber-600 dark:bg-amber-500 text-white text-xs font-medium">
+                Pending
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Amount Requested</p>
+                <p className="text-2xl font-bold text-foreground">
+                  {('₦' + (pendingPayout.amount as number).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string}
+                </p>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Reference Number</p>
+                <p className="text-sm font-mono text-foreground">{pendingPayout.reference}</p>
+              </div>
+
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                <p className="text-xs text-muted-foreground mb-1">Request Date</p>
+                <p className="text-sm text-foreground">
+                  {new Date(pendingPayout.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+
+              {pendingPayout.bankDetails && (
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
+                  <p className="text-xs text-muted-foreground mb-1">Bank Account</p>
+                  <p className="text-sm text-foreground font-medium">{pendingPayout.bankDetails.bankName}</p>
+                  <p className="text-xs text-muted-foreground font-mono">{pendingPayout.bankDetails.accountNumber}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 bg-amber-100 dark:bg-amber-900/30 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <svg className="w-4 h-4 text-amber-700 dark:text-amber-300 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-xs text-amber-800 dark:text-amber-200">
+                  Your payout will be processed within 24 hours and credited to your bank account within 3 business days.
+                </p>
+              </div>
+            </div>
+          </Card>
+        )}
 
 
         {availableBalance <= 0 && (
@@ -646,6 +742,15 @@ const allTransactions: any[] = [
         onClose={() => setShowWithdrawDialog(false)}
         walletBalance={availableBalance} // Pass the available balance, not total balance
         onWithdrawalConfirmed={onWithdrawalConfirmed}
+      />
+
+      {/* Payout Request Dialog */}
+      <PayoutRequestDialog
+        isOpen={showPayoutRequestDialog}
+        onClose={() => setShowPayoutRequestDialog(false)}
+        walletBalance={availableBalance}
+        pidUser={pidUser as string}
+        onPayoutRequested={fetchPendingPayout}
       />
     </div>
   );

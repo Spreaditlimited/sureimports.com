@@ -130,6 +130,7 @@ model users {
     bank_account_number  String?
     bank_account_name    String?
     bank_code            String?
+    bank_transfer_code   String?
     ref_id               String?
     userPhone            String?
     userCid              String?
@@ -150,6 +151,21 @@ model users {
     orders               orders[]
     wallets   Wallet[]
     accounts  Account[]
+}
+
+
+model payoutrequest {
+    id         Int       @id @default(autoincrement())
+    pidPayout  String    @unique()
+    pidUser    String?
+    amount     Float?
+    recipient    String?
+    reference    String?
+    reason    String?
+    status    String?
+    xStatus   String?
+    createdAt            DateTime?  @default(now())
+    updatedAt            DateTime?
 }
 
 

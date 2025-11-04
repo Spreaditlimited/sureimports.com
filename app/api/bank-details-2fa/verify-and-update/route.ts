@@ -145,6 +145,40 @@ export async function POST(request: Request) {
       );
     }
 
+    // Create Paystack transfer recipient to get recipient_code
+    let bank_transfer_code = null;
+    try {
+      console.log('Creating Paystack transfer recipient...');
+
+      const paystackResponse = await fetch('https://api.paystack.co/transferrecipient', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: 'nuban',
+          name: bank_account_name,
+          account_number: bank_account_number,
+          bank_code: bank_code,
+          currency: 'NGN',
+        }),
+      });
+
+      const paystackData = await paystackResponse.json();
+
+      if (paystackData.status && paystackData.data) {
+        bank_transfer_code = paystackData.data.recipient_code;
+        console.log('Transfer recipient created successfully:', bank_transfer_code);
+      } else {
+        console.error('Failed to create transfer recipient:', paystackData.message);
+        // Continue anyway - we'll save bank details without transfer code
+      }
+    } catch (paystackError) {
+      console.error('Error creating Paystack transfer recipient:', paystackError);
+      // Continue anyway - we'll save bank details without transfer code
+    }
+
     // All validations passed - update bank details
     const updatex = await prisma.users.update({
       where: { pidUser: pidUser, userEmail: email },
@@ -153,6 +187,7 @@ export async function POST(request: Request) {
         bank_code: bank_code,
         bank_account_number: bank_account_number,
         bank_account_name: bank_account_name,
+        bank_transfer_code: bank_transfer_code,
         userExt2: null, // Clear the verification code after successful use
         updatedAt: new Date(),
       },
@@ -164,7 +199,7 @@ export async function POST(request: Request) {
         const xEmail = email;
         const xTitle = 'Bank Details Updated Successfully';
         const xBodyTitle = 'Bank Details Update Confirmation';
-        const xBody1 = `Your bank details have been successfully updated.`;
+        const xBody1 = `Your bank details have been successfully updated and verified with Paystack.`;
         const xBody2 = `Bank Name: ${bank_name}<br/>Bank Code: ${bank_code}<br/>Account Number: ${bank_account_number}<br/>Account Name: ${bank_account_name}<br/><br/>If you did not make this change, please contact support immediately.`;
         const xButtonTitle = 'Go to Dashboard';
         const xButtonLink = process.env.ROOT_URL + '/dashboard';
