@@ -38,12 +38,74 @@ export async function POST(request: NextRequest) {
       }, { status: 404 });
     }
 
-    // Check if user has bank_transfer_code (Paystack recipient code)
-    if (!user.bank_transfer_code) {
+    // Check if user has bank details
+    const hasBankDetails = user.bank_account_number && user.bank_account_name && user.bank_code;
+
+    if (!hasBankDetails) {
       return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Bank details not found. Please add your bank details in your profile settings before requesting a payout.',
+        statusx: 'NO_BANK_DETAILS',
+        message: 'No bank account found. Please add your bank account details in your profile settings before requesting a payout.',
       }, { status: 400 });
+    }
+
+    // If user has bank details but no bank_transfer_code, create Paystack transfer recipient
+    let bank_transfer_code = user.bank_transfer_code;
+
+    if (!bank_transfer_code) {
+      console.log('No bank_transfer_code found. Creating Paystack transfer recipient...');
+
+      try {
+        const paystackResponse = await fetch('https://api.paystack.co/transferrecipient', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'nuban',
+            name: user.bank_account_name,
+            account_number: user.bank_account_number,
+            bank_code: user.bank_code,
+            currency: 'NGN',
+          }),
+        });
+
+        const paystackData = await paystackResponse.json();
+
+        console.log('Paystack transfer recipient response:', {
+          status: paystackData.status,
+          message: paystackData.message,
+        });
+
+        if (!paystackData.status || !paystackData.data || !paystackData.data.recipient_code) {
+          console.error('Failed to create Paystack transfer recipient:', paystackData.message);
+          return NextResponse.json({
+            statusx: 'PAYSTACK_ERROR',
+            message: `Failed to verify your bank account with Paystack. ${paystackData.message || 'Please verify your bank details are correct and try again.'}`,
+          }, { status: 400 });
+        }
+
+        bank_transfer_code = paystackData.data.recipient_code;
+
+        // Save the bank_transfer_code to the database
+        await prisma.users.update({
+          where: { pidUser: pidUser as string },
+          data: {
+            bank_transfer_code: bank_transfer_code,
+            updatedAt: new Date(),
+          },
+        });
+
+        console.log('Bank transfer code created and saved:', bank_transfer_code);
+
+      } catch (paystackError) {
+        console.error('Error creating Paystack transfer recipient:', paystackError);
+        return NextResponse.json({
+          statusx: 'FAILED',
+          message: 'Failed to create transfer recipient with Paystack. Please verify your bank details are correct and try again later.',
+          error: paystackError instanceof Error ? paystackError.message : 'Unknown error',
+        }, { status: 500 });
+      }
     }
 
     const email = user.userEmail;
@@ -141,7 +203,7 @@ export async function POST(request: NextRequest) {
         pidPayout: pidPayout,
         pidUser: pidUser as string,
         amount: payoutAmount,
-        recipient: user.bank_transfer_code, // Paystack transfer recipient code
+        recipient: bank_transfer_code, // Paystack transfer recipient code (either existing or newly created)
         reference: reference,
         reason: reason,
         status: 'pending',

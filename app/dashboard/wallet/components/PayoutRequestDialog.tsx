@@ -14,6 +14,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface PayoutRequestDialogProps {
   isOpen: boolean;
@@ -23,16 +24,18 @@ interface PayoutRequestDialogProps {
   onPayoutRequested: () => void;
 }
 
-export default function PayoutRequestDialog({ 
-  isOpen, 
-  onClose, 
-  walletBalance, 
+export default function PayoutRequestDialog({
+  isOpen,
+  onClose,
+  walletBalance,
   pidUser,
-  onPayoutRequested 
+  onPayoutRequested
 }: PayoutRequestDialogProps) {
-  
+
+  const router = useRouter();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [payoutRequested, setPayoutRequested] = useState(false);
+  const [showNoBankDetails, setShowNoBankDetails] = useState(false);
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +83,7 @@ export default function PayoutRequestDialog({
 
     try {
       const payoutAmount = parseFloat(amount);
-      
+
       const response = await fetch('/api/payout-request/create', {
         method: 'POST',
         headers: {
@@ -93,21 +96,32 @@ export default function PayoutRequestDialog({
       });
 
       const result = await response.json();
-      
+
       if (result.statusx === 'SUCCESS') {
         console.log('Payout request created:', result.data);
         setPayoutData(result.data);
         toast.success(result.message);
         setShowConfirmation(false);
         setPayoutRequested(true);
-        
+
         // Notify parent component to refresh
         onPayoutRequested();
-        
+
         // Auto close after 5 seconds
         setTimeout(() => {
           handleClose();
         }, 5000);
+      } else if (result.statusx === 'NO_BANK_DETAILS') {
+        // Handle missing bank details
+        console.error('No bank details found:', result.message);
+        toast.error(result.message);
+        setShowConfirmation(false);
+        setShowNoBankDetails(true);
+      } else if (result.statusx === 'PAYSTACK_ERROR') {
+        // Handle Paystack transfer recipient creation error
+        console.error('Paystack error:', result.message);
+        toast.error(result.message);
+        setShowConfirmation(false);
       } else {
         console.error('Payout request failed:', result.message);
         toast.error(result.message);
@@ -125,11 +139,148 @@ export default function PayoutRequestDialog({
   const handleClose = () => {
     setShowConfirmation(false);
     setPayoutRequested(false);
+    setShowNoBankDetails(false);
     setAmount('');
     setError('');
     setPayoutData(null);
     onClose();
   };
+
+  const handleGoToSettings = () => {
+    handleClose();
+    router.push('/dashboard/profile');
+  };
+
+  // No Bank Details Screen
+  if (showNoBankDetails) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                <svg
+                  className="w-5 h-5 text-red-600 dark:text-red-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
+                </svg>
+              </div>
+              Bank Account Required
+            </DialogTitle>
+            <DialogDescription>
+              You need to add your bank account details before you can request a payout.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-red-600 dark:bg-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-white dark:text-red-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-red-800 dark:text-red-200">No Bank Account Found</h4>
+                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                    We couldn't find any bank account details associated with your profile. Please add your bank account information to receive payouts.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-muted rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-3">What you need to do:</h4>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">1</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Go to Profile Settings</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Navigate to your profile settings page</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">2</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Add Bank Details</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Enter your bank name, account number, and account name</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">3</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Verify Your Account</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Complete the verification process to confirm your bank account</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Request Payout</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Once verified, you can request payouts anytime</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-blue-600 dark:bg-blue-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg className="w-3 h-3 text-white dark:text-blue-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="font-medium text-blue-800 dark:text-blue-200">Security Note</h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                    Your bank details are securely encrypted and will only be used for processing your payout requests.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGoToSettings}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Go to Profile Settings
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   // Success Screen
   if (payoutRequested && payoutData) {

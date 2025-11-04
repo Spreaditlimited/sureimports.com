@@ -46,6 +46,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   const [showTopUpDialog, setShowTopUpDialog] = useState(false);
   const [showPayoutRequestDialog, setShowPayoutRequestDialog] = useState(false);
   const [pendingPayout, setPendingPayout] = useState<any>(null);
+  const [hasBankDetails, setHasBankDetails] = useState<boolean>(true);
 
   const handleWithdraw = () => {
     setShowWithdrawDialog(true);
@@ -99,6 +100,22 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     }
   };
 
+  // Check if user has bank details
+  const checkBankDetails = async () => {
+    try {
+      const response = await fetch(`/api/user/check-bank-details?pidUser=${pidUser}`);
+      const data = await response.json();
+
+      if (data.statusx === 'SUCCESS') {
+        setHasBankDetails(data.hasBankDetails);
+      }
+    } catch (error) {
+      console.error('Error checking bank details:', error);
+      // Default to true to avoid blocking users unnecessarily
+      setHasBankDetails(true);
+    }
+  };
+
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
@@ -125,6 +142,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
 
     fetchCustomer();
     fetchPendingPayout();
+    checkBankDetails();
   }, [email]);
 
   if (loading)
@@ -442,19 +460,58 @@ const allTransactions: any[] = [
             </Button>
 
 
-            <Button
-              onClick={handleRequestPayout}
-              disabled={availableBalance <= 0 || !!pendingPayout}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
-              variant="outline"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19V13C21 11.8954 20.1046 11 19 11H5C3.89543 11 3 11.8954 5 13V19C3 20.1046 3.89543 21 5 21Z" />
-              </svg>
-              {pendingPayout ? 'Payout Pending' : 'Request Payout'}
-            </Button>
+            <div className="flex-1 relative">
+              <Button
+                onClick={handleRequestPayout}
+                disabled={availableBalance <= 0 || !!pendingPayout}
+                className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                variant="outline"
+                title={!hasBankDetails ? 'Bank details required. Click to add your bank account.' : ''}
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19V13C21 11.8954 20.1046 11 19 11H5C3.89543 11 3 11.8954 5 13V19C3 20.1046 3.89543 21 5 21Z" />
+                </svg>
+                {pendingPayout ? 'Payout Pending' : 'Request Payout'}
+                {!hasBankDetails && !pendingPayout && (
+                  <span className="ml-2 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-medium">
+                    !
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
         </Card>
+
+
+        {/* Missing Bank Details Warning Card */}
+        {!hasBankDetails && (
+          <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+            <div className="flex items-start gap-3">
+              <div className="w-5 h-5 rounded-full bg-amber-600 dark:bg-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg className="w-3 h-3 text-white dark:text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-amber-800 dark:text-amber-200">Bank Account Required for Payouts</h4>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                  To request payouts from your wallet, you need to add your bank account details in your profile settings.
+                </p>
+                <Button
+                  onClick={() => router.push('/dashboard/profile')}
+                  className="mt-3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white text-sm h-8"
+                  size="sm"
+                >
+                  <svg className="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Add Bank Details
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
 
 
         {/* Pending Payout Request Card */}
