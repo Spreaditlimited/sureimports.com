@@ -498,7 +498,7 @@ const allTransactions: any[] = [
                   To request payouts from your wallet, you need to add your bank account details in your profile settings.
                 </p>
                 <Button
-                  onClick={() => router.push('/dashboard/profile')}
+                  onClick={() => router.push('/dashboard/profile-update')}
                   className="mt-3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white text-sm h-8"
                   size="sm"
                 >
