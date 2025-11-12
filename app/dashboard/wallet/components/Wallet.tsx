@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import Loading from "../../loading";
 import { toast } from "sonner";
 import WalletTransactionTable from "../component/WalletTransactionTable";
+import DebitTransactionTable from "../component/DebitTransactionTable";
 
 interface WalletProps {
   onBackToStore: () => void;
@@ -78,6 +79,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
 
   const [customer, setCustomer] = useState<any | null>(null);
   const [transactionsx, setTransaction] = useState<any | null>(null);
+  const [debitsData, setDebitsData] = useState<any>({ debits: [], totalDebited: 0, count: 0 });
 
   const [loading, setLoading] = useState(true);
   const [statusx, setStatus] = useState<string | null>(null);
@@ -116,6 +118,23 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     }
   };
 
+  // Fetch debit transactions
+  const fetchDebits = async () => {
+    try {
+      const response = await fetch(`/api/wallet-debits?pidUser=${pidUser}`);
+      const data = await response.json();
+
+      if (data.statusx === 'SUCCESS' && data.data) {
+        setDebitsData(data.data);
+      } else {
+        setDebitsData({ debits: [], totalDebited: 0, count: 0 });
+      }
+    } catch (error) {
+      console.error('Error fetching debit transactions:', error);
+      setDebitsData({ debits: [], totalDebited: 0, count: 0 });
+    }
+  };
+
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
@@ -143,6 +162,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     fetchCustomer();
     fetchPendingPayout();
     checkBankDetails();
+    fetchDebits();
   }, [email]);
 
   if (loading)
@@ -665,6 +685,8 @@ const allTransactions: any[] = [
           </Card> 
           */}
 
+
+
           <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={handleTopUp}>
             <div className="flex items-center gap-3">
               
@@ -686,7 +708,7 @@ const allTransactions: any[] = [
 
         {/* Transaction History */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Recent Transactions</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Credit Transactions</h3>
           
           {transactionsx.transactions.length > 0 ? (
 
@@ -779,6 +801,44 @@ const allTransactions: any[] = [
               </div>
               <h3 className="text-lg font-medium text-foreground mb-2 dark:text-white">No transactions yet</h3>
               <p className="text-muted-foreground">Your transaction history will appear here</p>
+            </div>
+          )}
+        </Card>
+
+        {/* Debit Transaction History */}
+        <Card className="p-6 mt-6">
+          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Debit Transactions</h3>
+
+          {debitsData.debits.length > 0 ? (
+            <div className="p-1">
+              <div className="space-y-1">
+                <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-black-500">
+                  <Suspense fallback={<Loading />}>
+                    {debitsData.debits.length > 0 && (
+                      <DebitTransactionTable
+                        debits={debitsData.debits}
+                      />
+                    )}
+                    {debitsData.debits.length === 0 && (
+                      <div className="flex items-center justify-center p-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-800">
+                          No debit transactions available
+                        </p>
+                      </div>
+                    )}
+                  </Suspense>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground">
+                <svg className="block size-full" fill="none" viewBox="0 0 24 24">
+                  <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-foreground mb-2 dark:text-white">No debit transactions yet</h3>
+              <p className="text-muted-foreground">Your debit transaction history will appear here</p>
             </div>
           )}
         </Card>
