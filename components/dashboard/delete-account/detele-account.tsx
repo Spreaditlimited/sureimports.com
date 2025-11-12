@@ -167,7 +167,7 @@ function DeleteAccountForm() {
                       <span className="text-red-500">WARNING</span>
                       <span>
                         {' '}
-                        :Deleting your account removes your access to Speadit
+                        :Deleting your account removes your access to SureImports
                         account and all the information in your account. This
                         action is irreversible.{' '}
                       </span>

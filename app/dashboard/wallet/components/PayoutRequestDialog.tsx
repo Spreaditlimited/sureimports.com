@@ -570,7 +570,7 @@ export default function PayoutRequestDialog({
                 <div className="w-3 h-3 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <span className="text-xs font-medium text-blue-600 dark:text-blue-400">•</span>
                 </div>
-                <span className="text-muted-foreground">No processing fees charged</span>
+                <span className="text-muted-foreground">Funds deposited into this wallet are meant to be used for purchases on the Sure Imports website. However, if you choose to withdraw to your registered bank account, a 2% processing fee applies, capped at ₦2,500.</span>
               </div>
             </div>
           </Card>

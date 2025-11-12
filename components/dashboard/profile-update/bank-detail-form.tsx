@@ -353,7 +353,7 @@ export default function UpdateBankDetailsFrom() {
           // STEP 1: Bank Details Form
           <form onSubmit={requestVerificationCode}>
             <div>
-              <p>If you have a refund, we will pay it into this account.</p>
+              <p>We will credit this account for all payout requests.</p>
               <br />
             </div>
 

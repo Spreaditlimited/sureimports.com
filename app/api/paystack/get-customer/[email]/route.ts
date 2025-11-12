@@ -21,7 +21,6 @@ export async function GET(
   // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
   const emailx = params.email; // change this if pidUser is not the email
 
-
     const user:any = await prisma.users.findUnique({
       where: {
         userEmail: emailx as string | undefined,

@@ -6,4 +6,4 @@ type: "manual"
 
 Link: https://paystack.com/docs/api/transfer/
 
-(2) Work on only the bank-detail-form inside the profile update form in the product update
+(2) Work on only thie
