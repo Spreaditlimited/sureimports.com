@@ -89,7 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (data.statusx == 'USER_DOES_NOT_EXIST') {
         throw new Error(data.message);
       } else if (data.statusx == 'SUCCESS') {
-        router.push('/dashboard/store?id=laptop');
+        router.push('/dashboard/shop');
+        //router.push('/dashboard/store?id=laptop');
       } else {
         throw new Error(data.message);
       }
