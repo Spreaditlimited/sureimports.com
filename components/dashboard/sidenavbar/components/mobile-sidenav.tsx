@@ -30,24 +30,25 @@ export const MobileSidebar = () => {
         </div>
       </SheetTrigger>
       
-      <SheetContent side="left" className="w-[256px]  bg-black">
-        <div className="pb-6">
-          <Image
-            loading="lazy"
-            src="/images/svg-logo-white.svg"
-            alt="Logo"
-            width={144}
-            height={48}
-            className="mb-4 ml-[25px] h-12 w-36 self-center"
-            onClick={() => {
-              router.push('/');
-            }}
-          />
-          
-          {/* <div className="hide-scrollbar h-screen w-[256px] overflow-y-auto pb-24 pt-[25px]"> */}
-            <SideNav items={MobileNavItems} setOpen={setOpen} />
-          {/* </div> */}
+      <SheetContent side="left" className="w-[256px] bg-black p-0">
+        <div className="flex h-full flex-col">
+          <div className="flex-shrink-0 pb-6 pt-6">
+            <Image
+              loading="lazy"
+              src="/images/svg-logo-white.svg"
+              alt="Logo"
+              width={144}
+              height={48}
+              className="mb-4 ml-[25px] h-12 w-36 self-center hover:cursor-pointer"
+              onClick={() => {
+                router.push('/');
+              }}
+            />
+          </div>
 
+          <div className="sidebar-scrollable flex-1 overflow-y-auto px-3 pb-6">
+            <SideNav items={MobileNavItems} setOpen={setOpen} />
+          </div>
         </div>
       </SheetContent>
     </Sheet>
