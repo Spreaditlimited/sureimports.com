@@ -63,12 +63,12 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
-  {
-    title: 'Buy Phones & Laptops',
-    icon: Smartphone,
-    href: '/dashboard/store?id=laptop',
-    color: 'text-white',
-  },
+  // {
+  //   title: 'Buy Phones & Laptops',
+  //   icon: Smartphone,
+  //   href: '/dashboard/store?id=laptop',
+  //   color: 'text-white',
+  // },
   {
     title: 'Special Sourcing',
     icon: Search,
@@ -156,12 +156,12 @@ export const MobileNavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
-  {
-    title: 'Buy Phones & Laptops',
-    icon: Smartphone,
-    href: '/dashboard/store?id=laptop',
-    color: 'text-white',
-  },
+  // {
+  //   title: 'Buy Phones & Laptops',
+  //   icon: Smartphone,
+  //   href: '/dashboard/store?id=laptop',
+  //   color: 'text-white',
+  // },
   {
     title: 'Special Sourcing',
     icon: Search,

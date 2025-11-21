@@ -44,7 +44,7 @@ export default function ShopPage() {
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 dark:from-slate-100 dark:via-blue-100 dark:to-indigo-100 bg-clip-text text-transparent leading-tight">
-              SureImport Shop
+              Sure Imports Shop
             </h1>
             
             <p className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto font-medium">
