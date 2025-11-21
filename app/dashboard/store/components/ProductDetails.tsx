@@ -214,9 +214,12 @@ export default function ProductDetails({ product }: any) {
   const handleVerificationComplete = (success: boolean, data?: any) => {
     if (success) {
       console.log('Payment successful:', data);
+      toast.success('Payment verified successfully!');
+      router.push('/dashboard/success/payment');
     } else {
       console.log('Payment failed:', data);
-      toast.info('Payment Failed!');
+      const errorMessage = data?.message || data?.error || 'Payment verification failed';
+      toast.error(errorMessage);
     }
   };
 

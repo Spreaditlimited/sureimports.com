@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AlertProvider } from '@/app/context/AlertContext';
 import { ModalProvider } from '@/app/context/ModalContext';
+import { ShopCartProvider } from '@/app/context/ShopCartContext';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { useNavigate } from 'react-router-dom';
 import Loader from '@/components/uix/Loader';
@@ -93,7 +94,9 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
 
                 <AlertProvider>
                   <RecordCountProcurementProvider>
-                    {props.children}
+                    <ShopCartProvider>
+                      {props.children}
+                    </ShopCartProvider>
                   </RecordCountProcurementProvider>
                 </AlertProvider>
               </main>

@@ -4,6 +4,7 @@ import {
   Download,
   HandCoins,
   Instagram,
+  Package,
   Settings,
   ShoppingBag,
   ShoppingBasketIcon,
@@ -68,6 +69,12 @@ export const NavItems: NavItem[] = [
     ],
   },
   {
+    title: 'Shop',
+    icon: ShoppingBag,
+    href: '/dashboard/shop',
+    color: 'text-white',
+  },
+  {
     title: 'Buy From Chinese Websites',
     icon: Shop,
     href: '/dashboard/procurement',
@@ -121,6 +128,12 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/wallet',
     color: 'text-white',
   },
+  {
+    title: 'My Orders',
+    icon: Package,
+    href: '/dashboard/orders',
+    color: 'text-white',
+  },
   // {
   //   title: 'Buy Phones',
   //   icon: BuyPhones,
@@ -143,8 +156,8 @@ export const NavItems: NavItem[] = [
     color: 'text-white',
   },
   {
-    title: 'Shop',
-    icon: ShoppingBag,
+    title: 'Resources',
+    icon: ShoppingCartIcon,
     href: 'https://spreadit.selar.co',
     color: 'text-white',
   },
@@ -217,6 +230,12 @@ export const MobileNavItems: NavItem[] = [
       // },
     ],
   },
+    {
+    title: 'Shop',
+    icon: ShoppingBag,
+    href: '/dashboard/shop',
+    color: 'text-white',
+  },
   {
     title: 'Buy From Chinese Websites',
     icon: Frame,
@@ -272,6 +291,12 @@ export const MobileNavItems: NavItem[] = [
     color: 'text-white',
   },
   {
+    title: 'My Orders',
+    icon: Package,
+    href: '/dashboard/orders',
+    color: 'text-white',
+  },
+  {
     title: 'Pay Small Small',
     icon: HandCoins,
     href: '/dashboard/pay-small-small?status=SAVED',
@@ -293,9 +318,9 @@ export const MobileNavItems: NavItem[] = [
   //   ],
   // },
 
-  {
-    title: 'Shop',
-    icon: ShoppingBag,
+    {
+    title: 'Resources',
+    icon: ShoppingCartIcon,
     href: 'https://spreadit.selar.co',
     color: 'text-white',
   },

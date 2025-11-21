@@ -21,7 +21,14 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <AlertContext.Provider value={{ showSuccess, showError, showInfo }}>
       {children}
-      <Toaster position="top-right" expand={true} richColors />
+      <Toaster
+        position="top-right"
+        expand={true}
+        richColors
+        toastOptions={{
+          duration: 3000,
+        }}
+      />
     </AlertContext.Provider>
   );
 };
