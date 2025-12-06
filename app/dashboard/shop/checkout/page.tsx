@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, CreditCard, Loader2, Wallet } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { ArrowLeft, CreditCard, Loader2, Wallet, Minus, Plus, Trash2 } from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
@@ -20,12 +21,15 @@ declare global {
 function CheckoutContent() {
   const router = useRouter();
   const { user } = useAuth();
-  const { cart, cartCount, cartTotal, clearCart } = useShopCart();
+  const { cart, cartCount, cartTotal, clearCart, updateQuantity, removeFromCart } = useShopCart();
 
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
+  const [shippingAddress, setShippingAddress] = useState('');
+  const [loadingAddress, setLoadingAddress] = useState(false);
+  const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -40,9 +44,10 @@ function CheckoutContent() {
     script.async = true;
     document.body.appendChild(script);
 
-    // Fetch wallet balance
+    // Fetch wallet balance and shipping address
     if (user?.userEmail) {
       fetchWalletBalance();
+      fetchShippingAddress();
     }
 
     return () => {
@@ -84,6 +89,76 @@ function CheckoutContent() {
     }
   };
 
+  // Fetch shipping address
+  const fetchShippingAddress = async () => {
+    if (!user?.pidUser || !user?.userEmail) return;
+
+    setLoadingAddress(true);
+    try {
+      const response = await fetch(
+        `/api/user/update-shipping-address?pidUser=${encodeURIComponent(user.pidUser)}&userEmail=${encodeURIComponent(user.userEmail)}`
+      );
+      const data = await response.json();
+
+      if (data.statusx === 'SUCCESS' && data.data?.userShippingAddress2) {
+        setShippingAddress(data.data.userShippingAddress2);
+      }
+    } catch (error) {
+      console.error('Error fetching shipping address:', error);
+    } finally {
+      setLoadingAddress(false);
+    }
+  };
+
+  // Save shipping address
+  const saveShippingAddress = async () => {
+    if (!user?.pidUser || !user?.userEmail) {
+      toast.error('User information not available');
+      return false;
+    }
+
+    if (!shippingAddress || shippingAddress.trim().length === 0) {
+      toast.error('Please enter a shipping address');
+      return false;
+    }
+
+    if (shippingAddress.trim().length < 10) {
+      toast.error('Shipping address must be at least 10 characters long');
+      return false;
+    }
+
+    setSavingAddress(true);
+    try {
+      const response = await fetch('/api/user/update-shipping-address', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pidUser: user.pidUser,
+          userEmail: user.userEmail,
+          shippingAddress: shippingAddress.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.statusx === 'SUCCESS') {
+        toast.success('Shipping address saved successfully');
+        return true;
+      } else {
+        toast.error(data.message || 'Failed to save shipping address');
+        return false;
+      }
+    } catch (error) {
+      console.error('Error saving shipping address:', error);
+      toast.error('Failed to save shipping address');
+      return false;
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
   const handlePaymentSuccess = (reference: string) => {
     console.log('Payment initiated, reference:', reference);
     toast.info('Payment initiated successfully!');
@@ -116,7 +191,25 @@ function CheckoutContent() {
       return;
     }
 
+    // Validate shipping address before payment
+    if (!shippingAddress || shippingAddress.trim().length === 0) {
+      toast.error('Please enter a shipping address before proceeding');
+      return;
+    }
+
+    if (shippingAddress.trim().length < 10) {
+      toast.error('Shipping address must be at least 10 characters long');
+      return;
+    }
+
     setProcessingPayment(true);
+
+    // Save shipping address first
+    const addressSaved = await saveShippingAddress();
+    if (!addressSaved) {
+      setProcessingPayment(false);
+      return;
+    }
 
     try {
       // Initialize payment with backend
@@ -130,6 +223,7 @@ function CheckoutContent() {
           cartItems: cart,
           totalAmount: cartTotal,
           paymentMethod: 'paystack',
+          shippingAddress: shippingAddress.trim(),
         }),
       });
 
@@ -153,6 +247,7 @@ function CheckoutContent() {
         metadata: {
           pidUser: user.pidUser,
           cart_items: cart,
+          shipping_address: shippingAddress.trim(),
         },
         onClose: function() {
           handlePaymentClose();
@@ -202,6 +297,17 @@ function CheckoutContent() {
       return;
     }
 
+    // Validate shipping address before payment
+    if (!shippingAddress || shippingAddress.trim().length === 0) {
+      toast.error('Please enter a shipping address before proceeding');
+      return;
+    }
+
+    if (shippingAddress.trim().length < 10) {
+      toast.error('Shipping address must be at least 10 characters long');
+      return;
+    }
+
     // Check if wallet balance is loaded
     if (walletBalance === null) {
       toast.error('Loading wallet information. Please try again.');
@@ -223,6 +329,14 @@ function CheckoutContent() {
     }
 
     setProcessingPayment(true);
+
+    // Save shipping address first
+    const addressSaved = await saveShippingAddress();
+    if (!addressSaved) {
+      setProcessingPayment(false);
+      return;
+    }
+
     toast.info('Processing wallet payment...');
 
     try {
@@ -235,6 +349,7 @@ function CheckoutContent() {
           pidUser: user.pidUser,
           cartItems: cart,
           totalAmount: cartTotal,
+          shippingAddress: shippingAddress.trim(),
         }),
       });
 
@@ -309,18 +424,59 @@ function CheckoutContent() {
                     </div>
 
                     <div className="flex flex-1 flex-col">
-                      <h3 className="mb-1 font-medium text-foreground dark:text-white">
-                        {item.productName}
-                      </h3>
-                      {item.productBrand && (
-                        <p className="mb-2 text-sm text-muted-foreground dark:text-gray-400">
-                          {item.productBrand}
-                        </p>
-                      )}
+                      <div className="mb-2 flex items-start justify-between">
+                        <div className="flex-1">
+                          <h3 className="mb-1 font-medium text-foreground dark:text-white">
+                            {item.productName}
+                          </h3>
+                          {item.productBrand && (
+                            <p className="mb-2 text-sm text-muted-foreground dark:text-gray-400">
+                              {item.productBrand}
+                            </p>
+                          )}
+                        </div>
+                        {/* Remove Button */}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-8 w-8 text-red-600 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30"
+                          onClick={() => removeFromCart(item.pidProduct)}
+                          disabled={processingPayment}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
                       <div className="mt-auto flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground dark:text-gray-400">
-                          Qty: {item.quantity}
-                        </span>
+                        {/* Quantity Controls */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground dark:text-gray-400">
+                            Qty:
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                            onClick={() => updateQuantity(item.pidProduct, item.quantity - 1)}
+                            disabled={processingPayment || item.quantity <= 1}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center text-sm font-medium dark:text-white">
+                            {item.quantity}
+                          </span>
+                          <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                            onClick={() => updateQuantity(item.pidProduct, item.quantity + 1)}
+                            disabled={processingPayment}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+
+                        {/* Item Subtotal */}
                         <span className="font-semibold text-foreground dark:text-white">
                           ₦{(item.productPrice * item.quantity).toLocaleString()}
                         </span>
@@ -336,7 +492,7 @@ function CheckoutContent() {
               <h2 className="mb-4 text-xl font-semibold text-foreground dark:text-white">
                 Customer Information
               </h2>
-              <div className="space-y-2 text-sm">
+              <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground dark:text-gray-400">Name:</span>
                   <span className="font-medium text-foreground dark:text-white">
@@ -357,6 +513,53 @@ function CheckoutContent() {
                     </span>
                   </div>
                 )}
+
+                {/* Shipping Address Field */}
+                <div className="mt-4 space-y-2">
+                  <label
+                    htmlFor="shippingAddress"
+                    className="block text-sm font-medium text-foreground dark:text-white"
+                  >
+                    Shipping Address <span className="text-red-500">*</span>
+                  </label>
+                  {loadingAddress ? (
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : (
+                    <Textarea
+                      id="shippingAddress"
+                      placeholder="Enter your full delivery address (street, city, state, postal code)"
+                      value={shippingAddress}
+                      onChange={(e) => setShippingAddress(e.target.value)}
+                      disabled={processingPayment || savingAddress}
+                      className="min-h-[100px] resize-none bg-white dark:bg-gray-800 dark:text-white"
+                      required
+                    />
+                  )}
+                  <p className="text-xs text-muted-foreground dark:text-gray-400">
+                    Please provide your complete delivery address. Minimum 10 characters required.
+                  </p>
+                  {shippingAddress && shippingAddress.trim().length > 0 && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={saveShippingAddress}
+                      disabled={savingAddress || processingPayment || shippingAddress.trim().length < 10}
+                      className="mt-2 dark:bg-gray-800 dark:text-white"
+                    >
+                      {savingAddress ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        'Save Address'
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             </Card>
 
