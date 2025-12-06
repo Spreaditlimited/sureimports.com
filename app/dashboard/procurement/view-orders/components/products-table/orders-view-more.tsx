@@ -1547,7 +1547,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
                       }{' '}
                       USD
                     </b>
-
+ 
                 <span className="font-semibold">
                   {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
                   {destinationCountry == 'Nigeria' && (
