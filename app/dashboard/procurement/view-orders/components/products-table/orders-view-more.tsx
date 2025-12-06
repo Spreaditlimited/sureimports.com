@@ -1460,6 +1460,30 @@ function MoreOrders({ products }: MoreOrdersProps) {
                     }{' '}
                     USD
                   </b>
+                
+
+                <span className="font-semibold">
+                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                  {destinationCountry == 'Nigeria' && (
+                    <>
+                      {'  |  '}&nbsp;
+                      <span className="">
+                        ₦
+                        {
+                          (
+                            ((actualTotalShippingCost as number) / 1) *
+                            exNairaToDollar
+                          )
+                            .toFixed(2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                        }{' '}
+                        Naira
+                      </span>
+                    </>
+                  )}
+                </span>
+
                 </div>
               </div>
 
@@ -1523,6 +1547,29 @@ function MoreOrders({ products }: MoreOrdersProps) {
                       }{' '}
                       USD
                     </b>
+
+                <span className="font-semibold">
+                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                  {destinationCountry == 'Nigeria' && (
+                    <>
+                      {'  |  '}&nbsp;
+                      <span className="">
+                        ₦
+                        {
+                          (
+                            ((actualTotalShippingCost - estimatedTotalShippingCost as number) / 1) *
+                            exNairaToDollar
+                          )
+                            .toFixed(2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                        }{' '}
+                        Naira
+                      </span>
+                    </>
+                  )}
+                </span>
+
                   </div>
                 )}
 
