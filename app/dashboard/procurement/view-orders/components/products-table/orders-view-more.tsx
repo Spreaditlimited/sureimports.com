@@ -475,7 +475,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
     formData.append('currentStatus', currentStatus);
     formData.append('newStatus', actionType);
 
-    formData.append('refundAmount', costDifference as any);
+    formData.append('refundAmount', (actualTotalShippingCost - estimatedTotalShippingCost) as any);
     formData.append('serviceType', 'PROCUREMENT');
 
     //formData.append('message', message);
@@ -566,7 +566,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
                       <th className="px-6 py-3 text-left">Quantity</th>
                       <th className="px-6 py-3 text-left">Unit Weight</th>
                       <th className="px-6 py-3 text-left">Total Price</th>
-                      {(status == 'saved' || status == 'on-hold') && (
+                      {['saved', 'on-hold'].includes(status) && (
                         <>
                           <th className="px-6 py-3 text-left">Action</th>
                         </>
@@ -620,7 +620,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
                               {datax.productPrice * datax.productQuantity}
                             </td>
 
-                            {(status == 'saved' || status == 'on-hold') && (
+                            {['saved', 'on-hold'].includes(status) && (
                               <>
                                 <td className="flex px-6 py-3 text-left">
                                   <Link
@@ -760,8 +760,12 @@ function MoreOrders({ products }: MoreOrdersProps) {
               </div>
             </div>
           </div>
-          {/* estimated cost of order */}
 
+
+
+
+          {/* estimated cost of order (SAVED STAGE & ON HOLD STAGE) */}
+          {['saved', 'on-hold'].includes(status) && (
           <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
             <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
               Estimated Shipping Cost of Order:
@@ -839,6 +843,95 @@ function MoreOrders({ products }: MoreOrdersProps) {
               </div>
             </div>
           </div>
+          )}
+
+
+
+
+
+        {/* estimated shipping cost of order (OTHER STAGE) */}
+        {!['saved', 'on-hold'].includes(status) && (
+          <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
+            <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
+              Estimated Shipping Cost of Order:
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                <p className="w-72">Domestic Shipping Cost within China:</p> $
+                {
+                  ((domesticShippingCost as number) / 1)
+                    .toFixed(2)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                }
+              </div>
+              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                <p className="w-72">International Shipping Cost:</p> $
+                {
+                  ((estimatedTotalShippingCost - domesticShippingCost as number) / 1)
+                    .toFixed(2)
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                }
+              </div>
+
+              <hr />
+
+              <div className="flex gap-4 text-base text-slate-600 dark:text-white">
+                <span className="font-semibold">
+                  $
+                  <b>
+                    {
+                      ((estimatedTotalShippingCost as number) / 1)
+                        .toFixed(2)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                    }
+                  </b>
+                  USD
+                </span>
+
+                <span className="font-semibold">
+                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                  {destinationCountry == 'Nigeria' && (
+                    <>
+                      {'  |  '}&nbsp;
+                      <span className="">
+                        ₦
+                        {
+                          (
+                            ((estimatedTotalShippingCost as number) / 1) *
+                            exNairaToDollar
+                          )
+                            .toFixed(2)
+                            .toString()
+                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                        }{' '}
+                        Naira
+                      </span>
+                    </>
+                  )}
+                </span>
+              </div>
+            </div>
+
+            {/* important notice */}
+            <div>
+              <div className="text-sm font-semibold text-red-400">
+                Important Notice:
+              </div>
+              <div className="text-sm font-normal text-red-400">
+                If this cost is higher than the actual cost which will be
+                determined later at the China office, we will refund you. If the
+                actual cost is higher than this estimated cost, you will be
+                required to make a balance payment.
+              </div>
+            </div>
+          </div>
+          )}
+
+
+
 
           {/* details */}
           <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
@@ -1417,13 +1510,13 @@ function MoreOrders({ products }: MoreOrdersProps) {
 
                 <hr />
 
-                {costDifference > 0 && (
+                {(actualTotalShippingCost - estimatedTotalShippingCost) > 0 && (
                   <div className="flex gap-20 text-base text-red-700 dark:text-red-500">
                     <p className="w-72">Amount to Pay:</p>
                     <b>
                       $
                       {
-                        ((costDifference as number) / 1)
+                        ((actualTotalShippingCost - estimatedTotalShippingCost as number) / 1)
                           .toFixed(2)
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
@@ -1433,13 +1526,13 @@ function MoreOrders({ products }: MoreOrdersProps) {
                   </div>
                 )}
 
-                {costDifference < 0 && (
+                {(actualTotalShippingCost - estimatedTotalShippingCost) < 0 && (
                   <div className="flex gap-20 text-base text-green-700 dark:text-green-500">
                     <p className="w-72"> Refund Amount:</p>
                     <b>
                       $
                       {
-                        (((costDifference as number) * -1) / 1)
+                        ((((actualTotalShippingCost - estimatedTotalShippingCost) as number) * -1) / 1)
                           .toFixed(2)
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
@@ -1455,7 +1548,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
         {/* ............................... PDF PRINT SECTION ENDS ................................ */}
 
         {/* ............................... PAYMENT SECTION FOR PAY FOR SHIPPING................................ */}
-        {status == 'pay-for-shipping' && costDifference > 0 && (
+        {status == 'pay-for-shipping' && (actualTotalShippingCost - estimatedTotalShippingCost) > 0 && (
           <>
             <div className="flex flex-col justify-between border border-slate-200 p-[25px] max-xl:gap-4 xl:flex-row xl:items-center">
               <div className="flex flex-col items-center text-base text-slate-800 dark:text-slate-200 max-md:items-start max-md:gap-3 lg:items-start">
@@ -1488,8 +1581,8 @@ function MoreOrders({ products }: MoreOrdersProps) {
               <div className="flex flex-col gap-[15px] lg:flex-row">
                 {/* *********************************************************************************************************** */}
                 <FlutterwavePaymentButton
-                  amount={costDifference}
-                  amountNaira={costDifference * exNairaToDollar}
+                  amount={(actualTotalShippingCost - estimatedTotalShippingCost)}
+                  amountNaira={((actualTotalShippingCost - estimatedTotalShippingCost)) * exNairaToDollar}
                   destinationCountry={destinationCountry}
                   totalWeight={productsTotalWeight}
                   email={user?.userEmail as string}
@@ -1517,8 +1610,8 @@ function MoreOrders({ products }: MoreOrdersProps) {
                       : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
                   }
                   onClick={() => {
-                    let amount = costDifference as any;
-                    let amountNairax = (costDifference *
+                    let amount = (actualTotalShippingCost - estimatedTotalShippingCost) as any;
+                    let amountNairax = ((actualTotalShippingCost - estimatedTotalShippingCost) / exNairaToDollar*
                       exNairaToDollar) as any;
                     let totalWeightx = productsTotalWeight as any;
                     let destinationCountryx = destinationCountry as any;
@@ -1552,9 +1645,9 @@ function MoreOrders({ products }: MoreOrdersProps) {
 
                     router.push(
                       '/dashboard/bank-payment/?service=procurement&amount=' +
-                        costDifference +
+                        (actualTotalShippingCost - estimatedTotalShippingCost) +
                         '&amountNaira=' +
-                        costDifference * exNairaToDollar +
+                        (actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar +
                         '&currencyType=' +
                         currencyType +
                         '&exNairaToDollar=' +
@@ -1592,7 +1685,7 @@ function MoreOrders({ products }: MoreOrdersProps) {
         )}
 
         {/* ............................... PAYMENT SECTION FOR PAY FOR SHIPPING................................ */}
-        {status == 'pay-for-shipping' && costDifference < 0 && (
+        {status == 'pay-for-shipping' && (actualTotalShippingCost - estimatedTotalShippingCost) < 0 && (
           <>
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col justify-between border border-slate-200 p-[25px] max-xl:gap-4 xl:flex-row xl:items-center">
