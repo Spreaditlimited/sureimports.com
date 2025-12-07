@@ -1,3 +1,26 @@
+/**
+ * ============================================================================
+ * SHOP PAYMENT VERIFICATION API - PAYSTACK
+ * ============================================================================
+ *
+ * Purpose: Verify Paystack payment and create order records
+ *
+ * Order Status Management:
+ * - Initial Status: "PAID" (set after successful payment verification)
+ * - Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+ * - Admin updates status through order management interface (to be implemented)
+ *
+ * Related Files:
+ * - Database Schema: prisma/schema.prisma (store_sales model)
+ * - Wallet Payment: app/api/shop/payment/wallet/route.ts
+ * - My Orders Page: app/dashboard/orders/page.tsx
+ *
+ * Admin Integration:
+ * - TODO: Create /api/admin/orders/update-status endpoint
+ * - TODO: Create admin order management UI
+ * ============================================================================
+ */
+
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -112,7 +135,11 @@ export async function GET(request: NextRequest) {
 
       console.log('Payment record created successfully');
       console.log('Creating store_sales records for cart items...');
+
       // Create store_sales records for each cart item
+      // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+      // Initial status is PAID after successful payment
+      // Admin will update status through order management interface
       const salesRecords = await Promise.all(
         cartItems.map(async (item: any) => {
           return tx.store_sales.create({
@@ -124,9 +151,9 @@ export async function GET(request: NextRequest) {
               unit_price: item.productPrice.toFixed(2),
               total_price: (item.productPrice * item.quantity).toFixed(2),
               quantity: item.quantity.toString(),
-              status: 'COMPLETED',
-              ext1: txREF,
-              ext2: 'PAYSTACK',
+              status: 'PAID', // Initial status after successful payment
+              ext1: txREF, // Transaction reference
+              ext2: 'PAYSTACK', // Payment method
               createdAt: new Date(),
               updatedAt: new Date(),
             },

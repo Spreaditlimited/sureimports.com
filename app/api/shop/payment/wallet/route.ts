@@ -1,3 +1,26 @@
+/**
+ * ============================================================================
+ * SHOP PAYMENT API - WALLET PAYMENT
+ * ============================================================================
+ *
+ * Purpose: Process wallet payment and create order records
+ *
+ * Order Status Management:
+ * - Initial Status: "PAID" (set after successful wallet deduction)
+ * - Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+ * - Admin updates status through order management interface (to be implemented)
+ *
+ * Related Files:
+ * - Database Schema: prisma/schema.prisma (store_sales model)
+ * - Paystack Payment: app/api/shop/payment/verify/route.ts
+ * - My Orders Page: app/dashboard/orders/page.tsx
+ *
+ * Admin Integration:
+ * - TODO: Create /api/admin/orders/update-status endpoint
+ * - TODO: Create admin order management UI
+ * ============================================================================
+ */
+
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -244,6 +267,9 @@ export async function POST(request: NextRequest) {
       });
 
       // Create store_sales records for each cart item
+      // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+      // Initial status is PAID after successful payment
+      // Admin will update status through order management interface
       const salesRecords = await Promise.all(
         cartItems.map(async (item: any) => {
           return tx.store_sales.create({
@@ -255,9 +281,9 @@ export async function POST(request: NextRequest) {
               unit_price: item.productPrice.toFixed(2),
               total_price: (item.productPrice * item.quantity).toFixed(2),
               quantity: item.quantity.toString(),
-              status: 'PROCESSING',
-              ext1: txREF,
-              ext2: 'WALLET',
+              status: 'PAID', // Initial status after successful payment
+              ext1: txREF, // Transaction reference
+              ext2: 'WALLET', // Payment method
               createdAt: new Date(),
               updatedAt: new Date(),
             },

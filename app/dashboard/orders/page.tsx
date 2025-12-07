@@ -1,3 +1,37 @@
+/**
+ * ============================================================================
+ * MY ORDERS PAGE - ORDER STATUS DISPLAY
+ * ============================================================================
+ *
+ * Purpose: Display user's order history with status tracking
+ *
+ * Order Status System:
+ * - Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+ * - Status Badges: Color-coded visual indicators for each status
+ * - Order Categorization:
+ *   - Active Orders: PAID, PROCESSING, SHIPPED, DELIVERED
+ *   - Recent Orders: COMPLETED (last 30 days)
+ *   - Old Orders: COMPLETED (>30 days), CANCELLED
+ *
+ * Status Definitions:
+ * - PAID: Order paid, awaiting admin processing (Blue badge)
+ * - PROCESSING: Admin is preparing the order (Yellow badge)
+ * - SHIPPED: Order dispatched to customer (Purple badge)
+ * - DELIVERED: Order delivered to customer (Green badge)
+ * - COMPLETED: Order fully completed (Dark green badge)
+ * - CANCELLED: Order cancelled (Red badge)
+ *
+ * Related Files:
+ * - Database Schema: prisma/schema.prisma (store_sales model)
+ * - Payment APIs: app/api/shop/payment/verify/route.ts (Paystack)
+ *                 app/api/shop/payment/wallet/route.ts (Wallet)
+ *
+ * Admin Integration:
+ * - Admin updates order status through admin panel (to be implemented)
+ * - Status changes trigger customer notifications (to be implemented)
+ * ============================================================================
+ */
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -17,9 +51,9 @@ interface Order {
   unit_price: string;
   total_price: string;
   quantity: string;
-  status: string;
+  status: string; // Order status: PAID, PROCESSING, SHIPPED, DELIVERED, COMPLETED, CANCELLED
   ext1: string | null; // Transaction reference
-  ext2: string | null; // Payment method
+  ext2: string | null; // Payment method (PAYSTACK, WALLET)
   createdAt: Date;
   updatedAt: Date;
 }
@@ -107,12 +141,15 @@ export default function MyOrdersPage() {
         Math.min(...products.map((p) => new Date(p.createdAt).getTime()))
       );
 
-      // Determine overall status (prioritize PROCESSING > SHIPPED > COMPLETED > CANCELLED)
+      // Determine overall status (prioritize PAID > PROCESSING > SHIPPED > DELIVERED > COMPLETED > CANCELLED)
+      // Lower number = higher priority (shows most urgent status first)
       const statusPriority: Record<string, number> = {
-        PROCESSING: 1,
-        SHIPPED: 2,
-        COMPLETED: 3,
-        CANCELLED: 4,
+        PAID: 1,        // Newly paid orders (highest priority)
+        PROCESSING: 2,  // Being prepared
+        SHIPPED: 3,     // In transit
+        DELIVERED: 4,   // Delivered to customer
+        COMPLETED: 5,   // Fully completed
+        CANCELLED: 6,   // Cancelled orders
       };
 
       const status = products.reduce((prevStatus, product) => {
@@ -143,12 +180,19 @@ export default function MyOrdersPage() {
   };
 
   // Categorize grouped orders
+  // Active: PAID, PROCESSING, SHIPPED, DELIVERED (orders in progress)
+  // Recent: COMPLETED orders within last 30 days
+  // Old: COMPLETED orders older than 30 days, and CANCELLED orders
   const categorizeOrders = () => {
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const activeOrders = groupedOrders.filter(
-      (order) => order.status === 'PROCESSING' || order.status === 'SHIPPED'
+      (order) =>
+        order.status === 'PAID' ||
+        order.status === 'PROCESSING' ||
+        order.status === 'SHIPPED' ||
+        order.status === 'DELIVERED'
     );
 
     const recentOrders = groupedOrders.filter(
@@ -169,20 +213,31 @@ export default function MyOrdersPage() {
   const { activeOrders, recentOrders, oldOrders } = categorizeOrders();
 
   // Get status badge styling
+  // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+      PAID: {
+        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        icon: <CheckCircle className="h-3 w-3" />,
+        label: 'Paid',
+      },
       PROCESSING: {
         color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
         icon: <Clock className="h-3 w-3" />,
         label: 'Processing',
       },
       SHIPPED: {
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         icon: <Truck className="h-3 w-3" />,
         label: 'Shipped',
       },
-      COMPLETED: {
+      DELIVERED: {
         color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        icon: <Package className="h-3 w-3" />,
+        label: 'Delivered',
+      },
+      COMPLETED: {
+        color: 'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-300',
         icon: <CheckCircle className="h-3 w-3" />,
         label: 'Completed',
       },
@@ -193,7 +248,7 @@ export default function MyOrdersPage() {
       },
     };
 
-    const config = statusConfig[status] || statusConfig.PROCESSING;
+    const config = statusConfig[status] || statusConfig.PAID;
 
     return (
       <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}>

@@ -297,7 +297,7 @@ model payments {
   pidPayment           String    @unique()
   pidUser              String
   payerName            String
-  payerEmail           String
+  payerEmail           String?   // Made optional to handle existing NULL values
   txID                 String
   txRef                String
   paymentStatus        String?
@@ -891,6 +891,45 @@ model Transaction {
 
 
 
+// ============================================================================
+// STORE SALES - ORDER STATUS MANAGEMENT SYSTEM
+// ============================================================================
+//
+// Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
+//
+// Status Definitions:
+// - PAID: Order has been paid for (initial status after successful payment)
+//         Set automatically by payment APIs (Paystack & Wallet)
+// - PROCESSING: Order is being prepared/packed by admin
+//               Admin updates this status when starting order preparation
+// - SHIPPED: Order has been shipped/dispatched to customer
+//            Admin updates this status when order is sent out
+// - DELIVERED: Order has been delivered to customer
+//              Admin updates this status when delivery is confirmed
+// - COMPLETED: Order is fully completed and closed
+//              Admin updates this status when order lifecycle is complete
+//
+// Admin Integration Points:
+// - TODO: Create admin API endpoint: /api/admin/orders/update-status
+//   - Accept: pidStore (order ID), newStatus (status value)
+//   - Validate: Admin authentication, valid status transition
+//   - Update: store_sales.status field
+//   - Notify: Send email/notification to customer on status change
+//
+// - TODO: Create admin UI: app/admin/orders/page.tsx
+//   - Display: All orders with current status
+//   - Filter: By status, date, customer
+//   - Action: Update status dropdown for each order
+//   - Search: By order ID, customer name, transaction reference
+//
+// Database Notes:
+// - Using String type for backward compatibility with existing data
+// - Valid values: "PAID", "PROCESSING", "SHIPPED", "DELIVERED", "COMPLETED"
+// - Default value: "PAID" (set after successful payment)
+// - ext1: Stores transaction reference for payment tracking
+// - ext2: Stores payment method (PAYSTACK, WALLET)
+// ============================================================================
+
 model store_sales {
   id  String  @id @default(cuid())
   pidStore  String  @unique
@@ -900,9 +939,9 @@ model store_sales {
   unit_price  String
   total_price  String
   quantity  String
-  status  String
-  ext1  String?
-  ext2  String?
+  status  String  @default("PAID")  // Order status - defaults to PAID after payment
+  ext1  String?  // Transaction reference
+  ext2  String?  // Payment method (PAYSTACK, WALLET)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }
