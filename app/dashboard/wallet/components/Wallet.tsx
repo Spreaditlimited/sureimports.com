@@ -326,7 +326,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
 
   // Calculate available balance (total minus pending withdrawal)
   // const availableBalance = balance - pendingWithdrawal;
-  const availableBalance = transactionsx.totalAmount;
+  const availableBalance = transactionsx?.totalAmount ?? 0;
   const availableBalanceText = formatCurrency(availableBalance);
   const pendingBalanceText = formatCurrency(pendingWithdrawal);
 
@@ -712,18 +712,18 @@ const allTransactions: any[] = [
         <Card className="p-6">
           <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Credit Transactions</h3>
           
-          {transactionsx.transactions.length > 0 ? (
+          {transactionsx?.transactions?.length > 0 ? (
 
                   <div className="p-1">
                     <div className="space-y-1">
                       <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-black-500">
                         <Suspense fallback={<Loading />}>
-                          {transactionsx.transactions.length > 0 && (
+                          {transactionsx?.transactions?.length > 0 && (
                             <WalletTransactionTable
                               transactions={transactionsx.transactions}
                             />
                           )}
-                          {transactionsx.transactions.length == 0 && (
+                          {transactionsx?.transactions?.length == 0 && (
                             <div className="flex items-center justify-center p-4">
                               <p className="text-sm text-gray-600 dark:text-gray-800">
                                 No transactions available
@@ -848,9 +848,9 @@ const allTransactions: any[] = [
 
       {/* Top Up Dialog */}
       <TopUpDialog
-          bankName={customer.bankName}
-          accountName={customer.bankAccountName}
-          accountNumber={customer.bankAccountNumber}
+          bankName={customer?.bankName ?? ''}
+          accountName={customer?.bankAccountName ?? ''}
+          accountNumber={customer?.bankAccountNumber ?? ''}
           isOpen={showTopUpDialog}
           onClose={() => setShowTopUpDialog(false)}
       />

@@ -25,6 +25,14 @@ export default function Header() {
   const { isOpen } = useSidebar();
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Determine the resolved theme, defaulting to 'light' before mount
+  const resolvedTheme = mounted ? theme : 'light';
 
   return (
     <div
@@ -43,7 +51,7 @@ export default function Header() {
               <Image
                 loading="lazy"
                 src={
-                  theme === 'dark'
+                  resolvedTheme === 'dark'
                     ? '/icons/search-dark.svg'
                     : '/icons/search.svg'
                 }
@@ -67,15 +75,11 @@ export default function Header() {
                 router.push('/dashboard/message/message-box');
               }}
             >
-              {theme === 'dark' ? (
+              {resolvedTheme === 'dark' ? (
                 <Bell />
               ) : (
                 <Image
-                  src={
-                    theme === 'dark'
-                      ? '/icons/notification-dark.svg'
-                      : '/icons/notification.svg'
-                  }
+                  src="/icons/notification.svg"
                   alt="Logo"
                   width={60}
                   height={60}
@@ -88,15 +92,11 @@ export default function Header() {
                 router.push('/dashboard/profile-update');
               }}
             >
-              {theme === 'dark' ? (
+              {resolvedTheme === 'dark' ? (
                 <Bolt />
               ) : (
                 <Image
-                  src={
-                    theme === 'dark'
-                      ? '/icons/settings-dark.svg'
-                      : '/icons/settings.svg'
-                  }
+                  src="/icons/settings.svg"
                   alt="Logo"
                   width={60}
                   height={60}
