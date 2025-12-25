@@ -2,11 +2,10 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: Request,
-  { params }: { params: { dedicated_account_id: string } },
+  { params }: { params: Promise<{ dedicated_account_id: string }> },
 ) {
-  const { dedicated_account_id } = params;
-
   try {
+    const { dedicated_account_id } = await params;
     const response = await fetch(
       `https://api.paystack.co/dedicated_account/${dedicated_account_id}`,
       {

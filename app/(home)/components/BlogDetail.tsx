@@ -5,9 +5,7 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
-// ImageWithFallback component defined locally below
-import { getBlogPostBySlug, blogPosts, type BlogPost } from "./BlogData";
-// ADD: router fallback
+import type { BlogPost } from "../actions/blogActions";
 import { useRouter } from "next/navigation";
 
 // Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
@@ -23,6 +21,7 @@ const ImageWithFallback = ({ src, alt, className }: { src: string | { src: strin
 export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   // Fallback handlers if none provided
@@ -30,15 +29,131 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
   const handleSelectPostClick = onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
 
   useEffect(() => {
-    const foundPost = getBlogPostBySlug(slug);
-    if (foundPost) {
-      setPost(foundPost);
-      
-      // Get related posts (same category, excluding current post)
-      const related = blogPosts
-        .filter(p => p.category === foundPost.category && p.id !== foundPost.id)
-        .slice(0, 3);
-      setRelatedPosts(related);
+    async function fetchBlog() {
+      try {
+        setLoading(true);
+        // Fetch the blog post
+        const response = await fetch(`/api/crud/blog/fetch-single?slug=${slug}`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Transform the database blog to BlogPost format
+          const dbBlog = data.data;
+          
+          const excerpt = dbBlog.blogContent
+            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
+            : 'No excerpt available';
+          
+          const wordCount = dbBlog.blogContent
+            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
+            : 0;
+          const readTime = Math.ceil(wordCount / 200);
+          
+          const imageUrl = dbBlog.blogImage
+            ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${dbBlog.blogImage}`
+            : '/images/new/images/logo.png';
+          
+          let tags: string[] = [];
+          let category = 'Import Guide';
+          
+          try {
+            if (dbBlog.blogExt2) {
+              const metadata = JSON.parse(dbBlog.blogExt2);
+              if (metadata.tags) tags = metadata.tags;
+              if (metadata.category) category = metadata.category;
+            }
+          } catch {
+            tags = ['Import Guide'];
+          }
+          
+          const transformedPost: BlogPost = {
+            id: dbBlog.pidBlog,
+            title: dbBlog.blogTitle,
+            excerpt,
+            content: dbBlog.blogContent || '',
+            author: {
+              name: dbBlog.blogBy || 'Admin',
+              avatar: '/images/new/images/ijeoma-tdaniels.JPG',
+              role: 'Content Lead',
+            },
+            category,
+            tags,
+            publishDate: dbBlog.createdAt
+              ? new Date(dbBlog.createdAt).toISOString().split('T')[0]
+              : new Date().toISOString().split('T')[0],
+            readTime: readTime > 0 ? readTime : 5,
+            featured: false,
+            image: imageUrl,
+            slug: dbBlog.blogSlug || dbBlog.pidBlog,
+          };
+          
+          setPost(transformedPost);
+          
+          // Fetch all blogs for related posts
+          const allResponse = await fetch('/api/crud/blog/fetch?status=published&limit=100');
+          const allData = await allResponse.json();
+          
+          if (allData.success && allData.data) {
+            const allPosts = allData.data.map((b: any) => {
+              let postCategory = 'Import Guide';
+              try {
+                if (b.blogExt2) {
+                  const meta = JSON.parse(b.blogExt2);
+                  if (meta.category) postCategory = meta.category;
+                }
+              } catch {}
+              return { ...b, category: postCategory };
+            });
+            
+            const related = allPosts
+              .filter((p: any) => p.category === category && p.pidBlog !== dbBlog.pidBlog)
+              .slice(0, 3)
+              .map((b: any) => {
+                const ex = b.blogContent
+                  ? b.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
+                  : 'No excerpt available';
+                const wc = b.blogContent
+                  ? b.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
+                  : 0;
+                const rt = Math.ceil(wc / 200);
+                const img = b.blogImage
+                  ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${b.blogImage}`
+                  : '/images/new/images/logo.png';
+                  
+                return {
+                  id: b.pidBlog,
+                  title: b.blogTitle,
+                  excerpt: ex,
+                  content: b.blogContent || '',
+                  author: {
+                    name: b.blogBy || 'Admin',
+                    avatar: '/images/new/images/ijeoma-tdaniels.JPG',
+                    role: 'Content Lead',
+                  },
+                  category: b.category,
+                  tags: [],
+                  publishDate: b.createdAt
+                    ? new Date(b.createdAt).toISOString().split('T')[0]
+                    : new Date().toISOString().split('T')[0],
+                  readTime: rt > 0 ? rt : 5,
+                  featured: false,
+                  image: img,
+                  slug: b.blogSlug || b.pidBlog,
+                };
+              });
+            
+            setRelatedPosts(related);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching blog:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    if (slug) {
+      fetchBlog();
     }
   }, [slug]);
 
@@ -68,6 +183,17 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <p className="text-slate-300">Loading article...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!post) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
@@ -84,57 +210,9 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
     );
   }
 
-  // Parse markdown-like content to HTML
-  const formatContent = (content: string) => {
-    return content
-      .split('\n')
-      .map((line, index) => {
-        // Headers
-        if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-3xl md:text-4xl text-white mb-6 mt-8">{line.slice(2)}</h1>;
-        }
-        if (line.startsWith('## ')) {
-          return <h2 key={index} className="text-2xl md:text-3xl text-white mb-4 mt-8">{line.slice(3)}</h2>;
-        }
-        if (line.startsWith('### ')) {
-          return <h3 key={index} className="text-xl md:text-2xl text-white mb-3 mt-6">{line.slice(4)}</h3>;
-        }
-        
-        // Bold text
-        if (line.startsWith('**') && line.endsWith('**')) {
-          return <p key={index} className="text-white mb-4"><strong>{line.slice(2, -2)}</strong></p>;
-        }
-        
-        // Lists
-        if (line.startsWith('- ')) {
-          return <li key={index} className="text-slate-300 mb-2 ml-4">{line.slice(2)}</li>;
-        }
-        
-        // Regular paragraphs - check for HTML anchor tags
-        if (line.trim() && !line.startsWith('#')) {
-          // Check if line contains HTML anchor tags
-          if (line.includes('<a href=')) {
-            // Parse the line to handle anchor tags with proper styling
-            const styledLine = line.replace(
-              /<a href="([^"]*)"([^>]*)>/g, 
-              '<a href="$1"$2 style="color: #60a5fa; text-decoration: underline; transition: color 0.2s ease;" onmouseover="this.style.color=\'#93c5fd\'" onmouseout="this.style.color=\'#60a5fa\'">'
-            );
-            return (
-              <p key={index} className="text-slate-300 mb-4 leading-relaxed" 
-                 dangerouslySetInnerHTML={{ __html: styledLine }} />
-            );
-          }
-          return <p key={index} className="text-slate-300 mb-4 leading-relaxed">{line}</p>;
-        }
-        
-        // Empty lines
-        if (!line.trim()) {
-          return <div key={index} className="mb-2"></div>;
-        }
-        
-        return null;
-      })
-      .filter(Boolean);
+  // Check if content is HTML
+  const isHtmlContent = (content: string) => {
+    return /<[a-z][\s\S]*>/i.test(content);
   };
 
   return (
@@ -234,9 +312,142 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
         {/* Article Content */}
         <div className="prose prose-invert prose-slate max-w-none">
           <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-8 md:p-12 blog-content">
-            {formatContent(post.content)}
+            {isHtmlContent(post.content) ? (
+              <div
+                className="blog-html-content"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
+            ) : (
+              <div className="text-slate-300 leading-relaxed whitespace-pre-wrap">
+                {post.content}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Blog Content Styles */}
+        <style jsx global>{`
+          .blog-html-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+          }
+          .blog-html-content h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          .blog-html-content h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #93c5fd;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+          }
+          .blog-html-content p {
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1rem;
+          }
+          .blog-html-content strong {
+            color: #fff;
+            font-weight: 600;
+          }
+          .blog-html-content ul {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 1.5rem;
+          }
+          .blog-html-content ul li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+          }
+          .blog-html-content ul li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #60a5fa;
+            font-weight: bold;
+          }
+          .blog-html-content ul li p {
+            margin: 0;
+            display: inline;
+          }
+          .blog-html-content ol {
+            list-style: decimal;
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+          }
+          .blog-html-content ol li {
+            color: #cbd5e1;
+            margin-bottom: 0.5rem;
+          }
+          .blog-html-content a {
+            color: #60a5fa;
+            text-decoration: underline;
+            transition: color 0.2s ease;
+          }
+          .blog-html-content a:hover {
+            color: #93c5fd;
+          }
+          .blog-html-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #94a3b8;
+          }
+          .blog-html-content code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            color: #f472b6;
+          }
+          .blog-html-content pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+          }
+          .blog-html-content pre code {
+            background: transparent;
+            padding: 0;
+          }
+          .blog-html-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+          }
+          .blog-html-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+          }
+          .blog-html-content th,
+          .blog-html-content td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            text-align: left;
+            color: #cbd5e1;
+          }
+          .blog-html-content th {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-weight: 600;
+          }
+        `}</style>
 
         {/* Article Footer */}
         <footer className="mt-12 pt-8 border-t border-slate-700">

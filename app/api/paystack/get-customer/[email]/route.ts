@@ -14,37 +14,32 @@ type RequestBody = {
 
 export async function GET(
   request: Request,
-  { params }: { params: { email: string } },
+  { params }: { params: Promise<{ email: string }> },
 ) {
+  try {
+    // Await params first - required in Next.js 15
+    const { email } = await params;
 
-  //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID' 
-  // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
-  const emailx = params.email; // change this if pidUser is not the email
-
-    const user:any = await prisma.users.findUnique({
+    //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID' 
+    // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
+    const user: any = await prisma.users.findUnique({
       where: {
-        userEmail: emailx as string | undefined,
+        userEmail: email as string | undefined,
       },
     });
 
-  const debitAggregate = await prisma.debits.aggregate({
-    where: {
-      email: user?.userEmail,
-      paymentStatus: 'DEBITED',
-    },
-    _sum: {
-      amount: true,
-    },
-  });
-  const totalDebit = debitAggregate._sum.amount ?? 0;
+    const debitAggregate = await prisma.debits.aggregate({
+      where: {
+        email: user?.userEmail,
+        paymentStatus: 'DEBITED',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+    const totalDebit = debitAggregate._sum.amount ?? 0;
 
-  console.log('Total Debit Amount:', totalDebit);
-
-
-  try {
-    const { email } = await params; // Properly destructure params
-
-    //const email = 'sureimporters@gmail.com';
+    console.log('Total Debit Amount:', totalDebit);
 
     //////////////////// GET CUSTOMER PROFILE DETAILS ////////////////////
     const data = await fetch(`https://api.paystack.co/customer/${email}`, {

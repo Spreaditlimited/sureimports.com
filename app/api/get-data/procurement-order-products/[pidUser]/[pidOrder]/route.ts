@@ -13,11 +13,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pidUser: string; pidOrder: string } },
+  { params }: { params: Promise<{ pidUser: string; pidOrder: string }> },
 ) {
-  const { pidUser, pidOrder } = params;
-
   try {
+    const { pidUser, pidOrder } = await params;
     const products = await prisma.products.findMany({
       where: {
         pidUser: pidUser,

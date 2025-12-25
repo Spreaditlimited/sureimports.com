@@ -13,11 +13,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pidUser: string } },
+  { params }: { params: Promise<{ pidUser: string }> },
 ) {
-  const { pidUser } = params;
-
   try {
+    const { pidUser } = await params;
     const user = await prisma.users.findUnique({
       where: {
         pidUser: pidUser,

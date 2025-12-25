@@ -13,10 +13,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pidUser: string; statusx: string } },
+  { params }: { params: Promise<{ pidUser: string; statusx: string }> },
 ) {
-  const { pidUser, statusx } = await params;
   try {
+    const { pidUser, statusx } = await params;
     const savedOrderCount: number = await prisma.orders.count({
       where: {
         pidUser: pidUser,

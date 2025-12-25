@@ -15,9 +15,9 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pidUser: string; pidOrder: string } },
+  { params }: { params: Promise<{ pidUser: string; pidOrder: string }> },
 ) {
-  const { pidUser, pidOrder } = params;
+  const { pidUser, pidOrder } = await params;
 
   // const responsex = {
   //   message: 'TEST DELETE!!!!!!!!!!!!!------------------------------',

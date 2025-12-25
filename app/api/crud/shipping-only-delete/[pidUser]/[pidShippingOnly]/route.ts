@@ -13,11 +13,10 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pidUser: string; pidShippingOnly: string } },
+  { params }: { params: Promise<{ pidUser: string; pidShippingOnly: string }> },
 ) {
-  const { pidUser, pidShippingOnly } = params;
-
   try {
+    const { pidUser, pidShippingOnly } = await params;
     const deletedProduct = await prisma.pay_supplier.deleteMany({
       where: {
         pidUser: pidUser,

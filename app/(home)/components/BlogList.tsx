@@ -13,15 +13,38 @@ import {
 } from "./ui/dropdown-menu";
 import type { ImgHTMLAttributes } from "react";
 import type { StaticImageData } from "next/image";
-import { 
-  blogPosts, 
-  blogCategories, 
-  getFeaturedPosts, 
-  getBlogPostsByCategory, 
-  searchBlogPosts,
-  type BlogPost 
-} from "./BlogData";
+import type { BlogPost } from "../actions/blogActions";
 import { useRouter } from "next/navigation";
+
+// Blog categories
+const blogCategories = [
+  'All',
+  'Import Guide',
+  'Business Tips',
+  'Sourcing Gadgets',
+];
+
+// Helper functions
+function getFeaturedPosts(posts: BlogPost[]): BlogPost[] {
+  return posts.filter((post) => post.featured).slice(0, 3);
+}
+
+function getBlogPostsByCategory(posts: BlogPost[], category: string): BlogPost[] {
+  if (category === 'All') return posts;
+  return posts.filter((post) => post.category === category);
+}
+
+function searchBlogPosts(posts: BlogPost[], query: string): BlogPost[] {
+  const lowerQuery = query.toLowerCase();
+  return posts.filter(
+    (post) =>
+      post.title.toLowerCase().includes(lowerQuery) ||
+      post.excerpt.toLowerCase().includes(lowerQuery) ||
+      post.content.toLowerCase().includes(lowerQuery) ||
+      post.author.name.toLowerCase().includes(lowerQuery) ||
+      post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))
+  );
+}
 
 // Lightweight image component that supports StaticImageData and provides a simple fallback
 type ImageSource = string | StaticImageData;
@@ -47,16 +70,34 @@ function ImageWithFallback({ src, alt = "", fallbackSrc, ...props }: ImageWithFa
   );
 }
 
-export default function BlogList() {
+// Interface for optional navigation props
+interface BlogListProps {
+  blogPosts: BlogPost[];
+  onSelectPost?: (slug: string) => void;
+  onNavigateHome?: () => void;
+}
+
+export default function BlogList({ blogPosts, onSelectPost, onNavigateHome }: BlogListProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState<"newest" | "oldest" | "popular">("newest");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Handle post selection - use prop if provided, otherwise use router
+  const handleSelectPost = (slug: string) => {
+    setIsLoading(true);
+    if (onSelectPost) {
+      onSelectPost(slug);
+    } else {
+      router.push(`/blog/${slug}`);
+    }
+  };
 
   const filteredPosts = useMemo(() => {
     let posts = searchQuery
-      ? searchBlogPosts(searchQuery)
-      : getBlogPostsByCategory(selectedCategory);
+      ? searchBlogPosts(blogPosts, searchQuery)
+      : getBlogPostsByCategory(blogPosts, selectedCategory);
 
     // Sort posts
     switch (sortBy) {
@@ -72,9 +113,9 @@ export default function BlogList() {
     }
 
     return posts;
-  }, [searchQuery, selectedCategory, sortBy]);
+  }, [searchQuery, selectedCategory, sortBy, blogPosts]);
 
-  const featuredPosts = getFeaturedPosts().slice(0, 3);
+  const featuredPosts = getFeaturedPosts(blogPosts).slice(0, 3);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -269,7 +310,7 @@ export default function BlogList() {
                 <Card 
                   key={post.id}
                   className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group overflow-hidden"
-                  onClick={() => router.push(`/blog/${post.slug}`)}
+                  onClick={() => handleSelectPost(post.slug)}
                 >
                   <div className="relative overflow-hidden">
                     <ImageWithFallback
@@ -354,7 +395,7 @@ export default function BlogList() {
                 <Card 
                   key={post.id}
                   className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group overflow-hidden"
-                  onClick={() => router.push(`/blog/${post.slug}`)}
+                  onClick={() => handleSelectPost(post.slug)}
                 >
                   <div className="relative overflow-hidden">
                     <ImageWithFallback
@@ -423,19 +464,26 @@ export default function BlogList() {
             <div className="text-center py-16">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 p-8 max-w-md mx-auto">
                 <Search className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-xl text-white mb-2">No articles found</h3>
+                <h3 className="text-xl text-white mb-2">
+                  {blogPosts.length === 0 ? 'No blog posts published yet' : 'No articles found'}
+                </h3>
                 <p className="text-slate-300 mb-6">
-                  Try adjusting your search terms or browse all categories
+                  {blogPosts.length === 0 
+                    ? 'Check back soon for exciting content about importing and international trade.'
+                    : 'Try adjusting your search terms or browse all categories'
+                  }
                 </p>
-                <Button 
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("All");
-                  }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  View All Articles
-                </Button>
+                {blogPosts.length > 0 && (
+                  <Button 
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedCategory("All");
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    View All Articles
+                  </Button>
+                )}
               </div>
             </div>
           )}
