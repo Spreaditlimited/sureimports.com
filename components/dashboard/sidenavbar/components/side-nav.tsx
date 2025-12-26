@@ -114,7 +114,7 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
             }}
             className={cn(
               buttonVariants({}),
-              'group relative mr-0 flex h-12 justify-start rounded-r-none bg-transparent pr-0 text-sm font-normal hover:bg-white/10 bg-black',
+              'group relative mr-0 flex h-12 justify-start rounded-r-none bg-black bg-transparent pr-0 text-sm font-normal hover:bg-white/10',
               path.includes(item.href) && 'bg-white/10',
 
               isOpen && 'w-[227px]',

@@ -38,7 +38,15 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Package, ShoppingBag, Clock, CheckCircle, XCircle, Truck } from 'lucide-react';
+import {
+  Loader2,
+  Package,
+  ShoppingBag,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Truck,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 
@@ -138,18 +146,18 @@ export default function MyOrdersPage() {
 
       // Use the earliest createdAt date
       const orderDate = new Date(
-        Math.min(...products.map((p) => new Date(p.createdAt).getTime()))
+        Math.min(...products.map((p) => new Date(p.createdAt).getTime())),
       );
 
       // Determine overall status (prioritize PAID > PROCESSING > SHIPPED > DELIVERED > COMPLETED > CANCELLED)
       // Lower number = higher priority (shows most urgent status first)
       const statusPriority: Record<string, number> = {
-        PAID: 1,        // Newly paid orders (highest priority)
-        PROCESSING: 2,  // Being prepared
-        SHIPPED: 3,     // In transit
-        DELIVERED: 4,   // Delivered to customer
-        COMPLETED: 5,   // Fully completed
-        CANCELLED: 6,   // Cancelled orders
+        PAID: 1, // Newly paid orders (highest priority)
+        PROCESSING: 2, // Being prepared
+        SHIPPED: 3, // In transit
+        DELIVERED: 4, // Delivered to customer
+        COMPLETED: 5, // Fully completed
+        CANCELLED: 6, // Cancelled orders
       };
 
       const status = products.reduce((prevStatus, product) => {
@@ -176,7 +184,9 @@ export default function MyOrdersPage() {
     });
 
     // Sort by order date (newest first)
-    return groupedOrders.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+    return groupedOrders.sort(
+      (a, b) => b.orderDate.getTime() - a.orderDate.getTime(),
+    );
   };
 
   // Categorize grouped orders
@@ -192,19 +202,20 @@ export default function MyOrdersPage() {
         order.status === 'PAID' ||
         order.status === 'PROCESSING' ||
         order.status === 'SHIPPED' ||
-        order.status === 'DELIVERED'
+        order.status === 'DELIVERED',
     );
 
     const recentOrders = groupedOrders.filter(
       (order) =>
         order.status === 'COMPLETED' &&
-        new Date(order.orderDate) >= thirtyDaysAgo
+        new Date(order.orderDate) >= thirtyDaysAgo,
     );
 
     const oldOrders = groupedOrders.filter(
       (order) =>
-        (order.status === 'COMPLETED' && new Date(order.orderDate) < thirtyDaysAgo) ||
-        order.status === 'CANCELLED'
+        (order.status === 'COMPLETED' &&
+          new Date(order.orderDate) < thirtyDaysAgo) ||
+        order.status === 'CANCELLED',
     );
 
     return { activeOrders, recentOrders, oldOrders };
@@ -215,29 +226,37 @@ export default function MyOrdersPage() {
   // Get status badge styling
   // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+    const statusConfig: Record<
+      string,
+      { color: string; icon: React.ReactNode; label: string }
+    > = {
       PAID: {
-        color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+        color:
+          'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
         icon: <CheckCircle className="h-3 w-3" />,
         label: 'Paid',
       },
       PROCESSING: {
-        color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+        color:
+          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
         icon: <Clock className="h-3 w-3" />,
         label: 'Processing',
       },
       SHIPPED: {
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+        color:
+          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         icon: <Truck className="h-3 w-3" />,
         label: 'Shipped',
       },
       DELIVERED: {
-        color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+        color:
+          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
         icon: <Package className="h-3 w-3" />,
         label: 'Delivered',
       },
       COMPLETED: {
-        color: 'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-300',
+        color:
+          'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-300',
         icon: <CheckCircle className="h-3 w-3" />,
         label: 'Completed',
       },
@@ -251,7 +270,9 @@ export default function MyOrdersPage() {
     const config = statusConfig[status] || statusConfig.PAID;
 
     return (
-      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
+      >
         {config.icon}
         {config.label}
       </span>
@@ -260,26 +281,34 @@ export default function MyOrdersPage() {
 
   // Get payment method badge
   const getPaymentMethodBadge = (method: string | null) => {
-    if (!method) return <span className="text-xs text-slate-500 dark:text-slate-400">N/A</span>;
+    if (!method)
+      return (
+        <span className="text-xs text-slate-500 dark:text-slate-400">N/A</span>
+      );
 
     const methodConfig: Record<string, { color: string; label: string }> = {
       WALLET: {
-        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+        color:
+          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
         label: 'Wallet',
       },
       PAYSTACK: {
-        color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
+        color:
+          'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
         label: 'Paystack',
       },
     };
 
     const config = methodConfig[method] || {
-      color: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
+      color:
+        'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
       label: method,
     };
 
     return (
-      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}
+      >
         {config.label}
       </span>
     );
@@ -295,18 +324,18 @@ export default function MyOrdersPage() {
     return (
       <Card
         key={groupedOrder.transactionRef}
-        className="p-6 mb-6 bg-white dark:bg-slate-900 dark:border-slate-700 border border-slate-200 hover:shadow-lg transition-shadow"
+        className="mb-6 border border-slate-200 bg-white p-6 transition-shadow hover:shadow-lg dark:border-slate-700 dark:bg-slate-900"
       >
         <div className="flex flex-col gap-3">
           {/* Header */}
-          <div className="flex justify-between items-start gap-2">
+          <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
               {isSingleProduct ? (
                 <>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100 line-clamp-2">
+                  <h3 className="line-clamp-2 font-semibold text-slate-900 dark:text-slate-100">
                     {groupedOrder.products[0].product_name}
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     Order ID: {groupedOrder.products[0].pidStore}
                   </p>
                 </>
@@ -315,8 +344,9 @@ export default function MyOrdersPage() {
                   <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                     Order with {groupedOrder.products.length} items
                   </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    {groupedOrder.orderIds.length} product{groupedOrder.orderIds.length > 1 ? 's' : ''}
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    {groupedOrder.orderIds.length} product
+                    {groupedOrder.orderIds.length > 1 ? 's' : ''}
                   </p>
                 </>
               )}
@@ -329,22 +359,29 @@ export default function MyOrdersPage() {
             {groupedOrder.products.map((product, index) => (
               <div
                 key={product.id}
-                className={`flex justify-between items-start text-sm ${
-                  index > 0 ? 'pt-2 border-t border-slate-100 dark:border-slate-800' : ''
+                className={`flex items-start justify-between text-sm ${
+                  index > 0
+                    ? 'border-t border-slate-100 pt-2 dark:border-slate-800'
+                    : ''
                 }`}
               >
                 <div className="flex-1">
-                  <p className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1">
+                  <p className="line-clamp-1 font-medium text-slate-900 dark:text-slate-100">
                     {product.product_name}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     Qty: {product.quantity} × ₦
-                    {parseFloat(product.unit_price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    {parseFloat(product.unit_price)
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   </p>
                 </div>
-                <div className="text-right ml-2">
+                <div className="ml-2 text-right">
                   <p className="font-medium text-slate-900 dark:text-slate-100">
-                    ₦{parseFloat(product.total_price).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    ₦
+                    {parseFloat(product.total_price)
+                      .toFixed(2)
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   </p>
                 </div>
               </div>
@@ -352,23 +389,35 @@ export default function MyOrdersPage() {
           </div>
 
           {/* Order Summary */}
-          <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="grid grid-cols-2 gap-2 border-t border-slate-200 pt-2 dark:border-slate-700">
             <div>
-              <p className="text-slate-500 dark:text-slate-400 text-xs">Total Amount</p>
-              <p className="font-bold text-lg text-slate-900 dark:text-slate-100">
-                ₦{groupedOrder.totalAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Total Amount
+              </p>
+              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                ₦
+                {groupedOrder.totalAmount
+                  .toFixed(2)
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               </p>
             </div>
             <div>
-              <p className="text-slate-500 dark:text-slate-400 text-xs">Payment Method</p>
-              <div className="mt-1">{getPaymentMethodBadge(groupedOrder.paymentMethod)}</div>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Payment Method
+              </p>
+              <div className="mt-1">
+                {getPaymentMethodBadge(groupedOrder.paymentMethod)}
+              </div>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex justify-between items-center pt-2 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
             <div className="text-xs text-slate-500 dark:text-slate-400">
-              {format(new Date(groupedOrder.orderDate), 'MMM dd, yyyy • hh:mm a')}
+              {format(
+                new Date(groupedOrder.orderDate),
+                'MMM dd, yyyy • hh:mm a',
+              )}
             </div>
             {!groupedOrder.transactionRef.startsWith('SINGLE_') && (
               <div className="text-xs text-slate-500 dark:text-slate-400">
@@ -384,15 +433,17 @@ export default function MyOrdersPage() {
   // Render empty state
   const renderEmptyState = (category: string) => (
     <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-      <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4">
+      <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-slate-800">
         <Package className="h-12 w-12 text-slate-400 dark:text-slate-500" />
       </div>
-      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+      <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
         No {category} orders
       </h3>
-      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm">
-        {category === 'active' && "You don't have any orders being processed or shipped."}
-        {category === 'recent' && "You haven't completed any orders in the last 30 days."}
+      <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
+        {category === 'active' &&
+          "You don't have any orders being processed or shipped."}
+        {category === 'recent' &&
+          "You haven't completed any orders in the last 30 days."}
         {category === 'old' && "You don't have any older or cancelled orders."}
       </p>
     </div>
@@ -400,10 +451,12 @@ export default function MyOrdersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-white dark:bg-black">
+      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400" />
-          <p className="text-sm text-slate-600 dark:text-slate-400">Loading your orders...</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Loading your orders...
+          </p>
         </div>
       </div>
     );
@@ -424,36 +477,36 @@ export default function MyOrdersPage() {
       </div>
 
       {/* Content */}
-      <div className="px-5 md:px-8 pb-8 md:max-w-7xl md:mx-auto pt-6 md:pt-0">
+      <div className="px-5 pb-8 pt-6 md:mx-auto md:max-w-7xl md:px-8 md:pt-0">
         {/* Tabs */}
         <div className="mb-6">
-          <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+          <div className="flex gap-2 overflow-x-auto border-b border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setActiveTab('active')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'active'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               Currently Active ({activeOrders.length})
             </button>
             <button
               onClick={() => setActiveTab('recent')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'recent'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               Recent Orders ({recentOrders.length})
             </button>
             <button
               onClick={() => setActiveTab('old')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === 'old'
-                  ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
+                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
               }`}
             >
               Old Orders ({oldOrders.length})
@@ -462,7 +515,7 @@ export default function MyOrdersPage() {
         </div>
 
         {/* Orders Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {activeTab === 'active' && (
             <>
               {activeOrders.length > 0
@@ -488,40 +541,46 @@ export default function MyOrdersPage() {
 
         {/* Summary Stats */}
         {groupedOrders.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="p-6 bg-white dark:bg-slate-900 dark:border-slate-700 border border-slate-200">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                <div className="rounded-lg bg-yellow-100 p-3 dark:bg-yellow-900/30">
                   <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Active Orders</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Active Orders
+                  </p>
                   <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {activeOrders.length}
                   </p>
                 </div>
               </div>
             </Card>
-            <Card className="p-6 bg-white dark:bg-slate-900 dark:border-slate-700 border border-slate-200">
+            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
                   <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Recent Orders</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Recent Orders
+                  </p>
                   <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {recentOrders.length}
                   </p>
                 </div>
               </div>
             </Card>
-            <Card className="p-6 bg-white dark:bg-slate-900 dark:border-slate-700 border border-slate-200">
+            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg">
+                <div className="rounded-lg bg-indigo-100 p-3 dark:bg-indigo-900/30">
                   <Package className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Total Orders</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Total Orders
+                  </p>
                   <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
                     {groupedOrders.length}
                   </p>
@@ -534,4 +593,3 @@ export default function MyOrdersPage() {
     </div>
   );
 }
-

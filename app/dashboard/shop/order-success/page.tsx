@@ -43,7 +43,8 @@ function OrderSuccessContent() {
         </h1>
 
         <p className="mb-6 text-lg text-muted-foreground dark:text-gray-400">
-          Thank you for your purchase. Your order has been confirmed and is being processed.
+          Thank you for your purchase. Your order has been confirmed and is
+          being processed.
         </p>
 
         {reference && (
@@ -51,7 +52,7 @@ function OrderSuccessContent() {
             <p className="text-sm text-muted-foreground dark:text-gray-400">
               Order Reference
             </p>
-            <p className="text-lg font-mono font-semibold text-foreground dark:text-white">
+            <p className="font-mono text-lg font-semibold text-foreground dark:text-white">
               {reference}
             </p>
           </div>
@@ -79,9 +80,12 @@ function OrderSuccessContent() {
             Pickup Location
           </h3>
           <p className="text-sm text-muted-foreground dark:text-gray-400">
-            Sure Imports, 5 Olutosin Ajayi (Martins Adegboyega) Street,<br />
-            Ajao Estate, Lagos, Nigeria<br />
-            Phone: 0806 839 7263<br />
+            Sure Imports, 5 Olutosin Ajayi (Martins Adegboyega) Street,
+            <br />
+            Ajao Estate, Lagos, Nigeria
+            <br />
+            Phone: 0806 839 7263
+            <br />
             Hours: 9am to 5pm weekdays (except public holidays)
           </p>
         </div>
@@ -94,10 +98,7 @@ function OrderSuccessContent() {
             Continue Shopping
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button
-            onClick={() => router.push('/dashboard')}
-            variant="outline"
-          >
+          <Button onClick={() => router.push('/dashboard')} variant="outline">
             Go to Dashboard
           </Button>
         </div>
@@ -113,4 +114,3 @@ function OrderSuccessContent() {
 export default function OrderSuccessPage() {
   return <OrderSuccessContent />;
 }
-

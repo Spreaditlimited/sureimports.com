@@ -16,10 +16,7 @@ import { secureInput } from '@/utils/secureInput';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
-  const {
-    email,
-    service,
-  } = await request.json();
+  const { email, service } = await request.json();
 
   // Clean affiliate code
 
@@ -34,21 +31,28 @@ export async function POST(request: NextRequest) {
     email === '' ||
     email === null
   ) {
-
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex: 'Email cannot be empty', statusx: 'FAILED', successx: true, userx: null },
+      {
+        messagex: 'Email cannot be empty',
+        statusx: 'FAILED',
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
   }
 
-
   // Validate email
   if (!validateEmail(email)) {
-
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex: 'Please provide a valid email', statusx: 'FAILED', successx: true, userx: null },
+      {
+        messagex: 'Please provide a valid email',
+        statusx: 'FAILED',
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
   }
@@ -63,14 +67,17 @@ export async function POST(request: NextRequest) {
 
   //Check if user exists
   if (user) {
-
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex: 'You are already subscribed.', statusx: 'FAILED', successx: true, userx: null },
+      {
+        messagex: 'You are already subscribed.',
+        statusx: 'FAILED',
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
   }
-
 
   // Create a user in db
   const create = await prisma.subscriptions.create({
@@ -81,29 +88,27 @@ export async function POST(request: NextRequest) {
     },
   });
 
+  //ADD USER TO FLODESK
+  const response = await fetch('https://api.flodesk.com/v1/subscribers', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
+      'User-Agent': 'Sure Imports (www.sureimports.com)',
+    },
+    body: JSON.stringify({
+      email: email,
+      first_name: email,
+      last_name: '',
+      segment_ids: ['67699403ee348d7f8cb68f3a'],
+    }),
+  });
 
-    //ADD USER TO FLODESK
-    const response = await fetch('https://api.flodesk.com/v1/subscribers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
-        'User-Agent': 'Sure Imports (www.sureimports.com)',
-      },
-      body: JSON.stringify({
-        email: email,
-        first_name: email,
-        last_name: '',
-        segment_ids: ['67699403ee348d7f8cb68f3a'],
-      }),
-    });
+  console.log('response', response);
 
-    console.log('response', response);
-
-    // if (!response.ok) {
-    // throw new Error('Failed to add subscriber to Flodesk');
-    // }
-
+  // if (!response.ok) {
+  // throw new Error('Failed to add subscriber to Flodesk');
+  // }
 
   //send mail
   try {
@@ -113,13 +118,13 @@ export async function POST(request: NextRequest) {
     const xTitle = `Subscription Successful!`;
     const xBodyTitle = `Subscription Successful!`;
     const xButtonTitle = `Visit Sure Imports`;
-    const xButtonLink = 'https://sureimports.com'; 
-//subscription message
-
+    const xButtonLink = 'https://sureimports.com';
+    //subscription message
 
     // Prepare the email body
     const xBody1 =
-      `Hello ` + `,<br /><br />` +
+      `Hello ` +
+      `,<br /><br />` +
       `Thank you for subscribing to our service. We are excited to have you on board!<br /><br />
 
 <a href="` +
@@ -163,18 +168,25 @@ See you inside.<br /><br />
   // Redirect to login if success
   if (create) {
     return NextResponse.json(
-      { messagex: 'Thank you for subscribing! 🎉', statusx: 'SUCCESS', successx: true, userx: null },
+      {
+        messagex: 'Thank you for subscribing! 🎉',
+        statusx: 'SUCCESS',
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
 
-
-
     //redirect("/success/registration");
   } else {
-
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex: 'Action failed. you may contact admin', statusx: 'FAILED', successx: true, userx: null },
+      {
+        messagex: 'Action failed. you may contact admin',
+        statusx: 'FAILED',
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
   }

@@ -17,17 +17,16 @@ function ProductList({ products }: any) {
     //console.log(`Add product ${pidProduct} to cart`);
   };
 
-// Filter visible products first
-  const visibleProducts = products.filter((product: any) => product.productVisibility === true);
-
+  // Filter visible products first
+  const visibleProducts = products.filter(
+    (product: any) => product.productVisibility === true,
+  );
 
   return (
     <>
       <div className="align-center max-xl:grid-col-3 bg-backgroundx bg-slate-200x dark:bg-backgroundx dark:bg-slate-700x dark:text-whitex grid min-h-screen gap-5 rounded-xl p-2 text-slate-800 md:grid-cols-3 lg:pl-0 xl:ml-0 xl:mr-0 xl:grid-cols-4 2xl:grid-cols-4">
         {/* <div className="align-center max-xl:grid-col-3 grid gap-5 bg-slate-50 text-slate-800 dark:bg-gray-900 dark:text-white md:grid-cols-3 lg:pl-0 xl:ml-0 xl:mr-0 xl:grid-cols-4 2xl:grid-cols-5"> */}
-        {visibleProducts.map((product: any, index:any) => (
-
-          
+        {visibleProducts.map((product: any, index: any) => (
           <div className="mx-auto w-full max-w-md p-5" key={index}>
             <ProductCard
               id={product.id}
@@ -46,8 +45,6 @@ function ProductList({ products }: any) {
               onAddToCart={handleAddToCart}
             />
           </div>
-
-
         ))}
       </div>
     </>

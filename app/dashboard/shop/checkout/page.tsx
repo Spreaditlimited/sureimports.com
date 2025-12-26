@@ -6,7 +6,15 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, CreditCard, Loader2, Wallet, Minus, Plus, Trash2 } from 'lucide-react';
+import {
+  ArrowLeft,
+  CreditCard,
+  Loader2,
+  Wallet,
+  Minus,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
@@ -21,7 +29,14 @@ declare global {
 function CheckoutContent() {
   const router = useRouter();
   const { user } = useAuth();
-  const { cart, cartCount, cartTotal, clearCart, updateQuantity, removeFromCart } = useShopCart();
+  const {
+    cart,
+    cartCount,
+    cartTotal,
+    clearCart,
+    updateQuantity,
+    removeFromCart,
+  } = useShopCart();
 
   const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
@@ -61,7 +76,9 @@ function CheckoutContent() {
 
     setLoadingWallet(true);
     try {
-      const response = await fetch(`/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`);
+      const response = await fetch(
+        `/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`,
+      );
       const data = await response.json();
 
       console.log('Wallet API Response:', {
@@ -71,7 +88,10 @@ function CheckoutContent() {
       });
 
       // Check if wallet is ready and has transaction details
-      if (data.transactionDetails && typeof data.transactionDetails.totalAmount === 'number') {
+      if (
+        data.transactionDetails &&
+        typeof data.transactionDetails.totalAmount === 'number'
+      ) {
         setWalletBalance(data.transactionDetails.totalAmount);
       } else if (data.statusx === 'NO_ACCOUNT') {
         // Wallet not activated
@@ -96,7 +116,7 @@ function CheckoutContent() {
     setLoadingAddress(true);
     try {
       const response = await fetch(
-        `/api/user/update-shipping-address?pidUser=${encodeURIComponent(user.pidUser)}&userEmail=${encodeURIComponent(user.userEmail)}`
+        `/api/user/update-shipping-address?pidUser=${encodeURIComponent(user.pidUser)}&userEmail=${encodeURIComponent(user.userEmail)}`,
       );
       const data = await response.json();
 
@@ -173,12 +193,17 @@ function CheckoutContent() {
   const handleVerificationComplete = (success: boolean, data?: any) => {
     if (success) {
       console.log('Payment successful:', data);
-      toast.success('Payment verified successfully! Your order has been placed.');
+      toast.success(
+        'Payment verified successfully! Your order has been placed.',
+      );
       clearCart();
-      router.push('/dashboard/shop/order-success?ref=' + (data?.reference || ''));
+      router.push(
+        '/dashboard/shop/order-success?ref=' + (data?.reference || ''),
+      );
     } else {
       console.log('Payment failed:', data);
-      const errorMessage = data?.message || data?.error || 'Payment verification failed';
+      const errorMessage =
+        data?.message || data?.error || 'Payment verification failed';
       toast.error(errorMessage);
     }
     setProcessingPayment(false);
@@ -249,10 +274,10 @@ function CheckoutContent() {
           cart_items: cart,
           shipping_address: shippingAddress.trim(),
         },
-        onClose: function() {
+        onClose: function () {
           handlePaymentClose();
         },
-        callback: function(response: any) {
+        callback: function (response: any) {
           // Payment successful, now verify
           handlePaymentSuccess(response.reference);
           verifyPayment(response.reference);
@@ -260,7 +285,6 @@ function CheckoutContent() {
       });
 
       handler.openIframe();
-
     } catch (error) {
       console.error('Payment initialization error:', error);
       toast.error('Failed to initialize payment');
@@ -271,7 +295,9 @@ function CheckoutContent() {
   const verifyPayment = async (reference: string) => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/shop/payment/verify?reference=${reference}`);
+      const response = await fetch(
+        `/api/shop/payment/verify?reference=${reference}`,
+      );
       const data = await response.json();
 
       if (data.statusx === 'SUCCESS') {
@@ -283,7 +309,7 @@ function CheckoutContent() {
       console.error('Payment verification error:', error);
       handleVerificationComplete(false, {
         message: 'Failed to verify payment',
-        error: error instanceof Error ? error.message : String(error)
+        error: error instanceof Error ? error.message : String(error),
       });
     } finally {
       setLoading(false);
@@ -316,14 +342,16 @@ function CheckoutContent() {
 
     // Check if wallet is activated
     if (walletBalance === 0 && !loadingWallet) {
-      toast.warning('Wallet not activated. Please activate your wallet to use this payment method.');
+      toast.warning(
+        'Wallet not activated. Please activate your wallet to use this payment method.',
+      );
       return;
     }
 
     // Check if user has sufficient funds
     if (walletBalance < cartTotal) {
       toast.error(
-        `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${cartTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+        `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${cartTotal.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
       );
       return;
     }
@@ -358,7 +386,9 @@ function CheckoutContent() {
       if (data.statusx === 'SUCCESS') {
         toast.success('Payment successful! Your order has been placed.');
         clearCart();
-        router.push(`/dashboard/shop/order-success?ref=${data.data.transactionRef}`);
+        router.push(
+          `/dashboard/shop/order-success?ref=${data.data.transactionRef}`,
+        );
       } else if (data.statusx === 'INSUFFICIENT_FUNDS') {
         toast.error(data.message);
       } else if (data.statusx === 'NO_ACCOUNT') {
@@ -457,7 +487,9 @@ function CheckoutContent() {
                             size="icon"
                             variant="outline"
                             className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity - 1)
+                            }
                             disabled={processingPayment || item.quantity <= 1}
                           >
                             <Minus className="h-3 w-3" />
@@ -469,7 +501,9 @@ function CheckoutContent() {
                             size="icon"
                             variant="outline"
                             className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity + 1)
+                            }
                             disabled={processingPayment}
                           >
                             <Plus className="h-3 w-3" />
@@ -478,7 +512,8 @@ function CheckoutContent() {
 
                         {/* Item Subtotal */}
                         <span className="font-semibold text-foreground dark:text-white">
-                          ₦{(item.productPrice * item.quantity).toLocaleString()}
+                          ₦
+                          {(item.productPrice * item.quantity).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -494,20 +529,26 @@ function CheckoutContent() {
               </h2>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground dark:text-gray-400">Name:</span>
+                  <span className="text-muted-foreground dark:text-gray-400">
+                    Name:
+                  </span>
                   <span className="font-medium text-foreground dark:text-white">
                     {user?.userFirstname} {user?.userLastname}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground dark:text-gray-400">Email:</span>
+                  <span className="text-muted-foreground dark:text-gray-400">
+                    Email:
+                  </span>
                   <span className="font-medium text-foreground dark:text-white">
                     {user?.userEmail}
                   </span>
                 </div>
                 {user?.phone && (
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground dark:text-gray-400">Phone:</span>
+                    <span className="text-muted-foreground dark:text-gray-400">
+                      Phone:
+                    </span>
                     <span className="font-medium text-foreground dark:text-white">
                       {user.phone}
                     </span>
@@ -538,7 +579,8 @@ function CheckoutContent() {
                     />
                   )}
                   <p className="text-xs text-muted-foreground dark:text-gray-400">
-                    Please provide your complete delivery address. Minimum 10 characters required.
+                    Please provide your complete delivery address. Minimum 10
+                    characters required.
                   </p>
                   {shippingAddress && shippingAddress.trim().length > 0 && (
                     <Button
@@ -546,7 +588,11 @@ function CheckoutContent() {
                       variant="outline"
                       size="sm"
                       onClick={saveShippingAddress}
-                      disabled={savingAddress || processingPayment || shippingAddress.trim().length < 10}
+                      disabled={
+                        savingAddress ||
+                        processingPayment ||
+                        shippingAddress.trim().length < 10
+                      }
                       className="mt-2 dark:bg-gray-800 dark:text-white"
                     >
                       {savingAddress ? (
@@ -570,15 +616,25 @@ function CheckoutContent() {
               </h2>
               <div className="text-sm text-muted-foreground dark:text-gray-400">
                 <p className="mb-2">
-                  <strong className="text-foreground dark:text-white">Address:</strong><br />
-                  Sure Imports, 5 Olutosin Ajayi (Martins Adegboyega) Street,<br />
+                  <strong className="text-foreground dark:text-white">
+                    Address:
+                  </strong>
+                  <br />
+                  Sure Imports, 5 Olutosin Ajayi (Martins Adegboyega) Street,
+                  <br />
                   Ajao Estate, Lagos, Nigeria
                 </p>
                 <p className="mb-2">
-                  <strong className="text-foreground dark:text-white">Phone:</strong> 0806 839 7263
+                  <strong className="text-foreground dark:text-white">
+                    Phone:
+                  </strong>{' '}
+                  0806 839 7263
                 </p>
                 <p>
-                  <strong className="text-foreground dark:text-white">Hours:</strong> 9am to 5pm weekdays (except public holidays)
+                  <strong className="text-foreground dark:text-white">
+                    Hours:
+                  </strong>{' '}
+                  9am to 5pm weekdays (except public holidays)
                 </p>
               </div>
             </Card>
@@ -627,17 +683,20 @@ function CheckoutContent() {
                     <span className="text-sm font-medium text-muted-foreground dark:text-gray-400">
                       Wallet Balance:
                     </span>
-                    <span className={`text-sm font-bold ${
-                      walletBalance >= cartTotal
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-red-600 dark:text-red-400'
-                    }`}>
+                    <span
+                      className={`text-sm font-bold ${
+                        walletBalance >= cartTotal
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-red-600 dark:text-red-400'
+                      }`}
+                    >
                       ₦{walletBalance.toLocaleString()}
                     </span>
                   </div>
                   {walletBalance < cartTotal && walletBalance > 0 && (
                     <p className="mt-1 text-xs text-red-600 dark:text-red-400">
-                      Insufficient balance. Need ₦{(cartTotal - walletBalance).toLocaleString()} more
+                      Insufficient balance. Need ₦
+                      {(cartTotal - walletBalance).toLocaleString()} more
                     </p>
                   )}
                 </div>
@@ -648,8 +707,13 @@ function CheckoutContent() {
                 {/* Pay from Wallet Button */}
                 <Button
                   onClick={handleWalletPayment}
-                  disabled={processingPayment || loadingWallet || walletBalance === null || walletBalance < cartTotal}
-                  className="w-full bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled={
+                    processingPayment ||
+                    loadingWallet ||
+                    walletBalance === null ||
+                    walletBalance < cartTotal
+                  }
+                  className="w-full bg-green-600 text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-400"
                 >
                   {processingPayment ? (
                     <>
@@ -703,4 +767,3 @@ function CheckoutContent() {
 export default function CheckoutPage() {
   return <CheckoutContent />;
 }
-

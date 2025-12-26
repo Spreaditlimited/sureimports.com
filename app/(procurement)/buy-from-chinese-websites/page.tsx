@@ -121,7 +121,6 @@ const Buy = () => {
         </div>
       </div>
 
-      
       {/* <Works /> */}
       <HowWorks
         title="How It Works"

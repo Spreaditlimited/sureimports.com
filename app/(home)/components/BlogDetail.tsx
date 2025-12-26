@@ -1,21 +1,46 @@
 'use client';
-import { useState, useEffect } from "react";
-import { ArrowLeft, Calendar, Clock, User, Tag, Share2, BookOpen, Eye } from "lucide-react";
-import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
-import { Card, CardContent } from "./ui/card";
-import { Separator } from "./ui/separator";
-import type { BlogPost } from "../actions/blogActions";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react';
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  Tag,
+  Share2,
+  BookOpen,
+  Eye,
+} from 'lucide-react';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Card, CardContent } from './ui/card';
+import { Separator } from './ui/separator';
+import type { BlogPost } from '../actions/blogActions';
+import { useRouter } from 'next/navigation';
 
 // Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
-const ImageWithFallback = ({ src, alt, className }: { src: string | { src: string }; alt: string; className?: string }) => {
+const ImageWithFallback = ({
+  src,
+  alt,
+  className,
+}: {
+  src: string | { src: string };
+  alt: string;
+  className?: string;
+}) => {
   const [hasError, setHasError] = useState(false);
-  const resolvedSrc =
-    hasError
-      ? "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=="
-      : (typeof src === "string" ? src : (src && (src as any).src));
-  return <img src={resolvedSrc} alt={alt} className={className} onError={() => setHasError(true)} />;
+  const resolvedSrc = hasError
+    ? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
+    : typeof src === 'string'
+      ? src
+      : src && (src as any).src;
+  return (
+    <img
+      src={resolvedSrc}
+      alt={alt}
+      className={className}
+      onError={() => setHasError(true)}
+    />
+  );
 };
 
 export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
@@ -26,36 +51,40 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
 
   // Fallback handlers if none provided
   const handleBackClick = onBack ?? (() => router.back());
-  const handleSelectPostClick = onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
+  const handleSelectPostClick =
+    onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
 
   useEffect(() => {
     async function fetchBlog() {
       try {
         setLoading(true);
         // Fetch the blog post
-        const response = await fetch(`/api/crud/blog/fetch-single?slug=${slug}`);
+        const response = await fetch(
+          `/api/crud/blog/fetch-single?slug=${slug}`,
+        );
         const data = await response.json();
-        
+
         if (data.success && data.data) {
           // Transform the database blog to BlogPost format
           const dbBlog = data.data;
-          
+
           const excerpt = dbBlog.blogContent
-            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
+            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) +
+              '...'
             : 'No excerpt available';
-          
+
           const wordCount = dbBlog.blogContent
             ? dbBlog.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
             : 0;
           const readTime = Math.ceil(wordCount / 200);
-          
+
           const imageUrl = dbBlog.blogImage
             ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${dbBlog.blogImage}`
             : '/images/new/images/logo.png';
-          
+
           let tags: string[] = [];
           let category = 'Import Guide';
-          
+
           try {
             if (dbBlog.blogExt2) {
               const metadata = JSON.parse(dbBlog.blogExt2);
@@ -65,7 +94,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
           } catch {
             tags = ['Import Guide'];
           }
-          
+
           const transformedPost: BlogPost = {
             id: dbBlog.pidBlog,
             title: dbBlog.blogTitle,
@@ -86,13 +115,15 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
             image: imageUrl,
             slug: dbBlog.blogSlug || dbBlog.pidBlog,
           };
-          
+
           setPost(transformedPost);
-          
+
           // Fetch all blogs for related posts
-          const allResponse = await fetch('/api/crud/blog/fetch?status=published&limit=100');
+          const allResponse = await fetch(
+            '/api/crud/blog/fetch?status=published&limit=100',
+          );
           const allData = await allResponse.json();
-          
+
           if (allData.success && allData.data) {
             const allPosts = allData.data.map((b: any) => {
               let postCategory = 'Import Guide';
@@ -104,13 +135,17 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
               } catch {}
               return { ...b, category: postCategory };
             });
-            
+
             const related = allPosts
-              .filter((p: any) => p.category === category && p.pidBlog !== dbBlog.pidBlog)
+              .filter(
+                (p: any) =>
+                  p.category === category && p.pidBlog !== dbBlog.pidBlog,
+              )
               .slice(0, 3)
               .map((b: any) => {
                 const ex = b.blogContent
-                  ? b.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
+                  ? b.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) +
+                    '...'
                   : 'No excerpt available';
                 const wc = b.blogContent
                   ? b.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
@@ -119,7 +154,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                 const img = b.blogImage
                   ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${b.blogImage}`
                   : '/images/new/images/logo.png';
-                  
+
                 return {
                   id: b.pidBlog,
                   title: b.blogTitle,
@@ -141,7 +176,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                   slug: b.blogSlug || b.pidBlog,
                 };
               });
-            
+
             setRelatedPosts(related);
           }
         }
@@ -151,17 +186,17 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
         setLoading(false);
       }
     }
-    
+
     if (slug) {
       fetchBlog();
     }
   }, [slug]);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long", 
-      day: "numeric"
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
@@ -185,9 +220,9 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-400"></div>
           <p className="text-slate-300">Loading article...</p>
         </div>
       </div>
@@ -196,15 +231,15 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
 
   if (!post) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-slate-900">
         <div className="text-center">
-          <h1 className="text-2xl text-white mb-4">Article not found</h1>
-            <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+          <h1 className="mb-4 text-2xl text-white">Article not found</h1>
+          <Button asChild className="bg-blue-600 text-white hover:bg-blue-700">
             <a href="/blog">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Blog
             </a>
-            </Button>
+          </Button>
         </div>
       </div>
     );
@@ -219,65 +254,70 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
     <div className="min-h-screen bg-slate-900">
       {/* Header */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Button 
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <Button
             onClick={handleBackClick}
-            variant="ghost" 
-            className="text-slate-300 hover:text-white hover:bg-white/10 mb-6"
+            variant="ghost"
+            className="mb-6 text-slate-300 hover:bg-white/10 hover:text-white"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Blog
           </Button>
         </div>
       </div>
 
       {/* Article Content */}
-      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <article className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Image */}
-        <div className="relative overflow-hidden rounded-xl mb-8">
+        <div className="relative mb-8 overflow-hidden rounded-xl">
           <ImageWithFallback
             src={post.image}
             alt={post.title}
-            className="w-full h-64 md:h-96 object-cover"
+            className="h-64 w-full object-cover md:h-96"
           />
           {post.featured && (
-            <div className="absolute top-6 left-6">
-              <Badge className="bg-blue-600 text-white text-sm px-3 py-1">Featured Article</Badge>
+            <div className="absolute left-6 top-6">
+              <Badge className="bg-blue-600 px-3 py-1 text-sm text-white">
+                Featured Article
+              </Badge>
             </div>
           )}
         </div>
 
         {/* Article Header */}
         <header className="mb-8">
-          <div className="flex flex-wrap items-center gap-4 mb-4 text-sm text-slate-400">
-            <Badge variant="secondary" className="bg-blue-600/20 text-blue-400 border-blue-600/30">
+          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+            <Badge
+              variant="secondary"
+              className="border-blue-600/30 bg-blue-600/20 text-blue-400"
+            >
               {post.category}
             </Badge>
             <span className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
+              <Calendar className="h-4 w-4" />
               {formatDate(post.publishDate)}
             </span>
             <span className="flex items-center gap-1">
-              <Clock className="w-4 h-4" />
+              <Clock className="h-4 w-4" />
               {post.readTime} min read
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl text-white mb-6 leading-tight">
+          <h1 className="mb-6 text-3xl leading-tight text-white md:text-5xl">
             {post.title}
           </h1>
 
-          <p className="text-xl text-slate-300 mb-8 leading-relaxed">
+          <p className="mb-8 text-xl leading-relaxed text-slate-300">
             {post.excerpt}
           </p>
 
           {/* Author and Actions */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 bg-white/5 backdrop-blur-md rounded-xl border border-white/10">
+          <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="w-12 h-12 rounded-full"
+                className="h-12 w-12 rounded-full"
               />
               <div>
                 <p className="text-white">{post.author.name}</p>
@@ -290,35 +330,50 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                 onClick={handleShare}
                 variant="outline"
                 size="sm"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                className="border-white/20 bg-white/10 text-white hover:bg-white/20"
               >
-                <Share2 className="w-4 h-4 mr-2" />
+                <Share2 className="mr-2 h-4 w-4" />
                 Share
               </Button>
             </div>
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap gap-2 mt-6">
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <Tag className="w-3 h-3 mr-1" />
-                {tag}
-              </Badge>
-            ))}
-          </div>
+          {post.tags.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (
+                <a
+                  key={tag}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(`/blog?tag=${encodeURIComponent(tag)}`);
+                  }}
+                  className="inline-block"
+                >
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer border-slate-600 text-slate-300 transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400"
+                  >
+                    <Tag className="mr-1 h-3 w-3" />
+                    {tag}
+                  </Badge>
+                </a>
+              ))}
+            </div>
+          )}
         </header>
 
         {/* Article Content */}
         <div className="prose prose-invert prose-slate max-w-none">
-          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-8 md:p-12 blog-content">
+          <div className="blog-content rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-md md:p-12">
             {isHtmlContent(post.content) ? (
               <div
                 className="blog-html-content"
                 dangerouslySetInnerHTML={{ __html: post.content }}
               />
             ) : (
-              <div className="text-slate-300 leading-relaxed whitespace-pre-wrap">
+              <div className="whitespace-pre-wrap leading-relaxed text-slate-300">
                 {post.content}
               </div>
             )}
@@ -372,7 +427,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
             color: #cbd5e1;
           }
           .blog-html-content ul li::before {
-            content: "•";
+            content: '•';
             position: absolute;
             left: 0;
             color: #60a5fa;
@@ -450,28 +505,52 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
         `}</style>
 
         {/* Article Footer */}
-        <footer className="mt-12 pt-8 border-t border-slate-700">
-          <div className="flex flex-wrap gap-2 mb-6">
-            <span className="text-slate-400">Tagged with:</span>
-            {post.tags.map((tag) => (
-              <Badge key={tag} variant="outline" className="border-slate-600 text-slate-300">
-                {tag}
-              </Badge>
-            ))}
-          </div>
+        <footer className="mt-12 border-t border-slate-700 pt-8">
+          {post.tags.length > 0 && (
+            <div className="mb-6 flex flex-wrap items-center gap-2">
+              <span className="text-slate-400">Tagged with:</span>
+              {post.tags.map((tag) => (
+                <a
+                  key={tag}
+                  href={`/blog?tag=${encodeURIComponent(tag)}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(`/blog?tag=${encodeURIComponent(tag)}`);
+                  }}
+                  className="inline-block"
+                >
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer border-slate-600 text-slate-300 transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400"
+                  >
+                    <Tag className="mr-1 h-3 w-3" />
+                    {tag}
+                  </Badge>
+                </a>
+              ))}
+            </div>
+          )}
 
-          <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6">
+          <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
             <div className="flex items-center gap-4">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="w-16 h-16 rounded-full"
+                className="h-16 w-16 rounded-full"
               />
               <div>
-                <h3 className="text-lg text-white mb-1">About {post.author.name}</h3>
-                <p className="text-slate-300 text-sm mb-2">{post.author.role}</p>
-                <p className="text-slate-400 text-sm">
-                  Ijeoma is a content strategist and storyteller who helps entrepreneurs and brands turn their authentic stories into powerful growth tools. She blends strategy with creativity, analyzing backend business operations to craft content that connects, influences, and inspires.
+                <h3 className="mb-1 text-lg text-white">
+                  About {post.author.name}
+                </h3>
+                <p className="mb-2 text-sm text-slate-300">
+                  {post.author.role}
+                </p>
+                <p className="text-sm text-slate-400">
+                  Ijeoma is a content strategist and storyteller who helps
+                  entrepreneurs and brands turn their authentic stories into
+                  powerful growth tools. She blends strategy with creativity,
+                  analyzing backend business operations to craft content that
+                  connects, influences, and inspires.
                 </p>
               </div>
             </div>
@@ -482,44 +561,46 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
       {/* Related Articles */}
       {relatedPosts.length > 0 && (
         <section className="bg-gradient-to-b from-slate-800 to-slate-900 py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl text-white mb-4">Related Articles</h2>
-              <p className="text-slate-300">Continue reading with these related posts</p>
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center">
+              <h2 className="mb-4 text-3xl text-white">Related Articles</h2>
+              <p className="text-slate-300">
+                Continue reading with these related posts
+              </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid gap-8 md:grid-cols-3">
               {relatedPosts.map((relatedPost) => (
-                <Card 
+                <Card
                   key={relatedPost.id}
-                  className="bg-white/5 backdrop-blur-md border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer group"
+                  className="group cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20"
                   onClick={() => handleSelectPostClick(relatedPost.slug)}
                 >
                   <div className="relative overflow-hidden rounded-t-lg">
                     <ImageWithFallback
                       src={relatedPost.image}
                       alt={relatedPost.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
-                  
+
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-4 mb-3 text-sm text-slate-400">
+                    <div className="mb-3 flex items-center gap-4 text-sm text-slate-400">
                       <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
+                        <Calendar className="h-4 w-4" />
                         {formatDate(relatedPost.publishDate)}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
+                        <Clock className="h-4 w-4" />
                         {relatedPost.readTime} min read
                       </span>
                     </div>
-                    
-                    <h3 className="text-lg text-white group-hover:text-blue-400 transition-colors line-clamp-2 mb-3">
+
+                    <h3 className="mb-3 line-clamp-2 text-lg text-white transition-colors group-hover:text-blue-400">
                       {relatedPost.title}
                     </h3>
-                    
-                    <p className="text-slate-300 text-sm line-clamp-3 mb-4">
+
+                    <p className="mb-4 line-clamp-3 text-sm text-slate-300">
                       {relatedPost.excerpt}
                     </p>
 
@@ -528,11 +609,16 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                         <ImageWithFallback
                           src={relatedPost.author.avatar}
                           alt={relatedPost.author.name}
-                          className="w-6 h-6 rounded-full"
+                          className="h-6 w-6 rounded-full"
                         />
-                        <span className="text-xs text-slate-400">{relatedPost.author.name}</span>
+                        <span className="text-xs text-slate-400">
+                          {relatedPost.author.name}
+                        </span>
                       </div>
-                      <Badge variant="secondary" className="bg-slate-700 text-slate-300 text-xs">
+                      <Badge
+                        variant="secondary"
+                        className="bg-slate-700 text-xs text-slate-300"
+                      >
                         {relatedPost.category}
                       </Badge>
                     </div>

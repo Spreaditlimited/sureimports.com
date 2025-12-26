@@ -3,12 +3,26 @@ import { Button } from '@/components/ui/button';
 import React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Metadata } from 'next';
-import { Laptop, Phone, Tag, VideoIcon, Search as SearchIcon, X, ChevronUp } from 'lucide-react';
+import {
+  Laptop,
+  Phone,
+  Tag,
+  VideoIcon,
+  Search as SearchIcon,
+  X,
+  ChevronUp,
+} from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import { useAuth } from '@/lib/AuthContext';
 import ProductsList from './ProductsList';
 import { BiMobile } from 'react-icons/bi';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 
 let titlex = 'Dashboard: General Procurement';
@@ -88,15 +102,13 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
         <div className="flex flex-col gap-[25px]">
           {/* Filter Area (now local sticky inside product area) */}
           <div className="mx-auto w-full max-w-7xl">
-
             <div
               /* Sticky bar locks below nav bar (adjust --nav-height in your layout's <body> or root) */
-              className="sticky top-16 z-700 rounded-xl border border-slate-300/60 bg-slate-100/90 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-slate-100/70 dark:border-gray-700/60 dark:bg-gray-900/80 dark:backdrop-blur"
+              className="z-700 sticky top-16 rounded-xl border border-slate-300/60 bg-slate-100/90 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-slate-100/70 dark:border-gray-700/60 dark:bg-gray-900/80 dark:backdrop-blur"
               style={{ top: 'calc(var(--nav-height, 4rem) + 0.5rem)' }}
               role="region"
               aria-label="Product filters"
             >
-
               <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-start">
                 {/* Search */}
                 <div className="w-full md:w-[28rem]">
@@ -143,7 +155,9 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
                       <Select
                         value={id || 'all'}
                         onValueChange={(value) => {
-                          const params = new URLSearchParams(searchParams.toString());
+                          const params = new URLSearchParams(
+                            searchParams.toString(),
+                          );
                           if (!value || value === 'all') {
                             params.set('id', 'all');
                             params.delete('id2');
@@ -184,7 +198,9 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
                         disabled={!id || id === 'all'}
                         value={id2 || 'all'}
                         onValueChange={(value) => {
-                          const params = new URLSearchParams(searchParams.toString());
+                          const params = new URLSearchParams(
+                            searchParams.toString(),
+                          );
                           params.set('id', id || 'all');
                           if (!value || value === 'all') {
                             params.delete('id2');
@@ -198,7 +214,7 @@ function Procurement({ products, categories, brands, id, id2, q }: any) {
                         <SelectTrigger
                           aria-label="Filter by brand"
                           aria-labelledby="brand-label"
-                          className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 data-[disabled=true]:opacity-60 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
+                          className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 focus-visible:ring-2 focus-visible:ring-indigo-500 data-[disabled=true]:opacity-60 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:focus-visible:ring-indigo-400"
                         >
                           <SelectValue placeholder="Select brand" />
                         </SelectTrigger>

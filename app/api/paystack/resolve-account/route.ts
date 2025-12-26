@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: 'Account number and bank code are required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: 'Account number must be exactly 10 digits',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: 'Payment service not configured',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
           Authorization: `Bearer ${paystackSecretKey}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     const data = await response.json();
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: data.message || 'Failed to verify account number',
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -85,8 +85,7 @@ export async function GET(request: NextRequest) {
         status: false,
         message: 'An error occurred while verifying the account',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

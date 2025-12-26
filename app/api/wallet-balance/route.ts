@@ -20,7 +20,7 @@ export async function GET(
     // Await params first - required in Next.js 15
     const { email } = await params;
 
-    //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID' 
+    //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID'
     // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
     const user: any = await prisma.users.findUnique({
       where: {
@@ -142,7 +142,7 @@ export async function GET(
     //initialize transaction data
     let transactionData = {
       transactions: [],
-      totalAmount: 0  - totalDebit,
+      totalAmount: 0 - totalDebit,
       totalDebit: totalDebit,
     };
     if (
@@ -151,7 +151,7 @@ export async function GET(
     ) {
       transactionData = {
         transactions: filteredTransaction,
-        totalAmount: (totalAmount / 100) - totalDebit,
+        totalAmount: totalAmount / 100 - totalDebit,
         totalDebit: totalDebit,
       };
     } else {

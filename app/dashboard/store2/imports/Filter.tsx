@@ -1,9 +1,9 @@
-import svgPaths from "./svg-cenuq5ljyw";
+import svgPaths from './svg-cenuq5ljyw';
 
 function VuesaxOutlineCloseCircle() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/close-circle"
     >
       <svg
@@ -38,7 +38,7 @@ function VuesaxOutlineCloseCircle() {
 function VuesaxOutlineCloseCircle1() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/close-circle"
     >
       <VuesaxOutlineCloseCircle />
@@ -49,10 +49,10 @@ function VuesaxOutlineCloseCircle1() {
 function Text() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[24px] text-left text-slate-800 w-[356px]">
+      <div className="relative w-[356px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[24px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[34px]">Filter Products</p>
       </div>
       <VuesaxOutlineCloseCircle1 />
@@ -63,11 +63,11 @@ function Text() {
 function Title() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col gap-5 items-start justify-center left-[30px] p-0 top-[30px]"
+      className="absolute left-[30px] top-[30px] box-border flex flex-col content-stretch items-start justify-center gap-5 p-0"
       data-name="Title"
     >
       <Text />
-      <div className="h-0 relative shrink-0 w-[390px]">
+      <div className="relative h-0 w-[390px] shrink-0">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"
@@ -92,14 +92,14 @@ function Title() {
 
 function Frame24() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[155px]">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative w-[155px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">10</p>
           </div>
         </div>
@@ -111,10 +111,10 @@ function Frame24() {
 function Min() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0 w-[185px]"
+      className="relative box-border flex w-[185px] shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="Min"
     >
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-slate-800 w-full">
+      <div className="relative w-full shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">Min:</p>
       </div>
       <Frame24 />
@@ -124,14 +124,14 @@ function Min() {
 
 function Frame25() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[155px]">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative w-[155px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">5000</p>
           </div>
         </div>
@@ -143,10 +143,10 @@ function Frame25() {
 function Max() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0 w-[185px]"
+      className="relative box-border flex w-[185px] shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="Max"
     >
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-slate-800 w-full">
+      <div className="relative w-full shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">Max:</p>
       </div>
       <Frame25 />
@@ -156,7 +156,7 @@ function Max() {
 
 function Frame28() {
   return (
-    <div className="absolute box-border content-stretch flex flex-row gap-5 items-center justify-start left-[30px] p-0 top-36">
+    <div className="absolute left-[30px] top-36 box-border flex flex-row content-stretch items-center justify-start gap-5 p-0">
       <Min />
       <Max />
     </div>
@@ -165,7 +165,7 @@ function Frame28() {
 
 function Group1321315001() {
   return (
-    <div className="absolute h-3.5 left-[30px] top-[233px] w-[304px]">
+    <div className="absolute left-[30px] top-[233px] h-3.5 w-[304px]">
       <svg
         className="block size-full"
         fill="none"
@@ -204,10 +204,10 @@ function Group1321315001() {
 
 function Group1321315002() {
   return (
-    <div className="absolute contents left-[30px] top-[225px]">
+    <div className="absolute left-[30px] top-[225px] contents">
       <Group1321315001 />
-      <div className="absolute font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] left-[354px] not-italic text-[20px] text-indigo-800 text-left text-nowrap top-[225px]">
-        <p className="block leading-[30px] whitespace-pre">$5000</p>
+      <div className="absolute left-[354px] top-[225px] text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[20px] font-semibold not-italic leading-[0] text-indigo-800">
+        <p className="block whitespace-pre leading-[30px]">$5000</p>
       </div>
     </div>
   );
@@ -216,11 +216,11 @@ function Group1321315002() {
 function ByPrice() {
   return (
     <div
-      className="absolute contents left-[30px] top-[104px]"
+      className="absolute left-[30px] top-[104px] contents"
       data-name="By Price"
     >
-      <div className="absolute font-['Inter:Medium',_sans-serif] font-medium leading-[0] left-[30px] not-italic text-[20px] text-left text-nowrap text-slate-800 top-[104px]">
-        <p className="block leading-[30px] whitespace-pre">By Price</p>
+      <div className="absolute left-[30px] top-[104px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[20px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[30px]">By Price</p>
       </div>
       <Frame28 />
       <Group1321315002 />
@@ -230,12 +230,12 @@ function ByPrice() {
 
 function Frame26() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Laptops</p>
       </div>
     </div>
@@ -244,12 +244,12 @@ function Frame26() {
 
 function Frame27() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Phones</p>
       </div>
     </div>
@@ -258,13 +258,13 @@ function Frame27() {
 
 function Frame32() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 h-full items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[126px]">
+    <div className="relative box-border flex h-full w-[126px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Headphones</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[24px]">Headphones</p>
       </div>
     </div>
   );
@@ -272,7 +272,7 @@ function Frame32() {
 
 function Frame29() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Frame26 />
       <Frame27 />
       <div className="flex flex-row items-center self-stretch">
@@ -284,12 +284,12 @@ function Frame29() {
 
 function Frame33() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Watches</p>
       </div>
     </div>
@@ -298,12 +298,12 @@ function Frame33() {
 
 function Frame34() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Accessories</p>
       </div>
     </div>
@@ -312,7 +312,7 @@ function Frame34() {
 
 function Frame30() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Frame33 />
       <Frame34 />
     </div>
@@ -322,7 +322,7 @@ function Frame30() {
 function Card() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col gap-2.5 items-start justify-start left-[30px] p-0 top-[335px]"
+      className="absolute left-[30px] top-[335px] box-border flex flex-col content-stretch items-start justify-start gap-2.5 p-0"
       data-name="Card"
     >
       <Frame29 />
@@ -334,11 +334,11 @@ function Card() {
 function ByCategories() {
   return (
     <div
-      className="absolute contents left-[30px] top-[295px]"
+      className="absolute left-[30px] top-[295px] contents"
       data-name="By Categories"
     >
-      <div className="absolute font-['Inter:Medium',_sans-serif] font-medium leading-[0] left-[30px] not-italic text-[20px] text-left text-nowrap text-slate-800 top-[295px]">
-        <p className="block leading-[30px] whitespace-pre">By Categories</p>
+      <div className="absolute left-[30px] top-[295px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[20px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[30px]">By Categories</p>
       </div>
       <Card />
     </div>
@@ -347,14 +347,14 @@ function ByCategories() {
 
 function Frame35() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -370,7 +370,7 @@ function Frame35() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Black</p>
           </div>
         </div>
@@ -382,7 +382,7 @@ function Frame35() {
 function Component1() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="1"
     >
       <Frame35 />
@@ -392,14 +392,14 @@ function Component1() {
 
 function Frame36() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -415,7 +415,7 @@ function Frame36() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Yellow</p>
           </div>
         </div>
@@ -427,7 +427,7 @@ function Frame36() {
 function Component5() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="5"
     >
       <Frame36 />
@@ -437,14 +437,14 @@ function Component5() {
 
 function Frame37() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -460,7 +460,7 @@ function Frame37() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Green</p>
           </div>
         </div>
@@ -472,7 +472,7 @@ function Frame37() {
 function Component4() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="4"
     >
       <Frame37 />
@@ -482,7 +482,7 @@ function Component4() {
 
 function Frame38() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Component1 />
       <Component5 />
       <Component4 />
@@ -492,14 +492,14 @@ function Frame38() {
 
 function Frame39() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -515,7 +515,7 @@ function Frame39() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Red</p>
           </div>
         </div>
@@ -527,7 +527,7 @@ function Frame39() {
 function Component2() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="1"
     >
       <Frame39 />
@@ -537,14 +537,14 @@ function Component2() {
 
 function Frame40() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -560,7 +560,7 @@ function Frame40() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Blue</p>
           </div>
         </div>
@@ -572,7 +572,7 @@ function Frame40() {
 function Component6() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="5"
     >
       <Frame40 />
@@ -582,14 +582,14 @@ function Component6() {
 
 function Frame41() {
   return (
-    <div className="bg-neutral-50 relative rounded-[10px] shrink-0 w-full">
+    <div className="relative w-full shrink-0 rounded-[10px] bg-neutral-50">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative w-full">
-          <div className="relative shrink-0 size-5">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-2">
+          <div className="relative size-5 shrink-0">
             <svg
               className="block size-full"
               fill="none"
@@ -605,7 +605,7 @@ function Frame41() {
               />
             </svg>
           </div>
-          <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[63px]">
+          <div className="relative w-[63px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
             <p className="block leading-[24px]">Pink</p>
           </div>
         </div>
@@ -617,7 +617,7 @@ function Frame41() {
 function Component7() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="4"
     >
       <Frame41 />
@@ -627,7 +627,7 @@ function Component7() {
 
 function Frame42() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Component2 />
       <Component6 />
       <Component7 />
@@ -637,7 +637,7 @@ function Frame42() {
 
 function Frame43() {
   return (
-    <div className="absolute box-border content-stretch flex flex-col gap-2.5 items-start justify-start left-[30px] p-0 top-[505px]">
+    <div className="absolute left-[30px] top-[505px] box-border flex flex-col content-stretch items-start justify-start gap-2.5 p-0">
       <Frame38 />
       <Frame42 />
     </div>
@@ -647,11 +647,11 @@ function Frame43() {
 function ByColors() {
   return (
     <div
-      className="absolute contents left-[30px] top-[465px]"
+      className="absolute left-[30px] top-[465px] contents"
       data-name="By Colors"
     >
-      <div className="absolute font-['Inter:Medium',_sans-serif] font-medium leading-[0] left-[30px] not-italic text-[20px] text-left text-nowrap text-slate-800 top-[465px]">
-        <p className="block leading-[30px] whitespace-pre">By Colors</p>
+      <div className="absolute left-[30px] top-[465px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[20px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[30px]">By Colors</p>
       </div>
       <Frame43 />
     </div>
@@ -660,12 +660,12 @@ function ByColors() {
 
 function Frame44() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Apple</p>
       </div>
     </div>
@@ -674,12 +674,12 @@ function Frame44() {
 
 function Frame45() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">HP</p>
       </div>
     </div>
@@ -688,13 +688,13 @@ function Frame45() {
 
 function Frame46() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 h-full items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[126px]">
+    <div className="relative box-border flex h-full w-[126px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Samsung</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[24px]">Samsung</p>
       </div>
     </div>
   );
@@ -702,7 +702,7 @@ function Frame46() {
 
 function Frame47() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Frame44 />
       <Frame45 />
       <div className="flex flex-row items-center self-stretch">
@@ -714,12 +714,12 @@ function Frame47() {
 
 function Frame48() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Asus</p>
       </div>
     </div>
@@ -728,12 +728,12 @@ function Frame48() {
 
 function Frame49() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[122px]">
+    <div className="relative box-border flex w-[122px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-[92px]">
+      <div className="relative w-[92px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Lenovo</p>
       </div>
     </div>
@@ -742,13 +742,13 @@ function Frame49() {
 
 function Frame50() {
   return (
-    <div className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 h-full items-center justify-start px-[15px] py-2 relative rounded-[10px] shrink-0 w-[126px]">
+    <div className="relative box-border flex h-full w-[126px] shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-neutral-50 px-[15px] py-2">
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Dell</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[24px]">Dell</p>
       </div>
     </div>
   );
@@ -756,7 +756,7 @@ function Frame50() {
 
 function Frame31() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-0 relative shrink-0 w-full">
+    <div className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-2.5 p-0">
       <Frame48 />
       <Frame49 />
       <div className="flex flex-row items-center self-stretch">
@@ -769,7 +769,7 @@ function Frame31() {
 function Card1() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col gap-2.5 items-start justify-start left-[30px] p-0 top-[675px]"
+      className="absolute left-[30px] top-[675px] box-border flex flex-col content-stretch items-start justify-start gap-2.5 p-0"
       data-name="Card"
     >
       <Frame47 />
@@ -781,11 +781,11 @@ function Card1() {
 function ByColors1() {
   return (
     <div
-      className="absolute contents left-[30px] top-[635px]"
+      className="absolute left-[30px] top-[635px] contents"
       data-name="By Colors"
     >
-      <div className="absolute font-['Inter:Medium',_sans-serif] font-medium leading-[0] left-[30px] not-italic text-[20px] text-left text-nowrap text-slate-800 top-[635px]">
-        <p className="block leading-[30px] whitespace-pre">By Brands</p>
+      <div className="absolute left-[30px] top-[635px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[20px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[30px]">By Brands</p>
       </div>
       <Card1 />
     </div>
@@ -795,11 +795,11 @@ function ByColors1() {
 function Button() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[30px] px-5 py-2.5 rounded-[10px] top-[932px] w-[390px]"
+      className="absolute left-[30px] top-[932px] box-border flex w-[390px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-5 py-2.5"
       data-name="Button"
     >
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-center text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Clear Filter</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Clear Filter</p>
       </div>
     </div>
   );
@@ -808,13 +808,13 @@ function Button() {
 export default function Filter() {
   return (
     <div className="relative size-full" data-name="Filter">
-      <div className="absolute bg-[#ffffff] h-[1008px] right-0 rounded-bl-[20px] rounded-tl-[20px] top-1/2 translate-y-[-50%] w-[450px]" />
+      <div className="absolute right-0 top-1/2 h-[1008px] w-[450px] translate-y-[-50%] rounded-bl-[20px] rounded-tl-[20px] bg-[#ffffff]" />
       <Title />
       <ByPrice />
       <ByCategories />
       <ByColors />
       <ByColors1 />
-      <div className="absolute h-0 left-[30px] top-[275px] w-[390px]">
+      <div className="absolute left-[30px] top-[275px] h-0 w-[390px]">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"
@@ -833,7 +833,7 @@ export default function Filter() {
           </svg>
         </div>
       </div>
-      <div className="absolute h-0 left-[30px] top-[445px] w-[390px]">
+      <div className="absolute left-[30px] top-[445px] h-0 w-[390px]">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"
@@ -852,7 +852,7 @@ export default function Filter() {
           </svg>
         </div>
       </div>
-      <div className="absolute h-0 left-[30px] top-[615px] w-[390px]">
+      <div className="absolute left-[30px] top-[615px] h-0 w-[390px]">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"

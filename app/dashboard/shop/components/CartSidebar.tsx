@@ -14,7 +14,14 @@ interface CartSidebarProps {
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const router = useRouter();
-  const { cart, cartCount, cartTotal, updateQuantity, removeFromCart, clearCart } = useShopCart();
+  const {
+    cart,
+    cartCount,
+    cartTotal,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+  } = useShopCart();
 
   const handleCheckout = () => {
     onClose();
@@ -88,7 +95,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
                     {/* Product Info */}
                     <div className="flex flex-1 flex-col">
-                      <h4 className="mb-1 text-sm font-medium text-foreground line-clamp-2 dark:text-white">
+                      <h4 className="mb-1 line-clamp-2 text-sm font-medium text-foreground dark:text-white">
                         {item.productName}
                       </h4>
                       {item.productBrand && (
@@ -98,16 +105,19 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                       )}
                       <div className="mt-auto flex items-center justify-between">
                         <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                          ₦{(item.productPrice * item.quantity).toLocaleString()}
+                          ₦
+                          {(item.productPrice * item.quantity).toLocaleString()}
                         </span>
-                        
+
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-2">
                           <Button
                             size="icon"
                             variant="outline"
                             className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity - 1)}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity - 1)
+                            }
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
@@ -118,7 +128,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                             size="icon"
                             variant="outline"
                             className="h-7 w-7 border-gray-300 bg-white text-gray-900 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity + 1)}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity + 1)
+                            }
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
@@ -183,4 +195,3 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
     </>
   );
 }
-

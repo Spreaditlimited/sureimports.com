@@ -215,12 +215,11 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
   return (
     <>
       {/*.................................. FORM BLOCK STARTS.................................... */}
-      <RadFormLayout title="User Account Profile" subtitle=""> 
+      <RadFormLayout title="User Account Profile" subtitle="">
         <form onSubmit={submitForm}>
           {/* ///////////////////// IMAGE UPLOAD BOX ///////////////////// */}
-          <div className="flex flex-col p-2 md:flex-row dark:bg-black">
+          <div className="flex flex-col p-2 dark:bg-black md:flex-row">
             <div className="md:w-1/1 w-full">
-              
               <label className="block text-sm font-medium text-gray-400">
                 Upload Profile Picture
               </label>
@@ -237,7 +236,7 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
           </div>
 
           {/* TWO COLUMN: BANK NAME & ACCOUNT NUMBER */}
-          <div className="flex flex-col md:flex-row dark:bg-black">
+          <div className="flex flex-col dark:bg-black md:flex-row">
             <div className="w-full p-2 md:w-1/2">
               {/* COL 1 */}
               <div>
@@ -269,7 +268,7 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
           </div>
 
           {/* TWO COLUMN: BANK NAME & ACCOUNT NUMBER */}
-          <div className="flex flex-col md:flex-row dark:bg-black">
+          <div className="flex flex-col dark:bg-black md:flex-row">
             <div className="w-full p-2 md:w-1/2">
               {/* COL 1 */}
               <div>
@@ -300,7 +299,7 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
           </div>
 
           {/* TWO COLUMN: BANK NAME & ACCOUNT NUMBER */}
-          <div className="flex flex-col md:flex-row dark:bg-black">
+          <div className="flex flex-col dark:bg-black md:flex-row">
             <div className="w-full p-2 md:w-1/2">
               {/* COL 1 */}
               <div>
@@ -333,7 +332,7 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
           </div>
 
           {/* TWO COLUMN: BANK NAME & ACCOUNT NUMBER */}
-          <div className="flex flex-col md:flex-row dark:bg-black">
+          <div className="flex flex-col dark:bg-black md:flex-row">
             <div className="md:w-1/1 w-full p-2">
               {/* COL 2 */}
               <div>

@@ -26,7 +26,7 @@ function VerifySupplier() {
   return (
     <div className="h-full">
       <div className="p-[25px]">
-        <div className="text-[28px] font-bold text-slate-800 dark:text-white max-sm:pb-4 dark:bg-black">
+        <div className="text-[28px] font-bold text-slate-800 dark:bg-black dark:text-white max-sm:pb-4">
           Request to Verify a Supplier
         </div>
         <div className="text-base font-normal text-slate-600 dark:text-slate-300 xl:w-[930px]">

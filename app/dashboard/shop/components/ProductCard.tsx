@@ -48,7 +48,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           fill
           className="object-cover object-center transition-transform duration-300 group-hover:scale-105"
         />
-        
+
         {/* Category Badge */}
         {product.productCategory && (
           <div className="absolute left-2 top-2 rounded-md bg-indigo-600 px-2 py-1 text-xs font-medium text-white">
@@ -67,14 +67,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Product Info */}
       <div className="p-4">
         <h3
-          className="mb-2 cursor-pointer text-lg font-semibold text-foreground line-clamp-2 hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
+          className="mb-2 line-clamp-2 cursor-pointer text-lg font-semibold text-foreground hover:text-indigo-600 dark:text-white dark:hover:text-indigo-400"
           onClick={handleViewDetails}
         >
           {product.productName}
         </h3>
 
         {product.productDescription && (
-          <p className="mb-3 text-sm text-muted-foreground line-clamp-2 dark:text-gray-400">
+          <p className="mb-3 line-clamp-2 text-sm text-muted-foreground dark:text-gray-400">
             {product.productDescription}
           </p>
         )}
@@ -101,11 +101,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Condition */}
         {product.productCondition && (
           <div className="mb-3">
-            <span className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
-              product.productCondition === 'NEW' 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-            }`}>
+            <span
+              className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
+                product.productCondition === 'NEW'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+              }`}
+            >
               {product.productCondition}
             </span>
           </div>
@@ -134,4 +136,3 @@ export default function ProductCard({ product }: ProductCardProps) {
     </div>
   );
 }
-

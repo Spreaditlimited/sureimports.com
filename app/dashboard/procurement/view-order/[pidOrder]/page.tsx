@@ -1079,9 +1079,13 @@ function MoreOrders({ products }: MoreOrdersProps) {
                 service_name={'PROCUREMENT'}
                 description={'This is General Procuremnt & Shipping Service'}
                 isDisabled={isDisabled}
-                className={isDisabled
-                  ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'} destinationCountry={''}              />
+                className={
+                  isDisabled
+                    ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
+                    : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
+                }
+                destinationCountry={''}
+              />
               {/* *********************************************************************************************************** */}
               <Button
                 className={

@@ -1,9 +1,9 @@
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Shield, Users, CheckCircle } from "lucide-react";
-import { useState } from "react";
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Shield, Users, CheckCircle } from 'lucide-react';
+import { useState } from 'react';
 
 interface HeroSectionProps {
   onNavigateToSignUp?: () => void;
@@ -11,36 +11,36 @@ interface HeroSectionProps {
   onNavigateToPrivacy?: () => void;
 }
 
-export default function HeroSection({ 
-  onNavigateToSignUp, 
-  onNavigateToTerms, 
-  onNavigateToPrivacy 
+export default function HeroSection({
+  onNavigateToSignUp,
+  onNavigateToTerms,
+  onNavigateToPrivacy,
 }: HeroSectionProps) {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    password: "",
-    confirmPassword: ""
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+    confirmPassword: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
-    
+
     // Handle email validation
-    if (field === "email") {
+    if (field === 'email') {
       handleEmailValidation(value);
     }
-    
+
     // Handle password validation
-    if (field === "password" || field === "confirmPassword") {
+    if (field === 'password' || field === 'confirmPassword') {
       handlePasswordValidation(field, value);
     }
   };
@@ -52,145 +52,159 @@ export default function HeroSection({
   };
 
   const handleEmailValidation = (email: string) => {
-    if (email.trim() === "") {
-      setEmailError("");
+    if (email.trim() === '') {
+      setEmailError('');
     } else if (!isValidEmail(email)) {
-      setEmailError("Invalid email format");
+      setEmailError('Invalid email format');
     } else {
-      setEmailError("");
+      setEmailError('');
     }
   };
 
   const handlePasswordValidation = (field: string, value: string) => {
-    const currentPassword = field === "password" ? value : formData.password;
-    const currentConfirmPassword = field === "confirmPassword" ? value : formData.confirmPassword;
-    
+    const currentPassword = field === 'password' ? value : formData.password;
+    const currentConfirmPassword =
+      field === 'confirmPassword' ? value : formData.confirmPassword;
+
     // Only validate if both fields have values
     if (currentPassword && currentConfirmPassword) {
       if (currentPassword !== currentConfirmPassword) {
-        setPasswordError("Passwords do not match");
+        setPasswordError('Passwords do not match');
       } else {
-        setPasswordError("");
+        setPasswordError('');
       }
     } else {
-      setPasswordError("");
+      setPasswordError('');
     }
   };
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password || !formData.confirmPassword) {
-      alert("Please fill in all fields");
+
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.phone ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      alert('Please fill in all fields');
       return;
     }
 
     // Validate email before submission
     if (!isValidEmail(formData.email)) {
-      setEmailError("Invalid email format");
+      setEmailError('Invalid email format');
       return;
     }
 
     // Validate password match before submission
     if (formData.password !== formData.confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError('Passwords do not match');
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       // Simulate form submission
-      console.log("Form submitted:", formData);
-      
+      console.log('Form submitted:', formData);
+
       // Here you would typically send the data to your backend
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       alert("Thank you for signing up! We'll be in touch soon.");
-      
+
       // Reset form
       setFormData({
-        firstName: "",
-        lastName: "",
-        email: "",
-        phone: "",
-        password: "",
-        confirmPassword: ""
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
       });
-      setEmailError("");
-      setPasswordError("");
+      setEmailError('');
+      setPasswordError('');
     } catch (error) {
-      console.error("Form submission error:", error);
-      alert("There was an error submitting your information. Please try again.");
+      console.error('Form submission error:', error);
+      alert(
+        'There was an error submitting your information. Please try again.',
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:60px_60px]" />
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-500/10 to-purple-600/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-500/10 to-blue-600/10 rounded-full blur-3xl" />
-      
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center min-h-[calc(100vh-160px)]">
+      <div className="bg-grid-white/[0.02] absolute inset-0 bg-[size:60px_60px]" />
+      <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-600/10 blur-3xl" />
+      <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-gradient-to-tr from-purple-500/10 to-blue-600/10 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8">
+        <div className="grid min-h-[calc(100vh-160px)] items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Column - Content */}
-          <div className="space-y-8 flex flex-col justify-center">
+          <div className="flex flex-col justify-center space-y-8">
             <div className="space-y-6">
-              <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 rounded-full px-4 py-2">
-                <Shield className="w-4 h-4 text-blue-400" />
-                <span className="text-blue-400 text-sm font-medium">Trusted by 40,000+ merchants</span>
+              <div className="inline-flex items-center space-x-2 rounded-full border border-blue-500/20 bg-gradient-to-r from-blue-500/10 to-purple-600/10 px-4 py-2">
+                <Shield className="h-4 w-4 text-blue-400" />
+                <span className="text-sm font-medium text-blue-400">
+                  Trusted by 40,000+ merchants
+                </span>
               </div>
-              
-              <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight">
-                Buy from China with{" "}
+
+              <h1 className="text-4xl font-bold leading-tight text-white lg:text-6xl">
+                Buy from China with{' '}
                 <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
                   Confidence
                 </span>
               </h1>
-              
-              <p className="text-xl text-gray-300 leading-relaxed max-w-2xl">
-                Say goodbye to the fear of receiving poor quality or incorrect products from China. 
-                We guarantee the quality and accuracy of every item we source, ensuring you get exactly what 
-                you ordered, every time.
+
+              <p className="max-w-2xl text-xl leading-relaxed text-gray-300">
+                Say goodbye to the fear of receiving poor quality or incorrect
+                products from China. We guarantee the quality and accuracy of
+                every item we source, ensuring you get exactly what you ordered,
+                every time.
               </p>
             </div>
 
             {/* Features */}
             <div className="flex flex-wrap gap-6">
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-green-400" />
                 <span className="text-gray-300">Quality Guaranteed</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-green-400" />
                 <span className="text-gray-300">Secure Payments</span>
               </div>
               <div className="flex items-center space-x-2">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <CheckCircle className="h-5 w-5 text-green-400" />
                 <span className="text-gray-300">Fast Shipping</span>
               </div>
             </div>
 
             {/* Call to Action - Hidden on mobile, visible on desktop */}
-            <div className="hidden md:flex flex-col sm:flex-row gap-4 pt-4">
-              <Button 
+            <div className="hidden flex-col gap-4 pt-4 sm:flex-row md:flex">
+              <Button
                 onClick={onNavigateToSignUp}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 px-8 py-3 transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
+                className="border-0 bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-700 hover:shadow-blue-500/25"
               >
                 Start Importing Now
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => {
-                  const servicesSection = document.getElementById('services-section');
+                  const servicesSection =
+                    document.getElementById('services-section');
                   if (servicesSection) {
                     servicesSection.scrollIntoView({ behavior: 'smooth' });
                   }
                 }}
-                className="border-slate-400 bg-transparent text-white hover:bg-white/10 hover:border-slate-300 hover:text-white px-8 py-3 transition-all duration-200 font-medium"
+                className="border-slate-400 bg-transparent px-8 py-3 font-medium text-white transition-all duration-200 hover:border-slate-300 hover:bg-white/10 hover:text-white"
               >
                 Learn More
               </Button>
@@ -199,131 +213,162 @@ export default function HeroSection({
 
           {/* Right Column - Signup Form */}
           <div className="lg:pl-8">
-            <Card className="bg-white/5 backdrop-blur-sm border-slate-700/50 shadow-2xl">
-              <CardHeader className="text-center space-y-2">
-                <CardTitle className="text-2xl text-white">Join Our Network</CardTitle>
+            <Card className="border-slate-700/50 bg-white/5 shadow-2xl backdrop-blur-sm">
+              <CardHeader className="space-y-2 text-center">
+                <CardTitle className="text-2xl text-white">
+                  Join Our Network
+                </CardTitle>
                 <div className="flex items-center justify-center space-x-2 text-gray-400">
-                  <Users className="w-4 h-4" />
-                  <span className="text-sm">Join over 40,000 merchants today</span>
+                  <Users className="h-4 w-4" />
+                  <span className="text-sm">
+                    Join over 40,000 merchants today
+                  </span>
                 </div>
               </CardHeader>
-              
+
               <CardContent>
                 <form onSubmit={handleFormSubmit} className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstname" className="text-gray-300">First Name</Label>
+                      <Label htmlFor="firstname" className="text-gray-300">
+                        First Name
+                      </Label>
                       <Input
                         id="firstname"
                         value={formData.firstName}
-                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('firstName', e.target.value)
+                        }
                         placeholder="Enter your firstname"
-                        className="bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastname" className="text-gray-300">Last Name</Label>
+                      <Label htmlFor="lastname" className="text-gray-300">
+                        Last Name
+                      </Label>
                       <Input
                         id="lastname"
                         value={formData.lastName}
-                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('lastName', e.target.value)
+                        }
                         placeholder="Enter your lastname"
-                        className="bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                        className="border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                         required
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-gray-300">Email Address</Label>
+                    <Label htmlFor="email" className="text-gray-300">
+                      Email Address
+                    </Label>
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('email', e.target.value)
+                      }
                       placeholder="Enter your email"
-                      className={`bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${emailError ? "border-red-500 focus:border-red-500" : ""}`}
+                      className={`border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${emailError ? 'border-red-500 focus:border-red-500' : ''}`}
                       required
                     />
                     {emailError && (
-                      <p className="text-red-400 text-xs mt-1 break-words">
+                      <p className="mt-1 break-words text-xs text-red-400">
                         {emailError}
                       </p>
                     )}
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-gray-300">Phone Number</Label>
+                    <Label htmlFor="phone" className="text-gray-300">
+                      Phone Number
+                    </Label>
                     <Input
                       id="phone"
                       type="tel"
                       value={formData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('phone', e.target.value)
+                      }
                       placeholder="+234 801 234 5678"
-                      className="bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
+                      className="border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20"
                       required
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="password" className="text-gray-300">Password</Label>
+                        <Label htmlFor="password" className="text-gray-300">
+                          Password
+                        </Label>
                         <Input
                           id="password"
                           type="password"
                           value={formData.password}
-                          onChange={(e) => handleInputChange("password", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange('password', e.target.value)
+                          }
                           placeholder="Create a password"
-                          className={`bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${passwordError ? "border-red-500 focus:border-red-500" : ""}`}
+                          className={`border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${passwordError ? 'border-red-500 focus:border-red-500' : ''}`}
                           required
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword" className="text-gray-300">Repeat Password</Label>
+                        <Label
+                          htmlFor="confirmPassword"
+                          className="text-gray-300"
+                        >
+                          Repeat Password
+                        </Label>
                         <Input
                           id="confirmPassword"
                           type="password"
                           value={formData.confirmPassword}
-                          onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                          onChange={(e) =>
+                            handleInputChange('confirmPassword', e.target.value)
+                          }
                           placeholder="Repeat your password"
-                          className={`bg-slate-800/50 border-slate-600 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${passwordError ? "border-red-500 focus:border-red-500" : ""}`}
+                          className={`border-slate-600 bg-slate-800/50 text-white placeholder-gray-400 focus:border-blue-500 focus:ring-blue-500/20 ${passwordError ? 'border-red-500 focus:border-red-500' : ''}`}
                           required
                         />
                       </div>
                     </div>
                     {passwordError && (
-                      <div className="w-full max-w-full min-w-0 overflow-hidden">
-                        <p className="text-red-400 text-xs mt-1 break-all overflow-wrap-anywhere hyphens-auto leading-tight px-1">
+                      <div className="w-full min-w-0 max-w-full overflow-hidden">
+                        <p className="overflow-wrap-anywhere mt-1 hyphens-auto break-all px-1 text-xs leading-tight text-red-400">
                           {passwordError}
                         </p>
                       </div>
                     )}
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full rounded-lg border-0 bg-gradient-to-r from-blue-600 to-purple-600 py-3 text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-700 hover:shadow-blue-500/25 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {isSubmitting ? "Submitting..." : "Get Started Today"}
+                    {isSubmitting ? 'Submitting...' : 'Get Started Today'}
                   </Button>
-                  
-                  <p className="text-xs text-gray-400 text-center">
-                    By signing up, you agree to our{" "}
-                    <button 
+
+                  <p className="text-center text-xs text-gray-400">
+                    By signing up, you agree to our{' '}
+                    <button
                       type="button"
                       onClick={onNavigateToTerms}
-                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                      className="text-blue-400 transition-colors hover:text-blue-300"
                     >
                       Terms of Service
-                    </button>{" "}
-                    and{" "}
-                    <button 
+                    </button>{' '}
+                    and{' '}
+                    <button
                       type="button"
                       onClick={onNavigateToPrivacy}
-                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                      className="text-blue-400 transition-colors hover:text-blue-300"
                     >
                       Privacy Policy
                     </button>

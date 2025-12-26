@@ -102,7 +102,7 @@ function UpdatePasswordForm() {
 
   return (
     <div className="p-[25px]">
-      <div className="border-b border-gray-200 pb-[20px] text-xl font-bold text-slate-800 dark:border-gray-700 dark:text-white  dark:bg-black">
+      <div className="border-b border-gray-200 pb-[20px] text-xl font-bold text-slate-800 dark:border-gray-700 dark:bg-black dark:text-white">
         Reset Password
       </div>
       <div className="pt-[25px]">

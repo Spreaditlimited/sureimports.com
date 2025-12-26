@@ -3,7 +3,12 @@ import transporter from '@/lib/email/config/nodemailerConfig';
 
 const { SMTP_EMAIL } = process.env;
 
-const sendEmail = async (to: string, subject: string, html: string, retries = 3) => {
+const sendEmail = async (
+  to: string,
+  subject: string,
+  html: string,
+  retries = 3,
+) => {
   let lastError;
 
   for (let attempt = 1; attempt <= retries; attempt++) {
@@ -19,16 +24,18 @@ const sendEmail = async (to: string, subject: string, html: string, retries = 3)
 
       console.log('Email sent successfully:', info.messageId);
       return info; // Success - return immediately
-
     } catch (error: any) {
       lastError = error;
-      console.error(`Email send attempt ${attempt}/${retries} failed:`, error.message);
+      console.error(
+        `Email send attempt ${attempt}/${retries} failed:`,
+        error.message,
+      );
 
       // If this isn't the last attempt, wait before retrying
       if (attempt < retries) {
         const waitTime = attempt * 2000; // Exponential backoff: 2s, 4s, 6s
         console.log(`Waiting ${waitTime}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
       }
     }
   }

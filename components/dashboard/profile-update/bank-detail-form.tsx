@@ -182,7 +182,7 @@ export default function UpdateBankDetailsFrom() {
       toast.info('Verifying account number...');
 
       const response = await fetch(
-        `/api/paystack/resolve-account?account_number=${bank_account_number}&bank_code=${bank_code}`
+        `/api/paystack/resolve-account?account_number=${bank_account_number}&bank_code=${bank_code}`,
       );
       const data = await response.json();
 
@@ -211,7 +211,7 @@ export default function UpdateBankDetailsFrom() {
     setBankName(selectedBankName);
 
     // Find and set bank code
-    const selectedBank = banks.find(bank => bank.name === selectedBankName);
+    const selectedBank = banks.find((bank) => bank.name === selectedBankName);
     if (selectedBank) {
       setBankCode(selectedBank.code);
     } else {
@@ -224,7 +224,9 @@ export default function UpdateBankDetailsFrom() {
   };
 
   // Handle account number change
-  const handleAccountNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAccountNumberChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setAccountNumber(e.target.value);
     // Reset verification when account number changes
     setResolvedAccountName('');
@@ -267,7 +269,9 @@ export default function UpdateBankDetailsFrom() {
   };
 
   // STEP 1: Request verification code
-  const requestVerificationCode = async (e: React.FormEvent<HTMLFormElement>) => {
+  const requestVerificationCode = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
     // Validate bank details before requesting code
@@ -291,7 +295,9 @@ export default function UpdateBankDetailsFrom() {
   };
 
   // STEP 2: Verify code and update bank details
-  const verifyAndUpdateBankDetails = async (e: React.FormEvent<HTMLFormElement>) => {
+  const verifyAndUpdateBankDetails = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
 
     if (!verificationCode || verificationCode.length !== 6) {
@@ -358,95 +364,101 @@ export default function UpdateBankDetailsFrom() {
             </div>
 
             {/* CURRENT BANK DETAILS CARD */}
-            {userData && (userData.bank_name || userData.bank_account_number || userData.bank_account_name) && (
-              <div className="mb-6">
-                <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-6 shadow-sm">
-                  <div className="flex items-center mb-4">
-                    <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900/30 mr-3">
-                      <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-                        Current Bank Details
-                      </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400">
-                        Your registered bank account information
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                    {/* Bank Name */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center mb-2">
-                        <Landmark className="h-4 w-4 text-slate-500 dark:text-slate-400 mr-2" />
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                          Bank Name
+            {userData &&
+              (userData.bank_name ||
+                userData.bank_account_number ||
+                userData.bank_account_name) && (
+                <div className="mb-6">
+                  <div className="rounded-lg border border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100 p-6 shadow-sm dark:border-slate-700 dark:from-slate-800 dark:to-slate-900">
+                    <div className="mb-4 flex items-center">
+                      <div className="mr-3 rounded-full bg-blue-100 p-3 dark:bg-blue-900/30">
+                        <CreditCard className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                          Current Bank Details
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Your registered bank account information
                         </p>
                       </div>
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                        {userData.bank_name || 'Not set'}
-                      </p>
                     </div>
 
-                    {/* Bank Code */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center mb-2">
-                        <FileDigit className="h-4 w-4 text-slate-500 dark:text-slate-400 mr-2" />
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                          Bank Code
+                    <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                      {/* Bank Name */}
+                      <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                        <div className="mb-2 flex items-center">
+                          <Landmark className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                            Bank Name
+                          </p>
+                        </div>
+                        <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                          {userData.bank_name || 'Not set'}
                         </p>
                       </div>
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100 font-mono">
-                        {userData.bank_code || 'Not set'}
-                      </p>
-                    </div>
 
-                    {/* Account Number */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center mb-2">
-                        <FileDigit className="h-4 w-4 text-slate-500 dark:text-slate-400 mr-2" />
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                          Account Number
+                      {/* Bank Code */}
+                      <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                        <div className="mb-2 flex items-center">
+                          <FileDigit className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                            Bank Code
+                          </p>
+                        </div>
+                        <p className="font-mono text-base font-semibold text-slate-900 dark:text-slate-100">
+                          {userData.bank_code || 'Not set'}
                         </p>
                       </div>
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100 font-mono">
-                        {userData.bank_account_number || 'Not set'}
-                      </p>
-                    </div>
 
-                    {/* Account Name */}
-                    <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center mb-2">
-                        <CircleUser className="h-4 w-4 text-slate-500 dark:text-slate-400 mr-2" />
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                          Account Name
+                      {/* Account Number */}
+                      <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                        <div className="mb-2 flex items-center">
+                          <FileDigit className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                            Account Number
+                          </p>
+                        </div>
+                        <p className="font-mono text-base font-semibold text-slate-900 dark:text-slate-100">
+                          {userData.bank_account_number || 'Not set'}
                         </p>
                       </div>
-                      <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                        {userData.bank_account_name || 'Not set'}
-                      </p>
+
+                      {/* Account Name */}
+                      <div className="rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+                        <div className="mb-2 flex items-center">
+                          <CircleUser className="mr-2 h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                            Account Name
+                          </p>
+                        </div>
+                        <p className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                          {userData.bank_account_name || 'Not set'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* DIVIDER */}
-            {userData && (userData.bank_name || userData.bank_account_number || userData.bank_account_name) && (
-              <div className="mb-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white dark:bg-black text-slate-500 dark:text-slate-400 font-medium">
-                      Update Bank Details
-                    </span>
+            {userData &&
+              (userData.bank_name ||
+                userData.bank_account_number ||
+                userData.bank_account_name) && (
+                <div className="mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-slate-300 dark:border-slate-600"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="bg-white px-4 font-medium text-slate-500 dark:bg-black dark:text-slate-400">
+                        Update Bank Details
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* BANK NAME DROPDOWN */}
             <div className="flex flex-col md:flex-row">
@@ -454,12 +466,14 @@ export default function UpdateBankDetailsFrom() {
                 <div>
                   {isLoadingBanks ? (
                     <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-400 mb-2">
+                      <label className="mb-2 block text-sm font-medium text-gray-400">
                         Bank Name*
                       </label>
-                      <div className="flex items-center justify-center h-10 lg:h-[60px] w-full rounded-md border border-input bg-slate-200 dark:bg-slate-800">
-                        <Loader2 className="h-5 w-5 animate-spin text-gray-400 mr-2" />
-                        <span className="text-sm text-gray-400">Loading banks...</span>
+                      <div className="flex h-10 w-full items-center justify-center rounded-md border border-input bg-slate-200 dark:bg-slate-800 lg:h-[60px]">
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin text-gray-400" />
+                        <span className="text-sm text-gray-400">
+                          Loading banks...
+                        </span>
                       </div>
                     </div>
                   ) : (
@@ -481,13 +495,13 @@ export default function UpdateBankDetailsFrom() {
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/1 w-full p-2">
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">
+                  <label className="mb-2 block text-sm font-medium text-gray-400">
                     Bank Account Number* (10 digits)
                   </label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
                       <span
-                        className="absolute m-2 text-2xl lg:m-5 z-10"
+                        className="absolute z-10 m-2 text-2xl lg:m-5"
                         style={{ color: '#404040' }}
                       >
                         <FileDigit className="text-gray-400" />
@@ -506,8 +520,12 @@ export default function UpdateBankDetailsFrom() {
                     <Button
                       type="button"
                       onClick={verifyAccountNumber}
-                      disabled={isVerifyingAccount || !bank_code || bank_account_number.length !== 10}
-                      className="bg-indigo-600 hover:bg-indigo-700 h-10 lg:h-[60px] px-6"
+                      disabled={
+                        isVerifyingAccount ||
+                        !bank_code ||
+                        bank_account_number.length !== 10
+                      }
+                      className="h-10 bg-indigo-600 px-6 hover:bg-indigo-700 lg:h-[60px]"
                     >
                       {isVerifyingAccount ? (
                         <>
@@ -527,7 +545,7 @@ export default function UpdateBankDetailsFrom() {
             {resolvedAccountName && isAccountVerified && (
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/1 w-full p-2">
-                  <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/20">
                     <div className="flex items-center">
                       <CheckCircle2 className="mr-3 h-5 w-5 text-green-600 dark:text-green-400" />
                       <div>
@@ -567,9 +585,10 @@ export default function UpdateBankDetailsFrom() {
                     }
                   />
                   {isAccountVerified && (
-                    <p className="mt-2 text-xs text-green-600 dark:text-green-400 flex items-center">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
-                      This field has been auto-filled with the verified account name
+                    <p className="mt-2 flex items-center text-xs text-green-600 dark:text-green-400">
+                      <CheckCircle2 className="mr-1 h-3 w-3" />
+                      This field has been auto-filled with the verified account
+                      name
                     </p>
                   )}
                 </div>
@@ -579,18 +598,23 @@ export default function UpdateBankDetailsFrom() {
             {/* INFO MESSAGE */}
             <div className="flex flex-col md:flex-row">
               <div className="md:w-1/1 w-full p-2">
-                <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
                   <div className="flex items-start">
                     <Info className="mr-3 mt-1 h-5 w-5 text-blue-600 dark:text-blue-400" />
                     <div>
                       <p className="text-sm text-blue-800 dark:text-blue-200">
                         To update your bank details, please:
                       </p>
-                      <ol className="mt-2 text-sm text-blue-800 dark:text-blue-200 list-decimal list-inside space-y-1">
+                      <ol className="mt-2 list-inside list-decimal space-y-1 text-sm text-blue-800 dark:text-blue-200">
                         <li>Select your bank from the dropdown</li>
                         <li>Enter your 10-digit account number</li>
-                        <li>Click <strong>Verify</strong> to confirm the account</li>
-                        <li>Click <strong>Send Verification Code</strong> to receive a code via email</li>
+                        <li>
+                          Click <strong>Verify</strong> to confirm the account
+                        </li>
+                        <li>
+                          Click <strong>Send Verification Code</strong> to
+                          receive a code via email
+                        </li>
                       </ol>
                     </div>
                   </div>
@@ -619,7 +643,7 @@ export default function UpdateBankDetailsFrom() {
                     )}
                   </Button>
                   {!isAccountVerified && (
-                    <p className="mt-2 text-sm text-red-500 text-center">
+                    <p className="mt-2 text-center text-sm text-red-500">
                       Please verify your account number first
                     </p>
                   )}
@@ -642,7 +666,8 @@ export default function UpdateBankDetailsFrom() {
                     <strong>{email}</strong>
                   </p>
                   <p className="mt-1 text-sm text-blue-800 dark:text-blue-200">
-                    Please enter the code below to complete the bank details update.
+                    Please enter the code below to complete the bank details
+                    update.
                   </p>
                 </div>
               </div>
@@ -657,7 +682,9 @@ export default function UpdateBankDetailsFrom() {
                     name={'verificationCode'}
                     id={'verificationCode'}
                     value={verificationCode}
-                    onChange={(e) => setVerificationCode(e.target.value.toUpperCase())}
+                    onChange={(e) =>
+                      setVerificationCode(e.target.value.toUpperCase())
+                    }
                     disable={false}
                     placeholder="Enter 6-digit code"
                   />
@@ -709,9 +736,11 @@ export default function UpdateBankDetailsFrom() {
                 type="button"
                 onClick={resendVerificationCode}
                 disabled={isSendingCode}
-                className="text-sm text-blue-600 hover:underline dark:text-blue-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="text-sm text-blue-600 hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-blue-400"
               >
-                {isSendingCode ? 'Sending...' : "Didn't receive the code? Resend"}
+                {isSendingCode
+                  ? 'Sending...'
+                  : "Didn't receive the code? Resend"}
               </button>
             </div>
           </form>

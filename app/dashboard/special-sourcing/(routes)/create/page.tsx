@@ -36,7 +36,7 @@ function SpecialSourcing() {
           you go ahead with the order.{' '}
         </div>
       </div>
-      <div className="bg-slate-50x flex w-full flex-col items-center bg-[#ffffff] px-4  dark:bg-black lg:flex-row xl:items-start">
+      <div className="bg-slate-50x flex w-full flex-col items-center bg-[#ffffff] px-4 dark:bg-black lg:flex-row xl:items-start">
         <div className="w-full">
           <SpecialSourcingForm />
         </div>

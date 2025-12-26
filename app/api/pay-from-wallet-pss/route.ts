@@ -7,16 +7,21 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 export async function GET(request: NextRequest) {
   try {
     const pidUser = request.nextUrl.searchParams.get('pidUser');
-    const pidPaySmallSmall = request.nextUrl.searchParams.get('pidPaySmallSmall');
+    const pidPaySmallSmall =
+      request.nextUrl.searchParams.get('pidPaySmallSmall');
     const pidProduct = request.nextUrl.searchParams.get('pidProduct');
     const amount = request.nextUrl.searchParams.get('amount');
 
     // Validate required parameters
     if (!pidUser || !pidPaySmallSmall || !pidProduct || !amount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameters: pidUser, pidPaySmallSmall, pidProduct, and amount are required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            'Missing required parameters: pidUser, pidPaySmallSmall, pidProduct, and amount are required',
+        },
+        { status: 400 },
+      );
     }
 
     const user: any = await prisma.users.findUnique({
@@ -26,10 +31,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found. Please contact support for assistance',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found. Please contact support for assistance',
+        },
+        { status: 404 },
+      );
     }
 
     // Get Pay Small Small record - use lowercase model name
@@ -40,10 +48,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!paySmallSmall) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Pay Small Small record not found',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Pay Small Small record not found',
+        },
+        { status: 404 },
+      );
     }
 
     // Get product details
@@ -54,10 +65,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!product) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Product not found',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Product not found',
+        },
+        { status: 404 },
+      );
     }
 
     const email = user.userEmail;
@@ -67,10 +81,13 @@ export async function GET(request: NextRequest) {
 
     // Fetch customer data from Paystack API
     console.log('Fetching customer data for email:', email);
-    
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.ROOT_URL || 'http://localhost:3000';
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.ROOT_URL ||
+      'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -80,14 +97,17 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       console.error('Failed to fetch customer data:', response.statusText);
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Failed to fetch customer wallet information',
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Failed to fetch customer wallet information',
+        },
+        { status: 500 },
+      );
     }
 
     const data = await response.json();
-    
+
     console.log('Customer API Response:', {
       statusx: data.statusx,
       message: data.message,
@@ -97,17 +117,24 @@ export async function GET(request: NextRequest) {
 
     // Check if customer exists
     if (data.statusx === 'NO_CUSTOMER') {
-      return NextResponse.json({
-        statusx: 'NO_CUSTOMER',
-        message: 'Customer does not exist. Please contact support for assistance',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'NO_CUSTOMER',
+          message:
+            'Customer does not exist. Please contact support for assistance',
+        },
+        { status: 400 },
+      );
     }
 
     if (data.statusx === 'FAILED') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: data.message || 'Failed to retrieve customer information',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: data.message || 'Failed to retrieve customer information',
+        },
+        { status: 400 },
+      );
     }
 
     const customerDetails = data.customerDetails;
@@ -121,10 +148,13 @@ export async function GET(request: NextRequest) {
 
     // Check if user has sufficient funds
     if (walletBalance < claimAmount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${claimAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${claimAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+        },
+        { status: 400 },
+      );
     }
 
     ////////////////// PAYMENT PARAMS STARTS //////////////////////
@@ -221,7 +251,12 @@ export async function GET(request: NextRequest) {
         },
       });
 
-      return { create_debits, create_payment, update_paySmallSmall, create_purchase };
+      return {
+        create_debits,
+        create_payment,
+        update_paySmallSmall,
+        create_purchase,
+      };
     });
 
     // If transaction is successful, send emails
@@ -280,31 +315,39 @@ export async function GET(request: NextRequest) {
       });
 
       console.log('Pay Small Small claim processed successfully:', txREF);
-      
-      return NextResponse.json({
-        statusx: 'SUCCESS',
-        message: `Product claimed successfully! ₦${claimAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - claimAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-        data: {
-          transactionRef: txREF,
-          amount: claimAmount,
-          productName: product?.productName,
-          previousBalance: walletBalance,
-          newBalance: walletBalance - claimAmount,
-        },
-      }, { status: 200 });
-    } else {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment transaction failed. Please try again.',
-      }, { status: 500 });
-    }
 
+      return NextResponse.json(
+        {
+          statusx: 'SUCCESS',
+          message: `Product claimed successfully! ₦${claimAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - claimAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+          data: {
+            transactionRef: txREF,
+            amount: claimAmount,
+            productName: product?.productName,
+            previousBalance: walletBalance,
+            newBalance: walletBalance - claimAmount,
+          },
+        },
+        { status: 200 },
+      );
+    } else {
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment transaction failed. Please try again.',
+        },
+        { status: 500 },
+      );
+    }
   } catch (error) {
     console.error('Pay Small Small wallet claim error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while processing claim',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while processing claim',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }

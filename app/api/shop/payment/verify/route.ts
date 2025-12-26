@@ -33,18 +33,24 @@ export async function GET(request: NextRequest) {
     console.log('Shop payment verification started:', { reference });
 
     if (!reference) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment reference is required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment reference is required',
+        },
+        { status: 400 },
+      );
     }
 
     if (!process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY) {
       console.error('PAYSTACK_SECRET_KEY is not defined');
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment configuration error',
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment configuration error',
+        },
+        { status: 500 },
+      );
     }
 
     console.log('Verifying payment with Paystack...');
@@ -56,7 +62,7 @@ export async function GET(request: NextRequest) {
         headers: {
           Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
         },
-      }
+      },
     );
 
     const paystackData = await paystackResponse.json();
@@ -66,11 +72,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!paystackData.status || paystackData.data.status !== 'success') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment verification failed',
-        data: paystackData,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment verification failed',
+          data: paystackData,
+        },
+        { status: 400 },
+      );
     }
 
     const transactionData = paystackData.data;
@@ -89,10 +98,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found',
+        },
+        { status: 404 },
+      );
     }
 
     const email = user.userEmail;
@@ -158,10 +170,12 @@ export async function GET(request: NextRequest) {
               updatedAt: new Date(),
             },
           });
-        })
+        }),
       );
 
-      console.log(`Created ${salesRecords.length} store_sales records successfully`);
+      console.log(
+        `Created ${salesRecords.length} store_sales records successfully`,
+      );
       return { create_payment, salesRecords };
     });
 
@@ -171,13 +185,17 @@ export async function GET(request: NextRequest) {
     console.log('Sending confirmation emails...');
     if (result.create_payment) {
       // Build cart items HTML for email
-      const cartItemsHTML = cartItems.map((item: any) => `
+      const cartItemsHTML = cartItems
+        .map(
+          (item: any) => `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.productName}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">₦${(item.productPrice * item.quantity).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
         </tr>
-      `).join('');
+      `,
+        )
+        .join('');
 
       ////////////////////// SEND CUSTOMER PAYMENT RECEIPT EMAIL //////////////////////
       console.log('Sending customer email...');
@@ -274,17 +292,19 @@ export async function GET(request: NextRequest) {
       console.log('Shop payment processed successfully:', txREF);
     }
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: 'Payment verified and order created successfully',
-      data: {
-        transactionRef: txREF,
-        amount: amount,
-        itemsCount: cartItems.length,
-        paymentStatus: 'PAID',
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Payment verified and order created successfully',
+        data: {
+          transactionRef: txREF,
+          amount: amount,
+          itemsCount: cartItems.length,
+          paymentStatus: 'PAID',
+        },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Payment verification error:', error);
     console.error('Error details:', {
@@ -293,11 +313,13 @@ export async function GET(request: NextRequest) {
       stack: error instanceof Error ? error.stack : undefined,
     });
 
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while verifying payment',
-      error: error instanceof Error ? error.message : String(error),
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while verifying payment',
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
+    );
   }
 }
-

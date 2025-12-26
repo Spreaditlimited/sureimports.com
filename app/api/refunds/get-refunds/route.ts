@@ -20,28 +20,28 @@ export async function GET(request: NextRequest) {
   // const refundAmountx = (parseFloat(refundAmount) * -1) - (2.5/100 * (parseFloat(refundAmount) * -1));
   // const pidRefundx = 'RFND' + randomGenerator(15);
 
+  try {
+    const refunds_total = await prisma.refund_records.findMany({
+      where: {
+        pidUser: pidUser,
+        refundStatus: 'pending',
+      },
+    });
 
-
-try {
-
-  const refunds_total = await prisma.refund_records.findMany({
-    where: {
-      pidUser: pidUser,
-      refundStatus: 'pending',
-    },
-  });
-
-  return NextResponse.json(
-   { statusx: 'SUCCESS', message: 'Refunds fetched successfully', data: refunds_total },
-   { status: 200 },
-  );
-
-    
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Refunds fetched successfully',
+        data: refunds_total,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     return NextResponse.json(
       {
         statusx: 'FAILED',
-        message: 'Failed to process request - Error:'+error, data: [],
+        message: 'Failed to process request - Error:' + error,
+        data: [],
       },
       { status: 200 },
     );

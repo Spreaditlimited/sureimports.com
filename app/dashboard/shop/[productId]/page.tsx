@@ -5,17 +5,29 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, ArrowLeft, Minus, Plus, Package, Shield, Truck } from 'lucide-react';
+import {
+  ShoppingCart,
+  ArrowLeft,
+  Minus,
+  Plus,
+  Package,
+  Shield,
+  Truck,
+} from 'lucide-react';
 import { BiMoney } from 'react-icons/bi';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { toast } from 'sonner';
 import Loading from '../../loading';
 
-function ProductDetailsContent({ params }: { params: Promise<{ productId: string }> }) {
+function ProductDetailsContent({
+  params,
+}: {
+  params: Promise<{ productId: string }>;
+}) {
   const resolvedParams = use(params);
   const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useShopCart();
-  
+
   const [product, setProduct] = useState<any>(null);
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,7 +39,9 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
 
   const fetchProduct = async () => {
     try {
-      const response = await fetch(`/api/shop/product/${resolvedParams.productId}`);
+      const response = await fetch(
+        `/api/shop/product/${resolvedParams.productId}`,
+      );
       const data = await response.json();
 
       if (data.statusx === 'SUCCESS') {
@@ -53,14 +67,17 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
       ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${product.productImage}`
       : '/placeholder.svg?height=400&width=400';
 
-    addToCart({
-      pidProduct: product.pidProduct,
-      productName: product.productName,
-      productPrice: product.productPrice,
-      productImage: imageUrl,
-      productBrand: product.productBrand,
-      productCategory: product.productCategory,
-    }, quantity);
+    addToCart(
+      {
+        pidProduct: product.pidProduct,
+        productName: product.productName,
+        productPrice: product.productPrice,
+        productImage: imageUrl,
+        productBrand: product.productBrand,
+        productCategory: product.productCategory,
+      },
+      quantity,
+    );
   };
 
   const handleBuyNow = () => {
@@ -70,7 +87,9 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
 
   const handlePaySmallSmall = () => {
     if (!product) return;
-    router.push(`/dashboard/store/pay-small-small-terms?id=${product.pidProduct}`);
+    router.push(
+      `/dashboard/store/pay-small-small-terms?id=${product.pidProduct}`,
+    );
   };
 
   if (loading) {
@@ -96,11 +115,7 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
     <div className="min-h-screen bg-slate-100 dark:bg-black">
       <div className="mx-auto max-w-7xl px-4 py-8">
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => router.back()}
-          className="mb-6"
-        >
+        <Button variant="ghost" onClick={() => router.back()} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Shop
         </Button>
@@ -134,7 +149,8 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
 
             {product.productBrand && (
               <p className="mb-4 text-lg text-muted-foreground dark:text-gray-400">
-                Brand: <span className="font-medium">{product.productBrand}</span>
+                Brand:{' '}
+                <span className="font-medium">{product.productBrand}</span>
               </p>
             )}
 
@@ -148,7 +164,10 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
                 <div className="flex items-center gap-2">
                   <Package className="h-5 w-5 text-muted-foreground" />
                   <span className="text-sm">
-                    Condition: <span className="font-medium">{product.productCondition}</span>
+                    Condition:{' '}
+                    <span className="font-medium">
+                      {product.productCondition}
+                    </span>
                   </span>
                 </div>
               )}
@@ -156,7 +175,10 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
                 <div className="flex items-center gap-2">
                   <Shield className="h-5 w-5 text-muted-foreground" />
                   <span className="text-sm">
-                    Warranty: <span className="font-medium">{product.warrantyPeriod}</span>
+                    Warranty:{' '}
+                    <span className="font-medium">
+                      {product.warrantyPeriod}
+                    </span>
                   </span>
                 </div>
               )}
@@ -286,7 +308,11 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
                   <div
                     key={relatedProduct.pidProduct}
                     className="cursor-pointer overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all hover:shadow-md"
-                    onClick={() => router.push(`/dashboard/shop/${relatedProduct.pidProduct}`)}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/shop/${relatedProduct.pidProduct}`,
+                      )
+                    }
                   >
                     <div className="relative aspect-square bg-gray-100 dark:bg-gray-800">
                       <Image
@@ -297,7 +323,7 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
                       />
                     </div>
                     <div className="p-4">
-                      <h3 className="mb-2 text-sm font-medium line-clamp-2">
+                      <h3 className="mb-2 line-clamp-2 text-sm font-medium">
                         {relatedProduct.productName}
                       </h3>
                       <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
@@ -315,7 +341,10 @@ function ProductDetailsContent({ params }: { params: Promise<{ productId: string
   );
 }
 
-export default function ProductDetailsPage({ params }: { params: Promise<{ productId: string }> }) {
+export default function ProductDetailsPage({
+  params,
+}: {
+  params: Promise<{ productId: string }>;
+}) {
   return <ProductDetailsContent params={params} />;
 }
-

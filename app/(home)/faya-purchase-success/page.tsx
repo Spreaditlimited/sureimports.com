@@ -12,55 +12,56 @@ import BackButton from '@/components/uix/BackButton';
 const About: React.FC = () => (
   <>
     <Header />
-      <main className="min-h-screen">
-
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-white">
-      <Image
-        loading="lazy"
-        src="/images/background.png"
-        alt=""
-        layout="fill"
-        objectFit="cover"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="relative flex w-full max-w-full flex-col items-center px-2 sm:px-16">
-        <Card className="relative mx-auto my-5 flex max-w-[485px] flex-col justify-center rounded-3xl bg-white p-8 shadow-2xl max-md:px-5">
-          <CardContent className="flex flex-col max-md:max-w-full">
-            <Image
-              loading="lazy"
-              src="/icons/green-tick.svg"
-              alt="Success Icon"
-              width={100}
-              height={100}
-              className="aspect-square w-[100px] max-w-full self-center"
-            />
-            <div className="mt-6 flex flex-col max-md:max-w-full">
-              <div className="capitalizeREMOVE_ME mx-8 flex flex-col max-md:mx-2.5">
-                <div className="flex flex-col">
-                  <div className="self-center text-sm font-bold text-indigo-800">
-                    Payment Successful!
+    <main className="min-h-screen">
+      <div className="relative flex min-h-screen flex-col items-center justify-center bg-white">
+        <Image
+          loading="lazy"
+          src="/images/background.png"
+          alt=""
+          layout="fill"
+          objectFit="cover"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="relative flex w-full max-w-full flex-col items-center px-2 sm:px-16">
+          <Card className="relative mx-auto my-5 flex max-w-[485px] flex-col justify-center rounded-3xl bg-white p-8 shadow-2xl max-md:px-5">
+            <CardContent className="flex flex-col max-md:max-w-full">
+              <Image
+                loading="lazy"
+                src="/icons/green-tick.svg"
+                alt="Success Icon"
+                width={100}
+                height={100}
+                className="aspect-square w-[100px] max-w-full self-center"
+              />
+              <div className="mt-6 flex flex-col max-md:max-w-full">
+                <div className="capitalizeREMOVE_ME mx-8 flex flex-col max-md:mx-2.5">
+                  <div className="flex flex-col">
+                    <div className="self-center text-sm font-bold text-indigo-800">
+                      Payment Successful!
+                    </div>
+                    <div className="mt-1.5 text-center text-2xl font-[860] text-slate-800">
+                      Thank you for your business!
+                    </div>
                   </div>
-                  <div className="mt-1.5 text-center text-2xl font-[860] text-slate-800">
-                    Thank you for your business!
+                  <div className="mt-4 text-center text-sm leading-6 text-slate-600">
+                    An email confirmation for this order and which also contains
+                    delivery details or pickup information has been sent to your
+                    email.
                   </div>
                 </div>
-                <div className="mt-4 text-center text-sm leading-6 text-slate-600">
-                An email confirmation for this order and which also contains delivery details or pickup information has been sent to your email.
-                </div>
-              </div>
-              <BackButton />
-              {/* <Button
+                <BackButton />
+                {/* <Button
                 className="mt-8 h-14 py-3.5"
                 onClick={() => router.push('/dashboard')}
               >
                 Back to Dashbaord
               </Button> */}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
-      </main>
+    </main>
     <Footer />
   </>
 );

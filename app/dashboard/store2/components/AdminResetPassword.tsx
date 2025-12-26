@@ -1,11 +1,17 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { useAdminAuth } from './AdminAuthProvider';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { ArrowLeft, Mail, KeyRound } from 'lucide-react';
 
@@ -14,7 +20,10 @@ interface AdminResetPasswordProps {
   onBackToSignIn: () => void;
 }
 
-export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminResetPasswordProps) {
+export function AdminResetPassword({
+  onResetSuccess,
+  onBackToSignIn,
+}: AdminResetPasswordProps) {
   const { resetPassword } = useAdminAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -30,7 +39,9 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
     try {
       const result = await resetPassword(email);
       if (result.success) {
-        setSuccess('Password reset instructions have been sent. Please check the alert for your temporary password.');
+        setSuccess(
+          'Password reset instructions have been sent. Please check the alert for your temporary password.',
+        );
         setTimeout(() => {
           onResetSuccess();
         }, 3000);
@@ -51,13 +62,13 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md space-y-6">
         {/* Header with back button */}
         <div className="flex items-center justify-between">
           <button
             onClick={onBackToSignIn}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
             disabled={isLoading}
           >
             <ArrowLeft className="h-4 w-4" />
@@ -67,16 +78,17 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
 
         {/* Main card */}
         <Card className="border-2">
-          <CardHeader className="text-center space-y-4">
+          <CardHeader className="space-y-4 text-center">
             <div className="flex justify-center">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+              <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
                 <KeyRound className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             <div>
               <CardTitle className="text-2xl">Reset Password</CardTitle>
               <CardDescription>
-                Enter your admin email address and we'll help you reset your password
+                Enter your admin email address and we'll help you reset your
+                password
               </CardDescription>
             </div>
           </CardHeader>
@@ -90,7 +102,7 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
               )}
 
               {success && (
-                <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+                <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
                   <AlertDescription className="text-green-800 dark:text-green-200">
                     {success}
                   </AlertDescription>
@@ -100,7 +112,7 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
               <div className="space-y-2">
                 <Label htmlFor="email">Admin Email Address</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
@@ -122,7 +134,11 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={isLoading || !!success}
               >
-                {isLoading ? "Sending Reset..." : success ? "Reset Sent!" : "Send Reset Instructions"}
+                {isLoading
+                  ? 'Sending Reset...'
+                  : success
+                    ? 'Reset Sent!'
+                    : 'Send Reset Instructions'}
               </Button>
             </form>
 
@@ -131,7 +147,7 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
                 Remember your password?{' '}
                 <button
                   onClick={onBackToSignIn}
-                  className="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 hover:underline font-medium"
+                  className="font-medium text-green-600 hover:text-green-700 hover:underline dark:text-green-400 dark:hover:text-green-300"
                   disabled={isLoading}
                 >
                   Sign In Instead
@@ -140,10 +156,11 @@ export function AdminResetPassword({ onResetSuccess, onBackToSignIn }: AdminRese
             </div>
 
             {/* Info about temporary password */}
-            <div className="mt-4 p-4 bg-muted rounded-lg">
+            <div className="mt-4 rounded-lg bg-muted p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>Note:</strong> In this demo, temporary passwords are shown directly in an alert. 
-                In a production environment, reset instructions would be sent via email.
+                <strong>Note:</strong> In this demo, temporary passwords are
+                shown directly in an alert. In a production environment, reset
+                instructions would be sent via email.
               </p>
             </div>
           </CardContent>

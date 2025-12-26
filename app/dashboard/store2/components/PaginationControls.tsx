@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Pagination,
@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
   PaginationEllipsis,
-} from "./ui/pagination";
+} from './ui/pagination';
 
 interface PaginationControlsProps {
   currentPage: number;
@@ -25,7 +25,7 @@ export function PaginationControls({
 
   const getVisiblePages = () => {
     const visiblePages: (number | string)[] = [];
-    
+
     if (totalPages <= 7) {
       // Show all pages if 7 or fewer
       for (let i = 1; i <= totalPages; i++) {
@@ -34,31 +34,31 @@ export function PaginationControls({
     } else {
       // Show first page
       visiblePages.push(1);
-      
+
       if (currentPage <= 4) {
         // Show pages 1-5 + ... + last
         for (let i = 2; i <= 5; i++) {
           visiblePages.push(i);
         }
-        visiblePages.push("ellipsis");
+        visiblePages.push('ellipsis');
         visiblePages.push(totalPages);
       } else if (currentPage >= totalPages - 3) {
         // Show first + ... + last 5 pages
-        visiblePages.push("ellipsis");
+        visiblePages.push('ellipsis');
         for (let i = totalPages - 4; i <= totalPages; i++) {
           visiblePages.push(i);
         }
       } else {
         // Show first + ... + current-1, current, current+1 + ... + last
-        visiblePages.push("ellipsis");
+        visiblePages.push('ellipsis');
         for (let i = currentPage - 1; i <= currentPage + 1; i++) {
           visiblePages.push(i);
         }
-        visiblePages.push("ellipsis");
+        visiblePages.push('ellipsis');
         visiblePages.push(totalPages);
       }
     }
-    
+
     return visiblePages;
   };
 
@@ -75,15 +75,15 @@ export function PaginationControls({
             }}
             className={
               currentPage <= 1
-                ? "pointer-events-none opacity-50"
-                : "cursor-pointer"
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer'
             }
           />
         </PaginationItem>
 
         {visiblePages.map((page, index) => (
           <PaginationItem key={index}>
-            {page === "ellipsis" ? (
+            {page === 'ellipsis' ? (
               <PaginationEllipsis />
             ) : (
               <PaginationLink
@@ -108,8 +108,8 @@ export function PaginationControls({
             }}
             className={
               currentPage >= totalPages
-                ? "pointer-events-none opacity-50"
-                : "cursor-pointer"
+                ? 'pointer-events-none opacity-50'
+                : 'cursor-pointer'
             }
           />
         </PaginationItem>

@@ -9,19 +9,26 @@ export async function POST(request: NextRequest) {
 
     // Validate required parameters
     if (!pidUser || !amount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameters: pidUser and amount are required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            'Missing required parameters: pidUser and amount are required',
+        },
+        { status: 400 },
+      );
     }
 
     // Validate amount is a number and greater than 0
     const payoutAmount = parseFloat(amount);
     if (isNaN(payoutAmount) || payoutAmount <= 0) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Invalid amount. Amount must be greater than 0',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Invalid amount. Amount must be greater than 0',
+        },
+        { status: 400 },
+      );
     }
 
     // Get user details
@@ -32,43 +39,56 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found. Please contact support for assistance',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found. Please contact support for assistance',
+        },
+        { status: 404 },
+      );
     }
 
     // Check if user has bank details
-    const hasBankDetails = user.bank_account_number && user.bank_account_name && user.bank_code;
+    const hasBankDetails =
+      user.bank_account_number && user.bank_account_name && user.bank_code;
 
     if (!hasBankDetails) {
-      return NextResponse.json({
-        statusx: 'NO_BANK_DETAILS',
-        message: 'No bank account found. Please add your bank account details in your profile settings before requesting a payout.',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'NO_BANK_DETAILS',
+          message:
+            'No bank account found. Please add your bank account details in your profile settings before requesting a payout.',
+        },
+        { status: 400 },
+      );
     }
 
     // If user has bank details but no bank_transfer_code, create Paystack transfer recipient
     let bank_transfer_code = user.bank_transfer_code;
 
     if (!bank_transfer_code) {
-      console.log('No bank_transfer_code found. Creating Paystack transfer recipient...');
+      console.log(
+        'No bank_transfer_code found. Creating Paystack transfer recipient...',
+      );
 
       try {
-        const paystackResponse = await fetch('https://api.paystack.co/transferrecipient', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-            'Content-Type': 'application/json',
+        const paystackResponse = await fetch(
+          'https://api.paystack.co/transferrecipient',
+          {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'nuban',
+              name: user.bank_account_name,
+              account_number: user.bank_account_number,
+              bank_code: user.bank_code,
+              currency: 'NGN',
+            }),
           },
-          body: JSON.stringify({
-            type: 'nuban',
-            name: user.bank_account_name,
-            account_number: user.bank_account_number,
-            bank_code: user.bank_code,
-            currency: 'NGN',
-          }),
-        });
+        );
 
         const paystackData = await paystackResponse.json();
 
@@ -77,12 +97,22 @@ export async function POST(request: NextRequest) {
           message: paystackData.message,
         });
 
-        if (!paystackData.status || !paystackData.data || !paystackData.data.recipient_code) {
-          console.error('Failed to create Paystack transfer recipient:', paystackData.message);
-          return NextResponse.json({
-            statusx: 'PAYSTACK_ERROR',
-            message: `Failed to verify your bank account with Paystack. ${paystackData.message || 'Please verify your bank details are correct and try again.'}`,
-          }, { status: 400 });
+        if (
+          !paystackData.status ||
+          !paystackData.data ||
+          !paystackData.data.recipient_code
+        ) {
+          console.error(
+            'Failed to create Paystack transfer recipient:',
+            paystackData.message,
+          );
+          return NextResponse.json(
+            {
+              statusx: 'PAYSTACK_ERROR',
+              message: `Failed to verify your bank account with Paystack. ${paystackData.message || 'Please verify your bank details are correct and try again.'}`,
+            },
+            { status: 400 },
+          );
         }
 
         bank_transfer_code = paystackData.data.recipient_code;
@@ -96,15 +126,27 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        console.log('Bank transfer code created and saved:', bank_transfer_code);
-
+        console.log(
+          'Bank transfer code created and saved:',
+          bank_transfer_code,
+        );
       } catch (paystackError) {
-        console.error('Error creating Paystack transfer recipient:', paystackError);
-        return NextResponse.json({
-          statusx: 'FAILED',
-          message: 'Failed to create transfer recipient with Paystack. Please verify your bank details are correct and try again later.',
-          error: paystackError instanceof Error ? paystackError.message : 'Unknown error',
-        }, { status: 500 });
+        console.error(
+          'Error creating Paystack transfer recipient:',
+          paystackError,
+        );
+        return NextResponse.json(
+          {
+            statusx: 'FAILED',
+            message:
+              'Failed to create transfer recipient with Paystack. Please verify your bank details are correct and try again later.',
+            error:
+              paystackError instanceof Error
+                ? paystackError.message
+                : 'Unknown error',
+          },
+          { status: 500 },
+        );
       }
     }
 
@@ -112,10 +154,13 @@ export async function POST(request: NextRequest) {
 
     // Fetch customer wallet balance from Paystack
     console.log('Fetching customer wallet balance for email:', email);
-    
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.ROOT_URL || 'http://localhost:3000';
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.ROOT_URL ||
+      'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -124,15 +169,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch customer wallet data:', response.statusText);
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Failed to fetch wallet balance information',
-      }, { status: 500 });
+      console.error(
+        'Failed to fetch customer wallet data:',
+        response.statusText,
+      );
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Failed to fetch wallet balance information',
+        },
+        { status: 500 },
+      );
     }
 
     const data = await response.json();
-    
+
     console.log('Customer API Response:', {
       statusx: data.statusx,
       message: data.message,
@@ -142,32 +193,47 @@ export async function POST(request: NextRequest) {
 
     // Check if customer exists
     if (data.statusx === 'NO_CUSTOMER' || data.statusx === 'NO_ACCOUNT') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Wallet not found. Please activate your wallet first.',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Wallet not found. Please activate your wallet first.',
+        },
+        { status: 400 },
+      );
     }
 
     // Check if customer data fetch failed
     if (data.statusx === 'FAILED') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: data.message || 'Failed to retrieve wallet balance information',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            data.message || 'Failed to retrieve wallet balance information',
+        },
+        { status: 400 },
+      );
     }
 
     // Extract wallet balance from transaction details
     const transactionDetails = data.transactionDetails;
     const walletBalance = transactionDetails?.totalAmount || 0;
 
-    console.log('Wallet Balance:', walletBalance, 'Payout Amount:', payoutAmount);
+    console.log(
+      'Wallet Balance:',
+      walletBalance,
+      'Payout Amount:',
+      payoutAmount,
+    );
 
     // Check if user has sufficient funds
     if (walletBalance < payoutAmount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Requested: ₦${payoutAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Requested: ₦${payoutAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+        },
+        { status: 400 },
+      );
     }
 
     // Check if user already has a pending payout request
@@ -179,17 +245,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingPendingPayout) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'You already have a pending payout request. Please wait for it to be processed before creating a new one.',
-        data: {
-          existingPayout: {
-            pidPayout: existingPendingPayout.pidPayout,
-            amount: existingPendingPayout.amount,
-            createdAt: existingPendingPayout.createdAt,
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            'You already have a pending payout request. Please wait for it to be processed before creating a new one.',
+          data: {
+            existingPayout: {
+              pidPayout: existingPendingPayout.pidPayout,
+              amount: existingPendingPayout.amount,
+              createdAt: existingPendingPayout.createdAt,
+            },
           },
         },
-      }, { status: 400 });
+        { status: 400 },
+      );
     }
 
     // Generate unique identifiers
@@ -215,30 +285,34 @@ export async function POST(request: NextRequest) {
 
     console.log('Payout request created successfully:', pidPayout);
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: `Payout request created successfully! ₦${payoutAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} will be transferred to your registered bank account within 3 business days.`,
-      data: {
-        pidPayout: payoutRequest.pidPayout,
-        amount: payoutRequest.amount,
-        reference: payoutRequest.reference,
-        status: payoutRequest.status,
-        createdAt: payoutRequest.createdAt,
-        bankDetails: {
-          bankName: user.bank_name,
-          accountNumber: user.bank_account_number,
-          accountName: user.bank_account_name,
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: `Payout request created successfully! ₦${payoutAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} will be transferred to your registered bank account within 3 business days.`,
+        data: {
+          pidPayout: payoutRequest.pidPayout,
+          amount: payoutRequest.amount,
+          reference: payoutRequest.reference,
+          status: payoutRequest.status,
+          createdAt: payoutRequest.createdAt,
+          bankDetails: {
+            bankName: user.bank_name,
+            accountNumber: user.bank_account_number,
+            accountName: user.bank_account_name,
+          },
         },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Create payout request error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while creating payout request',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while creating payout request',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-

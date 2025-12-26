@@ -10,9 +10,7 @@ import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 
-
 export default function ProductDetails({ product }: any) {
-  
   const router = useRouter();
 
   const { user } = useAuth();
@@ -67,7 +65,6 @@ export default function ProductDetails({ product }: any) {
           data.message,
         );
       }
-      
 
       // if (data.responsex.status == 'SUCCESS') {
       //   openModal();

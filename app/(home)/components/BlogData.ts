@@ -1,9 +1,9 @@
 //import ijeomaAvatar from "/images/new/images/ijeoma-tdaniels.JPG";
-import avoidMistakesImage from "/images/new/images/logo.png";
-import londonUsedImage from "/images/new/images/logo.png";
-import Image from "next/image";
-import chinaToYourDoorImage from "/images/new/images/logo.png";
-  
+import avoidMistakesImage from '/images/new/images/logo.png';
+import londonUsedImage from '/images/new/images/logo.png';
+import Image from 'next/image';
+import chinaToYourDoorImage from '/images/new/images/logo.png';
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -24,17 +24,18 @@ export interface BlogPost {
 }
 
 export const blogCategories = [
-  "All",
-  "Import Guide",
-  "Business Tips",
-  "Sourcing Gadgets"
+  'All',
+  'Import Guide',
+  'Business Tips',
+  'Sourcing Gadgets',
 ];
 
 export const blogPosts: BlogPost[] = [
   {
-    id: "1",
-    title: "Complete Guide to Importing Electronics from China in 2025",
-    excerpt: "Everything you need to know about importing electronics safely and profitably, including regulations, quality checks, and shipping methods.",
+    id: '1',
+    title: 'Complete Guide to Importing Electronics from China in 2025',
+    excerpt:
+      'Everything you need to know about importing electronics safely and profitably, including regulations, quality checks, and shipping methods.',
     content: `
 # Complete Guide to Importing Electronics from China in 2025
 
@@ -139,22 +140,24 @@ Importing electronics from China requires careful planning, due diligence, and o
 Remember to always prioritize quality, compliance, and customer satisfaction. Start small, learn from experience, and gradually scale your operations as you gain expertise and confidence in the market.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Import Guide",
-    tags: ["Electronics", "China Import", "Business Guide", "Compliance"],
-    publishDate: "2025-08-08",
+    category: 'Import Guide',
+    tags: ['Electronics', 'China Import', 'Business Guide', 'Compliance'],
+    publishDate: '2025-08-08',
     readTime: 8,
     featured: true,
-    image: "https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=400&fit=crop",
-    slug: "complete-guide-importing-electronics-china-2025"
+    image:
+      'https://images.unsplash.com/photo-1586953208448-b95a79798f07?w=800&h=400&fit=crop',
+    slug: 'complete-guide-importing-electronics-china-2025',
   },
   {
-    id: "5",
-    title: "Top 10 Products to Import in 2025: Market Trends Analysis",
-    excerpt: "Data-driven analysis of the most profitable products to import based on market demand, competition levels, and profit margins.",
+    id: '5',
+    title: 'Top 10 Products to Import in 2025: Market Trends Analysis',
+    excerpt:
+      'Data-driven analysis of the most profitable products to import based on market demand, competition levels, and profit margins.',
     content: `
 # Top 10 Products to Import in 2025: Market Trends Analysis
 
@@ -361,22 +364,29 @@ Focus on categories where you can add value through local adaptation, customer s
 Remember to start with thorough market research, validate demand before large investments, and always prioritize customer satisfaction over short-term profits.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Business Tips",
-    tags: ["Market Trends", "Product Research", "2025 Trends", "Profitable Imports"],
-    publishDate: "2025-07-30",
+    category: 'Business Tips',
+    tags: [
+      'Market Trends',
+      'Product Research',
+      '2025 Trends',
+      'Profitable Imports',
+    ],
+    publishDate: '2025-07-30',
     readTime: 15,
     featured: true,
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
-    slug: "top-10-products-import-2025-market-trends"
+    image:
+      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop',
+    slug: 'top-10-products-import-2025-market-trends',
   },
   {
-    id: "6",
-    title: "Building Trust with International Suppliers: Best Practices",
-    excerpt: "Essential strategies for developing strong, reliable relationships with overseas suppliers that will benefit your import business long-term.",
+    id: '6',
+    title: 'Building Trust with International Suppliers: Best Practices',
+    excerpt:
+      'Essential strategies for developing strong, reliable relationships with overseas suppliers that will benefit your import business long-term.',
     content: `
 # Building Trust with International Suppliers: Best Practices
 
@@ -544,22 +554,30 @@ Start with small orders and gradually increase commitment as trust develops. Foc
 Invest time in understanding your suppliers' businesses, challenges, and goals. When suppliers see you as a valued partner rather than just another customer, they'll go the extra mile to ensure your success.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Business Tips",
-    tags: ["Supplier Relations", "International Trade", "Business Development", "Trust Building"],
-    publishDate: "2025-07-28",
+    category: 'Business Tips',
+    tags: [
+      'Supplier Relations',
+      'International Trade',
+      'Business Development',
+      'Trust Building',
+    ],
+    publishDate: '2025-07-28',
     readTime: 11,
     featured: false,
-    image: "https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&h=400&fit=crop",
-    slug: "building-trust-international-suppliers-best-practices"
+    image:
+      'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=800&h=400&fit=crop',
+    slug: 'building-trust-international-suppliers-best-practices',
   },
   {
-    id: "7",
-    title: "How to Safely Source Second-Hand iPhones and Laptops from China — Without Losing Money or Sleep",
-    excerpt: "Buying a second-hand iPhone, Samsung phone, or laptop from China can be a smart financial decision — if you know what you're doing. Learn how Sure Imports makes the process safe, simple, and reliable.",
+    id: '7',
+    title:
+      'How to Safely Source Second-Hand iPhones and Laptops from China — Without Losing Money or Sleep',
+    excerpt:
+      "Buying a second-hand iPhone, Samsung phone, or laptop from China can be a smart financial decision — if you know what you're doing. Learn how Sure Imports makes the process safe, simple, and reliable.",
     content: `
 # How to Safely Source Second-Hand iPhones and Laptops from China — Without Losing Money or Sleep
 
@@ -679,22 +697,32 @@ Ready to get started?
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a> and let us source your next iPhone, Samsung phone, or laptop — safely, quickly, and stress-free.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["Second-hand Devices", "iPhone", "Samsung", "MacBook", "China Sourcing", "Refurbished Electronics"],
-    publishDate: "2025-08-10",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'Second-hand Devices',
+      'iPhone',
+      'Samsung',
+      'MacBook',
+      'China Sourcing',
+      'Refurbished Electronics',
+    ],
+    publishDate: '2025-08-10',
     readTime: 7,
     featured: true,
-    image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop",
-    slug: "safely-source-second-hand-iphones-laptops-china"
+    image:
+      'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800&h=400&fit=crop',
+    slug: 'safely-source-second-hand-iphones-laptops-china',
   },
   {
-    id: "8",
-    title: "The Truth About Buying Pre-Owned Samsung and iPhone Devices from China",
-    excerpt: "When most people hear 'pre-owned phone from China,' they imagine a risky gamble. Learn the truth about China's pre-owned market and how to buy safely.",
+    id: '8',
+    title:
+      'The Truth About Buying Pre-Owned Samsung and iPhone Devices from China',
+    excerpt:
+      "When most people hear 'pre-owned phone from China,' they imagine a risky gamble. Learn the truth about China's pre-owned market and how to buy safely.",
     content: `
 # The Truth About Buying Pre-Owned Samsung and iPhone Devices from China
 
@@ -804,22 +832,32 @@ Ready to experience the smarter way to buy?
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a> now.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["Pre-owned Devices", "iPhone", "Samsung", "China Market", "Refurbished vs Used", "Device Authentication"],
-    publishDate: "2025-08-09",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'Pre-owned Devices',
+      'iPhone',
+      'Samsung',
+      'China Market',
+      'Refurbished vs Used',
+      'Device Authentication',
+    ],
+    publishDate: '2025-08-09',
     readTime: 6,
     featured: false,
-    image: "https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&h=400&fit=crop",
-    slug: "truth-about-buying-preowned-samsung-iphone-devices-china"
+    image:
+      'https://images.unsplash.com/photo-1556656793-08538906a9f8?w=800&h=400&fit=crop',
+    slug: 'truth-about-buying-preowned-samsung-iphone-devices-china',
   },
   {
-    id: "9",
-    title: "Why Smart Nigerians Are Sourcing Laptops and Phones from China — Through Sure Imports",
-    excerpt: "Walk into almost any phone or laptop store in Nigeria today, and you'll find an impressive display of shiny devices. But here's the uncomfortable truth about the local market and how smart buyers are avoiding the risks.",
+    id: '9',
+    title:
+      'Why Smart Nigerians Are Sourcing Laptops and Phones from China — Through Sure Imports',
+    excerpt:
+      "Walk into almost any phone or laptop store in Nigeria today, and you'll find an impressive display of shiny devices. But here's the uncomfortable truth about the local market and how smart buyers are avoiding the risks.",
     content: `
 # Why Smart Nigerians Are Sourcing Laptops and Phones from China — Through Sure Imports
 
@@ -905,22 +943,32 @@ With Sure Imports, you're not just buying a phone or laptop — you're buying pe
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a>.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["Nigeria Market", "Counterfeit Devices", "Authentic Electronics", "Local vs China", "Quality Assurance", "Device Verification"],
-    publishDate: "2025-08-08",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'Nigeria Market',
+      'Counterfeit Devices',
+      'Authentic Electronics',
+      'Local vs China',
+      'Quality Assurance',
+      'Device Verification',
+    ],
+    publishDate: '2025-08-08',
     readTime: 5,
     featured: false,
-    image: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop",
-    slug: "why-smart-nigerians-sourcing-laptops-phones-china-sure-imports"
+    image:
+      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&h=400&fit=crop',
+    slug: 'why-smart-nigerians-sourcing-laptops-phones-china-sure-imports',
   },
   {
-    id: "10",
-    title: "Avoid These 5 Costly Mistakes When Sourcing Second-Hand iPhones and Laptops from China",
-    excerpt: "Buying a second-hand iPhone, Samsung, or laptop from China can be a brilliant decision — but it can also be one of the most expensive mistakes you ever make if you get it wrong.",
+    id: '10',
+    title:
+      'Avoid These 5 Costly Mistakes When Sourcing Second-Hand iPhones and Laptops from China',
+    excerpt:
+      'Buying a second-hand iPhone, Samsung, or laptop from China can be a brilliant decision — but it can also be one of the most expensive mistakes you ever make if you get it wrong.',
     content: `
 # Avoid These 5 Costly Mistakes When Sourcing Second-Hand iPhones and Laptops from China
 
@@ -1014,22 +1062,30 @@ Every device we deliver is genuine, tested, warranted, and ready to use. No fake
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a>.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG" as any,
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG' as any,
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["Common Mistakes", "China Sourcing", "Device Authentication", "Quality Control", "Buyer Protection", "Sourcing Tips"],
-    publishDate: "2025-08-07",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'Common Mistakes',
+      'China Sourcing',
+      'Device Authentication',
+      'Quality Control',
+      'Buyer Protection',
+      'Sourcing Tips',
+    ],
+    publishDate: '2025-08-07',
     readTime: 6,
     featured: false,
-    image: "/images/new/images/imga.JPG" as any,
-    slug: "avoid-5-costly-mistakes-sourcing-second-hand-iphones-laptops-china"
+    image: '/images/new/images/imga.JPG' as any,
+    slug: 'avoid-5-costly-mistakes-sourcing-second-hand-iphones-laptops-china',
   },
   {
-    id: "12",
-    title: "What Exactly Is a \"London Used\" iPhone?",
-    excerpt: "If you've ever searched for a fairly used iPhone in Nigeria, you've probably come across the term \"London used\" more times than you can count. Learn the truth behind this popular but misunderstood label.",
+    id: '12',
+    title: 'What Exactly Is a "London Used" iPhone?',
+    excerpt:
+      'If you\'ve ever searched for a fairly used iPhone in Nigeria, you\'ve probably come across the term "London used" more times than you can count. Learn the truth behind this popular but misunderstood label.',
     content: `
 # What Exactly Is a "London Used" iPhone?
 
@@ -1172,22 +1228,31 @@ Which part of London? 😂
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a>
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG",
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG',
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["London Used", "iPhone Market", "Nigeria Market", "Device Authentication", "Marketing Terms", "Buyer Education"],
-    publishDate: "2025-08-11",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'London Used',
+      'iPhone Market',
+      'Nigeria Market',
+      'Device Authentication',
+      'Marketing Terms',
+      'Buyer Education',
+    ],
+    publishDate: '2025-08-11',
     readTime: 8,
     featured: false,
-    image: "/images/new/images/imgc.JPG",
-    slug: "what-exactly-is-london-used-iphone"
+    image: '/images/new/images/imgc.JPG',
+    slug: 'what-exactly-is-london-used-iphone',
   },
   {
-    id: "11",
-    title: "From China to Your Door: How Sure Imports Makes Sourcing Phones and Laptops Simple",
-    excerpt: "For many people, the idea of buying a phone or laptop from China feels risky and complicated. Discover exactly how Sure Imports takes all the stress, risk, and guesswork out of the process.",
+    id: '11',
+    title:
+      'From China to Your Door: How Sure Imports Makes Sourcing Phones and Laptops Simple',
+    excerpt:
+      'For many people, the idea of buying a phone or laptop from China feels risky and complicated. Discover exactly how Sure Imports takes all the stress, risk, and guesswork out of the process.',
     content: `
 # From China to Your Door: How Sure Imports Makes Sourcing Phones and Laptops Simple
 
@@ -1291,36 +1356,43 @@ Sourcing directly from China doesn't have to be risky, complicated, or stressful
 <a href="https://www.sureimports.com/auth/login" target="_blank" rel="noopener noreferrer">Click this link to place your order</a>.
     `,
     author: {
-      name: "Ijeoma TDaniels",
-      avatar: "/images/new/images/ijeoma-tdaniels.JPG",
-      role: "Content Lead"
+      name: 'Ijeoma TDaniels',
+      avatar: '/images/new/images/ijeoma-tdaniels.JPG',
+      role: 'Content Lead',
     },
-    category: "Sourcing Gadgets",
-    tags: ["Import Process", "Supply Chain", "Quality Assurance", "Customer Journey", "Shipping Process", "Device Testing"],
-    publishDate: "2025-08-06",
+    category: 'Sourcing Gadgets',
+    tags: [
+      'Import Process',
+      'Supply Chain',
+      'Quality Assurance',
+      'Customer Journey',
+      'Shipping Process',
+      'Device Testing',
+    ],
+    publishDate: '2025-08-06',
     readTime: 6,
     featured: false,
-    image: "/images/new/images/imgb.JPG",
-    slug: "from-china-to-your-door-sure-imports-makes-sourcing-simple"
-  }
+    image: '/images/new/images/imgb.JPG',
+    slug: 'from-china-to-your-door-sure-imports-makes-sourcing-simple',
+  },
 ];
 
 // Helper functions
 export function getFeaturedPosts(): BlogPost[] {
-  return blogPosts.filter(post => post.featured);
+  return blogPosts.filter((post) => post.featured);
 }
 
 export function getBlogPostsByCategory(category: string): BlogPost[] {
-  if (category === "All") {
+  if (category === 'All') {
     return blogPosts;
   }
-  return blogPosts.filter(post => post.category === category);
+  return blogPosts.filter((post) => post.category === category);
 }
 
 export function searchBlogPosts(query: string): BlogPost[] {
   const searchTerms = query.toLowerCase().split(' ');
-  
-  return blogPosts.filter(post => {
+
+  return blogPosts.filter((post) => {
     const searchableContent = `
       ${post.title} 
       ${post.excerpt} 
@@ -1329,34 +1401,42 @@ export function searchBlogPosts(query: string): BlogPost[] {
       ${post.category} 
       ${post.tags.join(' ')}
     `.toLowerCase();
-    
-    return searchTerms.every(term => searchableContent.includes(term));
+
+    return searchTerms.every((term) => searchableContent.includes(term));
   });
 }
 
 export function getBlogPostBySlug(slug: string): BlogPost | undefined {
-  return blogPosts.find(post => post.slug === slug);
+  return blogPosts.find((post) => post.slug === slug);
 }
 
-export function getRelatedPosts(currentPost: BlogPost, limit: number = 3): BlogPost[] {
+export function getRelatedPosts(
+  currentPost: BlogPost,
+  limit: number = 3,
+): BlogPost[] {
   // Get posts from the same category, excluding the current post
-  const relatedPosts = blogPosts.filter(post => 
-    post.id !== currentPost.id && post.category === currentPost.category
+  const relatedPosts = blogPosts.filter(
+    (post) =>
+      post.id !== currentPost.id && post.category === currentPost.category,
   );
-  
+
   // If not enough posts in the same category, add posts with similar tags
   if (relatedPosts.length < limit) {
-    const tagBasedPosts = blogPosts.filter(post => 
-      post.id !== currentPost.id && 
-      post.category !== currentPost.category &&
-      post.tags.some(tag => currentPost.tags.includes(tag))
+    const tagBasedPosts = blogPosts.filter(
+      (post) =>
+        post.id !== currentPost.id &&
+        post.category !== currentPost.category &&
+        post.tags.some((tag) => currentPost.tags.includes(tag)),
     );
-    
+
     relatedPosts.push(...tagBasedPosts);
   }
-  
+
   // Sort by publish date (newest first) and return limited results
   return relatedPosts
-    .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
+    )
     .slice(0, limit);
 }

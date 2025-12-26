@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState, useRef, useCallback } from "react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Card, CardContent } from "./ui/card";
-import { Upload, Link, Image as ImageIcon, X, Check } from "lucide-react";
+import { useState, useRef, useCallback } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card, CardContent } from './ui/card';
+import { Upload, Link, Image as ImageIcon, X, Check } from 'lucide-react';
 
 interface ImagePickerProps {
   value: string;
@@ -15,26 +15,26 @@ interface ImagePickerProps {
 }
 
 const predefinedImages = [
-  "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1609592604820-7cfc30c3ae23?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1493020258366-be3ead1b3027?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=500&h=500&fit=crop&crop=center",
-  "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=500&fit=crop&crop=center"
+  'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1609592604820-7cfc30c3ae23?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1493020258366-be3ead1b3027?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=500&h=500&fit=crop&crop=center',
+  'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&h=500&fit=crop&crop=center',
 ];
 
 export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
-  const [urlInput, setUrlInput] = useState(value || "");
+  const [urlInput, setUrlInput] = useState(value || '');
   const [dragActive, setDragActive] = useState(false);
   const [uploadPreview, setUploadPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,24 +56,27 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
     e.stopPropagation();
   }, []);
 
-  const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
 
-    const files = Array.from(e.dataTransfer.files);
-    const imageFile = files.find(file => file.type.startsWith('image/'));
-    
-    if (imageFile) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const result = event.target?.result as string;
-        setUploadPreview(result);
-        onChange(result);
-      };
-      reader.readAsDataURL(imageFile);
-    }
-  }, [onChange]);
+      const files = Array.from(e.dataTransfer.files);
+      const imageFile = files.find((file) => file.type.startsWith('image/'));
+
+      if (imageFile) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const result = event.target?.result as string;
+          setUploadPreview(result);
+          onChange(result);
+        };
+        reader.readAsDataURL(imageFile);
+      }
+    },
+    [onChange],
+  );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -102,11 +105,11 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
   };
 
   const clearImage = () => {
-    onChange("");
-    setUrlInput("");
+    onChange('');
+    setUrlInput('');
     setUploadPreview(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      fileInputRef.current.value = '';
     }
   };
 
@@ -115,14 +118,14 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
   return (
     <div className={className}>
       <Label htmlFor="image">Product Image</Label>
-      
+
       {/* Current Image Preview */}
       {currentImage && (
-        <div className="relative w-full h-48 mb-4 bg-muted rounded-lg overflow-hidden">
-          <img 
-            src={currentImage} 
+        <div className="relative mb-4 h-48 w-full overflow-hidden rounded-lg bg-muted">
+          <img
+            src={currentImage}
             alt="Product preview"
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
@@ -131,10 +134,10 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
             type="button"
             variant="destructive"
             size="sm"
-            className="absolute top-2 right-2"
+            className="absolute right-2 top-2"
             onClick={clearImage}
           >
-            <X className="w-4 h-4" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       )}
@@ -155,7 +158,7 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
               onKeyPress={(e) => e.key === 'Enter' && handleUrlSubmit()}
             />
             <Button type="button" onClick={handleUrlSubmit} variant="outline">
-              <Link className="w-4 h-4 mr-2" />
+              <Link className="mr-2 h-4 w-4" />
               Use URL
             </Button>
           </div>
@@ -163,10 +166,10 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
 
         <TabsContent value="upload" className="space-y-4">
           <div
-            className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive 
-                ? "border-primary bg-primary/5" 
-                : "border-muted-foreground/25 hover:border-muted-foreground/50"
+            className={`rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+              dragActive
+                ? 'border-primary bg-primary/5'
+                : 'border-muted-foreground/25 hover:border-muted-foreground/50'
             }`}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
@@ -180,8 +183,8 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
               onChange={handleFileSelect}
               className="hidden"
             />
-            <Upload className="w-10 h-10 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mb-2">
+            <Upload className="mx-auto mb-4 h-10 w-10 text-muted-foreground" />
+            <p className="mb-2 text-sm text-muted-foreground">
               Drag and drop an image here, or click to browse
             </p>
             <Button
@@ -189,17 +192,17 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
               variant="outline"
               onClick={() => fileInputRef.current?.click()}
             >
-              <ImageIcon className="w-4 h-4 mr-2" />
+              <ImageIcon className="mr-2 h-4 w-4" />
               Choose File
             </Button>
           </div>
         </TabsContent>
 
         <TabsContent value="gallery" className="space-y-4">
-          <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto">
+          <div className="grid max-h-64 grid-cols-4 gap-2 overflow-y-auto">
             {predefinedImages.map((imageUrl, index) => (
-              <Card 
-                key={index} 
+              <Card
+                key={index}
                 className={`relative cursor-pointer transition-all hover:ring-2 hover:ring-primary ${
                   value === imageUrl ? 'ring-2 ring-primary' : ''
                 }`}
@@ -207,18 +210,18 @@ export function ImagePicker({ value, onChange, className }: ImagePickerProps) {
               >
                 <CardContent className="p-0">
                   <div className="aspect-square overflow-hidden rounded-lg">
-                    <img 
-                      src={imageUrl} 
+                    <img
+                      src={imageUrl}
                       alt={`Option ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
                     />
                   </div>
                   {value === imageUrl && (
-                    <div className="absolute top-1 right-1 bg-primary text-primary-foreground rounded-full p-1">
-                      <Check className="w-3 h-3" />
+                    <div className="absolute right-1 top-1 rounded-full bg-primary p-1 text-primary-foreground">
+                      <Check className="h-3 w-3" />
                     </div>
                   )}
                 </CardContent>

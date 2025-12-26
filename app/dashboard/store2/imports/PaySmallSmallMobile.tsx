@@ -1,10 +1,10 @@
-import svgPaths from "./svg-oml3ehjwbt";
-import imgImage6 from "figma:asset/d451874bc35a5581d595e515d5f34b9ac1160bab.png";
-import imgImage8 from "figma:asset/41aa4a18cc975e63c67376fe9868633d944b75fc.png";
-import imgImage9 from "figma:asset/f9d06ddaf3b37fd3dba092847c08993cab4d91b4.png";
-import imgImage11 from "figma:asset/51ee115e33ab5b54b759f9fdbdbe1e6ff9d282e8.png";
-import imgSureimportsReverse from "figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png";
-import { imgImage7, imgImage10 } from "./svg-jauvs";
+import svgPaths from './svg-oml3ehjwbt';
+import imgImage6 from 'figma:asset/d451874bc35a5581d595e515d5f34b9ac1160bab.png';
+import imgImage8 from 'figma:asset/41aa4a18cc975e63c67376fe9868633d944b75fc.png';
+import imgImage9 from 'figma:asset/f9d06ddaf3b37fd3dba092847c08993cab4d91b4.png';
+import imgImage11 from 'figma:asset/51ee115e33ab5b54b759f9fdbdbe1e6ff9d282e8.png';
+import imgSureimportsReverse from 'figma:asset/84c7e5da1d268b600da8ab16cf73ccc4cef6b5ac.png';
+import { imgImage7, imgImage10 } from './svg-jauvs';
 
 function Group() {
   return (
@@ -33,7 +33,7 @@ function Group() {
 function Frame() {
   return (
     <div
-      className="absolute left-96 overflow-clip size-[26px] top-[37px]"
+      className="absolute left-96 top-[37px] size-[26px] overflow-clip"
       data-name="Frame"
     >
       <Group />
@@ -44,7 +44,7 @@ function Frame() {
 function VuesaxOutlineSearchNormal() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/search-normal"
     >
       <svg
@@ -74,7 +74,7 @@ function VuesaxOutlineSearchNormal() {
 function VuesaxOutlineSearchNormal1() {
   return (
     <div
-      className="absolute left-[348px] size-[26px] top-[37px]"
+      className="absolute left-[348px] top-[37px] size-[26px]"
       data-name="vuesax/outline/search-normal"
     >
       <VuesaxOutlineSearchNormal />
@@ -85,7 +85,7 @@ function VuesaxOutlineSearchNormal1() {
 function VuesaxOutlineSearchNormal2() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/search-normal"
     >
       <svg
@@ -115,7 +115,7 @@ function VuesaxOutlineSearchNormal2() {
 function VuesaxOutlineSearchNormal3() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/search-normal"
     >
       <VuesaxOutlineSearchNormal2 />
@@ -126,15 +126,15 @@ function VuesaxOutlineSearchNormal3() {
 function Filter() {
   return (
     <div
-      className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-center p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-neutral-50 p-[10px]"
       data-name="Filter"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
       <VuesaxOutlineSearchNormal3 />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[16px] text-[rgba(30,41,59,0.7)] text-left w-[296px]">
+      <div className="relative w-[296px] shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[rgba(30,41,59,0.7)]">
         <p className="block leading-[24px]">Search Product here...</p>
       </div>
     </div>
@@ -144,7 +144,7 @@ function Filter() {
 function VuesaxOutlineArrowDown() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/arrow-down"
     >
       <svg
@@ -169,7 +169,7 @@ function VuesaxOutlineArrowDown() {
 function VuesaxOutlineArrowDown1() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/arrow-down"
     >
       <VuesaxOutlineArrowDown />
@@ -180,15 +180,15 @@ function VuesaxOutlineArrowDown1() {
 function Dropdown() {
   return (
     <div
-      className="bg-[rgba(55,48,163,0.05)] box-border content-stretch flex flex-row gap-2.5 items-center justify-center p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-[rgba(55,48,163,0.05)] p-[10px]"
       data-name="Dropdown"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(55,48,163,0.7)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(55,48,163,0.7)]"
       />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-indigo-800 text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">Laptops</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-indigo-800">
+        <p className="block whitespace-pre leading-[24px]">Laptops</p>
       </div>
       <VuesaxOutlineArrowDown1 />
     </div>
@@ -198,7 +198,7 @@ function Dropdown() {
 function VuesaxOutlineFilter() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/filter"
     >
       <svg
@@ -227,7 +227,7 @@ function VuesaxOutlineFilter() {
 
 function VuesaxOutlineFilter1() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/filter">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/filter">
       <VuesaxOutlineFilter />
     </div>
   );
@@ -236,15 +236,15 @@ function VuesaxOutlineFilter1() {
 function Filter2() {
   return (
     <div
-      className="bg-neutral-50 box-border content-stretch flex flex-row gap-2.5 items-center justify-center p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-neutral-50 p-[10px]"
       data-name="Filter"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
       <VuesaxOutlineFilter1 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-10">
+      <div className="relative w-10 shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Filter</p>
       </div>
     </div>
@@ -253,7 +253,7 @@ function Filter2() {
 
 function Frame61() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-2.5 items-start justify-start p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-start justify-start gap-2.5 p-0">
       <Dropdown />
       <Filter2 />
     </div>
@@ -263,12 +263,12 @@ function Frame61() {
 function Card() {
   return (
     <div
-      className="absolute bg-[#ffffff] box-border content-stretch flex flex-col gap-2.5 items-end justify-center left-5 p-[20px] rounded-[15px] top-[291px]"
+      className="absolute left-5 top-[291px] box-border flex flex-col content-stretch items-end justify-center gap-2.5 rounded-[15px] bg-[#ffffff] p-[20px]"
       data-name="Card"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[15px]"
+        className="pointer-events-none absolute inset-0 rounded-[15px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
       <Filter />
       <Frame61 />
@@ -279,13 +279,13 @@ function Card() {
 function Text() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center leading-[0] not-italic p-0 relative shrink-0 text-left text-slate-800"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0 text-left not-italic leading-[0] text-slate-800"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[18px] w-[390px]">
+      <div className="relative w-[390px] shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold">
         <p className="block leading-[26px]">Buy Phones and Laptops</p>
       </div>
-      <div className="font-['Inter:Regular',_sans-serif] font-normal relative shrink-0 text-[16px] w-[390px]">
+      <div className="relative w-[390px] shrink-0 font-['Inter:Regular',_sans-serif] text-[16px] font-normal">
         <p className="block leading-[24px]">
           Every phone from Sure Imports comes sealed in its original box,
           complete with all accessories, and includes a one-year warranty for
@@ -300,7 +300,7 @@ function Text() {
 function Title() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-row gap-[30px] items-center justify-start left-5 p-0 top-[120px]"
+      className="absolute left-5 top-[120px] box-border flex flex-row content-stretch items-center justify-start gap-[30px] p-0"
       data-name="Title"
     >
       <Text />
@@ -311,15 +311,15 @@ function Title() {
 function Text1() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center leading-[0] not-italic p-0 relative shrink-0 text-left w-full"
+      className="relative box-border flex w-full shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0 text-left not-italic leading-[0]"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[16px] text-gray-900 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold text-gray-900">
         <p className="block leading-[24px]">
           HP EliteBook x360 1040 G8 – Power...
         </p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium relative shrink-0 text-[14px] text-zinc-500 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Medium',_sans-serif] text-[14px] font-medium text-zinc-500">
         <p className="block leading-[24px]">
           Experience elite performance in a sleek, convertible design with the
           HP EliteBook x360 1040 G8. Built...
@@ -356,7 +356,7 @@ function Group1() {
 function Frame1() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-0 mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-0 mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group1 />
@@ -391,7 +391,7 @@ function Group2() {
 function Frame2() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[25.03px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[25.03px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group2 />
@@ -426,7 +426,7 @@ function Group3() {
 function Frame3() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[50.061px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[50.061px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group3 />
@@ -461,7 +461,7 @@ function Group4() {
 function Frame4() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[75.091px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[75.091px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group4 />
@@ -496,7 +496,7 @@ function Group5() {
 function Frame5() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[100.121px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[100.121px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group5 />
@@ -506,7 +506,7 @@ function Frame5() {
 
 function Group960() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start">
       <Frame1 />
       <Frame2 />
       <Frame3 />
@@ -518,8 +518,8 @@ function Group960() {
 
 function Frame20() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[15px] items-center justify-start leading-[0] p-0 relative shrink-0">
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold not-italic relative shrink-0 text-[18px] text-gray-900 text-left w-[217px]">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[15px] p-0 leading-[0]">
+      <div className="relative w-[217px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic text-gray-900">
         <p className="block leading-[26px]">₦967,500.00</p>
       </div>
       <Group960 />
@@ -529,7 +529,7 @@ function Frame20() {
 
 function VuesaxOutlineEye() {
   return (
-    <div className="absolute contents inset-0" data-name="vuesax/outline/eye">
+    <div className="absolute inset-0 contents" data-name="vuesax/outline/eye">
       <svg
         className="block size-full"
         fill="none"
@@ -556,7 +556,7 @@ function VuesaxOutlineEye() {
 
 function VuesaxOutlineEye1() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/eye">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/eye">
       <VuesaxOutlineEye />
     </div>
   );
@@ -565,16 +565,16 @@ function VuesaxOutlineEye1() {
 function Button() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-[#ffffff] px-5 py-2.5"
       data-name="Button"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-slate-800 border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-slate-800"
       />
       <VuesaxOutlineEye1 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-center text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Details</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Details</p>
       </div>
     </div>
   );
@@ -583,7 +583,7 @@ function Button() {
 function VuesaxOutlineShoppingCart() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/shopping-cart"
     >
       <svg
@@ -623,7 +623,7 @@ function VuesaxOutlineShoppingCart() {
 function VuesaxOutlineShoppingCart1() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/shopping-cart"
     >
       <VuesaxOutlineShoppingCart />
@@ -634,12 +634,12 @@ function VuesaxOutlineShoppingCart1() {
 function Button1() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-5 py-2.5"
       data-name="Button"
     >
       <VuesaxOutlineShoppingCart1 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-center text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Buy</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Buy</p>
       </div>
     </div>
   );
@@ -648,7 +648,7 @@ function Button1() {
 function Button2() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0 w-full"
+      className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0"
       data-name="Button"
     >
       <Button />
@@ -660,7 +660,7 @@ function Button2() {
 function Text2() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-[15px] items-start justify-center ml-5 mt-[250px] p-0 relative"
+      className="relative ml-5 mt-[250px] box-border flex flex-col content-stretch items-start justify-center gap-[15px] p-0 [grid-area:1_/_1]"
       data-name="Text"
     >
       <Text1 />
@@ -673,20 +673,20 @@ function Text2() {
 function Image() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-5 mt-5 place-items-start relative"
+      className="relative ml-5 mt-5 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]"
       data-name="Image"
     >
       <div
-        className="[grid-area:1_/_1] bg-neutral-50 h-[210px] ml-0 mt-0 relative rounded-[20px] w-[350px]"
+        className="relative ml-0 mt-0 h-[210px] w-[350px] rounded-[20px] bg-neutral-50 [grid-area:1_/_1]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[283px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px_29px] mask-size-[350px_210px] ml-0 mt-[-29px] w-[350px]"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px_29px] mask-size-[350px_210px] ml-0 mt-[-29px] h-[283px] w-[350px] bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 6"
         style={{
           backgroundImage: `url('${imgImage6}')`,
@@ -699,9 +699,9 @@ function Image() {
 
 function Frame23() {
   return (
-    <div className="[grid-area:1_/_1] bg-slate-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center ml-[35px] mt-[35px] px-[15px] py-1 relative rounded-[20px]">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-left text-nowrap">
-        <p className="block leading-[22px] whitespace-pre">HP</p>
+    <div className="relative ml-[35px] mt-[35px] box-border flex flex-row content-stretch items-center justify-center gap-2.5 rounded-[20px] bg-slate-800 px-[15px] py-1 [grid-area:1_/_1]">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[12px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[22px]">HP</p>
       </div>
     </div>
   );
@@ -710,13 +710,13 @@ function Frame23() {
 function Card1() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start"
       data-name="Card - 1"
     >
-      <div className="[grid-area:1_/_1] bg-[#ffffff] h-[449px] ml-0 mt-0 relative rounded-[20px] w-[390px]">
+      <div className="relative ml-0 mt-0 h-[449px] w-[390px] rounded-[20px] bg-[#ffffff] [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.1)]"
         />
       </div>
       <Text2 />
@@ -729,15 +729,15 @@ function Card1() {
 function Text3() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center leading-[0] not-italic p-0 relative shrink-0 text-left w-full"
+      className="relative box-border flex w-full shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0 text-left not-italic leading-[0]"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[16px] text-gray-900 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold text-gray-900">
         <p className="block leading-[24px]">
           HP Elite x2 G8 – Core i7 Power Meet....
         </p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium relative shrink-0 text-[14px] text-zinc-500 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Medium',_sans-serif] text-[14px] font-medium text-zinc-500">
         <p className="block leading-[24px]">
           The HP Elite x2 G8 is a premium split (2-in-1) computer, blending the
           power of a laptop with...
@@ -774,7 +774,7 @@ function Group6() {
 function Frame6() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-0 mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-0 mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group6 />
@@ -809,7 +809,7 @@ function Group7() {
 function Frame7() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[25.03px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[25.03px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group7 />
@@ -844,7 +844,7 @@ function Group8() {
 function Frame8() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[50.061px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[50.061px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group8 />
@@ -879,7 +879,7 @@ function Group9() {
 function Frame9() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[75.091px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[75.091px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group9 />
@@ -914,7 +914,7 @@ function Group10() {
 function Frame10() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[100.121px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[100.121px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group10 />
@@ -924,7 +924,7 @@ function Frame10() {
 
 function Group961() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start">
       <Frame6 />
       <Frame7 />
       <Frame8 />
@@ -936,8 +936,8 @@ function Group961() {
 
 function Frame21() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[15px] items-center justify-start leading-[0] p-0 relative shrink-0">
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold not-italic relative shrink-0 text-[18px] text-gray-900 text-left w-[217px]">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[15px] p-0 leading-[0]">
+      <div className="relative w-[217px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic text-gray-900">
         <p className="block leading-[26px]">₦922,500.00</p>
       </div>
       <Group961 />
@@ -947,7 +947,7 @@ function Frame21() {
 
 function VuesaxOutlineEye2() {
   return (
-    <div className="absolute contents inset-0" data-name="vuesax/outline/eye">
+    <div className="absolute inset-0 contents" data-name="vuesax/outline/eye">
       <svg
         className="block size-full"
         fill="none"
@@ -974,7 +974,7 @@ function VuesaxOutlineEye2() {
 
 function VuesaxOutlineEye3() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/eye">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/eye">
       <VuesaxOutlineEye2 />
     </div>
   );
@@ -983,16 +983,16 @@ function VuesaxOutlineEye3() {
 function Button3() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-[#ffffff] px-5 py-2.5"
       data-name="Button"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-slate-800 border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-slate-800"
       />
       <VuesaxOutlineEye3 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-center text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Details</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Details</p>
       </div>
     </div>
   );
@@ -1001,7 +1001,7 @@ function Button3() {
 function VuesaxOutlineShoppingCart2() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/shopping-cart"
     >
       <svg
@@ -1041,7 +1041,7 @@ function VuesaxOutlineShoppingCart2() {
 function VuesaxOutlineShoppingCart3() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/shopping-cart"
     >
       <VuesaxOutlineShoppingCart2 />
@@ -1052,12 +1052,12 @@ function VuesaxOutlineShoppingCart3() {
 function Button4() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-5 py-2.5"
       data-name="Button"
     >
       <VuesaxOutlineShoppingCart3 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-center text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Buy</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Buy</p>
       </div>
     </div>
   );
@@ -1066,7 +1066,7 @@ function Button4() {
 function Button5() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0 w-full"
+      className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0"
       data-name="Button"
     >
       <Button3 />
@@ -1078,7 +1078,7 @@ function Button5() {
 function Text4() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-[15px] items-start justify-center ml-5 mt-[250px] p-0 relative"
+      className="relative ml-5 mt-[250px] box-border flex flex-col content-stretch items-start justify-center gap-[15px] p-0 [grid-area:1_/_1]"
       data-name="Text"
     >
       <Text3 />
@@ -1091,20 +1091,20 @@ function Text4() {
 function Image1() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-5 mt-5 place-items-start relative"
+      className="relative ml-5 mt-5 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]"
       data-name="Image"
     >
       <div
-        className="[grid-area:1_/_1] bg-neutral-50 h-[210px] ml-0 mt-0 relative rounded-[20px] w-[350px]"
+        className="relative ml-0 mt-0 h-[210px] w-[350px] rounded-[20px] bg-neutral-50 [grid-area:1_/_1]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[419px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px_96px] mask-size-[350px_210px] ml-0 mt-[-96px] w-[350px]"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px_96px] mask-size-[350px_210px] ml-0 mt-[-96px] h-[419px] w-[350px] bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 7"
         style={{
           backgroundImage: `url('${imgImage8}')`,
@@ -1117,9 +1117,9 @@ function Image1() {
 
 function Frame24() {
   return (
-    <div className="[grid-area:1_/_1] bg-slate-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center ml-[35px] mt-[35px] px-[15px] py-1 relative rounded-[20px]">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-left text-nowrap">
-        <p className="block leading-[22px] whitespace-pre">HP</p>
+    <div className="relative ml-[35px] mt-[35px] box-border flex flex-row content-stretch items-center justify-center gap-2.5 rounded-[20px] bg-slate-800 px-[15px] py-1 [grid-area:1_/_1]">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[12px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[22px]">HP</p>
       </div>
     </div>
   );
@@ -1128,13 +1128,13 @@ function Frame24() {
 function Card2() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start"
       data-name="Card - 2"
     >
-      <div className="[grid-area:1_/_1] bg-[#ffffff] h-[449px] ml-0 mt-0 relative rounded-[20px] w-[390px]">
+      <div className="relative ml-0 mt-0 h-[449px] w-[390px] rounded-[20px] bg-[#ffffff] [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.1)]"
         />
       </div>
       <Text4 />
@@ -1147,15 +1147,15 @@ function Card2() {
 function Text5() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center leading-[0] not-italic p-0 relative shrink-0 text-left w-full"
+      className="relative box-border flex w-full shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0 text-left not-italic leading-[0]"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[16px] text-gray-900 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold text-gray-900">
         <p className="block leading-[24px]">
           HP Elite x2 Split Computer (8th Gen...
         </p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium relative shrink-0 text-[14px] text-zinc-500 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Medium',_sans-serif] text-[14px] font-medium text-zinc-500">
         <p className="block leading-[24px]">
           The HP Elite x2 Split Computer combines the power of a laptop with the
           versatility of a tablet....
@@ -1192,7 +1192,7 @@ function Group11() {
 function Frame11() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-0 mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-0 mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group11 />
@@ -1227,7 +1227,7 @@ function Group12() {
 function Frame12() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[25.03px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[25.03px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group12 />
@@ -1262,7 +1262,7 @@ function Group13() {
 function Frame13() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[50.061px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[50.061px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group13 />
@@ -1297,7 +1297,7 @@ function Group14() {
 function Frame14() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[75.091px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[75.091px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group14 />
@@ -1332,7 +1332,7 @@ function Group15() {
 function Frame15() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[100.121px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[100.121px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group15 />
@@ -1342,7 +1342,7 @@ function Frame15() {
 
 function Group962() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start">
       <Frame11 />
       <Frame12 />
       <Frame13 />
@@ -1354,8 +1354,8 @@ function Group962() {
 
 function Frame25() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[15px] items-center justify-start leading-[0] p-0 relative shrink-0">
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold not-italic relative shrink-0 text-[18px] text-gray-900 text-left w-[217px]">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[15px] p-0 leading-[0]">
+      <div className="relative w-[217px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic text-gray-900">
         <p className="block leading-[26px]">₦596,250.00</p>
       </div>
       <Group962 />
@@ -1365,7 +1365,7 @@ function Frame25() {
 
 function VuesaxOutlineEye4() {
   return (
-    <div className="absolute contents inset-0" data-name="vuesax/outline/eye">
+    <div className="absolute inset-0 contents" data-name="vuesax/outline/eye">
       <svg
         className="block size-full"
         fill="none"
@@ -1392,7 +1392,7 @@ function VuesaxOutlineEye4() {
 
 function VuesaxOutlineEye5() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/eye">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/eye">
       <VuesaxOutlineEye4 />
     </div>
   );
@@ -1401,16 +1401,16 @@ function VuesaxOutlineEye5() {
 function Button6() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-[#ffffff] px-5 py-2.5"
       data-name="Button"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-slate-800 border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-slate-800"
       />
       <VuesaxOutlineEye5 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-center text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Details</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Details</p>
       </div>
     </div>
   );
@@ -1419,7 +1419,7 @@ function Button6() {
 function VuesaxOutlineShoppingCart4() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/shopping-cart"
     >
       <svg
@@ -1459,7 +1459,7 @@ function VuesaxOutlineShoppingCart4() {
 function VuesaxOutlineShoppingCart5() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/shopping-cart"
     >
       <VuesaxOutlineShoppingCart4 />
@@ -1470,12 +1470,12 @@ function VuesaxOutlineShoppingCart5() {
 function Button7() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-5 py-2.5"
       data-name="Button"
     >
       <VuesaxOutlineShoppingCart5 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-center text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Buy</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Buy</p>
       </div>
     </div>
   );
@@ -1484,7 +1484,7 @@ function Button7() {
 function Button8() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0 w-full"
+      className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0"
       data-name="Button"
     >
       <Button6 />
@@ -1496,7 +1496,7 @@ function Button8() {
 function Text6() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-[15px] items-start justify-center ml-5 mt-[250px] p-0 relative"
+      className="relative ml-5 mt-[250px] box-border flex flex-col content-stretch items-start justify-center gap-[15px] p-0 [grid-area:1_/_1]"
       data-name="Text"
     >
       <Text5 />
@@ -1509,20 +1509,20 @@ function Text6() {
 function Image2() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-5 mt-5 place-items-start relative"
+      className="relative ml-5 mt-5 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]"
       data-name="Image"
     >
       <div
-        className="[grid-area:1_/_1] bg-neutral-50 h-[210px] ml-0 mt-0 relative rounded-[20px] w-[350px]"
+        className="relative ml-0 mt-0 h-[210px] w-[350px] rounded-[20px] bg-neutral-50 [grid-area:1_/_1]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[266px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px] mask-size-[350px_210px] ml-0 mt-0 w-[350px]"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[0px] mask-size-[350px_210px] ml-0 mt-0 h-[266px] w-[350px] bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 8"
         style={{
           backgroundImage: `url('${imgImage9}')`,
@@ -1535,9 +1535,9 @@ function Image2() {
 
 function Frame26() {
   return (
-    <div className="[grid-area:1_/_1] bg-slate-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center ml-[35px] mt-[35px] px-[15px] py-1 relative rounded-[20px]">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-left text-nowrap">
-        <p className="block leading-[22px] whitespace-pre">HP</p>
+    <div className="relative ml-[35px] mt-[35px] box-border flex flex-row content-stretch items-center justify-center gap-2.5 rounded-[20px] bg-slate-800 px-[15px] py-1 [grid-area:1_/_1]">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[12px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[22px]">HP</p>
       </div>
     </div>
   );
@@ -1546,13 +1546,13 @@ function Frame26() {
 function Card3() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start"
       data-name="Card - 3"
     >
-      <div className="[grid-area:1_/_1] bg-[#ffffff] h-[449px] ml-0 mt-0 relative rounded-[20px] w-[390px]">
+      <div className="relative ml-0 mt-0 h-[449px] w-[390px] rounded-[20px] bg-[#ffffff] [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.1)]"
         />
       </div>
       <Text6 />
@@ -1565,13 +1565,13 @@ function Card3() {
 function Text7() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center leading-[0] not-italic p-0 relative shrink-0 text-left w-full"
+      className="relative box-border flex w-full shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0 text-left not-italic leading-[0]"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[16px] text-gray-900 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold text-gray-900">
         <p className="block leading-[24px]">{`MacBook Air 13.6" M3 Chip 8GB 512GB..`}</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium relative shrink-0 text-[14px] text-zinc-500 w-[350px]">
+      <div className="relative w-[350px] shrink-0 font-['Inter:Medium',_sans-serif] text-[14px] font-medium text-zinc-500">
         <p className="block leading-[24px]">
           A top-tier device for serious users. With 512GB SSD and the powerful
           M3 chip, this MacBook Air is ...
@@ -1608,7 +1608,7 @@ function Group16() {
 function Frame16() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-0 mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-0 mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group16 />
@@ -1643,7 +1643,7 @@ function Group17() {
 function Frame17() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[25.03px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[25.03px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group17 />
@@ -1678,7 +1678,7 @@ function Group18() {
 function Frame18() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[50.061px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[50.061px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group18 />
@@ -1713,7 +1713,7 @@ function Group19() {
 function Frame19() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[75.091px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[75.091px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group19 />
@@ -1748,7 +1748,7 @@ function Group20() {
 function Frame27() {
   return (
     <div
-      className="[grid-area:1_/_1] h-[18px] ml-[100.121px] mt-0 overflow-clip relative w-[17.879px]"
+      className="relative ml-[100.121px] mt-0 h-[18px] w-[17.879px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <Group20 />
@@ -1758,7 +1758,7 @@ function Frame27() {
 
 function Group963() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start">
       <Frame16 />
       <Frame17 />
       <Frame18 />
@@ -1770,8 +1770,8 @@ function Group963() {
 
 function Frame28() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[15px] items-center justify-start leading-[0] p-0 relative shrink-0">
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold not-italic relative shrink-0 text-[18px] text-gray-900 text-left w-[217px]">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[15px] p-0 leading-[0]">
+      <div className="relative w-[217px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic text-gray-900">
         <p className="block leading-[26px]">₦1,260,000.00</p>
       </div>
       <Group963 />
@@ -1781,7 +1781,7 @@ function Frame28() {
 
 function VuesaxOutlineEye6() {
   return (
-    <div className="absolute contents inset-0" data-name="vuesax/outline/eye">
+    <div className="absolute inset-0 contents" data-name="vuesax/outline/eye">
       <svg
         className="block size-full"
         fill="none"
@@ -1808,7 +1808,7 @@ function VuesaxOutlineEye6() {
 
 function VuesaxOutlineEye7() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/eye">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/eye">
       <VuesaxOutlineEye6 />
     </div>
   );
@@ -1817,16 +1817,16 @@ function VuesaxOutlineEye7() {
 function Button9() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-[#ffffff] px-5 py-2.5"
       data-name="Button"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-slate-800 border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-slate-800"
       />
       <VuesaxOutlineEye7 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[16px] text-center text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Details</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Details</p>
       </div>
     </div>
   );
@@ -1835,7 +1835,7 @@ function Button9() {
 function VuesaxOutlineShoppingCart6() {
   return (
     <div
-      className="absolute contents inset-0"
+      className="absolute inset-0 contents"
       data-name="vuesax/outline/shopping-cart"
     >
       <svg
@@ -1875,7 +1875,7 @@ function VuesaxOutlineShoppingCart6() {
 function VuesaxOutlineShoppingCart7() {
   return (
     <div
-      className="relative shrink-0 size-6"
+      className="relative size-6 shrink-0"
       data-name="vuesax/outline/shopping-cart"
     >
       <VuesaxOutlineShoppingCart6 />
@@ -1886,12 +1886,12 @@ function VuesaxOutlineShoppingCart7() {
 function Button10() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-2.5 relative rounded-[10px] shrink-0 w-[165px]"
+      className="relative box-border flex w-[165px] shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-5 py-2.5"
       data-name="Button"
     >
       <VuesaxOutlineShoppingCart7 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-center text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Buy</p>
+      <div className="relative shrink-0 text-nowrap text-center font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Buy</p>
       </div>
     </div>
   );
@@ -1900,7 +1900,7 @@ function Button10() {
 function Button11() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0 w-full"
+      className="relative box-border flex w-full shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0"
       data-name="Button"
     >
       <Button9 />
@@ -1912,7 +1912,7 @@ function Button11() {
 function Text8() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-[15px] items-start justify-center ml-5 mt-[250px] p-0 relative"
+      className="relative ml-5 mt-[250px] box-border flex flex-col content-stretch items-start justify-center gap-[15px] p-0 [grid-area:1_/_1]"
       data-name="Text"
     >
       <Text7 />
@@ -1925,20 +1925,20 @@ function Text8() {
 function Image3() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-5 mt-5 place-items-start relative"
+      className="relative ml-5 mt-5 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]"
       data-name="Image"
     >
       <div
-        className="[grid-area:1_/_1] bg-neutral-50 h-[210px] ml-0 mt-0 relative rounded-[20px] w-[350px]"
+        className="relative ml-0 mt-0 h-[210px] w-[350px] rounded-[20px] bg-neutral-50 [grid-area:1_/_1]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[294px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[50px_33px] mask-size-[350px_210px] ml-[-50px] mt-[-33px] w-[404px]"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[50px_33px] mask-size-[350px_210px] ml-[-50px] mt-[-33px] h-[294px] w-[404px] bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 9"
         style={{
           backgroundImage: `url('${imgImage11}')`,
@@ -1951,9 +1951,9 @@ function Image3() {
 
 function Frame22() {
   return (
-    <div className="[grid-area:1_/_1] bg-slate-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center ml-[35px] mt-[35px] px-[15px] py-1 relative rounded-[20px]">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[12px] text-left text-nowrap">
-        <p className="block leading-[22px] whitespace-pre">APPLE</p>
+    <div className="relative ml-[35px] mt-[35px] box-border flex flex-row content-stretch items-center justify-center gap-2.5 rounded-[20px] bg-slate-800 px-[15px] py-1 [grid-area:1_/_1]">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[12px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[22px]">APPLE</p>
       </div>
     </div>
   );
@@ -1962,13 +1962,13 @@ function Frame22() {
 function Card4() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start"
       data-name="Card - 4"
     >
-      <div className="[grid-area:1_/_1] bg-[#ffffff] h-[449px] ml-0 mt-0 relative rounded-[20px] w-[390px]">
+      <div className="relative ml-0 mt-0 h-[449px] w-[390px] rounded-[20px] bg-[#ffffff] [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.1)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.1)]"
         />
       </div>
       <Text8 />
@@ -1981,7 +1981,7 @@ function Card4() {
 function Card5() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col gap-5 items-start justify-center leading-[0] left-5 p-0 top-[449px]"
+      className="absolute left-5 top-[449px] box-border flex flex-col content-stretch items-start justify-center gap-5 p-0 leading-[0]"
       data-name="Card"
     >
       <Card1 />
@@ -1995,12 +1995,12 @@ function Card5() {
 export default function PaySmallSmallMobile() {
   return (
     <div
-      className="bg-slate-50 relative size-full"
+      className="relative size-full bg-slate-50"
       data-name="Pay Small Small - Mobile"
     >
-      <div className="absolute bg-[#0e0e1f] h-[90px] left-0 top-0 w-[430px]" />
+      <div className="absolute left-0 top-0 h-[90px] w-[430px] bg-[#0e0e1f]" />
       <div
-        className="absolute bg-no-repeat bg-size-[100%_100%] bg-top-left inset-[1.58%_49.3%_97.34%_4.65%]"
+        className="bg-size-[100%_100%] bg-top-left absolute inset-[1.58%_49.3%_97.34%_4.65%] bg-no-repeat"
         data-name="sureimports_reverse"
         style={{ backgroundImage: `url('${imgSureimportsReverse}')` }}
       />

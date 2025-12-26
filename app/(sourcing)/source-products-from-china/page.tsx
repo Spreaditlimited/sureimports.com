@@ -25,9 +25,6 @@ import WomenBusinessSlider from './sourcing/womenBusinessSlider';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 const Sourcing = () => {
-
-
-  
   const steps = [
     {
       number: '01',

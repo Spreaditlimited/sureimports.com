@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 const Procurement = () => {
   return (
-    <div className='dark:bg-black'>
+    <div className="dark:bg-black">
       <ProcurementComponent />
     </div>
   );

@@ -8,16 +8,14 @@ The account validation APIs allow merchants to confirm the authenticity of a cus
 Introduction
 Before sending money to a customer, you need to ensure the customer’s account details are correct. This is to ensure you aren’t sending money to the wrong person. In order to achieve this, we provide the following APIs:
 
-
 The Resolve Account Number API takes the customer’s account number and bank code and returns the account details of the customer. To resolve an account number, make a GET request to the /bank/resolve endpoint:
 
-
-
-
 ## SOURCE CODE
+
 `code`
+
 ```javascript
-const https = require('https')
+const https = require('https');
 
 const options = {
   hostname: 'api.paystack.co',
@@ -25,30 +23,31 @@ const options = {
   path: '/bank/resolve?account_number=0001234567&bank_code=058',
   method: 'GET',
   headers: {
-    Authorization: 'Bearer SECRET_KEY'
-  }
-}
+    Authorization: 'Bearer SECRET_KEY',
+  },
+};
 
-https.request(options, res => {
-  let data = ''
+https
+  .request(options, (res) => {
+    let data = '';
 
-  res.on('data', (chunk) => {
-    data += chunk
-  });
+    res.on('data', (chunk) => {
+      data += chunk;
+    });
 
-  res.on('end', () => {
-    console.log(JSON.parse(data))
+    res.on('end', () => {
+      console.log(JSON.parse(data));
+    });
   })
-}).on('error', error => {
-  console.error(error)
-})
+  .on('error', (error) => {
+    console.error(error);
+  });
 ```
 
-
-
-
 ## SORUCE CODE RESPONSE
+
 `code`
+
 ```json
 {
   "status": true,

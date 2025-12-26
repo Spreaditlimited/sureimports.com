@@ -5,7 +5,13 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import RadFormLayout from '@/components/uix/xForm/RadFormLayout';
 import RadText from '@/components/uix/xForm/RadText';
-import { Landmark, User, CreditCard, Loader2, CheckCircle2 } from 'lucide-react';
+import {
+  Landmark,
+  User,
+  CreditCard,
+  Loader2,
+  CheckCircle2,
+} from 'lucide-react';
 import nigerianBanks from '@/lib/data/nigerianBanks';
 
 interface TransferRecipientResponse {
@@ -33,7 +39,9 @@ interface TransferRecipientResponse {
 
 export default function TestPaystackTransferPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [recipientData, setRecipientData] = useState<TransferRecipientResponse['data'] | null>(null);
+  const [recipientData, setRecipientData] = useState<
+    TransferRecipientResponse['data'] | null
+  >(null);
 
   // Form states
   const [accountName, setAccountName] = useState('');
@@ -44,9 +52,9 @@ export default function TestPaystackTransferPage() {
   const handleBankChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     setSelectedBank(value);
-    
+
     // Extract bank code from the value (format: "BankName - Code")
-    const bank = nigerianBanks.find(b => `${b.name} - ${b.code}` === value);
+    const bank = nigerianBanks.find((b) => `${b.name} - ${b.code}` === value);
     if (bank) {
       setBankCode(bank.code);
     }
@@ -54,7 +62,7 @@ export default function TestPaystackTransferPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     // Validate inputs
     if (!accountName || !accountNumber || !bankCode) {
       toast.error('Please fill in all fields');
@@ -89,7 +97,9 @@ export default function TestPaystackTransferPage() {
       const data: TransferRecipientResponse = await response.json();
 
       if (data.status) {
-        toast.success(data.message || 'Transfer recipient created successfully!');
+        toast.success(
+          data.message || 'Transfer recipient created successfully!',
+        );
         setRecipientData(data.data || null);
       } else {
         toast.error(data.message || 'Failed to create transfer recipient');
@@ -121,11 +131,14 @@ export default function TestPaystackTransferPage() {
         </p>
       </div>
 
-      <RadFormLayout title="Create Transfer Recipient" subtitle="Enter bank account details">
+      <RadFormLayout
+        title="Create Transfer Recipient"
+        subtitle="Enter bank account details"
+      >
         <form onSubmit={handleSubmit}>
           {/* Account Name */}
           <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/1">
+            <div className="md:w-1/1 w-full p-2">
               <RadText
                 label="Account Name"
                 reacticon={<User className="text-gray-400" />}
@@ -141,7 +154,7 @@ export default function TestPaystackTransferPage() {
 
           {/* Account Number */}
           <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/1">
+            <div className="md:w-1/1 w-full p-2">
               <RadText
                 label="Account Number"
                 reacticon={<CreditCard className="text-gray-400" />}
@@ -157,13 +170,16 @@ export default function TestPaystackTransferPage() {
 
           {/* Bank Selection */}
           <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/1">
+            <div className="md:w-1/1 w-full p-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Select Bank
                 </label>
                 <div className="relative flex items-center">
-                  <Landmark className="absolute left-3 text-gray-400" size={20} />
+                  <Landmark
+                    className="absolute left-3 text-gray-400"
+                    size={20}
+                  />
                   <select
                     value={selectedBank}
                     onChange={handleBankChange}
@@ -171,7 +187,10 @@ export default function TestPaystackTransferPage() {
                   >
                     <option value="">-- Select Bank --</option>
                     {nigerianBanks.map((bank) => (
-                      <option key={bank.code} value={`${bank.name} - ${bank.code}`}>
+                      <option
+                        key={bank.code}
+                        value={`${bank.name} - ${bank.code}`}
+                      >
                         {bank.name} ({bank.code})
                       </option>
                     ))}
@@ -184,7 +203,7 @@ export default function TestPaystackTransferPage() {
           {/* Bank Code Display */}
           {bankCode && (
             <div className="flex flex-col md:flex-row">
-              <div className="w-full p-2 md:w-1/1">
+              <div className="md:w-1/1 w-full p-2">
                 <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
                     <strong>Selected Bank Code:</strong> {bankCode}
@@ -235,7 +254,10 @@ export default function TestPaystackTransferPage() {
       {/* Response Display */}
       {recipientData && (
         <div className="mt-6">
-          <RadFormLayout title="API Response" subtitle="Transfer recipient created successfully">
+          <RadFormLayout
+            title="API Response"
+            subtitle="Transfer recipient created successfully"
+          >
             <div className="space-y-4">
               <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                 <div className="flex items-start">
@@ -323,4 +345,3 @@ export default function TestPaystackTransferPage() {
     </div>
   );
 }
-

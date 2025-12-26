@@ -22,7 +22,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
         },
         successx: true,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error('Error in send-code endpoint:', error);
@@ -116,8 +116,7 @@ export async function POST(request: Request) {
         },
         successx: false,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

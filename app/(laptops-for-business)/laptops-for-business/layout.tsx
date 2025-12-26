@@ -27,7 +27,7 @@ const BackToTopButton = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           // Rotate ~0.5deg per pixel; loop within 0-359
-          setAngle(((y * 0.5) % 360 + 360) % 360);
+          setAngle((((y * 0.5) % 360) + 360) % 360);
           ticking = false;
         });
         ticking = true;
@@ -47,12 +47,10 @@ const BackToTopButton = () => {
       onClick={scrollToTop}
       aria-label="Back to top"
       title="Back to top"
-      className={`fixed z-50 bottom-6 right-6 transition-all duration-300
-        ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'}
-        rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2`}
+      className={`fixed bottom-6 right-6 z-50 transition-all duration-300 ${visible ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-3 opacity-0'} rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-white/60 focus:ring-offset-2`}
     >
       <div
-        className="p-3 rounded-full text-white"
+        className="rounded-full p-3 text-white"
         style={{
           background: `linear-gradient(${angle}deg, #6366f1, #a855f7, #3b82f6)`,
         }}

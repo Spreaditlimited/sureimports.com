@@ -577,20 +577,26 @@ const OrderCard: React.FC<ProductsProps> = ({
 
                             {/* *********************************************************************************************************** */}
                             <FlutterwavePaymentButton
-                                amount={amount}
-                                email={user?.userEmail as string}
-                                name={user?.userFirstname as string}
-                                phone_number={''}
-                                currency={currency}
-                                payment_type={'CARD'}
-                                consumer_id={user?.pidUser as string}
-                                service_id={pidVerifySupplier}
-                                service_name={'PROCUREMENT'}
-                                description={'This is General Procuremnt & Shipping Service'}
-                                isDisabled={isDisabled}
-                                className={isDisabled
+                              amount={amount}
+                              email={user?.userEmail as string}
+                              name={user?.userFirstname as string}
+                              phone_number={''}
+                              currency={currency}
+                              payment_type={'CARD'}
+                              consumer_id={user?.pidUser as string}
+                              service_id={pidVerifySupplier}
+                              service_name={'PROCUREMENT'}
+                              description={
+                                'This is General Procuremnt & Shipping Service'
+                              }
+                              isDisabled={isDisabled}
+                              className={
+                                isDisabled
                                   ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'} destinationCountry={''}                            />
+                                  : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
+                              }
+                              destinationCountry={''}
+                            />
                             {/* *********************************************************************************************************** */}
                           </Modal>
                         </div>

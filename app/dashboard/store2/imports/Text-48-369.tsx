@@ -1,19 +1,19 @@
-import svgPaths from "./svg-azlexlnr7v";
-import imgImage14 from "figma:asset/5b6f4bbdab7c47655211170a7ebc9dd2b6e1272f.png";
-import imgImage11 from "figma:asset/9624e54c7174fd81a33c10142056073f6d62d55d.png";
-import { imgImage15, imgGroup } from "./svg-hugm4";
+import svgPaths from './svg-azlexlnr7v';
+import imgImage14 from 'figma:asset/5b6f4bbdab7c47655211170a7ebc9dd2b6e1272f.png';
+import imgImage11 from 'figma:asset/9624e54c7174fd81a33c10142056073f6d62d55d.png';
+import { imgImage15, imgGroup } from './svg-hugm4';
 
 function Component1() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-5 h-12 items-center justify-start px-[15px] py-3 relative rounded-[10px] shrink-0"
+      className="relative box-border flex h-12 shrink-0 flex-row content-stretch items-center justify-start gap-5 rounded-[10px] bg-[#ffffff] px-[15px] py-3"
       data-name="1"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-indigo-800 border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-indigo-800"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[16px] text-center text-indigo-800 w-[300px]">
+      <div className="relative w-[300px] shrink-0 text-center font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold not-italic leading-[0] text-indigo-800">
         <p className="block leading-[24px]">Upcoming Orders (02)</p>
       </div>
     </div>
@@ -23,14 +23,14 @@ function Component1() {
 function Component5() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-5 h-12 items-center justify-start px-[15px] py-3 relative rounded-[10px] shrink-0"
+      className="relative box-border flex h-12 shrink-0 flex-row content-stretch items-center justify-start gap-5 rounded-[10px] bg-[#ffffff] px-[15px] py-3"
       data-name="5"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.3)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.3)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[16px] text-center text-slate-800 w-[300px]">
+      <div className="relative w-[300px] shrink-0 text-center font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Previous Orders (0)</p>
       </div>
     </div>
@@ -40,14 +40,14 @@ function Component5() {
 function Component4() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-row gap-5 h-12 items-center justify-start px-[15px] py-3 relative rounded-[10px] shrink-0"
+      className="relative box-border flex h-12 shrink-0 flex-row content-stretch items-center justify-start gap-5 rounded-[10px] bg-[#ffffff] px-[15px] py-3"
       data-name="4"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.3)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.3)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[16px] text-center text-slate-800 w-[300px]">
+      <div className="relative w-[300px] shrink-0 text-center font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Returned Order (03)</p>
       </div>
     </div>
@@ -57,7 +57,7 @@ function Component4() {
 function Button() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-5 items-center justify-center p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-5 p-0"
       data-name="Button"
     >
       <Component1 />
@@ -70,11 +70,11 @@ function Button() {
 function MaskGroup() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid ml-0 mt-0 place-items-start relative"
+      className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start [grid-area:1_/_1]"
       data-name="Mask group"
     >
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[129px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[15px_-1px] mask-size-[130px_130px] ml-[-15px] mt-px w-40"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[15px_-1px] mask-size-[130px_130px] ml-[-15px] mt-px h-[129px] w-40 bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 14"
         style={{
           backgroundImage: `url('${imgImage14}')`,
@@ -88,13 +88,13 @@ function MaskGroup() {
 function Image() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]"
       data-name="Image"
     >
-      <div className="[grid-area:1_/_1] bg-neutral-50 ml-0 mt-0 relative rounded-[10px] size-[130px]">
+      <div className="relative ml-0 mt-0 size-[130px] rounded-[10px] bg-neutral-50 [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <MaskGroup />
@@ -105,11 +105,11 @@ function Image() {
 function Tag() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-indigo-800 p-[10px]"
       data-name="Tag"
     >
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Order Details</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Order Details</p>
       </div>
     </div>
   );
@@ -118,15 +118,15 @@ function Tag() {
 function Tag1() {
   return (
     <div
-      className="bg-[rgba(242,68,68,0.1)] box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-[rgba(242,68,68,0.1)] p-[10px]"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[#f24444] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[#f24444]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#f24444] text-[16px] text-left text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Cancel Order</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[#f24444]">
+        <p className="block whitespace-pre leading-[26px]">Cancel Order</p>
       </div>
     </div>
   );
@@ -134,7 +134,7 @@ function Tag1() {
 
 function Frame48() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0">
       <Tag />
       <Tag1 />
     </div>
@@ -143,17 +143,17 @@ function Frame48() {
 
 function Frame49() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[30px] items-center justify-start p-0 relative shrink-0">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Order No. #1234</p>
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[30px] p-0">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Order No. #1234</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-slate-800 w-[451px]">
+      <div className="relative w-[451px] shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">HP EliteBook x360 1040 G8</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-center text-slate-800 w-[223px]">
+      <div className="relative w-[223px] shrink-0 text-center font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">Quantity : 2</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-center text-slate-800 w-[216px]">
+      <div className="relative w-[216px] shrink-0 text-center font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[26px]">
           <span className="text-slate-800">₦</span>19,35,000.00
         </p>
@@ -166,7 +166,7 @@ function Frame49() {
 function Group() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -203,7 +203,7 @@ function Group() {
 
 function ClipPathGroup() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group />
     </div>
   );
@@ -212,7 +212,7 @@ function ClipPathGroup() {
 function Frame() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup />
@@ -222,8 +222,8 @@ function Frame() {
 
 function Group1321315011() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-0 mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -247,7 +247,7 @@ function Group1321315011() {
 function Group1() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -284,7 +284,7 @@ function Group1() {
 
 function ClipPathGroup1() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group1 />
     </div>
   );
@@ -293,7 +293,7 @@ function ClipPathGroup1() {
 function Frame1() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup1 />
@@ -303,8 +303,8 @@ function Frame1() {
 
 function Group1321315016() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[1388px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[1388px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -331,7 +331,7 @@ function Group1321315016() {
 function Group2() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -368,7 +368,7 @@ function Group2() {
 
 function ClipPathGroup2() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group2 />
     </div>
   );
@@ -377,7 +377,7 @@ function ClipPathGroup2() {
 function Frame2() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup2 />
@@ -387,8 +387,8 @@ function Frame2() {
 
 function Group1321315019() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[694px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[694px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -412,7 +412,7 @@ function Group1321315019() {
 function Group3() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -449,7 +449,7 @@ function Group3() {
 
 function ClipPathGroup3() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group3 />
     </div>
   );
@@ -458,7 +458,7 @@ function ClipPathGroup3() {
 function Frame3() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup3 />
@@ -468,8 +468,8 @@ function Frame3() {
 
 function Group1321315017() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[1041px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[1041px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -496,7 +496,7 @@ function Group1321315017() {
 function Group4() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -533,7 +533,7 @@ function Group4() {
 
 function ClipPathGroup4() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group4 />
     </div>
   );
@@ -542,7 +542,7 @@ function ClipPathGroup4() {
 function Frame4() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup4 />
@@ -552,8 +552,8 @@ function Frame4() {
 
 function Group1321315018() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[347px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[347px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -576,9 +576,9 @@ function Group1321315018() {
 
 function Group1321315001() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid ml-0 mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] bg-[#e3e3e3] h-2 ml-0 mt-2 rounded-[20px] w-[1413px]" />
-      <div className="[grid-area:1_/_1] bg-indigo-800 h-2 ml-0 mt-2 rounded-[20px] w-[894px]" />
+    <div className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start [grid-area:1_/_1]">
+      <div className="ml-0 mt-2 h-2 w-[1413px] rounded-[20px] bg-[#e3e3e3] [grid-area:1_/_1]" />
+      <div className="ml-0 mt-2 h-2 w-[894px] rounded-[20px] bg-indigo-800 [grid-area:1_/_1]" />
       <Group1321315011 />
       <Group1321315016 />
       <Group1321315019 />
@@ -590,22 +590,22 @@ function Group1321315001() {
 
 function Group1321315020() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]">
       <Group1321315001 />
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-0 mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Confirmed</p>
+      <div className="relative ml-0 mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Confirmed</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[322px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Preparing</p>
+      <div className="relative ml-[322px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Preparing</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[675px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Shipped</p>
+      <div className="relative ml-[675px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Shipped</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[1024px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Pick Up</p>
+      <div className="relative ml-[1024px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Pick Up</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[1340.5px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Delivered</p>
+      <div className="relative ml-[1340.5px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Delivered</p>
       </div>
     </div>
   );
@@ -613,7 +613,7 @@ function Group1321315020() {
 
 function Frame51() {
   return (
-    <div className="box-border content-stretch flex flex-col gap-5 items-start justify-center p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-center gap-5 p-0">
       <Frame49 />
       <Group1321315020 />
     </div>
@@ -622,7 +622,7 @@ function Frame51() {
 
 function Frame34() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[30px] items-center justify-start p-0 relative shrink-0 w-[1573px]">
+    <div className="relative box-border flex w-[1573px] shrink-0 flex-row content-stretch items-center justify-start gap-[30px] p-0">
       <Image />
       <Frame51 />
     </div>
@@ -632,11 +632,11 @@ function Frame34() {
 function MaskGroup1() {
   return (
     <div
-      className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid ml-0 mt-0 place-items-start relative"
+      className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start [grid-area:1_/_1]"
       data-name="Mask group"
     >
       <div
-        className="[grid-area:1_/_1] bg-center bg-cover bg-no-repeat h-[129px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[3px_0px] mask-size-[130px_130px] ml-[-3px] mt-0 w-[136px]"
+        className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[3px_0px] mask-size-[130px_130px] ml-[-3px] mt-0 h-[129px] w-[136px] bg-cover bg-center bg-no-repeat [grid-area:1_/_1]"
         data-name="image 11"
         style={{
           backgroundImage: `url('${imgImage11}')`,
@@ -650,13 +650,13 @@ function MaskGroup1() {
 function Image1() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]"
       data-name="Image"
     >
-      <div className="[grid-area:1_/_1] bg-neutral-50 ml-0 mt-0 relative rounded-[10px] size-[130px]">
+      <div className="relative ml-0 mt-0 size-[130px] rounded-[10px] bg-neutral-50 [grid-area:1_/_1]">
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <MaskGroup1 />
@@ -667,11 +667,11 @@ function Image1() {
 function Tag2() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-indigo-800 p-[10px]"
       data-name="Tag"
     >
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Order Details</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[26px]">Order Details</p>
       </div>
     </div>
   );
@@ -680,15 +680,15 @@ function Tag2() {
 function Tag3() {
   return (
     <div
-      className="bg-[rgba(242,68,68,0.1)] box-border content-stretch flex flex-row gap-2.5 items-center justify-start p-[10px] relative rounded-[10px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-2.5 rounded-[10px] bg-[rgba(242,68,68,0.1)] p-[10px]"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[#f24444] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[#f24444]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#f24444] text-[16px] text-left text-nowrap">
-        <p className="block leading-[26px] whitespace-pre">Cancel Order</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[#f24444]">
+        <p className="block whitespace-pre leading-[26px]">Cancel Order</p>
       </div>
     </div>
   );
@@ -696,7 +696,7 @@ function Tag3() {
 
 function Frame50() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-5 items-center justify-start p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-5 p-0">
       <Tag2 />
       <Tag3 />
     </div>
@@ -705,17 +705,17 @@ function Frame50() {
 
 function Frame52() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[30px] items-center justify-start p-0 relative shrink-0">
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[26px] whitespace-pre">Order No. #1234</p>
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-start gap-[30px] p-0">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[26px]">Order No. #1234</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-left text-slate-800 w-[451px]">
+      <div className="relative w-[451px] shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">{`MacBook Air 13.6" M2 Chip 8GB 512GB`}</p>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[18px] text-center text-slate-800 w-[223px]">
+      <div className="relative w-[223px] shrink-0 text-center font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">Quantity : 1</p>
       </div>
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[18px] text-center text-slate-800 w-[216px]">
+      <div className="relative w-[216px] shrink-0 text-center font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">₦1,147,500.00</p>
       </div>
       <Frame50 />
@@ -726,7 +726,7 @@ function Frame52() {
 function Group5() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -763,7 +763,7 @@ function Group5() {
 
 function ClipPathGroup5() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group5 />
     </div>
   );
@@ -772,7 +772,7 @@ function ClipPathGroup5() {
 function Frame5() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup5 />
@@ -782,8 +782,8 @@ function Frame5() {
 
 function Group1321315012() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-0 mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -807,7 +807,7 @@ function Group1321315012() {
 function Group6() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -844,7 +844,7 @@ function Group6() {
 
 function ClipPathGroup6() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group6 />
     </div>
   );
@@ -853,7 +853,7 @@ function ClipPathGroup6() {
 function Frame6() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup6 />
@@ -863,8 +863,8 @@ function Frame6() {
 
 function Group1321315022() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[1388px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[1388px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -891,7 +891,7 @@ function Group1321315022() {
 function Group7() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -928,7 +928,7 @@ function Group7() {
 
 function ClipPathGroup7() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group7 />
     </div>
   );
@@ -937,7 +937,7 @@ function ClipPathGroup7() {
 function Frame7() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup7 />
@@ -947,8 +947,8 @@ function Frame7() {
 
 function Group1321315023() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[694px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[694px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -972,7 +972,7 @@ function Group1321315023() {
 function Group8() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -1009,7 +1009,7 @@ function Group8() {
 
 function ClipPathGroup8() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group8 />
     </div>
   );
@@ -1018,7 +1018,7 @@ function ClipPathGroup8() {
 function Frame8() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup8 />
@@ -1028,8 +1028,8 @@ function Frame8() {
 
 function Group1321315024() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[1041px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[1041px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -1056,7 +1056,7 @@ function Group1321315024() {
 function Group9() {
   return (
     <div
-      className="absolute inset-[8.333%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px]"
+      className="mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-1.5px] mask-size-[18px_18px] absolute inset-[8.333%]"
       data-name="Group"
       style={{ maskImage: `url('${imgGroup}')` }}
     >
@@ -1093,7 +1093,7 @@ function Group9() {
 
 function ClipPathGroup9() {
   return (
-    <div className="absolute contents inset-0" data-name="Clip path group">
+    <div className="absolute inset-0 contents" data-name="Clip path group">
       <Group9 />
     </div>
   );
@@ -1102,7 +1102,7 @@ function ClipPathGroup9() {
 function Frame9() {
   return (
     <div
-      className="[grid-area:1_/_1] ml-[3px] mt-[3px] overflow-clip relative size-[18px]"
+      className="relative ml-[3px] mt-[3px] size-[18px] overflow-clip [grid-area:1_/_1]"
       data-name="Frame"
     >
       <ClipPathGroup9 />
@@ -1112,8 +1112,8 @@ function Frame9() {
 
 function Group1321315025() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] ml-[347px] mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] ml-0 mt-0 relative size-6">
+    <div className="relative ml-[347px] mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0] [grid-area:1_/_1]">
+      <div className="relative ml-0 mt-0 size-6 [grid-area:1_/_1]">
         <svg
           className="block size-full"
           fill="none"
@@ -1136,9 +1136,9 @@ function Group1321315025() {
 
 function Group1321315002() {
   return (
-    <div className="[grid-area:1_/_1] grid-cols-[max-content] grid-rows-[max-content] inline-grid ml-0 mt-0 place-items-start relative">
-      <div className="[grid-area:1_/_1] bg-[#e3e3e3] h-2 ml-0 mt-2 rounded-[20px] w-[1413px]" />
-      <div className="[grid-area:1_/_1] bg-indigo-800 h-2 ml-0 mt-2 rounded-[20px] w-[894px]" />
+    <div className="relative ml-0 mt-0 inline-grid grid-cols-[max-content] grid-rows-[max-content] place-items-start [grid-area:1_/_1]">
+      <div className="ml-0 mt-2 h-2 w-[1413px] rounded-[20px] bg-[#e3e3e3] [grid-area:1_/_1]" />
+      <div className="ml-0 mt-2 h-2 w-[894px] rounded-[20px] bg-indigo-800 [grid-area:1_/_1]" />
       <Group1321315012 />
       <Group1321315022 />
       <Group1321315023 />
@@ -1150,22 +1150,22 @@ function Group1321315002() {
 
 function Group1321315021() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]">
       <Group1321315002 />
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-0 mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Confirmed</p>
+      <div className="relative ml-0 mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Confirmed</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[322px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Preparing</p>
+      <div className="relative ml-[322px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Preparing</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[675px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Shipped</p>
+      <div className="relative ml-[675px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Shipped</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[1024px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Pick Up</p>
+      <div className="relative ml-[1024px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Pick Up</p>
       </div>
-      <div className="[grid-area:1_/_1] font-['Inter:Medium',_sans-serif] font-medium ml-[1340.5px] mt-[29px] not-italic relative text-[16px] text-left text-nowrap text-slate-800">
-        <p className="block leading-[24px] whitespace-pre">Delivered</p>
+      <div className="relative ml-[1340.5px] mt-[29px] text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[16px] font-medium not-italic text-slate-800 [grid-area:1_/_1]">
+        <p className="block whitespace-pre leading-[24px]">Delivered</p>
       </div>
     </div>
   );
@@ -1173,7 +1173,7 @@ function Group1321315021() {
 
 function Frame53() {
   return (
-    <div className="box-border content-stretch flex flex-col gap-5 items-start justify-center p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-center gap-5 p-0">
       <Frame52 />
       <Group1321315021 />
     </div>
@@ -1182,7 +1182,7 @@ function Frame53() {
 
 function Frame37() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[30px] items-center justify-start p-0 relative shrink-0 w-[1573px]">
+    <div className="relative box-border flex w-[1573px] shrink-0 flex-row content-stretch items-center justify-start gap-[30px] p-0">
       <Image1 />
       <Frame53 />
     </div>
@@ -1192,15 +1192,15 @@ function Frame37() {
 function Card1() {
   return (
     <div
-      className="bg-[#ffffff] box-border content-stretch flex flex-col gap-5 items-center justify-center p-[30px] relative rounded-[20px] shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-center justify-center gap-5 rounded-[20px] bg-[#ffffff] p-[30px]"
       data-name="Card -1"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+        className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
       <Button />
-      <div className="h-0 relative shrink-0 w-[1574px]">
+      <div className="relative h-0 w-[1574px] shrink-0">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"
@@ -1219,11 +1219,11 @@ function Card1() {
           </svg>
         </div>
       </div>
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[20px] text-left text-slate-800 w-[1573px]">
+      <div className="relative w-[1573px] shrink-0 text-left font-['Inter:Medium',_sans-serif] text-[20px] font-medium not-italic leading-[0] text-slate-800">
         <p className="block leading-[30px]">Ordered Item’s :</p>
       </div>
       <Frame34 />
-      <div className="h-0 relative shrink-0 w-[1574px]">
+      <div className="relative h-0 w-[1574px] shrink-0">
         <div className="absolute bottom-0 left-0 right-0 top-[-1px]">
           <svg
             className="block size-full"
@@ -1249,7 +1249,7 @@ function Card1() {
 
 function Frame10() {
   return (
-    <div className="box-border content-stretch flex flex-row gap-[30px] items-center justify-center p-0 relative shrink-0">
+    <div className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-[30px] p-0">
       <Card1 />
     </div>
   );
@@ -1258,12 +1258,12 @@ function Frame10() {
 export default function Text() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-5 items-start justify-start p-0 relative size-full"
+      className="relative box-border flex size-full flex-col content-stretch items-start justify-start gap-5 p-0"
       data-name="Text"
     >
       <div
-        className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] min-w-full not-italic relative shrink-0 text-[22px] text-left text-slate-800"
-        style={{ width: "min-content" }}
+        className="relative min-w-full shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[22px] font-semibold not-italic leading-[0] text-slate-800"
+        style={{ width: 'min-content' }}
       >
         <p className="block leading-[34px]">My Orders</p>
       </div>

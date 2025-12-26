@@ -132,7 +132,7 @@ export function ViewOrders({ params }: orderStatus) {
     ); //CHECK IF RECORD IS EMPTY
 
   return (
-    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center dark:bg-black">
+    <div className="hide-scrollbar flex px-[25px] dark:bg-black 2xl:justify-center">
       <OrderSection initialOrders={orderData} />
     </div>
   );

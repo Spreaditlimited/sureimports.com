@@ -29,12 +29,17 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Validate bank details
-    if (!bank_name || !bank_code || !bank_account_number || !bank_account_name) {
+    if (
+      !bank_name ||
+      !bank_code ||
+      !bank_account_number ||
+      !bank_account_name
+    ) {
       return NextResponse.json(
         {
           responsex: {
@@ -43,7 +48,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -64,7 +69,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,7 +100,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -109,7 +114,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -122,12 +127,13 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           responsex: {
-            message: 'Verification code has expired. Please request a new code.',
+            message:
+              'Verification code has expired. Please request a new code.',
             status: 'CODE_EXPIRED',
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -141,7 +147,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -150,32 +156,44 @@ export async function POST(request: Request) {
     try {
       console.log('Creating Paystack transfer recipient...');
 
-      const paystackResponse = await fetch('https://api.paystack.co/transferrecipient', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-          'Content-Type': 'application/json',
+      const paystackResponse = await fetch(
+        'https://api.paystack.co/transferrecipient',
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'nuban',
+            name: bank_account_name,
+            account_number: bank_account_number,
+            bank_code: bank_code,
+            currency: 'NGN',
+          }),
         },
-        body: JSON.stringify({
-          type: 'nuban',
-          name: bank_account_name,
-          account_number: bank_account_number,
-          bank_code: bank_code,
-          currency: 'NGN',
-        }),
-      });
+      );
 
       const paystackData = await paystackResponse.json();
 
       if (paystackData.status && paystackData.data) {
         bank_transfer_code = paystackData.data.recipient_code;
-        console.log('Transfer recipient created successfully:', bank_transfer_code);
+        console.log(
+          'Transfer recipient created successfully:',
+          bank_transfer_code,
+        );
       } else {
-        console.error('Failed to create transfer recipient:', paystackData.message);
+        console.error(
+          'Failed to create transfer recipient:',
+          paystackData.message,
+        );
         // Continue anyway - we'll save bank details without transfer code
       }
     } catch (paystackError) {
-      console.error('Error creating Paystack transfer recipient:', paystackError);
+      console.error(
+        'Error creating Paystack transfer recipient:',
+        paystackError,
+      );
       // Continue anyway - we'll save bank details without transfer code
     }
 
@@ -228,7 +246,7 @@ export async function POST(request: Request) {
           },
           successx: true,
         },
-        { status: 200 }
+        { status: 200 },
       );
     } else {
       return NextResponse.json(
@@ -239,7 +257,7 @@ export async function POST(request: Request) {
           },
           successx: false,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (error: any) {
@@ -252,8 +270,7 @@ export async function POST(request: Request) {
         },
         successx: false,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

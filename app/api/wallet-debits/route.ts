@@ -7,10 +7,13 @@ export async function GET(request: NextRequest) {
 
     // Validate required parameter
     if (!pidUser) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameter: pidUser is required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Missing required parameter: pidUser is required',
+        },
+        { status: 400 },
+      );
     }
 
     // Get user details to fetch email
@@ -26,10 +29,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found',
+        },
+        { status: 404 },
+      );
     }
 
     // Fetch debit transactions for the user
@@ -44,31 +50,36 @@ export async function GET(request: NextRequest) {
 
     // Calculate total debited amount
     const totalDebited = debits
-      .filter(debit => debit.paymentStatus === 'DEBITED')
+      .filter((debit) => debit.paymentStatus === 'DEBITED')
       .reduce((sum, debit) => sum + (debit.amount || 0), 0);
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: 'Debit transactions fetched successfully',
-      data: {
-        debits: debits,
-        totalDebited: totalDebited,
-        count: debits.length,
-        userInfo: {
-          email: user.userEmail,
-          firstName: user.userFirstname,
-          lastName: user.userLastname,
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Debit transactions fetched successfully',
+        data: {
+          debits: debits,
+          totalDebited: totalDebited,
+          count: debits.length,
+          userInfo: {
+            email: user.userEmail,
+            firstName: user.userFirstname,
+            lastName: user.userLastname,
+          },
         },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Fetch debit transactions error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while fetching debit transactions',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message:
+          'Internal server error occurred while fetching debit transactions',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-

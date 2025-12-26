@@ -38,26 +38,30 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: 'Filter options fetched successfully',
-      data: {
-        categories: categories.map(c => c.productCategory).filter(Boolean),
-        brands: brands.map(b => b.productBrand).filter(Boolean),
-        priceRange: {
-          min: priceRange._min.productPrice || 0,
-          max: priceRange._max.productPrice || 1000000,
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Filter options fetched successfully',
+        data: {
+          categories: categories.map((c) => c.productCategory).filter(Boolean),
+          brands: brands.map((b) => b.productBrand).filter(Boolean),
+          priceRange: {
+            min: priceRange._min.productPrice || 0,
+            max: priceRange._max.productPrice || 1000000,
+          },
         },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Fetch filters error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while fetching filters',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while fetching filters',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-

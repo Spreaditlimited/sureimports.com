@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import svgPaths from "../imports/svg-3g55n0e1d6";
-import mobilesvgPaths from "../imports/svg-4aglxup5kq";
-import { Product, CartItem } from "./App";
-import { WalletPaymentDialog } from "./WalletPaymentDialog";
+import { useState, useEffect } from 'react';
+import svgPaths from '../imports/svg-3g55n0e1d6';
+import mobilesvgPaths from '../imports/svg-4aglxup5kq';
+import { Product, CartItem } from './App';
+import { WalletPaymentDialog } from './WalletPaymentDialog';
 //import ImageWithFallback from '../../favicon.ico';
 import imgSureimportsReverse from '../../../../public/favicon.png';
 
@@ -20,67 +20,149 @@ interface ProductDetailsProps {
 }
 
 // Mobile Header Component
-function MobileHeader({ onBulkBuyer, onBackToStore }: { onBulkBuyer?: () => void; onBackToStore: () => void }) {
+function MobileHeader({
+  onBulkBuyer,
+  onBackToStore,
+}: {
+  onBulkBuyer?: () => void;
+  onBackToStore: () => void;
+}) {
   return (
     <>
       {/* Dark Header */}
-      <div className="bg-[#0e0e1f] dark:bg-card h-[90px] w-full relative">
+      <div className="relative h-[90px] w-full bg-[#0e0e1f] dark:bg-card">
         {/* Logo */}
-        <div 
-          className="absolute top-1/2 left-4 transform -translate-y-1/2 w-[180px] h-[20px] bg-no-repeat bg-contain"
+        <div
+          className="absolute left-4 top-1/2 h-[20px] w-[180px] -translate-y-1/2 transform bg-contain bg-no-repeat"
           style={{ backgroundImage: `url('${imgSureimportsReverse}')` }}
         />
-        
+
         {/* Hamburger Menu */}
-        <div className="absolute top-1/2 right-16 transform -translate-y-1/2 w-[26px] h-[20px]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 26 20">
-            <path d={mobilesvgPaths.p26572800} fill="white" className="dark:fill-foreground" />
+        <div className="absolute right-16 top-1/2 h-[20px] w-[26px] -translate-y-1/2 transform">
+          <svg
+            className="block size-full"
+            fill="none"
+            preserveAspectRatio="none"
+            viewBox="0 0 26 20"
+          >
+            <path
+              d={mobilesvgPaths.p26572800}
+              fill="white"
+              className="dark:fill-foreground"
+            />
           </svg>
         </div>
-        
+
         {/* Search Icon */}
-        <div className="absolute top-1/2 right-4 transform -translate-y-1/2 w-[26px] h-[26px]">
-          <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 26 26">
-            <path d={mobilesvgPaths.p14b4c900} fill="white" className="dark:fill-foreground" />
-            <path d={mobilesvgPaths.p32503f00} fill="white" className="dark:fill-foreground" />
+        <div className="absolute right-4 top-1/2 h-[26px] w-[26px] -translate-y-1/2 transform">
+          <svg
+            className="block size-full"
+            fill="none"
+            preserveAspectRatio="none"
+            viewBox="0 0 26 26"
+          >
+            <path
+              d={mobilesvgPaths.p14b4c900}
+              fill="white"
+              className="dark:fill-foreground"
+            />
+            <path
+              d={mobilesvgPaths.p32503f00}
+              fill="white"
+              className="dark:fill-foreground"
+            />
           </svg>
         </div>
       </div>
-      
+
       {/* Title and Buttons */}
-      <div className="flex items-center justify-between px-5 py-6 bg-background">
+      <div className="flex items-center justify-between bg-background px-5 py-6">
         <h1 className="text-lg font-semibold text-foreground">
           Product Details
         </h1>
         <div className="flex items-center gap-2">
           <button
             onClick={onBackToStore}
-            className="bg-slate-600 hover:bg-slate-700 dark:bg-muted dark:hover:bg-muted/80 transition-colors flex items-center gap-1 px-2 py-1 rounded-lg"
+            className="flex items-center gap-1 rounded-lg bg-slate-600 px-2 py-1 transition-colors hover:bg-slate-700 dark:bg-muted dark:hover:bg-muted/80"
           >
-            <div className="w-4 h-4">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                <path d={svgPaths.p3c066000} fill="white" className="dark:fill-foreground" />
-                <path d={svgPaths.pff6570} fill="white" className="dark:fill-foreground" />
-                <path d={svgPaths.p3e164800} fill="white" className="dark:fill-foreground" />
-                <path d={svgPaths.p1faa6100} fill="white" className="dark:fill-foreground" />
+            <div className="h-4 w-4">
+              <svg
+                className="block size-full"
+                fill="none"
+                preserveAspectRatio="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d={svgPaths.p3c066000}
+                  fill="white"
+                  className="dark:fill-foreground"
+                />
+                <path
+                  d={svgPaths.pff6570}
+                  fill="white"
+                  className="dark:fill-foreground"
+                />
+                <path
+                  d={svgPaths.p3e164800}
+                  fill="white"
+                  className="dark:fill-foreground"
+                />
+                <path
+                  d={svgPaths.p1faa6100}
+                  fill="white"
+                  className="dark:fill-foreground"
+                />
               </svg>
             </div>
-            <span className="font-medium text-white dark:text-foreground text-xs">Back</span>
+            <span className="text-xs font-medium text-white dark:text-foreground">
+              Back
+            </span>
           </button>
           {onBulkBuyer && (
             <button
               onClick={onBulkBuyer}
-              className="bg-purple-600 hover:bg-purple-700 transition-colors flex items-center gap-2 px-3 py-2 rounded-lg"
+              className="flex items-center gap-2 rounded-lg bg-purple-600 px-3 py-2 transition-colors hover:bg-purple-700"
             >
-              <div className="w-4 h-4">
-                <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                  <path d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M12 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M9 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  <path d="M15 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <div className="h-4 w-4">
+                <svg
+                  className="block size-full"
+                  fill="none"
+                  preserveAspectRatio="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M12 12V16"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M9 12V16"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M15 12V16"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
-              <span className="font-medium text-white text-xs">Bulk Buyer?</span>
+              <span className="text-xs font-medium text-white">
+                Bulk Buyer?
+              </span>
             </button>
           )}
         </div>
@@ -90,20 +172,20 @@ function MobileHeader({ onBulkBuyer, onBackToStore }: { onBulkBuyer?: () => void
 }
 
 // Mobile Product Info Component
-function MobileProductInfo({ 
-  product, 
-  quantity, 
-  onQuantityChange, 
-  onAddToCart, 
-  cartItems, 
-  onGoToCart, 
+function MobileProductInfo({
+  product,
+  quantity,
+  onQuantityChange,
+  onAddToCart,
+  cartItems,
+  onGoToCart,
   onPayFromWallet,
   onBackToStore,
   onCheckout,
-  onPaySmallSmall
-}: { 
-  product: Product; 
-  quantity: number; 
+  onPaySmallSmall,
+}: {
+  product: Product;
+  quantity: number;
   onQuantityChange: (quantity: number) => void;
   onAddToCart: (product: Product) => void;
   cartItems: CartItem[];
@@ -113,36 +195,43 @@ function MobileProductInfo({
   onCheckout?: (quantity: number) => void;
   onPaySmallSmall?: (product: Product, quantity: number) => void;
 }) {
-  const [activeTab, setActiveTab] = useState("Description");
-  const isInCart = cartItems.some(item => item.id === product.id);
+  const [activeTab, setActiveTab] = useState('Description');
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   return (
-    <div className="bg-card mx-5 p-5 rounded-xl border border-border shadow-sm">
+    <div className="mx-5 rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="space-y-4">
         {/* Product Image */}
-        <div className="bg-muted rounded-xl relative aspect-square overflow-hidden border border-border">
+        <div className="relative aspect-square overflow-hidden rounded-xl border border-border bg-muted">
           <img
             src={product.image}
             alt={product.title}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         </div>
 
         {/* Brand Tag and Add to Cart - Above Title */}
         <div className="flex items-center gap-2">
-          <div className="bg-indigo-800 dark:bg-primary inline-flex items-center px-2 py-1 rounded-full">
-            <span className="font-medium text-white dark:text-primary-foreground text-xs">{product.brand}</span>
+          <div className="inline-flex items-center rounded-full bg-indigo-800 px-2 py-1 dark:bg-primary">
+            <span className="text-xs font-medium text-white dark:text-primary-foreground">
+              {product.brand}
+            </span>
           </div>
           <button
-            onClick={() => isInCart ? onGoToCart() : onAddToCart(product)}
-            className={`transition-colors inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${
-              isInCart 
-                ? 'bg-green-600 hover:bg-green-700 text-white' 
-                : 'bg-green-600 hover:bg-green-700 text-white'
+            onClick={() => (isInCart ? onGoToCart() : onAddToCart(product))}
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs transition-colors ${
+              isInCart
+                ? 'bg-green-600 text-white hover:bg-green-700'
+                : 'bg-green-600 text-white hover:bg-green-700'
             }`}
           >
-            <div className="w-3 h-3">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
+            <div className="h-3 w-3">
+              <svg
+                className="block size-full"
+                fill="none"
+                preserveAspectRatio="none"
+                viewBox="0 0 24 24"
+              >
                 <path
                   d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z"
                   stroke="white"
@@ -157,26 +246,31 @@ function MobileProductInfo({
             </span>
           </button>
         </div>
-        
+
         {/* Title and Rating */}
         <div>
-          <h2 className="font-semibold text-foreground leading-tight mb-1">
+          <h2 className="mb-1 font-semibold leading-tight text-foreground">
             {product.title}
           </h2>
           <div className="flex items-center gap-2">
             <div className="flex gap-0.5">
               {[...Array(5)].map((_, index) => (
-                <div key={index} className="w-3 h-3">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
+                <div key={index} className="h-3 w-3">
+                  <svg
+                    className="block size-full"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 18 18"
+                  >
                     <path
                       d={svgPaths.p304c0b00}
-                      fill={index < product.rating ? "#FFC107" : "#E0E0E0"}
+                      fill={index < product.rating ? '#FFC107' : '#E0E0E0'}
                     />
                   </svg>
                 </div>
               ))}
             </div>
-            <span className="text-foreground text-sm">{product.rating}.0</span>
+            <span className="text-sm text-foreground">{product.rating}.0</span>
           </div>
         </div>
 
@@ -186,19 +280,19 @@ function MobileProductInfo({
             <div className="font-semibold text-foreground">{product.price}</div>
             <div className="text-sm text-muted-foreground">MOQ - 1</div>
           </div>
-          <div className="bg-card border border-border flex items-center gap-2 px-2 py-1 rounded-lg">
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-2 py-1">
             <button
               onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
-              className="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity text-foreground"
+              className="flex h-5 w-5 items-center justify-center text-foreground transition-opacity hover:opacity-70"
             >
               <span className="leading-none">−</span>
             </button>
-            <span className="font-semibold text-foreground text-sm min-w-[20px] text-center">
+            <span className="min-w-[20px] text-center text-sm font-semibold text-foreground">
               {quantity}
             </span>
             <button
               onClick={() => onQuantityChange(quantity + 1)}
-              className="w-5 h-5 flex items-center justify-center hover:opacity-70 transition-opacity text-foreground"
+              className="flex h-5 w-5 items-center justify-center text-foreground transition-opacity hover:opacity-70"
             >
               <span className="leading-none">+</span>
             </button>
@@ -207,81 +301,123 @@ function MobileProductInfo({
 
         {/* Product Specs - Filter Panel Aligned */}
         <div className="grid grid-cols-2 gap-1.5 text-xs">
-          <div className="bg-muted border border-border px-2 py-1 rounded-md">
+          <div className="rounded-md border border-border bg-muted px-2 py-1">
             <span className="text-muted-foreground">Category</span>
-            <div className="font-medium text-foreground">{product.category}</div>
+            <div className="font-medium text-foreground">
+              {product.category}
+            </div>
           </div>
-          <div className="bg-muted border border-border px-2 py-1 rounded-md">
+          <div className="rounded-md border border-border bg-muted px-2 py-1">
             <span className="text-muted-foreground">Brand</span>
             <div className="font-medium text-foreground">{product.brand}</div>
           </div>
-          <div className="bg-muted border border-border px-2 py-1 rounded-md">
+          <div className="rounded-md border border-border bg-muted px-2 py-1">
             <span className="text-muted-foreground">Condition</span>
-            <div className="font-medium text-foreground">{product.condition}</div>
+            <div className="font-medium text-foreground">
+              {product.condition}
+            </div>
           </div>
           {product.memory && (
-            <div className="bg-muted border border-border px-2 py-1 rounded-md">
+            <div className="rounded-md border border-border bg-muted px-2 py-1">
               <span className="text-muted-foreground">Memory</span>
-              <div className="font-medium text-foreground">{product.memory} RAM</div>
+              <div className="font-medium text-foreground">
+                {product.memory} RAM
+              </div>
             </div>
           )}
           {product.storage && (
-            <div className="bg-muted border border-border px-2 py-1 rounded-md">
+            <div className="rounded-md border border-border bg-muted px-2 py-1">
               <span className="text-muted-foreground">Storage</span>
-              <div className="font-medium text-foreground">{product.storage} SSD</div>
+              <div className="font-medium text-foreground">
+                {product.storage} SSD
+              </div>
             </div>
           )}
           {product.hasGraphicsCard && product.graphicsMemory && (
-            <div className="bg-muted border border-border px-2 py-1 rounded-md">
+            <div className="rounded-md border border-border bg-muted px-2 py-1">
               <span className="text-muted-foreground">Graphics</span>
-              <div className="font-medium text-foreground">{product.graphicsMemory} VRAM</div>
+              <div className="font-medium text-foreground">
+                {product.graphicsMemory} VRAM
+              </div>
             </div>
           )}
           {product.warranty && (
-            <div className="bg-muted border border-border px-2 py-1 rounded-md col-span-2">
+            <div className="col-span-2 rounded-md border border-border bg-muted px-2 py-1">
               <span className="text-muted-foreground">Warranty</span>
-              <div className="font-medium text-foreground">{product.warranty}</div>
+              <div className="font-medium text-foreground">
+                {product.warranty}
+              </div>
             </div>
           )}
         </div>
 
         {/* Product Description */}
         <div className="space-y-2">
-          <h3 className="font-semibold text-foreground text-sm">Product Description</h3>
-          <div className="text-sm text-muted-foreground leading-relaxed space-y-2">
+          <h3 className="text-sm font-semibold text-foreground">
+            Product Description
+          </h3>
+          <div className="space-y-2 text-sm leading-relaxed text-muted-foreground">
             <p>
-              {product.description} This premium device offers exceptional performance and reliability.
+              {product.description} This premium device offers exceptional
+              performance and reliability.
             </p>
             <p>
-              <strong>What's Included:</strong> Complete original packaging, all standard accessories, warranty documentation, and quick start guide.
+              <strong>What's Included:</strong> Complete original packaging, all
+              standard accessories, warranty documentation, and quick start
+              guide.
             </p>
             <p>
-              <strong>Shipping:</strong> Fast 10-day shipping from China with tracking and comprehensive after-sales support.
+              <strong>Shipping:</strong> Fast 10-day shipping from China with
+              tracking and comprehensive after-sales support.
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <button 
+          <button
             onClick={() => onCheckout && onCheckout(quantity)}
-            className="flex-1 bg-indigo-800 hover:bg-indigo-900 dark:bg-primary dark:hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 py-3 rounded-lg text-white dark:text-primary-foreground text-sm font-medium"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-800 py-3 text-sm font-medium text-white transition-colors hover:bg-indigo-900 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
           >
-            <div className="w-5 h-5">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="h-5 w-5">
+              <svg
+                className="block size-full"
+                fill="none"
+                preserveAspectRatio="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             Checkout
           </button>
-          
-          <button 
-            onClick={() => onPaySmallSmall && onPaySmallSmall(product, quantity)}
-            className="flex-1 bg-green-600 hover:bg-green-700 transition-colors flex items-center justify-center gap-2 py-3 rounded-lg text-white text-sm font-medium"
+
+          <button
+            onClick={() =>
+              onPaySmallSmall && onPaySmallSmall(product, quantity)
+            }
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 py-3 text-sm font-medium text-white transition-colors hover:bg-green-700"
           >
-            <div className="w-5 h-5">
-              <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                <path d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="h-5 w-5">
+              <svg
+                className="block size-full"
+                fill="none"
+                preserveAspectRatio="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12Z"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             </div>
             Pay Small Small
@@ -290,36 +426,39 @@ function MobileProductInfo({
 
         {/* Compact Tabs */}
         <div className="border-t border-border pt-4">
-          <div className="flex gap-1 mb-3">
-            {["Description", "Features", "Pay Small Small"].map((tab) => (
+          <div className="mb-3 flex gap-1">
+            {['Description', 'Features', 'Pay Small Small'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 px-2 py-1 rounded text-sm font-medium transition-colors ${
-                  activeTab === tab 
-                    ? 'bg-indigo-800 dark:bg-primary text-white dark:text-primary-foreground' 
-                    : 'bg-card text-foreground border border-border'
+                className={`flex-1 rounded px-2 py-1 text-sm font-medium transition-colors ${
+                  activeTab === tab
+                    ? 'bg-indigo-800 text-white dark:bg-primary dark:text-primary-foreground'
+                    : 'border border-border bg-card text-foreground'
                 }`}
               >
                 {tab}
               </button>
             ))}
           </div>
-          
-          <div className="text-sm text-muted-foreground leading-relaxed">
-            {activeTab === "Description" && (
-              <p>{product.description} This premium device offers exceptional performance and reliability.</p>
+
+          <div className="text-sm leading-relaxed text-muted-foreground">
+            {activeTab === 'Description' && (
+              <p>
+                {product.description} This premium device offers exceptional
+                performance and reliability.
+              </p>
             )}
-            {activeTab === "Features" && (
-              <ul className="list-disc ml-4 space-y-1">
+            {activeTab === 'Features' && (
+              <ul className="ml-4 list-disc space-y-1">
                 <li>Premium build quality</li>
                 <li>High-performance components</li>
                 <li>Professional design</li>
                 <li>Comprehensive warranty</li>
               </ul>
             )}
-            {activeTab === "Pay Small Small" && (
-              <ul className="list-disc ml-4 space-y-1">
+            {activeTab === 'Pay Small Small' && (
+              <ul className="ml-4 list-disc space-y-1">
                 <li>Flexible payment options</li>
                 <li>No hidden fees</li>
                 <li>Secure payment processing</li>
@@ -334,41 +473,53 @@ function MobileProductInfo({
 }
 
 // Desktop Components
-export default function ProductDetails({ product, onBackToStore, onAddToCart, cartItems, onGoToCart, onBulkBuyer, onCheckout, onPaySmallSmall }: ProductDetailsProps) {
+export default function ProductDetails({
+  product,
+  onBackToStore,
+  onAddToCart,
+  cartItems,
+  onGoToCart,
+  onBulkBuyer,
+  onCheckout,
+  onPaySmallSmall,
+}: ProductDetailsProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [showWalletDialog, setShowWalletDialog] = useState(false);
-  const [activeTab, setActiveTab] = useState("Description");
+  const [activeTab, setActiveTab] = useState('Description');
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const isInCart = cartItems.some(item => item.id === product.id);
+  const isInCart = cartItems.some((item) => item.id === product.id);
 
   const handlePayFromWallet = () => {
     setShowWalletDialog(true);
   };
 
   const handleWalletPaymentComplete = () => {
-    alert("Payment completed successfully!");
+    alert('Payment completed successfully!');
     setShowWalletDialog(false);
   };
 
   if (isMobile) {
     return (
       <>
-        <div className="bg-background min-h-screen">
-          <MobileHeader onBulkBuyer={onBulkBuyer} onBackToStore={onBackToStore} />
+        <div className="min-h-screen bg-background">
+          <MobileHeader
+            onBulkBuyer={onBulkBuyer}
+            onBackToStore={onBackToStore}
+          />
           <div className="pb-8">
-            <MobileProductInfo 
-              product={product} 
+            <MobileProductInfo
+              product={product}
               quantity={quantity}
               onQuantityChange={setQuantity}
               onAddToCart={onAddToCart}
@@ -393,10 +544,10 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
 
   return (
     <>
-      <div className="bg-background mx-auto max-w-7xl px-8 py-12">
+      <div className="mx-auto max-w-7xl bg-background px-8 py-12">
         {/* Header Section - Consistent with main page */}
         <div className="mb-8">
-          <div className="flex items-start justify-between mb-2">
+          <div className="mb-2 flex items-start justify-between">
             <h1 className="text-2xl font-semibold text-foreground">
               Product Details
             </h1>
@@ -404,47 +555,101 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
               {onBulkBuyer && (
                 <button
                   onClick={onBulkBuyer}
-                  className="bg-purple-600 hover:bg-purple-700 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg"
+                  className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 transition-colors hover:bg-purple-700"
                 >
-                  <div className="w-5 h-5">
-                    <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                      <path d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M12 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M9 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <path d="M15 12V16" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <div className="h-5 w-5">
+                    <svg
+                      className="block size-full"
+                      fill="none"
+                      preserveAspectRatio="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 12V16"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9 12V16"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M15 12V16"
+                        stroke="white"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
                     </svg>
                   </div>
-                  <span className="font-medium text-white text-sm">Bulk Buyer?</span>
+                  <span className="text-sm font-medium text-white">
+                    Bulk Buyer?
+                  </span>
                 </button>
               )}
               <button
                 onClick={onBackToStore}
-                className="bg-slate-600 hover:bg-slate-700 dark:bg-muted dark:hover:bg-muted/80 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg"
+                className="flex items-center gap-2 rounded-lg bg-slate-600 px-4 py-2 transition-colors hover:bg-slate-700 dark:bg-muted dark:hover:bg-muted/80"
               >
-                <div className="w-5 h-5">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                    <path d={svgPaths.p3c066000} fill="white" className="dark:fill-foreground" />
-                    <path d={svgPaths.pff6570} fill="white" className="dark:fill-foreground" />
-                    <path d={svgPaths.p3e164800} fill="white" className="dark:fill-foreground" />
-                    <path d={svgPaths.p1faa6100} fill="white" className="dark:fill-foreground" />
+                <div className="h-5 w-5">
+                  <svg
+                    className="block size-full"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d={svgPaths.p3c066000}
+                      fill="white"
+                      className="dark:fill-foreground"
+                    />
+                    <path
+                      d={svgPaths.pff6570}
+                      fill="white"
+                      className="dark:fill-foreground"
+                    />
+                    <path
+                      d={svgPaths.p3e164800}
+                      fill="white"
+                      className="dark:fill-foreground"
+                    />
+                    <path
+                      d={svgPaths.p1faa6100}
+                      fill="white"
+                      className="dark:fill-foreground"
+                    />
                   </svg>
                 </div>
-                <span className="font-medium text-white dark:text-foreground text-sm">Back to Store</span>
+                <span className="text-sm font-medium text-white dark:text-foreground">
+                  Back to Store
+                </span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Main Content - Compact Two-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Product Image */}
-          <div className="bg-card rounded-xl shadow-sm overflow-hidden border border-border">
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <div className="p-6">
-              <div className="relative bg-muted rounded-lg border border-border overflow-hidden aspect-square">
+              <div className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted">
                 <img
                   src={product.image}
                   alt={product.title}
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
             </div>
@@ -454,19 +659,26 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
           <div className="space-y-6">
             {/* Brand and Add to Cart - Above Title */}
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-800 dark:bg-primary inline-flex items-center px-4 py-2 rounded-lg">
-                <span className="font-medium text-white dark:text-primary-foreground">{product.brand}</span>
+              <div className="inline-flex items-center rounded-lg bg-indigo-800 px-4 py-2 dark:bg-primary">
+                <span className="font-medium text-white dark:text-primary-foreground">
+                  {product.brand}
+                </span>
               </div>
               <button
-                onClick={() => isInCart ? onGoToCart() : onAddToCart(product)}
-                className={`transition-colors inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
-                  isInCart 
-                    ? 'bg-green-600 hover:bg-green-700 text-white' 
-                    : 'bg-green-600 hover:bg-green-700 text-white'
+                onClick={() => (isInCart ? onGoToCart() : onAddToCart(product))}
+                className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 transition-colors ${
+                  isInCart
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-green-600 text-white hover:bg-green-700'
                 }`}
               >
-                <div className="w-4 h-4">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
+                <div className="h-4 w-4">
+                  <svg
+                    className="block size-full"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z"
                       stroke="white"
@@ -484,45 +696,54 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
 
             {/* Title and Rating */}
             <div>
-              <h2 className="text-2xl font-semibold text-foreground leading-tight mb-2">
+              <h2 className="mb-2 text-2xl font-semibold leading-tight text-foreground">
                 {product.title}
               </h2>
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
                   {[...Array(5)].map((_, index) => (
-                    <div key={index} className="w-4 h-4">
-                      <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 18 18">
+                    <div key={index} className="h-4 w-4">
+                      <svg
+                        className="block size-full"
+                        fill="none"
+                        preserveAspectRatio="none"
+                        viewBox="0 0 18 18"
+                      >
                         <path
                           d={svgPaths.p304c0b00}
-                          fill={index < product.rating ? "#FFC107" : "#E0E0E0"}
+                          fill={index < product.rating ? '#FFC107' : '#E0E0E0'}
                         />
                       </svg>
                     </div>
                   ))}
                 </div>
-                <span className="text-foreground text-sm">{product.rating}.0</span>
+                <span className="text-sm text-foreground">
+                  {product.rating}.0
+                </span>
               </div>
             </div>
 
             {/* Price and Quantity */}
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xl font-semibold text-foreground">{product.price}</div>
+                <div className="text-xl font-semibold text-foreground">
+                  {product.price}
+                </div>
                 <div className="text-sm text-muted-foreground">MOQ - 1</div>
               </div>
-              <div className="bg-card border border-border flex items-center gap-3 px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-6 h-6 flex items-center justify-center hover:opacity-70 transition-opacity text-foreground"
+                  className="flex h-6 w-6 items-center justify-center text-foreground transition-opacity hover:opacity-70"
                 >
                   <span className="leading-none">−</span>
                 </button>
-                <span className="font-semibold text-foreground min-w-[20px] text-center">
+                <span className="min-w-[20px] text-center font-semibold text-foreground">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-6 h-6 flex items-center justify-center hover:opacity-70 transition-opacity text-foreground"
+                  className="flex h-6 w-6 items-center justify-center text-foreground transition-opacity hover:opacity-70"
                 >
                   <span className="leading-none">+</span>
                 </button>
@@ -531,56 +752,94 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
 
             {/* Product Specs - Filter Panel Structure */}
             <div className="grid grid-cols-3 gap-2">
-              <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                <span className="text-muted-foreground text-xs block">Category</span>
-                <span className="font-medium text-sm text-foreground">{product.category}</span>
+              <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                <span className="block text-xs text-muted-foreground">
+                  Category
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {product.category}
+                </span>
               </div>
-              <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                <span className="text-muted-foreground text-xs block">Brand</span>
-                <span className="font-medium text-sm text-foreground">{product.brand}</span>
+              <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                <span className="block text-xs text-muted-foreground">
+                  Brand
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {product.brand}
+                </span>
               </div>
-              <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                <span className="text-muted-foreground text-xs block">Condition</span>
-                <span className="font-medium text-sm text-foreground">{product.condition}</span>
+              <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                <span className="block text-xs text-muted-foreground">
+                  Condition
+                </span>
+                <span className="text-sm font-medium text-foreground">
+                  {product.condition}
+                </span>
               </div>
               {product.memory && (
-                <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                  <span className="text-muted-foreground text-xs block">Memory</span>
-                  <span className="font-medium text-sm text-foreground">{product.memory} RAM</span>
+                <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                  <span className="block text-xs text-muted-foreground">
+                    Memory
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    {product.memory} RAM
+                  </span>
                 </div>
               )}
               {product.storage && (
-                <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                  <span className="text-muted-foreground text-xs block">Storage</span>
-                  <span className="font-medium text-sm text-foreground">{product.storage} SSD</span>
+                <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                  <span className="block text-xs text-muted-foreground">
+                    Storage
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    {product.storage} SSD
+                  </span>
                 </div>
               )}
               {product.hasGraphicsCard && product.graphicsMemory && (
-                <div className="bg-muted border border-border px-3 py-2 rounded-lg">
-                  <span className="text-muted-foreground text-xs block">Graphics</span>
-                  <span className="font-medium text-sm text-foreground">{product.graphicsMemory} VRAM</span>
+                <div className="rounded-lg border border-border bg-muted px-3 py-2">
+                  <span className="block text-xs text-muted-foreground">
+                    Graphics
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    {product.graphicsMemory} VRAM
+                  </span>
                 </div>
               )}
               {product.warranty && (
-                <div className="bg-muted border border-border px-3 py-2 rounded-lg col-span-3">
-                  <span className="text-muted-foreground text-xs block">Warranty</span>
-                  <span className="font-medium text-sm text-foreground">{product.warranty}</span>
+                <div className="col-span-3 rounded-lg border border-border bg-muted px-3 py-2">
+                  <span className="block text-xs text-muted-foreground">
+                    Warranty
+                  </span>
+                  <span className="text-sm font-medium text-foreground">
+                    {product.warranty}
+                  </span>
                 </div>
               )}
             </div>
 
             {/* Product Description */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-foreground">Product Description</h3>
-              <div className="text-muted-foreground leading-relaxed space-y-3">
+              <h3 className="font-semibold text-foreground">
+                Product Description
+              </h3>
+              <div className="space-y-3 leading-relaxed text-muted-foreground">
                 <p>
-                  {product.description} This premium device offers exceptional performance, reliability, and style for professionals and enthusiasts alike.
+                  {product.description} This premium device offers exceptional
+                  performance, reliability, and style for professionals and
+                  enthusiasts alike.
                 </p>
                 <p>
-                  <strong>What's Included:</strong> Complete original packaging, all standard accessories, comprehensive warranty documentation, quick start guide, and premium protective accessories.
+                  <strong>What's Included:</strong> Complete original packaging,
+                  all standard accessories, comprehensive warranty
+                  documentation, quick start guide, and premium protective
+                  accessories.
                 </p>
                 <p>
-                  <strong>Shipping & Support:</strong> Fast 10-day shipping directly from China with full tracking and insurance coverage. Our dedicated customer support team provides comprehensive after-sales service.
+                  <strong>Shipping & Support:</strong> Fast 10-day shipping
+                  directly from China with full tracking and insurance coverage.
+                  Our dedicated customer support team provides comprehensive
+                  after-sales service.
                 </p>
               </div>
             </div>
@@ -589,23 +848,47 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
             <div className="flex gap-3">
               <button
                 onClick={() => onCheckout && onCheckout(quantity)}
-                className="flex-1 bg-indigo-800 hover:bg-indigo-900 dark:bg-primary dark:hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 py-4 rounded-lg text-white dark:text-primary-foreground font-medium"
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-indigo-800 py-4 font-medium text-white transition-colors hover:bg-indigo-900 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
               >
-                <div className="w-6 h-6">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                    <path d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <div className="h-6 w-6">
+                  <svg
+                    className="block size-full"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M3 3H5L5.4 5M7 13H17L21 5H5.4M7 13L5.4 5M7 13L4.7 15.3C4.3 15.7 4.6 16 5 16H17M17 13V16M9 19.5A1.5 1.5 0 1 1 12 19.5 1.5 1.5 0 0 1 9 19.5ZM20 19.5A1.5 1.5 0 1 1 23 19.5 1.5 1.5 0 0 1 20 19.5Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 Checkout
               </button>
-              
+
               <button
-                onClick={() => onPaySmallSmall && onPaySmallSmall(product, quantity)}
-                className="flex-1 bg-green-600 hover:bg-green-700 transition-colors flex items-center justify-center gap-2 py-4 rounded-lg text-white font-medium"
+                onClick={() =>
+                  onPaySmallSmall && onPaySmallSmall(product, quantity)
+                }
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-green-600 py-4 font-medium text-white transition-colors hover:bg-green-700"
               >
-                <div className="w-6 h-6">
-                  <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 24 24">
-                    <path d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <div className="h-6 w-6">
+                  <svg
+                    className="block size-full"
+                    fill="none"
+                    preserveAspectRatio="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H7M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12Z"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
                 Pay Small Small
@@ -614,28 +897,32 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
 
             {/* Tabs Section */}
             <div className="border-t border-border pt-6">
-              <div className="flex gap-2 mb-4">
-                {["Description", "Features", "Pay Small Small"].map((tab) => (
+              <div className="mb-4 flex gap-2">
+                {['Description', 'Features', 'Pay Small Small'].map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      activeTab === tab 
-                        ? 'bg-indigo-800 dark:bg-primary text-white dark:text-primary-foreground' 
-                        : 'bg-muted hover:bg-muted/80 text-foreground'
+                    className={`rounded-lg px-4 py-2 font-medium transition-colors ${
+                      activeTab === tab
+                        ? 'bg-indigo-800 text-white dark:bg-primary dark:text-primary-foreground'
+                        : 'bg-muted text-foreground hover:bg-muted/80'
                     }`}
                   >
                     {tab}
                   </button>
                 ))}
               </div>
-              
-              <div className="text-muted-foreground leading-relaxed">
-                {activeTab === "Description" && (
-                  <p>{product.description} This premium device offers exceptional performance, reliability, and style for professionals and enthusiasts alike.</p>
+
+              <div className="leading-relaxed text-muted-foreground">
+                {activeTab === 'Description' && (
+                  <p>
+                    {product.description} This premium device offers exceptional
+                    performance, reliability, and style for professionals and
+                    enthusiasts alike.
+                  </p>
                 )}
-                {activeTab === "Features" && (
-                  <ul className="list-disc ml-6 space-y-2">
+                {activeTab === 'Features' && (
+                  <ul className="ml-6 list-disc space-y-2">
                     <li>Premium build quality with attention to detail</li>
                     <li>High-performance components for demanding tasks</li>
                     <li>Professional design that stands out</li>
@@ -643,13 +930,18 @@ export default function ProductDetails({ product, onBackToStore, onAddToCart, ca
                     <li>Genuine accessories and original packaging</li>
                   </ul>
                 )}
-                {activeTab === "Pay Small Small" && (
+                {activeTab === 'Pay Small Small' && (
                   <div className="space-y-3">
-                    <p>Our flexible payment system allows you to pay in smaller, manageable installments:</p>
-                    <ul className="list-disc ml-6 space-y-2">
+                    <p>
+                      Our flexible payment system allows you to pay in smaller,
+                      manageable installments:
+                    </p>
+                    <ul className="ml-6 list-disc space-y-2">
                       <li>Flexible payment options tailored to your needs</li>
                       <li>No hidden fees or surprise charges</li>
-                      <li>Secure payment processing with bank-level security</li>
+                      <li>
+                        Secure payment processing with bank-level security
+                      </li>
                       <li>Dedicated customer support throughout the process</li>
                       <li>Build your credit score with timely payments</li>
                     </ul>

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Dialog,
@@ -7,8 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "./ui/dialog";
-import { Button } from "./ui/button";
+} from './ui/dialog';
+import { Button } from './ui/button';
 
 interface CancelOrderDialogProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export default function CancelOrderDialog({
   onClose,
   onConfirm,
   orderNumber,
-  orderTotal
+  orderTotal,
 }: CancelOrderDialogProps) {
   // Calculate the refund amount (minus 2.5% inconvenience fee)
   const calculateRefund = (totalString: string) => {
@@ -32,19 +32,21 @@ export default function CancelOrderDialog({
       return {
         refund: 0,
         fee: 0,
-        original: 0
+        original: 0,
       };
     }
-    
+
     // Extract numeric value from price string (e.g., "₦967,500.00" -> 967500)
-    const numericValue = parseInt(totalString.replace(/[₦,\s]/g, '').split('.')[0]);
+    const numericValue = parseInt(
+      totalString.replace(/[₦,\s]/g, '').split('.')[0],
+    );
     const refundAmount = numericValue * 0.975; // 97.5% of original amount
     const feeAmount = numericValue * 0.025; // 2.5% fee
-    
+
     return {
       refund: Math.round(refundAmount),
       fee: Math.round(feeAmount),
-      original: numericValue
+      original: numericValue,
     };
   };
 
@@ -55,9 +57,9 @@ export default function CancelOrderDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
               <svg
-                className="w-5 h-5 text-red-600 dark:text-red-400"
+                className="h-5 w-5 text-red-600 dark:text-red-400"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -75,7 +77,8 @@ export default function CancelOrderDialog({
           <DialogDescription asChild>
             <div className="space-y-4 text-sm text-muted-foreground">
               <p>
-                Are you sure you want to cancel this order? Please review the implications below:
+                Are you sure you want to cancel this order? Please review the
+                implications below:
               </p>
             </div>
           </DialogDescription>
@@ -83,76 +86,150 @@ export default function CancelOrderDialog({
 
         <div className="space-y-4">
           {/* Implications List */}
-          <div className="bg-muted rounded-lg p-4 space-y-3">
-            <h4 className="font-medium text-foreground">What happens when you cancel:</h4>
-            
+          <div className="space-y-3 rounded-lg bg-muted p-4">
+            <h4 className="font-medium text-foreground">
+              What happens when you cancel:
+            </h4>
+
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                  <svg
+                    className="h-3 w-3 text-red-600 dark:text-red-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Order Processing Stopped</p>
-                  <p className="text-sm text-muted-foreground">Your order will no longer be processed and shipment will be cancelled.</p>
+                  <p className="font-medium text-foreground">
+                    Order Processing Stopped
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Your order will no longer be processed and shipment will be
+                    cancelled.
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
+                  <svg
+                    className="h-3 w-3 text-yellow-600 dark:text-yellow-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Inconvenience Fee Applied</p>
-                  <p className="text-sm text-muted-foreground">A 2.5% inconvenience fee (₦{fee.toLocaleString()}) will be deducted from your refund.</p>
+                  <p className="font-medium text-foreground">
+                    Inconvenience Fee Applied
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    A 2.5% inconvenience fee (₦{fee.toLocaleString()}) will be
+                    deducted from your refund.
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                  <svg
+                    className="h-3 w-3 text-green-600 dark:text-green-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M5 13l4 4L19 7"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Automatic Wallet Credit</p>
-                  <p className="text-sm text-muted-foreground">₦{refund.toLocaleString()} will be automatically credited to your wallet.</p>
+                  <p className="font-medium text-foreground">
+                    Automatic Wallet Credit
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    ₦{refund.toLocaleString()} will be automatically credited to
+                    your wallet.
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg className="w-3 h-3 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                  <svg
+                    className="h-3 w-3 text-blue-600 dark:text-blue-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Flexible Wallet Usage</p>
-                  <p className="text-sm text-muted-foreground">Use your wallet balance to purchase other products or withdraw to your bank account.</p>
+                  <p className="font-medium text-foreground">
+                    Flexible Wallet Usage
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Use your wallet balance to purchase other products or
+                    withdraw to your bank account.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Refund Breakdown */}
-          <div className="bg-accent rounded-lg p-4">
-            <h4 className="font-medium text-foreground mb-3">Refund Breakdown:</h4>
+          <div className="rounded-lg bg-accent p-4">
+            <h4 className="mb-3 font-medium text-foreground">
+              Refund Breakdown:
+            </h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Order Total:</span>
-                <span className="font-medium text-foreground">{orderTotal}</span>
+                <span className="font-medium text-foreground">
+                  {orderTotal}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Inconvenience Fee (2.5%):</span>
-                <span className="font-medium text-red-600 dark:text-red-400">-₦{fee.toLocaleString()}</span>
+                <span className="text-muted-foreground">
+                  Inconvenience Fee (2.5%):
+                </span>
+                <span className="font-medium text-red-600 dark:text-red-400">
+                  -₦{fee.toLocaleString()}
+                </span>
               </div>
-              <div className="h-px bg-border my-2"></div>
+              <div className="my-2 h-px bg-border"></div>
               <div className="flex justify-between">
-                <span className="text-foreground font-medium">Wallet Credit:</span>
-                <span className="font-semibold text-green-600 dark:text-green-400">₦{refund.toLocaleString()}</span>
+                <span className="font-medium text-foreground">
+                  Wallet Credit:
+                </span>
+                <span className="font-semibold text-green-600 dark:text-green-400">
+                  ₦{refund.toLocaleString()}
+                </span>
               </div>
             </div>
           </div>
@@ -162,8 +239,8 @@ export default function CancelOrderDialog({
           <Button variant="outline" onClick={onClose}>
             Keep Order
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={() => {
               onConfirm();
             }}

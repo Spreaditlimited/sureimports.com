@@ -7,10 +7,13 @@ export async function GET(request: NextRequest) {
 
     // Validate required parameter
     if (!pidUser) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameter: pidUser is required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Missing required parameter: pidUser is required',
+        },
+        { status: 400 },
+      );
     }
 
     // Fetch pending payout request for the user
@@ -25,11 +28,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!pendingPayout) {
-      return NextResponse.json({
-        statusx: 'NO_PENDING',
-        message: 'No pending payout request found',
-        data: null,
-      }, { status: 200 });
+      return NextResponse.json(
+        {
+          statusx: 'NO_PENDING',
+          message: 'No pending payout request found',
+          data: null,
+        },
+        { status: 200 },
+      );
     }
 
     // Get user details for bank information
@@ -44,33 +50,40 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: 'Pending payout request found',
-      data: {
-        pidPayout: pendingPayout.pidPayout,
-        amount: pendingPayout.amount,
-        reference: pendingPayout.reference,
-        reason: pendingPayout.reason,
-        status: pendingPayout.status,
-        xStatus: pendingPayout.xStatus,
-        createdAt: pendingPayout.createdAt,
-        updatedAt: pendingPayout.updatedAt,
-        bankDetails: user ? {
-          bankName: user.bank_name,
-          accountNumber: user.bank_account_number,
-          accountName: user.bank_account_name,
-        } : null,
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Pending payout request found',
+        data: {
+          pidPayout: pendingPayout.pidPayout,
+          amount: pendingPayout.amount,
+          reference: pendingPayout.reference,
+          reason: pendingPayout.reason,
+          status: pendingPayout.status,
+          xStatus: pendingPayout.xStatus,
+          createdAt: pendingPayout.createdAt,
+          updatedAt: pendingPayout.updatedAt,
+          bankDetails: user
+            ? {
+                bankName: user.bank_name,
+                accountNumber: user.bank_account_number,
+                accountName: user.bank_account_name,
+              }
+            : null,
+        },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Get pending payout request error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while fetching pending payout request',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message:
+          'Internal server error occurred while fetching pending payout request',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-

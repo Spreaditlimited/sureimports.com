@@ -87,7 +87,7 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
 
   return (
     <>
-      <div className="p-7 flex w-full flex-col items-center dark:bg-black xl:flex-row xl:items-start">
+      <div className="flex w-full flex-col items-center p-7 dark:bg-black xl:flex-row xl:items-start">
         <div className="my-[20px] grid w-full justify-between gap-3 max-sm:justify-center md:grid-cols-2 xl:flex">
           {cards.map((card, index) => (
             <div

@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { toast } from 'sonner';
 
 // Types
@@ -79,12 +85,20 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   // Calculate cart total
-  const cartTotal = cart.reduce((total, item) => total + (item.productPrice * item.quantity), 0);
+  const cartTotal = cart.reduce(
+    (total, item) => total + item.productPrice * item.quantity,
+    0,
+  );
 
   // Add item to cart
-  const addToCart = (item: Omit<CartItem, 'quantity'>, quantity: number = 1) => {
+  const addToCart = (
+    item: Omit<CartItem, 'quantity'>,
+    quantity: number = 1,
+  ) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((i) => i.pidProduct === item.pidProduct);
+      const existingItem = prevCart.find(
+        (i) => i.pidProduct === item.pidProduct,
+      );
 
       if (existingItem) {
         // Update quantity if item already exists
@@ -100,7 +114,7 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
         return prevCart.map((i) =>
           i.pidProduct === item.pidProduct
             ? { ...i, quantity: newQuantity }
-            : i
+            : i,
         );
       } else {
         // Add new item
@@ -139,7 +153,7 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
           return { ...item, quantity };
         }
         return item;
-      })
+      }),
     );
   };
 
@@ -185,4 +199,3 @@ export function useShopCart() {
   }
   return context;
 }
-

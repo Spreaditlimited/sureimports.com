@@ -1,14 +1,21 @@
-"use client";
+'use client';
 
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from "lucide-react";
-import TikTokIcon from "./icons/TikTokIcon";
-import { useState } from "react";
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import {
+  Facebook,
+  Instagram,
+  Youtube,
+  Mail,
+  MapPin,
+  Phone,
+} from 'lucide-react';
+import TikTokIcon from './icons/TikTokIcon';
+import { useState } from 'react';
 import logo from '../public/images/logo.png';
-import Image from "next/image";
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 interface FooterProps {
   onNavigateToShippingPolicy?: () => void;
@@ -37,21 +44,26 @@ interface ApiResponse {
   // Add other properties as needed
 }
 
-export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrantyPolicy, onNavigateToTermsConditions, onNavigateToPrivacyPolicy, onNavigateToAbout }: FooterProps) {
-  const [email, setEmail] = useState("");
-  const [service, setService] = useState("SUREIMPORTS");
+export default function Footer({
+  onNavigateToShippingPolicy,
+  onNavigateToWarrantyPolicy,
+  onNavigateToTermsConditions,
+  onNavigateToPrivacyPolicy,
+  onNavigateToAbout,
+}: FooterProps) {
+  const [email, setEmail] = useState('');
+  const [service, setService] = useState('SUREIMPORTS');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
-  const [message, setMessage] = useState("");
-  const [messageStatus, setMessageStatus] = useState("");
-  
+  const [message, setMessage] = useState('');
+  const [messageStatus, setMessageStatus] = useState('');
 
   const router = useRouter();
 
   // Email validation function
   const isValidEmail = (email: string): boolean => {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
   };
 
   const handleEmailChange = (value: string) => {
@@ -59,18 +71,16 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
   };
 
   const handleSubscribe = async (e: React.FormEvent) => {
-    
-          e.preventDefault();
+    e.preventDefault();
 
-          toast.info("Subscribing to email list...");
+    toast.info('Subscribing to email list...');
 
-          // Only proceed if email is valid (button should be disabled if not)
-          if (!email.trim() || !isValidEmail(email)) {
-            return;
-          }
+    // Only proceed if email is valid (button should be disabled if not)
+    if (!email.trim() || !isValidEmail(email)) {
+      return;
+    }
 
-
-              //MAKE REQUEST ATTEMPT
+    //MAKE REQUEST ATTEMPT
     try {
       setIsSubmitting(true);
       //MAKE REQUEST
@@ -83,7 +93,6 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
         }),
       });
 
-
       const data: ApiResponse = await res.json();
 
       if (data.statusx === 'SUCCESS') {
@@ -94,14 +103,11 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
         setIsSubmitting(false);
 
         //toast.success(data.messagex);
-        
       } else {
-        
         //toast.error(data.messagex);
         setMessageStatus('FAILED');
         setMessage(data.messagex);
         setIsSubscribed(false);
-        
       }
     } catch (error: any) {
       //setError(error.message);
@@ -114,95 +120,102 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
       setIsSubscribed(false);
       setIsSubmitting(false);
     }
-          
-          // Simulate API call to email list service
-          // try {
-          //   //await new Promise(resolve => setTimeout(resolve, 1000));
-            
-          //   setIsSubmitting(true);
-          //   // Simulate successful subscription
-          //   setIsSubscribed(true);
-          //   setEmail("");
-            
-          //   // Reset success message after 3 seconds
-          //   setTimeout(() => {
-          //     setIsSubscribed(false);
-          //   }, 3000);
-            
-          // } catch (error) {
-          //     console.error("Subscription error:", error);
-          // } finally {
-          //     setIsSubmitting(false);
-          // }
+
+    // Simulate API call to email list service
+    // try {
+    //   //await new Promise(resolve => setTimeout(resolve, 1000));
+
+    //   setIsSubmitting(true);
+    //   // Simulate successful subscription
+    //   setIsSubscribed(true);
+    //   setEmail("");
+
+    //   // Reset success message after 3 seconds
+    //   setTimeout(() => {
+    //     setIsSubscribed(false);
+    //   }, 3000);
+
+    // } catch (error) {
+    //     console.error("Subscription error:", error);
+    // } finally {
+    //     setIsSubmitting(false);
+    // }
   };
 
-
-
   return (
-    <footer className="bg-slate-950 border-t border-slate-800">
+    <footer className="border-t border-slate-800 bg-slate-950">
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-                              <Image 
-                                src="/images/new/images/logo.png"
-                                alt="Sure Imports Logo"
-                                width={170}
-                                height={24}
-                                // priority
-                                // loading="eager"
-                                draggable={false}
-                                // className="w-full h-full object-contain"
-                              />
+              <Image
+                src="/images/new/images/logo.png"
+                alt="Sure Imports Logo"
+                width={170}
+                height={24}
+                // priority
+                // loading="eager"
+                draggable={false}
+                // className="w-full h-full object-contain"
+              />
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">
-              Your trusted partner for China product sourcing. We connect businesses with verified Chinese suppliers and manufacturers, ensuring quality and reliability.
+            <p className="text-sm leading-relaxed text-gray-400">
+              Your trusted partner for China product sourcing. We connect
+              businesses with verified Chinese suppliers and manufacturers,
+              ensuring quality and reliability.
             </p>
           </div>
 
           {/* Contact */}
           <div className="space-y-4">
-            <h3 className="text-white font-semibold">Contact</h3>
+            <h3 className="font-semibold text-white">Contact</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-2">
-                <Mail className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                <a href="mailto:hello@sureimports.com" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">
+                <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
+                <a
+                  href="mailto:hello@sureimports.com"
+                  className="text-sm text-gray-400 transition-colors hover:text-blue-400"
+                >
                   hello@sureimports.com
                 </a>
               </div>
-              
+
               <div className="space-y-2">
                 <div className="flex items-start space-x-2">
-                  <MapPin className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                  <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
                   <div className="text-sm">
-                    <p className="text-white font-medium">Nigeria Office:</p>
-                    <p className="text-gray-400">5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria</p>
+                    <p className="font-medium text-white">Nigeria Office:</p>
+                    <p className="text-gray-400">
+                      5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria
+                    </p>
                   </div>
                 </div>
-                
-                <div className="space-y-1 ml-6">
+
+                <div className="ml-6 space-y-1">
                   <div className="flex items-center space-x-2">
-                    <Phone className="w-3 h-3 text-gray-500" />
-                    <span className="text-gray-400 text-xs">08037649956</span>
+                    <Phone className="h-3 w-3 text-gray-500" />
+                    <span className="text-xs text-gray-400">08037649956</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Phone className="w-3 h-3 text-gray-500" />
-                    <span className="text-gray-400 text-xs">08064583664</span>
+                    <Phone className="h-3 w-3 text-gray-500" />
+                    <span className="text-xs text-gray-400">08064583664</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Phone className="w-3 h-3 text-gray-500" />
-                    <span className="text-gray-400 text-xs">08068397263</span>
+                    <Phone className="h-3 w-3 text-gray-500" />
+                    <span className="text-xs text-gray-400">08068397263</span>
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-start space-x-2">
-                <MapPin className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
                 <div className="text-sm">
-                  <p className="text-white font-medium">China Office:</p>
-                  <p className="text-gray-400">广州市白云区机场路111号建发广场5FB3-1</p>
+                  <p className="font-medium text-white">China Office:</p>
+                  <p className="text-gray-400">
+                    广州市白云区机场路111号建发广场5FB3-1
+                  </p>
                 </div>
               </div>
             </div>
@@ -210,43 +223,43 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
 
           {/* Legal & Support */}
           <div className="space-y-4">
-            <h3 className="text-white font-semibold">Legal & Support</h3>
+            <h3 className="font-semibold text-white">Legal & Support</h3>
             <div className="space-y-2">
-              <button 
-                onClick={() => router.push("/about")}
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
+              <button
+                onClick={() => router.push('/about')}
+                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 About
               </button>
-              <button 
-                onClick={() => router.push("/terms-and-conditions")}
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
+              <button
+                onClick={() => router.push('/terms-and-conditions')}
+                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 Terms & Conditions
               </button>
-              <button 
-                onClick={() => router.push("/privacy-policy")}
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
+              <button
+                onClick={() => router.push('/privacy-policy')}
+                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 Privacy Policy
               </button>
-              <button 
-                onClick={() => router.push("/warranty-policy")}
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
+              <button
+                onClick={() => router.push('/warranty-policy')}
+                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 Warranty Policy
               </button>
-              <button 
-                onClick={() => router.push("/shipping-policy")}
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors text-left"
+              <button
+                onClick={() => router.push('/shipping-policy')}
+                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 Shipping Policy
               </button>
-              <a 
-                href="https://affiliate.sureimports.com/" 
-                target="_blank" 
+              <a
+                href="https://affiliate.sureimports.com/"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="block text-gray-400 hover:text-blue-400 text-sm transition-colors"
+                className="block text-sm text-gray-400 transition-colors hover:text-blue-400"
               >
                 Affiliates
               </a>
@@ -255,100 +268,91 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
 
           {/* Stay Connected */}
           <div className="space-y-4">
-            <h3 className="text-white font-semibold">Stay Connected</h3>
-            <p className="text-gray-400 text-sm">
-              Get the latest updates on China sourcing opportunities and industry insights.
+            <h3 className="font-semibold text-white">Stay Connected</h3>
+            <p className="text-sm text-gray-400">
+              Get the latest updates on China sourcing opportunities and
+              industry insights.
             </p>
-            
+
             {/* Email Subscription */}
             <div className="space-y-2">
-              {
-                messageStatus == 'SUCCESS' && (
-                  <p className="text-green-500 text-sm text-center">
-                    {message}
-                  </p>
-                )
-              }
+              {messageStatus == 'SUCCESS' && (
+                <p className="text-center text-sm text-green-500">{message}</p>
+              )}
 
-              {
-                messageStatus == 'FAILED' && (
-                  <p className="text-red-500 text-sm text-center">
-                    {message}
-                  </p>
-                )
-              }
+              {messageStatus == 'FAILED' && (
+                <p className="text-center text-sm text-red-500">{message}</p>
+              )}
 
-
-              {
-              isSubscribed ? (
-                <div className="bg-green-600/10 border border-green-600/20 rounded-lg p-3">
-                  <p className="text-green-400 text-sm text-center">
+              {isSubscribed ? (
+                <div className="rounded-lg border border-green-600/20 bg-green-600/10 p-3">
+                  <p className="text-center text-sm text-green-400">
                     Thank you for subscribing! 🎉
                   </p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   <form onSubmit={handleSubscribe} className="flex space-x-2">
-
-                    <div className="flex-1 min-w-0">
-                      <Input 
-                        type="email" 
-                        placeholder="Your email" 
+                    <div className="min-w-0 flex-1">
+                      <Input
+                        type="email"
+                        placeholder="Your email"
                         value={email}
                         onChange={(e) => handleEmailChange(e.target.value)}
                         disabled={isSubmitting}
-                        className="bg-slate-900 border-slate-700 text-white placeholder:text-gray-500 text-sm disabled:opacity-50 w-full"
+                        className="w-full border-slate-700 bg-slate-900 text-sm text-white placeholder:text-gray-500 disabled:opacity-50"
                       />
                     </div>
 
-                    <Button 
+                    <Button
                       type="submit"
-                      disabled={isSubmitting || !email.trim() || !isValidEmail(email)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 text-sm disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
+                      disabled={
+                        isSubmitting || !email.trim() || !isValidEmail(email)
+                      }
+                      className="flex-shrink-0 bg-blue-600 px-4 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {isSubmitting ? "Submitting..." : "Subscribe"}
+                      {isSubmitting ? 'Submitting...' : 'Subscribe'}
                     </Button>
-
                   </form>
                 </div>
               )}
             </div>
-            
+
             {/* Social Links */}
             <div className="space-y-2">
-              <p className="text-white font-medium text-sm">Follow Us</p>
+              <p className="text-sm font-medium text-white">Follow Us</p>
               <div className="flex space-x-3">
-                <a 
-                  href="https://www.facebook.com/share/1BEjP95X7E/?mibextid=wwXIfr" 
-                  target="_blank" 
+                <a
+                  href="https://www.facebook.com/share/1BEjP95X7E/?mibextid=wwXIfr"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 bg-slate-800 hover:bg-blue-600 rounded-md flex items-center justify-center transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-blue-600"
                 >
-                  <Facebook className="w-4 h-4 text-gray-400 hover:text-white" />
+                  <Facebook className="h-4 w-4 text-gray-400 hover:text-white" />
                 </a>
-                <a 
-                  href="https://www.instagram.com/sureimport?igsh=NjRtaHJpbXlnMGxo&utm_source=qr" 
-                  target="_blank" 
+                <a
+                  href="https://www.instagram.com/sureimport?igsh=NjRtaHJpbXlnMGxo&utm_source=qr"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 bg-slate-800 hover:bg-pink-600 rounded-md flex items-center justify-center transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-pink-600"
                 >
-                  <Instagram className="w-4 h-4 text-gray-400 hover:text-white" />
+                  <Instagram className="h-4 w-4 text-gray-400 hover:text-white" />
                 </a>
-                <a 
-                  href="https://www.tiktok.com/@tochukwunkwocha?_t=ZS-8yeC5xnNBmH&_r=1" 
-                  target="_blank" 
+                <a
+                  href="https://www.tiktok.com/@tochukwunkwocha?_t=ZS-8yeC5xnNBmH&_r=1"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 bg-slate-800 hover:bg-black rounded-md flex items-center justify-center transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-black"
                 >
-                  <TikTokIcon className="w-4 h-4 text-gray-400 hover:text-white" />
+                  <TikTokIcon className="h-4 w-4 text-gray-400 hover:text-white" />
                 </a>
-                <a 
-                  href="https://youtube.com/@sureimports?si=gP4cw3zUC1iQN3Rd" 
-                  target="_blank" 
+                <a
+                  href="https://youtube.com/@sureimports?si=gP4cw3zUC1iQN3Rd"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="w-8 h-8 bg-slate-800 hover:bg-red-600 rounded-md flex items-center justify-center transition-colors"
+                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-red-600"
                 >
-                  <Youtube className="w-4 h-4 text-gray-400 hover:text-white" />
+                  <Youtube className="h-4 w-4 text-gray-400 hover:text-white" />
                 </a>
               </div>
             </div>
@@ -358,34 +362,34 @@ export default function Footer({ onNavigateToShippingPolicy, onNavigateToWarrant
 
       {/* Bottom Bar */}
       <div className="border-t border-slate-800 bg-slate-950">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-            <p className="text-gray-500 text-sm">
+        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
+            <p className="text-sm text-gray-500">
               © 2025 Sure Imports Limited. All rights reserved.
             </p>
-            <div className="flex flex-wrap justify-center sm:justify-end gap-x-6 gap-y-2">
-                <button
-                onClick={() => router.push("/terms-and-conditions")}
-                className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
-                >
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 sm:justify-end">
+              <button
+                onClick={() => router.push('/terms-and-conditions')}
+                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
+              >
                 Terms & Conditions
-                </button>
-              <button 
-                onClick={() => router.push("/privacy-policy")}
-                className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
+              </button>
+              <button
+                onClick={() => router.push('/privacy-policy')}
+                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
               >
                 Privacy Policy
               </button>
-              <button 
-                onClick={() => router.push("/shipping-policy")}
-                className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
+              <button
+                onClick={() => router.push('/shipping-policy')}
+                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
               >
                 Shipping Policy
               </button>
-              <button 
+              <button
                 //onClick={onNavigateToWarrantyPolicy}
-                onClick={() => router.push("/warranty-policy")}
-                className="text-gray-500 hover:text-blue-400 text-sm transition-colors"
+                onClick={() => router.push('/warranty-policy')}
+                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
               >
                 Warranty Policy
               </button>

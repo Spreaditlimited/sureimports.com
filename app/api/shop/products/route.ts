@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    
+
     // Get query parameters
     const search = searchParams.get('search') || '';
     const category = searchParams.get('category') || '';
@@ -23,14 +23,17 @@ export async function GET(request: NextRequest) {
 
     // Search filter (MySQL is case-insensitive by default)
     if (search) {
-      where.OR = search.split(' ').filter(term => term.trim()).map(term => ({
-        OR: [
-          { productName: { contains: term } },
-          { productDescription: { contains: term } },
-          { productBrand: { contains: term } },
-          { productCategory: { contains: term } },
-        ]
-      }));
+      where.OR = search
+        .split(' ')
+        .filter((term) => term.trim())
+        .map((term) => ({
+          OR: [
+            { productName: { contains: term } },
+            { productDescription: { contains: term } },
+            { productBrand: { contains: term } },
+            { productCategory: { contains: term } },
+          ],
+        }));
     }
 
     // Category filter
@@ -60,7 +63,7 @@ export async function GET(request: NextRequest) {
 
     // Determine sort order
     let orderBy: any = { createdAt: 'desc' }; // Default: newest first
-    
+
     switch (sortBy) {
       case 'price-asc':
         orderBy = { productPrice: 'asc' };
@@ -101,29 +104,33 @@ export async function GET(request: NextRequest) {
     const hasNextPage = page < totalPages;
     const hasPrevPage = page > 1;
 
-    return NextResponse.json({
-      statusx: 'SUCCESS',
-      message: 'Products fetched successfully',
-      data: {
-        products,
-        pagination: {
-          currentPage: page,
-          totalPages,
-          totalCount,
-          limit,
-          hasNextPage,
-          hasPrevPage,
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Products fetched successfully',
+        data: {
+          products,
+          pagination: {
+            currentPage: page,
+            totalPages,
+            totalCount,
+            limit,
+            hasNextPage,
+            hasPrevPage,
+          },
         },
       },
-    }, { status: 200 });
-
+      { status: 200 },
+    );
   } catch (error) {
     console.error('Fetch products error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while fetching products',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while fetching products',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-

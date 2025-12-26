@@ -28,7 +28,7 @@ function CreateOrder() {
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-hidden bg-[#ffffff] p-0 dark:bg-black lg:max-w-[1030px]">
         <DialogHeader className="sticky top-0 bg-white px-6 py-4 dark:bg-black">
-          <DialogTitle className="text-[28px] text-slate-800 dark:text-slate-100  ">
+          <DialogTitle className="text-[28px] text-slate-800 dark:text-slate-100">
             Create New Order
           </DialogTitle>
         </DialogHeader>

@@ -33,34 +33,30 @@ export async function POST(request: Request) {
     const pidPayment = 'PAY' + randomValue;
     const reference = `FAYASTORE_${Date.now()}`;
 
-
     const user: any = await prisma.users.findUnique({
       where: {
         pidUser: pidUser as string,
       },
     });
-    
 
+    // Get product details
+    const product: any = await prisma.store.findUnique({
+      where: {
+        pidProduct: pidProduct as string,
+      },
+    });
 
-    
-        // Get product details
-        const product: any = await prisma.store.findUnique({
-          where: {
-            pidProduct: pidProduct as string,
-          },
-        });
+    ////////////////// PAYMENT PARAMS STARTS //////////////////////
+    const txID = 'DEB' + randomValue;
+    const txREF = 'REF' + randomValue;
 
-        ////////////////// PAYMENT PARAMS STARTS //////////////////////
-        const txID = 'DEB' + randomValue;
-        const txREF = 'REF' + randomValue;
-    
-        const affiliatePayoutAmount = product.affiliatePayout || 0;
-        const affiliatePayoutPercentage = 2.5; // hard coded
-        const superAffiliatePayoutAmount = product.superAffiliatePayout || 0;
-        const superAffiliatePayoutPercentage = 0.2; // hard coded
-    
-        const affiliateRefId = user.userAffiliateRef || 'NO_REF';
-        ////////////////// PAYMENT PARAMS ENDS //////////////////////
+    const affiliatePayoutAmount = product.affiliatePayout || 0;
+    const affiliatePayoutPercentage = 2.5; // hard coded
+    const superAffiliatePayoutAmount = product.superAffiliatePayout || 0;
+    const superAffiliatePayoutPercentage = 0.2; // hard coded
+
+    const affiliateRefId = user.userAffiliateRef || 'NO_REF';
+    ////////////////// PAYMENT PARAMS ENDS //////////////////////
 
     // Get user details
     // const user = await prisma.users.findUnique({

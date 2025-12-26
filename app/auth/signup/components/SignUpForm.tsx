@@ -121,10 +121,16 @@ const InputField: React.FC<InputFieldProps> = ({
               />
             )}
             <Input
-              type={type === 'hidden' ? 'hidden' : (isPasswordVisible ? 'text' : type)}
+              type={
+                type === 'hidden' ? 'hidden' : isPasswordVisible ? 'text' : type
+              }
               placeholder={placeholder}
               aria-label={label}
-              className={type === 'hidden' ? 'hidden' : "mt-2 flex h-[60px] items-center rounded-[10px] border-none px-[50px]"}
+              className={
+                type === 'hidden'
+                  ? 'hidden'
+                  : 'mt-2 flex h-[60px] items-center rounded-[10px] border-none px-[50px]'
+              }
               {...field}
               value={field.value}
               defaultValue={field.value}
@@ -360,7 +366,6 @@ const SignupPageContainer: React.FC = () => {
       return urlAffRef;
     }
 
-
     alert('AFFREF1: ' + urlAffRef);
 
     // Second, check stored affiliate reference (cookie/localStorage)
@@ -375,7 +380,6 @@ const SignupPageContainer: React.FC = () => {
     // Default fallback
     return 'NO_REF';
   }, [searchParams]);
-  
 
   const userAffiliateRefx = getAffiliateRef();
 
@@ -384,7 +388,7 @@ const SignupPageContainer: React.FC = () => {
   React.useEffect(() => {
     // Check if user data is not loaded
     if (!user?.userEmail) {
-        setIsLoadingx(false);
+      setIsLoadingx(false);
       if (!user?.userEmail) {
         //do nothing
       }
@@ -426,7 +430,7 @@ const SignupPageContainer: React.FC = () => {
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     console.log('Form data with affiliate ref:', data);
-    
+
     const userFirstname = data.userFirstname;
     const userLastname = data.userLastname;
     const email = data.email;

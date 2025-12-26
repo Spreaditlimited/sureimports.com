@@ -13,10 +13,14 @@ export async function GET(request: NextRequest) {
 
     // Validate required parameters
     if (!pidUser || !pidProduct || !amount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameters: pidUser, pidProduct, and amount are required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            'Missing required parameters: pidUser, pidProduct, and amount are required',
+        },
+        { status: 400 },
+      );
     }
 
     const user: any = await prisma.users.findUnique({
@@ -26,10 +30,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found. Please contact support for assistance',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found. Please contact support for assistance',
+        },
+        { status: 404 },
+      );
     }
 
     // Get product details
@@ -40,10 +47,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!product) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Product not found',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Product not found',
+        },
+        { status: 404 },
+      );
     }
 
     const email = user.userEmail;
@@ -53,11 +63,14 @@ export async function GET(request: NextRequest) {
 
     // Fetch customer data from Paystack API
     console.log('Fetching customer data for email:', email);
-    
+
     // Get the full URL for the API call
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.ROOT_URL || 'http://localhost:3000';
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.ROOT_URL ||
+      'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -67,14 +80,17 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       console.error('Failed to fetch customer data:', response.statusText);
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Failed to fetch customer wallet information',
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Failed to fetch customer wallet information',
+        },
+        { status: 500 },
+      );
     }
 
     const data = await response.json();
-    
+
     console.log('Customer API Response:', {
       statusx: data.statusx,
       message: data.message,
@@ -84,18 +100,25 @@ export async function GET(request: NextRequest) {
 
     // Check if customer exists
     if (data.statusx === 'NO_CUSTOMER') {
-      return NextResponse.json({
-        statusx: 'NO_CUSTOMER',
-        message: 'Customer does not exist. Please contact support for assistance',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'NO_CUSTOMER',
+          message:
+            'Customer does not exist. Please contact support for assistance',
+        },
+        { status: 400 },
+      );
     }
 
     // Check if customer data fetch failed
     if (data.statusx === 'FAILED') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: data.message || 'Failed to retrieve customer information',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: data.message || 'Failed to retrieve customer information',
+        },
+        { status: 400 },
+      );
     }
 
     // Extract customer and transaction details
@@ -106,14 +129,22 @@ export async function GET(request: NextRequest) {
     const walletBalance = transactionDetails?.totalAmount || 0;
     const purchaseAmount = parseFloat(amount);
 
-    console.log('Wallet Balance:', walletBalance, 'Purchase Amount:', purchaseAmount);
+    console.log(
+      'Wallet Balance:',
+      walletBalance,
+      'Purchase Amount:',
+      purchaseAmount,
+    );
 
     // Check if user has sufficient funds
     if (walletBalance < purchaseAmount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+        },
+        { status: 400 },
+      );
     }
 
     ////////////////// PAYMENT PARAMS STARTS //////////////////////
@@ -264,32 +295,40 @@ export async function GET(request: NextRequest) {
       ////////////////////// SEND ADMIN PAYMENT EMAIL BLOCK ENDS //////////////////////
 
       console.log('Payment processed successfully:', txREF);
-      
-      return NextResponse.json({
-        statusx: 'SUCCESS',
-        message: `Payment successful! ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - purchaseAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-        data: {
-          transactionRef: txREF,
-          amount: purchaseAmount,
-          quantity: parseInt(quantity),
-          productName: product?.productName,
-          previousBalance: walletBalance,
-          newBalance: walletBalance - purchaseAmount,
-        },
-      }, { status: 200 });
-    } else {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment transaction failed. Please try again.',
-      }, { status: 500 });
-    }
 
+      return NextResponse.json(
+        {
+          statusx: 'SUCCESS',
+          message: `Payment successful! ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - purchaseAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+          data: {
+            transactionRef: txREF,
+            amount: purchaseAmount,
+            quantity: parseInt(quantity),
+            productName: product?.productName,
+            previousBalance: walletBalance,
+            newBalance: walletBalance - purchaseAmount,
+          },
+        },
+        { status: 200 },
+      );
+    } else {
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment transaction failed. Please try again.',
+        },
+        { status: 500 },
+      );
+    }
   } catch (error) {
     console.error('Pay from wallet error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while processing payment',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Internal server error occurred while processing payment',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }

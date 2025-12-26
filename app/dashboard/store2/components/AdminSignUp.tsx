@@ -1,14 +1,28 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { useAdminAuth, AdminPermissions } from './AdminAuthProvider';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { Checkbox } from './ui/checkbox';
-import { ArrowLeft, UserPlus, Eye, EyeOff, Mail, User, Lock } from 'lucide-react';
+import {
+  ArrowLeft,
+  UserPlus,
+  Eye,
+  EyeOff,
+  Mail,
+  User,
+  Lock,
+} from 'lucide-react';
 
 interface AdminSignUpProps {
   onSignUpSuccess: () => void;
@@ -16,13 +30,17 @@ interface AdminSignUpProps {
   isStandalone?: boolean;
 }
 
-export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = false }: AdminSignUpProps) {
+export function AdminSignUp({
+  onSignUpSuccess,
+  onBackToSignIn,
+  isStandalone = false,
+}: AdminSignUpProps) {
   const { createAdmin, currentAdmin } = useAdminAuth();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [permissions, setPermissions] = useState<AdminPermissions>({
     overview: false,
@@ -32,7 +50,7 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
     reports: false,
     bulkOrders: false,
     returns: false,
-    userManagement: false
+    userManagement: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -63,19 +81,22 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
     }
 
     // Check if at least one permission is selected
-    if (!Object.values(permissions).some(p => p)) {
+    if (!Object.values(permissions).some((p) => p)) {
       setError('Please select at least one permission');
       setIsLoading(false);
       return;
     }
 
     try {
-      const result = await createAdmin({
-        name: formData.name,
-        email: formData.email,
-        role: 'admin',
-        permissions
-      }, formData.password);
+      const result = await createAdmin(
+        {
+          name: formData.name,
+          email: formData.email,
+          role: 'admin',
+          permissions,
+        },
+        formData.password,
+      );
 
       if (result.success) {
         setSuccess('Admin account created successfully!');
@@ -89,7 +110,7 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
           reports: false,
           bulkOrders: false,
           returns: false,
-          userManagement: false
+          userManagement: false,
         });
         setTimeout(() => {
           onSignUpSuccess();
@@ -105,34 +126,66 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError('');
     if (success) setSuccess('');
   };
 
-  const handlePermissionChange = (permission: keyof AdminPermissions, checked: boolean) => {
-    setPermissions(prev => ({ ...prev, [permission]: checked }));
+  const handlePermissionChange = (
+    permission: keyof AdminPermissions,
+    checked: boolean,
+  ) => {
+    setPermissions((prev) => ({ ...prev, [permission]: checked }));
     if (error) setError('');
   };
 
-  const permissionLabels: Record<keyof AdminPermissions, { label: string; description: string }> = {
-    overview: { label: 'Dashboard Overview', description: 'View dashboard metrics and analytics' },
-    products: { label: 'Product Management', description: 'Add, edit, and delete products' },
-    orders: { label: 'Order Management', description: 'View and manage customer orders' },
-    customers: { label: 'Customer Analytics', description: 'View customer data and analytics' },
-    reports: { label: 'Financial Reports', description: 'Access financial reports and data' },
-    bulkOrders: { label: 'Bulk Orders', description: 'Create and manage bulk orders' },
-    returns: { label: 'Returns Management', description: 'Handle product returns and refunds' },
-    userManagement: { label: 'User Management', description: 'Manage admin users (Super Admin only)' }
+  const permissionLabels: Record<
+    keyof AdminPermissions,
+    { label: string; description: string }
+  > = {
+    overview: {
+      label: 'Dashboard Overview',
+      description: 'View dashboard metrics and analytics',
+    },
+    products: {
+      label: 'Product Management',
+      description: 'Add, edit, and delete products',
+    },
+    orders: {
+      label: 'Order Management',
+      description: 'View and manage customer orders',
+    },
+    customers: {
+      label: 'Customer Analytics',
+      description: 'View customer data and analytics',
+    },
+    reports: {
+      label: 'Financial Reports',
+      description: 'Access financial reports and data',
+    },
+    bulkOrders: {
+      label: 'Bulk Orders',
+      description: 'Create and manage bulk orders',
+    },
+    returns: {
+      label: 'Returns Management',
+      description: 'Handle product returns and refunds',
+    },
+    userManagement: {
+      label: 'User Management',
+      description: 'Manage admin users (Super Admin only)',
+    },
   };
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <div className="w-full max-w-md">
           <Card className="border-2">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+              <CardTitle className="text-xl text-destructive">
+                Access Denied
+              </CardTitle>
               <CardDescription>
                 Only super administrators can create new admin accounts.
               </CardDescription>
@@ -143,7 +196,7 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                 className="w-full"
                 variant="outline"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 {isStandalone ? 'Back to Admin Management' : 'Back to Sign In'}
               </Button>
             </CardContent>
@@ -155,12 +208,12 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
             onClick={onBackToSignIn}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             {isStandalone ? 'Back to Admin Management' : 'Back to Sign In'}
@@ -169,9 +222,9 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
 
         {/* Main card */}
         <Card className="border-2">
-          <CardHeader className="text-center space-y-4">
+          <CardHeader className="space-y-4 text-center">
             <div className="flex justify-center">
-              <div className="p-3 bg-purple-100 dark:bg-purple-900 rounded-full">
+              <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900">
                 <UserPlus className="h-8 w-8 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
@@ -192,7 +245,7 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
               )}
 
               {success && (
-                <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+                <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
                   <AlertDescription className="text-green-800 dark:text-green-200">
                     {success}
                   </AlertDescription>
@@ -202,16 +255,18 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
               {/* Basic Info */}
               <div className="space-y-4">
                 <h3 className="font-medium">Basic Information</h3>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('name', e.target.value)
+                      }
                       className="pl-10"
                       placeholder="Enter full name"
                       required
@@ -223,12 +278,14 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('email', e.target.value)
+                      }
                       className="pl-10"
                       placeholder="admin@example.com"
                       required
@@ -237,16 +294,18 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                       <Input
                         id="password"
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         value={formData.password}
-                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('password', e.target.value)
+                        }
                         className="pl-10 pr-10"
                         placeholder="Min. 8 characters"
                         required
@@ -256,9 +315,13 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 transform text-muted-foreground hover:text-foreground"
                       >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -266,12 +329,14 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                   <div className="space-y-2">
                     <Label htmlFor="confirmPassword">Confirm Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                       <Input
                         id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showConfirmPassword ? 'text' : 'password'}
                         value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('confirmPassword', e.target.value)
+                        }
                         className="pl-10 pr-10"
                         placeholder="Repeat password"
                         required
@@ -279,10 +344,16 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 transform text-muted-foreground hover:text-foreground"
                       >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -292,34 +363,41 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
               {/* Permissions */}
               <div className="space-y-4">
                 <h3 className="font-medium">Dashboard Permissions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(permissionLabels).map(([key, { label, description }]) => {
-                    const permissionKey = key as keyof AdminPermissions;
-                    // Only super admin can assign user management permissions
-                    if (permissionKey === 'userManagement') return null;
-                    
-                    return (
-                      <div key={permissionKey} className="flex items-start space-x-3">
-                        <Checkbox
-                          id={permissionKey}
-                          checked={permissions[permissionKey]}
-                          onCheckedChange={(checked) => handlePermissionChange(permissionKey, !!checked)}
-                          disabled={isLoading}
-                        />
-                        <div className="grid gap-1.5 leading-none">
-                          <Label
-                            htmlFor={permissionKey}
-                            className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {label}
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            {description}
-                          </p>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  {Object.entries(permissionLabels).map(
+                    ([key, { label, description }]) => {
+                      const permissionKey = key as keyof AdminPermissions;
+                      // Only super admin can assign user management permissions
+                      if (permissionKey === 'userManagement') return null;
+
+                      return (
+                        <div
+                          key={permissionKey}
+                          className="flex items-start space-x-3"
+                        >
+                          <Checkbox
+                            id={permissionKey}
+                            checked={permissions[permissionKey]}
+                            onCheckedChange={(checked) =>
+                              handlePermissionChange(permissionKey, !!checked)
+                            }
+                            disabled={isLoading}
+                          />
+                          <div className="grid gap-1.5 leading-none">
+                            <Label
+                              htmlFor={permissionKey}
+                              className="font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            >
+                              {label}
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                              {description}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               </div>
 
@@ -328,7 +406,7 @@ export function AdminSignUp({ onSignUpSuccess, onBackToSignIn, isStandalone = fa
                 className="w-full bg-purple-600 hover:bg-purple-700"
                 disabled={isLoading}
               >
-                {isLoading ? "Creating Account..." : "Create Admin Account"}
+                {isLoading ? 'Creating Account...' : 'Create Admin Account'}
               </Button>
             </form>
           </CardContent>

@@ -6,9 +6,9 @@ import Footer from '@/app/(home)/components/Footer';
 const Page: React.FC = () => (
   <>
     <Header />
-      <main className="min-h-screen">
-        <TermsAndConditions />
-      </main>
+    <main className="min-h-screen">
+      <TermsAndConditions />
+    </main>
     <Footer />
   </>
 );

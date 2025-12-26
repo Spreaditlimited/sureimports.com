@@ -35,7 +35,7 @@ export const BackToTopButton = () => {
   return (
     <button
       onClick={handleClick}
-      className="fixed bottom-20 right-6 z-50 p-3 rounded-full text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl"
+      className="fixed bottom-20 right-6 z-50 rounded-full p-3 text-white shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl"
       aria-label="Back to top"
       style={{
         background: `linear-gradient(${angle}deg, #6366f1, #a855f7, #3b82f6)`,

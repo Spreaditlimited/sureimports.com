@@ -1,10 +1,23 @@
-import { Button } from "./ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
-import { ChevronDown, Menu, X, Smartphone, Headphones, BookOpen, Laptop } from "lucide-react";
-import { useState } from "react";
-import sureImportsLogo from "../../../public/images/new/images/logo.png";
-import YouTubeIcon from "./icons/YouTubeIcon";
-import TikTokIcon from "./icons/TikTokIcon";
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import {
+  ChevronDown,
+  Menu,
+  X,
+  Smartphone,
+  Headphones,
+  BookOpen,
+  Laptop,
+} from 'lucide-react';
+import { useState } from 'react';
+import sureImportsLogo from '../../../public/images/new/images/logo.png';
+import YouTubeIcon from './icons/YouTubeIcon';
+import TikTokIcon from './icons/TikTokIcon';
 
 interface NavigationProps {
   onNavigateHome?: () => void;
@@ -13,170 +26,201 @@ interface NavigationProps {
   onNavigateToMacBooks?: () => void;
 }
 
-export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigateBlog, onNavigateToMacBooks }: NavigationProps) {
+export default function Navigation({
+  onNavigateHome,
+  onNavigateSignIn,
+  onNavigateBlog,
+  onNavigateToMacBooks,
+}: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-slate-900/95 backdrop-blur-sm border-b border-slate-800/50 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-50 w-full border-b border-slate-800/50 bg-slate-900/95 backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <button 
+            <button
               onClick={onNavigateHome}
-              className="hover:opacity-80 transition-opacity"
+              className="transition-opacity hover:opacity-80"
             >
-              <img 
-                src={sureImportsLogo as any} 
-                alt="SURE IMPORTS" 
+              <img
+                src={sureImportsLogo as any}
+                alt="SURE IMPORTS"
                 className="h-6 w-auto opacity-90"
               />
             </button>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <button 
+          <div className="hidden items-center space-x-8 md:flex">
+            <button
               onClick={onNavigateHome}
-              className="text-white hover:text-blue-400 transition-colors duration-200 relative group"
+              className="group relative text-white transition-colors duration-200 hover:text-blue-400"
             >
               Home
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
+              <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
             </button>
-            <button 
+            <button
               onClick={onNavigateBlog}
-              className="text-gray-300 hover:text-blue-400 transition-colors duration-200 relative group flex items-center space-x-1"
+              className="group relative flex items-center space-x-1 text-gray-300 transition-colors duration-200 hover:text-blue-400"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="h-4 w-4" />
               <span>Blog</span>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
+              <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-blue-400 transition-all duration-200 group-hover:w-full"></span>
             </button>
 
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center space-x-1 bg-transparent border-none outline-none">
+              <DropdownMenuTrigger className="flex items-center space-x-1 border-none bg-transparent text-gray-300 outline-none transition-colors duration-200 hover:text-blue-400">
                 <span>Videos</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-slate-800 border-slate-700 shadow-xl w-80">
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+              <DropdownMenuContent className="w-80 border-slate-700 bg-slate-800 shadow-xl">
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://youtube.com/@sureimports?si=sAunkYlz_EUyT5nM"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <YouTubeIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <YouTubeIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
                     <div className="flex flex-col">
                       <span className="font-medium">YouTube</span>
-                      <span className="text-xs text-gray-400 mt-1">Watch detailed tutorials and sourcing guides</span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Watch detailed tutorials and sourcing guides
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://www.tiktok.com/@tochukwunkwocha?_t=ZS-8ydbARssS1K&_r=1"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <TikTokIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                    <TikTokIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
                     <div className="flex flex-col">
                       <span className="font-medium">TikTok</span>
-                      <span className="text-xs text-gray-400 mt-1">Quick tips and behind-the-scenes content</span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Quick tips and behind-the-scenes content
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center space-x-1 bg-transparent border-none outline-none">
+              <DropdownMenuTrigger className="flex items-center space-x-1 border-none bg-transparent text-gray-300 outline-none transition-colors duration-200 hover:text-blue-400">
                 <span>Services</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-slate-800 border-slate-700 shadow-xl w-80">
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+              <DropdownMenuContent className="w-80 border-slate-700 bg-slate-800 shadow-xl">
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://www.sureimports.com/buy-from-chinese-websites"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">🛒</span>
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-purple-600">
+                      <span className="text-xs font-bold text-white">🛒</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium">Buy from Chinese Websites</span>
-                      <span className="text-xs text-gray-400 mt-1">Direct purchasing from Chinese platforms with quality assurance</span>
+                      <span className="font-medium">
+                        Buy from Chinese Websites
+                      </span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Direct purchasing from Chinese platforms with quality
+                        assurance
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://www.sureimports.com/source-products-from-china"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-green-500 to-blue-600 rounded-md flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">🔍</span>
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-blue-600">
+                      <span className="text-xs font-bold text-white">🔍</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium">Source Products from China</span>
-                      <span className="text-xs text-gray-400 mt-1">Custom product sourcing and supplier verification services</span>
+                      <span className="font-medium">
+                        Source Products from China
+                      </span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Custom product sourcing and supplier verification
+                        services
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <DropdownMenu>
-              <DropdownMenuTrigger className="text-gray-300 hover:text-blue-400 transition-colors duration-200 flex items-center space-x-1 bg-transparent border-none outline-none">
+              <DropdownMenuTrigger className="flex items-center space-x-1 border-none bg-transparent text-gray-300 outline-none transition-colors duration-200 hover:text-blue-400">
                 <span>Shop</span>
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="h-4 w-4" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-slate-800 border-slate-700 shadow-xl w-80">
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <button 
+              <DropdownMenuContent className="w-80 border-slate-700 bg-slate-800 shadow-xl">
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <button
                     onClick={onNavigateToMacBooks}
-                    className="flex items-start space-x-3 w-full text-left"
+                    className="flex w-full items-start space-x-3 text-left"
                   >
-                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
-                      <Laptop className="w-3 h-3 text-white" />
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-indigo-600">
+                      <Laptop className="h-3 w-3 text-white" />
                     </div>
                     <div className="flex flex-col">
                       <span className="font-medium">Laptops for Business</span>
-                      <span className="text-xs text-gray-400 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Authentic MacBooks and Windows laptops sourced with
+                        warranty
+                      </span>
                     </div>
                   </button>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://www.sureimports.com/buy-phones-from-china"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-orange-500 to-red-600 rounded-md flex items-center justify-center">
-                      <Smartphone className="w-3 h-3 text-white" />
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-orange-500 to-red-600">
+                      <Smartphone className="h-3 w-3 text-white" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium">Buy Gadgets from China</span>
-                      <span className="text-xs text-gray-400 mt-1">Phones, electronics, and tech gadgets at wholesale prices</span>
+                      <span className="font-medium">
+                        Buy Gadgets from China
+                      </span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Phones, electronics, and tech gadgets at wholesale
+                        prices
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
-                <DropdownMenuItem className="text-gray-300 hover:text-white hover:bg-slate-700 focus:text-white focus:bg-slate-700 p-4">
-                  <a 
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
                     href="https://www.sureimports.com/faya"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start space-x-3 w-full"
+                    className="flex w-full items-start space-x-3"
                   >
-                    <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-md flex items-center justify-center">
-                      <Headphones className="w-3 h-3 text-white" />
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-purple-500 to-pink-600">
+                      <Headphones className="h-3 w-3 text-white" />
                     </div>
                     <div className="flex flex-col">
-                      <span className="font-medium">FAYA Phone & Laptop Accessories</span>
-                      <span className="text-xs text-gray-400 mt-1">Premium accessories for phones, laptops, and devices</span>
+                      <span className="font-medium">
+                        FAYA Phone & Laptop Accessories
+                      </span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Premium accessories for phones, laptops, and devices
+                      </span>
                     </div>
                   </a>
                 </DropdownMenuItem>
@@ -186,9 +230,9 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
 
           {/* Desktop Sign In Button */}
           <div className="hidden md:block">
-            <Button 
+            <Button
               onClick={onNavigateSignIn}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 px-6 py-2 rounded-lg transition-all duration-200 shadow-lg hover:shadow-blue-500/25"
+              className="rounded-lg border-0 bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-700 hover:shadow-blue-500/25"
             >
               Sign In
             </Button>
@@ -197,145 +241,169 @@ export default function Navigation({ onNavigateHome, onNavigateSignIn, onNavigat
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-white hover:text-blue-400 transition-colors duration-200"
+            className="text-white transition-colors duration-200 hover:text-blue-400 md:hidden"
           >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {isMobileMenuOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
           </button>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-slate-800/50 py-4 space-y-4">
-            <button 
+          <div className="space-y-4 border-t border-slate-800/50 py-4 md:hidden">
+            <button
               onClick={onNavigateHome}
-              className="block text-white hover:text-blue-400 transition-colors duration-200 text-left w-full"
+              className="block w-full text-left text-white transition-colors duration-200 hover:text-blue-400"
             >
               Home
             </button>
-            <button 
+            <button
               onClick={onNavigateBlog}
-              className="flex items-center space-x-2 text-gray-300 hover:text-blue-400 transition-colors duration-200 text-left w-full"
+              className="flex w-full items-center space-x-2 text-left text-gray-300 transition-colors duration-200 hover:text-blue-400"
             >
-              <BookOpen className="w-4 h-4" />
+              <BookOpen className="h-4 w-4" />
               <span>Blog</span>
             </button>
 
             <div className="space-y-2">
-              <span className="block text-gray-300 font-medium">Videos</span>
-              <div className="pl-4 space-y-3">
-                <a 
+              <span className="block font-medium text-gray-300">Videos</span>
+              <div className="space-y-3 pl-4">
+                <a
                   href="https://youtube.com/@sureimports?si=sAunkYlz_EUyT5nM"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <YouTubeIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <YouTubeIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="flex flex-col">
                     <span className="font-medium">YouTube</span>
-                    <span className="text-xs text-gray-500 mt-1">Detailed tutorials and sourcing guides</span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Detailed tutorials and sourcing guides
+                    </span>
                   </div>
                 </a>
-                <a 
+                <a
                   href="https://www.tiktok.com/@tochukwunkwocha?_t=ZS-8ydbARssS1K&_r=1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <TikTokIcon className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                  <TikTokIcon className="mt-0.5 h-5 w-5 flex-shrink-0" />
                   <div className="flex flex-col">
                     <span className="font-medium">TikTok</span>
-                    <span className="text-xs text-gray-500 mt-1">Quick tips and behind-the-scenes content</span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Quick tips and behind-the-scenes content
+                    </span>
                   </div>
                 </a>
               </div>
             </div>
             <div className="space-y-2">
-              <span className="block text-gray-300 font-medium">Services</span>
-              <div className="pl-4 space-y-3">
-                <a 
+              <span className="block font-medium text-gray-300">Services</span>
+              <div className="space-y-3 pl-4">
+                <a
                   href="https://www.sureimports.com/buy-from-chinese-websites"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
-                    <span className="text-white text-xs">🛒</span>
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-purple-600">
+                    <span className="text-xs text-white">🛒</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium">Buy from Chinese Websites</span>
-                    <span className="text-xs text-gray-500 mt-1">Direct purchasing with quality assurance</span>
+                    <span className="font-medium">
+                      Buy from Chinese Websites
+                    </span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Direct purchasing with quality assurance
+                    </span>
                   </div>
                 </a>
-                <a 
+                <a
                   href="https://www.sureimports.com/source-products-from-china"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-green-500 to-blue-600 rounded-md flex items-center justify-center">
-                    <span className="text-white text-xs">🔍</span>
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-blue-600">
+                    <span className="text-xs text-white">🔍</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium">Source Products from China</span>
-                    <span className="text-xs text-gray-500 mt-1">Custom sourcing and supplier verification</span>
+                    <span className="font-medium">
+                      Source Products from China
+                    </span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Custom sourcing and supplier verification
+                    </span>
                   </div>
                 </a>
               </div>
             </div>
             <div className="space-y-2">
-              <span className="block text-gray-300 font-medium">Shop</span>
-              <div className="pl-4 space-y-3">
-                <button 
+              <span className="block font-medium text-gray-300">Shop</span>
+              <div className="space-y-3 pl-4">
+                <button
                   onClick={onNavigateToMacBooks}
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200 text-left w-full"
+                  className="flex w-full items-start space-x-3 text-left text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md flex items-center justify-center">
-                    <Laptop className="w-3 h-3 text-white" />
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-blue-500 to-indigo-600">
+                    <Laptop className="h-3 w-3 text-white" />
                   </div>
                   <div className="flex flex-col">
                     <span className="font-medium">Laptops for Business</span>
-                    <span className="text-xs text-gray-500 mt-1">Authentic MacBooks and Windows laptops sourced with warranty</span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Authentic MacBooks and Windows laptops sourced with
+                      warranty
+                    </span>
                   </div>
                 </button>
-                <a 
+                <a
                   href="https://www.sureimports.com/buy-phones-from-china"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-orange-500 to-red-600 rounded-md flex items-center justify-center">
-                    <Smartphone className="w-3 h-3 text-white" />
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-orange-500 to-red-600">
+                    <Smartphone className="h-3 w-3 text-white" />
                   </div>
                   <div className="flex flex-col">
                     <span className="font-medium">Buy Gadgets from China</span>
-                    <span className="text-xs text-gray-500 mt-1">Phones, electronics, and tech gadgets</span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Phones, electronics, and tech gadgets
+                    </span>
                   </div>
                 </a>
-                <a 
+                <a
                   href="https://www.sureimports.com/faya"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start space-x-3 text-gray-400 hover:text-blue-400 transition-colors duration-200"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                 >
-                  <div className="w-5 h-5 mt-0.5 flex-shrink-0 bg-gradient-to-br from-purple-500 to-pink-600 rounded-md flex items-center justify-center">
-                    <Headphones className="w-3 h-3 text-white" />
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-purple-500 to-pink-600">
+                    <Headphones className="h-3 w-3 text-white" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-medium">FAYA Phone & Laptop Accessories</span>
-                    <span className="text-xs text-gray-500 mt-1">Premium accessories for devices</span>
+                    <span className="font-medium">
+                      FAYA Phone & Laptop Accessories
+                    </span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Premium accessories for devices
+                    </span>
                   </div>
                 </a>
               </div>
             </div>
 
             {/* Mobile Sign In Button */}
-            <Button 
+            <Button
               onClick={onNavigateSignIn}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 rounded-lg transition-all duration-200"
+              className="w-full rounded-lg border-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white transition-all duration-200 hover:from-blue-700 hover:to-purple-700"
             >
               Sign In
             </Button>
-
           </div>
         )}
       </div>

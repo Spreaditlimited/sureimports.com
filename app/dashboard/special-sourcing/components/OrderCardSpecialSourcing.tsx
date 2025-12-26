@@ -281,7 +281,7 @@ const OrderCard: React.FC<ProductsProps> = ({
               </div>
             </div>
 
-            <AccordionContent className="hide-scrollbar rounded-2xl bg-white  dark:bg-black">
+            <AccordionContent className="hide-scrollbar rounded-2xl bg-white dark:bg-black">
               {/* <BankDepositForm /> */}
               {/*.................................. FORM BLOCK STARTS.................................... */}
               <RadFormLayout

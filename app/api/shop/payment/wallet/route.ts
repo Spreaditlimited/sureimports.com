@@ -33,17 +33,24 @@ export async function POST(request: NextRequest) {
 
     // Validate required parameters
     if (!pidUser || !cartItems || !totalAmount) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Missing required parameters: pidUser, cartItems, and totalAmount are required',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message:
+            'Missing required parameters: pidUser, cartItems, and totalAmount are required',
+        },
+        { status: 400 },
+      );
     }
 
     if (!Array.isArray(cartItems) || cartItems.length === 0) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Cart is empty. Please add items to cart before checkout',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Cart is empty. Please add items to cart before checkout',
+        },
+        { status: 400 },
+      );
     }
 
     // Get user details
@@ -54,10 +61,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'User not found. Please contact support for assistance',
-      }, { status: 404 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'User not found. Please contact support for assistance',
+        },
+        { status: 404 },
+      );
     }
 
     const email = user.userEmail;
@@ -67,10 +77,13 @@ export async function POST(request: NextRequest) {
 
     // Fetch customer wallet data from Paystack API
     console.log('Fetching customer wallet data for email:', email);
-    
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.ROOT_URL || 'http://localhost:3000';
+
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      process.env.ROOT_URL ||
+      'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
-    
+
     const response = await fetch(apiUrl, {
       method: 'GET',
       headers: {
@@ -79,15 +92,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      console.error('Failed to fetch customer wallet data:', response.statusText);
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Failed to fetch customer wallet information',
-      }, { status: 500 });
+      console.error(
+        'Failed to fetch customer wallet data:',
+        response.statusText,
+      );
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Failed to fetch customer wallet information',
+        },
+        { status: 500 },
+      );
     }
 
     const data = await response.json();
-    
+
     console.log('Customer API Response:', {
       statusx: data.statusx,
       message: data.message,
@@ -97,18 +116,25 @@ export async function POST(request: NextRequest) {
 
     // Check if customer exists
     if (data.statusx === 'NO_CUSTOMER' || data.statusx === 'NO_ACCOUNT') {
-      return NextResponse.json({
-        statusx: 'NO_ACCOUNT',
-        message: 'Wallet not activated. Please activate your wallet to use this payment method.',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'NO_ACCOUNT',
+          message:
+            'Wallet not activated. Please activate your wallet to use this payment method.',
+        },
+        { status: 400 },
+      );
     }
 
     // Check if customer data fetch failed
     if (data.statusx === 'FAILED') {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: data.message || 'Failed to retrieve wallet information',
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: data.message || 'Failed to retrieve wallet information',
+        },
+        { status: 400 },
+      );
     }
 
     // Extract customer and transaction details
@@ -119,16 +145,27 @@ export async function POST(request: NextRequest) {
     const walletBalance = transactionDetails?.totalAmount || 0;
 
     // Calculate purchase amount server-side to ensure accuracy (accounting for quantity)
-    const calculatedPurchaseAmount = cartItems.reduce((total: number, item: any) => {
-      const itemTotal = parseFloat(item.productPrice) * parseInt(item.quantity || 1);
-      return total + itemTotal;
-    }, 0);
+    const calculatedPurchaseAmount = cartItems.reduce(
+      (total: number, item: any) => {
+        const itemTotal =
+          parseFloat(item.productPrice) * parseInt(item.quantity || 1);
+        return total + itemTotal;
+      },
+      0,
+    );
 
     // Use calculated amount instead of trusting frontend value
     const purchaseAmount = calculatedPurchaseAmount;
 
     // Log for verification
-    console.log('Wallet Balance:', walletBalance, 'Purchase Amount (Calculated):', purchaseAmount, 'Frontend Total:', totalAmount);
+    console.log(
+      'Wallet Balance:',
+      walletBalance,
+      'Purchase Amount (Calculated):',
+      purchaseAmount,
+      'Frontend Total:',
+      totalAmount,
+    );
 
     // Verify frontend calculation matches server calculation (with small tolerance for floating point)
     const frontendTotal = parseFloat(totalAmount.toString());
@@ -136,21 +173,24 @@ export async function POST(request: NextRequest) {
       console.warn('Frontend total mismatch:', {
         frontend: frontendTotal,
         calculated: purchaseAmount,
-        difference: Math.abs(frontendTotal - purchaseAmount)
+        difference: Math.abs(frontendTotal - purchaseAmount),
       });
     }
 
     // Check if user has sufficient funds
     if (walletBalance < purchaseAmount) {
-      return NextResponse.json({
-        statusx: 'INSUFFICIENT_FUNDS',
-        message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-        data: {
-          walletBalance: walletBalance,
-          requiredAmount: purchaseAmount,
-          shortfall: purchaseAmount - walletBalance,
+      return NextResponse.json(
+        {
+          statusx: 'INSUFFICIENT_FUNDS',
+          message: `Insufficient wallet balance. Current balance: ₦${walletBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}, Required: ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+          data: {
+            walletBalance: walletBalance,
+            requiredAmount: purchaseAmount,
+            shortfall: purchaseAmount - walletBalance,
+          },
         },
-      }, { status: 400 });
+        { status: 400 },
+      );
     }
 
     ////////////////// PAYMENT PARAMS STARTS //////////////////////
@@ -180,7 +220,7 @@ export async function POST(request: NextRequest) {
           product,
           quantity: item.quantity || 1, // Default to 1 if quantity is undefined/null
         };
-      })
+      }),
     );
 
     // Calculate total affiliate payouts across all products (accounting for quantity)
@@ -190,8 +230,10 @@ export async function POST(request: NextRequest) {
     productDetailsWithQuantity.forEach(({ product, quantity }) => {
       if (product) {
         // Multiply affiliate payout by quantity for each product
-        const affiliatePayoutForItem = (product.affiliatePayout || 0) * quantity;
-        const superAffiliatePayoutForItem = (product.superAffiliatePayout || 0) * quantity;
+        const affiliatePayoutForItem =
+          (product.affiliatePayout || 0) * quantity;
+        const superAffiliatePayoutForItem =
+          (product.superAffiliatePayout || 0) * quantity;
 
         totalAffiliatePayout += affiliatePayoutForItem;
         totalSuperAffiliatePayout += superAffiliatePayoutForItem;
@@ -288,7 +330,7 @@ export async function POST(request: NextRequest) {
               updatedAt: new Date(),
             },
           });
-        })
+        }),
       );
 
       return { create_debits, create_payment, salesRecords };
@@ -297,15 +339,18 @@ export async function POST(request: NextRequest) {
     // If transaction is successful, send emails
     if (result.create_debits && result.create_payment) {
       // Build cart items summary for email
-      const cartItemsSummary = cartItems.map((item: any, index: number) =>
-        `<tr>
+      const cartItemsSummary = cartItems
+        .map(
+          (item: any, index: number) =>
+            `<tr>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">${index + 1}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.productName}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.quantity}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">₦${item.productPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
           <td style="padding: 8px; border-bottom: 1px solid #ddd;">₦${(item.productPrice * item.quantity).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
-        </tr>`
-      ).join('');
+        </tr>`,
+        )
+        .join('');
 
       ////////////////////// SEND CUSTOMER PAYMENT RECEIPT EMAIL BLOCK STARTS //////////////////////
       const xEmail_A = email;
@@ -400,33 +445,40 @@ export async function POST(request: NextRequest) {
 
       console.log('Wallet payment processed successfully:', txREF);
 
-      return NextResponse.json({
-        statusx: 'SUCCESS',
-        message: `Payment successful! ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - purchaseAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-        data: {
-          transactionRef: txREF,
-          amount: purchaseAmount,
-          itemsCount: cartItems.length,
-          previousBalance: walletBalance,
-          newBalance: walletBalance - purchaseAmount,
-          paymentStatus: 'PAID',
+      return NextResponse.json(
+        {
+          statusx: 'SUCCESS',
+          message: `Payment successful! ₦${purchaseAmount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')} has been deducted from your wallet. Your new balance is ₦${(walletBalance - purchaseAmount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+          data: {
+            transactionRef: txREF,
+            amount: purchaseAmount,
+            itemsCount: cartItems.length,
+            previousBalance: walletBalance,
+            newBalance: walletBalance - purchaseAmount,
+            paymentStatus: 'PAID',
+          },
         },
-      }, { status: 200 });
+        { status: 200 },
+      );
     } else {
-      return NextResponse.json({
-        statusx: 'FAILED',
-        message: 'Payment transaction failed. Please try again.',
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          statusx: 'FAILED',
+          message: 'Payment transaction failed. Please try again.',
+        },
+        { status: 500 },
+      );
     }
-
   } catch (error) {
     console.error('Wallet payment error:', error);
-    return NextResponse.json({
-      statusx: 'FAILED',
-      message: 'Internal server error occurred while processing wallet payment',
-      error: error instanceof Error ? error.message : 'Unknown error',
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message:
+          'Internal server error occurred while processing wallet payment',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 },
+    );
   }
 }
-
-

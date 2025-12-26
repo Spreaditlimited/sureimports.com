@@ -64,24 +64,24 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!body.transaction) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Transaction ID or reference is required' 
+        {
+          success: false,
+          error: 'Transaction ID or reference is required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Get Paystack secret key from environment variables
     const paystackSecretKey = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
-    
+
     if (!paystackSecretKey) {
       return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Paystack secret key not configured' 
+        {
+          success: false,
+          error: 'Paystack secret key not configured',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     const paystackResponse = await fetch('https://api.paystack.co/refund', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${paystackSecretKey}`,
+        Authorization: `Bearer ${paystackSecretKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(refundData),
@@ -110,12 +110,12 @@ export async function POST(request: NextRequest) {
 
     if (!paystackResponse.ok) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: responseData.message || 'Refund request failed',
-          details: responseData 
+          details: responseData,
         },
-        { status: paystackResponse.status }
+        { status: paystackResponse.status },
       );
     }
 
@@ -125,17 +125,16 @@ export async function POST(request: NextRequest) {
       message: responseData.message,
       data: responseData.data,
     });
-
   } catch (error) {
     console.error('Paystack refund error:', error);
-    
+
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -144,20 +143,20 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json(
     { error: 'Method not allowed. Use POST to initiate a refund.' },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
 export async function PUT() {
   return NextResponse.json(
     { error: 'Method not allowed. Use POST to initiate a refund.' },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
 export async function DELETE() {
   return NextResponse.json(
     { error: 'Method not allowed. Use POST to initiate a refund.' },
-    { status: 405 }
+    { status: 405 },
   );
 }

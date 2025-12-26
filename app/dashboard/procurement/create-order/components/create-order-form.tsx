@@ -408,14 +408,14 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
 
               {/* A Warning Message  */}
               <div className="flex-1">
-      <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
-        Shipping Weight Notice
-      </h3>
-      <p className="mt-1 text-sm leading-relaxed text-yellow-700 dark:text-yellow-200">
-        Kindly note that for orders with weight less than 10kg, we must use air shipping even if you select sea shipping.
-      </p>
-    </div>
-
+                <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">
+                  Shipping Weight Notice
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-yellow-700 dark:text-yellow-200">
+                  Kindly note that for orders with weight less than 10kg, we
+                  must use air shipping even if you select sea shipping.
+                </p>
+              </div>
             </div>
 
             {/* IF SHIPPING DESTINATION IS NIGERIA

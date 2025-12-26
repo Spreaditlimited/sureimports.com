@@ -15,7 +15,7 @@ function Storecard({ title, icon, href }: StoreItems) {
 
   return (
     <Link href={href as any} target="_blank">
-      <div className="flex h-[210px] flex-col items-center justify-center rounded-xl bg-white shadow hover:cursor-pointer dark:bg-black xl:w-[274px] border border-slate-200 dark:border-gray-700 p-4">
+      <div className="flex h-[210px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-4 shadow hover:cursor-pointer dark:border-gray-700 dark:bg-black xl:w-[274px]">
         <div className="flex h-[152px] items-center justify-center rounded-md border border-slate-100 bg-slate-50 dark:border-gray-700 dark:bg-gray-700 max-xl:w-[200px] max-sm:w-[300px] xl:w-[250px]">
           <Image
             src={theme === 'dark' ? icon.replace('.svg', '-dark.svg') : icon}

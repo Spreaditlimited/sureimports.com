@@ -87,7 +87,7 @@ export default function Sidebar({ className }: SidebarProps) {
         </button>
       </div>
 
-      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-x-visible overflow-y-auto bg-black/100 pb-24 pt-[25px] backdrop-blur-[151.85px]">
+      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-y-auto overflow-x-visible bg-black/100 pb-24 pt-[25px] backdrop-blur-[151.85px]">
         <div className="px-3">
           <div className="mt-3 space-y-1">
             <SideNav

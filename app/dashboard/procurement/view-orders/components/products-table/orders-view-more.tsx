@@ -475,7 +475,10 @@ function MoreOrders({ products }: MoreOrdersProps) {
     formData.append('currentStatus', currentStatus);
     formData.append('newStatus', actionType);
 
-    formData.append('refundAmount', (actualTotalShippingCost - estimatedTotalShippingCost) as any);
+    formData.append(
+      'refundAmount',
+      (actualTotalShippingCost - estimatedTotalShippingCost) as any,
+    );
     formData.append('serviceType', 'PROCUREMENT');
 
     //formData.append('message', message);
@@ -761,177 +764,170 @@ function MoreOrders({ products }: MoreOrdersProps) {
             </div>
           </div>
 
-
-
-
           {/* estimated cost of order (SAVED STAGE & ON HOLD STAGE) */}
           {['saved', 'on-hold'].includes(status) && (
-          <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
-              Estimated Shipping Cost of Order:
+            <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
+              <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                Estimated Shipping Cost of Order:
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                  <p className="w-72">Domestic Shipping Cost within China:</p> $
+                  {
+                    ((domesticShippingCost as number) / 1)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                </div>
+                <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                  <p className="w-72">International Shipping Cost:</p> $
+                  {
+                    ((internationalShippingCost as number) / 1)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                </div>
+
+                <hr />
+
+                <div className="flex gap-4 text-base text-slate-600 dark:text-white">
+                  <span className="font-semibold">
+                    $
+                    <b>
+                      {
+                        ((estimatedTotalShippingCost as number) / 1)
+                          .toFixed(2)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                      }
+                    </b>
+                    USD
+                  </span>
+
+                  <span className="font-semibold">
+                    {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                    {destinationCountry == 'Nigeria' && (
+                      <>
+                        {'  |  '}&nbsp;
+                        <span className="">
+                          ₦
+                          {
+                            (
+                              ((estimatedTotalShippingCost as number) / 1) *
+                              exNairaToDollar
+                            )
+                              .toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                          }{' '}
+                          Naira
+                        </span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* important notice */}
+              <div>
+                <div className="text-sm font-semibold text-red-400">
+                  Important Notice:
+                </div>
+                <div className="text-sm font-normal text-red-400">
+                  If this cost is higher than the actual cost which will be
+                  determined later at the China office, we will refund you. If
+                  the actual cost is higher than this estimated cost, you will
+                  be required to make a balance payment.
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
-                <p className="w-72">Domestic Shipping Cost within China:</p> $
-                {
-                  ((domesticShippingCost as number) / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                }
-              </div>
-              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
-                <p className="w-72">International Shipping Cost:</p> $
-                {
-                  ((internationalShippingCost as number) / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                }
-              </div>
-
-              <hr />
-
-              <div className="flex gap-4 text-base text-slate-600 dark:text-white">
-                <span className="font-semibold">
-                  $
-                  <b>
-                    {
-                      ((estimatedTotalShippingCost as number) / 1)
-                        .toFixed(2)
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                    }
-                  </b>
-                  USD
-                </span>
-
-                <span className="font-semibold">
-                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
-                  {destinationCountry == 'Nigeria' && (
-                    <>
-                      {'  |  '}&nbsp;
-                      <span className="">
-                        ₦
-                        {
-                          (
-                            ((estimatedTotalShippingCost as number) / 1) *
-                            exNairaToDollar
-                          )
-                            .toFixed(2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                        }{' '}
-                        Naira
-                      </span>
-                    </>
-                  )}
-                </span>
-              </div>
-            </div>
-
-            {/* important notice */}
-            <div>
-              <div className="text-sm font-semibold text-red-400">
-                Important Notice:
-              </div>
-              <div className="text-sm font-normal text-red-400">
-                If this cost is higher than the actual cost which will be
-                determined later at the China office, we will refund you. If the
-                actual cost is higher than this estimated cost, you will be
-                required to make a balance payment.
-              </div>
-            </div>
-          </div>
           )}
 
+          {/* estimated shipping cost of order (OTHER STAGE) */}
+          {!['saved', 'on-hold'].includes(status) && (
+            <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
+              <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
+                Estimated Shipping Cost of Order:
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                  <p className="w-72">Domestic Shipping Cost within China:</p> $
+                  {
+                    ((domesticShippingCost as number) / 1)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                </div>
+                <div className="flex gap-20 text-base text-slate-950 dark:text-white">
+                  <p className="w-72">International Shipping Cost:</p> $
+                  {
+                    (
+                      ((estimatedTotalShippingCost -
+                        domesticShippingCost) as number) / 1
+                    )
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                  }
+                </div>
 
+                <hr />
 
+                <div className="flex gap-4 text-base text-slate-600 dark:text-white">
+                  <span className="font-semibold">
+                    $
+                    <b>
+                      {
+                        ((estimatedTotalShippingCost as number) / 1)
+                          .toFixed(2)
+                          .toString()
+                          .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                      }
+                    </b>
+                    USD
+                  </span>
 
+                  <span className="font-semibold">
+                    {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                    {destinationCountry == 'Nigeria' && (
+                      <>
+                        {'  |  '}&nbsp;
+                        <span className="">
+                          ₦
+                          {
+                            (
+                              ((estimatedTotalShippingCost as number) / 1) *
+                              exNairaToDollar
+                            )
+                              .toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                          }{' '}
+                          Naira
+                        </span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
 
-        {/* estimated shipping cost of order (OTHER STAGE) */}
-        {!['saved', 'on-hold'].includes(status) && (
-          <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
-            <div className="text-lg font-bold text-slate-800 dark:text-slate-200">
-              Estimated Shipping Cost of Order:
+              {/* important notice */}
+              <div>
+                <div className="text-sm font-semibold text-red-400">
+                  Important Notice:
+                </div>
+                <div className="text-sm font-normal text-red-400">
+                  If this cost is higher than the actual cost which will be
+                  determined later at the China office, we will refund you. If
+                  the actual cost is higher than this estimated cost, you will
+                  be required to make a balance payment.
+                </div>
+              </div>
             </div>
-            <div className="flex flex-col gap-3">
-              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
-                <p className="w-72">Domestic Shipping Cost within China:</p> $
-                {
-                  ((domesticShippingCost as number) / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                }
-              </div>
-              <div className="flex gap-20 text-base text-slate-950 dark:text-white">
-                <p className="w-72">International Shipping Cost:</p> $
-                {
-                  ((estimatedTotalShippingCost - domesticShippingCost as number) / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                }
-              </div>
-
-              <hr />
-
-              <div className="flex gap-4 text-base text-slate-600 dark:text-white">
-                <span className="font-semibold">
-                  $
-                  <b>
-                    {
-                      ((estimatedTotalShippingCost as number) / 1)
-                        .toFixed(2)
-                        .toString()
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                    }
-                  </b>
-                  USD
-                </span>
-
-                <span className="font-semibold">
-                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
-                  {destinationCountry == 'Nigeria' && (
-                    <>
-                      {'  |  '}&nbsp;
-                      <span className="">
-                        ₦
-                        {
-                          (
-                            ((estimatedTotalShippingCost as number) / 1) *
-                            exNairaToDollar
-                          )
-                            .toFixed(2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                        }{' '}
-                        Naira
-                      </span>
-                    </>
-                  )}
-                </span>
-              </div>
-            </div>
-
-            {/* important notice */}
-            <div>
-              <div className="text-sm font-semibold text-red-400">
-                Important Notice:
-              </div>
-              <div className="text-sm font-normal text-red-400">
-                If this cost is higher than the actual cost which will be
-                determined later at the China office, we will refund you. If the
-                actual cost is higher than this estimated cost, you will be
-                required to make a balance payment.
-              </div>
-            </div>
-          </div>
           )}
-
-
-
 
           {/* details */}
           <div className="flex flex-col gap-4 border border-slate-200 p-[25px]">
@@ -1460,30 +1456,28 @@ function MoreOrders({ products }: MoreOrdersProps) {
                     }{' '}
                     USD
                   </b>
-                
 
-                <span className="font-semibold">
-                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
-                  {destinationCountry == 'Nigeria' && (
-                    <>
-                      {'  |  '}&nbsp;
-                      <span className="">
-                        ₦
-                        {
-                          (
-                            ((actualTotalShippingCost as number) / 1) *
-                            exNairaToDollar
-                          )
-                            .toFixed(2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                        }{' '}
-                        Naira
-                      </span>
-                    </>
-                  )}
-                </span>
-
+                  <span className="font-semibold">
+                    {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                    {destinationCountry == 'Nigeria' && (
+                      <>
+                        {'  |  '}&nbsp;
+                        <span className="">
+                          ₦
+                          {
+                            (
+                              ((actualTotalShippingCost as number) / 1) *
+                              exNairaToDollar
+                            )
+                              .toFixed(2)
+                              .toString()
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                          }{' '}
+                          Naira
+                        </span>
+                      </>
+                    )}
+                  </span>
                 </div>
               </div>
 
@@ -1534,52 +1528,61 @@ function MoreOrders({ products }: MoreOrdersProps) {
 
                 <hr />
 
-                {(actualTotalShippingCost - estimatedTotalShippingCost) > 0 && (
+                {actualTotalShippingCost - estimatedTotalShippingCost > 0 && (
                   <div className="flex gap-20 text-base text-red-700 dark:text-red-500">
                     <p className="w-72">Amount to Pay:</p>
                     <b>
                       $
                       {
-                        ((actualTotalShippingCost - estimatedTotalShippingCost as number) / 1)
+                        (
+                          ((actualTotalShippingCost -
+                            estimatedTotalShippingCost) as number) / 1
+                        )
                           .toFixed(2)
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
                       }{' '}
                       USD
                     </b>
- 
-                <span className="font-semibold">
-                  {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
-                  {destinationCountry == 'Nigeria' && (
-                    <>
-                      {'  |  '}&nbsp;
-                      <span className="">
-                        ₦
-                        {
-                          (
-                            ((actualTotalShippingCost - estimatedTotalShippingCost as number) / 1) *
-                            exNairaToDollar
-                          )
-                            .toFixed(2)
-                            .toString()
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
-                        }{' '}
-                        Naira
-                      </span>
-                    </>
-                  )}
-                </span>
 
+                    <span className="font-semibold">
+                      {/* IF DESTINATION COUNTRY NIGERIA, SHOW VALUE IN NAIRA */}
+                      {destinationCountry == 'Nigeria' && (
+                        <>
+                          {'  |  '}&nbsp;
+                          <span className="">
+                            ₦
+                            {
+                              (
+                                (((actualTotalShippingCost -
+                                  estimatedTotalShippingCost) as number) /
+                                  1) *
+                                exNairaToDollar
+                              )
+                                .toFixed(2)
+                                .toString()
+                                .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
+                            }{' '}
+                            Naira
+                          </span>
+                        </>
+                      )}
+                    </span>
                   </div>
                 )}
 
-                {(actualTotalShippingCost - estimatedTotalShippingCost) < 0 && (
+                {actualTotalShippingCost - estimatedTotalShippingCost < 0 && (
                   <div className="flex gap-20 text-base text-green-700 dark:text-green-500">
                     <p className="w-72"> Refund Amount:</p>
                     <b>
                       $
                       {
-                        ((((actualTotalShippingCost - estimatedTotalShippingCost) as number) * -1) / 1)
+                        (
+                          (((actualTotalShippingCost -
+                            estimatedTotalShippingCost) as number) *
+                            -1) /
+                          1
+                        )
                           .toFixed(2)
                           .toString()
                           .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as string
@@ -1595,176 +1598,194 @@ function MoreOrders({ products }: MoreOrdersProps) {
         {/* ............................... PDF PRINT SECTION ENDS ................................ */}
 
         {/* ............................... PAYMENT SECTION FOR PAY FOR SHIPPING................................ */}
-        {status == 'pay-for-shipping' && (actualTotalShippingCost - estimatedTotalShippingCost) > 0 && (
-          <>
-            <div className="flex flex-col justify-between border border-slate-200 p-[25px] max-xl:gap-4 xl:flex-row xl:items-center">
-              <div className="flex flex-col items-center text-base text-slate-800 dark:text-slate-200 max-md:items-start max-md:gap-3 lg:items-start">
-                <div className="pb-3">
-                  Agree to{' '}
-                  <Link href="/terms-and-conditions">
-                    <span className="pb-5 text-indigo-800">
-                      Terms & Condition
-                    </span>
-                  </Link>
-                </div>
-                <div className="flex text-sm text-slate-800 dark:text-slate-400 max-md:items-start max-md:gap-3 md:text-center lg:items-center lg:gap-2">
-                  {/* <Checkbox  /> */}
-                  <input
-                    type="checkbox"
-                    checked={isDisabled}
-                    onChange={(e) => setIsDisabled(e.target.checked)}
-                    className="h-4 w-4"
-                  />
-                  You must agree to our Terms & Conditions before proceeding
-                </div>
-                <br />
-                {/* <div className="dark:text-yellow-200d text-sm text-blue-800">
-                  Please note that card payment cannot exceed $1,000 USD or
-                  N500,000 Naira
-                </div>
-                <br /> */}
-              </div>
-
-              <div className="flex flex-col gap-[15px] lg:flex-row">
-                {/* *********************************************************************************************************** */}
-                <FlutterwavePaymentButton
-                  amount={(actualTotalShippingCost - estimatedTotalShippingCost)}
-                  amountNaira={((actualTotalShippingCost - estimatedTotalShippingCost)) * exNairaToDollar}
-                  destinationCountry={destinationCountry}
-                  totalWeight={productsTotalWeight}
-                  email={user?.userEmail as string}
-                  name={user?.userFirstname as string}
-                  phone_number={''}
-                  currency={'USD'}
-                  payment_type={'CARD'}
-                  consumer_id={user?.pidUser as string}
-                  service_id={pidOrder}
-                  service_name={'PROCUREMENT'}
-                  description={'This is General Procuremnt & Shipping Service'}
-                  isDisabled={isDisabled}
-                  className={
-                    isDisabled
-                      ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                      : 'flex items-center gap-2 rounded-2xl bg-[#c9d1db] pb-2 pl-5 pr-5 pt-2 text-[#ffffff] hover:bg-[#c9d1db] dark:bg-[#555d70] dark:text-[#8b8b94]'
-                  }
-                />
-                {/* *********************************************************************************************************** */}
-
-                <Button
-                  className={
-                    isDisabled
-                      ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
-                      : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
-                  }
-                  onClick={() => {
-                    let amount = (actualTotalShippingCost - estimatedTotalShippingCost) as any;
-                    let amountNairax = ((actualTotalShippingCost - estimatedTotalShippingCost) / exNairaToDollar*
-                      exNairaToDollar) as any;
-                    let totalWeightx = productsTotalWeight as any;
-                    let destinationCountryx = destinationCountry as any;
-
-                    //check minimum amount limit in dollars
-                    // if (amount < 200 && destinationCountryx != 'Nigeria') {
-                    //   alert(
-                    //     'We cannot process orders of less than $200 for orders going to your destination. Please, edit your order',
-                    //   );
-                    //   return;
-                    // }
-
-                    //check minimum amount limit in naira
-                    // if (
-                    //   amountNairax < 100000 &&
-                    //   destinationCountryx == 'Nigeria'
-                    // ) {
-                    //   alert(
-                    //     'We do not process orders less than N100,000. Please, edit your order.',
-                    //   );
-                    //   return;
-                    // }
-
-                    //check amount limit in naira
-                    if (totalWeightx < 10 && destinationCountryx != 'Nigeria') {
-                      alert(
-                        'We cannot ship orders with weight less than 10kg to your destination. Please, edit your order.',
-                      );
-                      return;
-                    }
-
-                    router.push(
-                      '/dashboard/bank-payment/?service=procurement&amount=' +
-                        (actualTotalShippingCost - estimatedTotalShippingCost) +
-                        '&amountNaira=' +
-                        (actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar +
-                        '&currencyType=' +
-                        currencyType +
-                        '&exNairaToDollar=' +
-                        exNairaToDollar +
-                        '&destinationCountry=' +
-                        destinationCountry +
-                        '&status=' +
-                        status +
-                        '&newEstimatedTotalShippingCost=' +
-                        estimatedTotalShippingCost +
-                        '&newTotalAmount=' +
-                        grandTotalCost +
-                        '&newTotalWeight=' +
-                        totalWeightx +
-                        '&serviceID=' +
-                        pidOrder +
-                        '&serviceDescription=Pay for General Procurement Service',
-                    );
-                  }}
-                  disabled={!isDisabled}
-                >
-                  <Image
-                    loading="lazy"
-                    src="/icons/bank.svg"
-                    alt="Logo"
-                    width={20}
-                    height={20}
-                    className="items-center self-center"
-                  />
-                  Direct Bank Deposit
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* ............................... PAYMENT SECTION FOR PAY FOR SHIPPING................................ */}
-        {status == 'pay-for-shipping' && (actualTotalShippingCost - estimatedTotalShippingCost) < 0 && (
-          <>
-            <form onSubmit={handleSubmit}>
+        {status == 'pay-for-shipping' &&
+          actualTotalShippingCost - estimatedTotalShippingCost > 0 && (
+            <>
               <div className="flex flex-col justify-between border border-slate-200 p-[25px] max-xl:gap-4 xl:flex-row xl:items-center">
                 <div className="flex flex-col items-center text-base text-slate-800 dark:text-slate-200 max-md:items-start max-md:gap-3 lg:items-start">
                   <div className="pb-3">
                     Agree to{' '}
-                    <Link href="/terms-and-conditions" target="_blank">
+                    <Link href="/terms-and-conditions">
                       <span className="pb-5 text-indigo-800">
                         Terms & Condition
                       </span>
                     </Link>
                   </div>
-
-                  <div className="flex items-center">
-                    <label className="flex cursor-pointer items-center">
-                      <input
-                        required
-                        type="checkbox"
-                        className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        checked={isDisabled}
-                        onChange={(e) => setIsDisabled(e.target.checked)}
-                      />
-                      <span className="ml-2 text-gray-500">
-                        You must agree to our Terms & Conditions before
-                        proceeding
-                      </span>
-                    </label>
+                  <div className="flex text-sm text-slate-800 dark:text-slate-400 max-md:items-start max-md:gap-3 md:text-center lg:items-center lg:gap-2">
+                    {/* <Checkbox  /> */}
+                    <input
+                      type="checkbox"
+                      checked={isDisabled}
+                      onChange={(e) => setIsDisabled(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                    You must agree to our Terms & Conditions before proceeding
                   </div>
+                  <br />
+                  {/* <div className="dark:text-yellow-200d text-sm text-blue-800">
+                  Please note that card payment cannot exceed $1,000 USD or
+                  N500,000 Naira
+                </div>
+                <br /> */}
+                </div>
 
-                  {/* Message to Admin */}
+                <div className="flex flex-col gap-[15px] lg:flex-row">
+                  {/* *********************************************************************************************************** */}
+                  <FlutterwavePaymentButton
+                    amount={
+                      actualTotalShippingCost - estimatedTotalShippingCost
+                    }
+                    amountNaira={
+                      (actualTotalShippingCost - estimatedTotalShippingCost) *
+                      exNairaToDollar
+                    }
+                    destinationCountry={destinationCountry}
+                    totalWeight={productsTotalWeight}
+                    email={user?.userEmail as string}
+                    name={user?.userFirstname as string}
+                    phone_number={''}
+                    currency={'USD'}
+                    payment_type={'CARD'}
+                    consumer_id={user?.pidUser as string}
+                    service_id={pidOrder}
+                    service_name={'PROCUREMENT'}
+                    description={
+                      'This is General Procuremnt & Shipping Service'
+                    }
+                    isDisabled={isDisabled}
+                    className={
+                      isDisabled
+                        ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
+                        : 'flex items-center gap-2 rounded-2xl bg-[#c9d1db] pb-2 pl-5 pr-5 pt-2 text-[#ffffff] hover:bg-[#c9d1db] dark:bg-[#555d70] dark:text-[#8b8b94]'
+                    }
+                  />
+                  {/* *********************************************************************************************************** */}
 
-                  {/* <div>
+                  <Button
+                    className={
+                      isDisabled
+                        ? 'flex items-center gap-2 rounded-2xl bg-indigo-800 pb-2 pl-5 pr-5 pt-2 hover:bg-indigo-700'
+                        : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
+                    }
+                    onClick={() => {
+                      let amount = (actualTotalShippingCost -
+                        estimatedTotalShippingCost) as any;
+                      let amountNairax = (((actualTotalShippingCost -
+                        estimatedTotalShippingCost) /
+                        exNairaToDollar) *
+                        exNairaToDollar) as any;
+                      let totalWeightx = productsTotalWeight as any;
+                      let destinationCountryx = destinationCountry as any;
+
+                      //check minimum amount limit in dollars
+                      // if (amount < 200 && destinationCountryx != 'Nigeria') {
+                      //   alert(
+                      //     'We cannot process orders of less than $200 for orders going to your destination. Please, edit your order',
+                      //   );
+                      //   return;
+                      // }
+
+                      //check minimum amount limit in naira
+                      // if (
+                      //   amountNairax < 100000 &&
+                      //   destinationCountryx == 'Nigeria'
+                      // ) {
+                      //   alert(
+                      //     'We do not process orders less than N100,000. Please, edit your order.',
+                      //   );
+                      //   return;
+                      // }
+
+                      //check amount limit in naira
+                      if (
+                        totalWeightx < 10 &&
+                        destinationCountryx != 'Nigeria'
+                      ) {
+                        alert(
+                          'We cannot ship orders with weight less than 10kg to your destination. Please, edit your order.',
+                        );
+                        return;
+                      }
+
+                      router.push(
+                        '/dashboard/bank-payment/?service=procurement&amount=' +
+                          (actualTotalShippingCost -
+                            estimatedTotalShippingCost) +
+                          '&amountNaira=' +
+                          (actualTotalShippingCost -
+                            estimatedTotalShippingCost) *
+                            exNairaToDollar +
+                          '&currencyType=' +
+                          currencyType +
+                          '&exNairaToDollar=' +
+                          exNairaToDollar +
+                          '&destinationCountry=' +
+                          destinationCountry +
+                          '&status=' +
+                          status +
+                          '&newEstimatedTotalShippingCost=' +
+                          estimatedTotalShippingCost +
+                          '&newTotalAmount=' +
+                          grandTotalCost +
+                          '&newTotalWeight=' +
+                          totalWeightx +
+                          '&serviceID=' +
+                          pidOrder +
+                          '&serviceDescription=Pay for General Procurement Service',
+                      );
+                    }}
+                    disabled={!isDisabled}
+                  >
+                    <Image
+                      loading="lazy"
+                      src="/icons/bank.svg"
+                      alt="Logo"
+                      width={20}
+                      height={20}
+                      className="items-center self-center"
+                    />
+                    Direct Bank Deposit
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+
+        {/* ............................... PAYMENT SECTION FOR PAY FOR SHIPPING................................ */}
+        {status == 'pay-for-shipping' &&
+          actualTotalShippingCost - estimatedTotalShippingCost < 0 && (
+            <>
+              <form onSubmit={handleSubmit}>
+                <div className="flex flex-col justify-between border border-slate-200 p-[25px] max-xl:gap-4 xl:flex-row xl:items-center">
+                  <div className="flex flex-col items-center text-base text-slate-800 dark:text-slate-200 max-md:items-start max-md:gap-3 lg:items-start">
+                    <div className="pb-3">
+                      Agree to{' '}
+                      <Link href="/terms-and-conditions" target="_blank">
+                        <span className="pb-5 text-indigo-800">
+                          Terms & Condition
+                        </span>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center">
+                      <label className="flex cursor-pointer items-center">
+                        <input
+                          required
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          checked={isDisabled}
+                          onChange={(e) => setIsDisabled(e.target.checked)}
+                        />
+                        <span className="ml-2 text-gray-500">
+                          You must agree to our Terms & Conditions before
+                          proceeding
+                        </span>
+                      </label>
+                    </div>
+
+                    {/* Message to Admin */}
+
+                    {/* <div>
                     <textarea
                       className="form-textarea w-full p-3 border rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
                       rows={3}
@@ -1774,10 +1795,10 @@ function MoreOrders({ products }: MoreOrdersProps) {
                     ></textarea>
                   </div><br /> */}
 
-                  <div className="container mx-auto px-2 py-2">
-                    <div className="flex flex-col gap-6 md:flex-row">
-                      {/* Left Column */}
-                      {/* <div className="md:w-1/ rounded-lg p-3">
+                    <div className="container mx-auto px-2 py-2">
+                      <div className="flex flex-col gap-6 md:flex-row">
+                        {/* Left Column */}
+                        {/* <div className="md:w-1/ rounded-lg p-3">
                         <p className="text-gray-400">
                           <button
                             type="submit"
@@ -1795,30 +1816,30 @@ function MoreOrders({ products }: MoreOrdersProps) {
                         </p>
                       </div> */}
 
-                      {/* Right Column */}
-                      <div className="md:w-3/3 rounded-lg p-3 shadow-md">
-                        <p className="text-gray-400">
-                          <button
-                            type="submit"
-                            name="action"
-                            value="in-transit"
-                            onClick={() => setActionType('in-transit')}
-                            className="btn btn-secondary mt-4 w-full rounded-md bg-indigo-600 py-3 text-sm text-white shadow hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                          >
-                            Create Refund & Move Order for Shipping
-                          </button>
-                          <small>
-                            This action also approves this Order for Shipping
-                          </small>
-                        </p>
+                        {/* Right Column */}
+                        <div className="md:w-3/3 rounded-lg p-3 shadow-md">
+                          <p className="text-gray-400">
+                            <button
+                              type="submit"
+                              name="action"
+                              value="in-transit"
+                              onClick={() => setActionType('in-transit')}
+                              className="btn btn-secondary mt-4 w-full rounded-md bg-indigo-600 py-3 text-sm text-white shadow hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                            >
+                              Create Refund & Move Order for Shipping
+                            </button>
+                            <small>
+                              This action also approves this Order for Shipping
+                            </small>
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </form>
-          </>
-        )}
+              </form>
+            </>
+          )}
 
         {/* --------------------------on-hold-------------------------- */}
 

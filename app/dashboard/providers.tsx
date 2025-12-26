@@ -94,9 +94,7 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
 
                 <AlertProvider>
                   <RecordCountProcurementProvider>
-                    <ShopCartProvider>
-                      {props.children}
-                    </ShopCartProvider>
+                    <ShopCartProvider>{props.children}</ShopCartProvider>
                   </RecordCountProcurementProvider>
                 </AlertProvider>
               </main>

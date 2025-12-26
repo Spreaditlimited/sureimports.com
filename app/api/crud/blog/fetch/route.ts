@@ -58,7 +58,7 @@ export async function GET(request: Request) {
           hasPrevPage: page > 1,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error('Error fetching blogs:', error);
@@ -67,7 +67,7 @@ export async function GET(request: Request) {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch blogs',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

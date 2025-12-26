@@ -1,25 +1,107 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useMemo } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
-import { Separator } from "./ui/separator";
-import { Progress } from "./ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Textarea } from "./ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
-import { Badge } from "./ui/badge";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "./ui/alert-dialog";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { useState, useEffect, useMemo } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
+import { Separator } from './ui/separator';
+import { Progress } from './ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Label } from './ui/label';
+import { Textarea } from './ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
+import { Badge } from './ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 import { Product, Order, OrderTab, BulkOrder } from '../App';
-import { ArrowLeft, Plus, Edit, Trash2, Eye, EyeOff, TrendingUp, TrendingDown, Package, Users, DollarSign, ShoppingCart, AlertTriangle, CheckCircle, UserPlus, Calendar, Clock, MapPin, Phone, Mail, User, CreditCard, Star, Truck, RotateCcw, Search, Filter, X, Settings, Save } from 'lucide-react';
+import {
+  ArrowLeft,
+  Plus,
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  TrendingUp,
+  TrendingDown,
+  Package,
+  Users,
+  DollarSign,
+  ShoppingCart,
+  AlertTriangle,
+  CheckCircle,
+  UserPlus,
+  Calendar,
+  Clock,
+  MapPin,
+  Phone,
+  Mail,
+  User,
+  CreditCard,
+  Star,
+  Truck,
+  RotateCcw,
+  Search,
+  Filter,
+  X,
+  Settings,
+  Save,
+} from 'lucide-react';
 import BulkOrderCreateDialog from './BulkOrderCreateDialog';
-import ReturnsOrderCreateDialog, { ReturnsOrder } from './ReturnsOrderCreateDialog';
-import { Switch } from "./ui/switch";
+import ReturnsOrderCreateDialog, {
+  ReturnsOrder,
+} from './ReturnsOrderCreateDialog';
+import { Switch } from './ui/switch';
 
 interface AdminDashboardProps {
   onBackToStore: () => void;
@@ -27,7 +109,11 @@ interface AdminDashboardProps {
   products: Product[];
   onProductUpdate: (products: Product[]) => void;
   orders: Record<OrderTab, Order[]> | null;
-  onOrderStatusUpdate: (orderId: string, newStatus: Order['status'], tab: OrderTab) => void;
+  onOrderStatusUpdate: (
+    orderId: string,
+    newStatus: Order['status'],
+    tab: OrderTab,
+  ) => void;
   onBulkOrderCreate?: (bulkOrder: BulkOrder) => void;
   onReturnsOrderCreate?: (returnsOrder: ReturnsOrder) => void;
   walletBalance: number;
@@ -65,7 +151,7 @@ export default function AdminDashboard({
   onBulkOrderCreate,
   onReturnsOrderCreate,
   walletBalance,
-  transactions
+  transactions,
 }: AdminDashboardProps) {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
@@ -74,19 +160,19 @@ export default function AdminDashboard({
   const [isCreatingBulkOrder, setIsCreatingBulkOrder] = useState(false);
   const [isCreatingReturnsOrder, setIsCreatingReturnsOrder] = useState(false);
   const [viewingOrder, setViewingOrder] = useState<Order | null>(null);
-  
+
   // Search and filter states
   const [productSearch, setProductSearch] = useState('');
   const [productCategoryFilter, setProductCategoryFilter] = useState('all');
   const [productBrandFilter, setProductBrandFilter] = useState('all');
   const [productConditionFilter, setProductConditionFilter] = useState('all');
   const [productVisibilityFilter, setProductVisibilityFilter] = useState('all');
-  
+
   const [orderSearch, setOrderSearch] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
   const [orderTypeFilter, setOrderTypeFilter] = useState('all');
   const [orderDateFilter, setOrderDateFilter] = useState('all');
-  
+
   // Settings state management
   const [storeSettings, setStoreSettings] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -101,10 +187,17 @@ export default function AdminDashboard({
     }
     return {
       categories: {
-        'Laptops': ['HP', 'Macbooks', 'ASUS', 'Lenovo', 'Dell', 'Acer'],
-        'Phones': ['Apple', 'Samsung', 'Google Pixel', 'Redmi', 'OnePlus', 'Huawei'],
-        'Tablets': ['Apple', 'Samsung', 'Microsoft', 'Huawei'],
-        'Accessories': ['FAYA', 'Anker', 'Belkin', 'JBL', 'Sony']
+        Laptops: ['HP', 'Macbooks', 'ASUS', 'Lenovo', 'Dell', 'Acer'],
+        Phones: [
+          'Apple',
+          'Samsung',
+          'Google Pixel',
+          'Redmi',
+          'OnePlus',
+          'Huawei',
+        ],
+        Tablets: ['Apple', 'Samsung', 'Microsoft', 'Huawei'],
+        Accessories: ['FAYA', 'Anker', 'Belkin', 'JBL', 'Sony'],
       },
       conditions: ['Brand new', 'Pre-owned', 'Refurbished', 'Open box'],
       storage: ['32G', '64G', '128G', '256G', '512G', '1TB', '2TB'],
@@ -112,16 +205,18 @@ export default function AdminDashboard({
       graphicsMemory: ['2G', '4G', '6G', '8G', '12G', '16G', '24G'],
       warranty: ['3 months', '6 months', '12 months', '24 months', '36 months'],
       pricingFormulas: {
-        'Phones': { addition: 500, multiplier: 225, commission: 20000 },
-        'Tablets': { addition: 500, multiplier: 225, commission: 20000 },
-        'Laptops': { addition: 750, multiplier: 225, commission: 20000 },
-        'Accessories': { addition: 0, multiplier: 225, commission: 1000 }
+        Phones: { addition: 500, multiplier: 225, commission: 20000 },
+        Tablets: { addition: 500, multiplier: 225, commission: 20000 },
+        Laptops: { addition: 750, multiplier: 225, commission: 20000 },
+        Accessories: { addition: 0, multiplier: 225, commission: 1000 },
       },
       deliveryTime: 10,
       currency: 'NGN',
       storeName: 'Buy Gadgets from China',
-      storeDescription: 'Get genuine brand new or pre-owned gadgets shipped from China in just 10 business days. Every phone comes boxed with accessories, a full warranty, and extras like screen protectors and cases plus friendly after-sales support you can count on. Quality gadgets, delivered hassle-free.',
-      paySmallSmallDefault: 'Own this item without the financial strain! Spread your payments anyhow you want and enjoy smooth, flexible financing. No credit or debit card required. No fixed payment amount. We will create a dedicated account for you and you transfer money to the account as many times as you want. When you complete payment, we ship from China to you. Our estimated delivery timeline is 10 business days to our Lagos office.'
+      storeDescription:
+        'Get genuine brand new or pre-owned gadgets shipped from China in just 10 business days. Every phone comes boxed with accessories, a full warranty, and extras like screen protectors and cases plus friendly after-sales support you can count on. Quality gadgets, delivered hassle-free.',
+      paySmallSmallDefault:
+        'Own this item without the financial strain! Spread your payments anyhow you want and enjoy smooth, flexible financing. No credit or debit card required. No fixed payment amount. We will create a dedicated account for you and you transfer money to the account as many times as you want. When you complete payment, we ship from China to you. Our estimated delivery timeline is 10 business days to our Lagos office.',
     };
   });
 
@@ -134,8 +229,15 @@ export default function AdminDashboard({
 
   // Settings editing states
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
-  const [editingBrand, setEditingBrand] = useState<{ category: string; brand: string } | null>(null);
-  const [editingListField, setEditingListField] = useState<{ field: string; value: string; index: number } | null>(null);
+  const [editingBrand, setEditingBrand] = useState<{
+    category: string;
+    brand: string;
+  } | null>(null);
+  const [editingListField, setEditingListField] = useState<{
+    field: string;
+    value: string;
+    index: number;
+  } | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [newBrandName, setNewBrandName] = useState('');
   const [newListFieldValue, setNewListFieldValue] = useState('');
@@ -158,141 +260,182 @@ export default function AdminDashboard({
     graphicsMemory: 'none',
     warranty: '12 months',
     features: '',
-    paySmallSmall: 'Own this item without the financial strain! Spread your payments anyhow you want and enjoy smooth, flexible financing. No credit or debit card required. No fixed payment amount. We will create a dedicated account for you and you transfer money to the account as many times as you want. When you complete payment, we ship from China to you. Our estimated delivery timeline is 10 business days to our Lagos office.'
+    paySmallSmall:
+      'Own this item without the financial strain! Spread your payments anyhow you want and enjoy smooth, flexible financing. No credit or debit card required. No fixed payment amount. We will create a dedicated account for you and you transfer money to the account as many times as you want. When you complete payment, we ship from China to you. Our estimated delivery timeline is 10 business days to our Lagos office.',
   });
 
   // Settings management functions
   const handleAddCategory = () => {
     if (newCategoryName.trim() && !storeSettings.categories[newCategoryName]) {
-      setStoreSettings(prev => ({
+      setStoreSettings((prev) => ({
         ...prev,
         categories: {
           ...prev.categories,
-          [newCategoryName]: []
+          [newCategoryName]: [],
         },
         pricingFormulas: {
           ...prev.pricingFormulas,
-          [newCategoryName]: { addition: 500, multiplier: 225, commission: 20000 }
-        }
+          [newCategoryName]: {
+            addition: 500,
+            multiplier: 225,
+            commission: 20000,
+          },
+        },
       }));
       setNewCategoryName('');
     }
   };
 
   const handleDeleteCategory = (categoryName: string) => {
-    const { [categoryName]: deleted, ...remainingCategories } = storeSettings.categories;
-    const { [categoryName]: deletedFormula, ...remainingFormulas } = storeSettings.pricingFormulas;
-    
-    setStoreSettings(prev => ({
+    const { [categoryName]: deleted, ...remainingCategories } =
+      storeSettings.categories;
+    const { [categoryName]: deletedFormula, ...remainingFormulas } =
+      storeSettings.pricingFormulas;
+
+    setStoreSettings((prev) => ({
       ...prev,
       categories: remainingCategories,
-      pricingFormulas: remainingFormulas
+      pricingFormulas: remainingFormulas,
     }));
   };
 
   const handleEditCategory = (oldName: string, newName: string) => {
-    if (newName.trim() && newName !== oldName && !storeSettings.categories[newName]) {
+    if (
+      newName.trim() &&
+      newName !== oldName &&
+      !storeSettings.categories[newName]
+    ) {
       const categoryBrands = storeSettings.categories[oldName];
       const categoryFormula = storeSettings.pricingFormulas[oldName];
-      
-      const { [oldName]: deleted, ...otherCategories } = storeSettings.categories;
-      const { [oldName]: deletedFormula, ...otherFormulas } = storeSettings.pricingFormulas;
-      
-      setStoreSettings(prev => ({
+
+      const { [oldName]: deleted, ...otherCategories } =
+        storeSettings.categories;
+      const { [oldName]: deletedFormula, ...otherFormulas } =
+        storeSettings.pricingFormulas;
+
+      setStoreSettings((prev) => ({
         ...prev,
         categories: {
           ...otherCategories,
-          [newName]: categoryBrands
+          [newName]: categoryBrands,
         },
         pricingFormulas: {
           ...otherFormulas,
-          [newName]: categoryFormula
-        }
+          [newName]: categoryFormula,
+        },
       }));
     }
     setEditingCategory(null);
   };
 
   const handleAddBrand = (category: string) => {
-    if (newBrandName.trim() && !storeSettings.categories[category].includes(newBrandName)) {
-      setStoreSettings(prev => ({
+    if (
+      newBrandName.trim() &&
+      !storeSettings.categories[category].includes(newBrandName)
+    ) {
+      setStoreSettings((prev) => ({
         ...prev,
         categories: {
           ...prev.categories,
-          [category]: [...prev.categories[category], newBrandName]
-        }
+          [category]: [...prev.categories[category], newBrandName],
+        },
       }));
       setNewBrandName('');
     }
   };
 
   const handleDeleteBrand = (category: string, brand: string) => {
-    setStoreSettings(prev => ({
+    setStoreSettings((prev) => ({
       ...prev,
       categories: {
         ...prev.categories,
-        [category]: prev.categories[category].filter(b => b !== brand)
-      }
+        [category]: prev.categories[category].filter((b) => b !== brand),
+      },
     }));
   };
 
-  const handleEditBrand = (category: string, oldBrand: string, newBrand: string) => {
-    if (newBrand.trim() && newBrand !== oldBrand && !storeSettings.categories[category].includes(newBrand)) {
-      setStoreSettings(prev => ({
+  const handleEditBrand = (
+    category: string,
+    oldBrand: string,
+    newBrand: string,
+  ) => {
+    if (
+      newBrand.trim() &&
+      newBrand !== oldBrand &&
+      !storeSettings.categories[category].includes(newBrand)
+    ) {
+      setStoreSettings((prev) => ({
         ...prev,
         categories: {
           ...prev.categories,
-          [category]: prev.categories[category].map(b => b === oldBrand ? newBrand : b)
-        }
+          [category]: prev.categories[category].map((b) =>
+            b === oldBrand ? newBrand : b,
+          ),
+        },
       }));
     }
     setEditingBrand(null);
   };
 
   const handleAddListFieldValue = (field: string) => {
-    if (newListFieldValue.trim() && !storeSettings[field].includes(newListFieldValue)) {
-      setStoreSettings(prev => ({
+    if (
+      newListFieldValue.trim() &&
+      !storeSettings[field].includes(newListFieldValue)
+    ) {
+      setStoreSettings((prev) => ({
         ...prev,
-        [field]: [...prev[field], newListFieldValue]
+        [field]: [...prev[field], newListFieldValue],
       }));
       setNewListFieldValue('');
     }
   };
 
   const handleDeleteListFieldValue = (field: string, value: string) => {
-    setStoreSettings(prev => ({
+    setStoreSettings((prev) => ({
       ...prev,
-      [field]: prev[field].filter(v => v !== value)
+      [field]: prev[field].filter((v) => v !== value),
     }));
   };
 
-  const handleEditListFieldValue = (field: string, oldValue: string, newValue: string) => {
-    if (newValue.trim() && newValue !== oldValue && !storeSettings[field].includes(newValue)) {
-      setStoreSettings(prev => ({
+  const handleEditListFieldValue = (
+    field: string,
+    oldValue: string,
+    newValue: string,
+  ) => {
+    if (
+      newValue.trim() &&
+      newValue !== oldValue &&
+      !storeSettings[field].includes(newValue)
+    ) {
+      setStoreSettings((prev) => ({
         ...prev,
-        [field]: prev[field].map(v => v === oldValue ? newValue : v)
+        [field]: prev[field].map((v) => (v === oldValue ? newValue : v)),
       }));
     }
     setEditingListField(null);
   };
 
-  const handleUpdatePricingFormula = (category: string, field: string, value: number) => {
-    setStoreSettings(prev => ({
+  const handleUpdatePricingFormula = (
+    category: string,
+    field: string,
+    value: number,
+  ) => {
+    setStoreSettings((prev) => ({
       ...prev,
       pricingFormulas: {
         ...prev.pricingFormulas,
         [category]: {
           ...prev.pricingFormulas[category],
-          [field]: value
-        }
-      }
+          [field]: value,
+        },
+      },
     }));
   };
 
   const handleUpdateGeneralSetting = (field: string, value: any) => {
-    setStoreSettings(prev => ({
+    setStoreSettings((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -309,8 +452,10 @@ export default function AdminDashboard({
       totalOrders: allOrders.length,
       totalRevenue,
       totalCustomers: 1250, // Mock data
-      pendingOrders: allOrders.filter(order => order.status === 'confirmed' || order.status === 'shipped').length,
-      lowStockItems: Math.floor(products.length * 0.15) // Mock 15% low stock
+      pendingOrders: allOrders.filter(
+        (order) => order.status === 'confirmed' || order.status === 'shipped',
+      ).length,
+      lowStockItems: Math.floor(products.length * 0.15), // Mock 15% low stock
     };
   };
 
@@ -328,42 +473,58 @@ export default function AdminDashboard({
     { month: 'May', sales: 5700000, orders: 189 },
     { month: 'Jun', sales: 6800000, orders: 221 },
     { month: 'Jul', sales: 7200000, orders: 234 },
-    { month: 'Aug', sales: 8100000, orders: 267 }
+    { month: 'Aug', sales: 8100000, orders: 267 },
   ];
 
   // Render list field management section
-  const renderListFieldSection = (field: string, title: string, description: string) => (
+  const renderListFieldSection = (
+    field: string,
+    title: string,
+    description: string,
+  ) => (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings className="w-5 h-5" />
+          <Settings className="h-5 w-5" />
           {title}
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-2 mb-4">
+        <div className="mb-4 flex gap-2">
           <Input
             value={newListFieldValue}
             onChange={(e) => setNewListFieldValue(e.target.value)}
             placeholder={`Add new ${title.toLowerCase()}`}
-            onKeyPress={(e) => e.key === 'Enter' && handleAddListFieldValue(field)}
+            onKeyPress={(e) =>
+              e.key === 'Enter' && handleAddListFieldValue(field)
+            }
           />
           <Button onClick={() => handleAddListFieldValue(field)}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add
           </Button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-3">
           {storeSettings[field]?.map((value: string, index: number) => (
-            <div key={value} className="flex items-center justify-between p-2 border rounded">
-              {editingListField?.field === field && editingListField?.value === value ? (
+            <div
+              key={value}
+              className="flex items-center justify-between rounded border p-2"
+            >
+              {editingListField?.field === field &&
+              editingListField?.value === value ? (
                 <Input
                   defaultValue={value}
-                  onBlur={(e) => handleEditListFieldValue(field, value, e.target.value)}
+                  onBlur={(e) =>
+                    handleEditListFieldValue(field, value, e.target.value)
+                  }
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
-                      handleEditListFieldValue(field, value, e.currentTarget.value);
+                      handleEditListFieldValue(
+                        field,
+                        value,
+                        e.currentTarget.value,
+                      );
                     }
                   }}
                   className="text-sm"
@@ -376,26 +537,33 @@ export default function AdminDashboard({
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={() => setEditingListField({ field, value, index })}
+                      onClick={() =>
+                        setEditingListField({ field, value, index })
+                      }
                     >
-                      <Edit className="w-3 h-3" />
+                      <Edit className="h-3 w-3" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button size="sm" variant="ghost">
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete {title}</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete "{value}"? This action cannot be undone.
+                            Are you sure you want to delete "{value}"? This
+                            action cannot be undone.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteListFieldValue(field, value)}>
+                          <AlertDialogAction
+                            onClick={() =>
+                              handleDeleteListFieldValue(field, value)
+                            }
+                          >
                             Delete
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -414,20 +582,17 @@ export default function AdminDashboard({
   return (
     <div className="min-h-screen bg-background">
       {/* Mobile Header */}
-      <div className="md:hidden bg-[#0e0e1f] dark:bg-card w-full pt-12 pb-4">
-        <div className="relative h-[42px] flex items-center px-4">
-          <button
-            onClick={onBackToStore}
-            className="absolute left-0 p-2"
-          >
-            <ArrowLeft className="w-5 h-5 text-white dark:text-foreground" />
+      <div className="w-full bg-[#0e0e1f] pb-4 pt-12 dark:bg-card md:hidden">
+        <div className="relative flex h-[42px] items-center px-4">
+          <button onClick={onBackToStore} className="absolute left-0 p-2">
+            <ArrowLeft className="h-5 w-5 text-white dark:text-foreground" />
           </button>
-          <h1 className="absolute left-1/2 transform -translate-x-1/2 text-white dark:text-foreground font-medium">
+          <h1 className="absolute left-1/2 -translate-x-1/2 transform font-medium text-white dark:text-foreground">
             Admin Dashboard
           </h1>
           <button
             onClick={onBulkBuyer}
-            className="absolute right-0 bg-purple-600 hover:bg-purple-700 transition-colors px-3 py-1.5 rounded text-white text-xs"
+            className="absolute right-0 rounded bg-purple-600 px-3 py-1.5 text-xs text-white transition-colors hover:bg-purple-700"
           >
             Bulk Buyer?
           </button>
@@ -435,28 +600,28 @@ export default function AdminDashboard({
       </div>
 
       {/* Desktop Header */}
-      <div className="hidden md:block bg-background border-b border-border p-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="hidden border-b border-border bg-background p-6 md:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={onBackToStore}
-              className="p-2 hover:bg-accent rounded-lg transition-colors"
+              className="rounded-lg p-2 transition-colors hover:bg-accent"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="h-5 w-5" />
             </button>
             <h1 className="text-2xl font-semibold">Admin Dashboard</h1>
           </div>
           <button
             onClick={onBulkBuyer}
-            className="bg-purple-600 hover:bg-purple-700 transition-colors flex items-center gap-2 px-4 py-2 rounded-lg text-white"
+            className="flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-white transition-colors hover:bg-purple-700"
           >
-            <Package className="w-4 h-4" />
+            <Package className="h-4 w-4" />
             <span className="text-sm">Bulk Buyer?</span>
           </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto p-4 md:p-6">
+      <div className="mx-auto max-w-7xl p-4 md:p-6">
         <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -470,16 +635,20 @@ export default function AdminDashboard({
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Revenue
+                  </CardTitle>
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(stats.totalRevenue)}</div>
+                  <div className="text-2xl font-bold">
+                    {formatCurrency(stats.totalRevenue)}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    <TrendingUp className="inline h-3 w-3 mr-1" />
+                    <TrendingUp className="mr-1 inline h-3 w-3" />
                     +12.5% from last month
                   </p>
                 </CardContent>
@@ -487,13 +656,15 @@ export default function AdminDashboard({
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Orders
+                  </CardTitle>
                   <ShoppingCart className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.totalOrders}</div>
                   <p className="text-xs text-muted-foreground">
-                    <TrendingUp className="inline h-3 w-3 mr-1" />
+                    <TrendingUp className="mr-1 inline h-3 w-3" />
                     +8.2% from last month
                   </p>
                 </CardContent>
@@ -501,13 +672,17 @@ export default function AdminDashboard({
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Products</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Total Products
+                  </CardTitle>
                   <Package className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalProducts}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalProducts}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    <AlertTriangle className="inline h-3 w-3 mr-1" />
+                    <AlertTriangle className="mr-1 inline h-3 w-3" />
                     {stats.lowStockItems} low stock
                   </p>
                 </CardContent>
@@ -515,13 +690,17 @@ export default function AdminDashboard({
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Active Customers</CardTitle>
+                  <CardTitle className="text-sm font-medium">
+                    Active Customers
+                  </CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.totalCustomers}</div>
+                  <div className="text-2xl font-bold">
+                    {stats.totalCustomers}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    <TrendingUp className="inline h-3 w-3 mr-1" />
+                    <TrendingUp className="mr-1 inline h-3 w-3" />
                     +5.4% from last month
                   </p>
                 </CardContent>
@@ -529,7 +708,7 @@ export default function AdminDashboard({
             </div>
 
             {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle>Sales Overview</CardTitle>
@@ -558,7 +737,12 @@ export default function AdminDashboard({
                       <XAxis dataKey="month" />
                       <YAxis />
                       <Tooltip />
-                      <Line type="monotone" dataKey="orders" stroke="#82ca9d" strokeWidth={2} />
+                      <Line
+                        type="monotone"
+                        dataKey="orders"
+                        stroke="#82ca9d"
+                        strokeWidth={2}
+                      />
                     </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
@@ -572,18 +756,25 @@ export default function AdminDashboard({
               <div>
                 <h2 className="text-2xl font-bold">Store Settings</h2>
                 <p className="text-muted-foreground">
-                  Manage your store configuration, product categories, pricing formulas, and system settings.
+                  Manage your store configuration, product categories, pricing
+                  formulas, and system settings.
                 </p>
               </div>
               <Button className="bg-green-600 hover:bg-green-700">
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="mr-2 h-4 w-4" />
                 Auto-saved
               </Button>
             </div>
 
-            <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-6">
+            <Tabs
+              value={activeSettingsTab}
+              onValueChange={setActiveSettingsTab}
+              className="space-y-6"
+            >
               <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
-                <TabsTrigger value="categories">Categories & Brands</TabsTrigger>
+                <TabsTrigger value="categories">
+                  Categories & Brands
+                </TabsTrigger>
                 <TabsTrigger value="attributes">Product Attributes</TabsTrigger>
                 <TabsTrigger value="pricing">Pricing & Commission</TabsTrigger>
                 <TabsTrigger value="general">General Settings</TabsTrigger>
@@ -595,155 +786,221 @@ export default function AdminDashboard({
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Package className="w-5 h-5" />
+                      <Package className="h-5 w-5" />
                       Product Categories & Brands
                     </CardTitle>
                     <CardDescription>
-                      Manage product categories and their associated brands. Each category has its own pricing formula.
+                      Manage product categories and their associated brands.
+                      Each category has its own pricing formula.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     {/* Add new category */}
-                    <div className="flex gap-2 mb-6">
+                    <div className="mb-6 flex gap-2">
                       <Input
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
                         placeholder="Add new category"
-                        onKeyPress={(e) => e.key === 'Enter' && handleAddCategory()}
+                        onKeyPress={(e) =>
+                          e.key === 'Enter' && handleAddCategory()
+                        }
                       />
                       <Button onClick={handleAddCategory}>
-                        <Plus className="w-4 h-4 mr-2" />
+                        <Plus className="mr-2 h-4 w-4" />
                         Add Category
                       </Button>
                     </div>
 
                     {/* Categories list */}
                     <div className="space-y-4">
-                      {Object.entries(storeSettings.categories).map(([category, brands]) => (
-                        <Card key={category} className="border-2">
-                          <CardHeader className="pb-3">
-                            <div className="flex items-center justify-between">
-                              {editingCategory === category ? (
-                                <Input
-                                  defaultValue={category}
-                                  onBlur={(e) => handleEditCategory(category, e.target.value)}
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      handleEditCategory(category, e.currentTarget.value);
+                      {Object.entries(storeSettings.categories).map(
+                        ([category, brands]) => (
+                          <Card key={category} className="border-2">
+                            <CardHeader className="pb-3">
+                              <div className="flex items-center justify-between">
+                                {editingCategory === category ? (
+                                  <Input
+                                    defaultValue={category}
+                                    onBlur={(e) =>
+                                      handleEditCategory(
+                                        category,
+                                        e.target.value,
+                                      )
                                     }
-                                  }}
-                                  className="font-medium text-lg"
-                                  autoFocus
+                                    onKeyPress={(e) => {
+                                      if (e.key === 'Enter') {
+                                        handleEditCategory(
+                                          category,
+                                          e.currentTarget.value,
+                                        );
+                                      }
+                                    }}
+                                    className="text-lg font-medium"
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <h3 className="flex items-center gap-2 text-lg font-medium">
+                                    {category}
+                                    <Badge variant="secondary">
+                                      {brands.length} brands
+                                    </Badge>
+                                  </h3>
+                                )}
+                                <div className="flex gap-1">
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => setEditingCategory(category)}
+                                  >
+                                    <Edit className="h-4 w-4" />
+                                  </Button>
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button size="sm" variant="ghost">
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>
+                                          Delete Category
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Are you sure you want to delete "
+                                          {category}" and all its brands? This
+                                          action cannot be undone.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>
+                                          Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                          onClick={() =>
+                                            handleDeleteCategory(category)
+                                          }
+                                        >
+                                          Delete
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent>
+                              {/* Add new brand */}
+                              <div className="mb-3 flex gap-2">
+                                <Input
+                                  value={newBrandName}
+                                  onChange={(e) =>
+                                    setNewBrandName(e.target.value)
+                                  }
+                                  placeholder={`Add brand to ${category}`}
+                                  onKeyPress={(e) =>
+                                    e.key === 'Enter' &&
+                                    handleAddBrand(category)
+                                  }
                                 />
-                              ) : (
-                                <h3 className="font-medium text-lg flex items-center gap-2">
-                                  {category}
-                                  <Badge variant="secondary">{brands.length} brands</Badge>
-                                </h3>
-                              )}
-                              <div className="flex gap-1">
                                 <Button
                                   size="sm"
-                                  variant="ghost"
-                                  onClick={() => setEditingCategory(category)}
+                                  onClick={() => handleAddBrand(category)}
                                 >
-                                  <Edit className="w-4 h-4" />
+                                  <Plus className="h-4 w-4" />
                                 </Button>
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button size="sm" variant="ghost">
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Delete Category</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Are you sure you want to delete "{category}" and all its brands? This action cannot be undone.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                      <AlertDialogAction onClick={() => handleDeleteCategory(category)}>
-                                        Delete
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
                               </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent>
-                            {/* Add new brand */}
-                            <div className="flex gap-2 mb-3">
-                              <Input
-                                value={newBrandName}
-                                onChange={(e) => setNewBrandName(e.target.value)}
-                                placeholder={`Add brand to ${category}`}
-                                onKeyPress={(e) => e.key === 'Enter' && handleAddBrand(category)}
-                              />
-                              <Button size="sm" onClick={() => handleAddBrand(category)}>
-                                <Plus className="w-4 h-4" />
-                              </Button>
-                            </div>
 
-                            {/* Brands list */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                              {brands.map((brand) => (
-                                <div key={brand} className="flex items-center justify-between p-2 border rounded">
-                                  {editingBrand?.category === category && editingBrand?.brand === brand ? (
-                                    <Input
-                                      defaultValue={brand}
-                                      onBlur={(e) => handleEditBrand(category, brand, e.target.value)}
-                                      onKeyPress={(e) => {
-                                        if (e.key === 'Enter') {
-                                          handleEditBrand(category, brand, e.currentTarget.value);
+                              {/* Brands list */}
+                              <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4">
+                                {brands.map((brand) => (
+                                  <div
+                                    key={brand}
+                                    className="flex items-center justify-between rounded border p-2"
+                                  >
+                                    {editingBrand?.category === category &&
+                                    editingBrand?.brand === brand ? (
+                                      <Input
+                                        defaultValue={brand}
+                                        onBlur={(e) =>
+                                          handleEditBrand(
+                                            category,
+                                            brand,
+                                            e.target.value,
+                                          )
                                         }
-                                      }}
-                                      className="text-sm"
-                                      autoFocus
-                                    />
-                                  ) : (
-                                    <>
-                                      <span className="text-sm">{brand}</span>
-                                      <div className="flex gap-1">
-                                        <Button
-                                          size="sm"
-                                          variant="ghost"
-                                          onClick={() => setEditingBrand({ category, brand })}
-                                        >
-                                          <Edit className="w-3 h-3" />
-                                        </Button>
-                                        <AlertDialog>
-                                          <AlertDialogTrigger asChild>
-                                            <Button size="sm" variant="ghost">
-                                              <Trash2 className="w-3 h-3" />
-                                            </Button>
-                                          </AlertDialogTrigger>
-                                          <AlertDialogContent>
-                                            <AlertDialogHeader>
-                                              <AlertDialogTitle>Delete Brand</AlertDialogTitle>
-                                              <AlertDialogDescription>
-                                                Are you sure you want to delete "{brand}" from {category}? This action cannot be undone.
-                                              </AlertDialogDescription>
-                                            </AlertDialogHeader>
-                                            <AlertDialogFooter>
-                                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                              <AlertDialogAction onClick={() => handleDeleteBrand(category, brand)}>
-                                                Delete
-                                              </AlertDialogAction>
-                                            </AlertDialogFooter>
-                                          </AlertDialogContent>
-                                        </AlertDialog>
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                                        onKeyPress={(e) => {
+                                          if (e.key === 'Enter') {
+                                            handleEditBrand(
+                                              category,
+                                              brand,
+                                              e.currentTarget.value,
+                                            );
+                                          }
+                                        }}
+                                        className="text-sm"
+                                        autoFocus
+                                      />
+                                    ) : (
+                                      <>
+                                        <span className="text-sm">{brand}</span>
+                                        <div className="flex gap-1">
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() =>
+                                              setEditingBrand({
+                                                category,
+                                                brand,
+                                              })
+                                            }
+                                          >
+                                            <Edit className="h-3 w-3" />
+                                          </Button>
+                                          <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                              <Button size="sm" variant="ghost">
+                                                <Trash2 className="h-3 w-3" />
+                                              </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                              <AlertDialogHeader>
+                                                <AlertDialogTitle>
+                                                  Delete Brand
+                                                </AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                  Are you sure you want to
+                                                  delete "{brand}" from{' '}
+                                                  {category}? This action cannot
+                                                  be undone.
+                                                </AlertDialogDescription>
+                                              </AlertDialogHeader>
+                                              <AlertDialogFooter>
+                                                <AlertDialogCancel>
+                                                  Cancel
+                                                </AlertDialogCancel>
+                                                <AlertDialogAction
+                                                  onClick={() =>
+                                                    handleDeleteBrand(
+                                                      category,
+                                                      brand,
+                                                    )
+                                                  }
+                                                >
+                                                  Delete
+                                                </AlertDialogAction>
+                                              </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                          </AlertDialog>
+                                        </div>
+                                      </>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ),
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -751,12 +1008,32 @@ export default function AdminDashboard({
 
               {/* Product Attributes Tab */}
               <TabsContent value="attributes" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {renderListFieldSection('conditions', 'Product Conditions', 'Manage available product conditions for categorizing inventory.')}
-                  {renderListFieldSection('storage', 'Storage Options', 'Define storage capacity options for devices.')}
-                  {renderListFieldSection('memory', 'Memory/RAM Options', 'Configure memory/RAM capacity options.')}
-                  {renderListFieldSection('graphicsMemory', 'Graphics Memory', 'Set graphics card memory options for laptops.')}
-                  {renderListFieldSection('warranty', 'Warranty Periods', 'Configure warranty duration options.')}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {renderListFieldSection(
+                    'conditions',
+                    'Product Conditions',
+                    'Manage available product conditions for categorizing inventory.',
+                  )}
+                  {renderListFieldSection(
+                    'storage',
+                    'Storage Options',
+                    'Define storage capacity options for devices.',
+                  )}
+                  {renderListFieldSection(
+                    'memory',
+                    'Memory/RAM Options',
+                    'Configure memory/RAM capacity options.',
+                  )}
+                  {renderListFieldSection(
+                    'graphicsMemory',
+                    'Graphics Memory',
+                    'Set graphics card memory options for laptops.',
+                  )}
+                  {renderListFieldSection(
+                    'warranty',
+                    'Warranty Periods',
+                    'Configure warranty duration options.',
+                  )}
                 </div>
               </TabsContent>
 
@@ -765,70 +1042,114 @@ export default function AdminDashboard({
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <DollarSign className="w-5 h-5" />
+                      <DollarSign className="h-5 w-5" />
                       Pricing Formulas & Commission Structure
                     </CardTitle>
                     <CardDescription>
-                      Configure pricing calculations and commission rates for each product category.
+                      Configure pricing calculations and commission rates for
+                      each product category.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {Object.entries(storeSettings.pricingFormulas).map(([category, formula]) => (
-                        <Card key={category} className="border-2">
-                          <CardHeader>
-                            <CardTitle className="text-lg">{category}</CardTitle>
-                            <CardDescription>
-                              Formula: (Supplier Price + ₦{formula.addition}) × {formula.multiplier} = Store Price
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div>
-                                <Label htmlFor={`addition-${category}`}>Addition (₦)</Label>
-                                <Input
-                                  id={`addition-${category}`}
-                                  type="number"
-                                  value={formula.addition}
-                                  onChange={(e) => handleUpdatePricingFormula(category, 'addition', parseInt(e.target.value) || 0)}
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">Amount added to supplier price</p>
+                      {Object.entries(storeSettings.pricingFormulas).map(
+                        ([category, formula]) => (
+                          <Card key={category} className="border-2">
+                            <CardHeader>
+                              <CardTitle className="text-lg">
+                                {category}
+                              </CardTitle>
+                              <CardDescription>
+                                Formula: (Supplier Price + ₦{formula.addition})
+                                × {formula.multiplier} = Store Price
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                                <div>
+                                  <Label htmlFor={`addition-${category}`}>
+                                    Addition (₦)
+                                  </Label>
+                                  <Input
+                                    id={`addition-${category}`}
+                                    type="number"
+                                    value={formula.addition}
+                                    onChange={(e) =>
+                                      handleUpdatePricingFormula(
+                                        category,
+                                        'addition',
+                                        parseInt(e.target.value) || 0,
+                                      )
+                                    }
+                                  />
+                                  <p className="mt-1 text-xs text-muted-foreground">
+                                    Amount added to supplier price
+                                  </p>
+                                </div>
+                                <div>
+                                  <Label htmlFor={`multiplier-${category}`}>
+                                    Multiplier
+                                  </Label>
+                                  <Input
+                                    id={`multiplier-${category}`}
+                                    type="number"
+                                    value={formula.multiplier}
+                                    onChange={(e) =>
+                                      handleUpdatePricingFormula(
+                                        category,
+                                        'multiplier',
+                                        parseFloat(e.target.value) || 0,
+                                      )
+                                    }
+                                  />
+                                  <p className="mt-1 text-xs text-muted-foreground">
+                                    Exchange rate multiplier
+                                  </p>
+                                </div>
+                                <div>
+                                  <Label htmlFor={`commission-${category}`}>
+                                    Commission (₦)
+                                  </Label>
+                                  <Input
+                                    id={`commission-${category}`}
+                                    type="number"
+                                    value={formula.commission}
+                                    onChange={(e) =>
+                                      handleUpdatePricingFormula(
+                                        category,
+                                        'commission',
+                                        parseInt(e.target.value) || 0,
+                                      )
+                                    }
+                                  />
+                                  <p className="mt-1 text-xs text-muted-foreground">
+                                    Affiliate commission per item
+                                  </p>
+                                </div>
                               </div>
-                              <div>
-                                <Label htmlFor={`multiplier-${category}`}>Multiplier</Label>
-                                <Input
-                                  id={`multiplier-${category}`}
-                                  type="number"
-                                  value={formula.multiplier}
-                                  onChange={(e) => handleUpdatePricingFormula(category, 'multiplier', parseFloat(e.target.value) || 0)}
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">Exchange rate multiplier</p>
+
+                              {/* Formula preview */}
+                              <div className="mt-4 rounded-lg bg-muted p-4">
+                                <h4 className="mb-2 font-medium">
+                                  Formula Preview
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  Example: Supplier price ¥1000 → (¥1000 + ₦
+                                  {formula.addition}) × {formula.multiplier} = ₦
+                                  {(
+                                    (1000 + formula.addition) *
+                                    formula.multiplier
+                                  ).toLocaleString()}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Commission: ₦
+                                  {formula.commission.toLocaleString()} per item
+                                </p>
                               </div>
-                              <div>
-                                <Label htmlFor={`commission-${category}`}>Commission (₦)</Label>
-                                <Input
-                                  id={`commission-${category}`}
-                                  type="number"
-                                  value={formula.commission}
-                                  onChange={(e) => handleUpdatePricingFormula(category, 'commission', parseInt(e.target.value) || 0)}
-                                />
-                                <p className="text-xs text-muted-foreground mt-1">Affiliate commission per item</p>
-                              </div>
-                            </div>
-                            
-                            {/* Formula preview */}
-                            <div className="mt-4 p-4 bg-muted rounded-lg">
-                              <h4 className="font-medium mb-2">Formula Preview</h4>
-                              <p className="text-sm text-muted-foreground">
-                                Example: Supplier price ¥1000 → (¥1000 + ₦{formula.addition}) × {formula.multiplier} = ₦{((1000 + formula.addition) * formula.multiplier).toLocaleString()}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                Commission: ₦{formula.commission.toLocaleString()} per item
-                              </p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      ))}
+                            </CardContent>
+                          </Card>
+                        ),
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -836,11 +1157,11 @@ export default function AdminDashboard({
 
               {/* General Settings Tab */}
               <TabsContent value="general" className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Settings className="w-5 h-5" />
+                        <Settings className="h-5 w-5" />
                         Store Information
                       </CardTitle>
                       <CardDescription>
@@ -853,35 +1174,55 @@ export default function AdminDashboard({
                         <Input
                           id="storeName"
                           value={storeSettings.storeName}
-                          onChange={(e) => handleUpdateGeneralSetting('storeName', e.target.value)}
+                          onChange={(e) =>
+                            handleUpdateGeneralSetting(
+                              'storeName',
+                              e.target.value,
+                            )
+                          }
                         />
                       </div>
                       <div>
                         <Label htmlFor="currency">Currency</Label>
                         <Select
                           value={storeSettings.currency}
-                          onValueChange={(value) => handleUpdateGeneralSetting('currency', value)}
+                          onValueChange={(value) =>
+                            handleUpdateGeneralSetting('currency', value)
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="NGN">Nigerian Naira (₦)</SelectItem>
+                            <SelectItem value="NGN">
+                              Nigerian Naira (₦)
+                            </SelectItem>
                             <SelectItem value="USD">US Dollar ($)</SelectItem>
                             <SelectItem value="EUR">Euro (€)</SelectItem>
-                            <SelectItem value="GBP">British Pound (£)</SelectItem>
+                            <SelectItem value="GBP">
+                              British Pound (£)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="deliveryTime">Delivery Time (Business Days)</Label>
+                        <Label htmlFor="deliveryTime">
+                          Delivery Time (Business Days)
+                        </Label>
                         <Input
                           id="deliveryTime"
                           type="number"
                           value={storeSettings.deliveryTime}
-                          onChange={(e) => handleUpdateGeneralSetting('deliveryTime', parseInt(e.target.value) || 10)}
+                          onChange={(e) =>
+                            handleUpdateGeneralSetting(
+                              'deliveryTime',
+                              parseInt(e.target.value) || 10,
+                            )
+                          }
                         />
-                        <p className="text-xs text-muted-foreground mt-1">Expected delivery time from China</p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Expected delivery time from China
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
@@ -889,7 +1230,7 @@ export default function AdminDashboard({
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Package className="w-5 h-5" />
+                        <Package className="h-5 w-5" />
                         Operational Settings
                       </CardTitle>
                       <CardDescription>
@@ -899,7 +1240,7 @@ export default function AdminDashboard({
                     <CardContent className="space-y-4">
                       <div>
                         <Label>Auto-calculate prices</Label>
-                        <div className="flex items-center space-x-2 mt-2">
+                        <div className="mt-2 flex items-center space-x-2">
                           <Switch defaultChecked />
                           <span className="text-sm text-muted-foreground">
                             Automatically calculate store prices using formulas
@@ -908,7 +1249,7 @@ export default function AdminDashboard({
                       </div>
                       <div>
                         <Label>Email notifications</Label>
-                        <div className="flex items-center space-x-2 mt-2">
+                        <div className="mt-2 flex items-center space-x-2">
                           <Switch defaultChecked />
                           <span className="text-sm text-muted-foreground">
                             Send email notifications for new orders
@@ -917,7 +1258,7 @@ export default function AdminDashboard({
                       </div>
                       <div>
                         <Label>Inventory tracking</Label>
-                        <div className="flex items-center space-x-2 mt-2">
+                        <div className="mt-2 flex items-center space-x-2">
                           <Switch />
                           <span className="text-sm text-muted-foreground">
                             Track inventory levels (coming soon)
@@ -934,7 +1275,7 @@ export default function AdminDashboard({
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Edit className="w-5 h-5" />
+                      <Edit className="h-5 w-5" />
                       Store Content
                     </CardTitle>
                     <CardDescription>
@@ -943,30 +1284,46 @@ export default function AdminDashboard({
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <Label htmlFor="storeDescription">Store Description</Label>
+                      <Label htmlFor="storeDescription">
+                        Store Description
+                      </Label>
                       <Textarea
                         id="storeDescription"
                         value={storeSettings.storeDescription}
-                        onChange={(e) => handleUpdateGeneralSetting('storeDescription', e.target.value)}
+                        onChange={(e) =>
+                          handleUpdateGeneralSetting(
+                            'storeDescription',
+                            e.target.value,
+                          )
+                        }
                         rows={4}
                         className="mt-2"
                       />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        This appears on your store homepage and marketing materials
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        This appears on your store homepage and marketing
+                        materials
                       </p>
                     </div>
 
                     <div>
-                      <Label htmlFor="paySmallSmallDefault">Default Pay Small Small Content</Label>
+                      <Label htmlFor="paySmallSmallDefault">
+                        Default Pay Small Small Content
+                      </Label>
                       <Textarea
                         id="paySmallSmallDefault"
                         value={storeSettings.paySmallSmallDefault}
-                        onChange={(e) => handleUpdateGeneralSetting('paySmallSmallDefault', e.target.value)}
+                        onChange={(e) =>
+                          handleUpdateGeneralSetting(
+                            'paySmallSmallDefault',
+                            e.target.value,
+                          )
+                        }
                         rows={6}
                         className="mt-2"
                       />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Default content for Pay Small Small payment option description
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        Default content for Pay Small Small payment option
+                        description
                       </p>
                     </div>
                   </CardContent>
@@ -983,7 +1340,9 @@ export default function AdminDashboard({
                 <CardDescription>Manage your product catalog</CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Product management interface will be implemented here.</p>
+                <p className="text-muted-foreground">
+                  Product management interface will be implemented here.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -993,10 +1352,14 @@ export default function AdminDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Order Management</CardTitle>
-                <CardDescription>View and manage customer orders</CardDescription>
+                <CardDescription>
+                  View and manage customer orders
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Order management interface will be implemented here.</p>
+                <p className="text-muted-foreground">
+                  Order management interface will be implemented here.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1006,10 +1369,14 @@ export default function AdminDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Customer Management</CardTitle>
-                <CardDescription>View customer analytics and information</CardDescription>
+                <CardDescription>
+                  View customer analytics and information
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Customer management interface will be implemented here.</p>
+                <p className="text-muted-foreground">
+                  Customer management interface will be implemented here.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -1019,10 +1386,14 @@ export default function AdminDashboard({
             <Card>
               <CardHeader>
                 <CardTitle>Advanced Analytics</CardTitle>
-                <CardDescription>Detailed business insights and reports</CardDescription>
+                <CardDescription>
+                  Detailed business insights and reports
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">Advanced analytics interface will be implemented here.</p>
+                <p className="text-muted-foreground">
+                  Advanced analytics interface will be implemented here.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>

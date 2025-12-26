@@ -4,7 +4,7 @@ import Orders from '@/content/general-procurement/saved-orders.json';
 
 function ApprovedOrders() {
   return (
-    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center dark:bg-black">
+    <div className="hide-scrollbar flex px-[25px] dark:bg-black 2xl:justify-center">
       <OrderSection initialOrders={Orders} />
     </div>
   );

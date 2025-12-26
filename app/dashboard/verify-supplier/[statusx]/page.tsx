@@ -131,7 +131,7 @@ export function OrderList({ params }: orderStatus) {
 
   return (
     <>
-      <div className='dark:bg-black'>
+      <div className="dark:bg-black">
         <Orders initialOrders={productData as any} statusx={statusx} />
       </div>
     </>

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
@@ -9,32 +9,99 @@ import { Analytics } from '@/components/GoogleAnalytics';
 import GoogleTag from '@/components/GoogleTag';
 import Loading from './dashboard/loading';
 import LiveChat from '@/components/LiveChat';
-import { checkAuth } from '@/lib/auth/checkAuth';
-import { getUser } from '@/lib/auth/auth';
-import { redirect } from 'next/navigation';
+import { JsonLdScript } from '@/components/seo/JsonLd';
+import { organizationSchema, websiteSchema, serviceSchema } from '@/lib/seo/schema';
 
 const inter = Inter({ subsets: ['latin'] });
 
-let titlex = 'Import from China';
-let descriptionx =
-  'Import from China. We guarantee the quality and accuracy of every product we source for you from China.';
+const baseUrl = 'https://sureimports.com';
 
-  
 export const metadata: Metadata = {
-  title: titlex,
-  description: descriptionx,
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: 'Sure Imports - Import from China with Confidence',
+    template: '%s | Sure Imports',
+  },
+  description:
+    'Import quality products from China with confidence. Sure Imports guarantees quality, authenticity, and reliable shipping for all your import needs.',
+  keywords: [
+    'import from china',
+    'china imports',
+    'product sourcing',
+    'china supplier',
+    'import products',
+    'wholesale from china',
+    'china procurement',
+    'import services',
+    'china shipping',
+    'quality imports',
+    'nigeria imports',
+    'africa imports',
+  ],
+  authors: [{ name: 'Sure Imports', url: baseUrl }],
+  creator: 'Sure Imports',
+  publisher: 'Sure Imports',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   openGraph: {
-    title: titlex,
-    description: descriptionx,
+    type: 'website',
+    locale: 'en_US',
+    url: baseUrl,
+    siteName: 'Sure Imports',
+    title: 'Sure Imports - Import from China with Confidence',
+    description:
+      'Import quality products from China with confidence. We guarantee quality, authenticity, and reliable shipping.',
     images: [
       {
-        url: 'https://www.sureimports.com/images/svg-logo-white.svg',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Sure Imports',
+        alt: 'Sure Imports - Import from China',
+        type: 'image/png',
       },
     ],
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sure Imports - Import from China with Confidence',
+    description:
+      'Import quality products from China. Quality guaranteed, reliable shipping.',
+    images: ['/images/og-image.png'],
+    creator: '@sureimports',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
+  verification: {
+    // Add your verification codes here
+    // google: 'your-google-verification-code',
+    // yandex: 'your-yandex-verification-code',
+  },
+  category: 'business',
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+  ],
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default async function RootLayout({
@@ -60,7 +127,10 @@ export default async function RootLayout({
             }}
           />
           {/* Google tag (gtag.js) */}
-          <script async src="https://www.googletagmanager.com/gtag/js?id=AW-998486805"></script>
+          <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=AW-998486805"
+          ></script>
           <script
             dangerouslySetInnerHTML={{
               __html: `
@@ -85,6 +155,11 @@ export default async function RootLayout({
                   style={{ display: 'none', visibility: 'hidden' }}
                 />
               </noscript>
+
+              {/* JSON-LD Structured Data */}
+              <JsonLdScript
+                data={[organizationSchema, websiteSchema, serviceSchema]}
+              />
 
               {children}
 

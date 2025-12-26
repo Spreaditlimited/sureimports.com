@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Suspense, useEffect, useState } from "react";
-import ImageWithFallback from "../../favicon.ico";
-import { ThemeToggle } from "./ThemeToggle";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
-import TopUpDialog from "./TopUpDialog";
-import WithdrawDialog from "./WithdrawDialog";
-import PayoutRequestDialog from "./PayoutRequestDialog";
+import { Suspense, useEffect, useState } from 'react';
+import ImageWithFallback from '../../favicon.ico';
+import { ThemeToggle } from './ThemeToggle';
+import { Button } from './ui/button';
+import { Card } from './ui/card';
+import TopUpDialog from './TopUpDialog';
+import WithdrawDialog from './WithdrawDialog';
+import PayoutRequestDialog from './PayoutRequestDialog';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
-import { useAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/navigation";
-import Loading from "../../loading";
-import { toast } from "sonner";
-import WalletTransactionTable from "../component/WalletTransactionTable";
-import DebitTransactionTable from "../component/DebitTransactionTable";
+import { useAuth } from '@/app/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import Loading from '../../loading';
+import { toast } from 'sonner';
+import WalletTransactionTable from '../component/WalletTransactionTable';
+import DebitTransactionTable from '../component/DebitTransactionTable';
 
 interface WalletProps {
   onBackToStore: () => void;
@@ -37,12 +37,17 @@ interface Transaction {
 // Helper function to format currency
 const formatCurrency = (amount: number): string => {
   //return `₦${amount.toLocaleString()}.00`;
-  return "0.00"
+  return '0.00';
 };
 
-
-
-export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWithdrawal, transactions, onWithdrawalConfirmed }: WalletProps) {
+export default function Wallet({
+  onBackToStore,
+  onBulkBuyer,
+  balance,
+  pendingWithdrawal,
+  transactions,
+  onWithdrawalConfirmed,
+}: WalletProps) {
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [showTopUpDialog, setShowTopUpDialog] = useState(false);
   const [showPayoutRequestDialog, setShowPayoutRequestDialog] = useState(false);
@@ -57,12 +62,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
     setShowPayoutRequestDialog(true);
   };
 
-
-
-
-
-
-///////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////
   const navigateWithAlert = useNavigationWithAlert();
 
   const { user, logout } = useAuth(); //DATA FROM SESSION
@@ -79,7 +79,11 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
 
   const [customer, setCustomer] = useState<any | null>(null);
   const [transactionsx, setTransaction] = useState<any | null>(null);
-  const [debitsData, setDebitsData] = useState<any>({ debits: [], totalDebited: 0, count: 0 });
+  const [debitsData, setDebitsData] = useState<any>({
+    debits: [],
+    totalDebited: 0,
+    count: 0,
+  });
 
   const [loading, setLoading] = useState(true);
   const [statusx, setStatus] = useState<string | null>(null);
@@ -88,7 +92,9 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   // Fetch pending payout request
   const fetchPendingPayout = async () => {
     try {
-      const response = await fetch(`/api/payout-request/get-pending?pidUser=${pidUser}`);
+      const response = await fetch(
+        `/api/payout-request/get-pending?pidUser=${pidUser}`,
+      );
       const data = await response.json();
 
       if (data.statusx === 'SUCCESS' && data.data) {
@@ -105,7 +111,9 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   // Check if user has bank details
   const checkBankDetails = async () => {
     try {
-      const response = await fetch(`/api/user/check-bank-details?pidUser=${pidUser}`);
+      const response = await fetch(
+        `/api/user/check-bank-details?pidUser=${pidUser}`,
+      );
       const data = await response.json();
 
       if (data.statusx === 'SUCCESS') {
@@ -318,11 +326,7 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
 
     activateWallet();
   }
-///////////////////////////////////////////////////////
-
-
-
-
+  ///////////////////////////////////////////////////////
 
   // Calculate available balance (total minus pending withdrawal)
   // const availableBalance = balance - pendingWithdrawal;
@@ -330,31 +334,29 @@ export default function Wallet({ onBackToStore, onBulkBuyer, balance, pendingWit
   const availableBalanceText = formatCurrency(availableBalance);
   const pendingBalanceText = formatCurrency(pendingWithdrawal);
 
-const allTransactions: any[] = [
-  ...(pendingWithdrawal > 0
-    ? [{
-        id: "pending",
-        type: 'debit' as const,
-        amount: pendingBalanceText,
-        description: "Pending withdrawal request",
-        date: "September 25, 2025"
-      }]
-    : []),
-  ...(transactions ?? [])
-];
-
+  const allTransactions: any[] = [
+    ...(pendingWithdrawal > 0
+      ? [
+          {
+            id: 'pending',
+            type: 'debit' as const,
+            amount: pendingBalanceText,
+            description: 'Pending withdrawal request',
+            date: 'September 25, 2025',
+          },
+        ]
+      : []),
+    ...(transactions ?? []),
+  ];
 
   const handleTopUp = () => {
     setShowTopUpDialog(true);
   };
 
-
-//alert(customer.bankName);
-
-
+  //alert(customer.bankName);
 
   return (
-    <div className="bg-background dark:bg-black min-h-screen md:pt-7">
+    <div className="min-h-screen bg-background dark:bg-black md:pt-7">
       {/* Mobile Header */}
       {/* <div className="md:hidden bg-[#0e0e1f] dark:bg-card w-full pt-12 pb-4">
         <div className="relative h-[42px] flex items-center">
@@ -437,63 +439,97 @@ const allTransactions: any[] = [
       </div> */}
 
       {/* Content */}
-      <div className="px-5 md:px-8 pb-8 md:max-w-7xl md:mx-auto pt-6 md:pt-0">
+      <div className="px-5 pb-8 pt-6 md:mx-auto md:max-w-7xl md:px-8 md:pt-0">
         {/* Wallet Balance Card */}
-        <Card className="p-6 mb-6 bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 border-none text-white">
-          <div className="flex items-center justify-between mb-4">
+        <Card className="mb-6 border-none bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white dark:from-indigo-700 dark:to-purple-700">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-white/80 text-sm">Available Balance</p>
+              <p className="text-sm text-white/80">Available Balance</p>
               <h2 className="text-3xl font-bold text-white">
                 {
-              
-              ('₦' +
-                (availableBalance as number)
-                  .toFixed(2)
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string
-              }
+                  ('₦' +
+                    (availableBalance as number)
+                      .toFixed(2)
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string
+                }
               </h2>
               {pendingWithdrawal > 0 && (
                 <div className="mt-2">
-                  <p className="text-white/60 text-xs">Pending Withdrawal</p>
-                  <p className="text-white/80 text-sm font-medium">{pendingBalanceText}</p>
+                  <p className="text-xs text-white/60">Pending Withdrawal</p>
+                  <p className="text-sm font-medium text-white/80">
+                    {pendingBalanceText}
+                  </p>
                 </div>
               )}
             </div>
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10H21M7 15H1M13 15H21M5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 5 3.89543 5 5V19C5 20.1046 3.89543 21 5 21Z" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
+              <svg
+                className="h-6 w-6 text-white"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 10H21M7 15H1M13 15H21M5 21H19C20.1046 21 21 20.1046 21 19V5C21 3.89543 20.1046 3 19 3H5C3.89543 3 5 3.89543 5 5V19C5 20.1046 3.89543 21 5 21Z"
+                />
               </svg>
             </div>
           </div>
-          
+
           <div className="flex gap-3">
             <Button
               onClick={handleTopUp}
-              className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30"
+              className="flex-1 border-white/30 bg-white/20 text-white hover:bg-white/30"
               variant="outline"
             >
-              <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V12M12 12V18M12 12H18M12 12H6" />
+              <svg
+                className="mr-2 h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6V12M12 12V18M12 12H18M12 12H6"
+                />
               </svg>
               Top Up
             </Button>
 
-
-            <div className="flex-1 relative">
+            <div className="relative flex-1">
               <Button
                 onClick={handleRequestPayout}
                 disabled={availableBalance <= 0 || !!pendingPayout}
-                className="w-full bg-white/20 hover:bg-white/30 text-white border-white/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full border-white/30 bg-white/20 text-white hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
                 variant="outline"
-                title={!hasBankDetails ? 'Bank details required. Click to add your bank account.' : ''}
+                title={
+                  !hasBankDetails
+                    ? 'Bank details required. Click to add your bank account.'
+                    : ''
+                }
               >
-                <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19V13C21 11.8954 20.1046 11 19 11H5C3.89543 11 3 11.8954 5 13V19C3 20.1046 3.89543 21 5 21Z" />
+                <svg
+                  className="mr-2 h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 9V7C17 5.34315 15.6569 4 14 4H10C8.34315 4 7 5.34315 7 7V9M3 11L21 11M5 21H19C20.1046 21 21 20.1046 21 19V13C21 11.8954 20.1046 11 19 11H5C3.89543 11 3 11.8954 5 13V19C3 20.1046 3.89543 21 5 21Z"
+                  />
                 </svg>
                 {pendingPayout ? 'Payout Pending' : 'Request Payout'}
                 {!hasBankDetails && !pendingPayout && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-medium">
+                  <span className="ml-2 rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-medium text-white">
                     !
                   </span>
                 )}
@@ -502,29 +538,56 @@ const allTransactions: any[] = [
           </div>
         </Card>
 
-
         {/* Missing Bank Details Warning Card */}
         {!hasBankDetails && (
-          <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+          <Card className="mb-6 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-amber-600 dark:bg-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-white dark:text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-600 dark:bg-amber-400">
+                <svg
+                  className="h-3 w-3 text-white dark:text-amber-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+                  />
                 </svg>
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-amber-800 dark:text-amber-200">Bank Account Required for Payouts</h4>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  To request payouts from your wallet, you need to add your bank account details in your profile settings.
+                <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                  Bank Account Required for Payouts
+                </h4>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                  To request payouts from your wallet, you need to add your bank
+                  account details in your profile settings.
                 </p>
                 <Button
                   onClick={() => router.push('/dashboard/profile-update')}
-                  className="mt-3 bg-amber-600 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700 text-white text-sm h-8"
+                  className="mt-3 h-8 bg-amber-600 text-sm text-white hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-700"
                   size="sm"
                 >
-                  <svg className="w-3 h-3 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <svg
+                    className="mr-1.5 h-3 w-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
                   </svg>
                   Add Bank Details
                 </Button>
@@ -533,15 +596,24 @@ const allTransactions: any[] = [
           </Card>
         )}
 
-
         {/* Pending Payout Request Card */}
         {pendingPayout && (
-          <Card className="p-6 mb-6 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
-            <div className="flex items-center justify-between mb-4">
+          <Card className="mb-6 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-6 dark:border-amber-800 dark:from-amber-900/20 dark:to-orange-900/20">
+            <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
+                  <svg
+                    className="h-5 w-5 text-amber-600 dark:text-amber-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                    />
                   </svg>
                 </div>
                 <div>
@@ -553,94 +625,153 @@ const allTransactions: any[] = [
                   </p>
                 </div>
               </div>
-              <div className="px-3 py-1 rounded-full bg-amber-600 dark:bg-amber-500 text-white text-xs font-medium">
+              <div className="rounded-full bg-amber-600 px-3 py-1 text-xs font-medium text-white dark:bg-amber-500">
                 Pending
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
-                <p className="text-xs text-muted-foreground mb-1">Amount Requested</p>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="rounded-lg bg-white p-4 dark:bg-slate-800">
+                <p className="mb-1 text-xs text-muted-foreground">
+                  Amount Requested
+                </p>
                 <p className="text-2xl font-bold text-foreground">
-                  {('₦' + (pendingPayout.amount as number).toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string}
+                  {
+                    ('₦' +
+                      (pendingPayout.amount as number)
+                        .toFixed(2)
+                        .toString()
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')) as string
+                  }
                 </p>
               </div>
 
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
-                <p className="text-xs text-muted-foreground mb-1">Reference Number</p>
-                <p className="text-sm font-mono text-foreground">{pendingPayout.reference}</p>
+              <div className="rounded-lg bg-white p-4 dark:bg-slate-800">
+                <p className="mb-1 text-xs text-muted-foreground">
+                  Reference Number
+                </p>
+                <p className="font-mono text-sm text-foreground">
+                  {pendingPayout.reference}
+                </p>
               </div>
 
-              <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
-                <p className="text-xs text-muted-foreground mb-1">Request Date</p>
+              <div className="rounded-lg bg-white p-4 dark:bg-slate-800">
+                <p className="mb-1 text-xs text-muted-foreground">
+                  Request Date
+                </p>
                 <p className="text-sm text-foreground">
-                  {new Date(pendingPayout.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+                  {new Date(pendingPayout.createdAt).toLocaleDateString(
+                    'en-US',
+                    {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    },
+                  )}
                 </p>
               </div>
 
               {pendingPayout.bankDetails && (
-                <div className="bg-white dark:bg-slate-800 rounded-lg p-4">
-                  <p className="text-xs text-muted-foreground mb-1">Bank Account</p>
-                  <p className="text-sm text-foreground font-medium">{pendingPayout.bankDetails.bankName}</p>
-                  <p className="text-xs text-muted-foreground font-mono">{pendingPayout.bankDetails.accountNumber}</p>
+                <div className="rounded-lg bg-white p-4 dark:bg-slate-800">
+                  <p className="mb-1 text-xs text-muted-foreground">
+                    Bank Account
+                  </p>
+                  <p className="text-sm font-medium text-foreground">
+                    {pendingPayout.bankDetails.bankName}
+                  </p>
+                  <p className="font-mono text-xs text-muted-foreground">
+                    {pendingPayout.bankDetails.accountNumber}
+                  </p>
                 </div>
               )}
             </div>
 
-            <div className="mt-4 bg-amber-100 dark:bg-amber-900/30 rounded-lg p-3">
+            <div className="mt-4 rounded-lg bg-amber-100 p-3 dark:bg-amber-900/30">
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-amber-700 dark:text-amber-300 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-700 dark:text-amber-300"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <p className="text-xs text-amber-800 dark:text-amber-200">
-                  Your payout will be processed within 24 hours and credited to your bank account within 3 business days.
+                  Your payout will be processed within 24 hours and credited to
+                  your bank account within 3 business days.
                 </p>
               </div>
             </div>
           </Card>
         )}
 
-
         {availableBalance <= 0 && (
-        <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+          <Card className="mb-6 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-amber-600 dark:bg-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-white dark:text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+              <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-600 dark:bg-amber-400">
+                <svg
+                  className="h-3 w-3 text-white dark:text-amber-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                  />
                 </svg>
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-amber-800 dark:text-amber-200">Important Notice</h4>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  Wallet not funded within <b>10 days</b> of activation will be automatically deactivated. Ignore message if wallet had been previously funded.
+                <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                  Important Notice
+                </h4>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                  Wallet not funded within <b>10 days</b> of activation will be
+                  automatically deactivated. Ignore message if wallet had been
+                  previously funded.
                 </p>
               </div>
             </div>
           </Card>
         )}
-
-
-
 
         {/* Pending Withdrawal Notice */}
         {pendingWithdrawal > 0 && (
-          <Card className="p-4 mb-6 bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800">
+          <Card className="mb-6 border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
             <div className="flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-amber-600 dark:bg-amber-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-white dark:text-amber-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" />
+              <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-amber-600 dark:bg-amber-400">
+                <svg
+                  className="h-3 w-3 text-white dark:text-amber-900"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8V16M8 12H16M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+                  />
                 </svg>
               </div>
               <div className="flex-1">
-                <h4 className="font-medium text-amber-800 dark:text-amber-200">Withdrawal in Progress</h4>
-                <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                  You have a pending withdrawal of <span className="font-semibold">{pendingBalanceText}</span>. This amount is being processed and will be credited to your registered bank account within 3 business days.
+                <h4 className="font-medium text-amber-800 dark:text-amber-200">
+                  Withdrawal in Progress
+                </h4>
+                <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
+                  You have a pending withdrawal of{' '}
+                  <span className="font-semibold">{pendingBalanceText}</span>.
+                  This amount is being processed and will be credited to your
+                  registered bank account within 3 business days.
                 </p>
               </div>
             </div>
@@ -648,20 +779,34 @@ const allTransactions: any[] = [
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" 
-          onClick={() =>
-            router.push('/dashboard/store?id=laptop')
-          }>
+        <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <Card
+            className="cursor-pointer p-4 transition-shadow hover:shadow-md"
+            onClick={() => router.push('/dashboard/store?id=laptop')}
+          >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
+                <svg
+                  className="h-5 w-5 text-blue-600 dark:text-blue-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7C16 5.89543 15.1046 5 14 5H10C8.89543 5 8 5.89543 8 7V11M5 9H19L18 21H6L5 9Z"
+                  />
                 </svg>
               </div>
               <div>
-                <p className="font-medium text-foreground dark:text-white">Shop Now</p>
-                <p className="text-sm text-muted-foreground">Use wallet balance</p>
+                <p className="font-medium text-foreground dark:text-white">
+                  Shop Now
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Use wallet balance
+                </p>
               </div>
             </div>
           </Card>
@@ -685,70 +830,79 @@ const allTransactions: any[] = [
           </Card> 
           */}
 
-
-
-          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer" onClick={handleTopUp}>
+          <Card
+            className="cursor-pointer p-4 transition-shadow hover:shadow-md"
+            onClick={handleTopUp}
+          >
             <div className="flex items-center gap-3">
-              
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V12M12 12V18M12 12H18M12 12H6" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
+                <svg
+                  className="h-5 w-5 text-purple-600 dark:text-purple-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6V12M12 12V18M12 12H18M12 12H6"
+                  />
                 </svg>
               </div>
 
               <div>
-                <p className="font-medium text-foreground dark:text-white">Add Funds</p>
+                <p className="font-medium text-foreground dark:text-white">
+                  Add Funds
+                </p>
                 <p className="text-sm text-muted-foreground">Top up wallet</p>
               </div>
-
             </div>
           </Card>
-
         </div>
-
-
 
         {/* Transaction History */}
         <Card className="p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Credit Transactions</h3>
-          
+          <h3 className="mb-0 text-lg font-semibold text-foreground dark:text-white">
+            Credit Transactions
+          </h3>
+
           {transactionsx?.transactions?.length > 0 ? (
-
-                  <div className="p-1">
-                    <div className="space-y-1">
-                      <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-black-500">
-                        <Suspense fallback={<Loading />}>
-                          {transactionsx?.transactions?.length > 0 && (
-                            <WalletTransactionTable
-                              transactions={transactionsx.transactions}
-                            />
-                          )}
-                          {transactionsx?.transactions?.length == 0 && (
-                            <div className="flex items-center justify-center p-4">
-                              <p className="text-sm text-gray-600 dark:text-gray-800">
-                                No transactions available
-                              </p>
-                            </div>
-                          )}
-                        </Suspense>
+            <div className="p-1">
+              <div className="space-y-1">
+                <div className="dark:bg-black-500 rounded-lg bg-gray-200 p-1 shadow">
+                  <Suspense fallback={<Loading />}>
+                    {transactionsx?.transactions?.length > 0 && (
+                      <WalletTransactionTable
+                        transactions={transactionsx.transactions}
+                      />
+                    )}
+                    {transactionsx?.transactions?.length == 0 && (
+                      <div className="flex items-center justify-center p-4">
+                        <p className="text-sm text-gray-600 dark:text-gray-800">
+                          No transactions available
+                        </p>
                       </div>
-                    </div>
-                  </div>
-
+                    )}
+                  </Suspense>
+                </div>
+              </div>
+            </div>
+          ) : (
             // {allTransactions.length > 0 ? (
             // <div className="space-y-4">
             //   {allTransactions.map((transaction) => (
             //     <div key={transaction.id} className={`flex items-center justify-between p-4 border rounded-lg ${
-            //       transaction.id === 'pending' 
-            //         ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20' 
+            //       transaction.id === 'pending'
+            //         ? 'border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20'
             //         : 'border-border'
             //     }`}>
             //       <div className="flex items-center gap-3">
             //         <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
             //           transaction.id === 'pending'
             //             ? 'bg-amber-100 dark:bg-amber-900/30'
-            //             : transaction.type === 'credit' 
-            //             ? 'bg-green-100 dark:bg-green-900/30' 
+            //             : transaction.type === 'credit'
+            //             ? 'bg-green-100 dark:bg-green-900/30'
             //             : 'bg-red-100 dark:bg-red-900/30'
             //         }`}>
             //           {transaction.id === 'pending' ? (
@@ -779,47 +933,58 @@ const allTransactions: any[] = [
             //         </div>
             //       </div>
 
-
             //       <div className={`font-semibold ${
             //             transaction.id === 'pending'
             //             ? 'text-amber-600 dark:text-amber-400'
-            //             : transaction.type === 'credit' 
-            //             ? 'text-green-600 dark:text-green-400' 
+            //             : transaction.type === 'credit'
+            //             ? 'text-green-600 dark:text-green-400'
             //             : 'text-red-600 dark:text-red-400'
             //         }`}>
             //         {transaction.id === 'pending' ? 'Pending ' : transaction.type === 'credit' ? '+' : '-'}{transaction.amount}
             //       </div>
 
-
             //     </div>
             //   ))}
             // </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground">
-                <svg className="block size-full" fill="none" viewBox="0 0 24 24">
-                  <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="py-8 text-center">
+              <div className="mx-auto mb-4 h-16 w-16 text-muted-foreground opacity-50">
+                <svg
+                  className="block size-full"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-foreground mb-2 dark:text-white">No transactions yet</h3>
-              <p className="text-muted-foreground">Your transaction history will appear here</p>
+              <h3 className="mb-2 text-lg font-medium text-foreground dark:text-white">
+                No transactions yet
+              </h3>
+              <p className="text-muted-foreground">
+                Your transaction history will appear here
+              </p>
             </div>
           )}
         </Card>
 
         {/* Debit Transaction History */}
-        <Card className="p-6 mt-6">
-          <h3 className="text-lg font-semibold text-foreground mb-0 dark:text-white">Debit Transactions</h3>
+        <Card className="mt-6 p-6">
+          <h3 className="mb-0 text-lg font-semibold text-foreground dark:text-white">
+            Debit Transactions
+          </h3>
 
           {debitsData.debits.length > 0 ? (
             <div className="p-1">
               <div className="space-y-1">
-                <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-black-500">
+                <div className="dark:bg-black-500 rounded-lg bg-gray-200 p-1 shadow">
                   <Suspense fallback={<Loading />}>
                     {debitsData.debits.length > 0 && (
-                      <DebitTransactionTable
-                        debits={debitsData.debits}
-                      />
+                      <DebitTransactionTable debits={debitsData.debits} />
                     )}
                     {debitsData.debits.length === 0 && (
                       <div className="flex items-center justify-center p-4">
@@ -833,14 +998,28 @@ const allTransactions: any[] = [
               </div>
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-4 opacity-50 text-muted-foreground">
-                <svg className="block size-full" fill="none" viewBox="0 0 24 24">
-                  <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <div className="py-8 text-center">
+              <div className="mx-auto mb-4 h-16 w-16 text-muted-foreground opacity-50">
+                <svg
+                  className="block size-full"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15M9 5C9 6.10457 9.89543 7 11 7H13C14.1046 7 15 6.10457 15 5M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-foreground mb-2 dark:text-white">No debit transactions yet</h3>
-              <p className="text-muted-foreground">Your debit transaction history will appear here</p>
+              <h3 className="mb-2 text-lg font-medium text-foreground dark:text-white">
+                No debit transactions yet
+              </h3>
+              <p className="text-muted-foreground">
+                Your debit transaction history will appear here
+              </p>
             </div>
           )}
         </Card>
@@ -848,11 +1027,11 @@ const allTransactions: any[] = [
 
       {/* Top Up Dialog */}
       <TopUpDialog
-          bankName={customer?.bankName ?? ''}
-          accountName={customer?.bankAccountName ?? ''}
-          accountNumber={customer?.bankAccountNumber ?? ''}
-          isOpen={showTopUpDialog}
-          onClose={() => setShowTopUpDialog(false)}
+        bankName={customer?.bankName ?? ''}
+        accountName={customer?.bankAccountName ?? ''}
+        accountNumber={customer?.bankAccountNumber ?? ''}
+        isOpen={showTopUpDialog}
+        onClose={() => setShowTopUpDialog(false)}
       />
 
       {/* Withdraw Dialog */}

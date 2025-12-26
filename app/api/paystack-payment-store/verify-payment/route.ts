@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail';
 
-
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
-
 
 export async function POST(request: Request) {
   try {
@@ -65,8 +63,6 @@ export async function POST(request: Request) {
       status: data.status,
       message: data.message,
     });
-
-    
 
     if (!data.status) {
       return NextResponse.json(

@@ -284,8 +284,6 @@ const NavBar = () => {
                     </NavigationMenuLink>
                   </Link>
                 </NavigationMenuItem> */}
-
-
               </NavigationMenuList>
             </NavigationMenu>
 
@@ -341,7 +339,7 @@ const NavBar = () => {
                           {
                             'after:w-full after:scale-x-100': pathname === '/',
                             'text-white': pathname !== '/',
-                          }
+                          },
                         )}
                       >
                         Home
@@ -400,7 +398,7 @@ const NavBar = () => {
                                     'after:w-full after:scale-x-100':
                                       pathname === component.href,
                                     'text-white': pathname !== component.href,
-                                  }
+                                  },
                                 )}
                               >
                                 <Image
@@ -432,7 +430,7 @@ const NavBar = () => {
                                     'after:scale-x-100X after:w-full':
                                       pathname === component.href,
                                     'text-white': pathname !== component.href,
-                                  }
+                                  },
                                 )}
                               >
                                 <Image
@@ -492,7 +490,7 @@ const NavBar = () => {
                             'after:w-full after:scale-x-100':
                               pathname === '/calculator',
                             'text-white': pathname !== '/calculator',
-                          }
+                          },
                         )}
                         target="_blank"
                       >
@@ -509,7 +507,7 @@ const NavBar = () => {
                             'after:w-full after:scale-x-100':
                               pathname === '/calendly',
                             'text-white': pathname !== '/calendly',
-                          }
+                          },
                         )}
                         target="_blank"
                       >
@@ -539,7 +537,7 @@ const NavBar = () => {
                       'w-30 m-7 h-12 w-full bg-white text-base text-indigo-800 hover:bg-indigo-100',
                       {
                         'ml-0': isMobile,
-                      }
+                      },
                     )}
                   >
                     <Link href="/auth/login" passHref>
@@ -574,7 +572,7 @@ const ListItem = React.forwardRef<
           className={cn(
             'block select-none space-y-1 rounded-xl p-3 leading-none text-indigo-800 no-underline outline-none transition-colors hover:bg-indigo-800 hover:bg-opacity-10 focus:bg-indigo-800 focus:text-white focus:outline-none focus:ring-2 focus:ring-indigo-800 focus:ring-opacity-50',
             { 'after:w-full after:scale-x-100': active }, // Apply active class
-            className
+            className,
           )}
           {...props}
         >

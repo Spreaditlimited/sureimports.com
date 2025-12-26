@@ -1,6 +1,12 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 
 export interface AdminPermissions {
   overview: boolean;
@@ -27,20 +33,42 @@ interface AdminAuthContextType {
   currentAdmin: AdminUser | null;
   isAuthenticated: boolean;
   admins: AdminUser[];
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (email: string, password: string, name: string) => Promise<{ success: boolean; error?: string }>;
+  signIn: (
+    email: string,
+    password: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  signUp: (
+    email: string,
+    password: string,
+    name: string,
+  ) => Promise<{ success: boolean; error?: string }>;
   signOut: () => void;
-  resetPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
-  createAdmin: (adminData: Omit<AdminUser, 'id' | 'createdAt' | 'lastLogin'>, password: string) => Promise<{ success: boolean; error?: string }>;
-  updateAdminPermissions: (adminId: string, permissions: AdminPermissions) => Promise<{ success: boolean; error?: string }>;
-  updateAdminProfile: (adminId: string, updateData: { name?: string; email?: string; password?: string }) => Promise<{ success: boolean; error?: string }>;
-  deleteAdmin: (adminId: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (
+    email: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  createAdmin: (
+    adminData: Omit<AdminUser, 'id' | 'createdAt' | 'lastLogin'>,
+    password: string,
+  ) => Promise<{ success: boolean; error?: string }>;
+  updateAdminPermissions: (
+    adminId: string,
+    permissions: AdminPermissions,
+  ) => Promise<{ success: boolean; error?: string }>;
+  updateAdminProfile: (
+    adminId: string,
+    updateData: { name?: string; email?: string; password?: string },
+  ) => Promise<{ success: boolean; error?: string }>;
+  deleteAdmin: (
+    adminId: string,
+  ) => Promise<{ success: boolean; error?: string }>;
   hasPermission: (permission: keyof AdminPermissions) => boolean;
   setSelectedAdmin: (admin: AdminUser | null) => void;
   getSelectedAdmin: () => AdminUser | null;
 }
 
-const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
+const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
+  undefined,
+);
 
 // Default super admin with full permissions
 const DEFAULT_SUPER_ADMIN: AdminUser = {
@@ -56,21 +84,24 @@ const DEFAULT_SUPER_ADMIN: AdminUser = {
     reports: true,
     bulkOrders: true,
     returns: true,
-    userManagement: true
+    userManagement: true,
   },
-  createdAt: '2025-01-01T00:00:00.000Z'
+  createdAt: '2025-01-01T00:00:00.000Z',
 };
 
 // Password for super admin: "SuperAdmin2025!"
 const DEFAULT_PASSWORDS: Record<string, string> = {
-  'superadmin@buygadgets.com': 'SuperAdmin2025!'
+  'superadmin@buygadgets.com': 'SuperAdmin2025!',
 };
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [currentAdmin, setCurrentAdmin] = useState<AdminUser | null>(null);
   const [admins, setAdmins] = useState<AdminUser[]>([]);
-  const [passwords, setPasswords] = useState<Record<string, string>>(DEFAULT_PASSWORDS);
-  const [selectedAdmin, setSelectedAdminState] = useState<AdminUser | null>(null);
+  const [passwords, setPasswords] =
+    useState<Record<string, string>>(DEFAULT_PASSWORDS);
+  const [selectedAdmin, setSelectedAdminState] = useState<AdminUser | null>(
+    null,
+  );
 
   // Initialize admin data from localStorage
   useEffect(() => {
@@ -133,9 +164,14 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
   }, [passwords]);
 
-  const signIn = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    const admin = admins.find(a => a.email.toLowerCase() === email.toLowerCase());
-    
+  const signIn = async (
+    email: string,
+    password: string,
+  ): Promise<{ success: boolean; error?: string }> => {
+    const admin = admins.find(
+      (a) => a.email.toLowerCase() === email.toLowerCase(),
+    );
+
     if (!admin) {
       return { success: false, error: 'Invalid email or password' };
     }
@@ -149,28 +185,43 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setCurrentAdmin(updatedAdmin);
 
     // Update admin in the list
-    setAdmins(prev => prev.map(a => a.id === admin.id ? updatedAdmin : a));
+    setAdmins((prev) =>
+      prev.map((a) => (a.id === admin.id ? updatedAdmin : a)),
+    );
 
     // Save session
     if (typeof window !== 'undefined') {
-      localStorage.setItem('currentAdminSession', JSON.stringify({
-        admin: updatedAdmin,
-        timestamp: new Date().toISOString()
-      }));
+      localStorage.setItem(
+        'currentAdminSession',
+        JSON.stringify({
+          admin: updatedAdmin,
+          timestamp: new Date().toISOString(),
+        }),
+      );
     }
 
     return { success: true };
   };
 
-  const signUp = async (email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> => {
+  const signUp = async (
+    email: string,
+    password: string,
+    name: string,
+  ): Promise<{ success: boolean; error?: string }> => {
     // Check if admin already exists
-    if (admins.find(a => a.email.toLowerCase() === email.toLowerCase())) {
-      return { success: false, error: 'An admin with this email already exists' };
+    if (admins.find((a) => a.email.toLowerCase() === email.toLowerCase())) {
+      return {
+        success: false,
+        error: 'An admin with this email already exists',
+      };
     }
 
     // Only super admin can create new admins
     if (!currentAdmin || currentAdmin.role !== 'super_admin') {
-      return { success: false, error: 'Only super administrators can create new admin accounts' };
+      return {
+        success: false,
+        error: 'Only super administrators can create new admin accounts',
+      };
     }
 
     const newAdmin: AdminUser = {
@@ -186,13 +237,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         reports: false,
         bulkOrders: false,
         returns: false,
-        userManagement: false
+        userManagement: false,
       },
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
-    setAdmins(prev => [...prev, newAdmin]);
-    setPasswords(prev => ({ ...prev, [email.toLowerCase()]: password }));
+    setAdmins((prev) => [...prev, newAdmin]);
+    setPasswords((prev) => ({ ...prev, [email.toLowerCase()]: password }));
 
     return { success: true };
   };
@@ -204,102 +255,144 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const resetPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
-    const admin = admins.find(a => a.email.toLowerCase() === email.toLowerCase());
-    
+  const resetPassword = async (
+    email: string,
+  ): Promise<{ success: boolean; error?: string }> => {
+    const admin = admins.find(
+      (a) => a.email.toLowerCase() === email.toLowerCase(),
+    );
+
     if (!admin) {
-      return { success: false, error: 'No admin found with this email address' };
+      return {
+        success: false,
+        error: 'No admin found with this email address',
+      };
     }
 
     // In a real app, this would send an email. For now, we'll generate a temporary password
     const tempPassword = `TempPass${Date.now()}`;
-    setPasswords(prev => ({ ...prev, [admin.email]: tempPassword }));
+    setPasswords((prev) => ({ ...prev, [admin.email]: tempPassword }));
 
     // In a real app, you'd send this via email
-    alert(`Password reset successful! Your temporary password is: ${tempPassword}\n\nPlease change it after logging in.`);
+    alert(
+      `Password reset successful! Your temporary password is: ${tempPassword}\n\nPlease change it after logging in.`,
+    );
 
     return { success: true };
   };
 
   const createAdmin = async (
-    adminData: Omit<AdminUser, 'id' | 'createdAt' | 'lastLogin'>, 
-    password: string
+    adminData: Omit<AdminUser, 'id' | 'createdAt' | 'lastLogin'>,
+    password: string,
   ): Promise<{ success: boolean; error?: string }> => {
     if (!currentAdmin || currentAdmin.role !== 'super_admin') {
-      return { success: false, error: 'Only super administrators can create admin accounts' };
+      return {
+        success: false,
+        error: 'Only super administrators can create admin accounts',
+      };
     }
 
-    if (admins.find(a => a.email.toLowerCase() === adminData.email.toLowerCase())) {
-      return { success: false, error: 'An admin with this email already exists' };
+    if (
+      admins.find(
+        (a) => a.email.toLowerCase() === adminData.email.toLowerCase(),
+      )
+    ) {
+      return {
+        success: false,
+        error: 'An admin with this email already exists',
+      };
     }
 
     const newAdmin: AdminUser = {
       ...adminData,
       id: `admin_${Date.now()}`,
       email: adminData.email.toLowerCase(),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
-    setAdmins(prev => [...prev, newAdmin]);
-    setPasswords(prev => ({ ...prev, [newAdmin.email]: password }));
+    setAdmins((prev) => [...prev, newAdmin]);
+    setPasswords((prev) => ({ ...prev, [newAdmin.email]: password }));
 
     return { success: true };
   };
 
   const updateAdminPermissions = async (
-    adminId: string, 
-    permissions: AdminPermissions
+    adminId: string,
+    permissions: AdminPermissions,
   ): Promise<{ success: boolean; error?: string }> => {
     if (!currentAdmin || currentAdmin.role !== 'super_admin') {
-      return { success: false, error: 'Only super administrators can update permissions' };
+      return {
+        success: false,
+        error: 'Only super administrators can update permissions',
+      };
     }
 
-    setAdmins(prev => prev.map(admin => 
-      admin.id === adminId ? { ...admin, permissions } : admin
-    ));
+    setAdmins((prev) =>
+      prev.map((admin) =>
+        admin.id === adminId ? { ...admin, permissions } : admin,
+      ),
+    );
 
     return { success: true };
   };
 
   const updateAdminProfile = async (
-    adminId: string, 
-    updateData: { name?: string; email?: string; password?: string }
+    adminId: string,
+    updateData: { name?: string; email?: string; password?: string },
   ): Promise<{ success: boolean; error?: string }> => {
     if (!currentAdmin || currentAdmin.role !== 'super_admin') {
-      return { success: false, error: 'Only super administrators can update admin profiles' };
+      return {
+        success: false,
+        error: 'Only super administrators can update admin profiles',
+      };
     }
 
-    const adminToUpdate = admins.find(a => a.id === adminId);
+    const adminToUpdate = admins.find((a) => a.id === adminId);
     if (!adminToUpdate) {
       return { success: false, error: 'Admin not found' };
     }
 
     if (adminToUpdate.role === 'super_admin' && currentAdmin.id !== adminId) {
-      return { success: false, error: 'Cannot edit another super administrator' };
+      return {
+        success: false,
+        error: 'Cannot edit another super administrator',
+      };
     }
 
     // Check if email already exists (if email is being changed)
     if (updateData.email && updateData.email !== adminToUpdate.email) {
-      if (admins.find(a => a.email.toLowerCase() === updateData.email.toLowerCase() && a.id !== adminId)) {
-        return { success: false, error: 'An admin with this email already exists' };
+      if (
+        admins.find(
+          (a) =>
+            a.email.toLowerCase() === updateData.email.toLowerCase() &&
+            a.id !== adminId,
+        )
+      ) {
+        return {
+          success: false,
+          error: 'An admin with this email already exists',
+        };
       }
     }
 
     // Update admin data
-    setAdmins(prev => prev.map(admin => {
-      if (admin.id === adminId) {
-        const updatedAdmin = { ...admin };
-        if (updateData.name) updatedAdmin.name = updateData.name;
-        if (updateData.email) updatedAdmin.email = updateData.email.toLowerCase();
-        return updatedAdmin;
-      }
-      return admin;
-    }));
+    setAdmins((prev) =>
+      prev.map((admin) => {
+        if (admin.id === adminId) {
+          const updatedAdmin = { ...admin };
+          if (updateData.name) updatedAdmin.name = updateData.name;
+          if (updateData.email)
+            updatedAdmin.email = updateData.email.toLowerCase();
+          return updatedAdmin;
+        }
+        return admin;
+      }),
+    );
 
     // Update password if provided
     if (updateData.password) {
       const newEmail = updateData.email || adminToUpdate.email;
-      setPasswords(prev => {
+      setPasswords((prev) => {
         const newPasswords = { ...prev };
         // Remove old email password if email changed
         if (updateData.email && updateData.email !== adminToUpdate.email) {
@@ -310,9 +403,10 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       });
     } else if (updateData.email && updateData.email !== adminToUpdate.email) {
       // If only email changed, update password key
-      setPasswords(prev => {
+      setPasswords((prev) => {
         const newPasswords = { ...prev };
-        newPasswords[updateData.email!.toLowerCase()] = prev[adminToUpdate.email];
+        newPasswords[updateData.email!.toLowerCase()] =
+          prev[adminToUpdate.email];
         delete newPasswords[adminToUpdate.email];
         return newPasswords;
       });
@@ -321,22 +415,30 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     return { success: true };
   };
 
-  const deleteAdmin = async (adminId: string): Promise<{ success: boolean; error?: string }> => {
+  const deleteAdmin = async (
+    adminId: string,
+  ): Promise<{ success: boolean; error?: string }> => {
     if (!currentAdmin || currentAdmin.role !== 'super_admin') {
-      return { success: false, error: 'Only super administrators can delete admin accounts' };
+      return {
+        success: false,
+        error: 'Only super administrators can delete admin accounts',
+      };
     }
 
-    const adminToDelete = admins.find(a => a.id === adminId);
+    const adminToDelete = admins.find((a) => a.id === adminId);
     if (!adminToDelete) {
       return { success: false, error: 'Admin not found' };
     }
 
     if (adminToDelete.role === 'super_admin') {
-      return { success: false, error: 'Cannot delete super administrator account' };
+      return {
+        success: false,
+        error: 'Cannot delete super administrator account',
+      };
     }
 
-    setAdmins(prev => prev.filter(admin => admin.id !== adminId));
-    setPasswords(prev => {
+    setAdmins((prev) => prev.filter((admin) => admin.id !== adminId));
+    setPasswords((prev) => {
       const newPasswords = { ...prev };
       delete newPasswords[adminToDelete.email];
       return newPasswords;
@@ -372,7 +474,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     deleteAdmin,
     hasPermission,
     setSelectedAdmin,
-    getSelectedAdmin
+    getSelectedAdmin,
   };
 
   return (

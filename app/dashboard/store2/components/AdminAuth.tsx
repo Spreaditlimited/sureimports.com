@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState } from 'react';
 import { AdminSignIn } from './AdminSignIn';
@@ -9,7 +9,12 @@ import { AdminUserManagement } from './AdminUserManagement';
 import { useAdminAuth } from './AdminAuthProvider';
 import { Product, Order, OrderTab, BulkOrder } from '../App';
 
-type AdminAuthView = 'signIn' | 'signUp' | 'resetPassword' | 'dashboard' | 'userManagement';
+type AdminAuthView =
+  | 'signIn'
+  | 'signUp'
+  | 'resetPassword'
+  | 'dashboard'
+  | 'userManagement';
 
 interface Transaction {
   id: string;
@@ -24,7 +29,11 @@ interface AdminAuthProps {
   products: Product[];
   orders: Record<OrderTab, Order[]>;
   onProductUpdate: (products: Product[]) => void;
-  onOrderStatusUpdate: (orderId: string, newStatus: Order['status'], tab: OrderTab) => void;
+  onOrderStatusUpdate: (
+    orderId: string,
+    newStatus: Order['status'],
+    tab: OrderTab,
+  ) => void;
   onBackToStore: () => void;
   onBulkBuyer: () => void;
   onBulkOrderCreate: (bulkOrder: BulkOrder) => void;
@@ -45,7 +54,7 @@ export function AdminAuth({
   onReturnsOrderCreate,
   walletBalance,
   transactions,
-  onShowManageAdmins
+  onShowManageAdmins,
 }: AdminAuthProps) {
   const { isAuthenticated, hasPermission } = useAdminAuth();
   const [currentView, setCurrentView] = useState<AdminAuthView>('signIn');
@@ -124,7 +133,7 @@ export function AdminAuth({
       }
       return (
         <div className="min-h-screen bg-background">
-          <div className="max-w-7xl mx-auto p-6">
+          <div className="mx-auto max-w-7xl p-6">
             <AdminUserManagement onCreateNewAdmin={handleCreateNewAdmin} />
             <div className="mt-6">
               <button

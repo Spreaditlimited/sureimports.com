@@ -23,13 +23,20 @@ export async function POST(request: Request) {
     const body: TransferRecipientRequest = await request.json();
 
     // Validate required fields
-    if (!body.type || !body.name || !body.account_number || !body.bank_code || !body.currency) {
+    if (
+      !body.type ||
+      !body.name ||
+      !body.account_number ||
+      !body.bank_code ||
+      !body.currency
+    ) {
       return NextResponse.json(
         {
           status: false,
-          message: 'Missing required fields: type, name, account_number, bank_code, currency',
+          message:
+            'Missing required fields: type, name, account_number, bank_code, currency',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -40,7 +47,7 @@ export async function POST(request: Request) {
           status: false,
           message: 'Paystack secret key not configured',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -71,7 +78,7 @@ export async function POST(request: Request) {
           message: data.message || 'Failed to create transfer recipient',
           data: data,
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -82,17 +89,18 @@ export async function POST(request: Request) {
         message: data.message || 'Transfer recipient created successfully',
         data: data.data,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.error('Error creating transfer recipient:', error);
     return NextResponse.json(
       {
         status: false,
-        message: error.message || 'An error occurred while creating transfer recipient',
+        message:
+          error.message ||
+          'An error occurred while creating transfer recipient',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

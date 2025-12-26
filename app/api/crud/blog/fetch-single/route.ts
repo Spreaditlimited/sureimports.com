@@ -13,7 +13,7 @@ export async function GET(request: Request) {
           success: false,
           error: 'Either slug or pidBlog parameter is required',
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
           success: false,
           error: 'Blog post not found',
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         success: true,
         data: blog,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error('Error fetching blog:', error);
@@ -57,7 +57,7 @@ export async function GET(request: Request) {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch blog',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

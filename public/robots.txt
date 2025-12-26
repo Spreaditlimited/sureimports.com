@@ -1,3 +1,15 @@
+﻿# Allow all crawlers
 User-Agent: *
-Disallow: /api/
 Allow: /
+
+# Block API routes and private areas from crawling
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /auth/
+
+# Specifically allow Googlebot
+User-Agent: Googlebot
+Allow: /
+
+# Sitemap location
+Sitemap: https://sureimports.com/sitemap.xml

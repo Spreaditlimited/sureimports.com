@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: 'Payment service not configured',
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
           Authorization: `Bearer ${paystackSecretKey}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     const data = await response.json();
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
           status: false,
           message: data.message || 'Failed to fetch banks',
         },
-        { status: response.status }
+        { status: response.status },
       );
     }
 
@@ -58,8 +58,7 @@ export async function GET(request: NextRequest) {
         status: false,
         message: 'An error occurred while fetching banks',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

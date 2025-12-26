@@ -4,8 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search as SearchIcon, X, ChevronUp, ShoppingCart, Filter, SlidersHorizontal } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Search as SearchIcon,
+  X,
+  ChevronUp,
+  ShoppingCart,
+  Filter,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import ProductGrid from './ProductGrid';
 import FilterPanel from './FilterPanel';
@@ -30,13 +43,25 @@ export default function ShopComponent() {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
   // Search and filter state
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
-  const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'all');
-  const [minPrice, setMinPrice] = useState(parseFloat(searchParams.get('minPrice') || '0'));
-  const [maxPrice, setMaxPrice] = useState(parseFloat(searchParams.get('maxPrice') || '999999999'));
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get('search') || '',
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get('category') || 'all',
+  );
+  const [selectedBrand, setSelectedBrand] = useState(
+    searchParams.get('brand') || 'all',
+  );
+  const [minPrice, setMinPrice] = useState(
+    parseFloat(searchParams.get('minPrice') || '0'),
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    parseFloat(searchParams.get('maxPrice') || '999999999'),
+  );
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'newest');
-  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
+  const [currentPage, setCurrentPage] = useState(
+    parseInt(searchParams.get('page') || '1'),
+  );
 
   // Pagination state
   const [pagination, setPagination] = useState({
@@ -55,7 +80,15 @@ export default function ShopComponent() {
   // Fetch products when filters change
   useEffect(() => {
     fetchProducts();
-  }, [searchQuery, selectedCategory, selectedBrand, minPrice, maxPrice, sortBy, currentPage]);
+  }, [
+    searchQuery,
+    selectedCategory,
+    selectedBrand,
+    minPrice,
+    maxPrice,
+    sortBy,
+    currentPage,
+  ]);
 
   // Scroll to top button
   useEffect(() => {
@@ -70,7 +103,7 @@ export default function ShopComponent() {
     try {
       const response = await fetch('/api/shop/filters');
       const data = await response.json();
-      
+
       if (data.statusx === 'SUCCESS') {
         setCategories(data.data.categories);
         setBrands(data.data.brands);
@@ -132,7 +165,7 @@ export default function ShopComponent() {
     if (maxPrice < 999999999) params.set('maxPrice', maxPrice.toString());
     if (sortBy !== 'newest') params.set('sortBy', sortBy);
     if (currentPage > 1) params.set('page', currentPage.toString());
-    
+
     router.push(`/dashboard/shop?${params.toString()}`);
   };
 
@@ -194,15 +227,25 @@ export default function ShopComponent() {
 
                 {/* Sort and Actions */}
                 <div className="flex items-center gap-2">
-                  <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setCurrentPage(1); }}>
+                  <Select
+                    value={sortBy}
+                    onValueChange={(value) => {
+                      setSortBy(value);
+                      setCurrentPage(1);
+                    }}
+                  >
                     <SelectTrigger className="h-[49px] w-[180px] rounded-xl border border-slate-300 bg-slate-200 dark:border-gray-600 dark:bg-gray-800">
                       <SelectValue placeholder="Sort by" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="newest">Newest First</SelectItem>
                       <SelectItem value="oldest">Oldest First</SelectItem>
-                      <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                      <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                      <SelectItem value="price-asc">
+                        Price: Low to High
+                      </SelectItem>
+                      <SelectItem value="price-desc">
+                        Price: High to Low
+                      </SelectItem>
                       <SelectItem value="name-asc">Name: A-Z</SelectItem>
                       <SelectItem value="name-desc">Name: Z-A</SelectItem>
                     </SelectContent>
@@ -212,7 +255,7 @@ export default function ShopComponent() {
                     onClick={() => setShowFilterPanel(true)}
                     className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-4 text-gray-800 hover:bg-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                   >
-                    <SlidersHorizontal className="h-4 w-4 mr-2" />
+                    <SlidersHorizontal className="mr-2 h-4 w-4" />
                     Filters
                   </Button>
 
@@ -220,10 +263,10 @@ export default function ShopComponent() {
                     onClick={() => setShowCartSidebar(true)}
                     className="relative h-[49px] rounded-xl bg-indigo-600 px-4 text-white hover:bg-indigo-700"
                   >
-                    <ShoppingCart className="h-4 w-4 mr-2" />
+                    <ShoppingCart className="mr-2 h-4 w-4" />
                     Cart
                     {cartCount > 0 && (
-                      <span className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                      <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
                         {cartCount}
                       </span>
                     )}
@@ -246,7 +289,7 @@ export default function ShopComponent() {
             ) : (
               <>
                 <ProductGrid products={products} />
-                
+
                 {/* Pagination */}
                 {pagination.totalPages > 1 && (
                   <div className="mt-8 flex justify-center gap-2">
@@ -307,4 +350,3 @@ export default function ShopComponent() {
     </>
   );
 }
-

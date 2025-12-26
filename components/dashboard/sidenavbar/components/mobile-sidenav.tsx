@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,7 +28,7 @@ export const MobileSidebar = () => {
           <MenuIcon />
         </div>
       </SheetTrigger>
-      
+
       <SheetContent side="left" className="w-[256px] bg-black p-0">
         <div className="flex h-full flex-col">
           <div className="flex-shrink-0 pb-6 pt-6">

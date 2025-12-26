@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
           statusx: 'FAILED',
           message: 'Unauthorized - No token provided',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
             statusx: 'FAILED',
             message: 'Invalid token',
           },
-          { status: 401 }
+          { status: 401 },
         );
       }
       userId = decoded.pidUser as string;
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
           statusx: 'FAILED',
           message: 'Token verification failed',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
           statusx: 'FAILED',
           message: 'User ID not found in token',
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -78,8 +78,7 @@ export async function GET(request: NextRequest) {
         message: 'Failed to fetch orders',
         error: error instanceof Error ? error.message : 'Unknown error',
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

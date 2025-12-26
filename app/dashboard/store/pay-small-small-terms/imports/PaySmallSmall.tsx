@@ -1,25 +1,25 @@
-import svgPaths from "./svg-htimv6y8us";
-import imgImage from "figma:asset/27d4ec04ddb84fba75591233e680f165d5cb6726.png";
-import imgSubtract from "figma:asset/4964a0ebe3d64b53b49b697a91f64216e204411f.png";
-import { imgImage1 } from "./svg-znnzx";
+import svgPaths from './svg-htimv6y8us';
+import imgImage from 'figma:asset/27d4ec04ddb84fba75591233e680f165d5cb6726.png';
+import imgSubtract from 'figma:asset/4964a0ebe3d64b53b49b697a91f64216e204411f.png';
+import { imgImage1 } from './svg-znnzx';
 
 function Image() {
   return (
     <div
-      className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0"
+      className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]"
       data-name="Image"
     >
       <div
-        className="[grid-area:1_/_1] bg-neutral-50 h-[456px] ml-0 mt-0 relative rounded-[20px] w-[560px]"
+        className="relative ml-0 mt-0 h-[456px] w-[560px] rounded-[20px] bg-neutral-50 [grid-area:1_/_1]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <div
-        className="[grid-area:1_/_1] bg-[100%_49.4%] bg-no-repeat bg-size-[101.62%_159.91%] h-[425px] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-36px_-15px] mask-size-[560px_456px] ml-9 mt-[15px] w-[489px]"
+        className="bg-size-[101.62%_159.91%] mask-alpha mask-intersect mask-no-clip mask-no-repeat mask-position-[-36px_-15px] mask-size-[560px_456px] ml-9 mt-[15px] h-[425px] w-[489px] bg-[100%_49.4%] bg-no-repeat [grid-area:1_/_1]"
         data-name="Image"
         style={{
           backgroundImage: `url('${imgImage}')`,
@@ -33,17 +33,17 @@ function Image() {
 function Image1() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-2.5 items-start justify-center ml-0 mt-0 p-0 relative w-[560px]"
+      className="relative ml-0 mt-0 box-border flex w-[560px] flex-col content-stretch items-start justify-center gap-2.5 p-0 [grid-area:1_/_1]"
       data-name="Image"
     >
       <Image />
       <div
-        className="bg-neutral-50 h-[217px] relative rounded-[20px] shrink-0 w-[560px]"
+        className="relative h-[217px] w-[560px] shrink-0 rounded-[20px] bg-neutral-50"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+          className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
     </div>
@@ -53,15 +53,15 @@ function Image1() {
 function Tag() {
   return (
     <div
-      className="bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center px-5 py-1.5 relative rounded-[30px] shrink-0"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[16px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">HP</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Regular',_sans-serif] text-[16px] font-normal not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">HP</p>
       </div>
     </div>
   );
@@ -70,16 +70,16 @@ function Tag() {
 function Text() {
   return (
     <div
-      className="box-border content-stretch flex flex-row gap-[5px] items-center justify-center leading-[0] not-italic p-0 relative shrink-0 text-left text-nowrap"
+      className="relative box-border flex shrink-0 flex-row content-stretch items-center justify-center gap-[5px] text-nowrap p-0 text-left not-italic leading-[0]"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold relative shrink-0 text-[20px] text-indigo-800">
-        <p className="block leading-[30px] text-nowrap whitespace-pre">
+      <div className="relative shrink-0 font-['Inter:Semi_Bold',_sans-serif] text-[20px] font-semibold text-indigo-800">
+        <p className="block whitespace-pre text-nowrap leading-[30px]">
           ₦1,015,875.00
         </p>
       </div>
-      <div className="font-['Inter:Regular',_sans-serif] font-normal relative shrink-0 text-[16px] text-slate-800">
-        <p className="block leading-[26px] text-nowrap whitespace-pre">
+      <div className="relative shrink-0 font-['Inter:Regular',_sans-serif] text-[16px] font-normal text-slate-800">
+        <p className="block whitespace-pre text-nowrap leading-[26px]">
           Inclusive of 5% PSS Fee
         </p>
       </div>
@@ -90,10 +90,10 @@ function Text() {
 function Text1() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-center p-0 relative shrink-0"
+      className="relative box-border flex shrink-0 flex-col content-stretch items-start justify-center gap-[5px] p-0"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[28px] text-left text-slate-800 w-[479px]">
+      <div className="relative w-[479px] shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[28px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[38px]">
           HP EliteBook x360 1040 G8 – Power Meets Elegance
         </p>
@@ -106,7 +106,7 @@ function Text1() {
 function Text2() {
   return (
     <div
-      className="[grid-area:1_/_1] box-border content-stretch flex flex-col gap-2.5 items-start justify-start ml-[30px] mt-[496px] p-0 relative"
+      className="relative ml-[30px] mt-[496px] box-border flex flex-col content-stretch items-start justify-start gap-2.5 p-0 [grid-area:1_/_1]"
       data-name="Text"
     >
       <Tag />
@@ -117,7 +117,7 @@ function Text2() {
 
 function Group1321315022() {
   return (
-    <div className="grid-cols-[max-content] grid-rows-[max-content] inline-grid leading-[0] place-items-start relative shrink-0">
+    <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]">
       <Image1 />
       <Text2 />
     </div>
@@ -127,13 +127,13 @@ function Group1321315022() {
 function Text3() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col font-['Inter:Regular',_sans-serif] font-normal gap-[5px] items-start justify-start leading-[0] left-[30px] not-italic p-0 text-[14px] text-left text-slate-800 top-[73px] w-[984px]"
+      className="absolute left-[30px] top-[73px] box-border flex w-[984px] flex-col content-stretch items-start justify-start gap-[5px] p-0 text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800"
       data-name="Text"
     >
-      <div className="relative shrink-0 w-full">
+      <div className="relative w-full shrink-0">
         <p className="block leading-[24px]">{`Thank you for choosing the "Pay Small Small" option on SureImports.`}</p>
       </div>
-      <div className="relative shrink-0 w-full">
+      <div className="relative w-full shrink-0">
         <p className="block leading-[24px]">
           This flexible payment plan allows you to pay for your selected product
           in convenient installments over a maximum period of 6 months. Once
@@ -148,16 +148,16 @@ function Text3() {
 function Field() {
   return (
     <div
-      className="bg-[rgba(255,255,255,0)] relative rounded-[10px] shrink-0 w-full"
+      className="relative w-full shrink-0 rounded-[10px] bg-[rgba(255,255,255,0)]"
       data-name="Field"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.3)] border-solid inset-0 pointer-events-none rounded-[10px]"
+        className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.3)]"
       />
-      <div className="flex flex-row items-center relative size-full">
-        <div className="box-border content-stretch flex flex-row gap-2.5 items-center justify-start px-[15px] py-3 relative w-full">
-          <div className="basis-0 font-['Inter:Regular',_sans-serif] font-normal grow leading-[0] min-h-px min-w-px not-italic relative shrink-0 text-[14px] text-[rgba(30,41,59,0.7)] text-left">
+      <div className="relative flex size-full flex-row items-center">
+        <div className="relative box-border flex w-full flex-row content-stretch items-center justify-start gap-2.5 px-[15px] py-3">
+          <div className="relative min-h-px min-w-px shrink-0 grow basis-0 text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-[rgba(30,41,59,0.7)]">
             <p className="block leading-[24px]">Enter a Valid Phone Number</p>
           </div>
         </div>
@@ -169,10 +169,10 @@ function Field() {
 function Text4() {
   return (
     <div
-      className="box-border content-stretch flex flex-col gap-[5px] items-start justify-start p-0 relative shrink-0 w-full"
+      className="relative box-border flex w-full shrink-0 flex-col content-stretch items-start justify-start gap-[5px] p-0"
       data-name="Text"
     >
-      <div className="font-['Inter:Regular',_sans-serif] font-normal leading-[0] not-italic relative shrink-0 text-[14px] text-left text-slate-800 w-full">
+      <div className="relative w-full shrink-0 text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">Phone Number</p>
       </div>
       <Field />
@@ -183,10 +183,10 @@ function Text4() {
 function Text5() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-col gap-2.5 items-start justify-start left-[30px] p-0 top-[490px] w-[984px]"
+      className="absolute left-[30px] top-[490px] box-border flex w-[984px] flex-col content-stretch items-start justify-start gap-2.5 p-0"
       data-name="Text"
     >
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[16px] text-left text-slate-800 w-full">
+      <div className="relative w-full shrink-0 text-left font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">{`To proceed, please ensure your SureImports account profile includes your phone number. If it's missing, kindly enter it below:`}</p>
       </div>
       <Text4 />
@@ -196,7 +196,7 @@ function Text5() {
 
 function VuesaxOutlineAdd() {
   return (
-    <div className="absolute contents inset-0" data-name="vuesax/outline/add">
+    <div className="absolute inset-0 contents" data-name="vuesax/outline/add">
       <svg
         className="block size-full"
         fill="none"
@@ -223,7 +223,7 @@ function VuesaxOutlineAdd() {
 
 function VuesaxOutlineAdd1() {
   return (
-    <div className="relative shrink-0 size-6" data-name="vuesax/outline/add">
+    <div className="relative size-6 shrink-0" data-name="vuesax/outline/add">
       <VuesaxOutlineAdd />
     </div>
   );
@@ -232,12 +232,12 @@ function VuesaxOutlineAdd1() {
 function Button() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 h-12 items-center justify-center left-[30px] px-[30px] py-2.5 rounded-[10px] top-[657px] w-[984px]"
+      className="absolute left-[30px] top-[657px] box-border flex h-12 w-[984px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[10px] bg-indigo-800 px-[30px] py-2.5"
       data-name="Button"
     >
       <VuesaxOutlineAdd1 />
-      <div className="font-['Inter:Medium',_sans-serif] font-medium leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[18px] text-left text-nowrap">
-        <p className="block leading-[28px] whitespace-pre">
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Medium',_sans-serif] text-[18px] font-medium not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[28px]">
           Add Product to Pay Small Small
         </p>
       </div>
@@ -248,15 +248,15 @@ function Button() {
 function Tag1() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[45px] px-2.5 py-1.5 rounded-[30px] size-[26px] top-[221px]"
+      className="absolute left-[45px] top-[221px] box-border flex size-[26px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-2.5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[14px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">01</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[14px] font-semibold not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">01</p>
       </div>
     </div>
   );
@@ -264,18 +264,18 @@ function Tag1() {
 
 function Group1321315004() {
   return (
-    <div className="absolute contents left-[30px] top-[206px]">
+    <div className="absolute left-[30px] top-[206px] contents">
       <div
-        className="absolute bg-[#ffffff] h-[264px] left-[30px] rounded-[10px] top-[206px] w-[189px]"
+        className="absolute left-[30px] top-[206px] h-[264px] w-[189px] rounded-[10px] bg-[#ffffff]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <Tag1 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[45px] not-italic text-[14px] text-left text-slate-800 top-[257px] w-[159px]">
+      <div className="absolute left-[45px] top-[257px] w-[159px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[22px]">
           When you click the button below, a virtual payment account will be
           created for you. You can pay into this account at your own pace, as
@@ -289,15 +289,15 @@ function Group1321315004() {
 function Tag2() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[244px] px-2.5 py-1.5 rounded-[30px] size-[26px] top-[221px]"
+      className="absolute left-[244px] top-[221px] box-border flex size-[26px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-2.5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[14px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">02</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[14px] font-semibold not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">02</p>
       </div>
     </div>
   );
@@ -305,18 +305,18 @@ function Tag2() {
 
 function Group1321315005() {
   return (
-    <div className="absolute contents left-[229px] top-[206px]">
+    <div className="absolute left-[229px] top-[206px] contents">
       <div
-        className="absolute bg-[#ffffff] h-[264px] left-[229px] rounded-[10px] top-[206px] w-[189px]"
+        className="absolute left-[229px] top-[206px] h-[264px] w-[189px] rounded-[10px] bg-[#ffffff]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <Tag2 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[244px] not-italic text-[14px] text-left text-slate-800 top-[257px] w-[159px]">
+      <div className="absolute left-[244px] top-[257px] w-[159px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[22px]">
           All payments made through this plan attract a 5% additional fee. This
           helps us manage exchange rate fluctuations in Nigeria and charges from
@@ -330,15 +330,15 @@ function Group1321315005() {
 function Tag3() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[443px] px-2.5 py-1.5 rounded-[30px] size-[26px] top-[221px]"
+      className="absolute left-[443px] top-[221px] box-border flex size-[26px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-2.5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[14px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">03</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[14px] font-semibold not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">03</p>
       </div>
     </div>
   );
@@ -346,18 +346,18 @@ function Tag3() {
 
 function Group1321315006() {
   return (
-    <div className="absolute contents left-[428px] top-[206px]">
+    <div className="absolute left-[428px] top-[206px] contents">
       <div
-        className="absolute bg-[#ffffff] h-[264px] left-[428px] rounded-[10px] top-[206px] w-[189px]"
+        className="absolute left-[428px] top-[206px] h-[264px] w-[189px] rounded-[10px] bg-[#ffffff]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <Tag3 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[443px] not-italic text-[14px] text-left text-slate-800 top-[257px] w-[159px]">
+      <div className="absolute left-[443px] top-[257px] w-[159px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[22px]">
           Your product will only be shipped after full payment has been
           received.
@@ -370,15 +370,15 @@ function Group1321315006() {
 function Tag4() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[642px] px-2.5 py-1.5 rounded-[30px] size-[26px] top-[221px]"
+      className="absolute left-[642px] top-[221px] box-border flex size-[26px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-2.5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[14px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">04</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[14px] font-semibold not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">04</p>
       </div>
     </div>
   );
@@ -386,18 +386,18 @@ function Tag4() {
 
 function Group1321315007() {
   return (
-    <div className="absolute contents left-[627px] top-[206px]">
+    <div className="absolute left-[627px] top-[206px] contents">
       <div
-        className="absolute bg-[#ffffff] h-[264px] left-[627px] rounded-[10px] top-[206px] w-[189px]"
+        className="absolute left-[627px] top-[206px] h-[264px] w-[189px] rounded-[10px] bg-[#ffffff]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <Tag4 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[642px] not-italic text-[14px] text-left text-slate-800 top-[257px] w-[159px]">
+      <div className="absolute left-[642px] top-[257px] w-[159px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[22px]">{`To activate your pay small smalls account, you'll be required to make a deposit of ₦5,000 to the dedicated virtual account created for you.`}</p>
       </div>
     </div>
@@ -407,15 +407,15 @@ function Group1321315007() {
 function Tag5() {
   return (
     <div
-      className="absolute bg-indigo-800 box-border content-stretch flex flex-row gap-2.5 items-center justify-center left-[841px] px-2.5 py-1.5 rounded-[30px] size-[26px] top-[221px]"
+      className="absolute left-[841px] top-[221px] box-border flex size-[26px] flex-row content-stretch items-center justify-center gap-2.5 rounded-[30px] bg-indigo-800 px-2.5 py-1.5"
       data-name="Tag"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[30px]"
+        className="pointer-events-none absolute inset-0 rounded-[30px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] not-italic relative shrink-0 text-[#ffffff] text-[14px] text-left text-nowrap">
-        <p className="block leading-[24px] whitespace-pre">05</p>
+      <div className="relative shrink-0 text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[14px] font-semibold not-italic leading-[0] text-[#ffffff]">
+        <p className="block whitespace-pre leading-[24px]">05</p>
       </div>
     </div>
   );
@@ -423,18 +423,18 @@ function Tag5() {
 
 function Group1321315008() {
   return (
-    <div className="absolute contents left-[826px] top-[206px]">
+    <div className="absolute left-[826px] top-[206px] contents">
       <div
-        className="absolute bg-[#ffffff] h-[264px] left-[826px] rounded-[10px] top-[206px] w-[189px]"
+        className="absolute left-[826px] top-[206px] h-[264px] w-[189px] rounded-[10px] bg-[#ffffff]"
         data-name="Bg"
       >
         <div
           aria-hidden="true"
-          className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[10px]"
+          className="pointer-events-none absolute inset-0 rounded-[10px] border border-solid border-[rgba(0,0,0,0.05)]"
         />
       </div>
       <Tag5 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[841px] not-italic text-[14px] text-left text-slate-800 top-[257px] w-[159px]">
+      <div className="absolute left-[841px] top-[257px] w-[159px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[22px]">
           You can choose to cancel at any time. In such cases, we will process a
           refund of the total amount paid, less 2.5% to cover administrative
@@ -447,7 +447,7 @@ function Group1321315008() {
 
 function Group1321315009() {
   return (
-    <div className="absolute contents left-[30px] top-[206px]">
+    <div className="absolute left-[30px] top-[206px] contents">
       <Group1321315004 />
       <Group1321315005 />
       <Group1321315006 />
@@ -460,22 +460,22 @@ function Group1321315009() {
 function Text6() {
   return (
     <div
-      className="bg-neutral-50 h-[735px] relative rounded-[20px] shrink-0 w-[1044px]"
+      className="relative h-[735px] w-[1044px] shrink-0 rounded-[20px] bg-neutral-50"
       data-name="Text"
     >
       <div
         aria-hidden="true"
-        className="absolute border border-[rgba(0,0,0,0.05)] border-solid inset-0 pointer-events-none rounded-[20px]"
+        className="pointer-events-none absolute inset-0 rounded-[20px] border border-solid border-[rgba(0,0,0,0.05)]"
       />
-      <div className="absolute font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] left-[30px] not-italic text-[18px] text-left text-slate-800 top-[30px] w-[984px]">
+      <div className="absolute left-[30px] top-[30px] w-[984px] text-left font-['Inter:Semi_Bold',_sans-serif] text-[18px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[28px]">Pay Small Small</p>
       </div>
       <Text3 />
-      <div className="absolute font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] left-[30px] not-italic text-[16px] text-left text-slate-800 top-[170px] w-[984px]">
+      <div className="absolute left-[30px] top-[170px] w-[984px] text-left font-['Inter:Semi_Bold',_sans-serif] text-[16px] font-semibold not-italic leading-[0] text-slate-800">
         <p className="block leading-[26px]">{`Here's how it works:`}</p>
       </div>
       <Text5 />
-      <div className="absolute font-['Inter:Regular',_sans-serif] font-normal leading-[0] left-[30px] not-italic text-[14px] text-left text-slate-800 top-[613px] w-[984px]">
+      <div className="absolute left-[30px] top-[613px] w-[984px] text-left font-['Inter:Regular',_sans-serif] text-[14px] font-normal not-italic leading-[0] text-slate-800">
         <p className="block leading-[24px]">
           Once ready, click the button below to begin.
         </p>
@@ -489,7 +489,7 @@ function Text6() {
 function Content() {
   return (
     <div
-      className="absolute box-border content-stretch flex flex-row gap-[30px] items-start justify-start left-64 p-0 top-[172px]"
+      className="absolute left-64 top-[172px] box-border flex flex-row content-stretch items-start justify-start gap-[30px] p-0"
       data-name="Content"
     >
       <Group1321315022 />
@@ -500,20 +500,20 @@ function Content() {
 
 export default function PaySmallSmall() {
   return (
-    <div className="bg-slate-50 relative size-full" data-name="Pay Small Small">
+    <div className="relative size-full bg-slate-50" data-name="Pay Small Small">
       <div
-        className="absolute h-[942px] left-0 top-0 w-[1920px]"
+        className="absolute left-0 top-0 h-[942px] w-[1920px]"
         data-name="Subtract"
       >
         <img
-          className="block max-w-none size-full"
+          className="block size-full max-w-none"
           height="942"
           src={imgSubtract}
           width="1920"
         />
       </div>
-      <div className="absolute font-['Inter:Semi_Bold',_sans-serif] font-semibold leading-[0] left-64 not-italic text-[22px] text-left text-nowrap text-slate-800 top-[110px]">
-        <p className="block leading-[32px] whitespace-pre">Pay Small Small</p>
+      <div className="absolute left-64 top-[110px] text-nowrap text-left font-['Inter:Semi_Bold',_sans-serif] text-[22px] font-semibold not-italic leading-[0] text-slate-800">
+        <p className="block whitespace-pre leading-[32px]">Pay Small Small</p>
       </div>
       <Content />
     </div>

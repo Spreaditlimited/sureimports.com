@@ -25,9 +25,11 @@ const DebitTransactionTable: React.FC<any> = ({ debits }) => {
     const statusClasses = {
       debited: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
       paid: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-      pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+      pending:
+        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
       failed: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-      unknown: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+      unknown:
+        'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
     };
 
     return (
@@ -40,9 +42,9 @@ const DebitTransactionTable: React.FC<any> = ({ debits }) => {
   };
 
   return (
-    <div className="overflow-x-auto rounded-lg bg-white shadow dark:text-black-100">
-      <table className="min-w-full divide-y divide-dark-200 dark:text-black-100">
-        <thead className="text-black-800 dark:bg-black dark:text-black-200">
+    <div className="dark:text-black-100 overflow-x-auto rounded-lg bg-white shadow">
+      <table className="divide-dark-200 dark:text-black-100 min-w-full divide-y">
+        <thead className="text-black-800 dark:text-black-200 dark:bg-black">
           <tr>
             <th
               scope="col"
@@ -77,7 +79,7 @@ const DebitTransactionTable: React.FC<any> = ({ debits }) => {
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-gray-200 dark:bg-black dark:bg-black-600 dark:text-gray-100">
+        <tbody className="dark:bg-black-600 divide-y divide-gray-200 dark:bg-black dark:text-gray-100">
           {debits.map((debit: any) => (
             <tr
               key={debit.id}
@@ -118,9 +120,7 @@ const DebitTransactionTable: React.FC<any> = ({ debits }) => {
               </td>
 
               <td className="whitespace-nowrap px-6 py-4 text-sm">
-                <div className="font-medium">
-                  {debit.serviceName || 'N/A'}
-                </div>
+                <div className="font-medium">{debit.serviceName || 'N/A'}</div>
                 {debit.paymentType && (
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     {debit.paymentType}
@@ -140,4 +140,3 @@ const DebitTransactionTable: React.FC<any> = ({ debits }) => {
 };
 
 export default DebitTransactionTable;
-

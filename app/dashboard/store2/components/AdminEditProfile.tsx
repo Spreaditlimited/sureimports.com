@@ -1,11 +1,17 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAdminAuth, AdminUser } from './AdminAuthProvider';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from './ui/card';
 import { Alert, AlertDescription } from './ui/alert';
 import { ArrowLeft, User, Mail, Eye, EyeOff, Lock, Save } from 'lucide-react';
 
@@ -14,14 +20,17 @@ interface AdminEditProfileProps {
   onCancel: () => void;
 }
 
-export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfileProps) {
+export function AdminEditProfile({
+  onEditSuccess,
+  onCancel,
+}: AdminEditProfileProps) {
   const { currentAdmin, getSelectedAdmin, updateAdminProfile } = useAdminAuth();
   const [selectedAdmin, setSelectedAdmin] = useState<AdminUser | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     newPassword: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -41,7 +50,7 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
         name: admin.name,
         email: admin.email,
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
       });
     }
   }, [getSelectedAdmin]);
@@ -55,7 +64,10 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
     setIsLoading(true);
 
     // Validation
-    if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
+    if (
+      formData.newPassword &&
+      formData.newPassword !== formData.confirmPassword
+    ) {
       setError('Passwords do not match');
       setIsLoading(false);
       return;
@@ -70,7 +82,7 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
     try {
       const updateData: any = {
         name: formData.name,
-        email: formData.email
+        email: formData.email,
       };
 
       // Only include password if it's being changed
@@ -96,29 +108,27 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
   };
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (error) setError('');
     if (success) setSuccess('');
   };
 
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <div className="w-full max-w-md">
           <Card className="border-2">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl text-destructive">Access Denied</CardTitle>
+              <CardTitle className="text-xl text-destructive">
+                Access Denied
+              </CardTitle>
               <CardDescription>
                 Only super administrators can edit admin profiles.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
-                onClick={onCancel}
-                className="w-full"
-                variant="outline"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+              <Button onClick={onCancel} className="w-full" variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Admin Management
               </Button>
             </CardContent>
@@ -130,22 +140,20 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
 
   if (!selectedAdmin) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="flex min-h-screen items-center justify-center bg-background p-4">
         <div className="w-full max-w-md">
           <Card className="border-2">
             <CardHeader className="text-center">
-              <CardTitle className="text-xl text-destructive">No Admin Selected</CardTitle>
+              <CardTitle className="text-xl text-destructive">
+                No Admin Selected
+              </CardTitle>
               <CardDescription>
                 Please select an admin to edit from the admin management page.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
-                onClick={onCancel}
-                className="w-full"
-                variant="outline"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
+              <Button onClick={onCancel} className="w-full" variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Admin Management
               </Button>
             </CardContent>
@@ -157,12 +165,12 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
             onClick={onCancel}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Admin Management
@@ -171,9 +179,9 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
 
         {/* Main card */}
         <Card className="border-2">
-          <CardHeader className="text-center space-y-4">
+          <CardHeader className="space-y-4 text-center">
             <div className="flex justify-center">
-              <div className="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+              <div className="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
                 <User className="h-8 w-8 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
@@ -194,7 +202,7 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
               )}
 
               {success && (
-                <Alert className="border-green-200 bg-green-50 dark:bg-green-950 dark:border-green-800">
+                <Alert className="border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950">
                   <AlertDescription className="text-green-800 dark:text-green-200">
                     {success}
                   </AlertDescription>
@@ -204,16 +212,18 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
               {/* Basic Info */}
               <div className="space-y-4">
                 <h3 className="font-medium">Basic Information</h3>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="name">Full Name</Label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
-                      onChange={(e) => handleInputChange('name', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('name', e.target.value)
+                      }
                       className="pl-10"
                       placeholder="Enter full name"
                       required
@@ -225,12 +235,14 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address</Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                     <Input
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange('email', e.target.value)
+                      }
                       className="pl-10"
                       placeholder="admin@example.com"
                       required
@@ -243,18 +255,22 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
               {/* Password Change */}
               <div className="space-y-4">
                 <h3 className="font-medium">Change Password (Optional)</h3>
-                <p className="text-sm text-muted-foreground">Leave blank to keep current password</p>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p className="text-sm text-muted-foreground">
+                  Leave blank to keep current password
+                </p>
+
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="newPassword">New Password</Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                       <Input
                         id="newPassword"
-                        type={showNewPassword ? "text" : "password"}
+                        type={showNewPassword ? 'text' : 'password'}
                         value={formData.newPassword}
-                        onChange={(e) => handleInputChange('newPassword', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('newPassword', e.target.value)
+                        }
                         className="pl-10 pr-10"
                         placeholder="Min. 8 characters"
                         disabled={isLoading}
@@ -263,32 +279,46 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
                       <button
                         type="button"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 transform text-muted-foreground hover:text-foreground"
                       >
-                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showNewPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                    <Label htmlFor="confirmPassword">
+                      Confirm New Password
+                    </Label>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-muted-foreground" />
                       <Input
                         id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
+                        type={showConfirmPassword ? 'text' : 'password'}
                         value={formData.confirmPassword}
-                        onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange('confirmPassword', e.target.value)
+                        }
                         className="pl-10 pr-10"
                         placeholder="Repeat new password"
                         disabled={isLoading}
                       />
                       <button
                         type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        onClick={() =>
+                          setShowConfirmPassword(!showConfirmPassword)
+                        }
+                        className="absolute right-3 top-1/2 -translate-y-1/2 transform text-muted-foreground hover:text-foreground"
                       >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -310,8 +340,8 @@ export function AdminEditProfile({ onEditSuccess, onCancel }: AdminEditProfilePr
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                   disabled={isLoading}
                 >
-                  <Save className="h-4 w-4 mr-2" />
-                  {isLoading ? "Updating..." : "Update Profile"}
+                  <Save className="mr-2 h-4 w-4" />
+                  {isLoading ? 'Updating...' : 'Update Profile'}
                 </Button>
               </div>
             </form>
