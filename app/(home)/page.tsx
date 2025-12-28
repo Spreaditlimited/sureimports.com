@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { generateBreadcrumbSchema, generateFAQSchema } from '@/lib/seo/schema';
 
-const baseUrl = 'https://sureimports.com';
+const baseUrl = 'https://www.sureimports.com';
 
 export const metadata: Metadata = {
   title: 'Sure Imports - Import from China with Confidence',

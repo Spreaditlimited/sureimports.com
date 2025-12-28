@@ -55,6 +55,9 @@ interface DbBlog {
   blogContent: string | null;
   blogSlug: string | null;
   blogPublished: boolean;
+  blogFeatured?: boolean;
+  blogTags?: string | null;
+  blogCategory?: string | null;
   blogImage: string | null;
   blogBy: string | null;
   blogExt1: string | null;
@@ -62,6 +65,27 @@ interface DbBlog {
   xStaus: string | null;
   createdAt: Date | null;
   updatedAt: Date | null;
+}
+
+// Parse tags from comma-separated string or JSON array
+function parseTags(tagsField: string | null | undefined): string[] {
+  if (!tagsField) return [];
+
+  // Try parsing as JSON array first
+  try {
+    const parsed = JSON.parse(tagsField);
+    if (Array.isArray(parsed)) {
+      return parsed.filter((tag) => typeof tag === 'string' && tag.trim());
+    }
+  } catch {
+    // Not JSON, treat as comma-separated string
+  }
+
+  // Parse as comma-separated string
+  return tagsField
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter((tag) => tag.length > 0);
 }
 
 // Parse SEO metadata from blogExt2 field
@@ -119,6 +143,18 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
   // Parse SEO data
   const seo = parseSEOData(dbBlog.blogExt2);
 
+  // Parse tags: prioritize database field, fallback to SEO data
+  const tags =
+    dbBlog.blogTags && dbBlog.blogTags.trim()
+      ? parseTags(dbBlog.blogTags)
+      : seo.tags || [];
+
+  // Get category: prioritize database field, fallback to SEO data
+  const category =
+    dbBlog.blogCategory && dbBlog.blogCategory.trim()
+      ? dbBlog.blogCategory
+      : seo.category || 'Import Guide';
+
   // Use SEO meta description as excerpt, or extract from content
   const excerpt =
     seo.metaDescription ||
@@ -147,13 +183,13 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
       avatar: '/images/new/images/ijeoma-tdaniels.JPG',
       role: 'Content Lead',
     },
-    category: seo.category || 'Import Guide',
-    tags: seo.tags || [],
+    category,
+    tags,
     publishDate: dbBlog.createdAt
       ? dbBlog.createdAt.toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0],
     readTime: readTime > 0 ? readTime : 5,
-    featured: seo.featured || false,
+    featured: dbBlog.blogFeatured === true || seo.featured === true,
     image: imageUrl,
     slug: dbBlog.blogSlug || dbBlog.pidBlog,
     seo,
@@ -208,6 +244,8 @@ export async function searchBlogs(query: string): Promise<BlogPost[]> {
           { blogTitle: { contains: query, mode: 'insensitive' } },
           { blogContent: { contains: query, mode: 'insensitive' } },
           { blogBy: { contains: query, mode: 'insensitive' } },
+          { blogTags: { contains: query, mode: 'insensitive' } },
+          { blogCategory: { contains: query, mode: 'insensitive' } },
         ],
       },
       orderBy: {
@@ -218,6 +256,100 @@ export async function searchBlogs(query: string): Promise<BlogPost[]> {
     return blogs.map(transformBlogPost);
   } catch (error) {
     console.error('Error searching blogs:', error);
+    return [];
+  }
+}
+
+export async function fetchBlogsByTag(tag: string): Promise<BlogPost[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+        blogTags: { contains: tag, mode: 'insensitive' },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return blogs.map(transformBlogPost);
+  } catch (error) {
+    console.error('Error fetching blogs by tag:', error);
+    return [];
+  }
+}
+
+export async function fetchBlogsByCategory(
+  category: string,
+): Promise<BlogPost[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+        blogCategory: { equals: category, mode: 'insensitive' },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return blogs.map(transformBlogPost);
+  } catch (error) {
+    console.error('Error fetching blogs by category:', error);
+    return [];
+  }
+}
+
+export async function fetchAllTags(): Promise<string[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+        blogTags: { not: null },
+      },
+      select: {
+        blogTags: true,
+      },
+    });
+
+    const allTags = new Set<string>();
+    blogs.forEach((blog) => {
+      if (blog.blogTags) {
+        const tags = parseTags(blog.blogTags);
+        tags.forEach((tag) => allTags.add(tag));
+      }
+    });
+
+    return Array.from(allTags).sort();
+  } catch (error) {
+    console.error('Error fetching all tags:', error);
+    return [];
+  }
+}
+
+export async function fetchAllCategories(): Promise<string[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+        blogCategory: { not: null },
+      },
+      select: {
+        blogCategory: true,
+      },
+      distinct: ['blogCategory'],
+    });
+
+    return blogs
+      .map((blog) => blog.blogCategory)
+      .filter((cat): cat is string => cat !== null && cat.trim() !== '')
+      .sort();
+  } catch (error) {
+    console.error('Error fetching all categories:', error);
     return [];
   }
 }

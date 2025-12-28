@@ -41,6 +41,9 @@ model blog {
   blogContent   String?
   blogSlug      String?
   blogPublished Boolean   @default(false)
+  blogFeatured  Boolean   @default(false)
+  blogTags      String?   @db.Text
+  blogCategory  String?   @db.VarChar(100)
   blogImage     String?
   blogBy        String?
   blogExt1      String?

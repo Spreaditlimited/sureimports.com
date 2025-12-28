@@ -75,7 +75,7 @@ export const NavItems: NavItem[] = [
   //   href: '/dashboard/special-sourcing/pending',
   //   color: 'text-white',
   // },
-  
+
   {
     title: 'LineScout',
     icon: Search,

@@ -6,7 +6,7 @@ import { fetchPublishedBlogs } from '../actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { generateBreadcrumbSchema } from '@/lib/seo/schema';
 
-const baseUrl = 'https://sureimports.com';
+const baseUrl = 'https://www.sureimports.com';
 
 export const metadata: Metadata = {
   title: 'Import Insights Blog - Expert Guides & Tips',
