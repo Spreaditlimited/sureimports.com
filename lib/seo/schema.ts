@@ -1,7 +1,7 @@
 // JSON-LD Structured Data for SEO
 // https://schema.org/
 
-const baseUrl = 'https://sureimports.com';
+const baseUrl = 'https://www.sureimports.com';
 
 // Organization Schema
 export const organizationSchema = {
@@ -128,7 +128,8 @@ export function generateArticleSchema(article: {
     },
     url: `${baseUrl}/blog/${article.slug}`,
     datePublished: article.publishDate || new Date().toISOString(),
-    dateModified: article.modifiedDate || article.publishDate || new Date().toISOString(),
+    dateModified:
+      article.modifiedDate || article.publishDate || new Date().toISOString(),
     mainEntityOfPage: {
       '@type': 'WebPage',
       '@id': `${baseUrl}/blog/${article.slug}`,
@@ -138,7 +139,7 @@ export function generateArticleSchema(article: {
 
 // FAQ Schema generator
 export function generateFAQSchema(
-  faqs: Array<{ question: string; answer: string }>
+  faqs: Array<{ question: string; answer: string }>,
 ) {
   return {
     '@context': 'https://schema.org',
@@ -156,7 +157,7 @@ export function generateFAQSchema(
 
 // Breadcrumb Schema generator
 export function generateBreadcrumbSchema(
-  items: Array<{ name: string; url: string }>
+  items: Array<{ name: string; url: string }>,
 ) {
   return {
     '@context': 'https://schema.org',

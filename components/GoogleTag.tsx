@@ -2,9 +2,14 @@
 'use client';
 import Script from 'next/script';
 
-const googleTagID = process.env.GOOGLE_TAG_ID;
+const googleTagID = process.env.NEXT_PUBLIC_GOOGLE_TAG_ID;
 
 const GoogleTag = () => {
+  // Don't render if no Google Tag ID is configured
+  if (!googleTagID) {
+    return null;
+  }
+
   return (
     <>
       {/* Google Tag Manager */}
@@ -20,7 +25,7 @@ const GoogleTag = () => {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', ${googleTagID});
+            gtag('config', '${googleTagID}');
           `,
         }}
       />

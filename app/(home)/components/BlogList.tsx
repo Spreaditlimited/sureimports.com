@@ -25,7 +25,7 @@ import {
 import type { ImgHTMLAttributes } from 'react';
 import type { StaticImageData } from 'next/image';
 import type { BlogPost } from '../actions/blogActions';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Blog categories
 const blogCategories = [
@@ -97,18 +97,13 @@ function ImageWithFallback({
 // Interface for optional navigation props
 interface BlogListProps {
   blogPosts: BlogPost[];
-  onSelectPost?: (slug: string) => void;
-  onNavigateHome?: () => void;
   initialTag?: string;
 }
 
 export default function BlogList({
   blogPosts,
-  onSelectPost,
-  onNavigateHome,
   initialTag,
 }: BlogListProps) {
-  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTag, setSelectedTag] = useState<string | null>(
@@ -117,7 +112,6 @@ export default function BlogList({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>(
     'newest',
   );
-  const [isLoading, setIsLoading] = useState(false);
 
   // Get all unique tags from blog posts
   const allTags = useMemo(() => {
@@ -141,23 +135,15 @@ export default function BlogList({
     setSelectedTag(null);
   };
 
-  // Handle post selection - use prop if provided, otherwise use router
-  const handleSelectPost = (slug: string) => {
-    setIsLoading(true);
-    if (onSelectPost) {
-      onSelectPost(slug);
-    } else {
-      router.push(`/blog/${slug}`);
-    }
-  };
-
   const filteredPosts = useMemo(() => {
     let posts = blogPosts;
 
     // Filter by tag first if selected
     if (selectedTag) {
       posts = posts.filter((post) =>
-        post.tags.some((tag) => tag.toLowerCase() === selectedTag.toLowerCase()),
+        post.tags.some(
+          (tag) => tag.toLowerCase() === selectedTag.toLowerCase(),
+        ),
       );
     } else if (searchQuery) {
       posts = searchBlogPosts(posts, searchQuery);
@@ -461,101 +447,103 @@ export default function BlogList({
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {featuredPosts.map((post, index) => (
-                <Card
+                <Link
                   key={post.id}
-                  className="group cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20"
-                  onClick={() => handleSelectPost(post.slug)}
+                  href={`/blog/${post.slug}`}
+                  className="block"
                 >
-                  <div className="relative overflow-hidden">
-                    <ImageWithFallback
-                      src={post.image}
-                      alt={post.title}
-                      className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
-                    />
-                    <div className="absolute left-4 top-4">
-                      <Badge className="bg-blue-600 px-3 py-1 text-xs text-white sm:text-sm">
-                        Featured
-                      </Badge>
-                    </div>
-                    <div className="absolute right-4 top-4">
-                      <div className="rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-                        <span className="text-xs text-white">{index + 1}</span>
+                  <Card className="group h-full cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
+                    <div className="relative overflow-hidden">
+                      <ImageWithFallback
+                        src={post.image}
+                        alt={post.title}
+                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
+                      />
+                      <div className="absolute left-4 top-4">
+                        <Badge className="bg-blue-600 px-3 py-1 text-xs text-white sm:text-sm">
+                          Featured
+                        </Badge>
                       </div>
-                    </div>
-                  </div>
-
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {formatDate(post.publishDate)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {post.readTime} min
-                      </span>
-                    </div>
-
-                    <h3 className="mb-3 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
-                      {post.title}
-                    </h3>
-
-                    <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
-                      {post.excerpt}
-                    </p>
-
-                    {/* Tags */}
-                    {post.tags.length > 0 && (
-                      <div className="mb-4 flex flex-wrap gap-1.5">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
-                              selectedTag === tag
-                                ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                                : 'text-slate-300'
-                            }`}
-                            onClick={(e) => handleTagClick(tag, e)}
-                          >
-                            <Tag className="mr-1 h-2.5 w-2.5" />
-                            {tag}
-                          </Badge>
-                        ))}
-                        {post.tags.length > 3 && (
-                          <span className="text-xs text-slate-500">
-                            +{post.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 sm:gap-3">
-                        <ImageWithFallback
-                          src={post.author.avatar}
-                          alt={post.author.name}
-                          className="h-8 w-8 rounded-full"
-                        />
-                        <div>
-                          <p className="text-sm text-white">
-                            {post.author.name}
-                          </p>
-                          <p className="text-xs text-slate-400">
-                            {post.author.role}
-                          </p>
+                      <div className="absolute right-4 top-4">
+                        <div className="rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
+                          <span className="text-xs text-white">{index + 1}</span>
                         </div>
                       </div>
-
-                      <Badge
-                        variant="secondary"
-                        className="bg-slate-700 text-xs text-slate-300"
-                      >
-                        {post.category}
-                      </Badge>
                     </div>
-                  </CardContent>
-                </Card>
+
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                          {formatDate(post.publishDate)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                          {post.readTime} min
+                        </span>
+                      </div>
+
+                      <h3 className="mb-3 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
+                        {post.title}
+                      </h3>
+
+                      <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
+                        {post.excerpt}
+                      </p>
+
+                      {/* Tags */}
+                      {post.tags.length > 0 && (
+                        <div className="mb-4 flex flex-wrap gap-1.5">
+                          {post.tags.slice(0, 3).map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
+                                selectedTag === tag
+                                  ? 'border-blue-500 bg-blue-600/20 text-blue-400'
+                                  : 'text-slate-300'
+                              }`}
+                              onClick={(e) => handleTagClick(tag, e)}
+                            >
+                              <Tag className="mr-1 h-2.5 w-2.5" />
+                              {tag}
+                            </Badge>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="text-xs text-slate-500">
+                              +{post.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <ImageWithFallback
+                            src={post.author.avatar}
+                            alt={post.author.name}
+                            className="h-8 w-8 rounded-full"
+                          />
+                          <div>
+                            <p className="text-sm text-white">
+                              {post.author.name}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {post.author.role}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Badge
+                          variant="secondary"
+                          className="bg-slate-700 text-xs text-slate-300"
+                        >
+                          {post.category}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>
@@ -584,98 +572,100 @@ export default function BlogList({
           {filteredPosts.length > 0 ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {filteredPosts.map((post) => (
-                <Card
+                <Link
                   key={post.id}
-                  className="group cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20"
-                  onClick={() => handleSelectPost(post.slug)}
+                  href={`/blog/${post.slug}`}
+                  className="block"
                 >
-                  <div className="relative overflow-hidden">
-                    <ImageWithFallback
-                      src={post.image}
-                      alt={post.title}
-                      className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
-                    />
-                    {post.featured && (
-                      <div className="absolute left-4 top-4">
-                        <Badge className="bg-blue-600 text-xs text-white">
-                          Featured
+                  <Card className="group h-full cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
+                    <div className="relative overflow-hidden">
+                      <ImageWithFallback
+                        src={post.image}
+                        alt={post.title}
+                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
+                      />
+                      {post.featured && (
+                        <div className="absolute left-4 top-4">
+                          <Badge className="bg-blue-600 text-xs text-white">
+                            Featured
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+                          {formatDate(post.publishDate)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+                          {post.readTime} min
+                        </span>
+                      </div>
+
+                      <h3 className="mb-3 line-clamp-2 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
+                        {post.title}
+                      </h3>
+
+                      <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
+                        {post.excerpt}
+                      </p>
+
+                      {/* Tags */}
+                      {post.tags.length > 0 && (
+                        <div className="mb-4 flex flex-wrap gap-1.5">
+                          {post.tags.slice(0, 3).map((tag) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
+                                selectedTag === tag
+                                  ? 'border-blue-500 bg-blue-600/20 text-blue-400'
+                                  : 'text-slate-300'
+                              }`}
+                              onClick={(e) => handleTagClick(tag, e)}
+                            >
+                              <Tag className="mr-1 h-2.5 w-2.5" />
+                              {tag}
+                            </Badge>
+                          ))}
+                          {post.tags.length > 3 && (
+                            <span className="text-xs text-slate-500">
+                              +{post.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <ImageWithFallback
+                            src={post.author.avatar}
+                            alt={post.author.name}
+                            className="h-8 w-8 rounded-full"
+                          />
+                          <div>
+                            <p className="text-sm text-white">
+                              {post.author.name}
+                            </p>
+                            <p className="text-xs text-slate-400">
+                              {post.author.role}
+                            </p>
+                          </div>
+                        </div>
+
+                        <Badge
+                          variant="secondary"
+                          className="bg-slate-700 text-xs text-slate-300"
+                        >
+                          {post.category}
                         </Badge>
                       </div>
-                    )}
-                  </div>
-
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {formatDate(post.publishDate)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                        {post.readTime} min
-                      </span>
-                    </div>
-
-                    <h3 className="mb-3 line-clamp-2 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
-                      {post.title}
-                    </h3>
-
-                    <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
-                      {post.excerpt}
-                    </p>
-
-                    {/* Tags */}
-                    {post.tags.length > 0 && (
-                      <div className="mb-4 flex flex-wrap gap-1.5">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
-                              selectedTag === tag
-                                ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                                : 'text-slate-300'
-                            }`}
-                            onClick={(e) => handleTagClick(tag, e)}
-                          >
-                            <Tag className="mr-1 h-2.5 w-2.5" />
-                            {tag}
-                          </Badge>
-                        ))}
-                        {post.tags.length > 3 && (
-                          <span className="text-xs text-slate-500">
-                            +{post.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <ImageWithFallback
-                          src={post.author.avatar}
-                          alt={post.author.name}
-                          className="h-8 w-8 rounded-full"
-                        />
-                        <div>
-                          <p className="text-sm text-white">
-                            {post.author.name}
-                          </p>
-                          <p className="text-xs text-slate-400">
-                            {post.author.role}
-                          </p>
-                        </div>
-                      </div>
-
-                      <Badge
-                        variant="secondary"
-                        className="bg-slate-700 text-xs text-slate-300"
-                      >
-                        {post.category}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (

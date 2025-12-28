@@ -1,6 +1,6 @@
 import { Metadata, Viewport } from 'next';
 
-const baseUrl = 'https://sureimports.com';
+const baseUrl = 'https://www.sureimports.com';
 const siteName = 'Sure Imports';
 
 // Default SEO configuration
@@ -164,7 +164,7 @@ export const pageSEO = {
 // Helper function to generate page metadata
 export function generatePageMetadata(
   page: keyof typeof pageSEO,
-  additionalMeta?: Partial<Metadata>
+  additionalMeta?: Partial<Metadata>,
 ): Metadata {
   const pageConfig = pageSEO[page];
 

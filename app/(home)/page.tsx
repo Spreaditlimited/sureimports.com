@@ -2,10 +2,7 @@ import * as React from 'react';
 import Home from './components/Home';
 import type { Metadata } from 'next';
 import { JsonLdScript } from '@/components/seo/JsonLd';
-import {
-  generateBreadcrumbSchema,
-  generateFAQSchema,
-} from '@/lib/seo/schema';
+import { generateBreadcrumbSchema, generateFAQSchema } from '@/lib/seo/schema';
 
 const baseUrl = 'https://sureimports.com';
 
@@ -51,9 +48,7 @@ export const metadata: Metadata = {
 };
 
 // Home page breadcrumb
-const homeBreadcrumb = generateBreadcrumbSchema([
-  { name: 'Home', url: '/' },
-]);
+const homeBreadcrumb = generateBreadcrumbSchema([{ name: 'Home', url: '/' }]);
 
 // FAQ Schema for home page
 const homeFAQ = generateFAQSchema([

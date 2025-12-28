@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   ArrowLeft,
   Calendar,
@@ -16,6 +16,7 @@ import { Card, CardContent } from './ui/card';
 import { Separator } from './ui/separator';
 import type { BlogPost } from '../actions/blogActions';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 // Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
 const ImageWithFallback = ({
@@ -43,154 +44,25 @@ const ImageWithFallback = ({
   );
 };
 
-export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([]);
-  const [loading, setLoading] = useState(true);
+interface BlogDetailProps {
+  post: BlogPost;
+  relatedPosts?: BlogPost[];
+  onBack?: () => void;
+  onSelectPost?: (slug: string) => void;
+}
+
+export default function BlogDetail({
+  post,
+  relatedPosts = [],
+  onBack,
+  onSelectPost,
+}: BlogDetailProps) {
   const router = useRouter();
 
   // Fallback handlers if none provided
   const handleBackClick = onBack ?? (() => router.back());
   const handleSelectPostClick =
     onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
-
-  useEffect(() => {
-    async function fetchBlog() {
-      try {
-        setLoading(true);
-        // Fetch the blog post
-        const response = await fetch(
-          `/api/crud/blog/fetch-single?slug=${slug}`,
-        );
-        const data = await response.json();
-
-        if (data.success && data.data) {
-          // Transform the database blog to BlogPost format
-          const dbBlog = data.data;
-
-          const excerpt = dbBlog.blogContent
-            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) +
-              '...'
-            : 'No excerpt available';
-
-          const wordCount = dbBlog.blogContent
-            ? dbBlog.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
-            : 0;
-          const readTime = Math.ceil(wordCount / 200);
-
-          const imageUrl = dbBlog.blogImage
-            ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${dbBlog.blogImage}`
-            : '/images/new/images/logo.png';
-
-          let tags: string[] = [];
-          let category = 'Import Guide';
-
-          try {
-            if (dbBlog.blogExt2) {
-              const metadata = JSON.parse(dbBlog.blogExt2);
-              if (metadata.tags) tags = metadata.tags;
-              if (metadata.category) category = metadata.category;
-            }
-          } catch {
-            tags = ['Import Guide'];
-          }
-
-          const transformedPost: BlogPost = {
-            id: dbBlog.pidBlog,
-            title: dbBlog.blogTitle,
-            excerpt,
-            content: dbBlog.blogContent || '',
-            author: {
-              name: dbBlog.blogBy || 'Admin',
-              avatar: '/images/new/images/ijeoma-tdaniels.JPG',
-              role: 'Content Lead',
-            },
-            category,
-            tags,
-            publishDate: dbBlog.createdAt
-              ? new Date(dbBlog.createdAt).toISOString().split('T')[0]
-              : new Date().toISOString().split('T')[0],
-            readTime: readTime > 0 ? readTime : 5,
-            featured: false,
-            image: imageUrl,
-            slug: dbBlog.blogSlug || dbBlog.pidBlog,
-          };
-
-          setPost(transformedPost);
-
-          // Fetch all blogs for related posts
-          const allResponse = await fetch(
-            '/api/crud/blog/fetch?status=published&limit=100',
-          );
-          const allData = await allResponse.json();
-
-          if (allData.success && allData.data) {
-            const allPosts = allData.data.map((b: any) => {
-              let postCategory = 'Import Guide';
-              try {
-                if (b.blogExt2) {
-                  const meta = JSON.parse(b.blogExt2);
-                  if (meta.category) postCategory = meta.category;
-                }
-              } catch {}
-              return { ...b, category: postCategory };
-            });
-
-            const related = allPosts
-              .filter(
-                (p: any) =>
-                  p.category === category && p.pidBlog !== dbBlog.pidBlog,
-              )
-              .slice(0, 3)
-              .map((b: any) => {
-                const ex = b.blogContent
-                  ? b.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) +
-                    '...'
-                  : 'No excerpt available';
-                const wc = b.blogContent
-                  ? b.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
-                  : 0;
-                const rt = Math.ceil(wc / 200);
-                const img = b.blogImage
-                  ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${b.blogImage}`
-                  : '/images/new/images/logo.png';
-
-                return {
-                  id: b.pidBlog,
-                  title: b.blogTitle,
-                  excerpt: ex,
-                  content: b.blogContent || '',
-                  author: {
-                    name: b.blogBy || 'Admin',
-                    avatar: '/images/new/images/ijeoma-tdaniels.JPG',
-                    role: 'Content Lead',
-                  },
-                  category: b.category,
-                  tags: [],
-                  publishDate: b.createdAt
-                    ? new Date(b.createdAt).toISOString().split('T')[0]
-                    : new Date().toISOString().split('T')[0],
-                  readTime: rt > 0 ? rt : 5,
-                  featured: false,
-                  image: img,
-                  slug: b.blogSlug || b.pidBlog,
-                };
-              });
-
-            setRelatedPosts(related);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching blog:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (slug) {
-      fetchBlog();
-    }
-  }, [slug]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -218,33 +90,6 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-blue-400"></div>
-          <p className="text-slate-300">Loading article...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!post) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900">
-        <div className="text-center">
-          <h1 className="mb-4 text-2xl text-white">Article not found</h1>
-          <Button asChild className="bg-blue-600 text-white hover:bg-blue-700">
-            <a href="/blog">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Blog
-            </a>
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   // Check if content is HTML
   const isHtmlContent = (content: string) => {
     return /<[a-z][\s\S]*>/i.test(content);
@@ -255,14 +100,13 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
       {/* Header */}
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Button
-            onClick={handleBackClick}
-            variant="ghost"
-            className="mb-6 text-slate-300 hover:bg-white/10 hover:text-white"
+          <Link
+            href="/blog"
+            className="mb-6 inline-flex items-center text-slate-300 hover:text-white transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Blog
-          </Button>
+          </Link>
         </div>
       </div>
 
@@ -339,16 +183,12 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
           </div>
 
           {/* Tags */}
-          {post.tags.length > 0 && (
+          {post.tags && post.tags.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
-                <a
+                <Link
                   key={tag}
                   href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(`/blog?tag=${encodeURIComponent(tag)}`);
-                  }}
                   className="inline-block"
                 >
                   <Badge
@@ -358,7 +198,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                     <Tag className="mr-1 h-3 w-3" />
                     {tag}
                   </Badge>
-                </a>
+                </Link>
               ))}
             </div>
           )}
@@ -506,17 +346,13 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
 
         {/* Article Footer */}
         <footer className="mt-12 border-t border-slate-700 pt-8">
-          {post.tags.length > 0 && (
+          {post.tags && post.tags.length > 0 && (
             <div className="mb-6 flex flex-wrap items-center gap-2">
               <span className="text-slate-400">Tagged with:</span>
               {post.tags.map((tag) => (
-                <a
+                <Link
                   key={tag}
                   href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(`/blog?tag=${encodeURIComponent(tag)}`);
-                  }}
                   className="inline-block"
                 >
                   <Badge
@@ -526,7 +362,7 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
                     <Tag className="mr-1 h-3 w-3" />
                     {tag}
                   </Badge>
-                </a>
+                </Link>
               ))}
             </div>
           )}
@@ -571,59 +407,61 @@ export default function BlogDetail({ slug, onBack, onSelectPost }: any) {
 
             <div className="grid gap-8 md:grid-cols-3">
               {relatedPosts.map((relatedPost) => (
-                <Card
+                <Link
                   key={relatedPost.id}
-                  className="group cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20"
-                  onClick={() => handleSelectPostClick(relatedPost.slug)}
+                  href={`/blog/${relatedPost.slug}`}
+                  className="block"
                 >
-                  <div className="relative overflow-hidden rounded-t-lg">
-                    <ImageWithFallback
-                      src={relatedPost.image}
-                      alt={relatedPost.title}
-                      className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  </div>
-
-                  <CardContent className="p-6">
-                    <div className="mb-3 flex items-center gap-4 text-sm text-slate-400">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(relatedPost.publishDate)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {relatedPost.readTime} min read
-                      </span>
+                  <Card className="group cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20 h-full">
+                    <div className="relative overflow-hidden rounded-t-lg">
+                      <ImageWithFallback
+                        src={relatedPost.image}
+                        alt={relatedPost.title}
+                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
                     </div>
 
-                    <h3 className="mb-3 line-clamp-2 text-lg text-white transition-colors group-hover:text-blue-400">
-                      {relatedPost.title}
-                    </h3>
-
-                    <p className="mb-4 line-clamp-3 text-sm text-slate-300">
-                      {relatedPost.excerpt}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <ImageWithFallback
-                          src={relatedPost.author.avatar}
-                          alt={relatedPost.author.name}
-                          className="h-6 w-6 rounded-full"
-                        />
-                        <span className="text-xs text-slate-400">
-                          {relatedPost.author.name}
+                    <CardContent className="p-6">
+                      <div className="mb-3 flex items-center gap-4 text-sm text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {formatDate(relatedPost.publishDate)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {relatedPost.readTime} min read
                         </span>
                       </div>
-                      <Badge
-                        variant="secondary"
-                        className="bg-slate-700 text-xs text-slate-300"
-                      >
-                        {relatedPost.category}
-                      </Badge>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                      <h3 className="mb-3 line-clamp-2 text-lg text-white transition-colors group-hover:text-blue-400">
+                        {relatedPost.title}
+                      </h3>
+
+                      <p className="mb-4 line-clamp-3 text-sm text-slate-300">
+                        {relatedPost.excerpt}
+                      </p>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <ImageWithFallback
+                            src={relatedPost.author.avatar}
+                            alt={relatedPost.author.name}
+                            className="h-6 w-6 rounded-full"
+                          />
+                          <span className="text-xs text-slate-400">
+                            {relatedPost.author.name}
+                          </span>
+                        </div>
+                        <Badge
+                          variant="secondary"
+                          className="bg-slate-700 text-xs text-slate-300"
+                        >
+                          {relatedPost.category}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>

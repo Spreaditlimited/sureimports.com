@@ -7,7 +7,7 @@ interface BlogForSitemap {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://sureimports.com';
+  const baseUrl = 'https://www.sureimports.com';
   const currentDate = new Date().toISOString();
 
   // Static pages
@@ -86,7 +86,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const blogs = await prisma.blog.findMany({
       where: {
         blogPublished: true,
-        xStaus: '1',
+        xStaus: 'active',
       },
       select: {
         blogSlug: true,
@@ -98,7 +98,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
 
     blogPages = blogs
-      .filter((blog: BlogForSitemap) => blog.blogSlug && blog.blogSlug.length > 0)
+      .filter(
+        (blog: BlogForSitemap) => blog.blogSlug && blog.blogSlug.length > 0,
+      )
       .map((blog: BlogForSitemap) => ({
         url: `${baseUrl}/blog/${blog.blogSlug}`,
         lastModified: blog.createdAt?.toISOString() || currentDate,

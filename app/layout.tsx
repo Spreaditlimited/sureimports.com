@@ -6,15 +6,18 @@ import { AuthProvider } from '@/app/context/AuthContext';
 import { Suspense } from 'react';
 import { FacebookPixel } from '@/components/FacebookPixel';
 import { Analytics } from '@/components/GoogleAnalytics';
-import GoogleTag from '@/components/GoogleTag';
 import Loading from './dashboard/loading';
 import LiveChat from '@/components/LiveChat';
 import { JsonLdScript } from '@/components/seo/JsonLd';
-import { organizationSchema, websiteSchema, serviceSchema } from '@/lib/seo/schema';
+import {
+  organizationSchema,
+  websiteSchema,
+  serviceSchema,
+} from '@/lib/seo/schema';
 
 const inter = Inter({ subsets: ['latin'] });
 
-const baseUrl = 'https://sureimports.com';
+const baseUrl = 'https://www.sureimports.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -167,7 +170,6 @@ export default async function RootLayout({
               <script src="https://checkout.flutterwave.com/v3.js"></script>
               <FacebookPixel />
               <Analytics />
-              <GoogleTag />
               <Toaster />
             </Suspense>
           </body>

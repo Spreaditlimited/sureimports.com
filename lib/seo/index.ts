@@ -1,5 +1,11 @@
 // SEO exports for easy importing
-export { defaultSEO, defaultViewport, pageSEO, generatePageMetadata, generateBlogMetadata } from './config';
+export {
+  defaultSEO,
+  defaultViewport,
+  pageSEO,
+  generatePageMetadata,
+  generateBlogMetadata,
+} from './config';
 export {
   organizationSchema,
   websiteSchema,

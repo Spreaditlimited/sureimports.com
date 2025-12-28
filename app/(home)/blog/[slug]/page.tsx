@@ -13,7 +13,7 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sureimports.com';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
 
 export async function generateStaticParams() {
   const blogPosts = await fetchPublishedBlogs();
@@ -48,7 +48,11 @@ export async function generateMetadata({
     ? seo.keywords
     : post.tags?.length
       ? post.tags
-      : ['import from china', 'china imports', post.category?.toLowerCase()].filter(Boolean);
+      : [
+          'import from china',
+          'china imports',
+          post.category?.toLowerCase(),
+        ].filter(Boolean);
   const canonicalUrl = seo.canonicalUrl || `${SITE_URL}/blog/${slug}`;
 
   // Open Graph values
@@ -82,7 +86,10 @@ export async function generateMetadata({
 
   return {
     title: `${title} | Sure Imports`,
-    description: description.length > 160 ? description.slice(0, 157) + '...' : description,
+    description:
+      description.length > 160
+        ? description.slice(0, 157) + '...'
+        : description,
     keywords: keywordsArray,
     authors: [{ name: post.author.name, url: SITE_URL }],
     creator: post.author.name,
@@ -122,7 +129,9 @@ export async function generateMetadata({
       description: twitterDescription,
       images: [
         {
-          url: twitterImage.startsWith('http') ? twitterImage : `${SITE_URL}${twitterImage}`,
+          url: twitterImage.startsWith('http')
+            ? twitterImage
+            : `${SITE_URL}${twitterImage}`,
           alt: twitterTitle,
         },
       ],
@@ -193,7 +202,8 @@ export default async function BlogDetailsPage({ params }: PageProps) {
       '@type': 'WebPage',
       '@id': canonicalUrl,
     },
-    keywords: seo.keywords?.join(', ') || post.tags?.join(', ') || 'import from china',
+    keywords:
+      seo.keywords?.join(', ') || post.tags?.join(', ') || 'import from china',
     articleSection: post.category || 'Import Guide',
     articleBody: plainTextContent.slice(0, 500),
     wordCount: wordCount,
@@ -264,6 +274,12 @@ export default async function BlogDetailsPage({ params }: PageProps) {
     },
   };
 
+  // Fetch related posts for passing to the component
+  const allPosts = await fetchPublishedBlogs();
+  const relatedPosts = allPosts
+    .filter((p) => p.category === post.category && p.id !== post.id)
+    .slice(0, 3);
+
   return (
     <>
       {/* JSON-LD Structured Data */}
@@ -285,7 +301,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
 
       <Header />
       <main className="min-h-screen">
-        <BlogDetail slug={slug} />
+        <BlogDetail post={post} relatedPosts={relatedPosts} />
       </main>
       <Footer />
     </>
