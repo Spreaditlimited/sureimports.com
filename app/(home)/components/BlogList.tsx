@@ -100,10 +100,7 @@ interface BlogListProps {
   initialTag?: string;
 }
 
-export default function BlogList({
-  blogPosts,
-  initialTag,
-}: BlogListProps) {
+export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTag, setSelectedTag] = useState<string | null>(
@@ -466,7 +463,9 @@ export default function BlogList({
                       </div>
                       <div className="absolute right-4 top-4">
                         <div className="rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-                          <span className="text-xs text-white">{index + 1}</span>
+                          <span className="text-xs text-white">
+                            {index + 1}
+                          </span>
                         </div>
                       </div>
                     </div>

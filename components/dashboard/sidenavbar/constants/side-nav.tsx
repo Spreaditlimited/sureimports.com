@@ -69,10 +69,16 @@ export const NavItems: NavItem[] = [
   //   href: '/dashboard/store?id=laptop',
   //   color: 'text-white',
   // },
-  {
-    title: 'Special Sourcing',
+  // {
+  //   title: 'Special Sourcing',
+  //   icon: Search,
+  //   href: '/dashboard/special-sourcing/pending',
+  //   color: 'text-white',
+  // },
+    {
+    title: 'LineScout',
     icon: Search,
-    href: '/dashboard/special-sourcing/pending',
+    href: 'https://linescout.sureimports.com/',
     color: 'text-white',
   },
   {
@@ -162,10 +168,16 @@ export const MobileNavItems: NavItem[] = [
   //   href: '/dashboard/store?id=laptop',
   //   color: 'text-white',
   // },
+  // {
+  //   title: 'Special Sourcing',
+  //   icon: Search,
+  //   href: '/dashboard/special-sourcing/pending',
+  //   color: 'text-white',
+  // },
   {
-    title: 'Special Sourcing',
+    title: 'LineScout',
     icon: Search,
-    href: '/dashboard/special-sourcing/pending',
+    href: 'https://linescout.sureimports.com/',
     color: 'text-white',
   },
   {

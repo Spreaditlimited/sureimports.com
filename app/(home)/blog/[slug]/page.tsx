@@ -13,7 +13,8 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
 
 export async function generateStaticParams() {
   const blogPosts = await fetchPublishedBlogs();

@@ -102,7 +102,7 @@ export default function BlogDetail({
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <Link
             href="/blog"
-            className="mb-6 inline-flex items-center text-slate-300 hover:text-white transition-colors"
+            className="mb-6 inline-flex items-center text-slate-300 transition-colors hover:text-white"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Blog
@@ -412,7 +412,7 @@ export default function BlogDetail({
                   href={`/blog/${relatedPost.slug}`}
                   className="block"
                 >
-                  <Card className="group cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20 h-full">
+                  <Card className="group h-full cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
                     <div className="relative overflow-hidden rounded-t-lg">
                       <ImageWithFallback
                         src={relatedPost.image}
