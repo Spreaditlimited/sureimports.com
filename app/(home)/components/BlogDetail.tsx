@@ -1,15 +1,6 @@
 'use client';
 import { useState } from 'react';
-import {
-  ArrowLeft,
-  Calendar,
-  Clock,
-  User,
-  Tag,
-  Share2,
-  BookOpen,
-  Eye,
-} from 'lucide-react';
+import { Calendar, Clock, Tag, Share2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
@@ -96,20 +87,7 @@ export default function BlogDetail({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-8">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/blog"
-            className="mb-6 inline-flex items-center text-slate-300 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Blog
-          </Link>
-        </div>
-      </div>
-
+    <div className="bg-slate-900">
       {/* Article Content */}
       <article className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Hero Image */}

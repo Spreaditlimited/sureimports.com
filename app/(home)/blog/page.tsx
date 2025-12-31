@@ -1,6 +1,7 @@
 import BlogList from '../components/BlogList';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
+import BlogBreadcrumb from '@/app/(home)/components/BlogBreadcrumb';
 import type { Metadata } from 'next';
 import { fetchPublishedBlogs } from '../actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
@@ -65,7 +66,11 @@ const Page = async ({ searchParams }: PageProps) => {
     <>
       <JsonLdScript data={blogBreadcrumbSchema} />
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-slate-900">
+        {/* Visual Breadcrumb Navigation */}
+        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
+          <BlogBreadcrumb items={[{ label: 'Blog' }]} />
+        </div>
         <BlogList blogPosts={blogPosts} initialTag={tag} />
       </main>
       <Footer />

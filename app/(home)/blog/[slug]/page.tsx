@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import BlogDetail from '@/app/(home)/components/BlogDetail';
+import BlogBreadcrumb from '@/app/(home)/components/BlogBreadcrumb';
 import {
   fetchPublishedBlogs,
   fetchBlogBySlug,
@@ -301,7 +302,20 @@ export default async function BlogDetailsPage({ params }: PageProps) {
       />
 
       <Header />
-      <main className="min-h-screen">
+      <main className="min-h-screen bg-slate-900">
+        {/* Visual Breadcrumb Navigation */}
+        <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
+          <BlogBreadcrumb
+            items={[
+              { label: 'Blog', href: '/blog' },
+              {
+                label: post.category || 'Article',
+                href: `/blog?category=${encodeURIComponent(post.category || 'all')}`,
+              },
+              { label: post.title },
+            ]}
+          />
+        </div>
         <BlogDetail post={post} relatedPosts={relatedPosts} />
       </main>
       <Footer />
