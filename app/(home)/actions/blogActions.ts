@@ -222,7 +222,9 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
     }
 
     // Remove leading slash if present to avoid double slashes
-    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+    const cleanPath = imagePath.startsWith('/')
+      ? imagePath.slice(1)
+      : imagePath;
 
     // Use the R2_PUBLIC_URL constant (with fallback already defined)
     const r2BaseUrl = R2_PUBLIC_URL.replace(/\/$/, '');
@@ -241,16 +243,20 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
         publisherRole: dbBlog.publisher.publisherRole || undefined,
         publisherImage: getR2ImageUrl(dbBlog.publisher.publisherImage),
         publisherSocialX: dbBlog.publisher.publisherSocialX || undefined,
-        publisherSocialLinkedin: dbBlog.publisher.publisherSocialLinkedin || undefined,
-        publisherSocialFacebook: dbBlog.publisher.publisherSocialFacebook || undefined,
-        publisherSocialInstagram: dbBlog.publisher.publisherSocialInstagram || undefined,
+        publisherSocialLinkedin:
+          dbBlog.publisher.publisherSocialLinkedin || undefined,
+        publisherSocialFacebook:
+          dbBlog.publisher.publisherSocialFacebook || undefined,
+        publisherSocialInstagram:
+          dbBlog.publisher.publisherSocialInstagram || undefined,
         publisherWebsite: dbBlog.publisher.publisherWebsite || undefined,
       }
     : undefined;
 
   // Author data derived from publisher (primary) or blogBy field (fallback)
   const authorName = publisher?.publisherName || dbBlog.blogBy || 'Admin';
-  const authorAvatar = publisher?.publisherImage || '/images/new/images/default-avatar.png';
+  const authorAvatar =
+    publisher?.publisherImage || '/images/new/images/default-avatar.png';
   const authorRole = publisher?.publisherRole || 'Author';
 
   return {

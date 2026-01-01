@@ -144,6 +144,7 @@ export default function Navigation({
                     </div>
                   </a>
                 </DropdownMenuItem>
+                
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
                     href="https://www.sureimports.com/source-products-from-china"
@@ -161,6 +162,27 @@ export default function Navigation({
                       <span className="mt-1 text-xs text-gray-400">
                         Custom product sourcing and supplier verification
                         services
+                      </span>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
+                    href="https://linescout.sureimports.com/"
+                    //target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-start space-x-3"
+                  >
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-blue-600">
+                      <span className="text-xs font-bold text-white">✨</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        LineScout
+                      </span>
+                      <span className="mt-1 text-xs text-gray-400">
+                       Clear guidance for machines and equipment sourcing from China to Nigeria
                       </span>
                     </div>
                   </a>
@@ -353,6 +375,26 @@ export default function Navigation({
                     </span>
                   </div>
                 </a>
+
+                                <a
+                  href="https://linescout.sureimports.com/"
+                  //target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start space-x-3 text-gray-400 transition-colors duration-200 hover:text-blue-400"
+                >
+                  <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-green-500 to-blue-600">
+                    <span className="text-xs text-white">✨</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-medium">
+                      LineScout
+                    </span>
+                    <span className="mt-1 text-xs text-gray-500">
+                      Clear guidance for machines and equipment sourcing from China to Nigeria.
+                    </span>
+                  </div>
+                </a>
+
               </div>
             </div>
             <div className="space-y-2">

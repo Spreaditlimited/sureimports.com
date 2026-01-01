@@ -1,6 +1,15 @@
 'use client';
 import { useState } from 'react';
-import { Calendar, Clock, Tag, Share2, Globe, Linkedin, Facebook, Instagram } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Tag,
+  Share2,
+  Globe,
+  Linkedin,
+  Facebook,
+  Instagram,
+} from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
@@ -20,9 +29,21 @@ const XIcon = ({ className }: { className?: string }) => (
 const PublisherSocialLinks = ({ publisher }: { publisher: BlogPublisher }) => {
   const socialLinks = [
     { url: publisher.publisherSocialX, icon: XIcon, label: 'X (Twitter)' },
-    { url: publisher.publisherSocialLinkedin, icon: Linkedin, label: 'LinkedIn' },
-    { url: publisher.publisherSocialFacebook, icon: Facebook, label: 'Facebook' },
-    { url: publisher.publisherSocialInstagram, icon: Instagram, label: 'Instagram' },
+    {
+      url: publisher.publisherSocialLinkedin,
+      icon: Linkedin,
+      label: 'LinkedIn',
+    },
+    {
+      url: publisher.publisherSocialFacebook,
+      icon: Facebook,
+      label: 'Facebook',
+    },
+    {
+      url: publisher.publisherSocialInstagram,
+      icon: Instagram,
+      label: 'Instagram',
+    },
     { url: publisher.publisherWebsite, icon: Globe, label: 'Website' },
   ].filter((link) => link.url);
 
@@ -401,7 +422,9 @@ export default function BlogDetail({
                     {post.publisher.publisherBio}
                   </p>
                 )}
-                {post.publisher && <PublisherSocialLinks publisher={post.publisher} />}
+                {post.publisher && (
+                  <PublisherSocialLinks publisher={post.publisher} />
+                )}
               </div>
             </div>
           </div>
