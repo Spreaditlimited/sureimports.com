@@ -2,6 +2,11 @@
 
 import { prisma } from '@/lib/prisma';
 
+// R2 public URL for serving images
+const R2_PUBLIC_URL =
+  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
+  'https://pub-0ae42e0c83e848408ac329e6ca048bc2.r2.dev';
+
 // SEO metadata interface
 export interface BlogSEO {
   // General SEO
@@ -27,6 +32,21 @@ export interface BlogSEO {
   featured?: boolean;
 }
 
+export interface BlogPublisher {
+  pidPublisher: string;
+  publisherName: string;
+  publisherSlug?: string;
+  publisherEmail?: string;
+  publisherBio?: string;
+  publisherRole?: string;
+  publisherImage?: string;
+  publisherSocialX?: string;
+  publisherSocialLinkedin?: string;
+  publisherSocialFacebook?: string;
+  publisherSocialInstagram?: string;
+  publisherWebsite?: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -37,6 +57,7 @@ export interface BlogPost {
     avatar: string;
     role: string;
   };
+  publisher?: BlogPublisher;
   category: string;
   tags: string[];
   publishDate: string;
@@ -45,6 +66,22 @@ export interface BlogPost {
   image: string;
   slug: string;
   seo?: BlogSEO;
+}
+
+// Database publisher model
+interface DbPublisher {
+  pidPublisher: string;
+  publisherName: string;
+  publisherSlug: string | null;
+  publisherEmail: string | null;
+  publisherBio: string | null;
+  publisherRole: string | null;
+  publisherImage: string | null;
+  publisherSocialX: string | null;
+  publisherSocialLinkedin: string | null;
+  publisherSocialFacebook: string | null;
+  publisherSocialInstagram: string | null;
+  publisherWebsite: string | null;
 }
 
 // Database blog model
@@ -60,6 +97,8 @@ interface DbBlog {
   blogCategory?: string | null;
   blogImage: string | null;
   blogBy: string | null;
+  publisherId: string | null;
+  publisher?: DbPublisher | null;
   blogExt1: string | null;
   blogExt2: string | null;
   xStaus: string | null;
@@ -170,8 +209,49 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
 
   // Get image URL
   const imageUrl = dbBlog.blogImage
-    ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${dbBlog.blogImage}`
+    ? `${R2_PUBLIC_URL}/${dbBlog.blogImage}`
     : '/images/new/images/logo.png';
+
+  // Helper to construct R2 image URL - handles various path formats
+  const getR2ImageUrl = (imagePath: string | null): string | undefined => {
+    if (!imagePath) return undefined;
+
+    // If already a full URL, return as-is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+
+    // Remove leading slash if present to avoid double slashes
+    const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
+
+    // Use the R2_PUBLIC_URL constant (with fallback already defined)
+    const r2BaseUrl = R2_PUBLIC_URL.replace(/\/$/, '');
+
+    return `${r2BaseUrl}/${cleanPath}`;
+  };
+
+  // Transform publisher data - use publisher as primary author source
+  const publisher: BlogPublisher | undefined = dbBlog.publisher
+    ? {
+        pidPublisher: dbBlog.publisher.pidPublisher,
+        publisherName: dbBlog.publisher.publisherName,
+        publisherSlug: dbBlog.publisher.publisherSlug || undefined,
+        publisherEmail: dbBlog.publisher.publisherEmail || undefined,
+        publisherBio: dbBlog.publisher.publisherBio || undefined,
+        publisherRole: dbBlog.publisher.publisherRole || undefined,
+        publisherImage: getR2ImageUrl(dbBlog.publisher.publisherImage),
+        publisherSocialX: dbBlog.publisher.publisherSocialX || undefined,
+        publisherSocialLinkedin: dbBlog.publisher.publisherSocialLinkedin || undefined,
+        publisherSocialFacebook: dbBlog.publisher.publisherSocialFacebook || undefined,
+        publisherSocialInstagram: dbBlog.publisher.publisherSocialInstagram || undefined,
+        publisherWebsite: dbBlog.publisher.publisherWebsite || undefined,
+      }
+    : undefined;
+
+  // Author data derived from publisher (primary) or blogBy field (fallback)
+  const authorName = publisher?.publisherName || dbBlog.blogBy || 'Admin';
+  const authorAvatar = publisher?.publisherImage || '/images/new/images/default-avatar.png';
+  const authorRole = publisher?.publisherRole || 'Author';
 
   return {
     id: dbBlog.pidBlog,
@@ -179,10 +259,11 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
     excerpt,
     content: dbBlog.blogContent || '',
     author: {
-      name: dbBlog.blogBy || 'Admin',
-      avatar: '/images/new/images/ijeoma-tdaniels.JPG',
-      role: 'Content Lead',
+      name: authorName,
+      avatar: authorAvatar,
+      role: authorRole,
     },
+    publisher,
     category,
     tags,
     publishDate: dbBlog.createdAt
@@ -203,12 +284,15 @@ export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
         blogPublished: true,
         xStaus: 'active',
       },
+      include: {
+        publisher: true,
+      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return blogs.map(transformBlogPost);
+    return blogs.map((blog) => transformBlogPost(blog as DbBlog));
   } catch (error) {
     console.error('Error fetching blogs:', error);
     return [];
@@ -223,11 +307,14 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
         blogPublished: true,
         xStaus: 'active',
       },
+      include: {
+        publisher: true,
+      },
     });
 
     if (!blog) return null;
 
-    return transformBlogPost(blog);
+    return transformBlogPost(blog as DbBlog);
   } catch (error) {
     console.error('Error fetching blog:', error);
     return null;
@@ -248,12 +335,15 @@ export async function searchBlogs(query: string): Promise<BlogPost[]> {
           { blogCategory: { contains: query, mode: 'insensitive' } },
         ],
       },
+      include: {
+        publisher: true,
+      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return blogs.map(transformBlogPost);
+    return blogs.map((blog) => transformBlogPost(blog as DbBlog));
   } catch (error) {
     console.error('Error searching blogs:', error);
     return [];
@@ -268,12 +358,15 @@ export async function fetchBlogsByTag(tag: string): Promise<BlogPost[]> {
         xStaus: 'active',
         blogTags: { contains: tag, mode: 'insensitive' },
       },
+      include: {
+        publisher: true,
+      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return blogs.map(transformBlogPost);
+    return blogs.map((blog) => transformBlogPost(blog as DbBlog));
   } catch (error) {
     console.error('Error fetching blogs by tag:', error);
     return [];
@@ -290,12 +383,15 @@ export async function fetchBlogsByCategory(
         xStaus: 'active',
         blogCategory: { equals: category, mode: 'insensitive' },
       },
+      include: {
+        publisher: true,
+      },
       orderBy: {
         createdAt: 'desc',
       },
     });
 
-    return blogs.map(transformBlogPost);
+    return blogs.map((blog) => transformBlogPost(blog as DbBlog));
   } catch (error) {
     console.error('Error fetching blogs by category:', error);
     return [];

@@ -1,13 +1,50 @@
 'use client';
 import { useState } from 'react';
-import { Calendar, Clock, Tag, Share2 } from 'lucide-react';
+import { Calendar, Clock, Tag, Share2, Globe, Linkedin, Facebook, Instagram } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Card, CardContent } from './ui/card';
 import { Separator } from './ui/separator';
-import type { BlogPost } from '../actions/blogActions';
+import type { BlogPost, BlogPublisher } from '../actions/blogActions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
+// X (Twitter) icon component
+const XIcon = ({ className }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+  </svg>
+);
+
+// Publisher Social Links Component
+const PublisherSocialLinks = ({ publisher }: { publisher: BlogPublisher }) => {
+  const socialLinks = [
+    { url: publisher.publisherSocialX, icon: XIcon, label: 'X (Twitter)' },
+    { url: publisher.publisherSocialLinkedin, icon: Linkedin, label: 'LinkedIn' },
+    { url: publisher.publisherSocialFacebook, icon: Facebook, label: 'Facebook' },
+    { url: publisher.publisherSocialInstagram, icon: Instagram, label: 'Instagram' },
+    { url: publisher.publisherWebsite, icon: Globe, label: 'Website' },
+  ].filter((link) => link.url);
+
+  if (socialLinks.length === 0) return null;
+
+  return (
+    <div className="mt-3 flex items-center gap-3">
+      {socialLinks.map((link) => (
+        <a
+          key={link.label}
+          href={link.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-slate-400 transition-colors hover:text-blue-400"
+          title={link.label}
+        >
+          <link.icon className="h-5 w-5" />
+        </a>
+      ))}
+    </div>
+  );
+};
 
 // Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
 const ImageWithFallback = ({
@@ -133,13 +170,13 @@ export default function BlogDetail({
             {post.excerpt}
           </p>
 
-          {/* Author and Actions */}
+          {/* Publisher/Author and Actions */}
           <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md sm:flex-row sm:items-center">
             <div className="flex items-center gap-3">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="h-12 w-12 rounded-full"
+                className="h-12 w-12 rounded-full object-cover"
               />
               <div>
                 <p className="text-white">{post.author.name}</p>
@@ -346,26 +383,25 @@ export default function BlogDetail({
           )}
 
           <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="h-16 w-16 rounded-full"
+                className="h-20 w-20 flex-shrink-0 rounded-full object-cover"
               />
-              <div>
+              <div className="flex-1">
                 <h3 className="mb-1 text-lg text-white">
                   About {post.author.name}
                 </h3>
                 <p className="mb-2 text-sm text-slate-300">
                   {post.author.role}
                 </p>
-                <p className="text-sm text-slate-400">
-                  Ijeoma is a content strategist and storyteller who helps
-                  entrepreneurs and brands turn their authentic stories into
-                  powerful growth tools. She blends strategy with creativity,
-                  analyzing backend business operations to craft content that
-                  connects, influences, and inspires.
-                </p>
+                {post.publisher?.publisherBio && (
+                  <p className="text-sm leading-relaxed text-slate-400">
+                    {post.publisher.publisherBio}
+                  </p>
+                )}
+                {post.publisher && <PublisherSocialLinks publisher={post.publisher} />}
               </div>
             </div>
           </div>
