@@ -324,7 +324,10 @@ const NavBar = () => {
 
             <Sheet>
               <SheetTrigger asChild className="m-2 h-10">
-                <Button className="text-white" aria-label="Open navigation menu">
+                <Button
+                  className="text-white"
+                  aria-label="Open navigation menu"
+                >
                   <AlignRight />
                 </Button>
               </SheetTrigger>
@@ -346,7 +349,11 @@ const NavBar = () => {
                   </SheetClose>
 
                   {/* Accordion for expandable sections */}
-                  <Accordion type="single" collapsible className="w-full space-y-1">
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="w-full space-y-1"
+                  >
                     {/* Videos Section */}
                     <AccordionItem value="videos" className="border-none">
                       <AccordionTrigger className="min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline [&[data-state=open]]:bg-white/10">
@@ -398,13 +405,22 @@ const NavBar = () => {
                         className={clsx(
                           'min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline',
                           {
-                            'bg-white/20': pathname.startsWith('/services') ||
-                                          pathname.startsWith('/buy-from-chinese-websites') ||
-                                          pathname.startsWith('/source-products-from-china'),
-                            '[&[data-state=open]]:bg-white/10': !(pathname.startsWith('/services') ||
-                                          pathname.startsWith('/buy-from-chinese-websites') ||
-                                          pathname.startsWith('/source-products-from-china')),
-                          }
+                            'bg-white/20':
+                              pathname.startsWith('/services') ||
+                              pathname.startsWith(
+                                '/buy-from-chinese-websites',
+                              ) ||
+                              pathname.startsWith(
+                                '/source-products-from-china',
+                              ),
+                            '[&[data-state=open]]:bg-white/10': !(
+                              pathname.startsWith('/services') ||
+                              pathname.startsWith(
+                                '/buy-from-chinese-websites',
+                              ) ||
+                              pathname.startsWith('/source-products-from-china')
+                            ),
+                          },
                         )}
                       >
                         Services
@@ -418,7 +434,8 @@ const NavBar = () => {
                                 className={clsx(
                                   'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white',
                                   {
-                                    'bg-white/20 text-white': pathname === component.href,
+                                    'bg-white/20 text-white':
+                                      pathname === component.href,
                                   },
                                 )}
                               >
@@ -429,7 +446,9 @@ const NavBar = () => {
                                   height={20}
                                   className="rounded-full bg-white p-1"
                                 />
-                                <span className="flex-1">{component.title}</span>
+                                <span className="flex-1">
+                                  {component.title}
+                                </span>
                               </Link>
                             </SheetClose>
                           ))}
@@ -443,13 +462,16 @@ const NavBar = () => {
                         className={clsx(
                           'min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline',
                           {
-                            'bg-white/20': pathname.startsWith('/shop') ||
-                                          pathname.startsWith('/buy-phones-from-china') ||
-                                          pathname.startsWith('/faya'),
-                            '[&[data-state=open]]:bg-white/10': !(pathname.startsWith('/shop') ||
-                                          pathname.startsWith('/buy-phones-from-china') ||
-                                          pathname.startsWith('/faya')),
-                          }
+                            'bg-white/20':
+                              pathname.startsWith('/shop') ||
+                              pathname.startsWith('/buy-phones-from-china') ||
+                              pathname.startsWith('/faya'),
+                            '[&[data-state=open]]:bg-white/10': !(
+                              pathname.startsWith('/shop') ||
+                              pathname.startsWith('/buy-phones-from-china') ||
+                              pathname.startsWith('/faya')
+                            ),
+                          },
                         )}
                       >
                         Shop
@@ -463,7 +485,8 @@ const NavBar = () => {
                                 className={clsx(
                                   'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white',
                                   {
-                                    'bg-white/20 text-white': pathname === component.href,
+                                    'bg-white/20 text-white':
+                                      pathname === component.href,
                                   },
                                 )}
                               >
@@ -474,7 +497,9 @@ const NavBar = () => {
                                   height={20}
                                   className="rounded-full bg-white p-1"
                                 />
-                                <span className="flex-1">{component.title}</span>
+                                <span className="flex-1">
+                                  {component.title}
+                                </span>
                               </Link>
                             </SheetClose>
                           ))}
@@ -518,9 +543,7 @@ const NavBar = () => {
                         asChild
                         className="h-12 w-full bg-white text-base font-medium text-indigo-800 transition-colors hover:bg-indigo-100"
                       >
-                        <Link href="/auth/login">
-                          Sign In
-                        </Link>
+                        <Link href="/auth/login">Sign In</Link>
                       </Button>
                     </SheetClose>
                   </div>
