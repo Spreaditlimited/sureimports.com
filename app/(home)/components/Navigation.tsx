@@ -565,7 +565,7 @@ export default function Navigation({
                 <AccordionContent className="pb-2">
                   <div className="space-y-3 pl-4">
                     <a
-                      href="https://www.sureimports.com/air-vs-sea-calculator"
+                      href="https://www.sureimports.com/tools/air-vs-sea-calculator"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
