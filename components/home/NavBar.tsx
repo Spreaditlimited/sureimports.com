@@ -324,80 +324,101 @@ const NavBar = () => {
 
             <Sheet>
               <SheetTrigger asChild className="m-2 h-10">
-                <Button className="text-white">
+                <Button className="text-white" aria-label="Open navigation menu">
                   <AlignRight />
                 </Button>
               </SheetTrigger>
-              <SheetContent className="bg-[#161629] text-white">
-                <NavigationMenu className="min-w-full">
-                  <nav className="w-full">
-                    <SheetClose asChild>
-                      <NavigationMenuLink
-                        href="/"
-                        className={clsx(
-                          'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
-                          {
-                            'after:w-full after:scale-x-100': pathname === '/',
-                            'text-white': pathname !== '/',
-                          },
-                        )}
-                      >
-                        Home
-                      </NavigationMenuLink>
-                    </SheetClose>
-                    <Accordion type="single" collapsible>
-                      <AccordionItem value="videos" className="border-none">
-                        <AccordionTrigger className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white hover:no-underline">
-                          Videos
-                        </AccordionTrigger>
-                        <AccordionContent>
+              <SheetContent className="overflow-y-auto bg-[#161629] text-white">
+                <div className="w-full space-y-1 pt-6">
+                  {/* Home Link */}
+                  <SheetClose asChild>
+                    <Link
+                      href="/"
+                      className={clsx(
+                        'flex min-h-[44px] items-center gap-4 rounded-xl px-3 py-3 text-base text-white transition-colors hover:bg-white/10',
+                        {
+                          'bg-white/20': pathname === '/',
+                        },
+                      )}
+                    >
+                      Home
+                    </Link>
+                  </SheetClose>
+
+                  {/* Accordion for expandable sections */}
+                  <Accordion type="single" collapsible className="w-full space-y-1">
+                    {/* Videos Section */}
+                    <AccordionItem value="videos" className="border-none">
+                      <AccordionTrigger className="min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline [&[data-state=open]]:bg-white/10">
+                        Videos
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-2 pt-1">
+                        <div className="space-y-1 pl-4">
                           <SheetClose asChild>
-                            <NavigationMenuLink
+                            <Link
                               href="https://www.tiktok.com/@tochukwunkwocha"
-                              className="flex items-center gap-4 px-3 py-2 text-white"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
                             >
                               <Image
                                 src="/icons/tiktok-app-symbol.svg"
                                 alt="TikTok"
                                 width={20}
                                 height={20}
-                                className="mr-2 rounded-full bg-white p-1"
+                                className="rounded-full bg-white p-1"
                               />
                               TikTok
-                            </NavigationMenuLink>
+                            </Link>
                           </SheetClose>
                           <SheetClose asChild>
-                            <NavigationMenuLink
+                            <Link
                               href="https://www.youtube.com/@sureimports"
-                              className="flex items-center gap-4 px-3 py-2 text-white"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
                             >
                               <Image
                                 src="/icons/yt-app-symbol.svg"
                                 alt="YouTube"
                                 width={20}
                                 height={20}
-                                className="mr-2 rounded-full bg-white p-1"
+                                className="rounded-full bg-white p-1"
                               />
                               YouTube
-                            </NavigationMenuLink>
+                            </Link>
                           </SheetClose>
-                        </AccordionContent>
-                      </AccordionItem>
-                      <AccordionItem value="services" className="border-none">
-                        <AccordionTrigger className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white hover:no-underline">
-                          Services
-                        </AccordionTrigger>
-                        <AccordionContent>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+
+                    {/* Services Section */}
+                    <AccordionItem value="services" className="border-none">
+                      <AccordionTrigger
+                        className={clsx(
+                          'min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline',
+                          {
+                            'bg-white/20': pathname.startsWith('/services') ||
+                                          pathname.startsWith('/buy-from-chinese-websites') ||
+                                          pathname.startsWith('/source-products-from-china'),
+                            '[&[data-state=open]]:bg-white/10': !(pathname.startsWith('/services') ||
+                                          pathname.startsWith('/buy-from-chinese-websites') ||
+                                          pathname.startsWith('/source-products-from-china')),
+                          }
+                        )}
+                      >
+                        Services
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-2 pt-1">
+                        <div className="space-y-1 pl-4">
                           {components.map((component) => (
                             <SheetClose asChild key={component.title}>
-                              <NavigationMenuLink
+                              <Link
                                 href={component.href}
                                 className={clsx(
-                                  'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
+                                  'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white',
                                   {
-                                    'after:w-full after:scale-x-100':
-                                      pathname === component.href,
-                                    'text-white': pathname !== component.href,
+                                    'bg-white/20 text-white': pathname === component.href,
                                   },
                                 )}
                               >
@@ -406,30 +427,43 @@ const NavBar = () => {
                                   alt={component.title}
                                   width={20}
                                   height={20}
-                                  className="mr-2 rounded-full bg-white p-1"
+                                  className="rounded-full bg-white p-1"
                                 />
-                                {component.title}
-                              </NavigationMenuLink>
+                                <span className="flex-1">{component.title}</span>
+                              </Link>
                             </SheetClose>
                           ))}
-                        </AccordionContent>
-                      </AccordionItem>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
 
-                      <AccordionItem value="shop" className="border-none">
-                        <AccordionTrigger className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white hover:no-underline">
-                          Shop
-                        </AccordionTrigger>
-                        <AccordionContent>
+                    {/* Shop Section */}
+                    <AccordionItem value="shop" className="border-none">
+                      <AccordionTrigger
+                        className={clsx(
+                          'min-h-[44px] rounded-xl px-3 py-0 text-base text-white hover:bg-white/10 hover:no-underline',
+                          {
+                            'bg-white/20': pathname.startsWith('/shop') ||
+                                          pathname.startsWith('/buy-phones-from-china') ||
+                                          pathname.startsWith('/faya'),
+                            '[&[data-state=open]]:bg-white/10': !(pathname.startsWith('/shop') ||
+                                          pathname.startsWith('/buy-phones-from-china') ||
+                                          pathname.startsWith('/faya')),
+                          }
+                        )}
+                      >
+                        Shop
+                      </AccordionTrigger>
+                      <AccordionContent className="pb-2 pt-1">
+                        <div className="space-y-1 pl-4">
                           {components2.map((component) => (
                             <SheetClose asChild key={component.title}>
-                              <NavigationMenuLink
+                              <Link
                                 href={component.href}
                                 className={clsx(
-                                  'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
+                                  'flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white',
                                   {
-                                    'after:scale-x-100X after:w-full':
-                                      pathname === component.href,
-                                    'text-white': pathname !== component.href,
+                                    'bg-white/20 text-white': pathname === component.href,
                                   },
                                 )}
                               >
@@ -438,113 +472,59 @@ const NavBar = () => {
                                   alt={component.title}
                                   width={20}
                                   height={20}
-                                  className="mr-2 rounded-full bg-white p-1"
+                                  className="rounded-full bg-white p-1"
                                 />
-                                {component.title}
-                              </NavigationMenuLink>
+                                <span className="flex-1">{component.title}</span>
+                              </Link>
                             </SheetClose>
                           ))}
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
-                    {/* <SheetClose asChild>
-                    <NavigationMenuLink
-                      href="/shop/deal-directly-with-suppliers"
-                      className={clsx(
-                        'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
-                        {
-                          'after:w-full after:scale-x-100':
-                            pathname === '/shop/deal-directly-with-suppliers',
-                          'text-white':
-                            pathname !== '/shop/deal-directly-with-suppliers',
-                        },
-                      )}
-                    >
-                      Shop
-                    </NavigationMenuLink>
-                  </SheetClose> */}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
 
-                    {/* <SheetClose asChild>
-                      <NavigationMenuLink
-                        href={`${process.env.NEXT_PUBLIC_ACADEMY_SITE_URL}/`}
-                        className={clsx(
-                          'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
-                          {
-                            'after:w-full after:scale-x-100':
-                              pathname === '/academy',
-                            'text-white': pathname !== '/academy',
-                          },
-                        )}
-                        target="_blank"
-                      >
-                        Academy
-                      </NavigationMenuLink>
-                    </SheetClose> */}
-
+                  {/* Additional Navigation Links */}
+                  <div className="space-y-1 pt-2">
                     <SheetClose asChild>
-                      <NavigationMenuLink
+                      <Link
                         href="https://spreaditglobal.com/calculator"
-                        className={clsx(
-                          'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
-                          {
-                            'after:w-full after:scale-x-100':
-                              pathname === '/calculator',
-                            'text-white': pathname !== '/calculator',
-                          },
-                        )}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex min-h-[44px] items-center gap-4 rounded-xl px-3 py-3 text-base text-white transition-colors hover:bg-white/10"
                       >
                         Calculator
-                      </NavigationMenuLink>
+                      </Link>
                     </SheetClose>
 
                     <SheetClose asChild>
-                      <NavigationMenuLink
+                      <Link
                         href="https://calendly.com/sureimports/product-sourcing-one-one-one-session/"
-                        className={clsx(
-                          'mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-white',
-                          {
-                            'after:w-full after:scale-x-100':
-                              pathname === '/calendly',
-                            'text-white': pathname !== '/calendly',
-                          },
-                        )}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex min-h-[44px] items-center rounded-xl px-3 py-3"
                       >
-                        <div className="rounded-xl bg-orange-500 p-2 pl-5 pr-5">
+                        <div className="w-full rounded-xl bg-orange-500 px-5 py-2 text-center text-base font-medium text-white transition-colors hover:bg-orange-600">
                           Book a Call
                         </div>
-                      </NavigationMenuLink>
+                      </Link>
                     </SheetClose>
-                  </nav>
-                </NavigationMenu>
+                  </div>
 
-                {/* <Button className="z-20 mr-7 h-12 w-28 bg-orange-500">
-                  <Link
-                    href="https://calendly.com/sureimports/product-sourcing-one-one-one-session/"
-                    target="_blank"
-                    passHref
-                  >
-                    Book a Call
-                  </Link>
-                </Button> */}
-
-                <SheetFooter className="w-full">
-                  <Button
-                    variant="default"
-                    asChild
-                    className={clsx(
-                      'w-30 m-7 h-12 w-full bg-white text-base text-indigo-800 hover:bg-indigo-100',
-                      {
-                        'ml-0': isMobile,
-                      },
-                    )}
-                  >
-                    <Link href="/auth/login" passHref>
-                      Sign In
-                    </Link>
-                  </Button>
-                </SheetFooter>
+                  {/* Sign In Button Footer */}
+                  <div className="mt-6 w-full pt-4">
+                    <SheetClose asChild className="w-full">
+                      <Button
+                        variant="default"
+                        asChild
+                        className="h-12 w-full bg-white text-base font-medium text-indigo-800 transition-colors hover:bg-indigo-100"
+                      >
+                        <Link href="/auth/login">
+                          Sign In
+                        </Link>
+                      </Button>
+                    </SheetClose>
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
