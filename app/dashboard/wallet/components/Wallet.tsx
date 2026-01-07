@@ -146,6 +146,7 @@ export default function Wallet({
   useEffect(() => {
     const fetchCustomer = async () => {
       try {
+
         const response = await fetch(`/api/paystack/get-customer/${email}`);
 
         // if (!response.ok) {
