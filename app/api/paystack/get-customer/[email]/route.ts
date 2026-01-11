@@ -16,13 +16,11 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ email: string }> },
 ) {
-
-
   try {
     // Await params first - required in Next.js 15
     const { email } = await params;
 
-        console.log("WORKING"+email);
+    console.log('WORKING' + email);
     //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID'
     // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
     const user: any = await prisma.users.findUnique({
@@ -44,7 +42,7 @@ export async function GET(
     const totalDebit = debitAggregate._sum.amount ?? 0;
 
     console.log('Total Debit Amount:', totalDebit);
-    console.log("WORKING OK 1 ..."+email);
+    console.log('WORKING OK 1 ...' + email);
     //////////////////// GET CUSTOMER PROFILE DETAILS ////////////////////
     const data = await fetch(`https://api.paystack.co/customer/${email}`, {
       method: 'GET',
@@ -54,10 +52,13 @@ export async function GET(
       },
     });
 
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::'+data);
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::' + data);
 
     const response_customer_details = await data.json();
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::1'+JSON.stringify(response_customer_details));
+    console.log(
+      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::1' +
+        JSON.stringify(response_customer_details),
+    );
     if (
       data.ok == false ||
       response_customer_details.data.dedicated_accounts == undefined ||
