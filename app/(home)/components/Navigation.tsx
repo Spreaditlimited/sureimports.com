@@ -133,7 +133,7 @@ export default function Navigation({
               <DropdownMenuContent className="w-80 border-slate-700 bg-slate-800 shadow-xl">
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/buy-from-chinese-websites"
+                    href="/buy-from-chinese-websites"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -155,7 +155,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/source-products-from-china"
+                    href="/source-products-from-china"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -170,6 +170,24 @@ export default function Navigation({
                       <span className="mt-1 text-xs text-gray-400">
                         Custom product sourcing and supplier verification
                         services
+                      </span>
+                    </div>
+                  </a>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
+                  <a
+                    href="/corporate-gifts"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-start space-x-3"
+                  >
+                    <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-amber-500 to-orange-600">
+                      <span className="text-xs font-bold text-white">🎁</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">Corporate Gifts</span>
+                      <span className="mt-1 text-xs text-gray-400">
+                        Branded gift sourcing and bulk customization from China
                       </span>
                     </div>
                   </a>
@@ -206,7 +224,7 @@ export default function Navigation({
               <DropdownMenuContent className="w-80 border-slate-700 bg-slate-800 shadow-xl">
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/tools/air-vs-sea-calculator"
+                    href="/tools/air-vs-sea-calculator"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -225,7 +243,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/tools/carton-optimization"
+                    href="/tools/carton-optimization"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -244,7 +262,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://sureimports.com/tools/cbm-volumetric-weight-calculator"
+                    href="/tools/cbm-volumetric-weight-calculator"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -265,7 +283,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://sureimports.com/tools/generator-sizing"
+                    href="/tools/generator-sizing"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -284,7 +302,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://sureimports.com/tools/landed-cost-estimator"
+                    href="/tools/landed-cost-estimator"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -304,7 +322,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://sureimports.com/tools/retail-price-builder"
+                    href="/tools/retail-price-builder"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -352,7 +370,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/buy-phones-from-china"
+                    href="/buy-phones-from-china"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -374,7 +392,7 @@ export default function Navigation({
 
                 <DropdownMenuItem className="p-4 text-gray-300 hover:bg-slate-700 hover:text-white focus:bg-slate-700 focus:text-white">
                   <a
-                    href="https://www.sureimports.com/faya"
+                    href="/faya"
                     //target="_blank"
                     rel="noopener noreferrer"
                     className="flex w-full items-start space-x-3"
@@ -502,7 +520,7 @@ export default function Navigation({
                 <AccordionContent className="pb-2">
                   <div className="space-y-3 pl-4">
                     <a
-                      href="https://www.sureimports.com/buy-from-chinese-websites"
+                      href="/buy-from-chinese-websites"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -519,7 +537,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://www.sureimports.com/source-products-from-china"
+                      href="/source-products-from-china"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -532,6 +550,21 @@ export default function Navigation({
                         </span>
                         <span className="mt-1 text-xs text-gray-500">
                           Custom sourcing and supplier verification
+                        </span>
+                      </div>
+                    </a>
+                    <a
+                      href="/corporate-gifts"
+                      rel="noopener noreferrer"
+                      className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
+                    >
+                      <div className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-amber-500 to-orange-600">
+                        <span className="text-xs text-white">🎁</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-medium">Corporate Gifts</span>
+                        <span className="mt-1 text-xs text-gray-500">
+                          Branded gift sourcing and bulk customization
                         </span>
                       </div>
                     </a>
@@ -565,7 +598,7 @@ export default function Navigation({
                 <AccordionContent className="pb-2">
                   <div className="space-y-3 pl-4">
                     <a
-                      href="https://www.sureimports.com/tools/air-vs-sea-calculator"
+                      href="/tools/air-vs-sea-calculator"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -582,7 +615,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://www.sureimports.com/tools/carton-optimization"
+                      href="/tools/carton-optimization"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -597,7 +630,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://sureimports.com/tools/cbm-volumetric-weight-calculator"
+                      href="/tools/cbm-volumetric-weight-calculator"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -612,7 +645,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://sureimports.com/tools/generator-sizing"
+                      href="/tools/generator-sizing"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -627,7 +660,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://sureimports.com/tools/landed-cost-estimator"
+                      href="/tools/landed-cost-estimator"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -644,7 +677,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://sureimports.com/tools/retail-price-builder"
+                      href="/tools/retail-price-builder"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -692,7 +725,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://www.sureimports.com/buy-phones-from-china"
+                      href="/buy-phones-from-china"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >
@@ -709,7 +742,7 @@ export default function Navigation({
                       </div>
                     </a>
                     <a
-                      href="https://www.sureimports.com/faya"
+                      href="/faya"
                       rel="noopener noreferrer"
                       className="flex min-h-[44px] items-start space-x-3 py-2 text-gray-400 transition-colors duration-200 hover:text-blue-400"
                     >

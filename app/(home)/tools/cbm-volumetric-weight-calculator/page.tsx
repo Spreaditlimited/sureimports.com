@@ -1,6 +1,18 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { 
+  Box, 
+  Plane, 
+  Ship, 
+  RotateCcw, 
+  Scale, 
+  Maximize2, 
+  HelpCircle,
+  AlertCircle,
+  ArrowDown,
+  ChevronRight
+} from 'lucide-react';
 
 type ShippingMode = 'both' | 'sea' | 'air';
 
@@ -27,19 +39,11 @@ export default function CbmVolumetricWeightCalculatorPage() {
   const [actualWeightPerCartonKg, setActualWeightPerCartonKg] = useState('');
 
   const nf2 = useMemo(
-    () =>
-      new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 2,
-        minimumFractionDigits: 2,
-      }),
+    () => new Intl.NumberFormat(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 }),
     [],
   );
   const nf4 = useMemo(
-    () =>
-      new Intl.NumberFormat(undefined, {
-        maximumFractionDigits: 4,
-        minimumFractionDigits: 4,
-      }),
+    () => new Intl.NumberFormat(undefined, { maximumFractionDigits: 4, minimumFractionDigits: 4 }),
     [],
   );
 
@@ -53,45 +57,24 @@ export default function CbmVolumetricWeightCalculatorPage() {
     };
   }, [lengthCm, widthCm, heightCm, quantity, actualWeightPerCartonKg]);
 
-  const canCalculate =
-    inputs.L !== null &&
-    inputs.W !== null &&
-    inputs.H !== null &&
-    inputs.Q !== null;
+  const canCalculate = inputs.L !== null && inputs.W !== null && inputs.H !== null && inputs.Q !== null;
 
   const calculated = useMemo(() => {
     if (!canCalculate) return null;
-
     const L = inputs.L!;
     const W = inputs.W!;
     const H = inputs.H!;
     const Q = inputs.Q!;
     const actualKg = inputs.actualKg;
 
-    // CBM (meters)
     const cbmPerCarton = (L / 100) * (W / 100) * (H / 100);
     const totalCbm = cbmPerCarton * Q;
-
-    // Volumetric weight (cm) / 6000
     const volumetricKgPerCarton = (L * W * H) / 6000;
     const totalVolumetricKg = volumetricKgPerCarton * Q;
-
     const totalActualKg = actualKg !== null ? actualKg * Q : null;
+    const chargeableKg = totalActualKg !== null ? Math.max(totalActualKg, totalVolumetricKg) : totalVolumetricKg;
 
-    // Chargeable for air is max(actual, volumetric) when actual is provided
-    const chargeableKg =
-      totalActualKg !== null
-        ? Math.max(totalActualKg, totalVolumetricKg)
-        : totalVolumetricKg;
-
-    return {
-      cbmPerCarton,
-      totalCbm,
-      volumetricKgPerCarton,
-      totalVolumetricKg,
-      totalActualKg,
-      chargeableKg,
-    };
+    return { cbmPerCarton, totalCbm, volumetricKgPerCarton, totalVolumetricKg, totalActualKg, chargeableKg };
   }, [canCalculate, inputs]);
 
   function reset() {
@@ -104,535 +87,218 @@ export default function CbmVolumetricWeightCalculatorPage() {
   }
 
   return (
-    <main className="wrap">
-      <style jsx>{`
-        :global(body) {
-          background: radial-gradient(
-              1200px 700px at 30% 20%,
-              rgba(99, 102, 241, 0.18),
-              transparent 60%
-            ),
-            radial-gradient(
-              900px 600px at 70% 35%,
-              rgba(168, 85, 247, 0.16),
-              transparent 55%
-            ),
-            linear-gradient(180deg, #0b1220 0%, #070b14 100%);
-        }
-
-        .wrap {
-          max-width: 980px;
-          margin: 0 auto;
-          padding: 34px 16px 60px;
-          color: rgba(255, 255, 255, 0.92);
-        }
-
-        .title {
-          font-size: 34px;
-          font-weight: 900;
-          margin: 0 0 10px;
-          letter-spacing: -0.02em;
-        }
-
-        .sub {
-          margin: 0 0 22px;
-          opacity: 0.82;
-          line-height: 1.6;
-          font-size: 15px;
-          max-width: 720px;
-        }
-
-        .card {
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 18px;
-          padding: 18px;
-          background: rgba(255, 255, 255, 0.06);
-          backdrop-filter: blur(12px);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-        }
-
-        .modeRow {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-          margin-bottom: 16px;
-        }
-
-        .pill {
-          padding: 10px 12px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.06);
-          color: rgba(255, 255, 255, 0.88);
-          font-weight: 800;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .pillActive {
-          border-color: rgba(255, 255, 255, 0.22);
-          background: linear-gradient(
-            90deg,
-            rgba(37, 99, 235, 0.85),
-            rgba(168, 85, 247, 0.85)
-          );
-          color: white;
-        }
-
-        .grid {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 12px;
-        }
-
-        @media (min-width: 720px) {
-          .grid {
-            grid-template-columns: 1fr 1fr;
-          }
-        }
-
-        .field {
-          display: grid;
-          gap: 6px;
-        }
-
-        .label {
-          font-weight: 900;
-          font-size: 13px;
-          color: rgba(255, 255, 255, 0.82);
-        }
-
-        .hint {
-          font-size: 13px;
-          opacity: 0.72;
-          line-height: 1.45;
-        }
-
-        .input {
-          padding: 12px 12px;
-          border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(7, 11, 20, 0.55);
-          color: rgba(255, 255, 255, 0.92);
-          font-size: 15px;
-          outline: none;
-        }
-
-        .input::placeholder {
-          color: rgba(255, 255, 255, 0.38);
-        }
-
-        .input:focus {
-          border-color: rgba(168, 85, 247, 0.45);
-          box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.18);
-        }
-
-        .actions {
-          display: flex;
-          justify-content: space-between;
-          gap: 10px;
-          flex-wrap: wrap;
-          margin-top: 14px;
-        }
-
-        .btn {
-          padding: 10px 12px;
-          border-radius: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.06);
-          color: rgba(255, 255, 255, 0.9);
-          font-weight: 900;
-          cursor: pointer;
-        }
-
-        .btnPrimary {
-          border-color: rgba(255, 255, 255, 0.22);
-          background: linear-gradient(
-            90deg,
-            rgba(37, 99, 235, 0.9),
-            rgba(168, 85, 247, 0.9)
-          );
-          color: white;
-        }
-
-        .results {
-          margin-top: 16px;
-          padding: 14px;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .resultsTitle {
-          font-weight: 900;
-          margin-bottom: 10px;
-        }
-
-        .resultGrid {
-          display: grid;
-          gap: 12px;
-        }
-
-        .resultBox {
-          padding: 12px;
-          border-radius: 16px;
-          background: rgba(7, 11, 20, 0.45);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-        }
-
-        .resultBoxTitle {
-          font-weight: 900;
-          margin-bottom: 6px;
-        }
-
-        .line {
-          line-height: 1.8;
-          font-size: 15px;
-        }
-
-        .meaning {
-          font-size: 13px;
-          opacity: 0.82;
-          line-height: 1.55;
-        }
-
-        .divider {
-          margin-top: 10px;
-          padding-top: 10px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .below {
-          margin-top: 28px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-          padding-top: 22px;
-        }
-
-        .h2 {
-          font-size: 20px;
-          font-weight: 900;
-          margin: 0 0 8px;
-        }
-
-        .p {
-          margin: 0 0 12px;
-          line-height: 1.75;
-          opacity: 0.88;
-          max-width: 820px;
-        }
-
-        .ul {
-          margin: 0 0 12px 18px;
-          padding: 0;
-          line-height: 1.75;
-          opacity: 0.9;
-          max-width: 820px;
-        }
-
-        .faq {
-          display: grid;
-          gap: 10px;
-          margin-top: 10px;
-          max-width: 880px;
-        }
-
-        .qa {
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 16px;
-          padding: 12px;
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .q {
-          font-weight: 900;
-          margin: 0 0 6px;
-        }
-
-        .a {
-          margin: 0;
-          opacity: 0.88;
-          line-height: 1.75;
-        }
-
-        .note {
-          margin-top: 14px;
-          font-size: 13px;
-          opacity: 0.72;
-          line-height: 1.6;
-        }
-      `}</style>
-
-      <h1 className="title">CBM & Volumetric Weight Calculator</h1>
-      <p className="sub">
-        Use this tool to calculate CBM for sea freight and volumetric weight for
-        air freight using carton dimensions. This helps you estimate space and
-        chargeable weight before you buy from China.
-      </p>
-
-      <section className="card" aria-label="Calculator">
-        <div className="modeRow" role="tablist" aria-label="Shipping mode">
-          {[
-            { key: 'both' as const, label: 'Sea + Air (Recommended)' },
-            { key: 'sea' as const, label: 'Sea Only (CBM)' },
-            { key: 'air' as const, label: 'Air Only (Volumetric)' },
-          ].map((opt) => (
-            <button
-              key={opt.key}
-              type="button"
-              className={`pill ${mode === opt.key ? 'pillActive' : ''}`}
-              onClick={() => setMode(opt.key)}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid">
-          <div className="field">
-            <label className="label">Length (cm)</label>
-            <input
-              className="input"
-              inputMode="decimal"
-              placeholder="e.g. 60"
-              value={lengthCm}
-              onChange={(e) => setLengthCm(e.target.value)}
-            />
+    <main className="min-h-screen bg-[#020617] text-slate-200 pb-24">
+      <div className="max-w-5xl mx-auto px-4 pt-12 sm:pt-20">
+        
+        {/* Header */}
+        <header className="mb-12 text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
+            <Scale className="w-3 h-3" />
+            Freight Estimation
           </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-6">
+            CBM & Volumetric <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Weight Calculator</span>
+          </h1>
+          <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">
+            Calculate space and weight metrics before shipping from China. Understand your 
+            chargeable weight for air freight and total volume for sea freight.
+          </p>
+        </header>
 
-          <div className="field">
-            <label className="label">Width (cm)</label>
-            <input
-              className="input"
-              inputMode="decimal"
-              placeholder="e.g. 40"
-              value={widthCm}
-              onChange={(e) => setWidthCm(e.target.value)}
-            />
-          </div>
-
-          <div className="field">
-            <label className="label">Height (cm)</label>
-            <input
-              className="input"
-              inputMode="decimal"
-              placeholder="e.g. 35"
-              value={heightCm}
-              onChange={(e) => setHeightCm(e.target.value)}
-            />
-          </div>
-
-          <div className="field">
-            <label className="label">Quantity (cartons)</label>
-            <input
-              className="input"
-              inputMode="numeric"
-              placeholder="e.g. 10"
-              value={quantity}
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-          </div>
-
-          {(mode === 'both' || mode === 'air') && (
-            <div className="field" style={{ gridColumn: '1 / -1' }}>
-              <label className="label">
-                Actual weight per carton (kg){' '}
-                <span style={{ fontWeight: 700, opacity: 0.6 }}>
-                  (optional)
-                </span>
-              </label>
-              <input
-                className="input"
-                inputMode="decimal"
-                placeholder="e.g. 18"
-                value={actualWeightPerCartonKg}
-                onChange={(e) => setActualWeightPerCartonKg(e.target.value)}
-              />
-              <div className="hint">
-                Air freight chargeable weight is the higher of actual weight and
-                volumetric weight.
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* Main Calculator Card */}
+          <section className="lg:col-span-7 space-y-6">
+            <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+              
+              {/* Tab Selector */}
+              <div className="flex p-1 bg-slate-950/50 rounded-2xl border border-white/5 mb-8">
+                {(['both', 'sea', 'air'] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    onClick={() => setMode(m)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-bold uppercase tracking-wider rounded-xl transition-all ${
+                      mode === m ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'
+                    }`}
+                  >
+                    {m === 'both' && 'Sea + Air'}
+                    {m === 'sea' && <><Ship className="w-3 h-3" /> Sea Only</>}
+                    {m === 'air' && <><Plane className="w-3 h-3" /> Air Only</>}
+                  </button>
+                ))}
               </div>
-            </div>
-          )}
-        </div>
 
-        <div className="actions">
-          <button type="button" className="btn" onClick={reset}>
-            Reset
-          </button>
-          <button
-            type="button"
-            className={`btn ${canCalculate ? 'btnPrimary' : ''}`}
-            onClick={() => {
-              const el = document.getElementById('results');
-              el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }}
-            disabled={!canCalculate}
-            aria-disabled={!canCalculate}
-            style={{
-              opacity: canCalculate ? 1 : 0.6,
-              cursor: canCalculate ? 'pointer' : 'not-allowed',
-            }}
-          >
-            View Results
-          </button>
-        </div>
-
-        <div id="results" className="results" aria-live="polite">
-          <div className="resultsTitle">Results</div>
-
-          {!canCalculate || !calculated ? (
-            <div className="meaning">
-              Enter length, width, height, and quantity to see results.
-            </div>
-          ) : (
-            <div className="resultGrid">
-              {(mode === 'both' || mode === 'sea') && (
-                <div className="resultBox">
-                  <div className="resultBoxTitle">Sea freight (CBM)</div>
-                  <div className="line">
-                    <div>
-                      <b>CBM per carton:</b>{' '}
-                      {nf4.format(calculated.cbmPerCarton)} m³
-                    </div>
-                    <div>
-                      <b>Total CBM:</b> {nf4.format(calculated.totalCbm)} m³ (
-                      {inputs.Q} cartons)
-                    </div>
+              {/* Input Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                {[
+                  { label: 'Length (cm)', val: lengthCm, set: setLengthCm },
+                  { label: 'Width (cm)', val: widthCm, set: setWidthCm },
+                  { label: 'Height (cm)', val: heightCm, set: setHeightCm },
+                  { label: 'Qty (Cartons)', val: quantity, set: setQuantity }
+                ].map((input) => (
+                  <div key={input.label} className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">{input.label}</label>
+                    <input
+                      value={input.val}
+                      onChange={(e) => input.set(e.target.value)}
+                      className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder:text-slate-700"
+                      inputMode="decimal"
+                      placeholder="0"
+                    />
                   </div>
-                  <div className="meaning" style={{ marginTop: 8 }}>
-                    CBM measures space. Sea freight is usually priced by CBM,
-                    especially for bulky shipments.
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
 
+              {/* Actual Weight Row */}
               {(mode === 'both' || mode === 'air') && (
-                <div className="resultBox">
-                  <div className="resultBoxTitle">
-                    Air freight (Volumetric weight)
-                  </div>
-                  <div className="line">
-                    <div>
-                      <b>Volumetric weight per carton:</b>{' '}
-                      {nf2.format(calculated.volumetricKgPerCarton)} kg
-                    </div>
-                    <div>
-                      <b>Total volumetric weight:</b>{' '}
-                      {nf2.format(calculated.totalVolumetricKg)} kg ({inputs.Q}{' '}
-                      cartons)
-                    </div>
-
-                    {calculated.totalActualKg !== null && (
-                      <div>
-                        <b>Total actual weight:</b>{' '}
-                        {nf2.format(calculated.totalActualKg)} kg
-                      </div>
-                    )}
-
-                    <div className="divider">
-                      <b>Chargeable weight:</b>{' '}
-                      {nf2.format(calculated.chargeableKg)} kg
-                      <div className="meaning" style={{ marginTop: 4 }}>
-                        Airlines charge the higher of actual weight and
-                        volumetric weight.
-                      </div>
-                    </div>
-                  </div>
+                <div className="mb-8 p-4 rounded-2xl bg-white/[0.02] border border-white/5">
+                  <label className="text-xs font-bold text-slate-300 mb-2 flex items-center gap-2">
+                    Actual Weight per Carton (kg) <span className="text-[10px] text-slate-500 font-normal italic">Optional</span>
+                  </label>
+                  <input
+                    value={actualWeightPerCartonKg}
+                    onChange={(e) => setActualWeightPerCartonKg(e.target.value)}
+                    className="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                    inputMode="decimal"
+                    placeholder="e.g. 18"
+                  />
+                  <p className="mt-2 text-[11px] text-slate-500">Air freight chargeable weight is the higher of actual weight and volumetric weight.</p>
                 </div>
               )}
 
-              <div className="meaning">
-                <b>Quick meaning:</b> Your carton size determines space (CBM).
-                For air freight, large cartons can be charged as heavier than
-                they really are because the airline bills by space used.
+              <div className="flex gap-4">
+                <button type="button" onClick={reset} className="flex-1 flex items-center justify-center gap-2 py-4 rounded-xl bg-white/5 border border-white/10 font-bold text-sm text-slate-400 hover:bg-white/10 transition-all">
+                  <RotateCcw className="w-4 h-4" /> Reset
+                </button>
+                <button 
+                  type="button"
+                  disabled={!canCalculate}
+                  onClick={() => document.getElementById('results-view')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="flex-[2] py-4 rounded-xl bg-blue-600 font-black text-white hover:bg-blue-500 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-600/20"
+                >
+                  View Results
+                </button>
               </div>
             </div>
-          )}
+            
+            <div className="flex items-center gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-[13px] text-amber-200/80 italic">
+               <HelpCircle className="w-4 h-4 shrink-0 text-amber-400" />
+               Standard formula: (L x W x H) / 6000
+            </div>
+          </section>
+
+          {/* Results Side Panel */}
+          <section id="results-view" className="lg:col-span-5 lg:sticky lg:top-8">
+            {!calculated ? (
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/10 bg-slate-900/20 p-8 text-center text-slate-500">
+                <Maximize2 className="w-12 h-12 mb-4 opacity-20" />
+                <p className="font-bold">Awaiting Data</p>
+                <p className="text-xs mt-2 leading-relaxed">Enter dimensions to calculate CBM <br/> and Volumetric Weight.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {(mode === 'both' || mode === 'sea') && (
+                  <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10"><Ship className="w-10 h-10 text-white" /></div>
+                    <h3 className="text-[10px] font-bold text-blue-400 uppercase tracking-[0.2em] mb-6">Sea Freight Metrics</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-end">
+                        <span className="text-slate-400 text-sm">CBM per Carton</span>
+                        <span className="text-xl font-mono text-white">{nf4.format(calculated.cbmPerCarton)} m³</span>
+                      </div>
+                      <div className="flex justify-between items-end pt-4 border-t border-white/5">
+                        <span className="text-slate-100 font-bold">Total Volume</span>
+                        <span className="text-2xl font-mono font-bold text-white">{nf4.format(calculated.totalCbm)} m³</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {(mode === 'both' || mode === 'air') && (
+                  <div className="rounded-3xl border border-white/10 bg-slate-900 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10"><Plane className="w-10 h-10 text-white" /></div>
+                    <h3 className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.2em] mb-6">Air Freight Metrics</h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-end">
+                        <span className="text-slate-400 text-sm">Volumetric per Carton</span>
+                        <span className="text-xl font-mono text-white">{nf2.format(calculated.volumetricKgPerCarton)} kg</span>
+                      </div>
+                      <div className="flex justify-between items-end pt-4 border-t border-white/5">
+                        <span className="text-slate-100 font-bold">Chargeable Weight</span>
+                        <span className="text-3xl font-mono font-bold text-indigo-400">{nf2.format(calculated.chargeableKg)} kg</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/5 text-xs text-slate-400 leading-relaxed italic">
+                  <b>Quick meaning:</b> Your carton size determines space (CBM). Airlines charge the higher of actual weight and volumetric weight.
+                </div>
+              </div>
+            )}
+          </section>
         </div>
 
-        <div className="note">
-          Provided by Sure Imports for education. Results are estimates based on
-          standard formulas, not a freight quote.
-        </div>
-      </section>
+        {/* FAQ Section */}
+        <section className="mt-24 border-t border-white/5 pt-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-8">
+              <h2 className="text-3xl font-bold text-white mb-8 tracking-tight">CBM & Volumetric Weight FAQ</h2>
+              <div className="grid grid-cols-1 gap-4">
+                {[
+                  {
+                    q: "Why is my air freight chargeable weight higher than my actual weight?",
+                    a: "Airlines charge the higher of actual weight and volumetric weight. If your carton is large, the volumetric calculation can exceed your actual kg."
+                  },
+                  {
+                    q: "Is CBM the same as weight?",
+                    a: "No. CBM is space. Weight is kg. A light but bulky carton can have low kg but high CBM, making it expensive to ship."
+                  },
+                  {
+                    q: "Should I use carton dimensions or product dimensions?",
+                    a: "Use carton dimensions (the packaged box). Freight pricing is based on the shipped package, not the bare product."
+                  },
+                  {
+                    q: "Can this calculator give me exact shipping cost?",
+                    a: "No. It gives you CBM and chargeable weight, which are the numbers you need before requesting a freight quote."
+                  }
+                ].map((item, i) => (
+                  <div key={i} className="p-6 rounded-2xl border border-white/5 bg-white/[0.02]">
+                    <p className="font-bold text-slate-200 mb-2">{item.q}</p>
+                    <p className="text-sm text-slate-500 leading-relaxed">{item.a}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-      {/* SEO content */}
-      <section className="below" aria-label="How it works">
-        <h2 className="h2">What is CBM?</h2>
-        <p className="p">
-          CBM means Cubic Meter. It tells you how much space your cartons
-          occupy. Sea freight and container planning often depends on CBM,
-          especially when the shipment is bulky.
-        </p>
-        <ul className="ul">
-          <li>Convert your carton dimensions from cm to meters.</li>
-          <li>Multiply length × width × height to get CBM per carton.</li>
-          <li>Multiply by quantity to get total CBM.</li>
-        </ul>
-
-        <h2 className="h2">What is volumetric weight?</h2>
-        <p className="p">
-          Volumetric weight is how airlines convert space into weight for
-          billing. If your cartons are big but not heavy, you can still be
-          charged as if they were heavy because they take up space on the
-          aircraft.
-        </p>
-        <p className="p">
-          The standard formula used by many forwarders is: (L × W × H) ÷ 6000,
-          where dimensions are in centimeters.
-        </p>
-
-        <h2 className="h2">Common mistakes importers make</h2>
-        <ul className="ul">
-          <li>Using product dimensions instead of carton dimensions.</li>
-          <li>Forgetting to multiply by quantity.</li>
-          <li>Assuming air freight is priced only by actual kg.</li>
-          <li>Mixing inches with centimeters without converting.</li>
-        </ul>
-
-        <h2 className="h2">FAQs</h2>
-        <div className="faq">
-          <div className="qa">
-            <p className="q">
-              Why is my air freight chargeable weight higher than my actual
-              weight?
-            </p>
-            <p className="a">
-              Because airlines charge the higher of actual weight and volumetric
-              weight. If your carton is large, the volumetric calculation can
-              exceed your actual kg.
-            </p>
+            <aside className="lg:col-span-4 space-y-6">
+              <div className="p-8 rounded-[2.5rem] bg-gradient-to-br from-blue-600/10 to-purple-600/10 border border-blue-500/20 shadow-xl">
+                <AlertCircle className="w-8 h-8 text-blue-400 mb-6" />
+                <h4 className="text-lg font-bold text-white mb-4">Common Mistakes</h4>
+                <ul className="text-sm text-slate-400 space-y-3">
+                  <li>• Using product dims instead of carton dims</li>
+                  <li>• Forgetting to multiply by quantity</li>
+                  <li>• Mixing inches with centimeters</li>
+                </ul>
+              </div>
+              
+              <div className="rounded-3xl border border-white/5 bg-slate-900/40 p-6 space-y-4">
+                <p className="text-xs font-bold text-slate-500 uppercase">Tools</p>
+                {[
+                  { label: "Air vs Sea Calculator", href: "/tools/air-vs-sea-calculator" },
+                  { label: "Landed Cost Estimator", href: "/tools/landed-cost-estimator" },
+                  { label: "Carton Optimizer", href: "/tools/carton-optimization-tool" }
+                ].map(tool => (
+                  <a key={tool.label} href={tool.href} className="flex justify-between items-center text-sm font-medium hover:text-blue-400 transition-colors">
+                    {tool.label} <ChevronRight className="w-4 h-4" />
+                  </a>
+                ))}
+              </div>
+            </aside>
           </div>
-
-          <div className="qa">
-            <p className="q">Is CBM the same as weight?</p>
-            <p className="a">
-              No. CBM is space. Weight is kg. A light but bulky carton can have
-              low kg but high CBM, and it can be expensive to ship.
-            </p>
-          </div>
-
-          <div className="qa">
-            <p className="q">
-              Should I use carton dimensions or product dimensions?
-            </p>
-            <p className="a">
-              Use carton dimensions (the packaged box). Freight pricing is based
-              on the shipped package, not the bare product.
-            </p>
-          </div>
-
-          <div className="qa">
-            <p className="q">
-              Can this calculator give me exact shipping cost?
-            </p>
-            <p className="a">
-              No. It gives you CBM and chargeable weight, which are the numbers
-              you need before requesting a freight quote.
-            </p>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }

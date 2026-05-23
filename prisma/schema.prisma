@@ -1036,6 +1036,43 @@ model store_sales_faya {
   updatedAt        DateTime  @updatedAt
 }
 
+model corporate_gift_request {
+  id                            Int       @id @default(autoincrement())
+  pidRequest                    String    @unique()
+  businessName                  String
+  contactPersonFullName         String
+  productOrItemNeeded           String
+  detailedSpecifications        String    @db.LongText
+  quantityNeeded                Int
+  preferredQualityLevel         String
+  brandingCustomizationRequired String
+  expectedDeliveryDate          String
+  finalDeliveryLocationNigeria  String
+  contactEmail                  String
+  whatsappNumber                String
+  proceedTimeline               String?
+  hearAboutSureImports          String?
+  additionalNotes               String?   @db.LongText
+  budgetRange                   String?
+  referenceFileUrl              String?
+  referenceFileName             String?
+  logoFileUrl                   String?
+  logoFileName                  String?
+  status                        String    @default("Pending")
+  handledByPidUser              String?
+  handledByEmail                String?
+  handledByName                 String?
+  pageUrl                       String?
+  utmSource                     String?
+  utmMedium                     String?
+  utmCampaign                   String?
+  utmContent                    String?
+  utmTerm                       String?
+  submittedAt                   String?
+  createdAt                     DateTime  @default(now())
+  updatedAt                     DateTime  @updatedAt
+}
+
 // model store_sales_faya {
 //   id  String  @id @default(cuid())
 //   pidStore  String  @unique
