@@ -1,8 +1,6 @@
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import { random } from 'lodash';
-import { getR2Client } from '@/app/utils/r2Client';
-import { Upload } from '@aws-sdk/lib-storage';
 import getFileExt from '@/app/utils/fileExt';
 import fileFilter from '@/utils/fileFilter';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -10,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
+import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 
 const prisma = new PrismaClient();
 
@@ -225,18 +224,13 @@ export async function POST(request: Request) {
         if (newFileName1 == null) {
         } else {
           const bufferAliPay = await aliPayAccountQRCodeImage.arrayBuffer();
-          //FILE UPLOAD DETAILS
-          const uploadAliPay = new Upload({
-            client: getR2Client(),
-            params: {
-              Bucket: process.env.R2_BUCKET_NAME,
-              Key: newFileName1 as string,
-              Body: Buffer.from(bufferAliPay),
-              ContentType: fileType1,
-            },
+          await uploadBufferToCloudinary(Buffer.from(bufferAliPay), {
+            folder: 'sureimports/pay-supplier',
+            publicId: newFileName1 as string,
+            useFilename: false,
+            uniqueFilename: false,
+            overwrite: true,
           });
-
-          await uploadAliPay.done();
           //RETURN SUCCESS ON FILE UPLOAD
           // const responsex = {
           //   message: 'Sourced Product was successfully placed',
@@ -252,17 +246,13 @@ export async function POST(request: Request) {
         if (newFileName2 == null) {
         } else {
           const bufferWeChat = await weChatAccountQRCodeImage.arrayBuffer();
-          const uploadWeChat = new Upload({
-            client: getR2Client(),
-            params: {
-              Bucket: process.env.R2_BUCKET_NAME,
-              Key: newFileName2 as string,
-              Body: Buffer.from(bufferWeChat),
-              ContentType: fileType2,
-            },
+          await uploadBufferToCloudinary(Buffer.from(bufferWeChat), {
+            folder: 'sureimports/pay-supplier',
+            publicId: newFileName2 as string,
+            useFilename: false,
+            uniqueFilename: false,
+            overwrite: true,
           });
-
-          await uploadWeChat.done();
           //RETURN SUCCESS ON FILE UPLOAD
           // const responsex = {
           //   message: 'Sourced Product was successfully placed',
@@ -278,17 +268,13 @@ export async function POST(request: Request) {
         if (newFileName3 == null) {
         } else {
           const bufferProForma = await proformaInvoiceImage.arrayBuffer();
-          const uploadProForma = new Upload({
-            client: getR2Client(),
-            params: {
-              Bucket: process.env.R2_BUCKET_NAME,
-              Key: newFileName3 as string,
-              Body: Buffer.from(bufferProForma),
-              ContentType: fileType3,
-            },
+          await uploadBufferToCloudinary(Buffer.from(bufferProForma), {
+            folder: 'sureimports/pay-supplier',
+            publicId: newFileName3 as string,
+            useFilename: false,
+            uniqueFilename: false,
+            overwrite: true,
           });
-
-          await uploadProForma.done();
           //RETURN SUCCESS ON FILE UPLOAD
           // const responsex = {
           //   message: 'Sourced Product was successfully placed',

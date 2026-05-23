@@ -25,7 +25,7 @@ export function UserAvatar({ userx }: UserAvatarProps) {
   const { theme } = useTheme();
 
   const imageUser =
-    process.env.NEXT_PUBLIC_R2_PUBLIC_URL + '/' + user?.userImage;
+    (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) + '/' + user?.userImage;
   const imageDefault = '../../../images/default.png';
 
   useEffect(() => {

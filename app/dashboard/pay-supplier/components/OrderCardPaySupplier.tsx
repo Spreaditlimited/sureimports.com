@@ -333,7 +333,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                         <label>Supplier`s AliPay Account Details Image</label>
                         <Image
                           src={
-                            process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                            (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
                             '/' +
                             aliPayAccountQRCodeImage
                           }
@@ -351,7 +351,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                         <label>Supplier`s WeChat Account Details Image</label>
                         <Image
                           src={
-                            process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                            (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
                             '/' +
                             weChatAccountQRCodeImage
                           }
@@ -369,7 +369,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                         <label>Proforma Invoice Image</label>
                         <Image
                           src={
-                            process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                            (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
                             '/' +
                             proformaInvoiceImage
                           }

@@ -12,13 +12,22 @@ const nextConfig = {
         ignoreDuringBuilds: true,
       },
     images: {
-        domains: ['b.io', 'cdn.builder.io'],
-    },
-    images: {
         remotePatterns: [
           {
             protocol: 'https',
-            hostname: 'pub-0ae42e0c83e848408ac329e6ca048bc2.r2.dev',
+            hostname: 'res.cloudinary.com',
+            port: '',
+            pathname: '/**',
+          },
+          {
+            protocol: 'https',
+            hostname: 'b.io',
+            port: '',
+            pathname: '/**',
+          },
+          {
+            protocol: 'https',
+            hostname: 'cdn.builder.io',
             port: '',
             pathname: '/**',
           },

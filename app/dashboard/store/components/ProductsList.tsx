@@ -35,7 +35,7 @@ function ProductList({ products }: any) {
               description={product.productDescription}
               price={product.productPrice}
               image={
-                (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                ((process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
                   '/' +
                   `${product.productImage}`) as string
               }

@@ -164,3 +164,17 @@
     transform 0.3s,
     box-shadow 0.3s;
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.mobile-logo-marquee {
+  animation: marquee 26s linear infinite;
+  will-change: transform;
+}

@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 const toFileUrl = (url: string | null, fileName: string | null) => {
   if (url) return url;
-  const base = (process.env.NEXT_PUBLIC_R2_PUBLIC_URL || '').replace(/\/$/, '');
+  const base = ((process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) || '').replace(/\/$/, '');
   if (!base || !fileName) return null;
   return `${base}/${fileName}`;
 };

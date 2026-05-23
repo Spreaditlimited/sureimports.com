@@ -2,10 +2,11 @@
 
 import { prisma } from '@/lib/prisma';
 
-// R2 public URL for serving images
-const R2_PUBLIC_URL =
-  process.env.NEXT_PUBLIC_R2_PUBLIC_URL ||
-  'https://pub-0ae42e0c83e848408ac329e6ca048bc2.r2.dev';
+// Media base URL for serving filename-based images during migration
+const MEDIA_PUBLIC_URL =
+  process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
+  (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) ||
+  '';
 
 // SEO metadata interface
 export interface BlogSEO {
@@ -209,11 +210,15 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
 
   // Get image URL
   const imageUrl = dbBlog.blogImage
-    ? `${R2_PUBLIC_URL}/${dbBlog.blogImage}`
+    ? dbBlog.blogImage.startsWith('http')
+      ? dbBlog.blogImage
+      : MEDIA_PUBLIC_URL
+        ? `${MEDIA_PUBLIC_URL.replace(/\/$/, '')}/${dbBlog.blogImage}`
+        : dbBlog.blogImage
     : '/images/new/images/logo.png';
 
-  // Helper to construct R2 image URL - handles various path formats
-  const getR2ImageUrl = (imagePath: string | null): string | undefined => {
+  // Helper to construct media image URL - handles various path formats
+  const getMediaImageUrl = (imagePath: string | null): string | undefined => {
     if (!imagePath) return undefined;
 
     // If already a full URL, return as-is
@@ -226,10 +231,9 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
       ? imagePath.slice(1)
       : imagePath;
 
-    // Use the R2_PUBLIC_URL constant (with fallback already defined)
-    const r2BaseUrl = R2_PUBLIC_URL.replace(/\/$/, '');
-
-    return `${r2BaseUrl}/${cleanPath}`;
+    const mediaBaseUrl = MEDIA_PUBLIC_URL.replace(/\/$/, '');
+    if (!mediaBaseUrl) return undefined;
+    return `${mediaBaseUrl}/${cleanPath}`;
   };
 
   // Transform publisher data - use publisher as primary author source
@@ -241,7 +245,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
         publisherEmail: dbBlog.publisher.publisherEmail || undefined,
         publisherBio: dbBlog.publisher.publisherBio || undefined,
         publisherRole: dbBlog.publisher.publisherRole || undefined,
-        publisherImage: getR2ImageUrl(dbBlog.publisher.publisherImage),
+        publisherImage: getMediaImageUrl(dbBlog.publisher.publisherImage),
         publisherSocialX: dbBlog.publisher.publisherSocialX || undefined,
         publisherSocialLinkedin:
           dbBlog.publisher.publisherSocialLinkedin || undefined,

@@ -538,7 +538,7 @@ export default function ProductClaim({ product, status }: any) {
                           <div className="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
                             <img
                               src={
-                                (process.env.NEXT_PUBLIC_R2_PUBLIC_URL +
+                                ((process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
                                   '/' +
                                   `${datax.store.productImage}`) as string
                               }

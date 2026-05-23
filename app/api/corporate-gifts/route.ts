@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { Upload } from '@aws-sdk/lib-storage';
-import { getR2Client } from '@/app/utils/r2Client';
 import sendEmail from '@/lib/email/config/sendEmail';
+import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 import {
   notifyCustomerCorporateGiftStatus,
   type CorporateGiftStatus,
@@ -19,23 +18,16 @@ const getString = (formData: FormData, keys: string[]) => {
   return '';
 };
 
-const toR2Url = (key: string) => {
-  const base = (process.env.NEXT_PUBLIC_R2_PUBLIC_URL || '').replace(/\/$/, '');
-  return base ? `${base}/${key}` : null;
-};
-
-const uploadToR2 = async (file: File, key: string) => {
-  const buffer = await file.arrayBuffer();
-  const upload = new Upload({
-    client: getR2Client(),
-    params: {
-      Bucket: process.env.R2_BUCKET_NAME,
-      Key: key,
-      Body: Buffer.from(buffer),
-      ContentType: file.type || 'application/octet-stream',
-    },
+const uploadToCloudinary = async (file: File, key: string) => {
+  const buffer = Buffer.from(await file.arrayBuffer());
+  const uploaded = await uploadBufferToCloudinary(buffer, {
+    folder: 'sureimports/corporate-gifts',
+    publicId: key,
+    useFilename: false,
+    uniqueFilename: false,
+    overwrite: true,
   });
-  await upload.done();
+  return uploaded.url;
 };
 
 export async function POST(req: Request) {
@@ -167,12 +159,14 @@ export async function POST(req: Request) {
 
     let referenceFileKey: string | null = null;
     let logoFileKey: string | null = null;
+    let referenceFileUrl: string | null = null;
+    let logoFileUrl: string | null = null;
     if (refImage && refImage.size > 0) {
       const ext = refImage.name.includes('.')
         ? refImage.name.split('.').pop()
         : 'bin';
       referenceFileKey = `${pidRequest}-reference.${ext}`;
-      await uploadToR2(refImage, referenceFileKey);
+      referenceFileUrl = await uploadToCloudinary(refImage, referenceFileKey);
     }
 
     if (companyLogo && companyLogo.size > 0) {
@@ -180,7 +174,7 @@ export async function POST(req: Request) {
         ? companyLogo.name.split('.').pop()
         : 'bin';
       logoFileKey = `${pidRequest}-logo.${ext}`;
-      await uploadToR2(companyLogo, logoFileKey);
+      logoFileUrl = await uploadToCloudinary(companyLogo, logoFileKey);
     }
 
     // 4. Persist submission in DB
@@ -201,9 +195,9 @@ export async function POST(req: Request) {
         proceedTimeline: data.proceedTimeline,
         hearAboutSureImports: data.hearAboutSureImports,
         additionalNotes: data.additionalNotes,
-        referenceFileUrl: referenceFileKey ? toR2Url(referenceFileKey) : null,
+        referenceFileUrl: referenceFileUrl,
         referenceFileName: refImage?.name || null,
-        logoFileUrl: logoFileKey ? toR2Url(logoFileKey) : null,
+        logoFileUrl: logoFileUrl,
         logoFileName: companyLogo?.name || null,
         status: 'Pending',
         pageUrl: data.pageUrl,

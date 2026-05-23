@@ -47,9 +47,9 @@ export default function CorporateGiftsPage() {
   return (
     <>
       <Header />
-      <main className="bg-[#020617] text-white">
+      <main className="bg-[#020617] text-white antialiased [text-rendering:optimizeLegibility] [-webkit-font-smoothing:antialiased] [font-kerning:normal]">
         {/* --- HERO SECTION --- */}
-        <section className="relative pt-20 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+        <section className="relative overflow-hidden pb-20 pt-20">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-blue-600/5 blur-[120px] pointer-events-none" />
           
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -79,7 +79,7 @@ export default function CorporateGiftsPage() {
               </div>
 
               {/* Product Visual Mockup */}
-              <div className="relative group">
+              <div className="relative hidden group md:block">
                 <div className="absolute -inset-1 rounded-[2rem] bg-gradient-to-r from-blue-500 to-purple-600 opacity-20 blur group-hover:opacity-30 transition duration-1000"></div>
                 <div className="relative grid grid-cols-2 gap-4 rounded-[2rem] border border-white/10 bg-slate-900/50 p-6 backdrop-blur-xl">
                    <div className="space-y-4">
@@ -95,11 +95,29 @@ export default function CorporateGiftsPage() {
             </div>
 
             {/* --- CLIENT TRUST BAR --- */}
-            <div className="mt-24 border-t border-white/5 pt-12">
-              <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 mb-8">
+            <div className="mt-16 border-t border-white/5 pt-10">
+              <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                 Trusted by organizations across Nigeria
               </p>
-              <div className="grid w-full grid-cols-2 place-items-center gap-10 md:grid-cols-4 md:gap-12">
+              <div className="md:hidden relative overflow-hidden">
+                <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-[#020617] to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-[#020617] to-transparent" />
+                <div className="mobile-logo-marquee flex w-max items-center gap-10">
+                  {[...clients, ...clients].map((client, idx) => (
+                    <div key={`${client.name}-${idx}`} className="flex items-center justify-center">
+                      <Image
+                        src={client.src}
+                        alt={client.name}
+                        width={260}
+                        height={100}
+                        quality={100}
+                        className={`h-auto object-contain ${client.widthClass ?? 'w-[180px]'} ${client.className ?? ''}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="hidden w-full grid-cols-2 place-items-center gap-10 md:grid md:grid-cols-4 md:gap-12">
                 {clients.map((client) => (
                   <div key={client.name} className="flex items-center justify-center">
                     <Image
@@ -107,6 +125,7 @@ export default function CorporateGiftsPage() {
                       alt={client.name}
                       width={260}
                       height={100}
+                      quality={100}
                       className={`h-auto object-contain ${
                         client.widthClass ?? 'w-[180px] md:w-[240px]'
                       } ${client.className ?? ''}`}
@@ -119,9 +138,9 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- PROCESS STEPS --- */}
-        <section className="py-24 bg-slate-950/50">
+        <section className="bg-slate-950/50 py-20">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold mb-16">The Sourcing Workflow</h2>
+            <h2 className="mb-16 text-3xl font-bold">The Sourcing Workflow</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
                 {/* Connecting Line (Desktop) */}
                 <div className="hidden md:block absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500/20 to-transparent -translate-y-12" />
@@ -145,13 +164,13 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- PRODUCT GRID --- */}
-        <section className="py-24 px-4">
+        <section className="px-4 py-20">
           <div className="mx-auto max-w-6xl">
-            <div className="flex justify-between items-end mb-10">
-               <h2 className="text-2xl font-bold">Catalog Examples</h2>
+            <div className="mb-10 flex items-end justify-between">
+               <h2 className="text-2xl font-bold">Product Examples</h2>
                <div className="text-xs bg-amber-500/10 border border-amber-500/20 text-amber-200 px-4 py-2 rounded-full flex items-center gap-2">
                  <CalendarClock className="w-3 h-3" />
-                 Book 6-8 weeks early for festive seasons
+                 Book at least 12 weeks early for festive seasons
                </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -166,9 +185,9 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- FORM SECTION --- */}
-        <section id="corporate-gifts-form" className="py-24 border-t border-white/5">
+        <section id="corporate-gifts-form" className="border-t border-white/5 py-20">
           <div className="mx-auto max-w-4xl px-4">
-            <div className="text-center mb-16">
+            <div className="mb-16 text-center">
               <h2 className="text-4xl font-bold">Submit Your Request</h2>
               <p className="mt-4 text-slate-400">Our sourcing team will review your details and contact you via WhatsApp.</p>
             </div>

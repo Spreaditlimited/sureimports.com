@@ -64,7 +64,7 @@ function ProductDetailsContent({
     if (!product) return;
 
     const imageUrl = product.productImage
-      ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${product.productImage}`
+      ? `${(process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL)}/${product.productImage}`
       : '/placeholder.svg?height=400&width=400';
 
     addToCart(
@@ -105,7 +105,7 @@ function ProductDetailsContent({
   }
 
   const imageUrl = product.productImage
-    ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${product.productImage}`
+    ? `${(process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL)}/${product.productImage}`
     : '/placeholder.svg?height=400&width=400';
 
   const inCart = isInCart(product.pidProduct);
@@ -301,7 +301,7 @@ function ProductDetailsContent({
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {relatedProducts.map((relatedProduct) => {
                 const relatedImageUrl = relatedProduct.productImage
-                  ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${relatedProduct.productImage}`
+                  ? `${(process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL)}/${relatedProduct.productImage}`
                   : '/placeholder.svg?height=200&width=200';
 
                 return (
