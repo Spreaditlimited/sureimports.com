@@ -16,7 +16,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart, isInCart } = useShopCart();
 
   const imageUrl = product.productImage
-    ? `${(process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL)}/${product.productImage}`
+    ? `${process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL}/${product.productImage}`
     : '/placeholder.svg?height=240&width=320';
 
   const handleViewDetails = () => {

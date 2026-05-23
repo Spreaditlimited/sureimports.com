@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma';
 // Media base URL for serving filename-based images during migration
 const MEDIA_PUBLIC_URL =
   process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
-  (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) ||
+  process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
   '';
 
 // SEO metadata interface

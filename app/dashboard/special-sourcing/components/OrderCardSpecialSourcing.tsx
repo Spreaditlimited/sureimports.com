@@ -313,7 +313,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                     {/* <label>Product Image</label> */}
                     <Image
                       src={
-                        (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
+                        process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
                         '/' +
                         productImage
                       }

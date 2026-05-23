@@ -109,4 +109,4 @@ If you have the admin blog management system set up:
 
 ### Images not showing?
 
-Make sure `NEXT_PUBLIC_R2_PUBLIC_URL` is set in your environment variables.
+Make sure `NEXT_PUBLIC_CLOUDINARY_BASE_URL` is set in your environment variables.

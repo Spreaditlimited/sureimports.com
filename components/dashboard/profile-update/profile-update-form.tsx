@@ -108,7 +108,7 @@ const ProfileUpdateForm: React.FC<FormProps> = () => {
 
   // alert(userData?.userImage);
 
-  //   const url = (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL)+'/'+imagex;
+  //   const url = process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL+'/'+imagex;
   //   const defaultSrc = "/icons/profile-update/default.png";
 
   //GET USER PROFILE RECORDS

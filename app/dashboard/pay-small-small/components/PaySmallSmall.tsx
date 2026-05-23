@@ -734,7 +734,7 @@ export default function App({
 
   const ProductImage = React.memo(
     ({ image, title }: { image?: string | null; title?: string }) => {
-      const base = (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL);
+      const base = process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL;
       const hasImage = Boolean(image && base);
       const src = hasImage ? `${base}/${image}` : undefined;
 

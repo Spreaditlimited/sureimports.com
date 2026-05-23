@@ -444,7 +444,7 @@ NEXT_SECRET_PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxxxxxx
 - Cart data persists in localStorage across sessions
 - Payment amounts are converted to kobo (multiply by 100) for Paystack
 - Email notifications use the `xMail` function from `lib/email/xMail3.ts`
-- Product images are served from R2 storage via `NEXT_PUBLIC_R2_PUBLIC_URL`
+- Product images are served from R2 storage via `NEXT_PUBLIC_CLOUDINARY_BASE_URL`
 - The shop is completely independent from the existing store at `/dashboard/store`
 
 ---

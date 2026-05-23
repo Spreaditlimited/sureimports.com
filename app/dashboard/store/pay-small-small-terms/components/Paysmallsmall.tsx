@@ -45,7 +45,7 @@ function ProductImage({ product }: ProductImageProps) {
     <div className="relative inline-grid shrink-0 grid-cols-[max-content] grid-rows-[max-content] place-items-start leading-[0]">
       <img
         src={
-          ((process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
+          (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
             '/' +
             `${product.productImage}`) as string
         }
@@ -241,7 +241,7 @@ function MobileProductImage({ product }: any) {
 
       <img
         src={
-          ((process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || process.env.NEXT_PUBLIC_R2_PUBLIC_URL) +
+          (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
             '/' +
             `${product.productImage}`) as string
         }
