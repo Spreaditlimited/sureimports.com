@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { User as UserIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/lib/AuthContext';
+import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
 export interface UserAvatarProps extends AvatarProps {
   userx: {
@@ -24,8 +25,7 @@ export function UserAvatar({ userx }: UserAvatarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
 
-  const imageUser =
-    process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL + '/' + user?.userImage;
+  const imageUser = resolveMediaUrl(user?.userImage);
   const imageDefault = '../../../images/default.png';
 
   useEffect(() => {

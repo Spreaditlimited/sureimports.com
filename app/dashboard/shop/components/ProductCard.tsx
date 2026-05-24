@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Eye } from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
+import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
 interface ProductCardProps {
   product: any;
@@ -15,9 +16,8 @@ export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
   const { addToCart, isInCart } = useShopCart();
 
-  const imageUrl = product.productImage
-    ? `${process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL}/${product.productImage}`
-    : '/placeholder.svg?height=240&width=320';
+  const imageUrl = resolveMediaUrl(product.productImage)
+    || '/placeholder.svg?height=240&width=320';
 
   const handleViewDetails = () => {
     router.push(`/dashboard/shop/${product.pidProduct}`);

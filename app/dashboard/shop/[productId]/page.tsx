@@ -18,6 +18,7 @@ import { BiMoney } from 'react-icons/bi';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { toast } from 'sonner';
 import Loading from '../../loading';
+import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
 function ProductDetailsContent({
   params,
@@ -63,9 +64,9 @@ function ProductDetailsContent({
   const handleAddToCart = () => {
     if (!product) return;
 
-    const imageUrl = product.productImage
-      ? `${process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL}/${product.productImage}`
-      : '/placeholder.svg?height=400&width=400';
+    const imageUrl =
+      resolveMediaUrl(product.productImage) ||
+      '/placeholder.svg?height=400&width=400';
 
     addToCart(
       {
@@ -104,9 +105,8 @@ function ProductDetailsContent({
     );
   }
 
-  const imageUrl = product.productImage
-    ? `${process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL}/${product.productImage}`
-    : '/placeholder.svg?height=400&width=400';
+  const imageUrl = resolveMediaUrl(product.productImage)
+    || '/placeholder.svg?height=400&width=400';
 
   const inCart = isInCart(product.pidProduct);
   const cartItem = getCartItem(product.pidProduct);
