@@ -49,11 +49,11 @@ export default function CorporateGiftsPage() {
       <Header />
       <main className="bg-[#020617] text-white antialiased [text-rendering:optimizeLegibility] [-webkit-font-smoothing:antialiased] [font-kerning:normal]">
         {/* --- HERO SECTION --- */}
-        <section className="relative overflow-hidden pb-20 pt-20">
+        <section className="relative overflow-hidden">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-blue-600/5 blur-[120px] pointer-events-none" />
           
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
+          <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8">
+            <div className="grid min-h-[calc(100vh-160px)] items-center grid-cols-1 gap-12 lg:grid-cols-2 lg:items-center">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-400 uppercase tracking-wider">
                   Direct Factory Sourcing
