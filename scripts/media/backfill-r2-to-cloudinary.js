@@ -22,7 +22,9 @@ function isHttpUrl(value) {
 }
 
 function makeLegacyUrl(value) {
-  const base = String(process.env.LEGACY_MEDIA_BASE_URL || '').trim().replace(/\/$/, '');
+  const base = String(process.env.LEGACY_MEDIA_BASE_URL || '')
+    .trim()
+    .replace(/\/$/, '');
   if (!base) return null;
   return `${base}/${String(value || '').replace(/^\//, '')}`;
 }
@@ -50,20 +52,71 @@ async function runBackfill() {
     secure: true,
   });
 
-  const dryRun = String(process.env.DRY_RUN || 'true').toLowerCase() !== 'false';
+  const dryRun =
+    String(process.env.DRY_RUN || 'true').toLowerCase() !== 'false';
   console.log(`[backfill] dryRun=${dryRun}`);
 
   const targets = [
-    { model: 'users', key: 'pidUser', imageField: 'userImage', folder: 'sureimports/users' },
-    { model: 'store', key: 'pidProduct', imageField: 'productImage', folder: 'sureimports/store' },
-    { model: 'special_sourcing', key: 'pidSpecialSourcing', imageField: 'productImage', folder: 'sureimports/special-sourcing' },
-    { model: 'pay_supplier', key: 'pidPaySupplier', imageField: 'aliPayAccountQRCodeImage', folder: 'sureimports/pay-supplier' },
-    { model: 'pay_supplier', key: 'pidPaySupplier', imageField: 'weChatAccountQRCodeImage', folder: 'sureimports/pay-supplier' },
-    { model: 'pay_supplier', key: 'pidPaySupplier', imageField: 'proformaInvoiceImage', folder: 'sureimports/pay-supplier' },
-    { model: 'blog', key: 'pidBlog', imageField: 'blogImage', folder: 'sureimports/blog' },
-    { model: 'blog_publisher', key: 'pidPublisher', imageField: 'publisherImage', folder: 'sureimports/blog-publisher' },
-    { model: 'corporate_gift_request', key: 'pidRequest', imageField: 'referenceFileUrl', folder: 'sureimports/corporate-gifts' },
-    { model: 'corporate_gift_request', key: 'pidRequest', imageField: 'logoFileUrl', folder: 'sureimports/corporate-gifts' },
+    {
+      model: 'users',
+      key: 'pidUser',
+      imageField: 'userImage',
+      folder: 'sureimports/users',
+    },
+    {
+      model: 'store',
+      key: 'pidProduct',
+      imageField: 'productImage',
+      folder: 'sureimports/store',
+    },
+    {
+      model: 'special_sourcing',
+      key: 'pidSpecialSourcing',
+      imageField: 'productImage',
+      folder: 'sureimports/special-sourcing',
+    },
+    {
+      model: 'pay_supplier',
+      key: 'pidPaySupplier',
+      imageField: 'aliPayAccountQRCodeImage',
+      folder: 'sureimports/pay-supplier',
+    },
+    {
+      model: 'pay_supplier',
+      key: 'pidPaySupplier',
+      imageField: 'weChatAccountQRCodeImage',
+      folder: 'sureimports/pay-supplier',
+    },
+    {
+      model: 'pay_supplier',
+      key: 'pidPaySupplier',
+      imageField: 'proformaInvoiceImage',
+      folder: 'sureimports/pay-supplier',
+    },
+    {
+      model: 'blog',
+      key: 'pidBlog',
+      imageField: 'blogImage',
+      folder: 'sureimports/blog',
+    },
+    {
+      model: 'blog_publisher',
+      key: 'pidPublisher',
+      imageField: 'publisherImage',
+      folder: 'sureimports/blog-publisher',
+    },
+    {
+      model: 'corporate_gift_request',
+      key: 'pidRequest',
+      imageField: 'referenceFileUrl',
+      folder: 'sureimports/corporate-gifts',
+    },
+    {
+      model: 'corporate_gift_request',
+      key: 'pidRequest',
+      imageField: 'logoFileUrl',
+      folder: 'sureimports/corporate-gifts',
+    },
   ];
 
   for (const target of targets) {
@@ -85,27 +138,42 @@ async function runBackfill() {
 
       const sourceUrl = isHttpUrl(current) ? current : makeLegacyUrl(current);
       if (!sourceUrl) {
-        console.log(`[skip] ${target.model}.${target.imageField} missing LEGACY_MEDIA_BASE_URL for ${id}`);
+        console.log(
+          `[skip] ${target.model}.${target.imageField} missing LEGACY_MEDIA_BASE_URL for ${id}`,
+        );
         continue;
       }
 
-      const hash = crypto.createHash('md5').update(current).digest('hex').slice(0, 10);
+      const hash = crypto
+        .createHash('md5')
+        .update(current)
+        .digest('hex')
+        .slice(0, 10);
       const publicId = `${id}-${target.imageField}-${hash}`;
 
       if (dryRun) {
-        console.log(`[dry-run] ${target.model}:${id} ${target.imageField} -> ${target.folder}/${publicId}`);
+        console.log(
+          `[dry-run] ${target.model}:${id} ${target.imageField} -> ${target.folder}/${publicId}`,
+        );
         continue;
       }
 
       try {
-        const uploaded = await uploadUrlToCloudinary(sourceUrl, target.folder, publicId);
+        const uploaded = await uploadUrlToCloudinary(
+          sourceUrl,
+          target.folder,
+          publicId,
+        );
         await delegate.update({
           where: { [target.key]: row[target.key] },
           data: { [target.imageField]: uploaded.secure_url },
         });
         console.log(`[ok] ${target.model}:${id} ${target.imageField}`);
       } catch (error) {
-        console.error(`[fail] ${target.model}:${id} ${target.imageField}`, error.message || error);
+        console.error(
+          `[fail] ${target.model}:${id} ${target.imageField}`,
+          error.message || error,
+        );
       }
     }
   }
