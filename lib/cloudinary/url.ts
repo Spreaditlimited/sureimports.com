@@ -15,8 +15,8 @@ export function isCloudinaryUrl(url: string): boolean {
 
 export function resolveMediaUrl(
   value: string | null | undefined,
-  baseUrl: string | null | undefined =
-    process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL,
+  baseUrl: string | null | undefined = process.env
+    .NEXT_PUBLIC_CLOUDINARY_BASE_URL,
 ): string {
   const media = String(value || '').trim();
   if (!media) return '';
