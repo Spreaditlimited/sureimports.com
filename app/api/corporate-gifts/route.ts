@@ -6,6 +6,7 @@ import {
   notifyCustomerCorporateGiftStatus,
   type CorporateGiftStatus,
 } from '@/lib/notifications/corporateGifts';
+import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -28,6 +29,19 @@ const uploadToCloudinary = async (file: File, key: string) => {
     overwrite: true,
   });
   return uploaded.url;
+};
+
+const getIpAddress = (req: Request) => {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const first = forwardedFor.split(',')[0]?.trim();
+    if (first) return first;
+  }
+
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp) return realIp;
+
+  return null;
 };
 
 export async function POST(req: Request) {
@@ -82,6 +96,9 @@ export async function POST(req: Request) {
       utmTerm: getString(formData, ['utm_term']) || null,
       submittedAt:
         getString(formData, ['submitted_at']) || new Date().toISOString(),
+      fbEventId: getString(formData, ['fb_event_id']) || null,
+      fbp: getString(formData, ['fbp']) || null,
+      fbc: getString(formData, ['fbc']) || null,
     };
 
     const quantityNeeded = Number(data.quantityNeededRaw);
@@ -195,9 +212,9 @@ export async function POST(req: Request) {
         proceedTimeline: data.proceedTimeline,
         hearAboutSureImports: data.hearAboutSureImports,
         additionalNotes: data.additionalNotes,
-        referenceFileUrl: referenceFileUrl,
+        referenceFileUrl,
         referenceFileName: refImage?.name || null,
-        logoFileUrl: logoFileUrl,
+        logoFileUrl,
         logoFileName: companyLogo?.name || null,
         status: 'Pending',
         pageUrl: data.pageUrl,
@@ -276,6 +293,38 @@ Page URL: ${data.pageUrl || 'N/A'}
       );
     } catch (emailError) {
       console.error('Corporate gifts email notification failed:', emailError);
+    }
+
+    // 7. Send Facebook CAPI Lead event (non-blocking for user success)
+    try {
+      const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+      const accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
+
+      if (pixelId && accessToken && data.fbEventId) {
+        await sendFacebookLeadCapiEvent({
+          pixelId,
+          accessToken,
+          eventId: data.fbEventId,
+          eventSourceUrl: data.pageUrl,
+          testEventCode: process.env.FACEBOOK_TEST_EVENT_CODE || null,
+          userData: {
+            email: data.contactEmail,
+            phone: data.whatsappNumber,
+            clientIpAddress: getIpAddress(req),
+            clientUserAgent: req.headers.get('user-agent'),
+            fbp: data.fbp,
+            fbc: data.fbc,
+          },
+          customData: {
+            content_name: 'Corporate Gift Submission',
+            content_category: 'Corporate Gifts',
+            value: quantityNeeded,
+            currency: 'NGN',
+          },
+        });
+      }
+    } catch (capiError) {
+      console.error('Corporate gifts Facebook CAPI failed:', capiError);
     }
 
     return NextResponse.json(

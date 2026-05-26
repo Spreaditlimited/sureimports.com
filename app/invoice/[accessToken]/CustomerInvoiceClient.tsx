@@ -146,6 +146,9 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
                 Issued to{' '}
                 <span className="font-medium text-slate-900">{invoice.customerName || invoice.customerEmail}</span>
               </p>
+              {invoice.customerEmail ? (
+                <p className="mt-1 text-sm text-slate-500">{invoice.customerEmail}</p>
+              ) : null}
             </div>
             <div className="text-left md:text-right">
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Balance Due</p>
@@ -364,4 +367,3 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
     </div>
   );
 }
-

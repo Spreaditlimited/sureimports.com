@@ -3,7 +3,6 @@ import Script from 'next/script';
 import { useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
-const FB_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID || '1080444112537852';
 const TT_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || 'CUGVPGRC77U7F7KCBAEG';
 const GA_ID = process.env.NEXT_PUBLIC_GA4_ID || 'G-CMGHVCHW1D';
 
@@ -13,10 +12,11 @@ export function TrackingPixels() {
 
   // Send GA4 page_view on client-side route changes (and initial load)
   useEffect(() => {
-    if (!(window as any).gtag || !GA_ID) return;
+    const gtag = (window as Window & { gtag?: Window['gtag'] }).gtag;
+    if (!gtag || !GA_ID) return;
     const query = searchParams?.toString();
     const page_location = `${window.location.origin}${pathname}${query ? `?${query}` : ''}`;
-    (window as any).gtag('event', 'page_view', {
+    gtag('event', 'page_view', {
       page_title: document.title,
       page_location,
       page_path: pathname,
@@ -26,40 +26,6 @@ export function TrackingPixels() {
 
   return (
     <>
-      {/* Facebook Pixel */}
-      <Script
-        id="fb-pixel"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `
-            !function(f,b,e,v,n,t,s){
-              if(f.fbq)return;
-              n=f.fbq=function(){
-                n.callMethod ? n.callMethod.apply(n,arguments) : n.queue.push(arguments)
-              };
-              if(!f._fbq)f._fbq=n;
-              n.push=n; n.loaded=!0; n.version='2.0';
-              n.queue=[];
-              t=b.createElement(e); t.async=!0; t.src=v;
-              s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s);
-            }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init','${FB_ID}');
-            fbq('track','PageView');
-          `,
-        }}
-      />
-      <noscript>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          height="1"
-          width="1"
-          style={{ display: 'none' }}
-          src={`https://www.facebook.com/tr?id=${FB_ID}&ev=PageView&noscript=1`}
-          alt=""
-        />
-      </noscript>
-
       {/* TikTok Pixel */}
       <Script
         id="tt-pixel"

@@ -227,6 +227,22 @@ export default function CorporateGiftsClient() {
       if (logoFile) formData.append('company_logo_upload', logoFile);
 
       const searchParams = new URLSearchParams(window.location.search);
+      const eventId =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+      const getCookieValue = (name: string) => {
+        const entry = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith(`${name}=`));
+        if (!entry) return '';
+        return decodeURIComponent(entry.split('=').slice(1).join('='));
+      };
+
+      const fbp = getCookieValue('_fbp');
+      const fbc = getCookieValue('_fbc');
+
       formData.append('page_url', window.location.href);
       formData.append('utm_source', searchParams.get('utm_source') || '');
       formData.append('utm_medium', searchParams.get('utm_medium') || '');
@@ -234,6 +250,9 @@ export default function CorporateGiftsClient() {
       formData.append('utm_content', searchParams.get('utm_content') || '');
       formData.append('utm_term', searchParams.get('utm_term') || '');
       formData.append('submitted_at', new Date().toISOString());
+      formData.append('fb_event_id', eventId);
+      formData.append('fbp', fbp);
+      formData.append('fbc', fbc);
 
       const response = await fetch('/api/corporate-gifts', {
         method: 'POST',
@@ -241,6 +260,21 @@ export default function CorporateGiftsClient() {
       });
 
       if (!response.ok) throw new Error('Submission failed');
+
+      const fbq = (window as Window & { fbq?: Window['fbq'] }).fbq;
+
+      if (typeof fbq === 'function') {
+        fbq(
+          'track',
+          'Lead',
+          {
+            content_name: 'Corporate Gift Submission',
+            content_category: 'Corporate Gifts',
+            source: 'website',
+          },
+          { eventID: eventId },
+        );
+      }
 
       setStatus('success');
       resetForm();
