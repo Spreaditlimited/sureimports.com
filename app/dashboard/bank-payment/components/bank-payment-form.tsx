@@ -1,23 +1,11 @@
 'use client';
 
 import React, { useState } from 'react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
+
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
-import banks from '@/lib/data/banks';
-import { BsBank } from 'react-icons/bs';
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -26,290 +14,220 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-import { Input } from '@/components/ui/input-with-dark-mode';
-import RadText from '@/components/uix/xForm/RadText';
-import { FaBox, FaUser } from 'react-icons/fa';
-import RadSelectOption from '@/components/uix/xForm/RadSelectOption';
-import { BiWorld } from 'react-icons/bi';
-import { BuildingOfficeIcon } from '@heroicons/react/16/solid';
-import { toast } from 'sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import {
+  Landmark, 
+  User, 
+  Loader2, 
+  CheckCircle2,
+  Wallet
+} from 'lucide-react';
+
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 import { useAuth } from '@/lib/AuthContext';
 import Loader from '@/components/uix/Loader';
-import { Landmark, User } from 'lucide-react';
 
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
+type BankOption = {
+  optionName: string;
+  optionValue: string;
+};
+
+interface BankPaymentFormProps {
+  bankOptions?: BankOption[];
 }
 
-//API RESPONSE
-interface ApiResponse {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
-
-function BankPaymentForm() {
+export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormProps) {
+  const SELECT_BANK_SENTINEL = '__SELECT_BANK__';
   const searchParams = useSearchParams();
-  const router = useRouter();
-
-  let productID = 'BANK' + new Date().getTime().toString();
-
-  //initialize alert system
   const navigateWithAlert = useNavigationWithAlert();
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [pidBankPayment, setPidBankPayment] = useState(productID);
-  const [email, setEmail] = useState(user?.userEmail);
+  const { user } = useAuth();
 
-  const [service, setService] = useState(searchParams.get('service')) as any;
-  const [amount, setAmount] = useState(searchParams.get('amount')) as any;
+  const [pidUser] = useState(user?.pidUser || '');
+  const [pidBankPayment] = useState('BANK' + new Date().getTime().toString());
+  
+  const service = searchParams.get('service') || '';
+  const amount = parseFloat(searchParams.get('amount') || '0');
+  const exNairaToDollar = parseFloat(searchParams.get('exNairaToDollar') || '0');
+  
+  const newTotalAmount = searchParams.get('newTotalAmount') || '';
+  const newTotalWeight = searchParams.get('newTotalWeight') || '';
+  const newEstimatedTotalShippingCost = searchParams.get('newEstimatedTotalShippingCost') || '';
+  const currencyType = searchParams.get('currencyType') || '';
+  const destinationCountry = searchParams.get('destinationCountry') || '';
+  const serviceID = searchParams.get('serviceID') || '';
+  const serviceDescription = searchParams.get('serviceDescription') || '';
+  const currentStatus = searchParams.get('status') || '';
 
-  const [newTotalAmount, setNewTotalAmount] = useState(
-    searchParams.get('newTotalAmount'),
-  ) as any;
-  const [newTotalWeight, setNewTotalWeight] = useState(
-    searchParams.get('newTotalWeight'),
-  ) as any;
-  const [newEstimatedTotalShippingCost, setNewEstimatedTotalShippingCost] =
-    useState(searchParams.get('newEstimatedTotalShippingCost')) as any;
-
-  const [amountNaira, setAmountNaira] = useState(
-    searchParams.get('amountNaira'),
-  ) as any;
-  const [exNairaToDollar, setExNairaToDollar] = useState(
-    searchParams.get('exNairaToDollar'),
-  ) as any;
-  const [currencyType, setCurrencyType] = useState(
-    searchParams.get('currencyType'),
-  ) as any;
-  const [destinationCountry, setDestinationCountry] = useState(
-    searchParams.get('destinationCountry'),
-  ) as any;
-  const [bank, setBank] = useState('');
+  const [bank, setBank] = useState(SELECT_BANK_SENTINEL);
   const [depositor, setDepositor] = useState('');
-  const [serviceID, setServiceID] = useState(searchParams.get('serviceID'));
-  const [serviceDescription, setServiceDescription] = useState(
-    searchParams.get('serviceDescription'),
-  );
-  const [currentStatus, setCurrentStatus] = useState(
-    searchParams.get('status'),
-  ) as any;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  //FORM DATA SUBMISSION
+  const formatCurrency = (val: number) => {
+    return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!bank || bank === SELECT_BANK_SENTINEL) {
+      toast.error('Please select the bank you paid into.');
+      return;
+    }
+    if (!depositor || depositor.trim().length < 3) {
+      toast.error('Please enter the full name of the depositor.');
+      return;
+    }
 
-    //await new Promise((resolve) => setTimeout(resolve, 3000));
+    setIsSubmitting(true);
+    toast.loading('Submitting payment details...', { id: 'submit-payment' });
 
-    const formData = new FormData() as any;
+    const formData = new FormData();
     formData.append('pidUser', pidUser);
-    formData.append('userEmail', user?.userEmail);
+    formData.append('userEmail', user?.userEmail || '');
     formData.append('pidBankPayment', pidBankPayment);
-
-    formData.append('amount', amount);
+    formData.append('amount', amount.toString());
     formData.append('currencyType', currencyType);
     formData.append('destinationCountry', destinationCountry);
-    formData.append('bank', bank);
+    formData.append('bank', bank === SELECT_BANK_SENTINEL ? '' : bank);
     formData.append('depositor', depositor);
-
     formData.append('newTotalAmount', newTotalAmount);
     formData.append('newTotalWeight', newTotalWeight);
-    formData.append(
-      'newEstimatedTotalShippingCost',
-      newEstimatedTotalShippingCost,
-    );
-
+    formData.append('newEstimatedTotalShippingCost', newEstimatedTotalShippingCost);
     formData.append('serviceID', serviceID);
     formData.append('serviceDescription', serviceDescription);
     formData.append('currentStatus', currentStatus);
 
-    //MAKE REQUEST ATTEMPT
     try {
-      toast.info('Processing . . .');
-      //MAKE REQUEST
       const res = await fetch('/api/bank-payment/' + service, {
         method: 'POST',
         body: formData,
       });
 
-      // GET & PROCESS RESPONSE FROM API
-      const data: any = await res.json();
+      const data = await res.json();
 
-      if (data.statusx == 'SUCCESS') {
+      if (data.statusx === 'SUCCESS') {
+        toast.success('Payment details submitted successfully.', { id: 'submit-payment' });
         navigateWithAlert(
           '/dashboard',
           'success',
-          'Payment details was successfully submited, awaiting payment status confirmation.',
+          'Payment details successfully submitted! Awaiting payment status confirmation.'
         );
+      } else if (data.statusx === 'ACTION_FAILED' || data.statusx === 'EMPTY_BANK_PAYMENT_DETAILS') {
+        toast.warning(data.message || data.responsex?.message, { id: 'submit-payment' });
+      } else {
+        toast.error('Failed to submit details. Please try again.', { id: 'submit-payment' });
       }
-      // if (data.responsex.status == 'SUCCESS') {
-      //   toast.success(data.responsex.message);
-      // }
-      if (data.statusx == 'ACTION_FAILED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.statusx == 'EMPTY_BANK_PAYMENT_DETAILS') {
-        toast.warning(data.message);
-      }
-    } catch (error: any) {
-      console.log(error.message);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown network error';
+      console.error(message);
+      toast.error('A network error occurred.', { id: 'submit-payment' });
     } finally {
-      //setLoading(false);
+      setIsSubmitting(false);
     }
-
-    //FORM SUBMISSION ENDS
   };
 
   if (!amount) return <Loader />;
 
   return (
-    <div className="p-[25px]">
-      <div className="pt-[25px]">
-        <div className="item-center flex gap-[74px] border-b p-[5px] pb-10 text-slate-800 dark:border-slate-300 dark:text-white max-sm:flex-col max-sm:gap-[20px]">
-          <p className="w-36">Amount to be paid</p>
-
-          {/* USD AMOUNT */}
-          {true && (
-            <>
-              <div className="text-2xl font-bold text-blue-800">
-                $
-                {
-                  (amount / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as any
-                }
+    <div className="w-full">
+      
+      {/* Amount Due Highlight Card */}
+      <div className="mb-8 overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/50 dark:border-indigo-900/30 dark:bg-indigo-900/10">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-6">
+          <div className="flex items-center gap-4 mb-4 sm:mb-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/20">
+              <Wallet className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-600/70 dark:text-indigo-400/70">
+                Amount Expected
+              </p>
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                {serviceDescription || 'Service Payment'}
+              </h3>
+            </div>
+          </div>
+          
+          <div className="text-left sm:text-right">
+            <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+              ${formatCurrency(amount)}
+            </div>
+            {destinationCountry === 'Nigeria' && exNairaToDollar > 0 && (
+              <div className="mt-1 text-sm font-bold text-slate-500 dark:text-slate-400">
+                ≈ ₦{formatCurrency(amount * exNairaToDollar)}
               </div>
-              {' | '}
-            </>
-          )}
+            )}
+          </div>
+        </div>
+      </div>
 
-          {/* YUAN AMOUNT */}
-          {/* {currencyType == 'CNY' && (
-            <>
-              <div className="text-white-800 text-2xl font-bold">
-                ¥
-                {
-                  (amount * 7.13)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as any
-                }
-              </div>
-            </>
-          )} */}
+      <form onSubmit={submitForm} className="space-y-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          
+          {/* Bank Selection */}
+          <div className="space-y-3 md:col-span-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              Bank You Transferred To <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <Landmark className="absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <Select value={bank} onValueChange={setBank}>
+                <SelectTrigger className="h-14 w-full rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-indigo-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                  <SelectValue placeholder="Select the receiving account" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
+                  {bankOptions.map((opt, i) => (
+                    <SelectItem 
+                      key={i} 
+                      value={opt.optionValue}
+                      disabled={opt.optionValue === SELECT_BANK_SENTINEL}
+                    >
+                      {opt.optionName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
-          {/* USD AMOUNT */}
-          {/* {currencyType == 'CNY' && (
-            <>
-              {' | '}
-              <div className="text-2xl font-bold text-blue-800">
-                $
-                {
-                  (amount / 7.13)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as any
-                }
-              </div>
-              {' | '}
-            </>
-          )} */}
-
-          {/* NAIRA AMOUNT */}
-          {destinationCountry == 'Nigeria' && (
-            <>
-              <div className="text-white-800 text-2xl font-bold">
-                ₦
-                {
-                  (amount * exNairaToDollar)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as any
-                }
-              </div>
-            </>
-          )}
-
-          {/* ---------------------------------OTHER SERVICES LIKE PAY SUPPLIER USES THE BELOW CONDITIONS-------------------------------- */}
-
-          {/* NAIRA AMOUNT */}
-          {/* {currencyType == 'NGN' && (
-            <>
-              <div className="text-white-800 text-2xl font-bold">
-                ₦
-                {
-                  (amountNaira / 1)
-                    .toFixed(2)
-                    .toString()
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ',') as any
-                }
-              </div>
-            </>
-          )} */}
+          {/* Depositor Name */}
+          <div className="space-y-3 md:col-span-2">
+            <label htmlFor="depositor" className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+              Depositor / Sender Name <span className="text-rose-500">*</span>
+            </label>
+            <div className="relative">
+              <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <Input
+                id="depositor"
+                placeholder="Enter the name on the account you sent money from"
+                value={depositor}
+                onChange={(e) => setDepositor(e.target.value)}
+                className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-indigo-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+              />
+            </div>
+            <p className="text-xs text-slate-500">
+              Please enter the exact name associated with the sending bank account so we can trace your payment.
+            </p>
+          </div>
         </div>
 
-        <form onSubmit={submitForm}>
-          {/* SINGLE COLUMN: PRODUCT NAME */}
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/1 w-full p-2">
-              {/* COL 2 */}
-              <div>
-                <RadSelectOption
-                  label={'Bank'}
-                  reacticon={<Landmark className="text-gray-400" />}
-                  name={'bank'}
-                  id={'bank'}
-                  xrecords={banks}
-                  value={bank}
-                  onChange={(e) => setBank(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+          <p className="text-xs font-semibold text-rose-500 dark:text-rose-400">
+            Please DO NOT submit the same payment details twice.
+          </p>
+          <Button
+            type="submit"
+            disabled={isSubmitting || !bank || bank === SELECT_BANK_SENTINEL || depositor.length < 3}
+            className="w-full sm:w-auto h-14 rounded-xl bg-indigo-600 px-8 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Verifying...</>
+            ) : (
+              <><CheckCircle2 className="mr-2 h-5 w-5" /> Submit Deposit Details</>
+            )}
+          </Button>
+        </div>
 
-          {/* SINGLE COLUMN: PRODUCT NAME */}
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/1 w-full p-2">
-              {/* COL 2 */}
-              <div>
-                <RadText
-                  label={'Depositors Full Name'}
-                  reacticon={<User className="text-gray-400" />}
-                  name={'depositor'}
-                  id={'depositor'}
-                  value={depositor}
-                  onChange={(e) => setDepositor(e.target.value)}
-                  placeholder={'Enter Depositors Fullname here'}
-                  disable={false}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="text-sm font-normal text-slate-600 dark:text-slate-300 md:w-[700px]">
-            Please, make a bank payment to any of the accounts above before
-            submitting. Please Do NOT submit the same payment twice.
-          </div>
-
-          <div className="mt-[25px] flex md:justify-end">
-            <Button
-              type="submit"
-              className="flex h-[49px] w-[300px] gap-[10px] rounded-xl bg-indigo-800 px-[25px] py-[15px] font-medium"
-            >
-              <Landmark className="text-gray-400" />
-              Submit Bank Deposit details
-            </Button>
-          </div>
-        </form>
-      </div>
+      </form>
     </div>
   );
 }
-
-export default BankPaymentForm;

@@ -51,6 +51,12 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
+const toTwoDecimals = (value: unknown): string => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return '';
+  return n.toFixed(2);
+};
+
 export default function EditProductForm({ product, productIDx }: any) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const params = useParams();
@@ -72,8 +78,8 @@ export default function EditProductForm({ product, productIDx }: any) {
       emailUser: user?.userEmail || '',
       productName: product?.productName || '',
       productLink: product?.productLink || '',
-      productPrice: product?.productPrice?.toString() || '',
-      productWeight: product?.productWeight?.toString() || '',
+      productPrice: toTwoDecimals(product?.productPrice),
+      productWeight: toTwoDecimals(product?.productWeight),
       productQuantity: product?.productQuantity?.toString() || '1',
       productInfo: product?.productInfo || '',
     },
@@ -95,11 +101,17 @@ export default function EditProductForm({ product, productIDx }: any) {
   }, [pidOrderx, product]);
 
   const onSubmit = async (values: FormValues) => {
-    if (parseFloat(values.productPrice) < 0.001) {
+    const normalizedValues: FormValues = {
+      ...values,
+      productPrice: toTwoDecimals(values.productPrice),
+      productWeight: toTwoDecimals(values.productWeight),
+    };
+
+    if (parseFloat(normalizedValues.productPrice) < 0.001) {
       toast.error('Minimum price for any purchase is 0.01.');
       return;
     }
-    if (parseFloat(values.productQuantity) < 1) {
+    if (parseFloat(normalizedValues.productQuantity) < 1) {
       toast.error('Quantity must be at least 1.');
       return;
     }
@@ -109,7 +121,7 @@ export default function EditProductForm({ product, productIDx }: any) {
       const res = await fetch('/api/crud/procurement-edit-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify(normalizedValues),
       });
 
       const data = await res.json();
@@ -334,6 +346,13 @@ export default function EditProductForm({ product, productIDx }: any) {
                         placeholder="0.00"
                         className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                         {...field}
+                        onBlur={(e) => {
+                          field.onBlur();
+                          form.setValue('productPrice', toTwoDecimals(e.target.value), {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+                        }}
                       />
                     </div>
                   </FormControl>
@@ -366,6 +385,13 @@ export default function EditProductForm({ product, productIDx }: any) {
                           placeholder="e.g., 1.5"
                           className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
+                          onBlur={(e) => {
+                            field.onBlur();
+                            form.setValue('productWeight', toTwoDecimals(e.target.value), {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            });
+                          }}
                         />
                       </div>
                     </FormControl>

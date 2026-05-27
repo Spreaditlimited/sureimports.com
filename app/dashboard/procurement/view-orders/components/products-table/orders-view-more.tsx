@@ -116,6 +116,12 @@ export default function MoreOrders({
   const [amountPounds, setAmountPounds] = useState<number>(0);
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const normalizedCurrency = String(currencyType || '').trim().toUpperCase();
+  const normalizedDestination = String(destinationCountry || '').trim().toLowerCase();
+  const shouldShowNairaRate =
+    normalizedDestination.includes('nigeria') && Number(exNairaToDollar) > 0;
+  const shouldShowYuanRate =
+    normalizedCurrency === 'CNY' && Number(exYuanToDollar) > 0;
 
   function replaceNullWithZero<T>(value: T | null): T | number {
     return value === null ? 0 : value;
@@ -462,8 +468,11 @@ export default function MoreOrders({
             {/* Exchange Rates Display */}
             <div className="space-y-2 pt-2 text-xs text-slate-500">
               <p className="font-bold uppercase tracking-widest mb-1 text-[10px]">Active Exchange Rates</p>
-              {currencyType === 'CNY' && <p>1 USD = ¥{exYuanToDollar} Yuan</p>}
-              {destinationCountry === 'Nigeria' && <p>1 USD = ₦{exNairaToDollar} Naira</p>}
+              {shouldShowYuanRate && <p>1 USD = ¥{formatCurrency(exYuanToDollar)} Yuan</p>}
+              {shouldShowNairaRate && <p>1 USD = ₦{formatCurrency(exNairaToDollar)} Naira</p>}
+              {!shouldShowYuanRate && !shouldShowNairaRate && (
+                <p className="text-slate-400">Exchange rates unavailable for this route.</p>
+              )}
             </div>
           </div>
 

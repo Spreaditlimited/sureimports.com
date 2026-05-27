@@ -30,6 +30,7 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
   const { isOpen } = useSidebar();
   const [openItem, setOpenItem] = useState('');
   const [lastOpenItem, setLastOpenItem] = useState('');
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     if (isOpen) {
@@ -154,7 +155,11 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
           </span>
         </button>
         <div className="mt-4 text-center text-[10px] text-muted-foreground">
-          © 2025. All rights reserved.
+          <div className="mx-auto mb-2 h-px w-20 bg-white/10" />
+          <p className="text-[10px] font-medium tracking-wide text-slate-400">
+            © {currentYear} Sure Imports
+          </p>
+          <p className="text-[10px] text-slate-500">All rights reserved.</p>
         </div>
       </div>
     </nav>
