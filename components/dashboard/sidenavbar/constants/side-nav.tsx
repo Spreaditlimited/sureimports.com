@@ -12,7 +12,6 @@ import {
   Globe,
   Search,
   Smartphone,
-  HandCoins,
   Truck,
   CheckCircle,
   Package2,

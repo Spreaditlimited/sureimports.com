@@ -103,9 +103,7 @@ After your first login, this temporary password expires and you will be prompted
     emailTriggered: emailResult.status === 'fulfilled',
     whatsappTriggered: whatsappResult.status === 'fulfilled',
     emailError:
-      emailResult.status === 'rejected'
-        ? String(emailResult.reason)
-        : null,
+      emailResult.status === 'rejected' ? String(emailResult.reason) : null,
     whatsappError:
       whatsappResult.status === 'rejected'
         ? String(whatsappResult.reason)
