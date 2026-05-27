@@ -27,21 +27,18 @@ export const metadata: Metadata = {
 
 function ProfileUpdate() {
   return (
-    <div className="bg-slate-50 dark:bg-black">
-      <div className="z-10 pl-[25px] pt-[25px] text-[28px] font-bold text-slate-800 dark:bg-black dark:text-white">
-        Profile Update
-      </div>
-      <div className="m-4 rounded-xl bg-white dark:bg-black">
-        <ProfileUpdateForm />
-      </div>
-      <div className="m-4 rounded-xl bg-white dark:bg-black">
-        <UpdatePassword />
-      </div>
-      <div className="m-4 rounded-xl bg-white dark:bg-black">
-        <UpdateBankDetailsFrom />
-      </div>
-      <div className="m-[25px] rounded-xl bg-white dark:bg-black">
-        <DeleteAccountForm />
+    <div className="min-h-screen bg-slate-50 dark:bg-black">
+      <ProfileUpdateForm />
+      <div className="px-4 py-4">
+        <div className="mb-4 rounded-xl bg-white dark:bg-black">
+          <UpdatePassword />
+        </div>
+        <div className="mb-4 rounded-xl bg-white dark:bg-black">
+          <UpdateBankDetailsFrom />
+        </div>
+        <div className="rounded-xl bg-white dark:bg-black">
+          <DeleteAccountForm />
+        </div>
       </div>
     </div>
   );

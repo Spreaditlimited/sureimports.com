@@ -47,7 +47,7 @@ export default function SearchPage() {
                   <Input
                     placeholder={`Search here...`}
                     {...field}
-                    className="flex h-[50px] w-[200px] items-center rounded-[10px] border-none px-[50px] placeholder:text-[13px] dark:bg-gray-800 md:w-[250px] xl:w-[409px]"
+                    className="flex h-[50px] w-full items-center rounded-[10px] border-none px-[50px] placeholder:text-[13px] dark:bg-gray-800"
                   />
                 </div>
               </FormControl>

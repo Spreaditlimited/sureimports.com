@@ -1,14 +1,12 @@
+'use client';
+
 import React from 'react';
 import AddProductForm from './add-product-form';
 
-function AddProductModal() {
+export default function AddProductModal() {
   return (
-    <div>
-      <div className="pl-6 pt-6">
-        <AddProductForm />
-      </div>
+    <div className="w-full h-full">
+      <AddProductForm />
     </div>
   );
 }
-
-export default AddProductModal;

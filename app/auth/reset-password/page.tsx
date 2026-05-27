@@ -328,7 +328,7 @@ const LoginPageContainer: React.FC = () => {
         router.push('/auth/account-not-activated/?email=' + email);
       } else {
         if (data.successx) {
-          login(data.userx);
+          await login(email, password);
           setLoading(false);
         } else {
           setMessage(data.messagex.message1);

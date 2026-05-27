@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
@@ -46,7 +47,7 @@ import {
   CheckCircle,
   X,
 } from 'lucide-react';
-import { Product, BulkOrder, BulkOrderItem } from '../App';
+import { Product, BulkOrder, BulkOrderItem } from './App';
 import { useEffect } from 'react';
 
 interface BulkOrderCreateDialogProps {

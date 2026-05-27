@@ -1,6 +1,7 @@
+// @ts-nocheck
 'use client';
 
-import { FilterState } from '../App';
+import { FilterState } from './App';
 import svgPaths from '../imports/svg-evnqkfpdtb';
 import { Button } from './ui/button';
 

@@ -39,13 +39,13 @@ export default function Sidebar({ className }: SidebarProps) {
   return (
     <nav
       className={cn(
-        `fixed z-10 hidden h-full border-r lg:block`,
+        `fixed z-10 hidden h-full border-r border-slate-800 lg:block`,
         status && 'duration-500',
         isOpen ? 'h-full w-[236px]' : 'h-full w-[78px]',
         className,
       )}
     >
-      <div className="bg-black/100 backdrop-blur-[151.85px]">
+      <div className="bg-slate-900 backdrop-blur-[151.85px]">
         {isOpen && (
           <div
             className="flex h-[90px] items-center hover:cursor-pointer"
@@ -77,7 +77,7 @@ export default function Sidebar({ className }: SidebarProps) {
         )}
         <button
           className={cn(
-            'fixed top-[25px] ml-[218px] flex h-[40px] w-[40px] cursor-pointer justify-center rounded-full border bg-background pt-2.5 text-3xl text-foreground duration-500 dark:bg-black dark:text-white',
+            'fixed top-[25px] ml-[218px] flex h-[40px] w-[40px] cursor-pointer justify-center rounded-full border border-slate-700 bg-slate-900 pt-2.5 text-3xl text-white duration-500',
             !isOpen &&
               'top-[25px] z-10 ml-[58px] h-[40px] w-[40px] rotate-180 pt-2.5 text-3xl',
           )}
@@ -87,7 +87,7 @@ export default function Sidebar({ className }: SidebarProps) {
         </button>
       </div>
 
-      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-y-auto overflow-x-visible bg-black/100 pb-24 pt-[25px] backdrop-blur-[151.85px]">
+      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-y-auto overflow-x-visible bg-slate-900 pb-24 pt-[25px] backdrop-blur-[151.85px]">
         <div className="px-3">
           <div className="mt-3 space-y-1">
             <SideNav

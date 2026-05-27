@@ -500,10 +500,7 @@ export default function UpdateBankDetailsFrom() {
                   </label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <span
-                        className="absolute z-10 m-2 text-2xl lg:m-5"
-                        style={{ color: '#404040' }}
-                      >
+                      <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-xl text-[#404040]">
                         <FileDigit className="text-gray-400" />
                       </span>
                       <input
@@ -514,7 +511,7 @@ export default function UpdateBankDetailsFrom() {
                         onChange={handleAccountNumberChange}
                         maxLength={10}
                         placeholder="Enter 10-digit account number"
-                        className="items-centerx max-sm:w-340px flex h-10 w-full justify-between rounded-md border border-input bg-background bg-slate-200 p-5 px-3 py-2 pl-12 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
+                        className="items-centerx max-sm:w-340px flex h-10 w-full justify-between rounded-md border border-input bg-background bg-slate-200 p-5 px-3 py-2 pl-14 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
                       />
                     </div>
                     <Button

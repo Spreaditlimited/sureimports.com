@@ -35,11 +35,37 @@ const config = {
       },
       
       colors: {
+        blue: {
+          50: '#EEF4FF',
+          100: '#DCE8FF',
+          200: '#BDD3FF',
+          300: '#93B6FF',
+          400: '#6695FF',
+          500: '#4579F0',
+          600: '#2E62D9',
+          700: '#2754BC',
+          800: '#20459B',
+          900: '#1B397F',
+          950: '#112553',
+        },
+        indigo: {
+          50: '#EEF4FF',
+          100: '#DCE8FF',
+          200: '#BDD3FF',
+          300: '#93B6FF',
+          400: '#6695FF',
+          500: '#4579F0',
+          600: '#2E62D9',
+          700: '#2754BC',
+          800: '#20459B',
+          900: '#1B397F',
+          950: '#112553',
+        },
         //store
         'buy-sourcing-white': "#FFF",
         'buy-sourcing-black': "#000",
         'buy-sourcing-bglightwhite': "rgba(255, 255, 255, 0.13)",
-        'buy-sourcing-blue': "#3730A3",
+        'buy-sourcing-blue': "#2E62D9",
         'buy-sourcing-purple': "#3E4095",
         'buy-sourcing-darkblack': "#161629",
         'buy-sourcing-gray': "#475569",
@@ -53,7 +79,7 @@ const config = {
         'store-white': "#FFF",
         'store-black': "#000",
         'store-bglightwhite': "rgba(255, 255, 255, 0.13)",
-        'store-blue': "#3730A3",
+        'store-blue': "#2E62D9",
         'store-purple': "#3E4095",
         'store-darkblack': "#161629",
         'store-gray': "#475569",
@@ -167,5 +193,4 @@ const config = {
 } satisfies Config
 
 export default config
-
 

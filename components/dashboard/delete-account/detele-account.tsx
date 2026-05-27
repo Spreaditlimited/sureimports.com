@@ -163,7 +163,7 @@ function DeleteAccountForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormDescription className="flex flex-col gap-4">
-                    <div>
+                    <span className="block">
                       <span className="text-red-500">WARNING</span>
                       <span>
                         {' '}
@@ -171,12 +171,14 @@ function DeleteAccountForm() {
                         SureImports account and all the information in your
                         account. This action is irreversible.{' '}
                       </span>
-                    </div>
-                    <div>
+                    </span>
+                    <span className="block">
                       You will be signed out of the system and will not be able
                       to sign in again
-                    </div>
-                    <div>Please type DELETE ACCOUNT to confirm.</div>
+                    </span>
+                    <span className="block">
+                      Please type DELETE ACCOUNT to confirm.
+                    </span>
                   </FormDescription>
                   <FormControl className="col-span-6">
                     <div className="item-center relative flex">

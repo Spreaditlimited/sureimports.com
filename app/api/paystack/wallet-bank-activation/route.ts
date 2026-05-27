@@ -14,6 +14,21 @@ type RequestBody = {
 
 export async function POST(request: Request) {
   try {
+    const paystackSecretKey =
+      process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY ||
+      process.env.PAYSTACK_SECRET_KEY;
+
+    if (!paystackSecretKey) {
+      return NextResponse.json(
+        {
+          status: false,
+          message:
+            'Missing Paystack secret key. Expected NEXT_SECRET_PAYSTACK_SECRET_KEY (or PAYSTACK_SECRET_KEY).',
+        },
+        { status: 500 },
+      );
+    }
+
     const body: RequestBody = await request.json();
     const { customer, preferred_bank } = body;
 
@@ -42,7 +57,7 @@ export async function POST(request: Request) {
           path: '/dedicated_account',
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+            Authorization: `Bearer ${paystackSecretKey}`,
             'Content-Type': 'application/json',
           },
         };

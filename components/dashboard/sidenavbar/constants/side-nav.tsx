@@ -12,7 +12,7 @@ import {
   Globe,
   Search,
   Smartphone,
-  DollarSign,
+  HandCoins,
   Truck,
   CheckCircle,
   Package2,
@@ -63,6 +63,12 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
+  {
+    title: 'Corporate Gifts',
+    icon: Package2,
+    href: '/dashboard/corporate-gifts',
+    color: 'text-white',
+  },
   // {
   //   title: 'Buy Phones & Laptops',
   //   icon: Smartphone,
@@ -77,20 +83,8 @@ export const NavItems: NavItem[] = [
   // },
 
   {
-    title: 'LineScout',
-    icon: Search,
-    href: 'https://linescout.sureimports.com/',
-    color: 'text-white',
-  },
-  {
-    title: 'Verify Supplier',
-    icon: CheckCircle,
-    href: '/dashboard/verify-supplier/pending-payment',
-    color: 'text-white',
-  },
-  {
     title: 'Refunds',
-    icon: DollarSign,
+    icon: HandCoins,
     href: '/dashboard/refunds',
     color: 'text-white',
   },
@@ -110,18 +104,6 @@ export const NavItems: NavItem[] = [
     title: 'Pay Small Small',
     icon: HandCoins,
     href: '/dashboard/pay-small-small?status=SAVED',
-    color: 'text-white',
-  },
-  {
-    title: 'Resources',
-    icon: BookOpen,
-    href: 'https://spreadit.selar.co',
-    color: 'text-white',
-  },
-  {
-    title: 'Free Consultation',
-    icon: User2,
-    href: 'https://calendly.com/sureimports/product-sourcing-one-one-one-session/',
     color: 'text-white',
   },
 ];
@@ -163,6 +145,12 @@ export const MobileNavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
+  {
+    title: 'Corporate Gifts',
+    icon: Package2,
+    href: '/dashboard/corporate-gifts',
+    color: 'text-white',
+  },
   // {
   //   title: 'Buy Phones & Laptops',
   //   icon: Smartphone,
@@ -176,20 +164,8 @@ export const MobileNavItems: NavItem[] = [
   //   color: 'text-white',
   // },
   {
-    title: 'LineScout',
-    icon: Search,
-    href: 'https://linescout.sureimports.com/',
-    color: 'text-white',
-  },
-  {
-    title: 'Verify Supplier',
-    icon: CheckCircle,
-    href: '/dashboard/verify-supplier/pending-payment',
-    color: 'text-white',
-  },
-  {
     title: 'Refunds',
-    icon: DollarSign,
+    icon: HandCoins,
     href: '/dashboard/refunds',
     color: 'text-white',
   },
@@ -209,18 +185,6 @@ export const MobileNavItems: NavItem[] = [
     title: 'Pay Small Small',
     icon: HandCoins,
     href: '/dashboard/pay-small-small?status=SAVED',
-    color: 'text-white',
-  },
-  {
-    title: 'Resources',
-    icon: BookOpen,
-    href: 'https://spreadit.selar.co',
-    color: 'text-white',
-  },
-  {
-    title: 'Free Consultation',
-    icon: User2,
-    href: 'https://calendly.com/sureimports/product-sourcing-one-one-one-session/',
     color: 'text-white',
   },
 ];

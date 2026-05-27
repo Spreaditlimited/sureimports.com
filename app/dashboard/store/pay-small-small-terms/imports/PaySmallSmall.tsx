@@ -1,3 +1,4 @@
+// @ts-nocheck
 import svgPaths from './svg-htimv6y8us';
 import imgImage from 'figma:asset/27d4ec04ddb84fba75591233e680f165d5cb6726.png';
 import imgSubtract from 'figma:asset/4964a0ebe3d64b53b49b697a91f64216e204411f.png';

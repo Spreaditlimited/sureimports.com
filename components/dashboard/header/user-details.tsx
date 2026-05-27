@@ -1,7 +1,13 @@
 import { type AvatarProps } from '@radix-ui/react-avatar';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/_lib/utils';
@@ -46,7 +52,7 @@ export function UserAvatar({ userx }: UserAvatarProps) {
   }
 
   return (
-    <div className="inline-flex items-center justify-start gap-2.5 text-slate-800 hover:cursor-pointer dark:text-white md:mr-12 md:h-[50px] md:w-[232px]">
+    <div className="inline-flex items-center justify-start gap-2.5 text-slate-800 hover:cursor-pointer dark:text-white md:mr-4 md:h-[50px]">
       {/* DESKTOP VIEW */}
       <Avatar className="hidden h-12 w-12 border-collapse border transition-all duration-300 hover:border-[#0E0E1F] dark:hover:border-white lg:block">
         {user?.userImage != null ? (
@@ -92,6 +98,9 @@ export function UserAvatar({ userx }: UserAvatarProps) {
           side="right"
           className="flex w-[264px] flex-col bg-[#0E0E1F] pr-0 text-white dark:bg-gray-900 lg:hidden"
         >
+          <SheetHeader className="sr-only">
+            <SheetTitle>User Menu</SheetTitle>
+          </SheetHeader>
           <div className="flex h-full flex-col gap-4">
             {/* MOBILE SLIDE OUT MENU ON AVATER CLICK */}
             <div className="flex gap-2">
@@ -123,32 +132,6 @@ export function UserAvatar({ userx }: UserAvatarProps) {
                 </div>
               </div>
             </div>
-
-            {/* INBOX LINK */}
-            <Link
-              href="/dashboard/message/message-box"
-              onClick={() => {
-                if (setOpen) setOpen(false);
-              }}
-              className={cn(
-                buttonVariants({}),
-                'group relative mr-0 flex h-12 justify-start rounded-r-none bg-white/10 pr-0 text-sm font-normal dark:bg-gray-800/50',
-              )}
-            >
-              <Image
-                src={
-                  theme === 'dark'
-                    ? '/icons/notification-dark.svg'
-                    : '/icons/notification.svg'
-                }
-                alt="Logo"
-                width={20}
-                height={20}
-              />
-              <span className={cn('absolute left-12 text-sm duration-200')}>
-                Inbox{' '}
-              </span>
-            </Link>
 
             {/* SETTINGS LINK */}
             <Link

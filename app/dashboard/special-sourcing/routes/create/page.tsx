@@ -1,5 +1,5 @@
 import React from 'react';
-import SpecialSourcingForm from '../../../../../_BACKUPS/FormSpecialSourcing';
+import SpecialSourcingForm from '@/app/dashboard/special-sourcing/components/FormSpecialSourcing';
 // import SpecialInstructions from './components/special-instructions';
 import type { Metadata } from 'next';
 

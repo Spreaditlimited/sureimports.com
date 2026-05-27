@@ -165,22 +165,17 @@ export default function WalletDashboard() {
   //////////// WALLET ACTIVATION //////////
   function walletActivation() {
     toast.info('Initializing Profile and Account');
+    setLoading(true);
 
     const activateWallet = async () => {
       try {
         const response = await fetch(
           '/api/paystack/wallet-customer-activation?pidUser=' + user?.pidUser,
         );
-
-        // if (!response.ok) {
-        //   throw new Error('Failed to fetch customer data');
-        // }
-
         const data: any = await response.json();
+        const customerID = data?.customerID;
 
-        const customerID = data.customerID;
-
-        if (data.statusx == 'SUCCESS') {
+        if (data?.statusx == 'SUCCESS' && customerID) {
           toast.success(data.message);
 
           try {
@@ -201,7 +196,6 @@ export default function WalletDashboard() {
             const data: any = await response.json();
 
             if (!data.status) {
-              //throw new Error(data.message || 'Failed to create dedicated account');
               toast.warning(
                 'Account Activation Failed, please try again or contact support. Error-Msg: ' +
                   data.message,
@@ -215,20 +209,23 @@ export default function WalletDashboard() {
               router.push('/dashboard/redirect?page=wallet');
             }
           } catch (err) {
-            // setError(
-            //   err instanceof Error ? err.message : 'An unknown error occurred',
-            // );
             toast.warning(
               'Account Activation Failed, please try again or contact support. Error: ' +
                 err,
             );
-          } finally {
-            setLoading(false);
           }
+        } else {
+          toast.warning(
+            data?.message ||
+              'Wallet activation failed. Please confirm your profile details and try again.',
+          );
         }
-      } catch (statusx) {
-        //setError(error instanceof Error ? error.message : 'Unknown error');
-        //setStatus(statusx as string);
+      } catch (error) {
+        toast.error(
+          `Wallet activation request failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
       } finally {
         setLoading(false);
       }

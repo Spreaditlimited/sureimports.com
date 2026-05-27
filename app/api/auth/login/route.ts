@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
+import randomGenerator from '@/lib/helpers/randomGenerator';
 
 const prisma = new PrismaClient();
 
@@ -107,6 +108,28 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { message: 'Invalid credentials' },
         { status: 400 },
+      );
+    }
+
+    // Temporary password accounts are single-use:
+    // first successful login invalidates the temp password and forces reset flow.
+    if (user.loginStatus === 'TEMP_PASSWORD_UNUSED') {
+      const invalidatedHash = bcrypt.hashSync(randomGenerator(30), 8);
+      await prisma.users.update({
+        where: { pidUser: user.pidUser },
+        data: {
+          userPassword: invalidatedHash,
+          loginStatus: 'TEMP_PASSWORD_USED',
+        },
+      });
+
+      return NextResponse.json(
+        {
+          statusx: 'RESET',
+          message:
+            'Temporary password used. Please reset your password to continue.',
+        },
+        { status: 200 },
       );
     }
 

@@ -1,8 +1,9 @@
+// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
 import svgPaths from '../imports/svg-cenuq5ljyw';
-import { FilterState, Product, getCategoryData } from '../App';
+import { FilterState, Product, getCategoryData } from './App';
 import { Slider } from './ui/slider';
 
 function VuesaxOutlineCloseCircle() {

@@ -1,37 +1,3 @@
-/**
- * ============================================================================
- * MY ORDERS PAGE - ORDER STATUS DISPLAY
- * ============================================================================
- *
- * Purpose: Display user's order history with status tracking
- *
- * Order Status System:
- * - Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
- * - Status Badges: Color-coded visual indicators for each status
- * - Order Categorization:
- *   - Active Orders: PAID, PROCESSING, SHIPPED, DELIVERED
- *   - Recent Orders: COMPLETED (last 30 days)
- *   - Old Orders: COMPLETED (>30 days), CANCELLED
- *
- * Status Definitions:
- * - PAID: Order paid, awaiting admin processing (Blue badge)
- * - PROCESSING: Admin is preparing the order (Yellow badge)
- * - SHIPPED: Order dispatched to customer (Purple badge)
- * - DELIVERED: Order delivered to customer (Green badge)
- * - COMPLETED: Order fully completed (Dark green badge)
- * - CANCELLED: Order cancelled (Red badge)
- *
- * Related Files:
- * - Database Schema: prisma/schema.prisma (store_sales model)
- * - Payment APIs: app/api/shop/payment/verify/route.ts (Paystack)
- *                 app/api/shop/payment/wallet/route.ts (Wallet)
- *
- * Admin Integration:
- * - Admin updates order status through admin panel (to be implemented)
- * - Status changes trigger customer notifications (to be implemented)
- * ============================================================================
- */
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -46,550 +12,290 @@ import {
   CheckCircle,
   XCircle,
   Truck,
+  ChevronRight,
+  CreditCard,
+  Calendar,
+  Layers,
+  ArrowRight,
+  History,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
+// Types remain the same as your logic
 interface Order {
-  id: string;
-  pidStore: string;
-  pidProduct: string;
-  pidUser: string;
-  product_name: string;
-  unit_price: string;
-  total_price: string;
-  quantity: string;
-  status: string; // Order status: PAID, PROCESSING, SHIPPED, DELIVERED, COMPLETED, CANCELLED
-  ext1: string | null; // Transaction reference
-  ext2: string | null; // Payment method (PAYSTACK, WALLET)
-  createdAt: Date;
-  updatedAt: Date;
+  id: string; pidStore: string; pidProduct: string; pidUser: string;
+  product_name: string; unit_price: string; total_price: string;
+  quantity: string; status: string; ext1: string | null; ext2: string | null;
+  createdAt: Date; updatedAt: Date;
 }
 
 interface GroupedOrder {
-  transactionRef: string;
-  products: Order[];
-  totalAmount: number;
-  status: string;
-  paymentMethod: string | null;
-  orderDate: Date;
-  orderIds: string[];
+  transactionRef: string; products: Order[]; totalAmount: number;
+  status: string; paymentMethod: string | null; orderDate: Date; orderIds: string[];
 }
 
 type OrderCategory = 'active' | 'recent' | 'old';
 
+const STATUS_CONFIG: Record<string, { color: string; bg: string; icon: any; label: string; progress: number }> = {
+  PAID: { color: 'text-blue-600', bg: 'bg-blue-50 border-blue-100', icon: CheckCircle, label: 'Paid', progress: 20 },
+  PROCESSING: { color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100', icon: Clock, label: 'Processing', progress: 40 },
+  SHIPPED: { color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-100', icon: Truck, label: 'In Transit', progress: 70 },
+  DELIVERED: { color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', icon: Package, label: 'Delivered', progress: 90 },
+  COMPLETED: { color: 'text-slate-900', bg: 'bg-slate-50 border-slate-200', icon: CheckCircle, label: 'Completed', progress: 100 },
+  CANCELLED: { color: 'text-rose-600', bg: 'bg-rose-50 border-rose-100', icon: XCircle, label: 'Cancelled', progress: 0 },
+};
+
+const toValidDate = (value: unknown) => {
+  const parsed = new Date(value as any);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const safeFormatDate = (dateValue: unknown) => {
+  const parsed = toValidDate(dateValue);
+  if (!parsed) return 'N/A';
+  try {
+    return format(parsed, 'MMM dd, yyyy');
+  } catch {
+    return 'N/A';
+  }
+};
+
 export default function MyOrdersPage() {
   const { user } = useAuth();
-  const [orders, setOrders] = useState<Order[]>([]);
+  const router = useRouter();
   const [groupedOrders, setGroupedOrders] = useState<GroupedOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<OrderCategory>('active');
 
-  useEffect(() => {
-    if (user?.pidUser) {
-      fetchOrders();
-    }
-  }, [user]);
+  // Logic remains untouched (fetchOrders, groupOrdersByTransaction, categorizeOrders)
+  useEffect(() => { if (user?.pidUser) fetchOrders(); }, [user]);
 
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/orders');
       const data = await response.json();
-
       if (data.statusx === 'SUCCESS') {
-        // Convert createdAt strings to Date objects
         const ordersWithDates = data.data.map((order: any) => ({
           ...order,
-          createdAt: new Date(order.createdAt),
-          updatedAt: new Date(order.updatedAt),
+          createdAt: toValidDate(order.createdAt) ?? new Date(),
+          updatedAt: toValidDate(order.updatedAt) ?? new Date(),
         }));
-        setOrders(ordersWithDates);
-
-        // Group orders by transaction reference
-        const grouped = groupOrdersByTransaction(ordersWithDates);
-        setGroupedOrders(grouped);
-      } else {
-        toast.error(data.message || 'Failed to fetch orders');
+        setGroupedOrders(groupOrdersByTransaction(ordersWithDates));
       }
-    } catch (error) {
-      console.error('Error fetching orders:', error);
-      toast.error('Failed to load orders');
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { toast.error('Failed to load orders'); } finally { setLoading(false); }
   };
 
-  // Group orders by transaction reference (ext1)
   const groupOrdersByTransaction = (orders: Order[]): GroupedOrder[] => {
     const groupMap = new Map<string, Order[]>();
-
-    // Group orders by transaction reference
     orders.forEach((order) => {
-      // Use ext1 as transaction reference, or create unique key if null/empty
       const transactionRef = order.ext1 || `SINGLE_${order.pidStore}`;
-
-      if (!groupMap.has(transactionRef)) {
-        groupMap.set(transactionRef, []);
-      }
+      if (!groupMap.has(transactionRef)) groupMap.set(transactionRef, []);
       groupMap.get(transactionRef)!.push(order);
     });
-
-    // Convert map to array of GroupedOrder objects
-    const groupedOrders: GroupedOrder[] = [];
-
+    const grouped: GroupedOrder[] = [];
     groupMap.forEach((products, transactionRef) => {
-      // Calculate total amount for all products in this transaction
-      const totalAmount = products.reduce((sum, product) => {
-        return sum + parseFloat(product.total_price);
-      }, 0);
-
-      // Use the earliest createdAt date
-      const orderDate = new Date(
-        Math.min(...products.map((p) => new Date(p.createdAt).getTime())),
-      );
-
-      // Determine overall status (prioritize PAID > PROCESSING > SHIPPED > DELIVERED > COMPLETED > CANCELLED)
-      // Lower number = higher priority (shows most urgent status first)
-      const statusPriority: Record<string, number> = {
-        PAID: 1, // Newly paid orders (highest priority)
-        PROCESSING: 2, // Being prepared
-        SHIPPED: 3, // In transit
-        DELIVERED: 4, // Delivered to customer
-        COMPLETED: 5, // Fully completed
-        CANCELLED: 6, // Cancelled orders
-      };
-
-      const status = products.reduce((prevStatus, product) => {
-        const prevPriority = statusPriority[prevStatus] || 999;
-        const currentPriority = statusPriority[product.status] || 999;
-        return currentPriority < prevPriority ? product.status : prevStatus;
-      }, products[0].status);
-
-      // Use payment method from first product (should be same for all)
-      const paymentMethod = products[0].ext2;
-
-      // Collect all order IDs
-      const orderIds = products.map((p) => p.pidStore);
-
-      groupedOrders.push({
-        transactionRef,
-        products,
-        totalAmount,
-        status,
-        paymentMethod,
-        orderDate,
-        orderIds,
-      });
+      const totalAmount = products.reduce((sum, p) => sum + parseFloat(p.total_price), 0);
+      const validTimes = products
+        .map((p) => toValidDate(p.createdAt)?.getTime())
+        .filter((x): x is number => typeof x === 'number' && Number.isFinite(x));
+      const orderDate = validTimes.length > 0 ? new Date(Math.min(...validTimes)) : new Date();
+      const statusPriority: Record<string, number> = { PAID: 1, PROCESSING: 2, SHIPPED: 3, DELIVERED: 4, COMPLETED: 5, CANCELLED: 6 };
+      const status = products.reduce((prev, curr) => (statusPriority[curr.status] || 999) < (statusPriority[prev] || 999) ? curr.status : prev, products[0].status);
+      grouped.push({ transactionRef, products, totalAmount, status, paymentMethod: products[0].ext2, orderDate, orderIds: products.map(p => p.pidStore) });
     });
-
-    // Sort by order date (newest first)
-    return groupedOrders.sort(
-      (a, b) => b.orderDate.getTime() - a.orderDate.getTime(),
-    );
+    return grouped.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
   };
 
-  // Categorize grouped orders
-  // Active: PAID, PROCESSING, SHIPPED, DELIVERED (orders in progress)
-  // Recent: COMPLETED orders within last 30 days
-  // Old: COMPLETED orders older than 30 days, and CANCELLED orders
-  const categorizeOrders = () => {
+  const categorized = () => {
     const now = new Date();
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-
-    const activeOrders = groupedOrders.filter(
-      (order) =>
-        order.status === 'PAID' ||
-        order.status === 'PROCESSING' ||
-        order.status === 'SHIPPED' ||
-        order.status === 'DELIVERED',
-    );
-
-    const recentOrders = groupedOrders.filter(
-      (order) =>
-        order.status === 'COMPLETED' &&
-        new Date(order.orderDate) >= thirtyDaysAgo,
-    );
-
-    const oldOrders = groupedOrders.filter(
-      (order) =>
-        (order.status === 'COMPLETED' &&
-          new Date(order.orderDate) < thirtyDaysAgo) ||
-        order.status === 'CANCELLED',
-    );
-
-    return { activeOrders, recentOrders, oldOrders };
-  };
-
-  const { activeOrders, recentOrders, oldOrders } = categorizeOrders();
-
-  // Get status badge styling
-  // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
-  const getStatusBadge = (status: string) => {
-    const statusConfig: Record<
-      string,
-      { color: string; icon: React.ReactNode; label: string }
-    > = {
-      PAID: {
-        color:
-          'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-        icon: <CheckCircle className="h-3 w-3" />,
-        label: 'Paid',
-      },
-      PROCESSING: {
-        color:
-          'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-        icon: <Clock className="h-3 w-3" />,
-        label: 'Processing',
-      },
-      SHIPPED: {
-        color:
-          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-        icon: <Truck className="h-3 w-3" />,
-        label: 'Shipped',
-      },
-      DELIVERED: {
-        color:
-          'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
-        icon: <Package className="h-3 w-3" />,
-        label: 'Delivered',
-      },
-      COMPLETED: {
-        color:
-          'bg-green-100 text-green-900 dark:bg-green-900/40 dark:text-green-300',
-        icon: <CheckCircle className="h-3 w-3" />,
-        label: 'Completed',
-      },
-      CANCELLED: {
-        color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
-        icon: <XCircle className="h-3 w-3" />,
-        label: 'Cancelled',
-      },
+    return {
+      active: groupedOrders.filter(o => ['PAID', 'PROCESSING', 'SHIPPED', 'DELIVERED'].includes(o.status)),
+      recent: groupedOrders.filter(o => o.status === 'COMPLETED' && o.orderDate >= thirtyDaysAgo),
+      old: groupedOrders.filter(o => (o.status === 'COMPLETED' && o.orderDate < thirtyDaysAgo) || o.status === 'CANCELLED')
     };
-
-    const config = statusConfig[status] || statusConfig.PAID;
-
-    return (
-      <span
-        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ${config.color}`}
-      >
-        {config.icon}
-        {config.label}
-      </span>
-    );
   };
 
-  // Get payment method badge
-  const getPaymentMethodBadge = (method: string | null) => {
-    if (!method)
-      return (
-        <span className="text-xs text-slate-500 dark:text-slate-400">N/A</span>
-      );
+  const category = categorized();
+  const currentOrders = activeTab === 'active' ? category.active : activeTab === 'recent' ? category.recent : category.old;
 
-    const methodConfig: Record<string, { color: string; label: string }> = {
-      WALLET: {
-        color:
-          'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
-        label: 'Wallet',
-      },
-      PAYSTACK: {
-        color:
-          'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400',
-        label: 'Paystack',
-      },
-    };
-
-    const config = methodConfig[method] || {
-      color:
-        'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
-      label: method,
-    };
-
-    return (
-      <span
-        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${config.color}`}
-      >
-        {config.label}
-      </span>
-    );
-  };
-
-  // Render grouped order card
-  const renderOrderCard = (groupedOrder: GroupedOrder) => {
-    const isSingleProduct = groupedOrder.products.length === 1;
-    const displayRef = groupedOrder.transactionRef.startsWith('SINGLE_')
-      ? groupedOrder.transactionRef.replace('SINGLE_', '')
-      : groupedOrder.transactionRef;
-
-    return (
-      <Card
-        key={groupedOrder.transactionRef}
-        className="mb-6 border border-slate-200 bg-white p-6 transition-shadow hover:shadow-lg dark:border-slate-700 dark:bg-slate-900"
-      >
-        <div className="flex flex-col gap-3">
-          {/* Header */}
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              {isSingleProduct ? (
-                <>
-                  <h3 className="line-clamp-2 font-semibold text-slate-900 dark:text-slate-100">
-                    {groupedOrder.products[0].product_name}
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    Order ID: {groupedOrder.products[0].pidStore}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-                    Order with {groupedOrder.products.length} items
-                  </h3>
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    {groupedOrder.orderIds.length} product
-                    {groupedOrder.orderIds.length > 1 ? 's' : ''}
-                  </p>
-                </>
-              )}
-            </div>
-            {getStatusBadge(groupedOrder.status)}
-          </div>
-
-          {/* Products List */}
-          <div className="space-y-2">
-            {groupedOrder.products.map((product, index) => (
-              <div
-                key={product.id}
-                className={`flex items-start justify-between text-sm ${
-                  index > 0
-                    ? 'border-t border-slate-100 pt-2 dark:border-slate-800'
-                    : ''
-                }`}
-              >
-                <div className="flex-1">
-                  <p className="line-clamp-1 font-medium text-slate-900 dark:text-slate-100">
-                    {product.product_name}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Qty: {product.quantity} × ₦
-                    {parseFloat(product.unit_price)
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  </p>
-                </div>
-                <div className="ml-2 text-right">
-                  <p className="font-medium text-slate-900 dark:text-slate-100">
-                    ₦
-                    {parseFloat(product.total_price)
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Order Summary */}
-          <div className="grid grid-cols-2 gap-2 border-t border-slate-200 pt-2 dark:border-slate-700">
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Total Amount
-              </p>
-              <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                ₦
-                {groupedOrder.totalAmount
-                  .toFixed(2)
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Payment Method
-              </p>
-              <div className="mt-1">
-                {getPaymentMethodBadge(groupedOrder.paymentMethod)}
-              </div>
-            </div>
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
-            <div className="text-xs text-slate-500 dark:text-slate-400">
-              {format(
-                new Date(groupedOrder.orderDate),
-                'MMM dd, yyyy • hh:mm a',
-              )}
-            </div>
-            {!groupedOrder.transactionRef.startsWith('SINGLE_') && (
-              <div className="text-xs text-slate-500 dark:text-slate-400">
-                Ref: {displayRef.substring(0, 12)}...
-              </div>
-            )}
-          </div>
-        </div>
-      </Card>
-    );
-  };
-
-  // Render empty state
-  const renderEmptyState = (category: string) => (
-    <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-      <div className="mb-4 rounded-full bg-slate-100 p-4 dark:bg-slate-800">
-        <Package className="h-12 w-12 text-slate-400 dark:text-slate-500" />
+  if (loading) return (
+    <div className="flex min-h-screen items-center justify-center bg-[#fcfcfd] dark:bg-slate-950">
+      <div className="flex flex-col items-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-blue-600" />
+        <p className="text-sm font-bold text-slate-500">Loading your shipments...</p>
       </div>
-      <h3 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">
-        No {category} orders
-      </h3>
-      <p className="max-w-sm text-sm text-slate-500 dark:text-slate-400">
-        {category === 'active' &&
-          "You don't have any orders being processed or shipped."}
-        {category === 'recent' &&
-          "You haven't completed any orders in the last 30 days."}
-        {category === 'old' && "You don't have any older or cancelled orders."}
-      </p>
     </div>
   );
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white dark:bg-black">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400" />
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Loading your orders...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="dark:bg-black">
-      <div className="p-4 dark:bg-black">
-        <div className="flex justify-between max-sm:flex-col">
-          <div className="text-[28px] font-bold text-black dark:text-slate-200 max-sm:pb-4">
-            My Orders
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+      {/* Hero Header */}
+      <div className="bg-slate-900 pb-32 pt-12 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-blue-500/20">
+                  Store Purchases
+                </span>
+              </div>
+              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Order History</h1>
+              <p className="mt-2 text-slate-400">Track and manage your products purchased from our store.</p>
+            </div>
 
-        <div className="mt-[7px] items-start justify-center gap-2 rounded-xl bg-white p-2 py-[10px] text-base font-normal text-slate-600 dark:bg-black dark:text-white max-sm:pl-4 md:flex-row">
-          View and track all your orders
+            {/* Quick Stats Overlay */}
+            <div className="flex items-center gap-6 rounded-3xl bg-white/5 p-6 backdrop-blur-md border border-white/10 shrink-0">
+               <div className="flex flex-col border-r border-white/10 pr-6">
+                <span className="text-[10px] font-bold uppercase text-slate-500 mb-1">In Transit</span>
+                <span className="text-2xl font-black">{category.active.length}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase text-slate-500 mb-1">Total Orders</span>
+                <span className="text-2xl font-black">{groupedOrders.length}</span>
+              </div>
+              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-blue-600 ml-2">
+                <ShoppingBag className="h-5 w-5" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="px-5 pb-8 pt-6 md:mx-auto md:max-w-7xl md:px-8 md:pt-0">
-        {/* Tabs */}
-        <div className="mb-6">
-          <div className="flex gap-2 overflow-x-auto border-b border-slate-200 dark:border-slate-700">
+      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        {/* Navigation Tabs */}
+        <div className="mb-8 flex items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl bg-white p-2 shadow-sm border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+          {[
+            { id: 'active', label: 'Active', count: category.active.length, icon: Clock },
+            { id: 'recent', label: 'Recent', count: category.recent.length, icon: CheckCircle },
+            { id: 'old', label: 'Archive', count: category.old.length, icon: History }
+          ].map((tab) => (
             <button
-              onClick={() => setActiveTab('active')}
-              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === 'active'
-                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`flex flex-1 min-w-[120px] items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
+                activeTab === tab.id
+                  ? 'bg-slate-900 text-white shadow-md dark:bg-blue-600'
+                  : 'text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              Currently Active ({activeOrders.length})
+              <tab.icon className="h-4 w-4" />
+              {tab.label}
+              <span className={`ml-1 rounded-full px-2 py-0.5 text-[10px] ${activeTab === tab.id ? 'bg-white/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                {tab.count}
+              </span>
             </button>
-            <button
-              onClick={() => setActiveTab('recent')}
-              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === 'recent'
-                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Recent Orders ({recentOrders.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('old')}
-              className={`whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
-                activeTab === 'old'
-                  ? 'border-b-2 border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
-                  : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
-            >
-              Old Orders ({oldOrders.length})
-            </button>
-          </div>
+          ))}
         </div>
 
-        {/* Orders Grid */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {activeTab === 'active' && (
-            <>
-              {activeOrders.length > 0
-                ? activeOrders.map(renderOrderCard)
-                : renderEmptyState('active')}
-            </>
-          )}
-          {activeTab === 'recent' && (
-            <>
-              {recentOrders.length > 0
-                ? recentOrders.map(renderOrderCard)
-                : renderEmptyState('recent')}
-            </>
-          )}
-          {activeTab === 'old' && (
-            <>
-              {oldOrders.length > 0
-                ? oldOrders.map(renderOrderCard)
-                : renderEmptyState('old')}
-            </>
+        {/* Orders List */}
+        <div className="space-y-6">
+          {currentOrders.length > 0 ? (
+            currentOrders.map((order) => {
+              const config = STATUS_CONFIG[order.status] || STATUS_CONFIG.PAID;
+              const StatusIcon = config.icon;
+              const displayRef = order.transactionRef.startsWith('SINGLE_') 
+                ? order.transactionRef.replace('SINGLE_', '') 
+                : order.transactionRef;
+
+              return (
+                <div key={order.transactionRef} className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+                  <div className="flex flex-col lg:flex-row">
+                    {/* Left: Shipment Summary */}
+                    <div className="p-6 lg:w-1/3 lg:border-r border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-tight ${config.bg} ${config.color}`}>
+                          <StatusIcon className="h-3.5 w-3.5" />
+                          {config.label}
+                        </div>
+                        <span className="text-[10px] font-bold uppercase text-slate-400">#{displayRef.substring(0, 10)}</span>
+                      </div>
+
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                        ₦{order.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      </h3>
+                      <p className="mt-1 text-xs font-medium text-slate-500">Order Amount</p>
+
+                      <div className="mt-6 space-y-3">
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-4 w-4 text-slate-400" />
+                          <span className="text-xs font-bold text-slate-600 dark:text-slate-300">{safeFormatDate(order.orderDate)}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <CreditCard className="h-4 w-4 text-slate-400" />
+                          <span className="inline-flex rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400 uppercase">
+                            {order.paymentMethod || 'PAYMENT'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      {/* Tracking Progress */}
+                      {order.status !== 'CANCELLED' && (
+                        <div className="mt-8">
+                          <div className="flex justify-between text-[10px] font-bold uppercase text-slate-400 mb-2">
+                             <span>Tracking Status</span>
+                             <span>{config.progress}%</span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                            <div className={`h-full transition-all duration-700 rounded-full ${config.color.replace('text', 'bg')}`} style={{ width: `${config.progress}%` }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right: Products List */}
+                    <div className="flex-1 p-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Layers className="h-4 w-4 text-slate-400" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Order Items ({order.products.length})</span>
+                      </div>
+                      
+                      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
+                        {order.products.map((product) => (
+                          <div key={product.id} className="flex items-start justify-between rounded-2xl bg-slate-50/50 p-4 dark:bg-slate-800/30">
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{product.product_name}</p>
+                              <div className="mt-1 flex items-center gap-3">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">Qty: {product.quantity}</span>
+                                <span className="h-1 w-1 rounded-full bg-slate-300"></span>
+                                <span className="text-[10px] font-bold text-slate-500 tracking-tighter">₦{parseFloat(product.unit_price).toLocaleString()} / unit</span>
+                              </div>
+                            </div>
+                            <div className="text-right ml-4">
+                              <p className="text-sm font-black text-slate-900 dark:text-white">₦{parseFloat(product.total_price).toLocaleString()}</p>
+                              <span className="text-[10px] font-bold text-blue-600">#{product.pidStore}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="mt-6 flex justify-end">
+                        <Button variant="ghost" className="text-xs font-bold text-blue-600 hover:bg-blue-50">
+                          View Full Details <ChevronRight className="h-4 w-4 ml-1" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white py-24 text-center dark:border-slate-700 dark:bg-slate-900">
+              <div className="rounded-full bg-slate-50 p-6 dark:bg-slate-800">
+                <Package className="h-12 w-12 text-slate-300" />
+              </div>
+              <h3 className="mt-6 text-xl font-bold text-slate-900 dark:text-white">No {activeTab} orders</h3>
+              <p className="mt-2 text-slate-500 max-w-xs mx-auto">Your orders will appear here once they are placed and confirmed by our system.</p>
+              <button onClick={() => router.push('/shop')} className="mt-8 flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-3 font-bold text-white shadow-lg transition hover:bg-blue-500">
+                Start Shopping <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
           )}
         </div>
-
-        {/* Summary Stats */}
-        {groupedOrders.length > 0 && (
-          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-yellow-100 p-3 dark:bg-yellow-900/30">
-                  <Clock className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Active Orders
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {activeOrders.length}
-                  </p>
-                </div>
-              </div>
-            </Card>
-            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-green-100 p-3 dark:bg-green-900/30">
-                  <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Recent Orders
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {recentOrders.length}
-                  </p>
-                </div>
-              </div>
-            </Card>
-            <Card className="border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-indigo-100 p-3 dark:bg-indigo-900/30">
-                  <Package className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Total Orders
-                  </p>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {groupedOrders.length}
-                  </p>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
 }

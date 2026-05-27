@@ -42,27 +42,26 @@ const RadText: React.FC<Props> = ({
         <label className="block text-sm font-medium text-gray-600">
           {label}
         </label>
-        <span
-          className="absolute m-2 text-2xl lg:m-5"
-          style={{ color: '#404040' }}
-        >
-          {/* {reacticon} */}
-        </span>
+        <div className="relative">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xl text-[#404040]">
+            {/* {reacticon} */}
+          </span>
 
-        <select
-          id="currency"
-          name="currency"
-          onChange={onChange}
-          onSelect={onSelect}
-          defaultValue={defaultValue}
-          value={value}
-          required
-          className="max-sm:w-340px flex h-10 w-full items-center justify-between rounded-md border border-input bg-background bg-slate-100 p-5 px-3 py-2 pl-12 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
-        >
-          <option value={'default'}>- Select -</option>
-          <option value={'USD'}>USD</option>
-          <option value={'NGN'}>NGN</option>
-        </select>
+          <select
+            id="currency"
+            name="currency"
+            onChange={onChange}
+            onSelect={onSelect}
+            defaultValue={defaultValue}
+            value={value}
+            required
+            className="max-sm:w-340px flex h-10 w-full items-center justify-between rounded-md border border-input bg-background bg-slate-100 p-5 px-3 py-2 pl-14 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
+          >
+            <option value={'default'}>- Select -</option>
+            <option value={'USD'}>USD</option>
+            <option value={'NGN'}>NGN</option>
+          </select>
+        </div>
         <div id="question-error" aria-live="polite" aria-atomic="true">
           <p className="mt-2 text-sm text-red-500">{errorx}</p>
         </div>

@@ -41,7 +41,7 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
   }, [isOpen]);
 
   return (
-    <nav className="space-y-2 bg-black">
+    <nav className="space-y-2 bg-slate-900">
       {items.map((item) =>
         item.isChidren ? (
           <Accordion
@@ -114,7 +114,7 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
             }}
             className={cn(
               buttonVariants({}),
-              'group relative mr-0 flex h-12 justify-start rounded-r-none bg-black bg-transparent pr-0 text-sm font-normal hover:bg-white/10',
+              'group relative mr-0 flex h-12 justify-start rounded-r-none bg-slate-900 bg-transparent pr-0 text-sm font-normal hover:bg-white/10',
               path.includes(item.href) && 'bg-white/10',
 
               isOpen && 'w-[227px]',
@@ -134,23 +134,26 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
       )}
 
       {/* ************************* LOGOUT ************************* */}
-      <div className="border-t_X z-50 p-4 pl-10">
+      <div className="z-50">
         <button
           onClick={logout}
-          className="z-auto flex items-center rounded-lg bg-slate-300 px-3 py-2 text-sm text-black hover:bg-slate-600"
+          className={cn(
+            buttonVariants({}),
+            'group relative mr-0 flex h-12 w-full justify-start rounded-r-none bg-transparent pr-0 text-sm font-normal hover:bg-white/10',
+            isOpen && 'w-[227px]',
+          )}
         >
-          <LogOut className="h-4 w-4 min-w-[1rem]" />
+          <LogOut />
           <span
-            className={`ml-3 transition-all duration-300 ${false ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}
+            className={cn(
+              'absolute left-12 text-xs duration-200',
+              !isOpen && className,
+            )}
           >
             Logout
           </span>
         </button>
-        <div
-          className={`mt-4 text-center text-[10px] text-muted-foreground transition-all duration-300 ${
-            false ? 'opacity-0' : 'opacity-100'
-          }`}
-        >
+        <div className="mt-4 text-center text-[10px] text-muted-foreground">
           © 2025. All rights reserved.
         </div>
       </div>

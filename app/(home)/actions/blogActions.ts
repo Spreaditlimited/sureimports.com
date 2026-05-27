@@ -94,12 +94,13 @@ interface DbBlog {
   blogSlug: string | null;
   blogPublished: boolean;
   blogFeatured?: boolean;
-  blogTags?: string | null;
-  blogCategory?: string | null;
   blogImage: string | null;
   blogBy: string | null;
   publisherId: string | null;
   publisher?: DbPublisher | null;
+  category?: {
+    categoryName: string;
+  } | null;
   blogExt1: string | null;
   blogExt2: string | null;
   xStaus: string | null;
@@ -183,17 +184,11 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
   // Parse SEO data
   const seo = parseSEOData(dbBlog.blogExt2);
 
-  // Parse tags: prioritize database field, fallback to SEO data
-  const tags =
-    dbBlog.blogTags && dbBlog.blogTags.trim()
-      ? parseTags(dbBlog.blogTags)
-      : seo.tags || [];
+  const tags = seo.tags || [];
 
   // Get category: prioritize database field, fallback to SEO data
   const category =
-    dbBlog.blogCategory && dbBlog.blogCategory.trim()
-      ? dbBlog.blogCategory
-      : seo.category || 'Import Guide';
+    dbBlog.category?.categoryName?.trim() || seo.category || 'Import Guide';
 
   // Use SEO meta description as excerpt, or extract from content
   const excerpt =
@@ -296,6 +291,7 @@ export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
       },
       include: {
         publisher: true,
+        category: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -319,6 +315,7 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
       },
       include: {
         publisher: true,
+        category: true,
       },
     });
 
@@ -338,15 +335,16 @@ export async function searchBlogs(query: string): Promise<BlogPost[]> {
         blogPublished: true,
         xStaus: 'active',
         OR: [
-          { blogTitle: { contains: query, mode: 'insensitive' } },
-          { blogContent: { contains: query, mode: 'insensitive' } },
-          { blogBy: { contains: query, mode: 'insensitive' } },
-          { blogTags: { contains: query, mode: 'insensitive' } },
-          { blogCategory: { contains: query, mode: 'insensitive' } },
+          { blogTitle: { contains: query } },
+          { blogContent: { contains: query } },
+          { blogBy: { contains: query } },
+          { blogExt2: { contains: query } },
+          { category: { is: { categoryName: { contains: query } } } },
         ],
       },
       include: {
         publisher: true,
+        category: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -366,10 +364,11 @@ export async function fetchBlogsByTag(tag: string): Promise<BlogPost[]> {
       where: {
         blogPublished: true,
         xStaus: 'active',
-        blogTags: { contains: tag, mode: 'insensitive' },
+        blogExt2: { contains: tag },
       },
       include: {
         publisher: true,
+        category: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -391,10 +390,11 @@ export async function fetchBlogsByCategory(
       where: {
         blogPublished: true,
         xStaus: 'active',
-        blogCategory: { equals: category, mode: 'insensitive' },
+        category: { is: { categoryName: category } },
       },
       include: {
         publisher: true,
+        category: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -414,17 +414,17 @@ export async function fetchAllTags(): Promise<string[]> {
       where: {
         blogPublished: true,
         xStaus: 'active',
-        blogTags: { not: null },
+        blogExt2: { not: null },
       },
       select: {
-        blogTags: true,
+        blogExt2: true,
       },
     });
 
     const allTags = new Set<string>();
     blogs.forEach((blog) => {
-      if (blog.blogTags) {
-        const tags = parseTags(blog.blogTags);
+      if (blog.blogExt2) {
+        const tags = parseSEOData(blog.blogExt2).tags || [];
         tags.forEach((tag) => allTags.add(tag));
       }
     });
@@ -438,20 +438,18 @@ export async function fetchAllTags(): Promise<string[]> {
 
 export async function fetchAllCategories(): Promise<string[]> {
   try {
-    const blogs = await prisma.blog.findMany({
+    const categories = await prisma.blog_category.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
-        blogCategory: { not: null },
+        status: 'active',
       },
       select: {
-        blogCategory: true,
+        categoryName: true,
       },
-      distinct: ['blogCategory'],
+      distinct: ['categoryName'],
     });
 
-    return blogs
-      .map((blog) => blog.blogCategory)
+    return categories
+      .map((cat) => cat.categoryName)
       .filter((cat): cat is string => cat !== null && cat.trim() !== '')
       .sort();
   } catch (error) {

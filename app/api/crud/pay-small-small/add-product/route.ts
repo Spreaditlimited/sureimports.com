@@ -1,124 +1,106 @@
-// app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
+// app/api/crud/pay-small-small/add-product/route.ts
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
-import { PaystackButton } from 'react-paystack';
-import { useRouter } from 'next/navigation';
-
-const prisma = new PrismaClient();
+import { db } from '@/lib/db';
 
 export async function POST(request: Request) {
-  //GET FORM JSON DATA
+  try {
+    const formData = await request.formData();
 
-  console.log('JESUS IS GOD');
+    const pidProduct = String(formData.get('pidProduct') || '');
+    const pidUser = String(formData.get('pidUser') || '');
+    const userEmail = String(formData.get('userEmail') || '');
+    const phone = String(formData.get('phone') || '');
+    const amountRaw = String(formData.get('amount') || '0');
+    const quantityRaw = String(formData.get('quantity') || '1');
 
-  const formData = await request.formData();
+    if (!pidProduct || !pidUser || !userEmail) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'Missing required fields.' },
+        { status: 200 },
+      );
+    }
 
-  const pidProduct = formData.get('pidProduct') as string;
-  const pidUser = formData.get('pidUser') as string;
-  const userEmail = formData.get('userEmail') as string;
-  const phone = formData.get('phone') as any;
-  const amount = formData.get('amount') as any;
-  const quantity = formData.get('quantity') as string;
+    const amount = Number(amountRaw);
+    const quantity = Number(quantityRaw);
+    if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(quantity) || quantity <= 0) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'Invalid amount or quantity.' },
+        { status: 200 },
+      );
+    }
 
-  console.log('JESUS IS KING');
+    const user = await db.users.findFirst({
+      where: {
+        pidUser,
+        userEmail,
+      },
+    });
 
-  //CHECK IF USER EXISTS
-  const user = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser,
-      userEmail: userEmail,
-    },
-  });
+    if (!user) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'User not found.' },
+        { status: 200 },
+      );
+    }
 
-  const product = await prisma.store.findUnique({
-    where: {
-      pidProduct: pidProduct,
-    },
-  });
+    if (!phone || phone.trim().length < 10) {
+      return NextResponse.json(
+        {
+          statusx: 'NO_PHONE_NUMBER',
+          message: 'Please provide a valid phone number to continue.',
+        },
+        { status: 200 },
+      );
+    }
 
-  console.log(
-    'kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk' + phone,
-  );
-  //CHECK FOR PROFILE PHONE NUMBER
-  // if (((user?.phone == '') || (user?.phone == null)) && ((phone == '') || (phone == 0) || (phone == '0'))) {
-  //       //SUCCESS
-  //       return NextResponse.json(
-  //         { statusx: 'NO_PHONE_NUMBER', message: 'No Profile Phone Number, you are are required to provide a valid phone number.' },
-  //         { status: 200 },
-  //       );
-  // }
+    const product = await db.store.findUnique({
+      where: { pidProduct },
+    });
 
-  //   if ((user?.phone == '') || (user?.phone == null)) {
-  //     //SUCCESS
-  //     return NextResponse.json(
-  //       { statusx: 'NO_PHONE_NUMBER', message: 'No Profile Phone Number, you are are required to provide a valid phone number.' },
-  //       { status: 200 },
-  //     );
-  // }
+    if (!product) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'Product not found.' },
+        { status: 200 },
+      );
+    }
 
-  console.log('JESUS IS GREAT!!!!!!!');
+    // Prevent duplicate initiations for the same user/product while plan is active.
+    const existing = await db.paysmallsmall.findFirst({
+      where: {
+        pidUser,
+        pidProduct,
+        status: { in: ['SAVED', 'STARTED'] },
+      },
+      select: { pidPaySmallSmall: true },
+    });
 
-  const pidPaySmallSmall = 'PSS' + randomGenerator(20);
+    if (existing) {
+      return NextResponse.json(
+        {
+          statusx: 'SUCCESS',
+          message: 'Pay Small Small already initiated for this product.',
+        },
+        { status: 200 },
+      );
+    }
 
-  // try {
-  //   const createx = await prisma.paysmallsmall.create({
-  //     data: {
-  //       pidPaySmallSmall: pidPaySmallSmall,
-  //       pidUser: pidUser,
-  //       pidProduct: pidProduct,
-  //       // productName: pidProduct,
-  //       // productDescription: 'SAVED',
-  //       amount: parseFloat(amount) as any,
-  //       quantity: parseInt(quantity),
-  //       status: 'SAVED',
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     },
-  //   });
-
-  // }
-  // catch(error){
-  //   if (error instanceof Error) {
-  //     console.log('ERROR_MESSAGE:'+error.stack);
-  //   } else {
-  //     console.log(error);
-  //   }
-  // }
-
-  if (user) {
-    //CREATE REQUEST
-    const createx = await prisma.paysmallsmall.create({
+    const created = await db.paysmallsmall.create({
       data: {
-        pidPaySmallSmall: pidPaySmallSmall,
-        pidUser: pidUser,
-        pidProduct: pidProduct,
-        productName: product?.productName,
-        productDescription: product?.productDescription,
-        amount: parseFloat(amount) as any,
-        quantity: parseInt(quantity),
+        pidPaySmallSmall: 'PSS' + randomGenerator(20),
+        pidUser,
+        pidProduct,
+        productName: product.productName,
+        productDescription: product.productDescription,
+        amount,
+        quantity: Math.floor(quantity),
         status: 'SAVED',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
-    // CONFIRM THAT PAY SMALL SMALL HAS BEEN STARTED
-    if (createx) {
-      //SUCCESS
-      return NextResponse.json(
-        {
-          statusx: 'SUCCESS',
-          message: 'Product added, pay small small Initiated!',
-        },
-        { status: 200 },
-      );
-    } else {
-      //FAILED
+    if (!created) {
       return NextResponse.json(
         {
           statusx: 'FAILED',
@@ -127,7 +109,22 @@ export async function POST(request: Request) {
         { status: 200 },
       );
     }
-  }
 
-  //END
+    return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: 'Product added, Pay Small Small initiated!',
+      },
+      { status: 200 },
+    );
+  } catch (error: any) {
+    console.error('PSS add-product failed:', error?.message || error);
+    return NextResponse.json(
+      {
+        statusx: 'FAILED',
+        message: 'Unable to initialize Pay Small Small right now. Please try again.',
+      },
+      { status: 200 },
+    );
+  }
 }

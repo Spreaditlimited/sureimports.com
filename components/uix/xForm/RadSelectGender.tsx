@@ -39,29 +39,28 @@ const RadText: React.FC<Props> = ({
     <>
       {/* TEXT INPUT */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-600">
+        <label className="mb-2 block text-sm font-medium text-gray-600">
           {label}
         </label>
-        <span
-          className="absolute m-2 text-2xl lg:m-5"
-          style={{ color: '#404040' }}
-        >
-          {reacticon}
-        </span>
-        <select
-          id="gender"
-          name="gender"
-          onChange={onChange}
-          onSelect={onSelect}
-          defaultValue={defaultValue}
-          value={value}
-          className="max-sm:w-340px flex h-10 w-full items-center justify-between rounded-md border border-input bg-background bg-slate-100 p-5 px-3 py-2 pl-12 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
-        >
-          <option>- Select -</option>
-          <option value={'Male'}>Male</option>
-          <option value={'Female'}>Female</option>
-          <option value={'Other'}>Other</option>
-        </select>
+        <div className="relative">
+          <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-[#404040]">
+            {reacticon}
+          </span>
+          <select
+            id="gender"
+            name="gender"
+            onChange={onChange}
+            onSelect={onSelect}
+            defaultValue={defaultValue}
+            value={value}
+            className="max-sm:w-340px flex h-10 w-full appearance-none items-center justify-between rounded-md border border-input bg-background bg-slate-100 p-5 px-3 py-2 pl-16 text-left text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
+          >
+            <option>- Select -</option>
+            <option value={'Male'}>Male</option>
+            <option value={'Female'}>Female</option>
+            <option value={'Other'}>Other</option>
+          </select>
+        </div>
         <div id="question-error" aria-live="polite" aria-atomic="true">
           <p className="mt-2 text-sm text-red-500">{errorx}</p>
         </div>

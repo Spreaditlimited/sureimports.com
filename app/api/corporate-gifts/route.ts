@@ -1,12 +1,14 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import sendEmail from '@/lib/email/config/sendEmail';
 import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
+import xMail from '@/lib/email/xMail2';
+import bcrypt from 'bcryptjs';
 import {
   notifyCustomerCorporateGiftStatus,
   type CorporateGiftStatus,
 } from '@/lib/notifications/corporateGifts';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
+import randomGenerator from '@/lib/helpers/randomGenerator';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -194,10 +196,53 @@ export async function POST(req: Request) {
       logoFileUrl = await uploadToCloudinary(companyLogo, logoFileKey);
     }
 
-    // 4. Persist submission in DB
+    // 4. Create account for corporate contact if missing
+    let createdDashboardAccount = false;
+    let temporaryPassword: string | null = null;
+
+    const existingUser = await prisma.users.findFirst({
+      where: {
+        OR: [{ userEmail: data.contactEmail }, { email: data.contactEmail }],
+      },
+      select: { pidUser: true },
+    });
+    let requestPidUser: string | null = existingUser?.pidUser || null;
+
+    if (!existingUser) {
+      temporaryPassword = randomGenerator(12);
+      const passwordHash = bcrypt.hashSync(temporaryPassword, 8);
+      const sessionHash = bcrypt.hashSync(randomGenerator(10), 8);
+      const contactNames = data.contactPersonFullName.split(' ').filter(Boolean);
+      const firstName = contactNames[0] || data.businessName;
+      const lastName = contactNames.slice(1).join(' ') || 'Corporate';
+
+      const createdUser = await prisma.users.create({
+        data: {
+          pidUser: `CUS${randomGenerator(10)}`,
+          userFirstname: firstName,
+          userLastname: lastName,
+          userEmail: data.contactEmail,
+          email: data.contactEmail,
+          userPassword: passwordHash,
+          userSession: sessionHash,
+          userPhone: data.whatsappNumber,
+          phone: data.whatsappNumber,
+          userCid: 'VERIFIED',
+          // Mark verified to allow immediate access with temporary password.
+          userStatus: 'AL1',
+          loginStatus: 'TEMP_PASSWORD_UNUSED',
+          userAffiliateCode: randomGenerator(6),
+        },
+      });
+      requestPidUser = createdUser.pidUser;
+      createdDashboardAccount = true;
+    }
+
+    // 5. Persist submission in DB
     await prisma.corporate_gift_request.create({
       data: {
         pidRequest,
+        pidUser: requestPidUser,
         businessName: data.businessName,
         contactPersonFullName: data.contactPersonFullName,
         productOrItemNeeded: data.productOrItemNeeded,
@@ -227,16 +272,21 @@ export async function POST(req: Request) {
       },
     });
 
-    await notifyCustomerCorporateGiftStatus({
+    const notificationResult = await notifyCustomerCorporateGiftStatus({
       requestId: pidRequest,
       businessName: data.businessName,
       contactPersonFullName: data.contactPersonFullName,
       contactEmail: data.contactEmail,
       whatsappNumber: data.whatsappNumber,
       status: 'Pending' as CorporateGiftStatus,
+      onboarding: {
+        accountCreated: createdDashboardAccount,
+        temporaryPassword: temporaryPassword || undefined,
+        dashboardLink: 'https://sureimports.com/dashboard/corporate-gifts',
+      },
     });
 
-    // 5. Construct Email Body
+    // 6. Construct Email Body
     const emailText = `
 New Corporate Gift Sourcing Request
 -----------------------------------
@@ -280,22 +330,26 @@ Submitted At: ${data.submittedAt}
 Page URL: ${data.pageUrl || 'N/A'}
     `.trim();
 
-    // 6. Send internal team email notification (non-blocking for user success)
+    // 7. Send internal team email notification (non-blocking for user success)
     try {
       const attachmentNames = attachments.length
         ? attachments.map((file) => file.filename).join(', ')
         : 'None';
 
-      await sendEmail(
-        'hello@sureimports.com',
-        `New Corporate Gift Sourcing Request - ${data.businessName}`,
-        `<pre>${emailText}</pre><p><strong>Attachments:</strong> ${attachmentNames}</p>`,
-      );
+      await xMail({
+        xEmail: 'hello@sureimports.com',
+        xTitle: `New Corporate Gift Sourcing Request - ${data.businessName}`,
+        xBodyTitle: 'New Corporate Gift Sourcing Request',
+        xBody1: `A new corporate gift sourcing request has been submitted.<br /><b>Request ID:</b> ${pidRequest}`,
+        xBody2: `<pre>${emailText}</pre><p><strong>Attachments:</strong> ${attachmentNames}</p>`,
+        xButtonTitle: 'Open Admin Dashboard',
+        xButtonLink: 'https://admin.sureimports.com/dashboard/corporate-gifts',
+      });
     } catch (emailError) {
       console.error('Corporate gifts email notification failed:', emailError);
     }
 
-    // 7. Send Facebook CAPI Lead event (non-blocking for user success)
+    // 8. Send Facebook CAPI Lead event (non-blocking for user success)
     try {
       const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
       const accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
@@ -332,6 +386,7 @@ Page URL: ${data.pageUrl || 'N/A'}
         success: true,
         message: 'Request submitted successfully',
         pidRequest,
+        notifications: notificationResult,
       },
       { status: 200 },
     );

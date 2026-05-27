@@ -7,12 +7,9 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Search from './search';
 import { useSidebar } from '@/hooks/useSidebar';
-import { ModeToggle } from './mode-toggle';
-import { useTheme } from 'next-themes';
-import { Bell, Bolt } from 'lucide-react';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Settings } from 'lucide-react';
 
 const user = {
   name: 'Admin',
@@ -23,16 +20,7 @@ const user = {
 export default function Header() {
   const router = useRouter();
   const { isOpen } = useSidebar();
-  const { theme, setTheme } = useTheme();
   const { user, logout } = useAuth();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // Determine the resolved theme, defaulting to 'light' before mount
-  const resolvedTheme = mounted ? theme : 'light';
 
   return (
     <div
@@ -44,17 +32,13 @@ export default function Header() {
       )}
     >
       <nav className="mx-4 flex h-[90px] items-center justify-between py-[20px] lg:ml-0">
-        <div className="flex">
+        <div className="flex flex-1">
           <div className={cn('flex gap-5 lg:hidden')}>
             <MobileSidebar />
             <div className="item-center flex md:hidden">
               <Image
                 loading="lazy"
-                src={
-                  resolvedTheme === 'dark'
-                    ? '/icons/search-dark.svg'
-                    : '/icons/search.svg'
-                }
+                src="/icons/search.svg"
                 alt=""
                 width={20}
                 height={20}
@@ -62,46 +46,19 @@ export default function Header() {
               />
             </div>
           </div>
-          <div className="flex md:pl-5 lg:ml-[36px] lg:p-0">
+          <div className="flex flex-1 md:pl-5 lg:ml-[36px] lg:p-0">
             <Search />
           </div>
         </div>
-        <div className="flex items-center gap-[23px] max-xl:gap-[10px]">
-          <ModeToggle />
+        <div className="ml-4 flex items-center gap-[23px] max-xl:gap-[10px]">
           <div className="hidden items-center gap-[15px] lg:flex">
-            <Button
-              className="h-[50px] w-[52px] rounded-[19px] bg-slate-100 hover:bg-[#161629]/10 dark:bg-gray-700 dark:hover:bg-gray-600"
-              onClick={() => {
-                router.push('/dashboard/message/message-box');
-              }}
-            >
-              {resolvedTheme === 'dark' ? (
-                <Bell />
-              ) : (
-                <Image
-                  src="/icons/notification.svg"
-                  alt="Logo"
-                  width={60}
-                  height={60}
-                />
-              )}
-            </Button>
             <Button
               className="h-[50px] w-[52px] rounded-[19px] bg-slate-100 hover:bg-[#161629]/10 dark:bg-gray-700 dark:hover:bg-gray-600"
               onClick={() => {
                 router.push('/dashboard/profile-update');
               }}
             >
-              {resolvedTheme === 'dark' ? (
-                <Bolt />
-              ) : (
-                <Image
-                  src="/icons/settings.svg"
-                  alt="Logo"
-                  width={60}
-                  height={60}
-                />
-              )}
+              <Settings className="h-5 w-5 text-slate-700 dark:text-slate-200" />
             </Button>
           </div>
           <UserNav userz={user as any} />

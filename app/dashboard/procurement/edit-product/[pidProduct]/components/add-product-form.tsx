@@ -1,10 +1,27 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
+import {
+  Tag,
+  Link as LinkIcon,
+  Scale,
+  Banknote,
+  Boxes,
+  Info,
+  Loader2,
+  ShoppingCart,
+  MessageCircle,
+  PlayCircle
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Form,
   FormControl,
@@ -13,526 +30,403 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input-with-dark-mode';
-import Image from 'next/image';
-import { Textarea } from '@/components/ui/textarea';
-import { CircleDollarSign, Layers3, Link } from 'lucide-react';
+
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
 import { useAuth } from '@/app/context/AuthContext';
-import { useState } from 'react';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { useParams, useSearchParams } from 'next/navigation';
 import { useModal } from '@/app/context/ModalContext';
 import Modal from '@/components/uix/ModalLarge';
-
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-}
-
-//API RESPONSE
-interface ApiResponse {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
 
 const formSchema = z.object({
   pidUser: z.string(),
   pidProduct: z.string(),
   pidOrder: z.string(),
   emailUser: z.string(),
-  productName: z
-    .string()
-    .min(2, {
-      message: 'Product Name is required',
-    })
-    .max(500),
-  productLink: z
-    .string()
-    .min(10, { message: 'Please enter a valid product link' }),
-
-  //productCategory: z.string().min(2, { message: 'Please select a category' }),
+  productName: z.string().min(2, { message: 'Product Name is required' }).max(500),
+  productLink: z.string().min(10, { message: 'Please enter a valid product link' }),
   productPrice: z.string().min(1, { message: 'Please enter product price' }),
   productWeight: z.string().min(1, { message: 'Please enter product weight' }),
-  productQuantity: z
-    .string()
-    .min(1, { message: 'Please enter product quantity' }),
-  productInfo: z
-    .string()
-    .min(1, { message: 'Please enter product information' }),
+  productQuantity: z.string().min(1, { message: 'Please enter product quantity' }),
+  productInfo: z.string().min(1, { message: 'Please enter product information' }),
 });
 
-interface ReportFormProps {}
+type FormValues = z.infer<typeof formSchema>;
 
-const AddProductForm: React.FC<ReportFormProps> = () => {
+export default function AddProductForm() {
   const { isModalOpen, openModal, closeModal } = useModal();
-
-  // Get route parameter
   const params = useParams();
-  const searchParams = useSearchParams();
-  const pidOrderx = params?.pidOrder as string;
-
-  //initialize alert system
-  let productID = 'PRD' + new Date().getTime().toString();
-  const navigateWithAlert = useNavigationWithAlert();
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [pidProduct, setPidProduct] = useState(productID);
-  const [pidOrder, setPidOrder] = useState(pidOrderx);
-  const [email, setEmail] = useState(user?.email);
-  const [message, setMessage] = React.useState('');
   const router = useRouter();
+  const navigateWithAlert = useNavigationWithAlert();
+  const { user } = useAuth();
+  
+  const pidOrderx = params?.pidOrder as string;
+  const [pidProduct] = useState('PRD' + new Date().getTime().toString());
+  const [currency, setCurrencyType] = useState<string>('USD');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      pidUser: pidUser,
+      pidUser: user?.pidUser || '',
       pidProduct: pidProduct,
-      pidOrder: pidOrder,
-      emailUser: email,
+      pidOrder: pidOrderx || '',
+      emailUser: user?.email || '',
       productName: '',
       productLink: '',
-      //productCategory: '',
       productPrice: '',
       productWeight: '',
-      productQuantity: '',
+      productQuantity: '1',
       productInfo: '',
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  useEffect(() => {
+    async function fetchDataOrder() {
+      if (!pidOrderx) return;
+      try {
+        const res = await fetch(`/api/get-data/order-one?pidOrder=${pidOrderx}`);
+        const data = await res.json();
+        setCurrencyType(data.getOneRecord?.currencyType || 'USD');
+      } catch (error) {
+        console.error('Error fetching order data:', error);
+      }
+    }
+    fetchDataOrder();
+  }, [pidOrderx]);
 
-    toast.info('Processing . . .');
-    //await new Promise((resolve) => setTimeout(resolve, 3000));
+  const onSubmit = async (values: FormValues) => {
+    if (parseFloat(values.productPrice) < 0.001) {
+      toast.error('Minimum price for any purchase is 0.01.');
+      return;
+    }
+    if (parseFloat(values.productQuantity) < 1) {
+      toast.error('Quantity must be at least 1.');
+      return;
+    }
 
-    const pidUser = values.pidUser;
-    const pidProduct = values.pidProduct;
-    const pidOrder = values.pidOrder;
-    const emailUser = values.emailUser;
-    const productName = values.productName;
-    const productLink = values.productLink;
-    //const productCategory = values.productCategory;
-    const productPrice = values.productPrice;
-    const productWeight = values.productWeight;
-    const productQuantity = values.productQuantity;
-    const productInfo = values.productInfo;
-
-    //MAKE REQUEST ATTEMPT
+    setIsSubmitting(true);
     try {
-      //MAKE REQUEST
       const res = await fetch('/api/crud/procurement-add-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pidUser,
-          pidProduct,
-          pidOrder,
-          emailUser,
-          productName,
-          productLink,
-          //productCategory,
-          productPrice,
-          productWeight,
-          productQuantity,
-          productInfo,
-        }),
+        body: JSON.stringify(values),
       });
 
-      const data: ApiResponse = await res.json();
+      const data = await res.json();
 
-      if (data.responsex.status == 'SUCCESS') {
+      if (data.responsex.status === 'SUCCESS') {
         navigateWithAlert(
           '/dashboard/procurement/view-orders/saved',
           'success',
-          'A Product has been added',
+          'Product successfully added to your order.'
         );
-      }
-
-      // if (data.responsex.status == 'SUCCESS') {
-      //   openModal();
-      //   toast.success(data.responsex.message);
-      // }
-
-      if (data.responsex.status == 'EMPTY_FIELD') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'FAILED') {
-        toast.warning(data.responsex.message);
+      } else {
+        toast.warning(data.responsex.message || 'Action failed.');
       }
     } catch (error: any) {
-      console.log(error.message);
+      toast.error('Connection error. Please try again.');
     } finally {
-      //setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      {/* MODAL VIEW STARTS */}
+      {/* Redesigned Weight Guide Modal */}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <h2 className="p-3 text-xl font-bold text-gray-700">
-          Tips on getting the weight of a product
-        </h2>
-        <hr />
-        <br />
+        <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden">
+          <div className="border-b border-slate-100 p-6 dark:border-slate-800 flex items-center gap-3">
+            <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20">
+              <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Product Weight Guide</h2>
+          </div>
+          
+          <div className="max-h-[70vh] overflow-y-auto p-6 space-y-8">
+            
+            {/* Video Guide */}
+            <div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-800">
+               <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center gap-2">
+                 <PlayCircle className="h-4 w-4 text-rose-500" />
+                 <span className="text-sm font-bold text-slate-900 dark:text-white">Video Tutorial</span>
+               </div>
+               <div className="relative aspect-video w-full">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={`https://www.youtube.com/embed/${'ZTgoROlS5NY'}`}
+                  title="YouTube Video Player"
+                  frameBorder="0"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
 
-        <div className="relative h-0 w-full pb-[56.25%]">
-          <iframe
-            className="absolute left-0 top-0 h-full w-full"
-            src={`https://www.youtube.com/embed/${'ZTgoROlS5NY'}`}
-            title="YouTube Video Player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          ></iframe>
-        </div>
+            {/* Direct Support */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10">
+              <div className="flex-1">
+                <h3 className="font-bold text-blue-900 dark:text-blue-100">Need exact weights?</h3>
+                <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
+                  Chat with our sourcing specialists in China. Share the product link, and we'll confirm the exact weight for you. (Response within 24hrs).
+                </p>
+              </div>
+              <a
+                href="https://wa.me/message/TZOKMEAUXVSCG1"
+                target="_blank"
+                rel="noreferrer"
+                className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
+              >
+                <MessageCircle className="h-4 w-4" /> Message Support
+              </a>
+            </div>
 
-        <div className="p-3 text-gray-700">
-          <p>
-            On 1688, most suppliers do not provide the weight of products,
-            however some do. Take your time to study the product page of any
-            product you intend to import to see if the supplier provided it's
-            weight.
-          </p>
-          <br />
-          <p>
-            If you don't find the weight of the product on 1688, look for that
-            same product on Alibaba.com. You can do an image search of the
-            product on Alibaba.com just like on 1688.com. On Alibaba, you will
-            most likely see the weight.
-          </p>
-          <br />
-          <p>
-            If you still don't find the weight on Alibaba, check for the same
-            product on Amazon.com. Here you most likely will see the weight.
-          </p>
-        </div>
+            {/* General Tips */}
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Sourcing Tips</h3>
+              <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400 list-disc pl-5">
+                <li>Study the 1688 product page details; some suppliers list the weight there.</li>
+                <li>Do an image search on <strong>Alibaba.com</strong> for the same product, as Alibaba listings almost always include weight.</li>
+                <li>Check <strong>Amazon.com</strong> for the same product to find accurate shipping weights.</li>
+              </ul>
+            </div>
 
-        <hr />
+            {/* Estimated Weights Table */}
+            <div>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Estimated Weights Reference</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-2 mb-2 dark:border-slate-700">Footwear</h4>
+                  <ul className="text-sm space-y-1 text-slate-600 dark:text-slate-300">
+                    <li className="flex justify-between"><span>Sneakers/Canvas</span> <span className="font-bold">0.6kg - 1kg</span></li>
+                    <li className="flex justify-between"><span>Corporate Shoes</span> <span className="font-bold">1.0kg</span></li>
+                    <li className="flex justify-between"><span>Boots</span> <span className="font-bold">2.0kg</span></li>
+                    <li className="flex justify-between"><span>Female Heels/Flats</span> <span className="font-bold">0.5kg - 0.6kg</span></li>
+                    <li className="flex justify-between"><span>Slippers</span> <span className="font-bold">0.4kg</span></li>
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-2 mb-2 dark:border-slate-700">Bags & Accessories</h4>
+                  <ul className="text-sm space-y-1 text-slate-600 dark:text-slate-300">
+                    <li className="flex justify-between"><span>Big Handbags</span> <span className="font-bold">1.0kg</span></li>
+                    <li className="flex justify-between"><span>Small Handbags</span> <span className="font-bold">0.6kg</span></li>
+                    <li className="flex justify-between"><span>Set of Bags (3-in-1)</span> <span className="font-bold">1.5kg</span></li>
+                    <li className="flex justify-between"><span>Wallets/Purses</span> <span className="font-bold">0.2kg - 0.3kg</span></li>
+                    <li className="flex justify-between"><span>Watches/Jewelry</span> <span className="font-bold">0.1kg - 0.2kg</span></li>
+                  </ul>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-400 border-b border-slate-200 pb-2 mb-2 dark:border-slate-700">Clothing & Hair</h4>
+                  <ul className="text-sm space-y-1 text-slate-600 dark:text-slate-300">
+                    <li className="flex justify-between"><span>Shirts/Gowns/Shorts</span> <span className="font-bold">0.3kg</span></li>
+                    <li className="flex justify-between"><span>Jeans</span> <span className="font-bold">0.5kg</span></li>
+                    <li className="flex justify-between"><span>Suits</span> <span className="font-bold">2.0kg</span></li>
+                    <li className="flex justify-between"><span>Hair Wigs</span> <span className="font-bold">0.3kg</span></li>
+                    <li className="flex justify-between"><span>Hair Attachment</span> <span className="font-bold">0.2kg</span></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
 
-        <div className="p-3 text-gray-700">
-          <p>
-            <i>
-              For General Products frequently bought by many of our customers,
-              the following estimated net weights apply:
-            </i>
-          </p>
-
-          <br />
-
-          <p>
-            Sneakers - 0.6kg.
-            <br />
-            Corporate shoes - 1kg
-            <br />
-            Boots - 2kg
-            <br />
-            Canvas - 1kg
-            <br />
-            Female heel shoes - 0.6kg
-            <br />
-            Female flat shoes - 0.5kg
-            <br />
-            Slippers - 0.4kg
-            <br />
-          </p>
-
-          <br />
-          <p>
-            Wristwatch - 0.2kg
-            <br />
-            Necklace - 0.1kg
-            <br />
-          </p>
-
-          <br />
-          <p>
-            Handbags
-            <br />
-            Big Handbags - 1kg
-            <br />
-            Small handbags - 0.6kg.
-            <br />
-            Many in one handbags - 1.5kg
-            <br />
-            Wallets - 0.2kg
-            <br />
-            Purse - 0.3kg
-            <br />
-          </p>
-
-          <br />
-          <p>
-            Hair Wigs - 0.3kg
-            <br />
-            Hair Attachment (1 bundle) - 0.2kg
-            <br />
-          </p>
-
-          <br />
-          <p>
-            Shirts - 0.3kg
-            <br />
-            Gowns - 0.3kg
-            <br />
-            Trousers - 0.3kg
-            <br />
-            Shorts - 0.3kg
-            <br />
-            Suits - 2kg
-            <br />
-            Jeans - 0.5kg
-            <br />
-          </p>
+          </div>
         </div>
       </Modal>
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="border-b py-5 pl-6 text-xl font-bold text-slate-800 dark:text-slate-300">
-            Order ID: {pidOrder}
-          </div>
+      <div className="mb-8 flex items-center justify-between rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+        <div>
+           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Order Reference</p>
+           <p className="mt-1 font-mono text-sm font-bold text-slate-900 dark:text-white">{pidOrderx || 'Pending'}</p>
+        </div>
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm dark:bg-slate-900">
+           <Boxes className="h-5 w-5 text-slate-400" />
+        </div>
+      </div>
 
-          <div className="flex w-full flex-col gap-3 border-b pb-[25px]">
-            <div className="flex flex-col lg:flex-row">
-              <div className="w-11/12 space-y-8 lg:w-[]">
-                <FormField
-                  control={form.control}
-                  name="productName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Name</FormLabel>
-                      <FormControl className="col-span-6">
-                        <div className="item-center relative flex">
-                          <Image
-                            src="/icons/add-product/name.svg"
-                            alt="search"
-                            width={20}
-                            height={20}
-                            className="absolute m-2 lg:m-5"
-                          />
-                          <Input
-                            className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                            placeholder="Enter product name"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="col-span-8 flex justify-start" />
-                    </FormItem>
-                  )}
-                />
-                {/* <FormField
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            
+            {/* Product Link */}
+            <div className="md:col-span-2">
+              <FormField
                 control={form.control}
-                name="productCategory"
+                name="productLink"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Product Category</FormLabel>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Product URL</FormLabel>
                     <FormControl>
-                      <div className="item-center relative flex">
-                        <div className="absolute m-2 lg:m-5">
-                          <Layers3 className="w-4" />
-                        </div>
-
+                      <div className="relative">
+                        <LinkIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <Input
-                          className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                          placeholder="Enter product catagory"
+                          placeholder="Paste the URL from 1688, Taobao, Alibaba..."
+                          className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
                         />
                       </div>
                     </FormControl>
-                    <FormMessage className="col-span-8 flex justify-start" />
+                    <FormMessage className="text-xs text-rose-500" />
                   </FormItem>
                 )}
-              /> */}
-                <FormField
-                  control={form.control}
-                  name="productWeight"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Weight</FormLabel>
-                      <FormControl>
-                        <div className="item-center relative flex">
-                          <Image
-                            src="/icons/specialsourcing/weight.svg"
-                            alt="search"
-                            width={20}
-                            height={20}
-                            className="absolute m-2 lg:m-5"
-                          />
-                          <Input
-                            className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                            placeholder="Enter product weight"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="col-span-8 flex justify-start" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="productQuantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Quantity</FormLabel>
-                      <FormControl>
-                        <div className="item-center relative flex">
-                          <Image
-                            src="/icons/add-product/quantity.png"
-                            alt="search"
-                            width={20}
-                            height={20}
-                            className="absolute m-2 lg:m-5"
-                          />
-                          <Input
-                            className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                            placeholder="Enter product quantity"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="col-span-8 flex justify-start" />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex flex-col gap-[22.5px] pb-4 lg:hidden">
-                  <div className="text-sm text-slate-600">
-                    Inputting the right weight{' '}
-                    <span>(This determines your shipping cost)</span>
-                  </div>
+              />
+            </div>
+
+            {/* Product Name */}
+            <div className="md:col-span-2">
+              <FormField
+                control={form.control}
+                name="productName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Product Name / Title</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Tag className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                        <Input
+                          placeholder="Short description of the item"
+                          className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-xs text-rose-500" />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Quantity */}
+            <FormField
+              control={form.control}
+              name="productQuantity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Quantity</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Boxes className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-xs text-rose-500" />
+                </FormItem>
+              )}
+            />
+
+            {/* Unit Price */}
+            <FormField
+              control={form.control}
+              name="productPrice"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Unit Price ({currency})</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Banknote className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0.01"
+                        placeholder="0.00"
+                        className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-xs text-rose-500" />
+                </FormItem>
+              )}
+            />
+
+          </div>
+
+          <hr className="border-slate-100 dark:border-slate-800 my-4" />
+
+          {/* Weight & Information Section */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:items-start">
+            
+            {/* Weight Input */}
+            <div className="space-y-6">
+              <FormField
+                control={form.control}
+                name="productWeight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Estimated Weight per unit (kg)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Scale className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="e.g., 1.5"
+                          className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-xs text-rose-500" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Contextual Weight Guide */}
+              <div 
+                onClick={openModal}
+                className="group cursor-pointer rounded-2xl border border-blue-200 bg-blue-50 p-4 transition-all hover:bg-blue-100 dark:border-blue-900/30 dark:bg-blue-900/10 dark:hover:bg-blue-900/20"
+              >
+                <div className="flex items-start gap-3">
+                  <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <div>
-                    <Button
-                      type="button"
-                      onClick={openModal}
-                      className="bg-red-400 text-xs font-medium hover:bg-red-300"
-                    >
-                      Important weight information, Click here
-                    </Button>
+                    <h4 className="text-sm font-bold text-blue-900 dark:text-blue-100">Need help with weight?</h4>
+                    <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
+                      Product weight determines your shipping cost. Click here for tips on finding accurate weights or to view our estimates guide.
+                    </p>
                   </div>
                 </div>
               </div>
-              <div className="w-11/12 space-y-8 max-md:mt-3 lg:w-10/12">
-                <FormField
-                  control={form.control}
-                  name="productLink"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Link</FormLabel>
-                      <FormControl>
-                        <div className="item-center relative flex">
-                          <div className="absolute m-2 lg:m-5">
-                            <Link className="w-4" />
-                          </div>
-                          <Input
-                            className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                            placeholder="Enter product link"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="col-span-8 flex justify-start" />
-                    </FormItem>
-                  )}
-                />
+            </div>
 
-                <FormField
-                  control={form.control}
-                  name="productPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Unit Price </FormLabel>
-                      <FormControl>
-                        <div className="item-center relative flex">
-                          {/* <CircleDollarSign
-                          className="absolute m-2 lg:m-5"
-                          size={20}
-                        /> */}
-                          <Input
-                            className="bg-slate-100 pl-12 max-sm:w-[340px] lg:h-[60px] lg:w-11/12"
-                            placeholder="Enter the price of the product"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="col-span-8 flex justify-start" />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-            <div className="gap-[22.5px flex flex-col max-lg:hidden">
-              <div className="text-sm text-slate-600">
-                Inputting the right weight{' '}
-                <span>(This determines your shipping cost)</span>
-              </div>
-              <div>
-                <Button
-                  type="button"
-                  onClick={openModal}
-                  className="bg-red-400 text-xs font-medium hover:bg-red-300"
-                >
-                  Important weight information, Click here
-                </Button>
-              </div>
-            </div>
-            <div className="flex flex-col max-lg:w-11/12 max-md:mt-[25px] lg:pr-8 xl:pl-0">
-              <FormField
-                control={form.control}
-                name="productInfo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Product Info</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className="w-full bg-slate-100 lg:h-32"
-                        placeholder="Provide any additional information for this product"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className="col-span-8 flex justify-start" />
-                  </FormItem>
-                )}
-              />
-            </div>
+            {/* Product Variants/Info */}
+            <FormField
+              control={form.control}
+              name="productInfo"
+              render={({ field }) => (
+                <FormItem className="h-full">
+                  <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">Variants & Specifications</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Specify colors, sizes, or variants you want the supplier to send..."
+                      className="min-h-[140px] resize-none rounded-xl border-slate-200 bg-slate-50 p-4 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-xs text-rose-500" />
+                </FormItem>
+              )}
+            />
           </div>
-          <div className="mt-[16px] flex w-11/12 flex-wrap text-sm font-normal text-red-400 lg:text-sm">
-            <div className="pb-3 text-slate-600">
-              Important Note: for countries outside nigeria
-            </div>
-            We are only able to ship directly to you, orders with a minimum
-            total estimated weight of 10kg. That is; the total estimated weight
-            of all the products in your order must be at least 10kg. Ensure you
-            input the right unit weight for each product as stated by the
-            supplier. Our order approval team will check to ensure correctness
-            and will only approve correctly placed orders for processing.
-          </div>
-          <div className="flex pr-12 pt-11 md:justify-end">
+
+          {/* Form Actions */}
+          <div className="flex justify-end pt-6 border-t border-slate-100 dark:border-slate-800">
             <Button
               type="submit"
-              className="item-center my-[25px] h-[49px] w-[162px] gap-2 text-base font-medium"
+              disabled={isSubmitting}
+              className="w-full sm:w-auto rounded-xl bg-blue-600 px-8 py-6 text-sm font-bold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 disabled:opacity-70 active:scale-[0.98]"
             >
-              <Image
-                src="/icons/add-product/cart.svg"
-                alt="search"
-                width={20}
-                height={20}
-                className="fill-white"
-              />
-              Add product
+              {isSubmitting ? (
+                <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Saving...</>
+              ) : (
+                <><ShoppingCart className="mr-2 h-5 w-5" /> Save Product to Order</>
+              )}
             </Button>
           </div>
+
         </form>
       </Form>
     </>
   );
-};
-
-export default AddProductForm;
+}

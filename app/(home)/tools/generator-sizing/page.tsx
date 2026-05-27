@@ -144,7 +144,9 @@ export default function GeneratorSizingTool() {
 
     if (totalKw <= 0 || totalKva <= 0) return null;
 
-    const surgeMult = startMultiplier(largestMotorRow?.startMethod || 'DOL');
+    const surgeMult = startMultiplier(
+      (largestMotorRow as LoadRow | null)?.startMethod ?? 'DOL',
+    );
     const motorStartKva = largestMotorKva * surgeMult;
     const stackKva = startScenario === 'largest_only' ? motorStartKva : baseKva + motorStartKva;
     const minKva = stackKva * (1 + engHeadroom / 100);

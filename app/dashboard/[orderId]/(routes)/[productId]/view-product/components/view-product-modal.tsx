@@ -8,10 +8,11 @@ import SavedOrders from '@/content/general-procurement/saved-orders.json';
 function AddProductModal() {
   const param = useParams();
   const productId = parseInt(
-    Array.isArray(param.productId) ? param.productId[0] : param.productId,
+    (Array.isArray(param.productId) ? param.productId[0] : param.productId) ??
+      '0',
   );
   const orderId = parseInt(
-    Array.isArray(param.orderId) ? param.orderId[0] : param.orderId,
+    (Array.isArray(param.orderId) ? param.orderId[0] : param.orderId) ?? '0',
   );
 
   // Find the order with the matching orderId

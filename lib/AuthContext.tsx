@@ -8,6 +8,10 @@ interface User {
   pidUser: string;
   userEmail: string;
   userFirstname?: string;
+  userLastname?: string;
+  phone?: string;
+  email?: string;
+  name?: string;
   userImage: string;
   userStatus: string;
 }

@@ -16,8 +16,9 @@ import {
   X,
   ChevronUp,
   ShoppingCart,
-  Filter,
   SlidersHorizontal,
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import ProductGrid from './ProductGrid';
@@ -43,27 +44,14 @@ export default function ShopComponent() {
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000000 });
 
   // Search and filter state
-  const [searchQuery, setSearchQuery] = useState(
-    searchParams.get('search') || '',
-  );
-  const [selectedCategory, setSelectedCategory] = useState(
-    searchParams.get('category') || 'all',
-  );
-  const [selectedBrand, setSelectedBrand] = useState(
-    searchParams.get('brand') || 'all',
-  );
-  const [minPrice, setMinPrice] = useState(
-    parseFloat(searchParams.get('minPrice') || '0'),
-  );
-  const [maxPrice, setMaxPrice] = useState(
-    parseFloat(searchParams.get('maxPrice') || '999999999'),
-  );
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'all');
+  const [selectedBrand, setSelectedBrand] = useState(searchParams.get('brand') || 'all');
+  const [minPrice, setMinPrice] = useState(parseFloat(searchParams.get('minPrice') || '0'));
+  const [maxPrice, setMaxPrice] = useState(parseFloat(searchParams.get('maxPrice') || '999999999'));
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'newest');
-  const [currentPage, setCurrentPage] = useState(
-    parseInt(searchParams.get('page') || '1'),
-  );
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1'));
 
-  // Pagination state
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1,
@@ -72,29 +60,14 @@ export default function ShopComponent() {
     hasPrevPage: false,
   });
 
-  // Fetch filter options
-  useEffect(() => {
-    fetchFilterOptions();
-  }, []);
+  useEffect(() => { fetchFilterOptions(); }, []);
 
-  // Fetch products when filters change
   useEffect(() => {
     fetchProducts();
-  }, [
-    searchQuery,
-    selectedCategory,
-    selectedBrand,
-    minPrice,
-    maxPrice,
-    sortBy,
-    currentPage,
-  ]);
+  }, [searchQuery, selectedCategory, selectedBrand, minPrice, maxPrice, sortBy, currentPage]);
 
-  // Scroll to top button
   useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > 300);
-    };
+    const handleScroll = () => setShowScrollTop(window.scrollY > 300);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -103,7 +76,6 @@ export default function ShopComponent() {
     try {
       const response = await fetch('/api/shop/filters');
       const data = await response.json();
-
       if (data.statusx === 'SUCCESS') {
         setCategories(data.data.categories);
         setBrands(data.data.brands);
@@ -138,23 +110,14 @@ export default function ShopComponent() {
         toast.error(data.message || 'Failed to fetch products');
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
       toast.error('Failed to load products');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSearch = () => {
-    setCurrentPage(1);
-    updateURL();
-  };
-
-  const clearSearch = () => {
-    setSearchQuery('');
-    setCurrentPage(1);
-    updateURL();
-  };
+  const handleSearch = () => { setCurrentPage(1); updateURL(); };
+  const clearSearch = () => { setSearchQuery(''); setCurrentPage(1); updateURL(); };
 
   const updateURL = () => {
     const params = new URLSearchParams();
@@ -165,18 +128,11 @@ export default function ShopComponent() {
     if (maxPrice < 999999999) params.set('maxPrice', maxPrice.toString());
     if (sortBy !== 'newest') params.set('sortBy', sortBy);
     if (currentPage > 1) params.set('page', currentPage.toString());
-
     router.push(`/dashboard/shop?${params.toString()}`);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    scrollToTop();
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handlePageChange = (page: number) => { setCurrentPage(page); scrollToTop(); };
 
   const handleFilterChange = (filters: any) => {
     setSelectedCategory(filters.category || 'all');
@@ -188,147 +144,133 @@ export default function ShopComponent() {
 
   return (
     <>
-      <div className="bg-slate-100 px-4 py-[25px] text-slate-800 dark:bg-black dark:text-white">
-        <div className="flex flex-col gap-[25px]">
-          {/* Filter Bar */}
-          <div className="mx-auto w-full max-w-7xl">
-            <div
-              className="sticky top-16 z-40 rounded-xl border border-slate-300/60 bg-slate-100/90 px-4 py-3 backdrop-blur-md supports-[backdrop-filter]:bg-slate-100/70 dark:border-gray-700/60 dark:bg-gray-900/80 dark:backdrop-blur"
-              style={{ top: 'calc(var(--nav-height, 4rem) + 0.5rem)' }}
-            >
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                {/* Search */}
-                <div className="flex w-full items-center gap-2 md:w-[28rem]">
-                  <Input
-                    value={searchQuery}
-                    placeholder="Search products..."
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSearch();
-                    }}
-                    className="h-[49px] w-full rounded-xl border border-slate-300 bg-slate-200 text-gray-800 placeholder:text-slate-500 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-400"
-                  />
-                  {searchQuery && (
-                    <Button
-                      variant="ghost"
-                      onClick={clearSearch}
-                      className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-3 dark:border-gray-600 dark:bg-gray-800"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleSearch}
-                    className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-4 text-gray-800 hover:bg-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <SearchIcon className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* Sort and Actions */}
-                <div className="flex items-center gap-2">
-                  <Select
-                    value={sortBy}
-                    onValueChange={(value) => {
-                      setSortBy(value);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <SelectTrigger className="h-[49px] w-[180px] rounded-xl border border-slate-300 bg-slate-200 dark:border-gray-600 dark:bg-gray-800">
-                      <SelectValue placeholder="Sort by" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="newest">Newest First</SelectItem>
-                      <SelectItem value="oldest">Oldest First</SelectItem>
-                      <SelectItem value="price-asc">
-                        Price: Low to High
-                      </SelectItem>
-                      <SelectItem value="price-desc">
-                        Price: High to Low
-                      </SelectItem>
-                      <SelectItem value="name-asc">Name: A-Z</SelectItem>
-                      <SelectItem value="name-desc">Name: Z-A</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Button
-                    onClick={() => setShowFilterPanel(true)}
-                    className="h-[49px] rounded-xl border border-slate-300 bg-slate-200 px-4 text-gray-800 hover:bg-slate-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                  >
-                    <SlidersHorizontal className="mr-2 h-4 w-4" />
-                    Filters
-                  </Button>
-
-                  <Button
-                    onClick={() => setShowCartSidebar(true)}
-                    className="relative h-[49px] rounded-xl bg-indigo-600 px-4 text-white hover:bg-indigo-700"
-                  >
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Cart
-                    {cartCount > 0 && (
-                      <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                        {cartCount}
-                      </span>
-                    )}
-                  </Button>
-                </div>
+      <div className="mx-auto w-full max-w-7xl">
+        
+        {/* Floating Action Bar */}
+        <div className="sticky top-4 z-40 mb-8 rounded-2xl border border-slate-200/60 bg-white/80 p-3 shadow-lg shadow-slate-200/20 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-900/80 dark:shadow-none">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            
+            {/* Search Input */}
+            <div className="relative flex-1 lg:max-w-md">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <SearchIcon className="h-4 w-4 text-slate-400" />
               </div>
+              <Input
+                value={searchQuery}
+                placeholder="Search premium devices..."
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                className="h-11 w-full rounded-xl border-slate-200 bg-slate-50 pl-10 pr-10 text-sm font-medium focus-visible:ring-1 focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-950"
+              />
+              {searchQuery && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
+              <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setCurrentPage(1); }}>
+                <SelectTrigger className="h-11 w-[160px] rounded-xl border-slate-200 bg-slate-50 text-xs font-bold dark:border-slate-800 dark:bg-slate-950 shrink-0">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
+                  <SelectItem value="newest">Newest Arrivals</SelectItem>
+                  <SelectItem value="oldest">Classic First</SelectItem>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                  <SelectItem value="name-asc">Name: A to Z</SelectItem>
+                  <SelectItem value="name-desc">Name: Z to A</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                onClick={() => setShowFilterPanel(true)}
+                className="h-11 rounded-xl border-slate-200 bg-slate-50 px-4 text-xs font-bold hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-800 shrink-0"
+              >
+                <SlidersHorizontal className="mr-2 h-4 w-4" />
+                Filters
+              </Button>
+
+              <Button
+                onClick={() => setShowCartSidebar(true)}
+                className="relative h-11 rounded-xl bg-blue-600 px-5 text-xs font-bold text-white shadow-md shadow-blue-600/20 transition hover:bg-blue-500 shrink-0"
+              >
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Cart
+                {cartCount > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white bg-rose-500 text-[10px] font-black text-white dark:border-slate-900">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
             </div>
           </div>
+        </div>
 
-          {/* Products Grid */}
-          <div className="mx-auto w-full max-w-7xl">
-            {loading ? (
-              <div className="py-8 text-center text-slate-600 dark:text-slate-400">
-                Loading products...
-              </div>
-            ) : products.length === 0 ? (
-              <div className="py-8 text-center text-slate-600 dark:text-slate-400">
-                No products found. Try adjusting your search or filters.
-              </div>
-            ) : (
-              <>
-                <ProductGrid products={products} />
+        {/* Product Grid Area */}
+        <div className="min-h-[400px]">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-20 text-slate-500">
+              <div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-600 border-t-transparent mb-4"></div>
+              <p className="text-sm font-bold tracking-widest uppercase">Loading Collection</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white/50 py-24 text-center dark:border-slate-800 dark:bg-slate-900/50">
+               <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800 mb-4">
+                <SearchIcon className="h-8 w-8 text-slate-400" />
+               </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">No products found</h3>
+              <p className="mt-1 text-sm text-slate-500">We couldn't find anything matching your current filters.</p>
+              <Button onClick={clearSearch} variant="link" className="mt-4 text-blue-600">Clear all filters</Button>
+            </div>
+          ) : (
+            <>
+              <ProductGrid products={products} />
 
-                {/* Pagination */}
-                {pagination.totalPages > 1 && (
-                  <div className="mt-8 flex justify-center gap-2">
-                    <Button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={!pagination.hasPrevPage}
-                      className="rounded-xl"
-                    >
-                      Previous
-                    </Button>
-                    <span className="flex items-center px-4 text-sm">
-                      Page {pagination.currentPage} of {pagination.totalPages}
-                    </span>
-                    <Button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={!pagination.hasNextPage}
-                      className="rounded-xl"
-                    >
-                      Next
-                    </Button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+              {/* Minimal Pagination */}
+              {pagination.totalPages > 1 && (
+                <div className="mt-12 flex items-center justify-between border-t border-slate-200 pt-6 dark:border-slate-800">
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={!pagination.hasPrevPage}
+                    className="h-10 rounded-xl border-slate-200 px-4 text-xs font-bold dark:border-slate-800"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Prev
+                  </Button>
+                  <span className="text-xs font-bold uppercase tracking-widest text-slate-500">
+                    {pagination.currentPage} / {pagination.totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={!pagination.hasNextPage}
+                    className="h-10 rounded-xl border-slate-200 px-4 text-xs font-bold dark:border-slate-800"
+                  >
+                    Next <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
-      {/* Scroll to Top Button */}
       {showScrollTop && (
-        <Button
+        <button
           onClick={scrollToTop}
-          className="fixed bottom-4 right-4 z-50 h-12 w-12 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700"
+          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-white shadow-xl transition-transform hover:-translate-y-1 dark:bg-blue-600"
         >
-          <ChevronUp className="h-6 w-6" />
-        </Button>
+          <ChevronUp className="h-5 w-5" />
+        </button>
       )}
 
-      {/* Filter Panel */}
       <FilterPanel
         isOpen={showFilterPanel}
         onClose={() => setShowFilterPanel(false)}
@@ -342,7 +284,6 @@ export default function ShopComponent() {
         onFilterChange={handleFilterChange}
       />
 
-      {/* Cart Sidebar */}
       <CartSidebar
         isOpen={showCartSidebar}
         onClose={() => setShowCartSidebar(false)}

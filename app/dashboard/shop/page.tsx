@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import ShopComponent from './components/ShopComponent';
 import Loading from '../loading';
@@ -12,8 +12,9 @@ import {
   Watch,
   Tablet,
   Headphones,
-  Shield,
-  Package,
+  ShieldCheck,
+  PackageCheck,
+  Award,
 } from 'lucide-react';
 
 export default function ShopPage() {
@@ -35,121 +36,105 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-950 dark:via-gray-900 dark:to-black">
-      {/* Header Section */}
-      <div className="relative overflow-hidden">
-        {/* Background Decorative Elements */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-blue-400/10 blur-3xl dark:bg-blue-600/10"></div>
-          <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-indigo-400/10 blur-3xl dark:bg-indigo-600/10"></div>
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-          {/* Main Title Section */}
-          <div className="mb-8 space-y-4 text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 dark:bg-blue-900/30">
-              <ShoppingBag className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                Official Store
-              </span>
-            </div>
-
-            <h1 className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 bg-clip-text text-4xl font-bold leading-tight text-transparent dark:from-slate-100 dark:via-blue-100 dark:to-indigo-100 sm:text-5xl lg:text-6xl">
-              Sure Imports Shop
-            </h1>
-
-            <p className="mx-auto max-w-3xl text-lg font-medium text-slate-600 dark:text-slate-300 sm:text-xl">
-              Premium Phones, Laptops, Smart Watches, Tablets & Accessories
-            </p>
-          </div>
-
-          {/* Product Categories Icons */}
-          <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-            {[
-              { icon: Smartphone, label: 'Phones' },
-              { icon: Laptop, label: 'Laptops' },
-              { icon: Watch, label: 'Watches' },
-              { icon: Tablet, label: 'Tablets' },
-              { icon: Headphones, label: 'Accessories' },
-              { icon: Package, label: 'More' },
-            ].map((category, index) => (
-              <div
-                key={index}
-                className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white p-4 backdrop-blur-sm transition-all duration-300 hover:border-blue-400 hover:shadow-lg dark:border-gray-700 dark:bg-gray-800/50 dark:hover:border-blue-500"
-              >
-                <category.icon className="mb-2 h-8 w-8 text-slate-600 transition-colors group-hover:text-blue-600 dark:text-slate-300 dark:group-hover:text-blue-400" />
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                  {category.label}
+    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+      {/* Deep Slate Hero Section */}
+      <div className="bg-slate-900 pb-32 pt-12 text-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+            <div className="max-w-2xl">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-400">
+                  Official Store
                 </span>
               </div>
-            ))}
-          </div>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+                Sure Imports Shop
+              </h1>
+              <p className="mt-4 text-lg text-slate-400">
+                Premium authentic devices. Hand-selected, verified, and delivered directly to your door with full warranty protection.
+              </p>
 
-          {/* Info Cards */}
-          <div className="mb-6 grid gap-4 md:grid-cols-2">
-            {/* Phones Info Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 p-6 text-white shadow-xl">
-              <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-white/10"></div>
-              <div className="relative">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
-                    <Smartphone className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-bold">Brand New Phones</h3>
+              {/* Trust Indicators - Minimalist Row */}
+              <div className="mt-8 flex flex-wrap items-center gap-6 text-sm font-medium text-slate-300">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-emerald-400" />
+                  Warranty Included
                 </div>
-                <p className="leading-relaxed text-blue-50">
-                  Every phone comes sealed in its original box, complete with
-                  all accessories, and includes a{' '}
-                  <span className="font-semibold text-white">
-                    one-year warranty
-                  </span>{' '}
-                  for your peace of mind.
-                </p>
+                <div className="flex items-center gap-2">
+                  <PackageCheck className="h-4 w-4 text-blue-400" />
+                  Sealed Packaging
+                </div>
+                <div className="flex items-center gap-2">
+                  <Award className="h-4 w-4 text-indigo-400" />
+                  100% Authentic
+                </div>
               </div>
             </div>
 
-            {/* Laptops Info Card */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white shadow-xl">
-              <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-white/10"></div>
-              <div className="relative">
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="rounded-lg bg-white/20 p-2 backdrop-blur-sm">
-                    <Laptop className="h-6 w-6" />
-                  </div>
-                  <h3 className="text-xl font-bold">Quality Laptops</h3>
+            {/* Visual Categories Strip */}
+            <div className="hidden grid-cols-3 gap-3 sm:grid lg:grid-cols-5">
+              {[
+                { icon: Smartphone, label: 'Phones' },
+                { icon: Laptop, label: 'Laptops' },
+                { icon: Watch, label: 'Watches' },
+                { icon: Tablet, label: 'Tablets' },
+                { icon: Headphones, label: 'Audio' },
+              ].map((category, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-white/5 p-4 text-slate-400 backdrop-blur-sm transition hover:bg-white/10 hover:text-white"
+                >
+                  <category.icon className="h-5 w-5" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">{category.label}</span>
                 </div>
-                <p className="leading-relaxed text-indigo-50">
-                  Pre-owned laptops in excellent condition, comes with bag and
-                  charger, backed by a{' '}
-                  <span className="font-semibold text-white">
-                    3-month warranty
-                  </span>{' '}
-                  for quality assurance.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl border border-slate-200 bg-white/50 p-4 backdrop-blur-sm dark:border-gray-700 dark:bg-gray-800/30">
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
-              <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
-              <span className="text-sm font-medium">Warranty Included</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
-              <Package className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium">Original Packaging</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
-              <ShoppingBag className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              <span className="text-sm font-medium">Authentic Products</span>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Shop Component */}
-      <ShopComponent />
+      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        
+        {/* Overlapping Info Cards */}
+        <div className="mb-12 grid gap-6 md:grid-cols-2">
+          
+          {/* Phones Policy */}
+          <div className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                <Smartphone className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Top Quality Phones</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                  Every phone comes factory-sealed in its original box, complete with all OEM accessories, and includes a comprehensive <strong className="text-slate-900 dark:text-white">one-year warranty</strong> for your peace of mind.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Laptops Policy */}
+          <div className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
+                <Laptop className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Quality Assured Laptops</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                  Premium pre-owned laptops in excellent grade-A condition. Delivered with a protective bag and charger, backed by our <strong className="text-slate-900 dark:text-white">3-month warranty</strong> for quality assurance.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+
+        {/* Shop Component Wrapper */}
+        <div className="rounded-3xl">
+          <ShopComponent />
+        </div>
+      </main>
     </div>
   );
 }

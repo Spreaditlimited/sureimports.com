@@ -1,21 +1,10 @@
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
-import OrderCard from './order-card';
-import { toast } from 'sonner';
-import { useAuth } from '@/lib/AuthContext';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Product {
-  id: number;
-  name: string;
-  image: string;
-  info: string;
-  link: string;
-  quantity: number;
-  unitPrice: number;
-  unitWeight: number;
-}
+import { useAuth } from '@/lib/AuthContext';
+import { toast } from 'sonner';
+import OrderCard from './order-card';
 
 interface OrderData {
   id: any;
@@ -31,74 +20,84 @@ interface OrderData {
   createdAt: string;
 }
 
-interface Orders {
-  Orders: OrderData[];
-}
-
 interface OrderSectionProps {
-  initialOrders: OrderData;
+  initialOrders: any; // Can be an array or an object of orders
 }
 
-function OrderSection({ initialOrders }: OrderSectionProps) {
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [orders, setOrders] = useState(initialOrders as any);
-  const [loading, setLoading] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
+export default function OrderSection({ initialOrders }: OrderSectionProps) {
+  const router = useRouter(); // MUST be called at the top level, not inside functions
+  const { user } = useAuth();
+  
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
-  const handleDelete = async (pidOrder: number) => {
-    //------------------------- PRODUCT DELETE FUNCTION --------------------------//
+  // Safely format the incoming data into an array
+  useEffect(() => {
+    if (!initialOrders) {
+      setOrders([]);
+      return;
+    }
+    
+    const formattedOrders = Array.isArray(initialOrders) 
+      ? initialOrders 
+      : Object.values(initialOrders);
+      
+    setOrders(formattedOrders as OrderData[]);
+  }, [initialOrders]);
+
+  const handleDelete = async (pidOrder: string) => {
+    if (!user?.pidUser) return;
 
     try {
-      const router = useRouter();
-
-      toast.info('Processing . . .' + orders[0]['pidOrder']);
-      setLoading(true);
-      console.log('Reloading child component...');
-      setReloadKey((prev) => prev + 1); // Change the key to force a re-render
+      setIsDeleting(pidOrder);
+      toast.loading('Deleting order...', { id: `delete-${pidOrder}` });
 
       const res = await fetch(
-        `/api/crud/procurement-delete-order/${user?.pidUser}/${pidOrder}`,
+        `/api/crud/procurement-delete-order/${user.pidUser}/${pidOrder}`
       );
 
-      //check if request was successful
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
+        throw new Error(errorData.error || 'Failed to delete order');
       }
 
-      // GET & PROCESS RESPONSE FROM API
-      const data: any = await res.json();
+      const data = await res.json();
 
-      if (data.responsex.status == 'SUCCESS') {
-        toast.success(data.responsex.message);
+      if (data.responsex?.status === 'SUCCESS') {
+        toast.success(data.responsex.message, { id: `delete-${pidOrder}` });
+        
+        // Optimistic UI Update: Instantly remove it from the screen without a full reload
+        setOrders((prev) => prev.filter((order) => order.pidOrder !== pidOrder));
+        
+        // Refresh the router in the background to sync server state
         router.refresh();
-      }
-      if (data.responsex.status == 'FAILED') {
-        toast.warning(data.responsex.message);
+      } else {
+        toast.error(data.responsex?.message || 'Failed to delete order', { id: `delete-${pidOrder}` });
       }
     } catch (error: any) {
-      console.log(error.message);
+      console.error(error.message);
+      toast.error('An error occurred while deleting.', { id: `delete-${pidOrder}` });
     } finally {
-      setLoading(false);
+      setIsDeleting(null);
     }
   };
 
-  useEffect(() => {
-    setOrders(initialOrders);
-  }, [orders, reloadKey]);
-
   return (
-    <div key={reloadKey} className="flex w-full flex-col gap-3 dark:bg-black">
-      {orders.map((order: any, index: any) => (
-        <OrderCard
-          key={order.id}
-          id={index + 1}
-          order={order}
-          onDelete={handleDelete}
-        />
+    <div className="flex w-full flex-col gap-6">
+      {orders.map((order, index) => (
+        <div 
+          key={order.pidOrder || index}
+          className={`transition-all duration-300 ${
+            isDeleting === order.pidOrder ? 'pointer-events-none opacity-50 blur-sm' : 'opacity-100'
+          }`}
+        >
+          <OrderCard
+            id={index + 1}
+            order={order}
+            onDelete={() => handleDelete(order.pidOrder)}
+          />
+        </div>
       ))}
     </div>
   );
 }
-
-export default OrderSection;

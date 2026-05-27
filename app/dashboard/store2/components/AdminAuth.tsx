@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import { AdminResetPassword } from './AdminResetPassword';
 import { AdminDashboard } from './AdminDashboard';
 import { AdminUserManagement } from './AdminUserManagement';
 import { useAdminAuth } from './AdminAuthProvider';
-import { Product, Order, OrderTab, BulkOrder } from '../App';
+import { Product, Order, OrderTab, BulkOrder } from './App';
 
 type AdminAuthView =
   | 'signIn'

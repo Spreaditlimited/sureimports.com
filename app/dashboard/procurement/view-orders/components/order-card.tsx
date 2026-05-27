@@ -1,371 +1,180 @@
 'use client';
 
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/context/AuthContext';
+import { toast } from 'sonner';
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import React, { useEffect, useState, useRef, Suspense } from 'react';
-import Image from 'next/image';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-} from '@/components/ui/select';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { 
+  PackageSearch, 
+  Trash2, 
+  PlusCircle, 
+  AlertTriangle,
+  ChevronDown
+} from 'lucide-react';
 
 import MoreOrders from './products-table/orders-view-more';
-import { usePathname } from 'next/navigation';
-import Loader from '@/components/uix/Loader';
-import { useAuth } from '@/app/context/AuthContext';
-
-import Link from 'next/link';
-import { toast } from 'sonner';
-
-interface ProductData {
-  id: number;
-  pidUser: string;
-  pidProduct: string;
-  pidOrder: string;
-  productName: string;
-  productLink: string;
-  productCategory: string;
-  productPrice: string;
-  productWeight: string;
-  productQuantity: string;
-  productInfo: string;
-  createdAt: string;
-}
-
-interface OrderData {
-  //[x: string]: any;
-  id: any;
-  pidOrder: string;
-  pidUser: string;
-  whatsappNumber: string;
-  shippingName: string;
-  shippingTo: string;
-  grossWeight: string;
-  trackingNumber: string;
-  shippingPlan: string;
-  wantProductVerification: string;
-  wantConsolidation: string;
-  multipleSuppliers: string;
-  description: string;
-  status: string;
-  createdAt: string;
-}
-
-interface Orders {
-  Orders: OrderData[];
-}
 
 interface Order {
   id: any;
   pidOrder: string;
   pidUser: string;
   orderName: string;
-  destinationCountry: string;
-  currencyType: string;
-  shippingPlan: string;
-  orderCategory: string;
-  shippingAddress: string;
   status: string;
   createdAt: string;
-  //Product: Product[];
 }
 
 interface OrderCardProps {
   id: number;
   order: Order;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void; // Expect string to match pidOrder
 }
 
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-  userImage: string;
-  userStatus: string;
-}
-
-//API RESPONSE
-interface ApiResponse {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
-
-function OrderCard({ id, order, onDelete }: OrderCardProps) {
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-
+export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState<{ isOpen: boolean }>({ isOpen: false });
-  const path = usePathname();
+  const { user } = useAuth();
 
-  const [productData, setProductData] = useState<ProductData>();
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [pidOrder, setPidOrder] = useState(order.pidOrder);
+  const [isOpen, setIsOpen] = useState(false);
+  const [productData, setProductData] = useState<any>(null);
+  const [pidUser] = useState(user?.pidUser);
   const [loading, setLoading] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen({ isOpen: open });
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      if (!pidUser || !order.pidOrder) return;
+      try {
+        const res = await fetch(`/api/get-data/procurement-order-products/${pidUser}/${order.pidOrder}`);
+        if (!res.ok) throw new Error('Failed to fetch products');
+        const data = await res.json();
+        setProductData(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchProducts();
+  }, [pidUser, order.pidOrder]);
 
   const handleDelete = async () => {
-    try {
-      toast.info('Deleting Order . . .');
-      console.log('Reloading child component...');
-      setReloadKey((prev) => prev + 1); // Change the key to force a re-render
-      setLoading(true);
-      window.location.reload();
-      // const router = useRouter();
-      // router.push('/specific-path');
-
-      const res = await fetch(
-        `/api/crud/procurement-delete-order/${user?.pidUser}/${pidOrder}`,
-      );
-
-      //check if request was successful
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
-      }
-
-      // GET & PROCESS RESPONSE FROM API
-      const data: any = await res.json();
-
-      if (data.responsex.status == 'SUCCESS') {
-        toast.success(data.responsex.message);
-        navigateWithAlert(
-          '/dashboard/procurement/view-orders/saved?status=success',
-          'success',
-          'Your request has been submitted!',
-        );
-        // window.location.href = '/dashboard/procurement/view-orders/saved';
-        // window.location.reload();
-        // const router = useRouter();
-        // router.refresh();
-        const timer = setTimeout(() => {
-          window.location.reload();
-        }, 5000); // 5000 milliseconds = 5 seconds
-        return () => clearTimeout(timer);
-      }
-      if (data.responsex.status == 'FAILED') {
-        toast.warning(data.responsex.message);
-      }
-    } catch (error: any) {
-      console.log(error.message);
-    } finally {
-      setLoading(false);
-    }
-
-    //console.log('deleted');
-    onDelete(id);
-    setIsOpen({ isOpen: false });
+    // Rely on parent to handle API call and state removal for optimistic UI
+    setIsOpen(false);
+    onDelete(order.pidOrder);
   };
 
-  const onKeep = () => {
-    console.log('kept');
-    setIsOpen({ isOpen: false });
+  const handleAddProduct = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent accordion from toggling
+    router.push(`/dashboard/procurement/add-product/${order.pidOrder}`);
   };
 
-  const fetchProducts = async (pidUser: string, pidOrder: string) => {
-    try {
-      //request for users
-      const res = await fetch(
-        `/api/get-data/procurement-order-products/${pidUser}/${pidOrder}`,
-      );
-
-      //check if request was successful
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
-      }
-
-      //fetch json records into userData
-      const data: ProductData = await res.json();
-
-      //update user records variables
-      setProductData(data);
-      //setPidUser(data.pidUser);
-    } catch (err: any) {
-      //setError(err.message || 'An error occurred');
-    } finally {
-      //setLoading(false);
-    }
-  };
-
-  //run fetchUser function to get user records
-  useEffect(() => {
-    if (pidUser) {
-      fetchProducts(pidUser, pidOrder);
-      //fetchProductCount(pidUser, status);
-    }
-  }, [pidUser]);
-
-  //const product: ProductData[] = productData; //ARRAY FORMAT
-  //const jsonData = JSON.stringify(productData, null, 2); //JSON FORMAT
-  //CHECK IF USER DATA HAS BEEN FULLY LOADED TO DOM
-
-  //GET RECORDS INTO ARRAY FOR COUNT
-  // const countRecords: OrderData[] = [];
-  // for (const key in productData) {
-  //   if (Object.prototype.hasOwnProperty.call(orderData, key)) {
-  //     countRecords.push(orderData[key as keyof typeof orderData]);
-  //   }
-  // }
-
-  if (!productData) return <div>. . .</div>;
-
-  //if (countRecords.length == 0)
+  if (!productData) {
+    return (
+      <div className="h-24 w-full animate-pulse rounded-[24px] bg-slate-50 dark:bg-slate-800/50" />
+    );
+  }
 
   return (
-    <div key={reloadKey} className="dark:bg-black">
-      <Accordion type="single" collapsible>
-        <AccordionItem value="item-1">
-          <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-black lg:flex-row xl:h-[100px] xl:items-center">
-            <div>
-              <div className="flex flex-row gap-4">
-                <div className="flex h-[60px] w-[60px] items-center justify-center rounded-lg bg-slate-100 text-center text-4xl capitalize text-slate-300 dark:bg-slate-800 dark:text-white">
-                  {id}
-                </div>
-                <div className="flex flex-col gap-2">
-                  <div className="text-xl font-bold capitalize text-slate-800 dark:text-slate-200">
-                    {order.orderName}
-                  </div>
-                  <div className="text-base font-normal text-slate-950 dark:text-slate-100">
-                    Order Id:{' '}
-                    <span className="text-slate-600">{order.pidOrder}</span>
-                  </div>
+    <div className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
+      <Accordion type="single" collapsible className="w-full border-none">
+        <AccordionItem value={`item-${order.pidOrder}`} className="border-none">
+          
+          {/* Card Header (Always Visible) */}
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            
+            {/* Left Info Section */}
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
+                <PackageSearch className="h-6 w-6" />
+              </div>
+              <div className="flex flex-col">
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white line-clamp-1">
+                  {order.orderName}
+                </h3>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Ref:</span>
+                  <span className="font-mono text-xs font-semibold text-slate-600 dark:text-slate-300">
+                    {order.pidOrder}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 max-lg:w-full sm:flex-row sm:justify-between lg:justify-normal">
-              <div className="flex gap-3">
-                {/* {
-                    path.includes('pending-orders') ||
-                    path.includes('approved-orders') ||
-                    path.includes('in-transit') ||
-                    path.includes('ready-for-pickup') ||
-                    path.includes('completed-orders') ||
-                    path.includes('on-hold-orders') ||
-                    path.includes('pay-for-shipping') ? (
-                  ''
-                ) : ( */}
 
-                {(order.status == 'saved' || order.status == 'on-hold') && (
-                  <Button
-                    className="h-[49px] rounded-xl font-normal md:px-[30px] md:py-[15px] xl:w-[162px]"
-                    onClick={() => {
-                      router.push(
-                        `/dashboard/procurement/add-product/${order.pidOrder}`,
-                      );
-                    }}
-                  >
-                    + Add Product
-                  </Button>
-                )}
-
-                {/* )
-                } */}
-
-                {/* <select
-                  name="cars"
-                  id="cars"
-                  onChange={goToPDF}
-                  className="bg-black-100 inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl px-[30px] py-[15px] text-base font-medium text-slate-600 hover:bg-[#161629]/10 dark:text-white xl:w-[201px]"
+            {/* Right Action Section */}
+            <div className="flex items-center gap-2 sm:shrink-0">
+              
+              {/* Add Product Button */}
+              {(order.status === 'saved' || order.status === 'on-hold') && (
+                <button
+                  onClick={handleAddProduct}
+                  className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95"
                 >
-                  <option value="audi">- Export Order -</option>
-                  <option value="audi">PDF</option>
-                </select> */}
+                  <PlusCircle className="h-4 w-4" /> Add Product
+                </button>
+              )}
 
-                {/* <Select>
-                  <SelectTrigger className="inline-flex h-[49px] items-center justify-center gap-2.5 rounded-xl bg-slate-100 px-[30px] py-[15px] text-base font-medium text-slate-600 hover:bg-[#161629]/10 dark:text-white xl:w-[201px]">
-                    Export Order
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="csv">CSV</SelectItem>
-                    <SelectItem value="excel">Excel</SelectItem>
-                    <SelectItem value="pdf">PDF</SelectItem>
-                  </SelectContent>
-                </Select> */}
-              </div>
-              <div className="flex gap-3">
-                <Dialog open={isOpen.isOpen} onOpenChange={handleOpenChange}>
+              {/* Delete Button & Modal */}
+              {order.status === 'saved' && (
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
                   <DialogTrigger asChild>
-                    {order.status == 'saved' && (
-                      <Button className="item-ceneter flex h-11 w-11 justify-center rounded-lg bg-red-100 p-0 font-normal hover:bg-red-200">
-                        <Image
-                          src="/icons/delete.svg"
-                          alt="delete"
-                          width={20}
-                          height={20}
-                          className="cursor-pointer"
-                        />
-                      </Button>
-                    )}
+                    <button 
+                      onClick={(e) => e.stopPropagation()} 
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 transition hover:bg-rose-100 hover:text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </DialogTrigger>
 
-                  <DialogContent className="flex max-w-[396px] flex-col items-center justify-center overflow-auto rounded-[20px] py-[30px] dark:bg-[#161629]">
-                    <Image
-                      src="/icons/deletewarning.svg"
-                      alt="delete"
-                      width={100}
-                      height={100}
-                      className="cursor-pointer"
-                    />
-
-                    <div className="w-[280px] text-center text-2xl font-bold text-slate-800 dark:text-slate-300">
-                      Are you sure you want to delete?
+                  <DialogContent className="max-w-md gap-0 p-0 overflow-hidden rounded-[32px] border-none shadow-2xl dark:bg-slate-900">
+                    <div className="bg-rose-500 p-8 text-center text-white dark:bg-rose-600">
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/10">
+                        <AlertTriangle className="h-8 w-8" />
+                      </div>
+                      <h2 className="text-2xl font-black">Delete Order?</h2>
                     </div>
-                    <div className="flex w-80 text-center text-sm text-slate-600">
-                      This will delete this record and you cannot recover it.
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={onKeep}
-                        className="h-[49px] items-center justify-center gap-2.5 rounded-xl bg-slate-100 px-[30px] py-[15px] text-base text-slate-600 hover:bg-slate-200 lg:w-[162px]"
-                      >
-                        No! keep it
-                      </Button>
-
-                      <Button
-                        onClick={handleDelete}
-                        className="h-[49px] items-center justify-center gap-2.5 rounded-xl bg-red-100 px-[30px] py-[15px] text-base text-red-500 hover:bg-red-200 lg:w-[162px]"
-                      >
-                        {' '}
-                        Yes! Remove
-                      </Button>
+                    <div className="p-8 text-center">
+                      <p className="text-slate-600 dark:text-slate-400">
+                        This action cannot be undone. All products associated with this order reference <strong className="text-slate-900 dark:text-white">({order.pidOrder})</strong> will be permanently removed.
+                      </p>
+                      <div className="mt-8 flex gap-3">
+                        <button
+                          onClick={() => setIsOpen(false)}
+                          className="flex-1 rounded-xl bg-slate-100 py-4 text-sm font-bold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                        >
+                          Keep Order
+                        </button>
+                        <button
+                          onClick={handleDelete}
+                          className="flex-1 rounded-xl bg-rose-500 py-4 text-sm font-bold text-white shadow-lg shadow-rose-500/20 transition hover:bg-rose-600 active:scale-[0.98]"
+                        >
+                          Yes, Delete
+                        </button>
+                      </div>
                     </div>
                   </DialogContent>
                 </Dialog>
+              )}
 
-                <AccordionTrigger className="item-ceneter flex h-11 w-11 justify-center rounded-lg bg-slate-100 p-0 text-slate-600 hover:bg-black/10"></AccordionTrigger>
-              </div>
+              {/* Custom Accordion Trigger */}
+              <AccordionTrigger className="!flex-none !justify-center !py-0 flex h-10 w-10 items-center rounded-xl bg-slate-50 p-0 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:text-white">
+                <ChevronDown className="h-5 w-5 transition-transform duration-200" />
+              </AccordionTrigger>
+
             </div>
           </div>
 
-          <AccordionContent className="hide-scrollbar border-t-2">
+          {/* Expandable Content (Products Table) */}
+          <AccordionContent className="border-t border-slate-100 bg-slate-50/50 p-0 dark:border-slate-800 dark:bg-slate-900/30">
             <MoreOrders products={productData as any} />
           </AccordionContent>
+          
         </AccordionItem>
       </Accordion>
     </div>
   );
-}
-
-export default OrderCard;
-function navigateWithAlert(arg0: string, arg1: string, arg2: string) {
-  throw new Error('Function not implemented.');
 }

@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { MenuIcon } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { SideNav } from './side-nav';
 import { MobileNavItems } from '../constants/side-nav';
 import Image from 'next/image';
@@ -29,7 +35,10 @@ export const MobileSidebar = () => {
         </div>
       </SheetTrigger>
 
-      <SheetContent side="left" className="w-[256px] bg-black p-0">
+      <SheetContent side="left" className="w-[256px] bg-slate-900 p-0">
+        <SheetHeader className="sr-only">
+          <SheetTitle>Dashboard Menu</SheetTitle>
+        </SheetHeader>
         <div className="flex h-full flex-col">
           <div className="flex-shrink-0 pb-6 pt-6">
             <Image

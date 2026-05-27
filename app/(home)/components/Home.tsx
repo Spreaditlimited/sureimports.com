@@ -21,6 +21,7 @@ import CookieConsent from '../components/CookieConsent';
 import BlogList from '../components/BlogList';
 import BlogDetail from '../components/BlogDetail';
 import { useRouter } from 'next/navigation';
+import type { BlogPost } from '../actions/blogActions';
 
 type Page =
   | 'home'
@@ -39,6 +40,20 @@ type Page =
   | 'blog-detail';
 
 export default function Home() {
+  const emptyPost: BlogPost = {
+    id: '',
+    title: '',
+    excerpt: '',
+    content: '',
+    author: { name: '', avatar: '', role: '' },
+    category: 'Import Guide',
+    tags: [],
+    publishDate: new Date().toISOString().split('T')[0],
+    readTime: 0,
+    featured: false,
+    image: '',
+    slug: '',
+  };
   const [currentPage, setCurrentPage] = useState<Page>('home');
   const [selectedBlogSlug, setSelectedBlogSlug] = useState<string>('');
   const router = useRouter();
@@ -311,8 +326,7 @@ export default function Home() {
           onNavigateBlog={handleNavigateToBlog}
         />
         <BlogList
-          onSelectPost={handleSelectBlogPost as any}
-          onNavigateHome={() => navigateToPage('home')}
+          blogPosts={[]}
         />
         <Footer
           onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
@@ -337,7 +351,7 @@ export default function Home() {
           onNavigateBlog={handleNavigateToBlog}
         />
         <BlogDetail
-          slug={selectedBlogSlug}
+          post={emptyPost}
           onBack={handleBackToBlog}
           onSelectPost={handleSelectBlogPost}
         />

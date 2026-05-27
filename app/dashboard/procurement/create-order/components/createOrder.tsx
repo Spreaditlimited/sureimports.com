@@ -12,7 +12,11 @@ import {
 import React, { useState } from 'react';
 import CreateOrderForm from './create-order-form';
 
-function CreateOrder() {
+interface CreateOrderProps {
+  className?: string;
+}
+
+function CreateOrder({ className }: CreateOrderProps) {
   const [isOpen, setIsOpen] = useState<{ isOpen: boolean }>({ isOpen: false });
 
   const handleOpenChange = (open: boolean) => {
@@ -22,7 +26,9 @@ function CreateOrder() {
   return (
     <Dialog open={isOpen.isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button className="h-[49px] py-[15px] font-normal max-md:w-full md:px-[30px] xl:w-[162px]">
+        <Button
+          className={`h-[49px] py-[15px] font-normal max-md:w-full md:px-[30px] xl:w-[162px] ${className || ''}`}
+        >
           Create Order
         </Button>
       </DialogTrigger>

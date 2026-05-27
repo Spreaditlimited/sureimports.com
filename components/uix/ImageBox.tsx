@@ -3,26 +3,29 @@
 import { PhotoIcon } from '@heroicons/react/16/solid';
 import React, { useState, ChangeEvent, DragEvent } from 'react';
 import Image from 'next/image';
+import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
 interface ImageUploadProps {
   onImageChange: (file: File) => void;
   imagex: any;
+  avatarMode?: boolean;
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onImageChange, imagex }) => {
-  //const [previewImage, setPreviewImage] = useState<string | null>('/icons/profile-update/default.png');
-  if (imagex == null || imagex == undefined || imagex == '') {
-    imagex = 'default.png';
-  } //set default image value
-
-  const url =
-    (process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
-      process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL) +
-    '/' +
-    imagex;
-  const [previewImage, setPreviewImage] = useState<string | null>(url);
+const ImageUpload: React.FC<ImageUploadProps> = ({
+  onImageChange,
+  imagex,
+  avatarMode = false,
+}) => {
+  const defaultPreview = '/icons/profile-update/default.png';
+  const [previewImage, setPreviewImage] = useState<string | null>(
+    resolveMediaUrl(imagex) || defaultPreview,
+  );
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  React.useEffect(() => {
+    setPreviewImage(resolveMediaUrl(imagex) || defaultPreview);
+  }, [imagex]);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -70,7 +73,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageChange, imagex }) => {
       //     textAlign: 'center',
       //     cursor: 'pointer',
       //   }}
-      className={`dark:hover:bg-bray-800 flex h-[94px] w-full cursor-pointer items-center rounded-[10px] border border-dashed bg-slate-100 dark:bg-slate-800 ${isDragOver ? 'border-blue-500' : 'border-gray-300'} `}
+      className={
+        avatarMode
+          ? `h-full w-full cursor-pointer overflow-hidden rounded-full ${
+              isDragOver ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+            }`
+          : `dark:hover:bg-bray-800 flex h-[94px] w-full cursor-pointer items-center rounded-[10px] border border-dashed bg-slate-100 dark:bg-slate-800 ${
+              isDragOver ? 'border-blue-500' : 'border-gray-300'
+            }`
+      }
     >
       <input
         type="file"
@@ -86,29 +97,37 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onImageChange, imagex }) => {
           <Image
             src={previewImage}
             alt="Preview"
-            width={70}
-            height={70}
-            className="m-3 max-h-[70px] w-auto rounded-lg object-contain md:max-h-[70px] lg:max-h-[70px]"
-            style={{ maxWidth: '300px' }}
+            width={avatarMode ? 240 : 70}
+            height={avatarMode ? 240 : 70}
+            className={
+              avatarMode
+                ? 'h-full w-full object-cover'
+                : 'm-3 max-h-[70px] w-auto rounded-lg object-contain md:max-h-[70px] lg:max-h-[70px]'
+            }
+            style={avatarMode ? undefined : { maxWidth: '300px' }}
           />
 
-          <p className="m-2 p-5 pb-2 text-[12px]">
-            Click or drag and drop an image to upload <br />
-            <div className="pb-2 text-[10px]">
-              Max image size 2.5MB (Use a square sized photo e.g. 150px x 150px
-              for best fit.)
+          {!avatarMode && (
+            <div className="m-2 p-5 pb-2 text-[12px]">
+              Click or drag and drop an image to upload <br />
+              <div className="pb-2 text-[10px]">
+                Max image size 2.5MB (Use a square sized photo e.g. 150px x
+                150px for best fit.)
+              </div>
             </div>
-          </p>
+          )}
         </>
       ) : (
         <>
-          <p className="m-2 p-5 pb-2 text-[12px]">
-            Click or drag and drop an image to upload <br />
-            <div className="pb-2 text-[10px]">
-              Max image size 2.5MB (Use a square sized photo e.g. 150px x 150px
-              for best fit.)
+          {!avatarMode && (
+            <div className="m-2 p-5 pb-2 text-[12px]">
+              Click or drag and drop an image to upload <br />
+              <div className="pb-2 text-[10px]">
+                Max image size 2.5MB (Use a square sized photo e.g. 150px x
+                150px for best fit.)
+              </div>
             </div>
-          </p>
+          )}
         </>
       )}
     </div>

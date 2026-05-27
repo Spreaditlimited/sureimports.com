@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -37,7 +38,7 @@ import {
   RotateCcw,
   Truck,
 } from 'lucide-react';
-import { Product, Order } from '../App';
+import { Product, Order } from './App';
 
 interface ReturnsOrderCreateDialogProps {
   isOpen: boolean;

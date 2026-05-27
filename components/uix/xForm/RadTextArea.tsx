@@ -33,6 +33,9 @@ const RadTextArea: React.FC<Props> = ({
 }) => {
   let classprops =
     'pl-3 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6 ';
+  const textAreaValueProps =
+    value !== undefined ? { value } : { defaultValue };
+
   return (
     <>
       {/* TEXT AREA INPUT */}
@@ -44,12 +47,11 @@ const RadTextArea: React.FC<Props> = ({
           id={id}
           name={name}
           rows={rows}
-          defaultValue={defaultValue}
           placeholder={placeholder}
-          value={value}
           onClick={onClick}
           onChange={onChange}
           disabled={disable}
+          {...textAreaValueProps}
           className="max-sm:w-340px flex min-h-[80px] w-full rounded-md border border-input bg-background bg-slate-200 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-32 lg:w-full"
         />
         <p className="mt-3 text-sm leading-6 text-gray-600">{hint}</p>

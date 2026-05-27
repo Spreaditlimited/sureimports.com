@@ -1,4 +1,4 @@
-import sendEmail from '@/lib/email/config/sendEmail';
+import xMail from '@/lib/email/xMail2';
 
 export const CORPORATE_GIFT_STATUSES = [
   'Pending',
@@ -21,6 +21,11 @@ type NotifyInput = {
   whatsappNumber: string;
   status: CorporateGiftStatus;
   handledByName?: string | null;
+  onboarding?: {
+    accountCreated: boolean;
+    temporaryPassword?: string;
+    dashboardLink?: string;
+  };
 };
 
 async function sendWhatsAppTemplate(input: NotifyInput) {
@@ -63,26 +68,47 @@ async function sendWhatsAppTemplate(input: NotifyInput) {
 
 export async function notifyCustomerCorporateGiftStatus(input: NotifyInput) {
   const statusLine = `Current Status: ${input.status}`;
-  const ownerLine = input.handledByName
-    ? `Handled by: ${input.handledByName}`
+  const dashboardLink =
+    input.onboarding?.dashboardLink ||
+    'https://sureimports.com/dashboard/corporate-gifts';
+
+  const emailBody = `
+<table style="width:100%;border-collapse:collapse;margin-top:6px;border:1px solid #e5e7eb;">
+  <tr><td style="padding:8px;border:1px solid #e5e7eb;background:#f8fafc;"><b>Request ID</b></td><td style="padding:8px;border:1px solid #e5e7eb;">${input.requestId}</td></tr>
+  <tr><td style="padding:8px;border:1px solid #e5e7eb;background:#f8fafc;"><b>Business</b></td><td style="padding:8px;border:1px solid #e5e7eb;">${input.businessName}</td></tr>
+  <tr><td style="padding:8px;border:1px solid #e5e7eb;background:#f8fafc;"><b>Current Status</b></td><td style="padding:8px;border:1px solid #e5e7eb;"><b>${statusLine}</b></td></tr>
+</table>`;
+
+  const onboardingBlock = input.onboarding?.accountCreated
+    ? `<br /><br /><b>Your SureImports dashboard account has been created automatically.</b><br />
+Email: ${input.contactEmail}<br />
+Temporary single-use password: <b>${input.onboarding.temporaryPassword || ''}</b><br />
+After your first login, this temporary password expires and you will be prompted to reset it.`
     : '';
 
-  const emailHtml = `
-    <p>Hello ${input.contactPersonFullName || 'Customer'},</p>
-    <p>We have an update on your corporate gift sourcing request.</p>
-    <p><strong>Request ID:</strong> ${input.requestId}<br/>
-    <strong>Business:</strong> ${input.businessName}<br/>
-    <strong>${statusLine}</strong></p>
-    ${ownerLine ? `<p>${ownerLine}</p>` : ''}
-    <p>Thank you for choosing Sure Imports.</p>
-  `;
-
-  await Promise.allSettled([
-    sendEmail(
-      input.contactEmail,
-      `Corporate Gift Request Update - ${input.requestId} (${input.status})`,
-      emailHtml,
-    ),
+  const [emailResult, whatsappResult] = await Promise.allSettled([
+    xMail({
+      xEmail: input.contactEmail,
+      xTitle: `Corporate Gift Request Update - ${input.requestId} (${input.status})`,
+      xBodyTitle: 'Corporate Gift Status Update',
+      xBody1: `Hello ${input.contactPersonFullName || 'Customer'},<br />We have an update on your corporate gift sourcing request.`,
+      xBody2: `${emailBody}${onboardingBlock}<br /><br />Thank you for choosing Sure Imports.`,
+      xButtonTitle: 'Open Corporate Gifts Dashboard',
+      xButtonLink: dashboardLink,
+    }),
     sendWhatsAppTemplate(input),
   ]);
+
+  return {
+    emailTriggered: emailResult.status === 'fulfilled',
+    whatsappTriggered: whatsappResult.status === 'fulfilled',
+    emailError:
+      emailResult.status === 'rejected'
+        ? String(emailResult.reason)
+        : null,
+    whatsappError:
+      whatsappResult.status === 'rejected'
+        ? String(whatsappResult.reason)
+        : null,
+  };
 }

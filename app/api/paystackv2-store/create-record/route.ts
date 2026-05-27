@@ -1,4 +1,4 @@
-// app/api/paystack-payment/create-record/route.ts
+// app/api/paystackv2-store/create-record/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -17,7 +17,6 @@ export async function POST(request: Request) {
       serviceID,
       serviceName,
       serviceDescription,
-
       activeTab,
       purchaseType,
       fullName,
@@ -33,48 +32,47 @@ export async function POST(request: Request) {
     const pidPayment = 'PAY' + randomValue;
     const reference = `FAYASTORE_${Date.now()}`;
 
-    // Create store sales record
     await prisma.store_sales_faya.create({
       data: {
-        pidStore: `SALE${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-        pidProduct: pidProduct as string,
-        pidUser: pidUser as string,
-        product_name: product.productName,
-        unit_price: (purchaseAmount / parseInt(quantity)).toFixed(2),
-        total_price: purchaseAmount.toFixed(2),
-        quantity: quantity.toString(),
-        status: 'COMPLETED',
-        ext1: txREF, // Store transaction reference
-        ext2: 'WALLET', // Store payment method
+        pidStore,
+        pidProduct: pidProduct,
+        pidUser: pidUser,
+        product_name: productName || 'Unknown Product',
+        unit_price: productPrice?.toString() || '0',
+        total_price: amount?.toString() || '0',
+        quantity: quantity?.toString() || '1',
+        activeTab: activeTab,
+        purchaseType: purchaseType,
+        fullName: fullName || 'Unknown User',
+        phone: phone || 'Unknown Phone',
+        address: address || 'Unknown Address',
+        deliveryOption: deliveryOption || 'Standard Delivery',
+        deliveryLocation: deliveryLocation || 'Default Location',
+        status: 'PENDING',
+        ext1: '',
+        ext2: '',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
     });
 
-    // Create payment record
     await prisma.payments.create({
       data: {
-        pidPayment: pidPayment,
-        pidUser: pidUser as any,
-        payerName: `${first_name} ${last_name}` || 'Unknown User',
+        pidPayment,
+        pidUser,
+        payerName: fullName || 'Unknown User',
         payerEmail: email,
-        txID: txID,
-        txRef: txREF,
-        paymentStatus: 'PAID',
-        paymentType: 'WALLET',
-        currency: 'NGN',
-        amount: purchaseAmount,
-        serviceID: serviceID,
-        serviceName: 'SURESTORE',
-        serviceDescription: 'Online Purchase',
-
-        affiliate_payout_amount: affiliatePayoutAmount,
-        affiliate_payout_percentage: affiliatePayoutPercentage,
-        superAffiliate_payout_amount: superAffiliatePayoutAmount,
-        superAffiliate_payout_percentage: superAffiliatePayoutPercentage,
-
+        txID: pidStore || 'FAYA',
+        txRef: reference || 'FAYA',
+        paymentStatus: 'PENDING',
+        paymentType: 'UNKNOWN',
+        currency: currency || 'NGN',
+        amount: parseFloat(amount) || 0,
+        serviceID: serviceID || 'FAYA',
+        serviceName: serviceName || 'SURESTORE',
+        serviceDescription: serviceDescription || 'Online Purchase',
         affiliatePayStatus: 'pending',
-        affiliateRefId: affiliateRefId || 'NO_REF',
+        affiliateRefId: email || 'Unknown User',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
