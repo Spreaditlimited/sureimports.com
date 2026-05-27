@@ -159,7 +159,7 @@ const ForgotPasswordPage: React.FC<ForgotPasswordPageProps> = ({
               </Button>
 
               <Link href={'/auth/login'}>
-                <Button className="mt-8 h-14 bg-slate-300 py-3.5 hover:bg-slate-400">
+                <Button className="mt-8 h-14 py-3.5">
                   Back to Login
                 </Button>
               </Link>
