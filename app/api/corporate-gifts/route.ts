@@ -12,6 +12,8 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_CORPORATE_GIFT_QUANTITY = 500;
+const MIN_DELIVERY_LEAD_DAYS = 60;
 
 const getString = (formData: FormData, keys: string[]) => {
   for (const key of keys) {
@@ -129,6 +131,33 @@ export async function POST(req: Request) {
     if (!EMAIL_REGEX.test(data.contactEmail)) {
       return NextResponse.json(
         { error: 'Invalid contact email' },
+        { status: 400 },
+      );
+    }
+
+    if (quantityNeeded < MIN_CORPORATE_GIFT_QUANTITY) {
+      return NextResponse.json(
+        {
+          error: `Minimum quantity is ${MIN_CORPORATE_GIFT_QUANTITY} units.`,
+        },
+        { status: 400 },
+      );
+    }
+
+    const expectedDeliveryDate = new Date(`${data.expectedDeliveryDate}T00:00:00`);
+    const minimumAllowedDate = new Date();
+    minimumAllowedDate.setHours(0, 0, 0, 0);
+    minimumAllowedDate.setDate(minimumAllowedDate.getDate() + MIN_DELIVERY_LEAD_DAYS);
+
+    if (
+      Number.isNaN(expectedDeliveryDate.getTime()) ||
+      expectedDeliveryDate < minimumAllowedDate
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Expected delivery date must be at least 2 months from today (recommended 2-3 months).',
+        },
         { status: 400 },
       );
     }

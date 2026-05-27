@@ -14,6 +14,8 @@ import {
 } from '@/app/(home)/components/ui/select';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
+const MIN_CORPORATE_GIFT_QUANTITY = 500;
+const MIN_DELIVERY_LEAD_DAYS = 60;
 
 type FormErrors = Record<string, string>;
 type Status = 'idle' | 'submitting' | 'success' | 'error';
@@ -91,7 +93,11 @@ export default function CorporateGiftsClient() {
   const [status, setStatus] = useState<Status>('idle');
   const [currentStep, setCurrentStep] = useState(0);
 
-  const minDate = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const minDeliveryDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + MIN_DELIVERY_LEAD_DAYS);
+    return date.toISOString().split('T')[0];
+  }, []);
   const steps = [
     'Business Details',
     'Product Details',
@@ -165,6 +171,20 @@ export default function CorporateGiftsClient() {
       const quantity = Number(values.quantity_needed);
       if (!values.quantity_needed || Number.isNaN(quantity) || quantity <= 0) {
         nextErrors.quantity_needed = 'Quantity must be a positive number.';
+      } else if (quantity < MIN_CORPORATE_GIFT_QUANTITY) {
+        nextErrors.quantity_needed = `Minimum quantity is ${MIN_CORPORATE_GIFT_QUANTITY} units.`;
+      }
+    }
+
+    const shouldCheckExpectedDate =
+      typeof stepIndex !== 'number' || stepIndex === 3;
+    if (shouldCheckExpectedDate && values.expected_delivery_date) {
+      const selectedDate = new Date(`${values.expected_delivery_date}T00:00:00`);
+      const minAllowedDate = new Date(`${minDeliveryDate}T00:00:00`);
+      if (Number.isNaN(selectedDate.getTime())) {
+        nextErrors.expected_delivery_date = 'Please select a valid expected delivery date.';
+      } else if (selectedDate < minAllowedDate) {
+        nextErrors.expected_delivery_date = 'Expected delivery date must be at least 2 months from today (recommended 2-3 months).';
       }
     }
 
@@ -401,7 +421,7 @@ export default function CorporateGiftsClient() {
                 type="number"
                 placeholder="E.g. 500"
                 error={errors.quantity_needed}
-                min={1}
+                min={MIN_CORPORATE_GIFT_QUANTITY}
               />
               <PremiumSelect
                 label="Preferred quality level"
@@ -462,9 +482,12 @@ export default function CorporateGiftsClient() {
                 value={values.expected_delivery_date}
                 onChange={(next) => onChange('expected_delivery_date', next)}
                 type="date"
-                min={minDate}
+                min={minDeliveryDate}
                 error={errors.expected_delivery_date}
               />
+              <p className="-mt-2 text-xs text-slate-400">
+                Expected delivery date must be at least 2 months from today (recommended 2-3 months).
+              </p>
               <TextField
                 label="Final delivery location in Nigeria"
                 required

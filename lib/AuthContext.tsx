@@ -1,7 +1,13 @@
 'use client';
 
 import type React from 'react';
-import { createContext, useContext, useState, useEffect } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -16,27 +22,39 @@ interface User {
   userStatus: string;
 }
 
+/* eslint-disable no-unused-vars */
 interface AuthContextType {
   user: User | null;
-  login: (userEmail: string, userPassword: string) => Promise<void>;
+  login(_userEmail: string, _userPassword: string): Promise<void>;
   logout: () => Promise<void>;
-  register: (
-    userEmail: string,
-    userPassword: string,
-    userFirstname?: string,
-  ) => Promise<void>;
+  register(
+    _userEmail: string,
+    _userPassword: string,
+    _userFirstname?: string,
+  ): Promise<void>;
   checkAuth: () => Promise<boolean>;
 }
+/* eslint-enable no-unused-vars */
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const USER_CACHE_KEY = 'sureimports:user';
 
   //////////////////////////////////// CHECK AUTH
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
+      const cachedUser = sessionStorage.getItem(USER_CACHE_KEY);
+      if (cachedUser && !user) {
+        try {
+          setUser(JSON.parse(cachedUser));
+        } catch {
+          sessionStorage.removeItem(USER_CACHE_KEY);
+        }
+      }
+
       const res = await fetch('/api/auth/me', {
         headers: {
           'Cache-Control': 'no-cache',
@@ -49,22 +67,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await res.json();
       if (data.user) {
         setUser(data.user);
+        sessionStorage.setItem(USER_CACHE_KEY, JSON.stringify(data.user));
         return true;
       } else {
         setUser(null);
+        sessionStorage.removeItem(USER_CACHE_KEY);
         return false;
       }
     } catch (error) {
       console.error('Error checking auth:', error);
       setUser(null);
+      sessionStorage.removeItem(USER_CACHE_KEY);
       return false;
     }
-  };
+  }, [USER_CACHE_KEY, user]);
 
   //////////////////////////////////// RUN AUTH-CHECK
   useEffect(() => {
     checkAuth();
-  }, []); //This was the line that needed to be updated to include the dependency
+  }, [checkAuth]);
 
   //////////////////////////////////// LOGIN
   const login = async (userEmail: string, userPassword: string) => {
@@ -76,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = await res.json();
     if (res.ok) {
       setUser(data.user);
+      sessionStorage.setItem(USER_CACHE_KEY, JSON.stringify(data.user));
 
       if (data.statusx === 'RESET') {
         router.push('/auth/welcome-reset-password?email=' + userEmail);
@@ -97,7 +119,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
-    router.push('/auth/login');
+    sessionStorage.removeItem(USER_CACHE_KEY);
+    router.replace('/auth/login');
+    router.refresh();
   };
 
   /////////////////////////////////// REGISTRATION

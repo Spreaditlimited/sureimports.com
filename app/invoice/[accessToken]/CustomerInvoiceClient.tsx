@@ -58,6 +58,10 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
       setError('Enter a valid amount paid.');
       return;
     }
+    if (!selectedBankAccountId) {
+      setError('Please select the bank account you paid into before confirming payment.');
+      return;
+    }
 
     setSubmitting(true);
     setError('');
@@ -343,7 +347,7 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
                 ) : null}
 
                 <button
-                  disabled={submitting}
+                  disabled={submitting || !selectedBankAccountId}
                   onClick={submitClaim}
                   className="w-full rounded-xl bg-blue-600 px-4 py-4 text-sm font-black uppercase tracking-widest text-white transition-all hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/25 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 >

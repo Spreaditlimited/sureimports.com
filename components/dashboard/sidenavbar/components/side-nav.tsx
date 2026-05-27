@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 import { type NavItem } from '../types';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/_lib/utils';
 import { useSidebar } from '@/hooks/useSidebar';
 import { buttonVariants } from '@/components/ui/button';
@@ -14,32 +14,36 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import type { Dispatch, SetStateAction } from 'react';
 
 interface SideNavProps {
   items: NavItem[];
-  setOpen?: (open: boolean) => void;
+  setOpen?: Dispatch<SetStateAction<boolean>>;
   className?: string;
 }
 
 export function SideNav({ items, setOpen, className }: SideNavProps) {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const path = usePathname();
   const { isOpen } = useSidebar();
   const [openItem, setOpenItem] = useState('');
-  const [lastOpenItem, setLastOpenItem] = useState('');
+  const lastOpenItemRef = useRef('');
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
-    if (isOpen) {
-      setOpenItem(lastOpenItem);
-    } else {
-      setLastOpenItem(openItem);
+    if (!isOpen) {
+      if (openItem) lastOpenItemRef.current = openItem;
       setOpenItem('');
+      return;
     }
-  }, [isOpen]);
+
+    if (!openItem && lastOpenItemRef.current) {
+      setOpenItem(lastOpenItemRef.current);
+    }
+  }, [isOpen, openItem]);
 
   return (
     <nav className="space-y-2 bg-slate-900">
@@ -83,6 +87,12 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
                   <Link
                     key={child.title}
                     href={child.href}
+                    target={child.target || undefined}
+                    rel={
+                      child.target === '_blank'
+                        ? 'noopener noreferrer'
+                        : undefined
+                    }
                     onClick={() => {
                       if (setOpen) setOpen(false);
                     }}
@@ -110,6 +120,8 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
           <Link
             key={item.title}
             href={item.href}
+            target={item.target || undefined}
+            rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
             onClick={() => {
               if (setOpen) setOpen(false);
             }}

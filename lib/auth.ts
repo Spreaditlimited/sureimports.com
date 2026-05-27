@@ -4,10 +4,10 @@ import { redirect } from 'next/navigation';
 
 export async function checkAuth() {
   const cookieStore = cookies();
-  const authToken = (await cookieStore).get('auth_token');
+  const authToken = (await cookieStore).get('token');
 
   if (!authToken) {
-    redirect('/login');
+    redirect('/auth/login');
   }
 
   return authToken.value;

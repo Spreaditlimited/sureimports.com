@@ -1,30 +1,16 @@
 'use client';
 
 import {
-  Download,
   HandCoins,
   Package,
-  Settings,
   ShoppingBag,
-  ShoppingCart,
-  User2,
   Wallet,
   Globe,
-  Search,
-  Smartphone,
-  Truck,
-  CheckCircle,
   Package2,
-  BookOpen,
-  UserPlus,
-  MessageSquare,
-  LogOut,
   Video,
-  Youtube,
-  Instagram,
 } from 'lucide-react';
 import { type NavItem } from '../types';
-import { BsInstagram, BsTiktok, BsYoutube } from 'react-icons/bs';
+import { BsTiktok, BsYoutube } from 'react-icons/bs';
 
 export const NavItems: NavItem[] = [
   {
@@ -47,6 +33,7 @@ export const NavItems: NavItem[] = [
         icon: BsYoutube,
         color: 'text-white',
         href: 'https://youtube.com/@sureimports?si=Ff0Ziwec36sACB2g',
+        target: '_blank',
       },
     ],
   },
@@ -129,6 +116,7 @@ export const MobileNavItems: NavItem[] = [
         icon: BsYoutube,
         color: 'text-white',
         href: 'https://youtube.com/@sureimports?si=Ff0Ziwec36sACB2g',
+        target: '_blank',
       },
     ],
   },

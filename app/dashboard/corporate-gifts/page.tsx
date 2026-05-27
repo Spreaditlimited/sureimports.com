@@ -40,6 +40,33 @@ type CorporateGiftRequest = {
   status: string;
   createdAt: string;
   updatedAt: string;
+  invoices?: Array<{
+    pidPayment: string;
+    pidInvoice?: string;
+    amount?: string;
+    currency_type?: string;
+    payment_status?: string;
+    payment_type?: string;
+    invoiceNumber?: string;
+    accessToken?: string | null;
+    source?: string;
+    createdAt?: string;
+  }>;
+  payments?: Array<{
+    pidPayment?: string;
+    pidBankPayment?: string;
+    amount?: number | string;
+    currency?: string;
+    paymentType?: string;
+    paymentStatus?: string;
+    bankStatus?: string;
+    paymentReference?: string;
+    note?: string;
+    selectedBankAccountId?: string;
+    selectedBankAccountJson?: string;
+    claimedAt?: string;
+    createdAt?: string;
+  }>;
 };
 
 const STATUS_STEPS = [
@@ -71,6 +98,11 @@ const SOURCE_OPTIONS = [
   'Returning Customer',
   'Other',
 ];
+const MIN_CORPORATE_GIFT_QUANTITY = 500;
+const MIN_DELIVERY_LEAD_DAYS = 60;
+
+const formatNaira = (value: number) =>
+  `₦${Number(value || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 export default function CorporateGiftsDashboardPage() {
   const { user } = useAuth();
@@ -83,7 +115,7 @@ export default function CorporateGiftsDashboardPage() {
     contactPersonFullName: '',
     productOrItemNeeded: '',
     detailedSpecifications: '',
-    quantityNeeded: 100,
+    quantityNeeded: MIN_CORPORATE_GIFT_QUANTITY,
     preferredQualityLevel: 'Mid-range corporate quality',
     brandingCustomizationRequired: 'Yes',
     expectedDeliveryDate: '',
@@ -97,6 +129,11 @@ export default function CorporateGiftsDashboardPage() {
   const [referenceImage, setReferenceImage] = useState<File | null>(null);
   const [companyLogo, setCompanyLogo] = useState<File | null>(null);
   const [deliveryDateInputFocused, setDeliveryDateInputFocused] = useState(false);
+  const minDeliveryDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + MIN_DELIVERY_LEAD_DAYS);
+    return date.toISOString().split('T')[0];
+  }, []);
 
   const fetchRequests = async () => {
     try {
@@ -133,6 +170,22 @@ export default function CorporateGiftsDashboardPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (Number(form.quantityNeeded) < MIN_CORPORATE_GIFT_QUANTITY) {
+      toast.error(`Minimum quantity is ${MIN_CORPORATE_GIFT_QUANTITY} units.`);
+      return;
+    }
+    const expectedDate = new Date(`${form.expectedDeliveryDate}T00:00:00`);
+    const minimumDate = new Date(`${minDeliveryDate}T00:00:00`);
+    if (
+      !form.expectedDeliveryDate ||
+      Number.isNaN(expectedDate.getTime()) ||
+      expectedDate < minimumDate
+    ) {
+      toast.error(
+        'Expected delivery date must be at least 2 months from today (recommended 2-3 months).',
+      );
+      return;
+    }
     try {
       setSubmitting(true);
       const payload = new FormData();
@@ -158,7 +211,7 @@ export default function CorporateGiftsDashboardPage() {
         businessName: '',
         productOrItemNeeded: '',
         detailedSpecifications: '',
-        quantityNeeded: 100,
+        quantityNeeded: MIN_CORPORATE_GIFT_QUANTITY,
         expectedDeliveryDate: '',
         finalDeliveryLocationNigeria: '',
         proceedTimeline: '',
@@ -169,6 +222,58 @@ export default function CorporateGiftsDashboardPage() {
       toast.error(error.message || 'Could not submit request');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const payCorporateInvoiceWithWallet = async (
+    pidRequest: string,
+    amount: number,
+    pidPaymentRecord?: string,
+  ) => {
+    try {
+      const res = await fetch('/api/pay-from-wallet/corporate-gifts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pidUser: user?.pidUser,
+          pidRequest,
+          amount,
+          pidPaymentRecord,
+        }),
+      });
+      const rawResponseText = await res.text();
+      let data: any = null;
+      try {
+        data = rawResponseText ? JSON.parse(rawResponseText) : null;
+      } catch {
+        data = null;
+      }
+      if (!res.ok || data?.statusx !== 'SUCCESS') {
+        if (data?.statusx === 'NO_WALLET') {
+          toast.warning(data.message || 'Please activate your wallet first.');
+          window.location.href = '/dashboard/wallet';
+          return;
+        }
+        if (data?.statusx === 'INSUFFICIENT_WALLET_BALANCE') {
+          const walletBalance = Number(data?.meta?.walletBalance ?? 0);
+          const requiredAmount = Number(data?.meta?.requiredAmount ?? amount);
+          const shortfall = Number(data?.meta?.shortfall ?? Math.max(requiredAmount - walletBalance, 0));
+          toast.error(
+            `Insufficient wallet balance. Balance: ${formatNaira(walletBalance)}. Add: ${formatNaira(shortfall)} to pay ${formatNaira(requiredAmount)}.`,
+          );
+          return;
+        }
+        toast.error(
+          data?.message ||
+            rawResponseText ||
+            'Unable to complete wallet payment right now. Please try again.',
+        );
+        return;
+      }
+      toast.success(data.message || 'Payment completed');
+      await fetchRequests();
+    } catch (error: any) {
+      toast.error(error?.message || 'Unable to complete wallet payment right now. Please try again.');
     }
   };
 
@@ -244,7 +349,7 @@ export default function CorporateGiftsDashboardPage() {
                   <div className="space-y-3">
                     <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="What items do you need?" value={form.productOrItemNeeded} onChange={(e) => setForm(p => ({ ...p, productOrItemNeeded: e.target.value }))} required />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="number" className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Quantity" value={form.quantityNeeded} onChange={(e) => setForm(p => ({ ...p, quantityNeeded: Number(e.target.value) }))} required />
+                      <input type="number" min={MIN_CORPORATE_GIFT_QUANTITY} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Quantity (minimum 500)" value={form.quantityNeeded} onChange={(e) => setForm(p => ({ ...p, quantityNeeded: Number(e.target.value) }))} required />
                       <Select
                         value={form.preferredQualityLevel}
                         onValueChange={(value) => setForm((p) => ({ ...p, preferredQualityLevel: value }))}
@@ -276,6 +381,7 @@ export default function CorporateGiftsDashboardPage() {
                             placeholder="Tap to select expected delivery date"
                             className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 pr-10 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400"
                             value={form.expectedDeliveryDate}
+                            min={minDeliveryDate}
                             onFocus={() => setDeliveryDateInputFocused(true)}
                             onBlur={() => setDeliveryDateInputFocused(false)}
                             onChange={(e) =>
@@ -288,6 +394,9 @@ export default function CorporateGiftsDashboardPage() {
                           />
                           <CalendarDays className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                         </div>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-300">
+                          Must be at least 2 months from today (recommended 2-3 months).
+                        </p>
                       </div>
                       <div className="space-y-1">
                         <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
@@ -467,6 +576,106 @@ export default function CorporateGiftsDashboardPage() {
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+
+                  {/* Payments & Invoices */}
+                  <div className="border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                          Invoices
+                        </p>
+                        {request.invoices?.length ? (
+                          <div className="mt-2 space-y-2">
+                            {request.invoices.map((invoice: any) => {
+                              const invoiceAmount = Number(invoice.amount || 0);
+                              const invoiceStatus = String(invoice.payment_status || 'PENDING').toUpperCase();
+                              const invoiceCurrency = String(invoice.currency_type || '').toUpperCase();
+                              const canUseWallet = invoiceCurrency === 'NGN';
+                              const invoiceLink = invoice.accessToken
+                                ? `/invoice/${encodeURIComponent(String(invoice.accessToken))}`
+                                : null;
+                              return (
+                                <div key={invoice.pidPayment} className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                                  <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                                    {invoice.invoiceNumber || invoice.pidPayment} • {invoice.currency_type || 'USD'} {invoice.amount || '0.00'}
+                                  </p>
+                                  <p className="mt-1 text-[11px] text-slate-500">{invoiceStatus}</p>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    {invoiceLink && (
+                                      <a
+                                        href={invoiceLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500"
+                                      >
+                                        View Invoice
+                                      </a>
+                                    )}
+                                    {invoiceStatus !== 'PAID' && invoiceAmount > 0 && canUseWallet && (
+                                      <button
+                                        onClick={() =>
+                                          payCorporateInvoiceWithWallet(
+                                            request.pidRequest,
+                                            invoiceAmount,
+                                            invoice.pidPayment,
+                                          )
+                                        }
+                                        title="Pay from wallet"
+                                        className="rounded-md bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500"
+                                      >
+                                        Pay from Wallet
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-xs text-slate-500">No invoices yet.</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                          Payments
+                        </p>
+                        {request.payments?.length ? (
+                          <div className="mt-2 space-y-2">
+                            {request.payments.slice(0, 5).map((payment: any, idx: number) => (
+                              <div key={`${payment.pidPayment || payment.pidBankPayment}-${idx}`} className="rounded-lg border border-slate-200 p-3 dark:border-slate-700">
+                                <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                                  {(payment.paymentType || 'BANK').toUpperCase()} • {String(payment.currency || 'NGN').toUpperCase()} {Number(payment.amount || 0).toLocaleString()}
+                                </p>
+                                <p className="mt-1 text-[11px] text-slate-500">
+                                  {String(payment.paymentStatus || payment.bankStatus || 'PENDING').toUpperCase()}
+                                </p>
+                                {String(payment.paymentType || '').toUpperCase() === 'INVOICE_CLAIM' ? (
+                                  <div className="mt-1 text-[11px] text-slate-500">
+                                    {payment.paymentReference ? <p>Ref: {payment.paymentReference}</p> : null}
+                                    {payment.selectedBankAccountJson ? (
+                                      <p>
+                                        Paid Into:{' '}
+                                        {(() => {
+                                          try {
+                                            const bank = JSON.parse(String(payment.selectedBankAccountJson));
+                                            return `${bank.accountName || ''} (${bank.bankName || ''}) ${bank.accountNumber || ''}`.trim();
+                                          } catch {
+                                            return String(payment.selectedBankAccountId || 'Selected account');
+                                          }
+                                        })()}
+                                      </p>
+                                    ) : null}
+                                  </div>
+                                ) : null}
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="mt-2 text-xs text-slate-500">No payments recorded yet.</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

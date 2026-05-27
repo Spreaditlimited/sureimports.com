@@ -86,12 +86,17 @@ Temporary single-use password: <b>${input.onboarding.temporaryPassword || ''}</b
 After your first login, this temporary password expires and you will be prompted to reset it.`
     : '';
 
+  const introLine =
+    input.status === 'Pending'
+      ? `Hello ${input.contactPersonFullName || 'Customer'},<br />Your corporate gift sourcing request has been received.`
+      : `Hello ${input.contactPersonFullName || 'Customer'},<br />We have an update on your corporate gift sourcing request.`;
+
   const [emailResult, whatsappResult] = await Promise.allSettled([
     xMail({
       xEmail: input.contactEmail,
       xTitle: `Corporate Gift Request Update - ${input.requestId} (${input.status})`,
       xBodyTitle: 'Corporate Gift Status Update',
-      xBody1: `Hello ${input.contactPersonFullName || 'Customer'},<br />We have an update on your corporate gift sourcing request.`,
+      xBody1: introLine,
       xBody2: `${emailBody}${onboardingBlock}<br /><br />Thank you for choosing Sure Imports.`,
       xButtonTitle: 'Open Corporate Gifts Dashboard',
       xButtonLink: dashboardLink,

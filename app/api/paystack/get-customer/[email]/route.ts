@@ -39,9 +39,21 @@ export async function GET(
       },
     });
 
-    const totalDebit = debitAggregate._sum.amount ?? 0;
+    const refundCreditAggregate = await prisma.debits.aggregate({
+      where: {
+        email: user?.userEmail,
+        paymentStatus: 'REFUND_CREDIT',
+      },
+      _sum: {
+        amount: true,
+      },
+    });
 
-    console.log('Total Debit Amount:', totalDebit);
+    const totalDebit = debitAggregate._sum.amount ?? 0;
+    const totalRefundCredit = refundCreditAggregate._sum.amount ?? 0;
+    const netDebit = totalDebit - totalRefundCredit;
+
+    console.log('Total Debit Amount:', totalDebit, 'Total Refund Credit:', totalRefundCredit);
     console.log('WORKING OK 1 ...' + email);
     //////////////////// GET CUSTOMER PROFILE DETAILS ////////////////////
     const data = await fetch(`https://api.paystack.co/customer/${email}`, {
@@ -147,8 +159,8 @@ export async function GET(
     //initialize transaction data
     let transactionData = {
       transactions: [],
-      totalAmount: 0 - totalDebit,
-      totalDebit: totalDebit,
+      totalAmount: 0 - netDebit,
+      totalDebit: netDebit,
     };
     if (
       filteredTransaction.length > 0 ||
@@ -156,8 +168,8 @@ export async function GET(
     ) {
       transactionData = {
         transactions: filteredTransaction,
-        totalAmount: totalAmount / 100 - totalDebit,
-        totalDebit: totalDebit,
+        totalAmount: totalAmount / 100 - netDebit,
+        totalDebit: netDebit,
       };
     } else {
     }

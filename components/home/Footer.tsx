@@ -160,7 +160,17 @@ const Footer: React.FC = () => (
             // },
           ].map((item, index) => (
             <NavigationMenuItem key={index}>
-              <Link href={item.href} legacyBehavior passHref>
+              <Link
+                href={item.href}
+                legacyBehavior
+                passHref
+                target={item.href.startsWith('http') ? '_blank' : undefined}
+                rel={
+                  item.href.startsWith('http')
+                    ? 'noopener noreferrer'
+                    : undefined
+                }
+              >
                 <NavigationMenuLink
                   className={navigationMenuTriggerStyle({
                     className:

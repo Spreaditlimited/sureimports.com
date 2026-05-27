@@ -64,6 +64,9 @@ interface ApiResponse {
   successx: boolean;
 }
 
+const formatNaira = (value: number) =>
+  `₦${Number(value || 0).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 export default function MoreOrders({
   products,
   statusOverride,
@@ -122,6 +125,10 @@ export default function MoreOrders({
     normalizedDestination.includes('nigeria') && Number(exNairaToDollar) > 0;
   const shouldShowYuanRate =
     normalizedCurrency === 'CNY' && Number(exYuanToDollar) > 0;
+  const isWalletEligibleForOrder = normalizedDestination.includes('nigeria');
+  const returnTo = encodeURIComponent(
+    `/dashboard/procurement/view-orders/${status || 'saved'}`,
+  );
 
   function replaceNullWithZero<T>(value: T | null): T | number {
     return value === null ? 0 : value;
@@ -269,6 +276,66 @@ export default function MoreOrders({
       }
     } catch (error) {
       toast.error('Action failed');
+    }
+  };
+
+  const payWithWallet = async (payload: {
+    amountNaira: number;
+    nextStatus: string;
+    newTotalAmount?: number;
+    newTotalWeight?: number;
+    newEstimatedTotalShippingCost?: number;
+  }) => {
+    try {
+      toast.info('Processing wallet payment...');
+      const res = await fetch('/api/pay-from-wallet/procurement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pidUser: user?.pidUser,
+          pidOrder,
+          amount: payload.amountNaira,
+          nextStatus: payload.nextStatus,
+          newTotalAmount: payload.newTotalAmount,
+          newTotalWeight: payload.newTotalWeight,
+          newEstimatedTotalShippingCost: payload.newEstimatedTotalShippingCost,
+        }),
+      });
+      const rawResponseText = await res.text();
+      let data: any = null;
+      try {
+        data = rawResponseText ? JSON.parse(rawResponseText) : null;
+      } catch {
+        data = null;
+      }
+      if (!res.ok || data?.statusx !== 'SUCCESS') {
+        if (data?.statusx === 'NO_WALLET') {
+          toast.warning(data.message || 'Please activate your wallet first.');
+          router.push('/dashboard/wallet');
+          return;
+        }
+        if (data?.statusx === 'INSUFFICIENT_WALLET_BALANCE') {
+          const walletBalance = Number(data?.meta?.walletBalance ?? 0);
+          const requiredAmount = Number(data?.meta?.requiredAmount ?? payload.amountNaira);
+          const shortfall = Number(data?.meta?.shortfall ?? Math.max(requiredAmount - walletBalance, 0));
+          toast.error(
+            `Insufficient wallet balance. Balance: ${formatNaira(walletBalance)}. Add: ${formatNaira(shortfall)} to pay ${formatNaira(requiredAmount)}.`,
+          );
+          return;
+        }
+        toast.error(
+          data?.message ||
+            rawResponseText ||
+            'Unable to complete wallet payment right now. Please try again.',
+        );
+        return;
+      }
+
+      toast.success(data.message || 'Wallet payment successful');
+      router.push(`/dashboard/procurement/view-orders/${payload.nextStatus}`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unable to complete wallet payment right now. Please try again.';
+      toast.error(errorMessage);
     }
   };
 
@@ -627,11 +694,31 @@ export default function MoreOrders({
                     : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                   onClick={() => {
                     // Logic retained
-                    router.push(`/dashboard/bank-payment/?service=procurement&amount=${grandTotalCost}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service`);
+                    router.push(`/dashboard/bank-payment/?service=procurement&amount=${grandTotalCost}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
                   }}
                 >
                   <Banknote className="mr-2 h-4 w-4" /> Bank Deposit
                 </Button>
+                {isWalletEligibleForOrder && (
+                  <Button
+                    disabled={!isDisabled}
+                    className={isDisabled
+                      ? "h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
+                      : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                    title="Pay with wallet"
+                    onClick={() =>
+                      payWithWallet({
+                        amountNaira: amountNaira,
+                        nextStatus: 'pending',
+                        newTotalAmount: grandTotalCost,
+                        newTotalWeight: productsTotalWeight,
+                        newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                      })
+                    }
+                  >
+                    <Wallet className="mr-2 h-4 w-4" /> Wallet
+                  </Button>
+                )}
               </div>
             </div>
             
@@ -733,18 +820,38 @@ export default function MoreOrders({
                         ? "flex h-12 flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                         : "flex h-12 flex-1 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                     />
-                    <Button
+                <Button
                       disabled={!isDisabled}
                       className={isDisabled 
                         ? "h-12 flex-1 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
                         : "h-12 flex-1 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                       onClick={() => {
                         // Routing logic retained
-                        router.push(`/dashboard/bank-payment/?service=procurement&amount=${onHoldDifference}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service`);
+                        router.push(`/dashboard/bank-payment/?service=procurement&amount=${onHoldDifference}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
                       }}
                     >
                       <Banknote className="mr-2 h-4 w-4" /> Bank Deposit
                     </Button>
+                    {isWalletEligibleForOrder && (
+                      <Button
+                        disabled={!isDisabled}
+                        className={isDisabled
+                          ? "h-12 flex-1 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
+                          : "h-12 flex-1 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                        title="Pay with wallet"
+                        onClick={() =>
+                          payWithWallet({
+                            amountNaira: amountNairaDifference,
+                            nextStatus: 'pending',
+                            newTotalAmount: grandTotalCost,
+                            newTotalWeight: productsTotalWeight,
+                            newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                          })
+                        }
+                      >
+                        <Wallet className="mr-2 h-4 w-4" /> Wallet
+                      </Button>
+                    )}
                   </div>
                 )}
 
@@ -805,11 +912,31 @@ export default function MoreOrders({
                       : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                     onClick={() => {
                       // Routing logic retained
-                      router.push(`/dashboard/bank-payment/?service=procurement&amount=${actualTotalShippingCost - estimatedTotalShippingCost}&amountNaira=${(actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service`);
+                      router.push(`/dashboard/bank-payment/?service=procurement&amount=${actualTotalShippingCost - estimatedTotalShippingCost}&amountNaira=${(actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
                     }}
                   >
                     <Banknote className="mr-2 h-4 w-4" /> Bank Deposit
                   </Button>
+                  {isWalletEligibleForOrder && (
+                    <Button
+                      disabled={!isDisabled}
+                      className={isDisabled
+                        ? "h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
+                        : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                      title="Pay with wallet"
+                      onClick={() =>
+                        payWithWallet({
+                          amountNaira: (actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar,
+                          nextStatus: 'in-transit',
+                          newTotalAmount: grandTotalCost,
+                          newTotalWeight: productsTotalWeight,
+                          newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                        })
+                      }
+                    >
+                      <Wallet className="mr-2 h-4 w-4" /> Wallet
+                    </Button>
+                  )}
                 </div>
               </div>
             ) : (

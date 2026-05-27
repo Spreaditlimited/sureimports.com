@@ -9,7 +9,6 @@ import { useSidebar } from '@/hooks/useSidebar';
 import { ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/app/context/AuthContext';
 
 interface SidebarProps {
   className?: string;
@@ -19,17 +18,7 @@ export default function Sidebar({ className }: SidebarProps) {
   const { isOpen, toggle } = useSidebar();
   const [status, setStatus] = useState(false);
   //const router = useRouter();
-
-  ////////////////// LOGOUT FUNCTION //////////////////
-  const { user, logout } = useAuth();
   const router = useRouter();
-  //test 1
-  const Logoutx = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    logout();
-    router.push('../auth/login');
-  };
-  ////////////////// LOGOUT FUNCTION box //////////////////
 
   const handleToggle = () => {
     setStatus(true);

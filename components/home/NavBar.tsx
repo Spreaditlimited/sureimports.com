@@ -21,7 +21,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetFooter,
   SheetTrigger,
 } from '@/components/ui/sheet';
 import {
@@ -567,9 +566,15 @@ const ListItem = React.forwardRef<
     active?: boolean;
   }
 >(({ className, title, href, icon, active, ...props }, ref) => {
+  const isExternal = /^https?:\/\//.test(href);
   return (
     <li>
-      <Link href={href} passHref>
+      <Link
+        href={href}
+        passHref
+        target={isExternal ? '_blank' : undefined}
+        rel={isExternal ? 'noopener noreferrer' : undefined}
+      >
         <div
           ref={ref}
           className={cn(

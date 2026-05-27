@@ -2,7 +2,9 @@ import {
   createContext,
   useContext,
   useState,
-  ReactNode,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
   useEffect,
 } from 'react';
 
@@ -25,7 +27,7 @@ interface Record {
 
 interface RecordContextProps {
   recordx: Record | null;
-  setRecord: (recordx: Record) => void;
+  setRecord: Dispatch<SetStateAction<Record | null>>;
 }
 
 const RecordContext = createContext<RecordContextProps | undefined>(undefined);
@@ -43,22 +45,38 @@ export const RecordCountProcurementProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  //get user id and product status
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [pidUser, setPidUser] = useState(user?.pidUser);
+  const { user } = useAuth();
+  const pidUser = user?.pidUser;
   const statusx = 'saved';
   const [recordx, setRecord] = useState<Record | null>(null);
+  const cacheKey = pidUser ? `procurement-count:${pidUser}` : null;
 
   useEffect(() => {
+    if (!pidUser) return;
+
+    if (cacheKey) {
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          setRecord(JSON.parse(cached));
+        } catch {
+          sessionStorage.removeItem(cacheKey);
+        }
+      }
+    }
+
     const fetchRecord = async () => {
       const res = await fetch(
         `/api/get-data/procurement-count/${pidUser}/${statusx}`,
       );
       const data = await res.json();
       setRecord(data);
+      if (cacheKey) {
+        sessionStorage.setItem(cacheKey, JSON.stringify(data));
+      }
     };
     fetchRecord();
-  }, [pidUser]);
+  }, [pidUser, cacheKey]);
 
   //alert(pidUser)
   if (!user?.pidUser) {

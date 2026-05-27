@@ -12,7 +12,12 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { 
   PackageSearch, 
   Trash2, 
@@ -131,6 +136,9 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
                   </DialogTrigger>
 
                   <DialogContent className="max-w-md gap-0 p-0 overflow-hidden rounded-[32px] border-none shadow-2xl dark:bg-slate-900">
+                    <DialogTitle className="sr-only">
+                      Delete procurement order confirmation
+                    </DialogTitle>
                     <div className="bg-rose-500 p-8 text-center text-white dark:bg-rose-600">
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 ring-4 ring-white/10">
                         <AlertTriangle className="h-8 w-8" />

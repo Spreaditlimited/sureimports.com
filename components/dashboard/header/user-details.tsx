@@ -1,5 +1,5 @@
 import { type AvatarProps } from '@radix-ui/react-avatar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import {
   Sheet,
@@ -12,7 +12,6 @@ import Link from 'next/link';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/_lib/utils';
 import Image from 'next/image';
-import { User as UserIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useAuth } from '@/lib/AuthContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
@@ -56,17 +55,21 @@ export function UserAvatar({ userx }: UserAvatarProps) {
       {/* DESKTOP VIEW */}
       <Avatar className="hidden h-12 w-12 border-collapse border transition-all duration-300 hover:border-[#0E0E1F] dark:hover:border-white lg:block">
         {user?.userImage != null ? (
-          <img
+          <Image
             src={imageUser}
-            height={100}
-            width={100}
+            alt={`${userx.userFirstname || 'User'} avatar`}
+            height={48}
+            width={48}
+            unoptimized
             className="h-full w-full object-fill"
           />
         ) : (
-          <img
+          <Image
             src={imageDefault}
-            height={100}
-            width={100}
+            alt="Default avatar"
+            height={48}
+            width={48}
+            unoptimized
             className="h-full w-full object-fill"
           />
         )}
@@ -77,17 +80,21 @@ export function UserAvatar({ userx }: UserAvatarProps) {
         <SheetTrigger asChild>
           <Avatar className="h-12 w-12 border-collapse border transition-all duration-300 hover:border-[#0E0E1F] dark:hover:border-white lg:hidden">
             {user?.userImage != null ? (
-              <img
+              <Image
                 src={imageUser}
-                height={100}
-                width={100}
+                alt={`${userx.userFirstname || 'User'} avatar`}
+                height={48}
+                width={48}
+                unoptimized
                 className="h-full w-full object-fill"
               />
             ) : (
-              <img
+              <Image
                 src={imageDefault}
-                height={100}
-                width={100}
+                alt="Default avatar"
+                height={48}
+                width={48}
+                unoptimized
                 className="h-full w-full object-fill"
               />
             )}
@@ -106,17 +113,21 @@ export function UserAvatar({ userx }: UserAvatarProps) {
             <div className="flex gap-2">
               <Avatar className="hover:border-solid-black h-[50px] w-[50px] border-collapse border transition-all duration-300 dark:hover:border-white">
                 {user?.userImage != null ? (
-                  <img
+                  <Image
                     src={imageUser}
-                    height={100}
-                    width={100}
+                    alt={`${userx.userFirstname || 'User'} avatar`}
+                    height={50}
+                    width={50}
+                    unoptimized
                     className="h-full w-full object-fill"
                   />
                 ) : (
-                  <img
+                  <Image
                     src={imageDefault}
-                    height={100}
-                    width={100}
+                    alt="Default avatar"
+                    height={50}
+                    width={50}
+                    unoptimized
                     className="h-full w-full object-fill"
                   />
                 )}
@@ -160,14 +171,15 @@ export function UserAvatar({ userx }: UserAvatarProps) {
             </Link>
 
             {/* LOGOUT LINK */}
-            <Link
-              href="/auth/login"
-              onClick={() => {
+            <button
+              type="button"
+              onClick={async () => {
                 if (setOpen) setOpen(false);
+                await logout();
               }}
               className={cn(
                 buttonVariants({}),
-                'group relative mr-0 flex h-12 justify-start rounded-r-none bg-white/10 pr-0 text-sm font-normal dark:bg-gray-800/50',
+                'group relative mr-0 flex h-12 w-full justify-start rounded-r-none bg-white/10 pr-0 text-sm font-normal dark:bg-gray-800/50',
               )}
             >
               <Image
@@ -183,7 +195,7 @@ export function UserAvatar({ userx }: UserAvatarProps) {
               <span className={cn('absolute left-12 text-sm duration-200')}>
                 Logout
               </span>
-            </Link>
+            </button>
           </div>
         </SheetContent>
       </Sheet>

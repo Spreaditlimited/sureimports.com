@@ -49,7 +49,18 @@ async function getPaymentChannels(): Promise<AdminBankAccount[]> {
   }
 }
 
-export default async function BankPayment() {
+export default async function BankPayment({
+  searchParams,
+}: {
+  searchParams?: Promise<{ returnTo?: string }>;
+}) {
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const backHref =
+    resolvedSearchParams?.returnTo &&
+    resolvedSearchParams.returnTo.startsWith('/dashboard/')
+      ? resolvedSearchParams.returnTo
+      : '/dashboard/procurement';
+
   const channels = await getPaymentChannels();
   
   const bankOptions: BankOption[] = [
@@ -78,11 +89,11 @@ export default async function BankPayment() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           
           <Link 
-            href="/dashboard/procurement" 
+            href={backHref}
             className="group mb-8 flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back to Dashboard
+            Back to Orders
           </Link>
 
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">

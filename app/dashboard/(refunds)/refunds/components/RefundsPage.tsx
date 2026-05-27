@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   ChevronLeft,
   ChevronRight,
@@ -42,6 +43,7 @@ function StatusTag({ status }: { status: string }) {
 }
 
 export default function RefundsPage({ records }: any) {
+  const router = useRouter();
   const [refundData] = useState(records || []);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
@@ -65,9 +67,39 @@ export default function RefundsPage({ records }: any) {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const filteredData = selectedFilter === 'All' 
-    ? refundData 
-    : refundData.filter((item: any) => item.refundStatus === selectedFilter);
+  // Case-insensitive status filtering to avoid hiding valid records
+  // when database values are lowercase (e.g. "pending") but UI filters are title case.
+  const filteredData = selectedFilter === 'All'
+    ? refundData
+    : refundData.filter(
+        (item: any) =>
+          String(item.refundStatus || '').toLowerCase() ===
+          selectedFilter.toLowerCase(),
+      );
+
+  const transferRefundToWallet = async (pidRefund: string) => {
+    try {
+      const res = await fetch('/api/refunds/transfer-to-wallet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pidRefund }),
+      });
+      const data = await res.json();
+      if (!res.ok || data?.statusx !== 'SUCCESS') {
+        if (data?.statusx === 'NO_WALLET') {
+          alert(data.message || 'Please activate your wallet first.');
+          router.push('/dashboard/wallet');
+          return;
+        }
+        alert(data?.message || 'Unable to transfer refund to wallet');
+        return;
+      }
+      alert(data.message || 'Refund transferred to wallet successfully.');
+      router.refresh();
+    } catch (error) {
+      alert('Failed to transfer refund to wallet');
+    }
+  };
 
   const totalAmount = filteredData.reduce((sum: number, item: any) => sum + parseFloat(item.amount || 0), 0);
   const hasRefundableAmounts = refundData.some((item: any) => parseFloat(item.amount) > 0);
@@ -169,7 +201,16 @@ export default function RefundsPage({ records }: any) {
                       <td className="px-6 py-4 text-xs text-slate-500 font-medium">{item.serviceType}</td>
                       <td className="px-6 py-4"><StatusTag status={item.refundStatus} /></td>
                       <td className="px-6 py-4 text-right">
-                        <button className="text-xs font-bold text-blue-600 hover:underline">Details</button>
+                        {['pending', 'requested'].includes(String(item.refundStatus || '').toLowerCase()) ? (
+                          <button
+                            onClick={() => transferRefundToWallet(item.pidRefund)}
+                            className="text-xs font-bold text-blue-600 hover:underline"
+                          >
+                            Transfer to Wallet
+                          </button>
+                        ) : (
+                          <button className="text-xs font-bold text-blue-600 hover:underline">Details</button>
+                        )}
                       </td>
                     </tr>
                   ))

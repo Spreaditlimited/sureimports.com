@@ -1,14 +1,15 @@
 // lib/withAuth.tsx
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
+import type { ComponentType } from 'react';
 
-export function withAuth(Component: React.ComponentType) {
-  return async function AuthenticatedComponent(props: any) {
+export function withAuth<T extends object>(Component: ComponentType<T>) {
+  return async function AuthenticatedComponent(props: T) {
     const cookieStore = await cookies();
-    const authToken = cookieStore.get('auth_token');
+    const authToken = cookieStore.get('token');
 
     if (!authToken) {
-      redirect('/login');
+      redirect('/auth/login');
     }
 
     return <Component {...props} />;

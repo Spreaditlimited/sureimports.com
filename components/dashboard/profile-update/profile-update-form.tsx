@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { 
   User, Mail, Phone, Globe, CalendarDays, Tag, 
@@ -20,7 +19,6 @@ import countries from '@/lib/data/countries';
 
 export default function ProfileUpdateForm() {
   const { user } = useAuth();
-  const router = useRouter();
   
   const [userData, setUserData] = useState<any>(null);
   const [pidUser, setPidUser] = useState(user?.pidUser);
@@ -78,8 +76,10 @@ export default function ProfileUpdateForm() {
       const data = await res.json();
 
       if (data.responsex.status === 'SUCCESS') {
+        if (pidUser) {
+          await fetchUser(pidUser);
+        }
         toast.success('Profile updated successfully');
-        router.refresh();
       } else {
         toast.warning(data.responsex.message);
       }
@@ -265,7 +265,10 @@ export default function ProfileUpdateForm() {
               <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-5 sm:px-8 dark:border-slate-800 dark:bg-slate-900/50">
                 <div className="flex items-center justify-between">
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Last updated: {userData.updatedAt ? new Date(userData.updatedAt).toLocaleDateString() : 'Never'}
+                    Last updated:{' '}
+                    {userData.updatedAt
+                      ? new Date(userData.updatedAt).toLocaleString()
+                      : 'Never'}
                   </p>
                   
                   <button

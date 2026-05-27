@@ -1,10 +1,5 @@
 import React from 'react';
 import StoreComponent from './components/StoreComponent';
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/app/utils/jwt';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 
@@ -18,6 +13,21 @@ const DashBoard = async ({
     notFound();
   }
 
+  const searchTerms = (q || '')
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter(Boolean);
+
+  const searchOr =
+    searchTerms.length > 0
+      ? searchTerms.flatMap((term) => [
+          { productName: { contains: term } },
+          { productBrand: { contains: term } },
+          { productCategory: { contains: term } },
+          { productDescription: { contains: term } },
+        ])
+      : undefined;
+
   // Fetch categories (always, as they are needed for filters)
   const categories = await db.store.findMany({
     select: {
@@ -30,14 +40,7 @@ const DashBoard = async ({
   const brands = await db.store.findMany({
     where: {
       productCategory: id !== 'all' ? id : undefined, // If id is 'all', don't filter by category for brands
-      ...(q && {
-        OR: q
-          .split(' ')
-          .filter((term) => term.trim())
-          .map((term) => ({
-            productName: { contains: term },
-          })),
-      }), // Multiple word search (assumes DB is case-insensitive; adjust if needed)
+      ...(searchOr ? { OR: searchOr } : {}),
     },
     select: {
       productBrand: true,
@@ -50,14 +53,7 @@ const DashBoard = async ({
     where: {
       ...(id !== 'all' && { productCategory: id }),
       ...(id2 !== 'all' && { productBrand: id2 }),
-      ...(q && {
-        OR: q
-          .split(' ')
-          .filter((term) => term.trim())
-          .map((term) => ({
-            productName: { contains: term },
-          })),
-      }), // Multiple word search (assumes DB is case-insensitive; adjust if needed)
+      ...(searchOr ? { OR: searchOr } : {}),
     },
     orderBy: { createdAt: 'desc' },
   });
