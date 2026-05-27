@@ -6,7 +6,8 @@ import Link from 'next/link';
 
 import { useAuth } from '@/app/context/AuthContext';
 import Loader from '@/components/uix/Loader';
-import { cn } from '@/_lib/utils'; // Assuming you have standard shadcn cn utility
+import { cn } from '@/_lib/utils';
+import { PROCUREMENT_STATUS_ITEMS } from '@/app/dashboard/procurement/constants/order-statuses';
 
 export function useHorizontalScroll<T extends HTMLDivElement>() {
   const elRef = useRef<T>(null);
@@ -54,20 +55,11 @@ export default function OrderTypes() {
     return <Loader />;
   }
 
-  // Unified the array: removed arbitrary colors, kept it purely data-driven
-  const OrderTypeItems = [
-    { title: 'Saved', count: recordx?.savedOrderCount, href: '/dashboard/procurement/view-orders/saved' },
-    { title: 'Pending', count: recordx?.pendingOrderCount, href: '/dashboard/procurement/view-orders/pending' },
-    { title: 'Approved', count: recordx?.approvedOrderCount, href: '/dashboard/procurement/view-orders/approved' },
-    { title: 'Pay Shipping', count: recordx?.payForShippingOrderCount, href: '/dashboard/procurement/view-orders/pay-for-shipping' },
-    { title: 'In-Transit', count: recordx?.inTransitOrderCount, href: '/dashboard/procurement/view-orders/in-transit' },
-    { title: 'Ready For Pickup', count: recordx?.readyForPickupOrderCount, href: '/dashboard/procurement/view-orders/ready-for-pickup' },
-    { title: 'Completed', count: recordx?.completedOrdersCount, href: '/dashboard/procurement/view-orders/completed' },
-    { title: 'On-Hold', count: recordx?.onHoldOrdersCount, href: '/dashboard/procurement/view-orders/on-hold' },
-    { title: 'Bank Pending (Saved)', count: recordx?.bankPendingSavedOrdersCount, href: '/dashboard/procurement/view-orders/bank-pending-saved-orders' },
-    { title: 'Bank Pending (Shipping)', count: recordx?.bankPendingShippingOrdersCount, href: '/dashboard/procurement/view-orders/bank-pending-shipping-orders' },
-    { title: 'Cancelled', count: recordx?.cancelledOrdersCount, href: '/dashboard/procurement/view-orders/cancelled' },
-  ];
+    const OrderTypeItems = PROCUREMENT_STATUS_ITEMS.map((item) => ({
+    title: item.title,
+    href: item.href,
+    count: recordx?.[item.countKey],
+  }));
 
   return (
     <div className="relative mb-6 w-full border-b border-slate-200 dark:border-slate-800">

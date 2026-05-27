@@ -6,10 +6,8 @@ import { useAuth } from '@/lib/AuthContext';
 import OrderSection from '../../view-orders/components/order-section';
 import CreateOrder from '../../create-order/components/createOrder';
 import Loader from '@/components/uix/Loader';
-import { 
-  Search, 
-  LayoutList
-} from 'lucide-react';
+import { Search, LayoutList } from 'lucide-react';
+import { PROCUREMENT_STATUS_ITEMS } from '@/app/dashboard/procurement/constants/order-statuses';
 import {
   Select,
   SelectContent,
@@ -42,6 +40,12 @@ export function ViewOrders({ params }: orderStatus) {
   
   const { statusx } = use(params);
   const currentStatus = statusx ? statusx.toLowerCase() : 'saved';
+  const validStatusValues = new Set(
+    PROCUREMENT_STATUS_ITEMS.map((item) => item.value),
+  );
+  const normalizedStatus = validStatusValues.has(currentStatus)
+    ? currentStatus
+    : 'saved';
   
   const [pidUser] = useState(user?.pidUser);
   const [orderData, setOrderData] = useState<any>(null);
@@ -64,12 +68,12 @@ export function ViewOrders({ params }: orderStatus) {
   };
 
   useEffect(() => {
-    if (pidUser && statusx) {
-      fetchOrder(pidUser, statusx);
+    if (pidUser) {
+      fetchOrder(pidUser, normalizedStatus);
     } else if (!pidUser) {
-      setLoading(true); 
+      setLoading(true);
     }
-  }, [pidUser, statusx]);
+  }, [pidUser, normalizedStatus]);
 
   const countRecords: OrderData[] = orderData ? Object.values(orderData) : [];
 
@@ -109,18 +113,16 @@ export function ViewOrders({ params }: orderStatus) {
                 <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
                   Viewing
                 </h1>
-                <Select value={currentStatus} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="h-10 w-40 rounded-xl border-white/20 bg-white/10 px-4 text-lg font-bold text-white shadow-none backdrop-blur-md focus:ring-0 focus:ring-offset-0 dark:border-slate-700 dark:bg-slate-800 sm:h-12 sm:w-48 sm:text-2xl">
+                <Select value={normalizedStatus} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="h-10 w-40 rounded-xl border-white/20 bg-white/10 px-4 text-lg font-bold text-white shadow-none backdrop-blur-md focus:ring-0 focus:ring-offset-0 dark:border-slate-700 dark:bg-slate-800 sm:h-12 sm:w-56 sm:text-2xl">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
-                    <SelectItem value="saved">Saved</SelectItem>
-                    <SelectItem value="pending">Pending</SelectItem>
-                    <SelectItem value="approved">Approved</SelectItem>
-                    <SelectItem value="processing">Processing</SelectItem>
-                    <SelectItem value="shipped">Shipped</SelectItem>
-                    <SelectItem value="delivered">Delivered</SelectItem>
-                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                    {PROCUREMENT_STATUS_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.title}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
@@ -158,10 +160,10 @@ export function ViewOrders({ params }: orderStatus) {
               <Search className="h-10 w-10 text-slate-400 dark:text-slate-500" />
             </div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-              No {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)} Orders
+              No {normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1)} Orders
             </h3>
             <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-              You currently don't have any procurement requests in this state.
+              You currently don&apos;t have any procurement requests in this state.
             </p>
             <button
               onClick={() => router.push('/dashboard/procurement/create-order')}
