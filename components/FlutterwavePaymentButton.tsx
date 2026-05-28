@@ -4,8 +4,16 @@ import { useRouter } from 'next/navigation';
 import router from 'next/router';
 import { useState } from 'react';
 import Image from 'next/image';
-import { CreditCard, IdCardIcon } from 'lucide-react';
+import { CreditCard, Landmark } from 'lucide-react';
 import { Button } from './ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
 
 interface PaymentButtonProps {
   amount: number;
@@ -49,6 +57,8 @@ export default function PaymentButton({
   isDisabled,
 }: PaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showFlutterwaveLimitModal, setShowFlutterwaveLimitModal] =
+    useState(false);
 
   const handlePayment = () => {
     let amountNairax = amountNaira as any;
@@ -72,9 +82,7 @@ export default function PaymentButton({
 
     //check amount limit in naira
     if (amountNairax >= 50000 && destinationCountryx == 'Nigeria') {
-      alert(
-        'You cannot pay for orders more than N500,000 with Flutterwave. Please, use bank deposit.',
-      );
+      setShowFlutterwaveLimitModal(true);
       return;
     }
 
@@ -206,6 +214,38 @@ export default function PaymentButton({
         <CreditCard />
         {isLoading ? '  Processing...  ' : '  Pay with Flutterwave  '}
       </Button>
+
+      <Dialog
+        open={showFlutterwaveLimitModal}
+        onOpenChange={setShowFlutterwaveLimitModal}
+      >
+        <DialogContent className="overflow-hidden rounded-2xl border-0 p-0 shadow-2xl sm:max-w-md">
+          <div className="bg-slate-900 p-5 text-white">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-xl font-bold text-white">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-blue-500/20">
+                  <Landmark className="h-5 w-5 text-blue-300" />
+                </span>
+                Use Bank Transfer
+              </DialogTitle>
+              <DialogDescription className="pt-2 text-sm leading-relaxed text-slate-200">
+                Orders above <span className="font-bold">₦500,000</span> cannot
+                be paid via Flutterwave. Please use the Bank Deposit option to
+                complete this payment.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <DialogFooter className="bg-white p-5 dark:bg-slate-900">
+            <Button
+              onClick={() => setShowFlutterwaveLimitModal(false)}
+              className="h-11 w-full rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-500"
+            >
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* <button onClick={handlePayment} disabled={isLoading} className={className}>
                       <CreditCard />
       {isLoading ? '  Processing...  ' : '  Pay with Flutterwave  '}
