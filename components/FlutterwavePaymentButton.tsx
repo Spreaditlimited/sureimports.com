@@ -219,7 +219,7 @@ export default function PaymentButton({
         open={showFlutterwaveLimitModal}
         onOpenChange={setShowFlutterwaveLimitModal}
       >
-        <DialogContent className="overflow-hidden rounded-2xl border-0 p-0 shadow-2xl sm:max-w-md">
+        <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border-0 p-0 shadow-2xl sm:w-full sm:max-w-md">
           <div className="bg-slate-900 p-5 text-white">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-xl font-bold text-white">

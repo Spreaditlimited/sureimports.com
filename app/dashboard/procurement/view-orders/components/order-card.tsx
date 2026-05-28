@@ -135,7 +135,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
                     </button>
                   </DialogTrigger>
 
-                  <DialogContent className="max-w-md gap-0 p-0 overflow-hidden rounded-[32px] border-none shadow-2xl dark:bg-slate-900">
+                  <DialogContent className="w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] gap-0 overflow-hidden rounded-[32px] border-none p-0 shadow-2xl dark:bg-slate-900 sm:max-w-md">
                     <DialogTitle className="sr-only">
                       Delete procurement order confirmation
                     </DialogTitle>

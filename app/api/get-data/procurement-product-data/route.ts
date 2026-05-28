@@ -63,12 +63,13 @@ export async function GET(request: NextRequest) {
     });
 
     //SHIPPING RATE
-    const shippingRate: any = await prisma.shippingplan.findUnique({
+    const shippingRate: any = await prisma.shippingplan.findFirst({
       where: {
-        countryId: orderRecord?.destinationCountry,
-        pidShippingPlan: orderRecord?.shippingPlan,
-      } as any,
+        countryId: orderRecord?.destinationCountry as any,
+        pidShippingPlan: orderRecord?.shippingPlan as any,
+      },
       select: {
+        shippingPlanName: true,
         shippingPlanRate: true,
       },
     });
@@ -134,17 +135,20 @@ export async function GET(request: NextRequest) {
     }
 
     //Shipping Plan Name
-    let shippingPlanName = orderRecord?.shippingPlan; //value in USD
+    let shippingPlanName = (shippingRate?.shippingPlanName || '').replace(
+      /_/g,
+      ' ',
+    );
 
     //Shipping rate per KG
-    let shippingPlanRate = shippingRate.shippingPlanRate || 10; //value in USD
+    let shippingPlanRate = shippingRate?.shippingPlanRate || 10; //value in USD
 
     //Domestic Shipping Cost within China
     let domesticShippingCost = 5; //value in USD
 
     //International Shipping Cost
     let internationalShippingCost =
-      totalWeight * parseFloat(shippingRate.shippingPlanRate);
+      totalWeight * parseFloat(shippingRate?.shippingPlanRate || 0);
 
     //Estimated Total Weight of Order
     let estimatedTotalShippingCost =

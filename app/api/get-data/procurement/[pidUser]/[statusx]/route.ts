@@ -43,7 +43,42 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(orders);
+    const shippingPlanIds = Array.from(
+      new Set(
+        orders
+          .map((order) => order.shippingPlan)
+          .filter((value): value is string => Boolean(value)),
+      ),
+    );
+
+    const planRecords = await prisma.shippingplan.findMany({
+      where: {
+        pidShippingPlan: {
+          in: shippingPlanIds,
+        },
+      },
+      select: {
+        pidShippingPlan: true,
+        shippingPlanName: true,
+      },
+    });
+
+    const planNameById = new Map(
+      planRecords.map((plan) => [plan.pidShippingPlan, plan.shippingPlanName]),
+    );
+
+    const formatPlanLabel = (value: string) =>
+      value.replace(/_/g, ' ').trim();
+
+    const normalizedOrders = orders.map((order) => {
+      const planName = planNameById.get(order.shippingPlan || '') || '';
+      return {
+        ...order,
+        shippingPlan: formatPlanLabel(planName),
+      };
+    });
+
+    return NextResponse.json(normalizedOrders);
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch user' },
