@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { toast } from 'sonner';
+import { useRouter } from 'next/navigation';
 import { 
   Plus, 
   RefreshCcw, 
@@ -38,6 +39,7 @@ type CorporateGiftRequest = {
   contactEmail: string;
   whatsappNumber: string;
   status: string;
+  cancellationReason?: string | null;
   createdAt: string;
   updatedAt: string;
   invoices?: Array<{
@@ -106,10 +108,15 @@ const formatNaira = (value: number) =>
 
 export default function CorporateGiftsDashboardPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const [requests, setRequests] = useState<CorporateGiftRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showOfflineModal, setShowOfflineModal] = useState(false);
+  const [offlineMessage, setOfflineMessage] = useState(
+    'You appear to be offline. Check your internet connection and try again.',
+  );
   const [form, setForm] = useState({
     businessName: '',
     contactPersonFullName: '',
@@ -135,14 +142,38 @@ export default function CorporateGiftsDashboardPage() {
     return date.toISOString().split('T')[0];
   }, []);
 
+  const openOfflineModal = (
+    message = 'You appear to be offline. Check your internet connection and try again.',
+  ) => {
+    setOfflineMessage(message);
+    setShowOfflineModal(true);
+  };
+
   const fetchRequests = async () => {
     try {
       setLoading(true);
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        openOfflineModal();
+        return;
+      }
       const res = await fetch('/api/corporate-gifts/user', { cache: 'no-store' });
+      if (res.status === 401) {
+        const nextPath = `${window.location.pathname}${window.location.search}`;
+        router.replace(`/auth/login?next=${encodeURIComponent(nextPath)}`);
+        return;
+      }
       if (!res.ok) throw new Error('Failed to fetch your projects');
       const data = await res.json();
       setRequests(data?.data || []);
     } catch (error: any) {
+      const isNetworkError =
+        typeof navigator !== 'undefined' &&
+        (!navigator.onLine ||
+          /failed to fetch|networkerror|load failed/i.test(String(error?.message || '')));
+      if (isNetworkError) {
+        openOfflineModal();
+        return;
+      }
       toast.error(error.message || 'Failed to fetch corporate gift projects');
     } finally {
       setLoading(false);
@@ -188,6 +219,10 @@ export default function CorporateGiftsDashboardPage() {
     }
     try {
       setSubmitting(true);
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        openOfflineModal('No internet connection. Reconnect and try submitting again.');
+        return;
+      }
       const payload = new FormData();
       Object.entries(form).forEach(([key, value]) => {
         const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
@@ -219,6 +254,14 @@ export default function CorporateGiftsDashboardPage() {
       }));
       await fetchRequests();
     } catch (error: any) {
+      const isNetworkError =
+        typeof navigator !== 'undefined' &&
+        (!navigator.onLine ||
+          /failed to fetch|networkerror|load failed/i.test(String(error?.message || '')));
+      if (isNetworkError) {
+        openOfflineModal('No internet connection. Reconnect and try submitting again.');
+        return;
+      }
       toast.error(error.message || 'Could not submit request');
     } finally {
       setSubmitting(false);
@@ -231,6 +274,10 @@ export default function CorporateGiftsDashboardPage() {
     pidPaymentRecord?: string,
   ) => {
     try {
+      if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        openOfflineModal('No internet connection. Reconnect and try wallet payment again.');
+        return;
+      }
       const res = await fetch('/api/pay-from-wallet/corporate-gifts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -249,6 +296,11 @@ export default function CorporateGiftsDashboardPage() {
         data = null;
       }
       if (!res.ok || data?.statusx !== 'SUCCESS') {
+        if (res.status === 401 || data?.statusx === 'UNAUTHORIZED') {
+          const nextPath = `${window.location.pathname}${window.location.search}`;
+          router.replace(`/auth/login?next=${encodeURIComponent(nextPath)}`);
+          return;
+        }
         if (data?.statusx === 'NO_WALLET') {
           toast.warning(data.message || 'Please activate your wallet first.');
           window.location.href = '/dashboard/wallet';
@@ -273,12 +325,54 @@ export default function CorporateGiftsDashboardPage() {
       toast.success(data.message || 'Payment completed');
       await fetchRequests();
     } catch (error: any) {
+      const isNetworkError =
+        typeof navigator !== 'undefined' &&
+        (!navigator.onLine ||
+          /failed to fetch|networkerror|load failed/i.test(String(error?.message || '')));
+      if (isNetworkError) {
+        openOfflineModal('No internet connection. Reconnect and try wallet payment again.');
+        return;
+      }
       toast.error(error?.message || 'Unable to complete wallet payment right now. Please try again.');
     }
   };
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-black">
+      {showOfflineModal ? (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/40">
+              <Info className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+            </div>
+            <h3 className="text-center text-xl font-semibold text-slate-900 dark:text-slate-100">
+              Connection Needed
+            </h3>
+            <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-300">
+              {offlineMessage}
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowOfflineModal(false)}
+                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowOfflineModal(false);
+                  fetchRequests();
+                }}
+                className="flex-1 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
       {/* Hero Section */}
       <div className="bg-slate-900 pb-32 pt-12 text-white dark:bg-[#0b0c16]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -502,6 +596,7 @@ export default function CorporateGiftsDashboardPage() {
           ) : (
             requests.map((request) => {
               const activeIndex = STATUS_STEPS.indexOf(request.status as any);
+              const isCancelled = String(request.status || '').toLowerCase() === 'cancelled';
               return (
                 <div key={request.pidRequest} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-md dark:border-slate-700 dark:bg-[#161629]">
                   <div className="flex flex-col p-6 lg:flex-row lg:items-center lg:gap-8">
@@ -544,7 +639,11 @@ export default function CorporateGiftsDashboardPage() {
                     {/* Status Badge */}
                     <div className="flex items-center justify-between pt-4 lg:pt-0 lg:w-48">
                       <div className={`rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${
-                        request.status === 'Delivered' ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950/50 dark:text-emerald-300' : 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-950/50 dark:text-blue-300'
+                        isCancelled
+                          ? 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950/50 dark:text-rose-300'
+                          : request.status === 'Delivered'
+                            ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950/50 dark:text-emerald-300'
+                            : 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-950/50 dark:text-blue-300'
                       }`}>
                         {request.status}
                       </div>
@@ -554,29 +653,38 @@ export default function CorporateGiftsDashboardPage() {
 
                   {/* Progress Track */}
                   <div className="bg-slate-50 px-6 py-4 dark:bg-[#0f1020]">
-                    <div className="flex items-center justify-between gap-1 overflow-x-auto no-scrollbar">
-                      {STATUS_STEPS.map((step, idx) => {
-                        const isPast = idx < activeIndex;
-                        const isCurrent = idx === activeIndex;
-                        return (
-                          <div key={step} className="flex flex-1 items-center gap-2 min-w-[100px]">
-                            <div className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
-                              isPast ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
-                            }`}>
-                              {isPast ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+                    {isCancelled ? (
+                      <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-300">
+                        <p className="font-bold uppercase tracking-wide">Project Cancelled</p>
+                        <p className="mt-1">
+                          {request.cancellationReason || 'A cancellation reason was not provided.'}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                        {STATUS_STEPS.map((step, idx) => {
+                          const isPast = idx < activeIndex;
+                          const isCurrent = idx === activeIndex;
+                          return (
+                            <div key={step} className="flex min-w-0 flex-1 basis-0 items-center gap-2">
+                              <div className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
+                                isPast ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
+                              }`}>
+                                {isPast ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+                              </div>
+                              <span className={`truncate text-[10px] font-bold uppercase tracking-tight ${
+                                isCurrent ? 'text-blue-600 dark:text-blue-300' : 'text-slate-400 dark:text-slate-500'
+                              }`}>
+                                {step}
+                              </span>
+                              {idx !== STATUS_STEPS.length - 1 ? (
+                                <div className="mx-1 h-[1px] flex-1 bg-slate-200 dark:bg-slate-800" />
+                              ) : null}
                             </div>
-                            <span className={`whitespace-nowrap text-[10px] font-bold uppercase tracking-tight ${
-                              isCurrent ? 'text-blue-600 dark:text-blue-300' : 'text-slate-400 dark:text-slate-500'
-                            }`}>
-                              {step}
-                            </span>
-                            {idx !== STATUS_STEPS.length - 1 && (
-                              <div className="h-[1px] flex-1 bg-slate-200 dark:bg-slate-800 mx-2" />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   {/* Payments & Invoices */}

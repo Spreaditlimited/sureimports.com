@@ -148,12 +148,18 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
           </div>
           
           <div className="text-left sm:text-right">
-            <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
-              ${formatCurrency(amount)}
-            </div>
-            {destinationCountry === 'Nigeria' && exNairaToDollar > 0 && (
-              <div className="mt-1 text-sm font-bold text-slate-500 dark:text-slate-400">
-                ≈ ₦{formatCurrency(amount * exNairaToDollar)}
+            {destinationCountry === 'Nigeria' && exNairaToDollar > 0 ? (
+              <>
+                <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                  ₦{formatCurrency(amount * exNairaToDollar)}
+                </div>
+                <div className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                  ≈ ${formatCurrency(amount)}
+                </div>
+              </>
+            ) : (
+              <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                ${formatCurrency(amount)}
               </div>
             )}
           </div>

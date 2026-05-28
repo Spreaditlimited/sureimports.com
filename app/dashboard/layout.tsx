@@ -8,6 +8,18 @@ import { RecordCountProcurementProvider } from '../context/RecordCountProcuremen
 import Header from './procurement/view-orders/components/header';
 import { LiveChatWidgetComponent } from '@/components/live-chat-widget';
 import { checkAuth } from '@/lib/auth/checkAuth';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Dashboard',
+    template: '%s | Dashboard | Sure Imports',
+  },
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function ProtectedLayout({
   children,

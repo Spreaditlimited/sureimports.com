@@ -20,7 +20,12 @@ export function middleware(request: NextRequest) {
     (pathname === '/auth/login' || pathname === '/login') &&
     isAuthenticated
   ) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    const nextParam = request.nextUrl.searchParams.get('next');
+    const safeNextPath =
+      nextParam && nextParam.startsWith('/') && !nextParam.startsWith('/auth/')
+        ? nextParam
+        : '/dashboard/procurement';
+    return NextResponse.redirect(new URL(safeNextPath, request.url));
   }
 
   return NextResponse.next();

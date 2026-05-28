@@ -1,7 +1,18 @@
-'use client';
-
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: {
+    default: 'Import Tools',
+    template: '%s | Import Tools | Sure Imports',
+  },
+  description:
+    'Free import tools for landed cost estimation, CBM calculation, shipping comparison, and pricing decisions.',
+  alternates: {
+    canonical: 'https://www.sureimports.com/tools',
+  },
+};
 
 export default function ToolsLayout({
   children,
@@ -10,29 +21,9 @@ export default function ToolsLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col bg-slate-900">
-      <Navigation
-        onNavigateHome={() => (window.location.href = '/')}
-        onNavigateSignIn={() =>
-          (window.location.href = 'https://www.sureimports.com/auth/login')
-        }
-        onNavigateBlog={() => (window.location.href = '/blog')}
-      />
+      <Navigation />
       <main className="flex-grow">{children}</main>
-      <Footer
-        onNavigateToShippingPolicy={() =>
-          (window.location.href = '/shipping-policy')
-        }
-        onNavigateToWarrantyPolicy={() =>
-          (window.location.href = '/warranty-policy')
-        }
-        onNavigateToTermsConditions={() =>
-          (window.location.href = '/terms-and-conditions')
-        }
-        onNavigateToPrivacyPolicy={() =>
-          (window.location.href = '/privacy-policy')
-        }
-        onNavigateToAbout={() => (window.location.href = '/about')}
-      />
+      <Footer />
     </div>
   );
 }

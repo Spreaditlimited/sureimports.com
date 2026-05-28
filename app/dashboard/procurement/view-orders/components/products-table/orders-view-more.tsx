@@ -604,12 +604,32 @@ export default function MoreOrders({
             {/* Grand Total */}
             <div className="rounded-2xl bg-indigo-600 p-5 text-white shadow-lg shadow-indigo-600/20">
               <p className="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-1">Grand Total</p>
-              <div className="flex items-end justify-between">
-                <span className="text-3xl font-black">${formatCurrency(grandTotalCost)}</span>
-                <div className="text-right text-indigo-100">
-                  {currencyType === 'CNY' && <p className="text-sm font-semibold">¥{formatCurrency(grandTotalCost * exYuanToDollar)}</p>}
-                  {destinationCountry === 'Nigeria' && <p className="text-sm font-bold">₦{formatCurrency(grandTotalCost * exNairaToDollar)}</p>}
-                  {destinationCountry === 'United Kingdom' && <p className="text-sm font-bold">£{formatCurrency(amountPounds)}</p>}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                {destinationCountry === 'Nigeria' ? (
+                  <span className="break-words text-[40px] font-black leading-none sm:text-3xl">
+                    ₦{formatCurrency(grandTotalCost * exNairaToDollar)}
+                  </span>
+                ) : (
+                  <span className="break-words text-[40px] font-black leading-none sm:text-3xl">
+                    ${formatCurrency(grandTotalCost)}
+                  </span>
+                )}
+                <div className="max-w-full text-left text-indigo-100 sm:text-right">
+                  {destinationCountry === 'Nigeria' && (
+                    <p className="break-words text-sm font-semibold leading-tight">
+                      ${formatCurrency(grandTotalCost)}
+                    </p>
+                  )}
+                  {currencyType === 'CNY' && (
+                    <p className="break-words text-sm font-semibold leading-tight">
+                      ¥{formatCurrency(grandTotalCost * exYuanToDollar)}
+                    </p>
+                  )}
+                  {destinationCountry === 'United Kingdom' && (
+                    <p className="break-words text-sm font-bold leading-tight">
+                      £{formatCurrency(amountPounds)}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const USER_CACHE_KEY = 'sureimports:user';
+  const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
 
   //////////////////////////////////// CHECK AUTH
   const checkAuth = useCallback(async () => {
@@ -89,6 +90,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   //////////////////////////////////// LOGIN
   const login = async (userEmail: string, userPassword: string) => {
+    const searchParams =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const nextParam = searchParams?.get('next') || '';
+    const storedNextPath =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) || ''
+        : '';
+    const redirectCandidate = nextParam || storedNextPath;
+    const safeNextPath =
+      redirectCandidate &&
+      redirectCandidate.startsWith('/') &&
+      !redirectCandidate.startsWith('/auth/')
+        ? redirectCandidate
+        : '/dashboard/procurement';
+
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -106,7 +124,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (data.statusx == 'USER_DOES_NOT_EXIST') {
         throw new Error(data.message);
       } else if (data.statusx == 'SUCCESS') {
-        router.push('/dashboard/store?id=laptop');
+        if (typeof window !== 'undefined') {
+          window.localStorage.removeItem(POST_LOGOUT_REDIRECT_KEY);
+        }
+        router.push(safeNextPath);
       } else {
         throw new Error(data.message);
       }
@@ -117,10 +138,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /////////////////////////////////// LOGOUT
   const logout = async () => {
+    const currentPath =
+      typeof window !== 'undefined'
+        ? `${window.location.pathname}${window.location.search}`
+        : '';
+    const safeCurrentPath =
+      currentPath &&
+      currentPath.startsWith('/') &&
+      !currentPath.startsWith('/auth/')
+        ? currentPath
+        : '/dashboard/procurement';
+
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
     sessionStorage.removeItem(USER_CACHE_KEY);
-    router.replace('/auth/login');
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(POST_LOGOUT_REDIRECT_KEY, safeCurrentPath);
+    }
+    router.replace(`/auth/login?next=${encodeURIComponent(safeCurrentPath)}`);
     router.refresh();
   };
 

@@ -8,8 +8,6 @@
 // export default AuthLayout;
 
 import { AuthProvider } from '@/lib/AuthContext';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import type React from 'react'; // Import React
 
 export default async function AuthLayout({
@@ -17,13 +15,6 @@ export default async function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
-  const token = (await cookieStore).get('token');
-
-  if (token) {
-    redirect('/dashboard');
-  }
-
   return (
     <>
       <AuthProvider>{children}</AuthProvider>
