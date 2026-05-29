@@ -8,6 +8,7 @@ import {
   Globe,
   Package2,
   Video,
+  ReceiptText,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import { BsTiktok, BsYoutube } from 'react-icons/bs';
@@ -84,6 +85,12 @@ export const NavItems: NavItem[] = [
     title: 'My Orders',
     icon: Package,
     href: '/dashboard/orders',
+    color: 'text-white',
+  },
+  {
+    title: 'My Invoices',
+    icon: ReceiptText,
+    href: '/dashboard/my-invoices',
     color: 'text-white',
   },
   {
@@ -166,6 +173,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'My Orders',
     icon: Package,
     href: '/dashboard/orders',
+    color: 'text-white',
+  },
+  {
+    title: 'My Invoices',
+    icon: ReceiptText,
+    href: '/dashboard/my-invoices',
     color: 'text-white',
   },
   {
