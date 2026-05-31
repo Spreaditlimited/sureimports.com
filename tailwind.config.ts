@@ -1,67 +1,57 @@
-import type { Config } from "tailwindcss"
+import type { Config } from 'tailwindcss';
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config = {
-  darkMode: ["class"],
+  darkMode: ['class'],
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
-  prefix: "",
+  prefix: '',
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: '2rem',
       screens: {
-        "2xl": "1400px",
-        "md": "900px",
+        '2xl': '1400px',
+        md: '900px',
       },
     },
     extend: {
-      //
       backgroundImage: {
         bannerimage: "url('/images/banner.png')",
       },
       backdropOpacity: {
         2: '0.2',
       },
-      
       screens: {
         xl17: '1700px',
         xl16: '1600px',
         xl15: '1500px',
         xl14: '1400px',
       },
-      
       colors: {
+        // --- CORE BRAND TOKENS ---
         blue: {
-          50: '#EEF4FF',
-          100: '#DCE8FF',
-          200: '#BDD3FF',
-          300: '#93B6FF',
-          400: '#6695FF',
-          500: '#4579F0',
-          600: '#2E62D9',
-          700: '#2754BC',
-          800: '#20459B',
-          900: '#1B397F',
-          950: '#112553',
+          50: '#EEF4FF', 100: '#DCE8FF', 200: '#BDD3FF', 300: '#93B6FF',
+          400: '#6695FF', 500: '#4579F0', 600: '#2E62D9', 700: '#2754BC',
+          800: '#20459B', 900: '#1B397F', 950: '#112553',
         },
         indigo: {
-          50: '#EEF4FF',
-          100: '#DCE8FF',
-          200: '#BDD3FF',
-          300: '#93B6FF',
-          400: '#6695FF',
-          500: '#4579F0',
-          600: '#2E62D9',
-          700: '#2754BC',
-          800: '#20459B',
-          900: '#1B397F',
-          950: '#112553',
+          50: '#EEF4FF', 100: '#DCE8FF', 200: '#BDD3FF', 300: '#93B6FF',
+          400: '#6695FF', 500: '#4579F0', 600: '#2E62D9', 700: '#2754BC',
+          800: '#20459B', 900: '#1B397F', 950: '#112553',
         },
-        //store
+        // NEW: Strategic Brand Orange for CTAs and Conversions
+        'brand-orange': {
+          50: '#fff4ed', 100: '#ffe6d4', 200: '#fecaa6', 300: '#fda66e',
+          400: '#fb7b35', 500: '#f95a0e', 600: '#ea4306', 700: '#c23106',
+          800: '#9a270d', 900: '#7c230e', 950: '#430e05',
+        },
+        
+        // --- LEGACY TOKENS (Preserved to prevent breaking old components) ---
         'buy-sourcing-white': "#FFF",
         'buy-sourcing-black': "#000",
         'buy-sourcing-bglightwhite': "rgba(255, 255, 255, 0.13)",
@@ -89,54 +79,55 @@ const config = {
         'store-blacklight': "rgba(0, 0, 0, 0.70)",
         'store-bgextralightwhite': "rgba(255, 255, 255, 0.19)",
         'store-lightpurple': "rgba(62, 64, 149, 0.25)",
-        //
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        
+        // --- SHADCN SYSTEM TOKENS ---
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))',
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))',
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))',
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))',
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))',
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
+        'accordion-down': {
+          from: { height: '0' },
+          to: { height: 'var(--radix-accordion-content-height)' },
         },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
+        'accordion-up': {
+          from: { height: 'var(--radix-accordion-content-height)' },
+          to: { height: '0' },
         },
         'marquee-left': {
           '0%': { transform: 'translateX(0)' },
@@ -168,8 +159,8 @@ const config = {
         }
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        'accordion-down': 'accordion-down 0.2s ease-out',
+        'accordion-up': 'accordion-up 0.2s ease-out',
         'marquee-left': 'marquee-left 25s linear infinite',
         'marquee-left-lg': 'marquee-left-lg 20s linear infinite',
         'marquee-left-sm': 'marquee-left-sm 20s linear infinite',
@@ -180,17 +171,15 @@ const config = {
       },
       boxShadow: {
         '3xl': '0 35px 60px -15px rgba(0, 0, 0, 0.3)',
-        //
         custom: '0px 4px 15px rgba(0, 0, 0, 0.10)',
         customshadow: '0px 0px 15px 0px rgba(0, 0, 0, 0.10)',
         customboxshadow: '10px 10px 10px 0px rgba(0, 0, 0, 0.08)',
         cardshadow: '5px 5px 10px 0px rgba(0, 0, 0, 0.08)',
         cardshadow2: '0px 4px 18px 0px rgba(0, 0, 0, 0.12)',
-      }
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config
+  plugins: [tailwindcssAnimate],
+} satisfies Config;
 
-export default config
-
+export default config;

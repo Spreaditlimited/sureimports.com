@@ -9,9 +9,10 @@ import { useAuth } from '@/app/context/AuthContext';
 
 interface Record {
   requestReceivedOrder: number;
-  readyToShipOrder: number;
   productShippedOrder: number;
   productArrivedOrder: number;
+  invoicedOrder: number;
+  paidOrder: number;
   productDeliveredOrder: number;
   cancelledRequestOrder: number;
 }

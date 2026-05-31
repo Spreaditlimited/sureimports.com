@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/app/context/AuthContext';
@@ -167,7 +168,10 @@ export default async function RootLayout({
               {children}
 
               <LiveChat />
-              <script src="https://checkout.flutterwave.com/v3.js"></script>
+              <Script
+                src="https://checkout.flutterwave.com/v3.js"
+                strategy="lazyOnload"
+              />
               <FacebookPixel />
               <Analytics />
               <Toaster />

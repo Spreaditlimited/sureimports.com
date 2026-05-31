@@ -8,7 +8,7 @@ import CreateOrder from '../create-order/components/createOrder';
 import { VideoIcon, ExternalLink, PlayCircle, Bookmark, Globe } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
 import Modal from '@/components/uix/ModalLarge';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 
 export default function Procurement() {
   const { user } = useAuth();

@@ -1,14 +1,16 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import BlogDetail from '@/app/(home)/components/BlogDetail';
-import BlogBreadcrumb from '@/app/(home)/components/BlogBreadcrumb';
-import {
-  fetchPublishedBlogs,
-  fetchBlogBySlug,
-} from '@/app/(home)/actions/blogActions';
-import Header from '@/app/(home)/components/Navigation';
-import Footer from '@/app/(home)/components/Footer';
 import Script from 'next/script';
+
+import BlogDetail from '@/app/(home)/components/BlogDetail';
+import {
+  fetchPublishedBlogSlugs,
+  fetchBlogBySlug,
+  fetchRelatedBlogs,
+} from '@/app/(home)/actions/blogActions';
+
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -18,10 +20,8 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
 
 export async function generateStaticParams() {
-  const blogPosts = await fetchPublishedBlogs();
-  return blogPosts
-    .filter((p) => typeof p.slug === 'string' && p.slug.length > 0)
-    .map((p) => ({ slug: p.slug }));
+  const slugs = await fetchPublishedBlogSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -277,10 +277,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
   };
 
   // Fetch related posts for passing to the component
-  const allPosts = await fetchPublishedBlogs();
-  const relatedPosts = allPosts
-    .filter((p) => p.category === post.category && p.id !== post.id)
-    .slice(0, 3);
+  const relatedPosts = await fetchRelatedBlogs(post.category, post.id, 3);
 
   return (
     <>
@@ -301,21 +298,8 @@ export default async function BlogDetailsPage({ params }: PageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
       />
 
-      <Header />
-      <main className="min-h-screen bg-slate-900">
-        {/* Visual Breadcrumb Navigation */}
-        <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6 lg:px-8">
-          <BlogBreadcrumb
-            items={[
-              { label: 'Blog', href: '/blog' },
-              {
-                label: post.category || 'Article',
-                href: `/blog?category=${encodeURIComponent(post.category || 'all')}`,
-              },
-              { label: post.title },
-            ]}
-          />
-        </div>
+      <Navbar />
+      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
         <BlogDetail post={post} relatedPosts={relatedPosts} />
       </main>
       <Footer />

@@ -22,17 +22,10 @@ export async function GET(
       },
     });
 
-    const readyToShipOrder: number = await prisma.shipping_only.count({
-      where: {
-        pidUser: pidUser,
-        status: 'ready-to-ship',
-      },
-    });
-
     const productShippedOrder: number = await prisma.shipping_only.count({
       where: {
         pidUser: pidUser,
-        status: 'product-shipped',
+        OR: [{ status: 'product-shipped' }, { status: 'ready-to-ship' }],
       },
     });
 
@@ -40,6 +33,20 @@ export async function GET(
       where: {
         pidUser: pidUser,
         status: 'product-arrived',
+      },
+    });
+
+    const invoicedOrder: number = await prisma.shipping_only.count({
+      where: {
+        pidUser: pidUser,
+        status: 'invoiced',
+      },
+    });
+
+    const paidOrder: number = await prisma.shipping_only.count({
+      where: {
+        pidUser: pidUser,
+        status: 'paid',
       },
     });
 
@@ -53,7 +60,7 @@ export async function GET(
     const cancelledRequestOrder: number = await prisma.shipping_only.count({
       where: {
         pidUser: pidUser,
-        status: 'cancelled-request',
+        OR: [{ status: 'request-cancelled' }, { status: 'cancelled-request' }],
       },
     });
 
@@ -63,9 +70,10 @@ export async function GET(
     return NextResponse.json(
       {
         requestReceivedOrder: requestReceivedOrder,
-        readyToShipOrder: readyToShipOrder,
         productShippedOrder: productShippedOrder,
         productArrivedOrder: productArrivedOrder,
+        invoicedOrder: invoicedOrder,
+        paidOrder: paidOrder,
         productDeliveredOrder: productDeliveredOrder,
         cancelledRequestOrder: cancelledRequestOrder,
       },

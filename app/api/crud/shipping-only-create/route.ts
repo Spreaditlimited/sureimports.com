@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
+import { notifyNewShippingOnlyRequest } from '@/lib/notifications/shippingOnly';
 
 const prisma = new PrismaClient();
 
@@ -110,6 +111,30 @@ export async function POST(request: Request) {
     // CONFIRM THAT PROFILE DATA HAS BEEN UPDATED THEN UPLOAD IMAGE
     if (createx) {
       try {
+        try {
+          await notifyNewShippingOnlyRequest({
+            pidShippingOnly,
+            customerName:
+              `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() ||
+              shippingName ||
+              'Customer',
+            customerEmail: user.userEmail || email || '',
+            whatsappNumber,
+            shippingName,
+            shippingTo,
+            shippingPlan,
+            grossWeight,
+            trackingNumber,
+            expectedShipments,
+            description,
+          });
+        } catch (emailError) {
+          console.error(
+            'shipping-only create email notification failed:',
+            emailError,
+          );
+        }
+
         //GET FILE PAYLOAD
         const responsex = {
           message: 'Your request has been successfuly submitted!',

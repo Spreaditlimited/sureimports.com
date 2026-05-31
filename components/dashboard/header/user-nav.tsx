@@ -1,7 +1,7 @@
 'use client';
 
 import { UserAvatar } from './user-details';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 
 type Props = {
   userz: {

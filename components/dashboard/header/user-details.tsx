@@ -13,7 +13,7 @@ import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/_lib/utils';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
 export interface UserAvatarProps extends AvatarProps {

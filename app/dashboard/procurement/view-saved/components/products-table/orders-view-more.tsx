@@ -111,10 +111,6 @@ function MoreOrders({ products }: MoreOrdersProps) {
           <p className="md:w-64">Destination Country:</p>
           <p>Nigeria</p>
         </div>
-        <div className="flex max-md:justify-between md:gap-20">
-          <p className="md:w-64">Port of Exit:</p>
-          <p>HONG KONG</p>
-        </div>
       </div>
       <div className="flex items-center gap-4 border border-slate-200 p-[25px]">
         <p className="md:pr-[84px]">Grand total cost:</p>

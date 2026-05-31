@@ -191,15 +191,7 @@ export default function Home() {
             onNavigateBlog={handleNavigateToBlog}
           />
           <ShippingPolicy />
-          <Footer
-            onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-            onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-            onNavigateToTermsConditions={() =>
-              navigateToPage('terms-conditions')
-            }
-            onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-            onNavigateToAbout={() => navigateToPage('about')}
-          />
+          <Footer />
         </div>
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
@@ -218,15 +210,7 @@ export default function Home() {
             onNavigateBlog={handleNavigateToBlog}
           />
           <WarrantyPolicy />
-          <Footer
-            onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-            onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-            onNavigateToTermsConditions={() =>
-              navigateToPage('terms-conditions')
-            }
-            onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-            onNavigateToAbout={() => navigateToPage('about')}
-          />
+          <Footer />
         </div>
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
@@ -245,15 +229,7 @@ export default function Home() {
             onNavigateBlog={handleNavigateToBlog}
           />
           <TermsAndConditions />
-          <Footer
-            onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-            onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-            onNavigateToTermsConditions={() =>
-              navigateToPage('terms-conditions')
-            }
-            onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-            onNavigateToAbout={() => navigateToPage('about')}
-          />
+          <Footer />
         </div>
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
@@ -272,15 +248,7 @@ export default function Home() {
             onNavigateBlog={handleNavigateToBlog}
           />
           <PrivacyPolicy />
-          <Footer
-            onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-            onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-            onNavigateToTermsConditions={() =>
-              navigateToPage('terms-conditions')
-            }
-            onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-            onNavigateToAbout={() => navigateToPage('about')}
-          />
+          <Footer />
         </div>
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
@@ -299,15 +267,7 @@ export default function Home() {
             onNavigateBlog={handleNavigateToBlog}
           />
           <AboutUs />
-          <Footer
-            onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-            onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-            onNavigateToTermsConditions={() =>
-              navigateToPage('terms-conditions')
-            }
-            onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-            onNavigateToAbout={() => navigateToPage('about')}
-          />
+          <Footer />
         </div>
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
@@ -327,14 +287,12 @@ export default function Home() {
         />
         <BlogList
           blogPosts={[]}
+          featuredPosts={[]}
+          currentPage={1}
+          totalPages={1}
+          totalPosts={0}
         />
-        <Footer
-          onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-          onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-          onNavigateToTermsConditions={() => navigateToPage('terms-conditions')}
-          onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-          onNavigateToAbout={() => navigateToPage('about')}
-        />
+        <Footer />
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
         />
@@ -355,13 +313,7 @@ export default function Home() {
           onBack={handleBackToBlog}
           onSelectPost={handleSelectBlogPost}
         />
-        <Footer
-          onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-          onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-          onNavigateToTermsConditions={() => navigateToPage('terms-conditions')}
-          onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-          onNavigateToAbout={() => navigateToPage('about')}
-        />
+        <Footer />
         <CookieConsent
           onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
         />
@@ -386,13 +338,7 @@ export default function Home() {
         <ServicesSection onNavigateToSignUp={handleExternalAuth} />
         <WhyChooseUs />
         <CustomerReviews onNavigateToSignUp={handleExternalAuth} />
-        <Footer
-          onNavigateToShippingPolicy={() => navigateToPage('shipping-policy')}
-          onNavigateToWarrantyPolicy={() => navigateToPage('warranty-policy')}
-          onNavigateToTermsConditions={() => navigateToPage('terms-conditions')}
-          onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}
-          onNavigateToAbout={() => navigateToPage('about')}
-        />
+        <Footer />
       </div>
       <CookieConsent
         onNavigateToPrivacyPolicy={() => navigateToPage('privacy-policy')}

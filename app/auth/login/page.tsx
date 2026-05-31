@@ -2,18 +2,15 @@ import React from 'react';
 import LoginForm from './components/LoginForm';
 import type { Metadata } from 'next';
 
-let titlex = 'Login Page';
-let descriptionx =
-  'Import from China. We guarantee the quality and accuracy of every product we source for you from China.';
 export const metadata: Metadata = {
-  title: titlex,
-  description: descriptionx,
+  title: 'Sign In | Sure Imports',
+  description: 'Access your Sure Imports dashboard. We guarantee the quality and accuracy of every product we source for you from China.',
   openGraph: {
-    title: titlex,
-    description: descriptionx,
+    title: 'Sign In | Sure Imports',
+    description: 'Access your Sure Imports dashboard. We guarantee the quality and accuracy of every product we source for you from China.',
     images: [
       {
-        url: 'https://www.sureimports.com/images/svg-logo-white.svg',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Sure Imports',
@@ -22,12 +19,10 @@ export const metadata: Metadata = {
   },
 };
 
-const Login = () => {
+export default function LoginPage() {
   return (
-    <div>
+    <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       <LoginForm />
-    </div>
+    </main>
   );
-};
-
-export default Login;
+}

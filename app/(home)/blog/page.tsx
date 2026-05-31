@@ -1,13 +1,19 @@
-import BlogList from '../components/BlogList';
-import Header from '@/app/(home)/components/Navigation';
-import Footer from '@/app/(home)/components/Footer';
-import BlogBreadcrumb from '@/app/(home)/components/BlogBreadcrumb';
+import * as React from 'react';
 import type { Metadata } from 'next';
-import { fetchPublishedBlogs } from '../actions/blogActions';
+
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import BlogList from '../components/BlogList';
+import { fetchPublishedBlogsLite } from '../actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { generateBreadcrumbSchema } from '@/lib/seo/schema';
 
-const baseUrl = 'https://www.sureimports.com';
+// Safely use environment variables with a fallback
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
+
+// OPTIMIZATION: Revalidate this page every hour (3600 seconds). 
+// This gives you the speed of a static page, while ensuring new posts appear automatically.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: 'Import Insights Blog - Expert Guides & Tips',
@@ -54,28 +60,33 @@ const blogBreadcrumbSchema = generateBreadcrumbSchema([
 ]);
 
 type PageProps = {
-  searchParams: Promise<{ tag?: string }>;
+  searchParams: Promise<{ tag?: string; page?: string }>;
 };
 
-const Page = async ({ searchParams }: PageProps) => {
-  // Fetch blog posts from database
-  const blogPosts = await fetchPublishedBlogs();
-  const { tag } = await searchParams;
+export default async function BlogPage({ searchParams }: PageProps) {
+  const { tag, page } = await searchParams;
+  const currentPage = Number.parseInt(page || '1', 10);
+  const { posts, featuredPosts, totalPages, totalPosts, page: resolvedPage } =
+    await fetchPublishedBlogsLite(
+      Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1,
+      9,
+    );
 
   return (
     <>
       <JsonLdScript data={blogBreadcrumbSchema} />
-      <Header />
+      <Navbar />
       <main className="min-h-screen bg-slate-900">
-        {/* Visual Breadcrumb Navigation */}
-        <div className="mx-auto max-w-7xl px-4 pt-6 sm:px-6 lg:px-8">
-          <BlogBreadcrumb items={[{ label: 'Blog' }]} />
-        </div>
-        <BlogList blogPosts={blogPosts} initialTag={tag} />
+        <BlogList
+          blogPosts={posts}
+          featuredPosts={featuredPosts}
+          initialTag={tag}
+          currentPage={resolvedPage}
+          totalPages={totalPages}
+          totalPosts={totalPosts}
+        />
       </main>
       <Footer />
     </>
   );
-};
-
-export default Page;
+}

@@ -9,14 +9,15 @@ import {
   Linkedin,
   Facebook,
   Instagram,
+  CheckCircle2,
+  Link as LinkIcon
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Card, CardContent } from './ui/card';
-import { Separator } from './ui/separator';
 import type { BlogPost, BlogPublisher } from '../actions/blogActions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 // X (Twitter) icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -29,45 +30,33 @@ const XIcon = ({ className }: { className?: string }) => (
 const PublisherSocialLinks = ({ publisher }: { publisher: BlogPublisher }) => {
   const socialLinks = [
     { url: publisher.publisherSocialX, icon: XIcon, label: 'X (Twitter)' },
-    {
-      url: publisher.publisherSocialLinkedin,
-      icon: Linkedin,
-      label: 'LinkedIn',
-    },
-    {
-      url: publisher.publisherSocialFacebook,
-      icon: Facebook,
-      label: 'Facebook',
-    },
-    {
-      url: publisher.publisherSocialInstagram,
-      icon: Instagram,
-      label: 'Instagram',
-    },
+    { url: publisher.publisherSocialLinkedin, icon: Linkedin, label: 'LinkedIn' },
+    { url: publisher.publisherSocialFacebook, icon: Facebook, label: 'Facebook' },
+    { url: publisher.publisherSocialInstagram, icon: Instagram, label: 'Instagram' },
     { url: publisher.publisherWebsite, icon: Globe, label: 'Website' },
   ].filter((link) => link.url);
 
   if (socialLinks.length === 0) return null;
 
   return (
-    <div className="mt-3 flex items-center gap-3">
+    <div className="mt-4 flex flex-wrap items-center gap-2">
       {socialLinks.map((link) => (
         <a
           key={link.label}
           href={link.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-slate-400 transition-colors hover:text-blue-400"
+          className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800/50 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400"
           title={link.label}
         >
-          <link.icon className="h-5 w-5" />
+          <link.icon className="h-4 w-4" />
         </a>
       ))}
     </div>
   );
 };
 
-// Lightweight local ImageWithFallback component to accept string or StaticImageData and provide a safe fallback
+// Lightweight local ImageWithFallback component
 const ImageWithFallback = ({
   src,
   alt,
@@ -103,16 +92,7 @@ interface BlogDetailProps {
 export default function BlogDetail({
   post,
   relatedPosts = [],
-  onBack,
-  onSelectPost,
 }: BlogDetailProps) {
-  const router = useRouter();
-
-  // Fallback handlers if none provided
-  const handleBackClick = onBack ?? (() => router.back());
-  const handleSelectPostClick =
-    onSelectPost ?? ((s: string) => router.push(`/blog/${s}`));
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -130,295 +110,129 @@ export default function BlogDetail({
           url: window.location.href,
         });
       } catch (err) {
-        // Fallback: copy to clipboard
         navigator.clipboard.writeText(window.location.href);
+        toast.success("Link copied to clipboard");
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
+      toast.success("Link copied to clipboard");
     }
   };
 
-  // Check if content is HTML
   const isHtmlContent = (content: string) => {
     return /<[a-z][\s\S]*>/i.test(content);
   };
 
   return (
-    <div className="bg-slate-900">
-      {/* Article Content */}
-      <article className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div className="bg-[#fcfcfd] dark:bg-slate-950 pb-24">
+      <article className="mx-auto max-w-4xl px-4 pt-48 sm:px-6 lg:px-8">
+        
+        {/* Article Header */}
+        <header className="mb-12 text-center">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
+            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[10px] uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+              {post.category}
+            </span>
+            <span className="flex items-center gap-1.5 uppercase tracking-widest">
+              <Calendar className="h-3.5 w-3.5" />
+              {formatDate(post.publishDate)}
+            </span>
+            <span className="flex items-center gap-1.5 uppercase tracking-widest">
+              <Clock className="h-3.5 w-3.5" />
+              {post.readTime} min read
+            </span>
+          </div>
+
+          <h1 className="mb-8 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl leading-[1.1]">
+            {post.title}
+          </h1>
+
+          <p className="mx-auto max-w-3xl text-xl font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+            {post.excerpt}
+          </p>
+
+          {/* Author Bento Box */}
+          <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center justify-between gap-6 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 sm:flex-row sm:px-8">
+            <div className="flex items-center gap-4 text-left">
+              <ImageWithFallback
+                src={post.author.avatar}
+                alt={post.author.name}
+                className="h-14 w-14 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+              />
+              <div>
+                <p className="font-bold text-slate-900 dark:text-white">{post.author.name}</p>
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleShare}
+              className="h-12 w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 hover:text-indigo-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-indigo-400 sm:w-auto px-6"
+            >
+              <Share2 className="mr-2 h-4 w-4" /> Share Article
+            </Button>
+          </div>
+        </header>
+
         {/* Hero Image */}
-        <div className="relative mb-8 overflow-hidden rounded-xl">
+        <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50 shadow-sm dark:border-slate-800 dark:bg-slate-900">
           <ImageWithFallback
             src={post.image}
             alt={post.title}
-            className="h-64 w-full object-cover md:h-96"
+            className="h-[300px] w-full object-cover md:h-[500px]"
           />
           {post.featured && (
             <div className="absolute left-6 top-6">
-              <Badge className="bg-blue-600 px-3 py-1 text-sm text-white">
-                Featured Article
+              <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white border-0 shadow-lg">
+                Featured Report
               </Badge>
             </div>
           )}
         </div>
 
-        {/* Article Header */}
-        <header className="mb-8">
-          <div className="mb-4 flex flex-wrap items-center gap-4 text-sm text-slate-400">
-            <Badge
-              variant="secondary"
-              className="border-blue-600/30 bg-blue-600/20 text-blue-400"
-            >
-              {post.category}
-            </Badge>
-            <span className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              {formatDate(post.publishDate)}
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {post.readTime} min read
-            </span>
-          </div>
-
-          <h1 className="mb-6 text-3xl leading-tight text-white md:text-5xl">
-            {post.title}
-          </h1>
-
-          <p className="mb-8 text-xl leading-relaxed text-slate-300">
-            {post.excerpt}
-          </p>
-
-          {/* Publisher/Author and Actions */}
-          <div className="flex flex-col items-start justify-between gap-4 rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md sm:flex-row sm:items-center">
-            <div className="flex items-center gap-3">
-              <ImageWithFallback
-                src={post.author.avatar}
-                alt={post.author.name}
-                className="h-12 w-12 rounded-full object-cover"
-              />
-              <div>
-                <p className="text-white">{post.author.name}</p>
-                <p className="text-sm text-slate-400">{post.author.role}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleShare}
-                variant="outline"
-                size="sm"
-                className="border-white/20 bg-white/10 text-white hover:bg-white/20"
-              >
-                <Share2 className="mr-2 h-4 w-4" />
-                Share
-              </Button>
-            </div>
-          </div>
-
-          {/* Tags */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <Link
-                  key={tag}
-                  href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  className="inline-block"
-                >
-                  <Badge
-                    variant="outline"
-                    className="cursor-pointer border-slate-600 text-slate-300 transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400"
-                  >
-                    <Tag className="mr-1 h-3 w-3" />
-                    {tag}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-          )}
-        </header>
-
         {/* Article Content */}
-        <div className="prose prose-invert prose-slate max-w-none">
-          <div className="blog-content rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-md md:p-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="blog-html-content">
             {isHtmlContent(post.content) ? (
-              <div
-                className="blog-html-content"
-                dangerouslySetInnerHTML={{ __html: post.content }}
-              />
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
             ) : (
-              <div className="whitespace-pre-wrap leading-relaxed text-slate-300">
+              <div className="whitespace-pre-wrap">
                 {post.content}
               </div>
             )}
           </div>
-        </div>
 
-        {/* Blog Content Styles */}
-        <style jsx global>{`
-          .blog-html-content h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            line-height: 1.3;
-          }
-          .blog-html-content h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fff;
-            margin-top: 2rem;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .blog-html-content h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #93c5fd;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-          }
-          .blog-html-content p {
-            color: #cbd5e1;
-            line-height: 1.8;
-            margin-bottom: 1rem;
-          }
-          .blog-html-content strong {
-            color: #fff;
-            font-weight: 600;
-          }
-          .blog-html-content ul {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 1.5rem;
-          }
-          .blog-html-content ul li {
-            position: relative;
-            padding-left: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: #cbd5e1;
-          }
-          .blog-html-content ul li::before {
-            content: '•';
-            position: absolute;
-            left: 0;
-            color: #60a5fa;
-            font-weight: bold;
-          }
-          .blog-html-content ul li p {
-            margin: 0;
-            display: inline;
-          }
-          .blog-html-content ol {
-            list-style: decimal;
-            padding-left: 1.5rem;
-            margin-bottom: 1.5rem;
-          }
-          .blog-html-content ol li {
-            color: #cbd5e1;
-            margin-bottom: 0.5rem;
-          }
-          .blog-html-content a {
-            color: #60a5fa;
-            text-decoration: underline;
-            transition: color 0.2s ease;
-          }
-          .blog-html-content a:hover {
-            color: #93c5fd;
-          }
-          .blog-html-content blockquote {
-            border-left: 4px solid #3b82f6;
-            padding-left: 1rem;
-            margin: 1.5rem 0;
-            font-style: italic;
-            color: #94a3b8;
-          }
-          .blog-html-content code {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-size: 0.875rem;
-            color: #f472b6;
-          }
-          .blog-html-content pre {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-            margin: 1rem 0;
-          }
-          .blog-html-content pre code {
-            background: transparent;
-            padding: 0;
-          }
-          .blog-html-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-          }
-          .blog-html-content table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 1rem 0;
-          }
-          .blog-html-content th,
-          .blog-html-content td {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.75rem;
-            text-align: left;
-            color: #cbd5e1;
-          }
-          .blog-html-content th {
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-weight: 600;
-          }
-        `}</style>
-
-        {/* Article Footer */}
-        <footer className="mt-12 border-t border-slate-700 pt-8">
+          {/* Tags */}
           {post.tags && post.tags.length > 0 && (
-            <div className="mb-6 flex flex-wrap items-center gap-2">
-              <span className="text-slate-400">Tagged with:</span>
+            <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-8 dark:border-slate-800">
+              <span className="mr-2 text-sm font-bold uppercase tracking-widest text-slate-400">Filed Under:</span>
               {post.tags.map((tag) => (
-                <Link
-                  key={tag}
-                  href={`/blog?tag=${encodeURIComponent(tag)}`}
-                  className="inline-block"
-                >
-                  <Badge
-                    variant="outline"
-                    className="cursor-pointer border-slate-600 text-slate-300 transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400"
-                  >
-                    <Tag className="mr-1 h-3 w-3" />
-                    {tag}
-                  </Badge>
+                <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`}>
+                  <span className="inline-flex cursor-pointer items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400">
+                    <Tag className="mr-1.5 h-3 w-3" /> {tag}
+                  </span>
                 </Link>
               ))}
             </div>
           )}
 
-          <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+          {/* Publisher Bio Box */}
+          <div className="mt-16 rounded-[32px] border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900/50 sm:p-10">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="h-20 w-20 flex-shrink-0 rounded-full object-cover"
+                className="h-24 w-24 flex-shrink-0 rounded-[24px] object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
               <div className="flex-1">
-                <h3 className="mb-1 text-lg text-white">
-                  About {post.author.name}
+                <h3 className="mb-1 text-xl font-bold text-slate-900 dark:text-white">
+                  Written by {post.author.name}
                 </h3>
-                <p className="mb-2 text-sm text-slate-300">
+                <p className="mb-4 text-sm font-bold text-indigo-600 dark:text-indigo-400">
                   {post.author.role}
                 </p>
                 {post.publisher?.publisherBio && (
-                  <p className="text-sm leading-relaxed text-slate-400">
+                  <p className="text-base font-medium leading-relaxed text-slate-600 dark:text-slate-400">
                     {post.publisher.publisherBio}
                   </p>
                 )}
@@ -428,76 +242,228 @@ export default function BlogDetail({
               </div>
             </div>
           </div>
-        </footer>
+        </div>
       </article>
+
+      {/* Blog HTML Content Styles (Dark & Light Mode Support) */}
+      <style jsx global>{`
+        .blog-html-content {
+          font-family: inherit;
+          font-size: 1.125rem; /* 18px */
+          line-height: 2; /* 36px */
+          color: #475569; /* slate-600 */
+        }
+        
+        .dark .blog-html-content {
+          color: #cbd5e1; /* slate-300 */
+        }
+
+        .blog-html-content h2 {
+          font-size: 2rem;
+          font-weight: 900;
+          color: #0f172a; /* slate-900 */
+          margin-top: 3.5rem;
+          margin-bottom: 1.5rem;
+          line-height: 1.3;
+          letter-spacing: -0.025em;
+        }
+
+        .dark .blog-html-content h2 {
+          color: #ffffff;
+        }
+
+        .blog-html-content h3 {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #1e293b; /* slate-800 */
+          margin-top: 2.5rem;
+          margin-bottom: 1rem;
+          line-height: 1.4;
+        }
+
+        .dark .blog-html-content h3 {
+          color: #f8fafc; /* slate-50 */
+        }
+
+        .blog-html-content p {
+          margin-bottom: 1.5rem;
+        }
+
+        .blog-html-content strong,
+        .blog-html-content b {
+          font-weight: 700;
+          color: #0f172a;
+        }
+
+        .dark .blog-html-content strong,
+        .dark .blog-html-content b {
+          color: #ffffff;
+        }
+
+        .blog-html-content a {
+          color: #4f46e5; /* indigo-600 */
+          font-weight: 600;
+          text-decoration-line: underline;
+          text-decoration-color: #c7d2fe;
+          text-decoration-thickness: 2px;
+          text-underline-offset: 4px;
+          transition: all 0.2s ease;
+        }
+        
+        .dark .blog-html-content a {
+          color: #818cf8; /* indigo-400 */
+          text-decoration-color: #3730a3;
+        }
+
+        .blog-html-content a:hover {
+          color: #4338ca;
+          text-decoration-color: #4f46e5;
+        }
+
+        .dark .blog-html-content a:hover {
+          color: #a5b4fc;
+          text-decoration-color: #818cf8;
+        }
+
+        /* Blockquotes - Notion Style */
+        .blog-html-content blockquote {
+          border-left: 4px solid #4f46e5; /* indigo-600 */
+          background: #eef2ff; /* indigo-50 */
+          padding: 1.5rem 2rem;
+          border-radius: 0 1rem 1rem 0;
+          margin: 2.5rem 0;
+          font-style: italic;
+          color: #312e81; /* indigo-900 */
+          font-weight: 500;
+          font-size: 1.25rem;
+        }
+
+        .dark .blog-html-content blockquote {
+          border-left-color: #6366f1; /* indigo-500 */
+          background: rgba(79, 70, 229, 0.1);
+          color: #c7d2fe; /* indigo-200 */
+        }
+
+        .blog-html-content blockquote p {
+          margin-bottom: 0;
+        }
+
+        /* Lists */
+        .blog-html-content ul {
+          list-style: none;
+          padding-left: 0.5rem;
+          margin-bottom: 2rem;
+          margin-top: 1rem;
+        }
+
+        .blog-html-content ul li {
+          position: relative;
+          padding-left: 2rem;
+          margin-bottom: 0.75rem;
+        }
+
+        .blog-html-content ul li::before {
+          content: '•';
+          position: absolute;
+          left: 0.5rem;
+          color: #4f46e5; /* indigo-600 */
+          font-weight: 900;
+          font-size: 1.5rem;
+          line-height: 1.5rem;
+        }
+
+        .dark .blog-html-content ul li::before {
+          color: #818cf8;
+        }
+
+        .blog-html-content ol {
+          padding-left: 1.5rem;
+          margin-bottom: 2rem;
+          margin-top: 1rem;
+        }
+
+        .blog-html-content ol li {
+          margin-bottom: 0.75rem;
+          padding-left: 0.5rem;
+        }
+
+        .blog-html-content ol li::marker {
+          color: #4f46e5;
+          font-weight: 700;
+        }
+
+        .dark .blog-html-content ol li::marker {
+          color: #818cf8;
+        }
+
+        /* Images inside content */
+        .blog-html-content img {
+          max-width: 100%;
+          height: auto;
+          border-radius: 1.5rem;
+          margin: 2.5rem 0;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .dark .blog-html-content img {
+          border-color: #1e293b;
+        }
+      `}</style>
 
       {/* Related Articles */}
       {relatedPosts.length > 0 && (
-        <section className="bg-gradient-to-b from-slate-800 to-slate-900 py-16">
+        <section className="mt-16 bg-slate-50 border-t border-slate-200 py-16 dark:bg-slate-900/50 dark:border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
-              <h2 className="mb-4 text-3xl text-white">Related Articles</h2>
-              <p className="text-slate-300">
-                Continue reading with these related posts
+              <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">Keep Reading</h2>
+              <p className="text-lg font-medium text-slate-500 dark:text-slate-400">
+                Explore more insights on this topic
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {relatedPosts.map((relatedPost) => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/blog/${relatedPost.slug}`}
-                  className="block"
-                >
-                  <Card className="group h-full cursor-pointer border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
-                    <div className="relative overflow-hidden rounded-t-lg">
+                <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block h-full outline-none">
+                  <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+                    
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <ImageWithFallback
                         src={relatedPost.image}
                         alt={relatedPost.title}
-                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                    </div>
-
-                    <CardContent className="p-6">
-                      <div className="mb-3 flex items-center gap-4 text-sm text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {formatDate(relatedPost.publishDate)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
-                          {relatedPost.readTime} min read
-                        </span>
-                      </div>
-
-                      <h3 className="mb-3 line-clamp-2 text-lg text-white transition-colors group-hover:text-blue-400">
-                        {relatedPost.title}
-                      </h3>
-
-                      <p className="mb-4 line-clamp-3 text-sm text-slate-300">
-                        {relatedPost.excerpt}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ImageWithFallback
-                            src={relatedPost.author.avatar}
-                            alt={relatedPost.author.name}
-                            className="h-6 w-6 rounded-full"
-                          />
-                          <span className="text-xs text-slate-400">
-                            {relatedPost.author.name}
-                          </span>
-                        </div>
-                        <Badge
-                          variant="secondary"
-                          className="bg-slate-700 text-xs text-slate-300"
-                        >
+                      <div className="absolute left-4 top-4">
+                        <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
                           {relatedPost.category}
                         </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+
+                    <div className="flex flex-1 flex-col p-6 sm:p-8">
+                      <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(relatedPost.publishDate)}</span>
+                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{relatedPost.readTime} min</span>
+                      </div>
+
+                      <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                        {relatedPost.title}
+                      </h3>
+
+                      <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        {relatedPost.excerpt}
+                      </p>
+
+                      <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
+                        <div className="flex items-center gap-3">
+                          <ImageWithFallback src={relatedPost.author.avatar} alt={relatedPost.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
+                          <div>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{relatedPost.author.name}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
                 </Link>
               ))}
             </div>

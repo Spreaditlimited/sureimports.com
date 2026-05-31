@@ -44,27 +44,6 @@ export async function POST(request: Request) {
     );
   }
 
-  //-----------------------RESET
-  // Check if this is a new but returning user
-  const userWelcomReset = await prisma.users.findFirst({
-    where: {
-      userEmail: userEmail,
-      loginStatus: 'RESET',
-    },
-  });
-
-  if (!userWelcomReset) {
-    //>>>>>>>>>>>>>>>>>>>>>> RESPONSE
-    return NextResponse.json(
-      {
-        statusx: 'RESET',
-        message:
-          'You have to reset your password as a first time login into the new app.',
-      },
-      { status: 200 },
-    );
-  }
-
   //-----------------------NOT_VERIFIED
   //Check if users email has been verified
   const userVerification = await prisma.users.findFirst({
@@ -125,7 +104,7 @@ export async function POST(request: Request) {
 
       return NextResponse.json(
         {
-          statusx: 'RESET',
+          statusx: 'MIGRATION_REQUIRED',
           message:
             'Temporary password used. Please reset your password to continue.',
         },
@@ -146,6 +125,9 @@ export async function POST(request: Request) {
         pidUser: user.pidUser,
         userEmail: user.userEmail,
         userFirstname: user.userFirstname,
+        userLastname: user.userLastname,
+        userPhone: user.userPhone,
+        phone: user.phone,
         userImage: user.userImage,
       },
       statusx: 'SUCCESS',

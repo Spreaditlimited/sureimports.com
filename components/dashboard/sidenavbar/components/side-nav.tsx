@@ -16,7 +16,7 @@ import {
 
 import { useEffect, useRef, useState } from 'react';
 import { LogOut } from 'lucide-react';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import type { Dispatch, SetStateAction } from 'react';
 
 interface SideNavProps {

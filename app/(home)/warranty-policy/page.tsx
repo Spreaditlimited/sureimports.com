@@ -1,26 +1,26 @@
 import * as React from 'react';
-import WarrantyPolicy from '../components/WarrantyPolicy';
-import Header from '@/app/(home)/components/Navigation';
-import Footer from '@/app/(home)/components/Footer';
 import type { Metadata } from 'next';
 
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import WarrantyPolicy from '../components/WarrantyPolicy';
+
 export const metadata: Metadata = {
-  title: 'Warranty Policy',
-  description:
-    'Review Sure Imports warranty terms for eligible products and support coverage.',
+  title: 'Warranty Policy | Sure Imports',
+  description: 'Review Sure Imports warranty terms for eligible products and support coverage.',
   alternates: {
     canonical: 'https://www.sureimports.com/warranty-policy',
   },
 };
 
-const Page: React.FC = () => (
-  <>
-    <Header />
-    <main className="min-h-screen">
-      <WarrantyPolicy />
-    </main>
-    <Footer />
-  </>
-);
-
-export default Page;
+export default function WarrantyPolicyPage() {
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-[#fcfcfd] pt-48 dark:bg-slate-950">
+        <WarrantyPolicy />
+      </main>
+      <Footer />
+    </>
+  );
+}

@@ -15,7 +15,6 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,8 +23,16 @@ import {
 } from './ui/dropdown-menu';
 import type { ImgHTMLAttributes } from 'react';
 import type { StaticImageData } from 'next/image';
-import type { BlogPost } from '../actions/blogActions';
+import type { BlogListPost } from '../actions/blogActions';
 import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from './ui/pagination';
 
 // Blog categories
 const blogCategories = [
@@ -35,26 +42,20 @@ const blogCategories = [
   'Sourcing Gadgets',
 ];
 
-// Helper functions
-function getFeaturedPosts(posts: BlogPost[]): BlogPost[] {
-  return posts.filter((post) => post.featured).slice(0, 3);
-}
-
 function getBlogPostsByCategory(
-  posts: BlogPost[],
+  posts: BlogListPost[],
   category: string,
-): BlogPost[] {
+): BlogListPost[] {
   if (category === 'All') return posts;
   return posts.filter((post) => post.category === category);
 }
 
-function searchBlogPosts(posts: BlogPost[], query: string): BlogPost[] {
+function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
   const lowerQuery = query.toLowerCase();
   return posts.filter(
     (post) =>
       post.title.toLowerCase().includes(lowerQuery) ||
       post.excerpt.toLowerCase().includes(lowerQuery) ||
-      post.content.toLowerCase().includes(lowerQuery) ||
       post.author.name.toLowerCase().includes(lowerQuery) ||
       post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
   );
@@ -96,11 +97,24 @@ function ImageWithFallback({
 
 // Interface for optional navigation props
 interface BlogListProps {
-  blogPosts: BlogPost[];
+  blogPosts: BlogListPost[];
+  featuredPosts: BlogListPost[];
   initialTag?: string;
+  currentPage: number;
+  totalPages: number;
+  totalPosts: number;
 }
 
-export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
+export default function BlogList({
+  blogPosts,
+  featuredPosts,
+  initialTag,
+  currentPage,
+  totalPages,
+  totalPosts,
+}: BlogListProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTag, setSelectedTag] = useState<string | null>(
@@ -110,18 +124,10 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
     'newest',
   );
 
-  // Get all unique tags from blog posts
-  const allTags = useMemo(() => {
-    const tags = new Set<string>();
-    blogPosts.forEach((post) => {
-      post.tags.forEach((tag) => tags.add(tag));
-    });
-    return Array.from(tags).sort();
-  }, [blogPosts]);
-
   // Handle tag click - filter posts by tag
   const handleTagClick = (tag: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
+    e.preventDefault(); 
+    e.stopPropagation(); 
     setSelectedTag(selectedTag === tag ? null : tag);
     setSearchQuery('');
     setSelectedCategory('All');
@@ -135,7 +141,6 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
   const filteredPosts = useMemo(() => {
     let posts = blogPosts;
 
-    // Filter by tag first if selected
     if (selectedTag) {
       posts = posts.filter((post) =>
         post.tags.some(
@@ -148,7 +153,6 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
       posts = getBlogPostsByCategory(posts, selectedCategory);
     }
 
-    // Sort posts
     switch (sortBy) {
       case 'newest':
         posts = [...posts].sort(
@@ -172,8 +176,6 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
     return posts;
   }, [searchQuery, selectedCategory, selectedTag, sortBy, blogPosts]);
 
-  const featuredPosts = getFeaturedPosts(blogPosts).slice(0, 3);
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -182,136 +184,107 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
     });
   };
 
-  // Calculate blog stats
-  const totalArticles = blogPosts.length;
   const totalReadTime = blogPosts.reduce((acc, post) => acc + post.readTime, 0);
-  const categoriesCount = blogCategories.length - 1; // Exclude "All"
+  const categoriesCount = blogCategories.length - 1; 
+  
+  const buildPageHref = (targetPage: number) => {
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    if (targetPage <= 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(targetPage));
+    }
+    const query = params.toString();
+    return query ? `${pathname}?${query}` : pathname || '/blog';
+  };
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+      
       {/* Enhanced Hero Section */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        {/* Background Elements */}
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/10 to-slate-900/90"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iNCIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
-
-          {/* Floating Elements */}
-          <div className="absolute left-10 top-20 h-2 w-2 animate-pulse rounded-full bg-blue-400/30"></div>
-          <div
-            className="absolute right-20 top-32 h-1 w-1 animate-pulse rounded-full bg-purple-400/40"
-            style={{ animationDelay: '1s' }}
-          ></div>
-          <div
-            className="absolute bottom-40 left-16 h-1.5 w-1.5 animate-pulse rounded-full bg-blue-300/20"
-            style={{ animationDelay: '2s' }}
-          ></div>
-          <div
-            className="absolute right-32 top-40 h-1 w-1 animate-pulse rounded-full bg-purple-300/30"
-            style={{ animationDelay: '3s' }}
-          ></div>
+      <div className="relative overflow-hidden border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
-          {/* Header Content */}
+        <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-48 sm:px-6 lg:px-8">
+          
           <div className="mb-12 text-center lg:mb-16">
-            {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-600/20 px-4 py-2 backdrop-blur-sm">
-              <BookOpen className="h-4 w-4 text-blue-400" />
-              <span className="text-sm font-medium text-blue-300">
-                Import Insights & Expert Guides
-              </span>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+              <BookOpen className="h-3.5 w-3.5" />
+              Import Insights & Expert Guides
             </div>
 
-            {/* Main Title */}
-            <h1 className="mb-6 bg-gradient-to-r from-white via-blue-100 to-slate-300 bg-clip-text text-3xl leading-tight text-transparent sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl">
+            <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Import Insights{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">
                 Blog
               </span>
             </h1>
 
-            {/* Description */}
-            <p className="mx-auto mb-8 max-w-3xl px-4 text-base leading-relaxed text-slate-300 sm:px-0 sm:text-lg lg:text-xl">
+            <p className="mx-auto mb-12 max-w-3xl text-lg font-medium leading-relaxed text-slate-500 dark:text-slate-400 sm:text-xl">
               Master the art of international trade with expert insights,
               success stories, and practical guides to help you build a thriving
               import business.
             </p>
 
-            {/* Stats Row */}
-            <div className="mx-auto mb-10 grid max-w-2xl grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm lg:p-6">
-                <div className="mb-2 flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-blue-400 sm:h-6 sm:w-6" />
+            {/* Stats Row Bento */}
+            <div className="mx-auto mb-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+              {[
+                { icon: BookOpen, val: `${totalPosts}+`, label: 'Articles Published', color: 'text-indigo-600 dark:text-indigo-400' },
+                { icon: Clock, val: `${totalReadTime}+`, label: 'Minutes of Reading', color: 'text-brand-orange-500 dark:text-brand-orange-400' },
+                { icon: Tag, val: categoriesCount, label: 'Topics Covered', color: 'text-emerald-600 dark:text-emerald-400' }
+              ].map((stat, i) => (
+                <div key={i} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                  <div className={`mb-3 flex justify-center ${stat.color}`}>
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                  <div className="mb-1 text-3xl font-black text-slate-900 dark:text-white">
+                    {stat.val}
+                  </div>
+                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="mb-1 text-xl text-white sm:text-2xl lg:text-3xl">
-                  {totalArticles}+
-                </div>
-                <div className="text-xs text-slate-400 sm:text-sm">
-                  Articles
-                </div>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm lg:p-6">
-                <div className="mb-2 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-purple-400 sm:h-6 sm:w-6" />
-                </div>
-                <div className="mb-1 text-xl text-white sm:text-2xl lg:text-3xl">
-                  {totalReadTime}+
-                </div>
-                <div className="text-xs text-slate-400 sm:text-sm">
-                  Min Read
-                </div>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm lg:p-6">
-                <div className="mb-2 flex items-center justify-center">
-                  <Tag className="h-5 w-5 text-green-400 sm:h-6 sm:w-6" />
-                </div>
-                <div className="mb-1 text-xl text-white sm:text-2xl lg:text-3xl">
-                  {categoriesCount}
-                </div>
-                <div className="text-xs text-slate-400 sm:text-sm">
-                  Categories
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          {/* Enhanced Search and Filter Section */}
+          {/* Search and Filter Section */}
           <div className="mx-auto max-w-4xl">
-            {/* Mobile-First Search Bar */}
-            <div className="mb-6 rounded-2xl border border-white/20 bg-white/10 p-4 backdrop-blur-md sm:p-6">
+            <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
               <div className="space-y-4">
-                {/* Search Input - Full Width on Mobile */}
+                
+                {/* Search Input */}
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-slate-300" />
+                  <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-slate-400" />
                   <Input
                     placeholder="Search articles, authors, or topics..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="rounded-xl border-white/20 bg-white/10 py-3 pl-12 pr-4 text-base text-white placeholder-slate-300 focus:border-blue-400 focus:ring-blue-400"
+                    className="h-14 rounded-2xl border-slate-200 bg-slate-50 pl-12 pr-4 text-base text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950/50 dark:text-white dark:placeholder-slate-500 dark:focus:ring-indigo-400"
                   />
                 </div>
 
-                {/* Filter Row - Responsive Layout */}
+                {/* Filter Row */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                  {/* Category Filter */}
                   <div className="flex-1">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="flex w-full items-center justify-between gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white transition-colors hover:bg-white/20">
+                      <DropdownMenuTrigger className="flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:bg-slate-800">
                         <div className="flex items-center gap-2">
-                          <Filter className="h-4 w-4" />
-                          <span className="text-sm sm:text-base">
+                          <Filter className="h-4 w-4 text-slate-400" />
+                          <span className="text-sm font-semibold sm:text-base">
                             {selectedCategory}
                           </span>
                         </div>
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56 border-slate-700 bg-slate-800">
+                      <DropdownMenuContent className="w-56 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 shadow-xl">
                         {blogCategories.map((category) => (
                           <DropdownMenuItem
                             key={category}
                             onClick={() => setSelectedCategory(category)}
-                            className="cursor-pointer text-white hover:bg-slate-700"
+                            className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 py-2"
                           >
                             {category}
                           </DropdownMenuItem>
@@ -320,54 +293,43 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
                     </DropdownMenu>
                   </div>
 
-                  {/* Sort Options */}
                   <div className="flex-1 sm:flex-none">
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="flex w-full items-center justify-between gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white transition-colors hover:bg-white/20 sm:w-auto">
-                        <span className="text-sm sm:text-base">
-                          Sort:{' '}
-                          {sortBy === 'newest'
-                            ? 'Newest'
-                            : sortBy === 'oldest'
-                              ? 'Oldest'
-                              : 'Popular'}
+                      <DropdownMenuTrigger className="flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:bg-slate-800 sm:w-auto">
+                        <span className="text-sm font-semibold sm:text-base">
+                          Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'oldest' ? 'Oldest' : 'Popular'}
                         </span>
-                        <ChevronDown className="h-4 w-4" />
+                        <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-48 border-slate-700 bg-slate-800">
-                        <DropdownMenuItem
-                          onClick={() => setSortBy('newest')}
-                          className="cursor-pointer text-white hover:bg-slate-700"
-                        >
-                          Newest First
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setSortBy('oldest')}
-                          className="cursor-pointer text-white hover:bg-slate-700"
-                        >
-                          Oldest First
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => setSortBy('popular')}
-                          className="cursor-pointer text-white hover:bg-slate-700"
-                        >
-                          Most Popular
-                        </DropdownMenuItem>
+                      <DropdownMenuContent className="w-48 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 shadow-xl">
+                        {[
+                          { val: 'newest', label: 'Newest First' },
+                          { val: 'oldest', label: 'Oldest First' },
+                          { val: 'popular', label: 'Most Popular' }
+                        ].map(opt => (
+                          <DropdownMenuItem
+                            key={opt.val}
+                            onClick={() => setSortBy(opt.val as any)}
+                            className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 py-2"
+                          >
+                            {opt.label}
+                          </DropdownMenuItem>
+                        ))}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
 
                 {/* Quick Category Pills */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 pt-2">
                   {blogCategories.slice(1, 5).map((category) => (
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
-                      className={`rounded-full px-3 py-1.5 text-xs transition-colors sm:text-sm ${
+                      className={`rounded-lg px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
                         selectedCategory === category
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white/10 text-slate-300 hover:bg-white/20'
+                          ? 'bg-indigo-600 text-white shadow-md dark:bg-indigo-500'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
                       }`}
                     >
                       {category}
@@ -379,41 +341,41 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
 
             {/* Results Summary */}
             {(searchQuery || selectedCategory !== 'All' || selectedTag) && (
-              <div className="mb-8 text-center">
-                <p className="text-slate-300">
+              <div className="mt-8 text-center">
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                   {selectedTag ? (
                     <span className="inline-flex items-center gap-2">
                       Showing{' '}
-                      <span className="font-medium text-blue-400">
+                      <span className="font-black text-indigo-600 dark:text-indigo-400">
                         {filteredPosts.length}
                       </span>{' '}
                       articles tagged with{' '}
                       <Badge
-                        className="cursor-pointer bg-blue-600 text-white hover:bg-blue-700"
+                        className="cursor-pointer bg-indigo-100 text-indigo-700 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50"
                         onClick={clearTagFilter}
                       >
                         <Tag className="mr-1 h-3 w-3" />
                         {selectedTag}
-                        <span className="ml-1 text-xs">×</span>
+                        <span className="ml-1 text-xs font-black">×</span>
                       </Badge>
                     </span>
                   ) : searchQuery ? (
                     <>
                       Found{' '}
-                      <span className="font-medium text-blue-400">
+                      <span className="font-black text-indigo-600 dark:text-indigo-400">
                         {filteredPosts.length}
                       </span>{' '}
                       articles for "
-                      <span className="text-white">{searchQuery}</span>"
+                      <span className="text-slate-900 dark:text-white">{searchQuery}</span>"
                     </>
                   ) : (
                     <>
                       Showing{' '}
-                      <span className="font-medium text-blue-400">
+                      <span className="font-black text-indigo-600 dark:text-indigo-400">
                         {filteredPosts.length}
                       </span>{' '}
                       articles in{' '}
-                      <span className="text-white">{selectedCategory}</span>
+                      <span className="text-slate-900 dark:text-white">{selectedCategory}</span>
                     </>
                   )}
                 </p>
@@ -424,124 +386,65 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
       </div>
 
       {/* Featured Posts Section */}
-      {searchQuery === '' && selectedCategory === 'All' && (
-        <section className="bg-gradient-to-b from-slate-900 to-slate-800 py-12 sm:py-16 lg:py-20">
+      {searchQuery === '' && selectedCategory === 'All' && currentPage === 1 && !selectedTag && (
+        <section className="bg-slate-50 border-b border-slate-200 py-16 lg:py-24 dark:bg-slate-900/50 dark:border-slate-800">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mb-12 text-center lg:mb-16">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-yellow-400/30 bg-yellow-600/20 px-4 py-2 backdrop-blur-sm">
-                <TrendingUp className="h-4 w-4 text-yellow-400" />
-                <span className="text-sm font-medium text-yellow-300">
+            
+            <div className="mb-12 lg:mb-16">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 dark:border-brand-orange-900/30 dark:bg-brand-orange-900/10">
+                <TrendingUp className="h-4 w-4 text-brand-orange-600 dark:text-brand-orange-400" />
+                <span className="text-xs font-black uppercase tracking-widest text-brand-orange-700 dark:text-brand-orange-300">
                   Featured Content
                 </span>
               </div>
-              <h2 className="mb-4 text-2xl text-white sm:text-3xl lg:text-4xl">
+              <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white sm:text-4xl">
                 Must-Read Articles
               </h2>
-              <p className="mx-auto max-w-2xl text-base text-slate-300 sm:text-lg">
-                Don't miss these essential reads for import professionals
-              </p>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {featuredPosts.map((post, index) => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.slug}`}
-                  className="block"
-                >
-                  <Card className="group h-full cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
-                    <div className="relative overflow-hidden">
+                <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
+                  <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+                    
+                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <ImageWithFallback
                         src={post.image}
                         alt={post.title}
-                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute left-4 top-4">
-                        <Badge className="bg-blue-600 px-3 py-1 text-xs text-white sm:text-sm">
+                        <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white border-0 shadow-md">
                           Featured
                         </Badge>
                       </div>
-                      <div className="absolute right-4 top-4">
-                        <div className="rounded-full bg-black/50 px-2 py-1 backdrop-blur-sm">
-                          <span className="text-xs text-white">
-                            {index + 1}
-                          </span>
-                        </div>
-                      </div>
                     </div>
 
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {formatDate(post.publishDate)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {post.readTime} min
-                        </span>
+                    <div className="flex flex-1 flex-col p-6 sm:p-8">
+                      <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(post.publishDate)}</span>
+                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
                       </div>
 
-                      <h3 className="mb-3 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
+                      <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
                         {post.title}
                       </h3>
 
-                      <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
+                      <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                         {post.excerpt}
                       </p>
 
-                      {/* Tags */}
-                      {post.tags.length > 0 && (
-                        <div className="mb-4 flex flex-wrap gap-1.5">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
-                                selectedTag === tag
-                                  ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                                  : 'text-slate-300'
-                              }`}
-                              onClick={(e) => handleTagClick(tag, e)}
-                            >
-                              <Tag className="mr-1 h-2.5 w-2.5" />
-                              {tag}
-                            </Badge>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <span className="text-xs text-slate-500">
-                              +{post.tags.length - 3} more
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2 sm:gap-3">
-                          <ImageWithFallback
-                            src={post.author.avatar}
-                            alt={post.author.name}
-                            className="h-8 w-8 rounded-full"
-                          />
+                      <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
+                        <div className="flex items-center gap-3">
+                          <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
                           <div>
-                            <p className="text-sm text-white">
-                              {post.author.name}
-                            </p>
-                            <p className="text-xs text-slate-400">
-                              {post.author.role}
-                            </p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">{post.author.name}</p>
+                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
                           </div>
                         </div>
-
-                        <Badge
-                          variant="secondary"
-                          className="bg-slate-700 text-xs text-slate-300"
-                        >
-                          {post.category}
-                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </article>
                 </Link>
               ))}
             </div>
@@ -550,136 +453,120 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
       )}
 
       {/* All Posts Section */}
-      <section className="py-12 sm:py-16 lg:py-20">
+      <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex items-center justify-between lg:mb-12">
-            <div>
-              <h2 className="mb-2 text-2xl text-white sm:text-3xl">
-                {searchQuery
-                  ? `Search Results (${filteredPosts.length})`
-                  : 'All Articles'}
-              </h2>
-              {selectedCategory !== 'All' && (
-                <p className="text-slate-300">
-                  Showing articles in:{' '}
-                  <span className="text-blue-400">{selectedCategory}</span>
-                </p>
-              )}
-            </div>
+          <div className="mb-10 flex items-center justify-between">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">
+              {searchQuery ? 'Search Results' : 'Latest Articles'}
+            </h2>
           </div>
 
           {filteredPosts.length > 0 ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {filteredPosts.map((post) => (
-                <Link
-                  key={post.id}
-                  href={`/blog/${post.slug}`}
-                  className="block"
-                >
-                  <Card className="group h-full cursor-pointer overflow-hidden border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-white/20">
-                    <div className="relative overflow-hidden">
-                      <ImageWithFallback
-                        src={post.image}
-                        alt={post.title}
-                        className="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-52 lg:h-48"
-                      />
-                      {post.featured && (
+            <>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+                {filteredPosts.map((post) => (
+                  <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
+                    <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+                      
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                        <ImageWithFallback
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
                         <div className="absolute left-4 top-4">
-                          <Badge className="bg-blue-600 text-xs text-white">
-                            Featured
+                          <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
+                            {post.category}
                           </Badge>
                         </div>
-                      )}
-                    </div>
-
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="mb-3 flex items-center gap-3 text-xs text-slate-400 sm:gap-4 sm:text-sm">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {formatDate(post.publishDate)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                          {post.readTime} min
-                        </span>
                       </div>
 
-                      <h3 className="mb-3 line-clamp-2 text-lg leading-tight text-white transition-colors group-hover:text-blue-400 sm:text-xl">
-                        {post.title}
-                      </h3>
-
-                      <p className="mb-4 line-clamp-3 text-sm leading-relaxed text-slate-300 sm:text-base">
-                        {post.excerpt}
-                      </p>
-
-                      {/* Tags */}
-                      {post.tags.length > 0 && (
-                        <div className="mb-4 flex flex-wrap gap-1.5">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className={`cursor-pointer border-slate-600 text-xs transition-colors hover:border-blue-500 hover:bg-blue-600/20 hover:text-blue-400 ${
-                                selectedTag === tag
-                                  ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                                  : 'text-slate-300'
-                              }`}
-                              onClick={(e) => handleTagClick(tag, e)}
-                            >
-                              <Tag className="mr-1 h-2.5 w-2.5" />
-                              {tag}
-                            </Badge>
-                          ))}
-                          {post.tags.length > 3 && (
-                            <span className="text-xs text-slate-500">
-                              +{post.tags.length - 3} more
-                            </span>
-                          )}
+                      <div className="flex flex-1 flex-col p-6 sm:p-8">
+                        <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(post.publishDate)}</span>
+                          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
                         </div>
-                      )}
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ImageWithFallback
-                            src={post.author.avatar}
-                            alt={post.author.name}
-                            className="h-8 w-8 rounded-full"
-                          />
-                          <div>
-                            <p className="text-sm text-white">
-                              {post.author.name}
-                            </p>
-                            <p className="text-xs text-slate-400">
-                              {post.author.role}
-                            </p>
+                        <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                          {post.title}
+                        </h3>
+
+                        <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                          {post.excerpt}
+                        </p>
+
+                        {post.tags.length > 0 && (
+                          <div className="mb-6 flex flex-wrap gap-2">
+                            {post.tags.slice(0, 3).map((tag) => (
+                              <span
+                                key={tag}
+                                onClick={(e) => handleTagClick(tag, e)}
+                                className={`inline-flex cursor-pointer items-center rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                                  selectedTag === tag
+                                    ? 'bg-indigo-600 text-white dark:bg-indigo-500'
+                                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
+                                }`}
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
+                          <div className="flex items-center gap-3">
+                            <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
+                            <div>
+                              <p className="text-sm font-bold text-slate-900 dark:text-white">{post.author.name}</p>
+                              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
+                            </div>
                           </div>
                         </div>
-
-                        <Badge
-                          variant="secondary"
-                          className="bg-slate-700 text-xs text-slate-300"
-                        >
-                          {post.category}
-                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+
+              {searchQuery === '' && selectedCategory === 'All' && !selectedTag && totalPages > 1 && (
+                <div className="mt-16 flex justify-center">
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          href={currentPage > 1 ? buildPageHref(currentPage - 1) : '#'}
+                          className={currentPage > 1 ? 'text-slate-600 dark:text-slate-300' : 'pointer-events-none opacity-50'}
+                        />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <span className="px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+                          Page {currentPage} of {totalPages}
+                        </span>
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationNext
+                          href={currentPage < totalPages ? buildPageHref(currentPage + 1) : '#'}
+                          className={currentPage < totalPages ? 'text-slate-600 dark:text-slate-300' : 'pointer-events-none opacity-50'}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                </div>
+              )}
+            </>
           ) : (
-            <div className="py-16 text-center">
-              <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
-                <Search className="mx-auto mb-4 h-16 w-16 text-slate-400" />
-                <h3 className="mb-2 text-xl text-white">
-                  {blogPosts.length === 0
-                    ? 'No blog posts published yet'
-                    : 'No articles found'}
+            <div className="py-20 text-center">
+              <div className="mx-auto max-w-lg rounded-[32px] border border-slate-200 bg-white p-12 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800/50">
+                  <Search className="h-10 w-10 text-slate-400" />
+                </div>
+                <h3 className="mb-3 text-2xl font-black text-slate-900 dark:text-white">
+                  {blogPosts.length === 0 ? 'No posts published yet' : 'No articles found'}
                 </h3>
-                <p className="mb-6 text-slate-300">
+                <p className="mb-8 text-base font-medium text-slate-500 dark:text-slate-400">
                   {blogPosts.length === 0
                     ? 'Check back soon for exciting content about importing and international trade.'
-                    : 'Try adjusting your search terms or browse all categories'}
+                    : 'Try adjusting your search terms or browse all categories.'}
                 </p>
                 {blogPosts.length > 0 && (
                   <Button
@@ -688,7 +575,7 @@ export default function BlogList({ blogPosts, initialTag }: BlogListProps) {
                       setSelectedCategory('All');
                       setSelectedTag(null);
                     }}
-                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    className="h-12 rounded-xl bg-indigo-600 px-8 text-base font-bold text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                   >
                     View All Articles
                   </Button>

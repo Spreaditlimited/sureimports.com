@@ -69,6 +69,31 @@ export interface BlogPost {
   seo?: BlogSEO;
 }
 
+export interface BlogListPost extends Omit<BlogPost, 'content'> {
+  content: string;
+}
+
+export interface BlogListPageResult {
+  posts: BlogListPost[];
+  featuredPosts: BlogListPost[];
+  page: number;
+  pageSize: number;
+  totalPosts: number;
+  totalPages: number;
+}
+
+function toLitePost(dbBlog: DbBlog): BlogListPost {
+  const transformed = transformBlogPost(dbBlog);
+  return {
+    ...transformed,
+    content: '',
+    excerpt:
+      transformed.excerpt && transformed.excerpt !== 'No excerpt available'
+        ? transformed.excerpt
+        : `Read insights from ${transformed.title}.`,
+  };
+}
+
 // Database publisher model
 interface DbPublisher {
   pidPublisher: string;
@@ -305,11 +330,170 @@ export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
   }
 }
 
+export async function fetchPublishedBlogsLite(
+  page = 1,
+  pageSize = 9,
+): Promise<BlogListPageResult> {
+  try {
+    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+    const safePageSize =
+      Number.isFinite(pageSize) && pageSize > 0
+        ? Math.min(9, Math.floor(pageSize))
+        : 9;
+    const where = {
+      blogPublished: true,
+      xStaus: 'active',
+    };
+
+    const totalPosts = await prisma.blog.count({ where });
+
+    const totalPages = Math.max(1, Math.ceil(totalPosts / safePageSize));
+    const resolvedPage = Math.min(safePage, totalPages);
+    const postSelect = {
+      id: true,
+      pidBlog: true,
+      blogTitle: true,
+      blogSlug: true,
+      blogPublished: true,
+      blogFeatured: true,
+      blogImage: true,
+      blogBy: true,
+      publisherId: true,
+      blogExt1: true,
+      blogExt2: true,
+      xStaus: true,
+      createdAt: true,
+      updatedAt: true,
+      publisher: {
+        select: {
+          pidPublisher: true,
+          publisherName: true,
+          publisherSlug: true,
+          publisherEmail: true,
+          publisherBio: true,
+          publisherRole: true,
+          publisherImage: true,
+          publisherSocialX: true,
+          publisherSocialLinkedin: true,
+          publisherSocialFacebook: true,
+          publisherSocialInstagram: true,
+          publisherWebsite: true,
+        },
+      },
+      category: {
+        select: {
+          categoryName: true,
+        },
+      },
+    } as const;
+
+    const blogs = await prisma.blog.findMany({
+      where,
+      select: postSelect,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: safePageSize,
+      skip: (resolvedPage - 1) * safePageSize,
+    });
+
+    const featuredBlogs = await prisma.blog.findMany({
+      where: {
+        ...where,
+        OR: [{ blogFeatured: true }, { blogExt2: { contains: '"featured":true' } }],
+      },
+      select: postSelect,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: 3,
+    });
+
+    const posts = blogs.map((blog) => toLitePost(blog as DbBlog));
+    const featuredPosts = featuredBlogs.map((blog) => toLitePost(blog as DbBlog));
+
+    return {
+      posts,
+      featuredPosts,
+      page: resolvedPage,
+      pageSize: safePageSize,
+      totalPosts,
+      totalPages,
+    };
+  } catch (error) {
+    console.error('Error fetching lite blogs:', error);
+    return {
+      posts: [],
+      featuredPosts: [],
+      page: 1,
+      pageSize: 9,
+      totalPosts: 0,
+      totalPages: 1,
+    };
+  }
+}
+
+export async function fetchPublishedBlogSlugs(): Promise<string[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+      },
+      select: {
+        blogSlug: true,
+        pidBlog: true,
+      },
+    });
+
+    return blogs
+      .map((blog) => blog.blogSlug || blog.pidBlog)
+      .filter((slug): slug is string => Boolean(slug && slug.length > 0));
+  } catch (error) {
+    console.error('Error fetching blog slugs:', error);
+    return [];
+  }
+}
+
+export async function fetchRelatedBlogs(
+  category: string,
+  excludeId: string,
+  limit = 3,
+): Promise<BlogPost[]> {
+  try {
+    const blogs = await prisma.blog.findMany({
+      where: {
+        blogPublished: true,
+        xStaus: 'active',
+        pidBlog: { not: excludeId },
+        category: {
+          is: {
+            categoryName: category,
+          },
+        },
+      },
+      include: {
+        publisher: true,
+        category: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      take: limit,
+    });
+
+    return blogs.map((blog) => transformBlogPost(blog as DbBlog));
+  } catch (error) {
+    console.error('Error fetching related blogs:', error);
+    return [];
+  }
+}
+
 export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
   try {
     const blog = await prisma.blog.findFirst({
       where: {
-        blogSlug: slug,
+        OR: [{ blogSlug: slug }, { pidBlog: slug }],
         blogPublished: true,
         xStaus: 'active',
       },

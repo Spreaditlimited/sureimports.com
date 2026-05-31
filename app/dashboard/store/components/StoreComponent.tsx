@@ -13,7 +13,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import ProductsList from './ProductsList';
 import { BiMobile } from 'react-icons/bi';
 import {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import OrderCard from '@/app/dashboard/shipping-only/components/OrderCardShippingOnly';
 
 interface Order {
@@ -21,6 +21,19 @@ interface Order {
   description: string;
   status: string;
   createdAt: string;
+  invoices?: Array<{
+    pidPayment: string;
+    pidInvoice?: string;
+    amount?: string;
+    currency_type?: string;
+    payment_status?: string;
+    payment_type?: string;
+    invoiceNumber?: string;
+    accessToken?: string | null;
+    source?: string;
+    createdAt?: string | null;
+    issuedAt?: string | null;
+  }>;
 }
 
 interface PaymentSectionProps {
@@ -30,6 +43,10 @@ interface PaymentSectionProps {
 
 function Orders({ initialOrders }: PaymentSectionProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+  }, [initialOrders]);
 
   const handleDelete = (id: number) => {
     setOrders(orders.filter((order) => order.id !== id));
@@ -42,13 +59,20 @@ function Orders({ initialOrders }: PaymentSectionProps) {
   //special update
   return (
     <>
-      <div className="flex w-full flex-col gap-3">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            Shipping Requests
+          </h2>
+        </div>
+
+        <div className="flex w-full flex-col gap-4">
         {orderArray.map((order, index) => {
           const serialNumber = index + 1; // Auto-incrementing serial number
           return (
             <OrderCard
               serialNumber={serialNumber}
-              key={index}
+              key={`${order.id}-${order.pidShippingOnly}-${index}`}
               id={order.id}
               pidShippingOnly={order.pidShippingOnly}
               pidUser={order.pidUser}
@@ -65,9 +89,12 @@ function Orders({ initialOrders }: PaymentSectionProps) {
               description={order.description}
               status={order.status}
               createdAt={order.createdAt}
+              invoices={order.invoices}
+              onDelete={handleDelete}
             />
           );
         })}
+        </div>
       </div>
 
       {/* <div className="flex w-full flex-col gap-3">
@@ -106,6 +133,3 @@ function Orders({ initialOrders }: PaymentSectionProps) {
 }
 
 export default Orders;
-function useEffect(arg0: () => void, arg1: never[]) {
-  throw new Error('Function not implemented.');
-}

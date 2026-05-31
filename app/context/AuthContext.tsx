@@ -9,6 +9,7 @@ interface User {
   userEmail: string;
   userFirstname?: string;
   userLastname?: string;
+  userPhone?: string;
   phone?: string;
   email?: string;
   name?: string;
@@ -104,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (res.ok) {
       setUser(data.user);
 
-      if (data.statusx === 'RESET') {
+      if (data.statusx === 'MIGRATION_REQUIRED' || data.statusx === 'RESET') {
         router.push('/auth/welcome-reset-password?email=' + userEmail);
       } else if (data.statusx === 'NOT_VERIFIED') {
         router.push('/auth/account-not-activated/?email=' + userEmail);

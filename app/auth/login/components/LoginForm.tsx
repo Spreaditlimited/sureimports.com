@@ -1,372 +1,196 @@
 'use client';
 
-import * as React from 'react';
-import { useRouter } from 'next/navigation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Control, useForm, UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
-import Image from 'next/image';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Card,
-  CardHeader,
-  CardFooter,
-  CardContent,
-} from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { Separator } from '@/components/ui/separator';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { toast } from 'sonner';
+import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/app/context/AuthContext';
 
-////////////////////// ZOD DATA SCHEMA //////////////////////
-const formSchema = z.object({
-  email: z.string().email({
-    message: 'Invalid email address.',
-  }),
-  password: z.string().min(6, {
-    message: '',
-  }),
-  keepMeSignedIn: z.boolean().optional(),
-});
-////////////////////// INPUT FIELD COMPONENTS //////////////////////
+export default function LoginForm() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-type FormValues = z.infer<typeof formSchema>;
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-interface InputFieldProps {
-  name: keyof FormValues;
-  control: Control<FormValues>;
-  label: string;
-  type: string;
-  placeholder: string;
-  iconSrc: string;
-  description?: string;
-  password?: boolean;
-  isPasswordVisible?: boolean;
-  togglePasswordVisibility?: () => void;
-}
-
-const InputField: React.FC<InputFieldProps> = ({
-  name,
-  control,
-  label,
-  type,
-  placeholder,
-  iconSrc,
-  description,
-  password = false,
-  isPasswordVisible = false,
-  togglePasswordVisibility,
-}) => (
-  <FormField
-    control={control}
-    name={name}
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel className="text-sm text-slate-600">{label}</FormLabel>
-        <FormControl>
-          <div className="relative">
-            <Image
-              loading="lazy"
-              src={iconSrc}
-              alt=""
-              width={20}
-              height={20}
-              className="absolute m-5 h-5 w-5 shrink-0"
-            />
-
-            {password && (
-              <Image
-                loading="lazy"
-                src={
-                  isPasswordVisible
-                    ? '/icons/visible.svg'
-                    : '/icons/invisible.png'
-                }
-                alt=""
-                width={20}
-                height={20}
-                className="absolute right-0 m-5 h-5 w-5 shrink-0 cursor-pointer"
-                onClick={togglePasswordVisibility}
-              />
-            )}
-
-            <Input
-              type={isPasswordVisible ? 'text' : type}
-              placeholder={placeholder}
-              aria-label={label}
-              className="mt-2 flex h-[60px] items-center rounded-[10px] border-none px-[50px]"
-              {...field}
-              value={
-                typeof field.value === 'boolean'
-                  ? field.value.toString()
-                  : field.value
-              }
-            />
-          </div>
-        </FormControl>
-        {description && <FormDescription>{description}</FormDescription>}
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-);
-
-////////////////////// FORM COMPONENT //////////////////////
-interface LoginPageProps {
-  message: string;
-  form: UseFormReturn<FormValues>;
-  isPasswordVisible: boolean;
-  isLoading: boolean;
-  togglePasswordVisibility: () => void;
-  onSubmit: (data: FormValues) => Promise<void>;
-}
-
-const LoginPage: React.FC<LoginPageProps> = ({
-  message,
-  form,
-  isPasswordVisible,
-  isLoading,
-  togglePasswordVisibility,
-  onSubmit,
-}) => (
-  <div className="relative flex min-h-screen flex-col items-center justify-center bg-white">
-    <Image
-      loading="lazy"
-      src="/images/background.png"
-      alt=""
-      layout="fill"
-      objectFit="cover"
-      className="absolute inset-0 h-full w-full object-cover"
-    />
-    <div className="relative flex w-full max-w-full flex-col items-center px-2 sm:px-16">
-      <Card className="relative my-5 w-full max-w-lg rounded-3xl bg-white p-5 shadow-2xl sm:p-10">
-        <CardHeader className="mt-0 p-0 text-center">
-          <Link href="/" className="self-center">
-            <Image
-              loading="lazy"
-              src="/images/svg-logo.svg"
-              alt="Logo"
-              width={144}
-              height={48}
-              className="mb-4 h-12 w-96 self-center"
-            />
-          </Link>
-          <div className="text-sm font-bold text-indigo-800">Welcome Back!</div>
-          <h1 className="mt-1.5 text-3xl font-extrabold text-slate-800">
-            Login with your email
-          </h1>
-        </CardHeader>
-        <CardContent className="mb-0 mt-10 px-0 py-0">
-          <Form {...form}>
-            <form
-              className="flex flex-col space-y-5"
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <InputField
-                name="email"
-                control={form.control}
-                label="Email/Username"
-                type="email"
-                placeholder="Enter Your Email"
-                iconSrc="/icons/mail.svg"
-              />
-              <InputField
-                name="password"
-                control={form.control}
-                label="Password"
-                type="password"
-                password={true}
-                isPasswordVisible={isPasswordVisible}
-                togglePasswordVisibility={togglePasswordVisibility}
-                placeholder="*****************"
-                iconSrc="/icons/password.svg"
-                description=""
-              />
-
-              <FormField
-                control={form.control}
-                name="keepMeSignedIn"
-                render={({ field }) => (
-                  <FormItem className="mt-4 flex items-center justify-between text-base font-medium text-slate-600">
-                    <Label className="flex items-center gap-2">
-                      <Checkbox
-                        checked={field.value || false}
-                        onCheckedChange={field.onChange}
-                      />
-                      <span className="text-sm text-slate-600 sm:text-base">
-                        Keep me signed in
-                      </span>
-                    </Label>
-                    <Link
-                      href="/auth/forgot-password"
-                      className="text-sm text-indigo-800 sm:text-base"
-                    >
-                      Forgot Password?
-                    </Link>
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="mt-8 h-14 py-3.5"
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className="animate-spin" /> : 'Login'}
-              </Button>
-              {message && <p className="text-red-600">{message}</p>}
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="mt-5 flex w-full flex-col items-center space-y-5 px-0 py-0">
-          <div className="text-base font-medium">
-            <span className="text-base font-medium text-slate-600">
-              Don’t have an account?{' '}
-            </span>
-            <Link
-              href="/auth/signup"
-              className="text-base font-semibold text-indigo-800"
-            >
-              Register Now
-            </Link>
-          </div>
-
-          {/* <div className="flex h-[20px] w-full items-center text-slate-600">
-            <div className="w-full">
-              <Separator className="" />
-            </div>
-            <div className="mx-4 w-6 text-base font-normal text-slate-600">
-              OR
-            </div>
-            <div className="w-full">
-              <Separator className="" />
-            </div>
-          </div> */}
-
-          {/* <Button className="flex h-14 w-full items-center rounded-xl bg-slate-100 py-3.5 hover:bg-slate-200">
-            <Image
-              loading="lazy"
-              src="/icons/google.svg"
-              alt="Google icon"
-              width={24}
-              height={24}
-              className="mr-2 h-6 w-6"
-            />
-            <span className="text-base font-semibold text-black">
-              Login with Google
-            </span>
-          </Button> */}
-        </CardFooter>
-      </Card>
-    </div>
-  </div>
-);
-
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-  userImage: string;
-  userStatus: string;
-}
-
-//API RESPONSE
-interface ApiResponse {
-  messagex: any;
-  statusx: string;
-  successx: boolean;
-  userx: User;
-  // Add other properties as needed
-}
-
-////////////////////// MAIN FORM : LOGIN //////////////////////
-const LoginPageContainer: React.FC = () => {
-  useEffect;
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    mode: 'onChange',
-    defaultValues: { email: '', password: '', keepMeSignedIn: false },
-  });
-
-  const { user, login } = useAuth();
-  const router = useRouter();
-  const [isLoading, setLoading] = React.useState(false);
-  const [isPasswordVisible, setPasswordVisible] = React.useState(false);
-  const [message, setMessage] = React.useState('');
-  //const [userEmail, setUserEmail] = useState('');
-  //const [userPassword, setUserPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const togglePasswordVisibility = () => {
-    setPasswordVisible(!isPasswordVisible);
-  };
-
-  // SUBMIT FORM
-  const onSubmit = async (data: FormValues) => {
-    setLoading(true);
-
-    try {
-      setLoading(true);
-      await login(data.email, data.password);
-    } catch (err) {
-      setLoading(false);
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
+    if (!email || !password) {
+      toast.error('Please enter both email and password.');
+      return;
     }
 
-    // try {
-    //   const res = await fetch('/api/auth/login', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(data),
-    //   });
-
-    //   const response: ApiResponse = await res.json();
-    //   //alert('==================ddd==================='+response);
-    //   if (response.statusx === 'RESET') {
-    //     router.push('/auth/welcome-reset-password?email=' + data.email);
-    //   } else if (response.statusx === 'NOT_VERIFIED') {
-    //     router.push('/auth/account-not-activated/?email=' + data.email);
-    //   } else if (response.successx) {
-    //     login(response.userx);
-    //   } else {
-    //     setMessage(response.messagex?.message1 || 'Login failed');
-    //   }
-    // } catch (error) {
-    //   console.error(error);
-    //   setMessage('An error occurred');
-    // } finally {
-    //   setLoading(false);
-    // }
+    setIsLoading(true);
+    try {
+      await login(email, password);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Invalid credentials. Please try again.';
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <>
-      <LoginPage
-        message={error}
-        form={form}
-        isPasswordVisible={isPasswordVisible}
-        isLoading={isLoading}
-        togglePasswordVisibility={togglePasswordVisibility}
-        onSubmit={onSubmit}
-      />
-    </>
-  );
-};
+    <div className="flex min-h-screen w-full">
+      <div className="relative hidden w-1/2 flex-col justify-between bg-slate-900 p-12 lg:flex xl:p-16">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/hero-background-1.png"
+            alt="Global Logistics Port"
+            fill
+            className="object-cover opacity-30 mix-blend-luminosity"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
+        </div>
 
-export default LoginPageContainer;
+        <div className="relative z-10">
+          <Link href="/">
+            <Image
+              src="/images/svg-logo-white.svg"
+              alt="Sure Imports"
+              width={180}
+              height={40}
+              className="transition-opacity hover:opacity-80"
+            />
+          </Link>
+        </div>
+
+        <div className="relative z-10 max-w-xl">
+          <h1 className="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-white xl:text-5xl">
+            GLOBAL LOGISTICS,{' '}
+            <span className="text-brand-orange-500">STREAMLINED.</span>
+          </h1>
+          <p className="text-lg font-medium leading-relaxed text-slate-300">
+            Securely manage your global import network from one centralized
+            platform. Source, track, and trade with absolute confidence.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex w-full items-center justify-center bg-[#fcfcfd] px-4 dark:bg-slate-950 sm:px-8 lg:w-1/2">
+        <div className="w-full max-w-[440px]">
+          <div className="mb-8 flex justify-center lg:hidden">
+            <Link href="/">
+              <Image
+                src="/images/new/images/logo.png"
+                alt="Sure Imports"
+                width={160}
+                height={36}
+              />
+            </Link>
+          </div>
+
+          <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-slate-200/40 dark:border dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-12 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:border-none dark:lg:bg-transparent">
+            <div className="mb-8 text-center lg:text-left">
+              <p className="mb-2 text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Welcome Back!
+              </p>
+              <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                Login to your account
+              </h2>
+            </div>
+
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                  Email / Username
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-4 text-sm transition-all focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm transition-all focus-visible:ring-0 focus-visible:ring-offset-0 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 text-sm">
+                <label className="flex cursor-pointer items-center gap-2 font-medium text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-0 dark:border-slate-700 dark:bg-slate-900"
+                  />
+                  <span>Keep me signed in</span>
+                </label>
+                <Link
+                  href="/auth/forgot-password"
+                  className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+
+              <div className="pt-4">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="h-14 w-full rounded-xl bg-indigo-800 text-base font-bold text-white shadow-xl shadow-indigo-900/20 transition-all hover:bg-indigo-900 active:scale-[0.98] disabled:opacity-70 dark:bg-indigo-600 dark:hover:bg-indigo-700"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    'Login to Dashboard'
+                  )}
+                </Button>
+              </div>
+            </form>
+
+            <div className="mt-8 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
+              Don't have an account?{' '}
+              <Link
+                href="/auth/signup"
+                className="font-bold text-brand-orange-500 transition-colors hover:text-brand-orange-600"
+              >
+                Register Now
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

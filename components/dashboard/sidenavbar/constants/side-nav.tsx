@@ -56,6 +56,12 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/corporate-gifts',
     color: 'text-white',
   },
+  {
+    title: 'Ship with us',
+    icon: Package2,
+    href: '/dashboard/shipping-only',
+    color: 'text-white',
+  },
   // {
   //   title: 'Buy Phones & Laptops',
   //   icon: Smartphone,
@@ -143,6 +149,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'Corporate Gifts',
     icon: Package2,
     href: '/dashboard/corporate-gifts',
+    color: 'text-white',
+  },
+  {
+    title: 'Ship with us',
+    icon: Package2,
+    href: '/dashboard/shipping-only',
     color: 'text-white',
   },
   // {

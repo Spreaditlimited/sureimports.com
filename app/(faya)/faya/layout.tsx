@@ -4,7 +4,7 @@ import './globals.css';
 import NavBar from '@/components/home/NavBar';
 import { CookieConsent } from '@/components/home/CookieConsent';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import ScrollToTopButton from '@/components/home/scrollToTopButton';
+import { BackToTopButton } from '@/app/(home)/components/BackToTopButton';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 
@@ -37,7 +37,7 @@ export default function RootLayout({
         />
         {/* <LiveChat /> */}
         <Footer />
-        {/* <ScrollToTopButton /> */}
+        <BackToTopButton />
       </div>
     </>
   );

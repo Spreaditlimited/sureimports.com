@@ -9,9 +9,10 @@ import { useAuth } from '@/app/context/AuthContext';
 
 interface Record {
   requestReceivedOrder: number;
-  readyToShipOrder: number;
   productShippedOrder: number;
   productArrivedOrder: number;
+  invoicedOrder: number;
+  paidOrder: number;
   productDeliveredOrder: number;
   cancelledRequestOrder: number;
 }
@@ -39,11 +40,12 @@ export const RecordCountShippingOnlyProvider = ({
   const [recordx, setRecord] = useState<Record | null>(null);
 
   //get user id and product status
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [pidUser, setPidUser] = useState(user?.pidUser);
+  const { user } = useAuth();
+  const pidUser = user?.pidUser;
   const statusx = 'request-received';
 
   useEffect(() => {
+    if (!pidUser) return;
     const fetchRecord = async () => {
       const res = await fetch(
         `/api/get-data/shipping-only-count/${pidUser}/${statusx}`,
@@ -52,7 +54,7 @@ export const RecordCountShippingOnlyProvider = ({
       setRecord(data);
     };
     fetchRecord();
-  }, []);
+  }, [pidUser, statusx]);
 
   //alert(recordx?.requestReceivedOrder);
 

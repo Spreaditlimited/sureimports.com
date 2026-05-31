@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -28,8 +28,10 @@ import { toast } from 'sonner';
 
 export default function ShopComponent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { cartCount } = useShopCart();
+  const shopBasePath = pathname?.startsWith('/shop') ? '/shop' : '/dashboard/shop';
 
   // State
   const [products, setProducts] = useState<any[]>([]);
@@ -128,7 +130,7 @@ export default function ShopComponent() {
     if (maxPrice < 999999999) params.set('maxPrice', maxPrice.toString());
     if (sortBy !== 'newest') params.set('sortBy', sortBy);
     if (currentPage > 1) params.set('page', currentPage.toString());
-    router.push(`/dashboard/shop?${params.toString()}`);
+    router.push(`${shopBasePath}?${params.toString()}`);
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });

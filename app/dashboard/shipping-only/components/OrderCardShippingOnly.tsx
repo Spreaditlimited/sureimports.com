@@ -1,101 +1,24 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-
+import { useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  Hash,
+  MapPin,
+  Phone,
+  Scale,
+  Trash2,
+  Truck,
+  Boxes,
+} from 'lucide-react';
 import { toast } from 'sonner';
-import { useAuth } from '@/app/context/AuthContext';
-import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
-import { useModal } from '@/app/context/ModalContext';
-
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { EnumLike, z } from 'zod';
-import { Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/_lib/utils';
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from '@/components/ui/command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Input } from '@/components/ui/input-with-dark-mode';
-import { CommandList } from 'cmdk';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Textarea } from '@/components/ui/textarea';
-import { useRouter } from 'next/navigation';
-import { Label } from '@/components/ui/label';
+import { useAuth } from '@/app/context/AuthContext';
 
-const formSchema = z.object({
-  pidUser: z.string(),
-  pidShippingOnly: z.string(),
-  shippingName: z.string().min(10, {
-    message: 'Name is required',
-  }),
-  shippingEmail: z.string().email({
-    message: 'Email is required',
-  }),
-  whatsappNumber: z
-    .string()
-    .min(10, { message: 'WhatsApp Number must not be empty' })
-    .regex(/^\d+$/, { message: 'WhatsApp Number must be a number' }),
-  shippingTo: z.string().min(10, 'select the country you are shipping to'),
-  grossWeight: z.string().min(10, 'select the gross weight of the product'),
-  trackingNumber: z.string().optional(),
-  shippingPlan: z.enum([
-    'Normal Air Cargo',
-    'Express Air Cargo',
-    'Special Air Cargo',
-    'Sea Shipping',
-  ]),
-  expectedShipments: z.string().optional(),
-  wantProductVerification: z.boolean().default(false),
-  wantConsolidation: z.boolean().default(false),
-  multipleSuppliers: z.boolean().default(false),
-  description: z.string().min(10, 'Description is required'),
-});
-
-const plan = [
-  { label: 'Normal Air Cargo', value: 'Normal Air Cargo' },
-  { label: 'Express Air Cargo', value: 'Express Air Cargo' },
-  { label: 'Special Air Cargo', value: 'Special Air Cargo' },
-  { label: 'Sea Shipping', value: 'Sea Shipping' },
-] as const;
-
-const shippingfrom = [
-  { label: 'USA', value: 'USA' },
-  { label: 'China', value: 'China' },
-  { label: 'UAE', value: 'UAE' },
-  { label: 'Nigeria', value: 'Nigeria' },
-  { label: 'Italy', value: 'Italy' },
-  { label: 'UK', value: 'UK' },
-] as const;
-
-// Define an interface for the props
-interface ProductsProps {
+interface ShippingOnlyOrderCardProps {
   serialNumber: number;
   id: number;
   pidShippingOnly: string;
@@ -113,29 +36,44 @@ interface ProductsProps {
   description: string;
   status: string;
   createdAt: string;
+  invoices?: Array<{
+    pidPayment: string;
+    pidInvoice?: string;
+    amount?: string;
+    currency_type?: string;
+    payment_status?: string;
+    payment_type?: string;
+    invoiceNumber?: string;
+    accessToken?: string | null;
+    source?: string;
+    createdAt?: string | null;
+    issuedAt?: string | null;
+  }>;
+  onDelete?: (id: number) => void;
 }
 
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-}
+const STATUS_STEPS = [
+  'Request Received',
+  'Shipped',
+  'Arrived',
+  'Invoiced',
+  'Paid',
+  'Completed',
+] as const;
 
-//API RESPONSE
-interface ApiResponse {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
+const STATUS_TO_STEP: Record<string, (typeof STATUS_STEPS)[number]> = {
+  'request-received': 'Request Received',
+  'ready-to-ship': 'Shipped',
+  'product-shipped': 'Shipped',
+  'product-arrived': 'Arrived',
+  invoiced: 'Invoiced',
+  paid: 'Paid',
+  'product-delivered': 'Completed',
+};
 
-// Use the interface to annotate the props of the component
-//const OrderCard: React.FC<ProductsProps> = ({ products }) => {
-const OrderCard: React.FC<ProductsProps> = ({
-  serialNumber,
+export default function OrderCardShippingOnly({
   id,
   pidShippingOnly,
-  pidUser,
   whatsappNumber,
   shippingName,
   shippingTo,
@@ -149,507 +87,314 @@ const OrderCard: React.FC<ProductsProps> = ({
   description,
   status,
   createdAt,
-}) => {
-  const url = `product-description/${pidShippingOnly}`;
-
-  const [isOpen, setIsOpen] = useState<{ isOpen: boolean }>({ isOpen: false });
-  const [isCurrencySelected, setIsCurrencySelected] = useState<true | false>(
-    true,
-  );
-  const [amount, setAmount] = useState<number>(35000);
-  const [currency, setCurrency] = useState<string>('default');
-  //initialize alert system
-  const navigateWithAlert = useNavigationWithAlert();
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  //const [userData, setUserData] = useState<userData>(); //DATA FROM API CALL
-  const [pidUserx, setPidUser] = useState(user?.pidUser);
-  const { isModalOpen, openModal, closeModal } = useModal();
-
-  //let productID = 'SL' + new Date().getTime().toString();
-  const [email, setEmail] = useState(user?.userEmail);
-  const [message, setMessage] = React.useState('');
+  invoices,
+  onDelete,
+}: ShippingOnlyOrderCardProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const { user } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      pidUser: pidUser,
-      pidShippingOnly: pidShippingOnly,
-      whatsappNumber: '',
-      shippingName: '',
-      shippingTo: '',
-      grossWeight: '',
-      trackingNumber: '',
-      shippingPlan: shippingPlan as any,
-      expectedShipments,
-      wantProductVerification: false,
-      wantConsolidation: false,
-      multipleSuppliers: false,
-      description: '',
-    },
-  });
+  const lowerStatus = String(status || '').toLowerCase();
+  const statusClass =
+    lowerStatus === 'product-delivered'
+      ? 'bg-emerald-50 text-emerald-700 ring-emerald-600/20 dark:bg-emerald-950/40 dark:text-emerald-300'
+      : lowerStatus === 'request-cancelled'
+        ? 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950/40 dark:text-rose-300'
+        : 'bg-blue-50 text-blue-700 ring-blue-600/20 dark:bg-blue-950/40 dark:text-blue-300';
 
-  const handleCurrencyChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setCurrency(event.target.value);
-    setIsCurrencySelected(false);
-  };
+  const labelFromStatus =
+    lowerStatus === 'product-delivered'
+      ? 'Completed'
+      : String(status || '')
+          .replace(/-/g, ' ')
+          .replace(/\b\w/g, (char) => char.toUpperCase());
+  const normalizedStep = STATUS_TO_STEP[lowerStatus];
+  const activeIndex = normalizedStep ? STATUS_STEPS.indexOf(normalizedStep) : -1;
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen({ isOpen: open });
-  };
+  const boolLabel = (value: string) =>
+    String(value).toLowerCase() === 'true' ? 'Yes' : 'No';
+
+  const canDelete = pathname.includes('/request-received');
 
   const handleDelete = async () => {
-    //console.log('deleted');
-
+    if (!user?.pidUser) return;
+    setDeleting(true);
     try {
-      setIsOpen({ isOpen: false });
-      toast.info('Processing . . .');
       const res = await fetch(
-        `/api/crud/shipping-only-delete/${pidUserx}/${pidShippingOnly}`,
+        `/api/crud/shipping-only-delete/${user.pidUser}/${pidShippingOnly}`,
       );
-
-      //check if request was successful
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
+      const data = await res.json();
+      if (data?.responsex?.status === 'SUCCESS') {
+        toast.success('Request deleted successfully.');
+        onDelete?.(id);
+        router.refresh();
+        return;
       }
-
-      // GET & PROCESS RESPONSE FROM API
-      const data: ApiResponse = await res.json();
-
-      if (data.responsex.status == 'SUCCESS') {
-        navigateWithAlert(
-          '/dashboard/shipping-only/pending',
-          'success',
-          'Request has been deleted!',
-        );
-      }
-      // if (data.responsex.status == 'SUCCESS') {
-      //   toast.success(data.responsex.message);
-      // }
-      if (data.responsex.status == 'FAILED') {
-        toast.warning(data.responsex.message);
-      }
-    } catch (error: any) {
-      console.log(error.message);
+      toast.error(data?.responsex?.message || 'Unable to delete request.');
+    } catch {
+      toast.error('Unable to delete request right now.');
     } finally {
-      //setLoading(false);
+      setDeleting(false);
     }
   };
 
-  const onKeep = () => {
-    console.log('kept');
-    setIsOpen({ isOpen: false });
-  };
-
   return (
-    <>
-      <div className="pl-4 pr-4">
-        <Accordion type="single" collapsible>
-          <AccordionItem value="item-1">
-            <div className="flex flex-col items-start justify-between gap-3 rounded-xl bg-white px-5 py-5 transition-all duration-200 dark:bg-[#161629] sm:flex-row xl:h-[100px] xl:items-center">
-              <div>
-                <div className="flex flex-row gap-4">
-                  <div className="flex h-[60px] w-[60px] items-center justify-center rounded-lg bg-slate-100 text-center text-4xl font-bold capitalize text-slate-300 dark:bg-slate-800 dark:text-white">
-                    {serialNumber}
-                  </div>
-                  <div className="flex flex-col justify-center gap-1">
-                    <div className="text-xl font-bold capitalize text-slate-800 dark:text-slate-200">
-                      {shippingName}
-                    </div>
-                    <div className="text-base font-normal text-slate-950 dark:text-slate-100">
-                      Order Id: <b>{pidShippingOnly}</b>
-                      <span className="text-slate-600">
-                        {' '}
-                        ( Shipping To: <b>{shippingTo}</b>, Phone:
-                        <b>{whatsappNumber}</b>)
+    <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-md dark:border-slate-700 dark:bg-[#161629]">
+      <div className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center">
+        <div className="lg:w-1/4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">
+              {pidShippingOnly}
+            </span>
+            <span className="h-1 w-1 rounded-full bg-slate-300" />
+            <span className="text-[10px] font-medium text-slate-400">
+              {new Date(createdAt).toLocaleDateString()}
+            </span>
+          </div>
+          <h3 className="mt-1 text-lg font-bold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white">
+            {shippingName || 'Shipping Request'}
+          </h3>
+          <p className="mt-1 line-clamp-1 text-sm text-slate-500 dark:text-slate-300">
+            {description}
+          </p>
+        </div>
+
+        <div className="grid flex-1 grid-cols-2 gap-4 border-slate-100 py-1 lg:grid-cols-3 lg:border-l lg:border-r lg:px-8 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-slate-50 p-2 dark:bg-slate-800">
+              <MapPin className="h-4 w-4 text-slate-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase text-slate-400">
+                Destination
+              </p>
+              <p className="line-clamp-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {shippingTo}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-slate-50 p-2 dark:bg-slate-800">
+              <Truck className="h-4 w-4 text-slate-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase text-slate-400">
+                Shipping Plan
+              </p>
+              <p className="line-clamp-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {shippingPlan}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="rounded-lg bg-slate-50 p-2 dark:bg-slate-800">
+              <Scale className="h-4 w-4 text-slate-500" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase text-slate-400">
+                Gross Weight
+              </p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {grossWeight}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3 lg:w-56 lg:justify-end">
+          <div className={cn('rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset', statusClass)}>
+            {labelFromStatus}
+          </div>
+          {canDelete && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="rounded-lg bg-rose-50 p-2 text-rose-600 transition hover:bg-rose-100 disabled:opacity-50 dark:bg-rose-950/30 dark:text-rose-300 dark:hover:bg-rose-950/50"
+              title="Delete request"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setExpanded((prev) => !prev)}
+            className="rounded-lg bg-slate-100 p-2 text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+            title={expanded ? 'Hide details' : 'View details'}
+          >
+            {expanded ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-[#0f1020]">
+          {lowerStatus !== 'request-cancelled' && lowerStatus !== 'cancelled-request' && (
+            <div className="mb-4 rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-[#161629]">
+              <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                {STATUS_STEPS.map((step, idx) => {
+                  const isPast = idx < activeIndex;
+                  const isCurrent = idx === activeIndex;
+                  return (
+                    <div
+                      key={step}
+                      className="flex min-w-0 flex-1 basis-0 items-center gap-2"
+                    >
+                      <div
+                        className={cn(
+                          'relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors',
+                          isPast
+                            ? 'bg-blue-600 text-white'
+                            : isCurrent
+                              ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600 dark:bg-blue-900 dark:text-blue-200'
+                              : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300',
+                        )}
+                      >
+                        {isPast ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+                      </div>
+                      <span
+                        className={cn(
+                          'truncate text-[10px] font-bold uppercase tracking-tight',
+                          isCurrent
+                            ? 'text-blue-600 dark:text-blue-300'
+                            : 'text-slate-400 dark:text-slate-500',
+                        )}
+                      >
+                        {step}
                       </span>
+                      {idx !== STATUS_STEPS.length - 1 ? (
+                        <div className="mx-1 h-[1px] flex-1 bg-slate-200 dark:bg-slate-800" />
+                      ) : null}
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex flex-col items-end gap-3 max-sm:w-full md:flex-row">
-                <div className="flex gap-3">
-                  <Dialog open={isOpen.isOpen} onOpenChange={handleOpenChange}>
-                    <DialogTrigger asChild>
-                      <Button className="item-ceneter flex h-11 w-11 justify-center rounded-lg bg-red-100 p-0 font-normal hover:bg-red-200">
-                        <Image
-                          src="/icons/delete.svg"
-                          alt="delete"
-                          width={20}
-                          height={20}
-                          className="cursor-pointer"
-                        />
-                      </Button>
-                    </DialogTrigger>
-
-                    <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[20px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
-                      <Image
-                        src="/icons/deletewarning.svg"
-                        alt="delete"
-                        width={100}
-                        height={100}
-                        className="cursor-pointer"
-                      />
-                      <div className="w-[280px] text-center text-2xl font-bold text-slate-800 dark:text-white">
-                        Are you sure you want to delete?
-                      </div>
-                      <div className="flex w-80 text-center text-sm text-slate-600">
-                        This will delete this record and you cannot recover it.
-                      </div>
-                      <div className="flex gap-3">
-                        <Button
-                          onClick={onKeep}
-                          className="h-[49px] items-center justify-center gap-2.5 rounded-xl bg-slate-100 px-[30px] py-[15px] text-base text-slate-600 hover:bg-slate-200 lg:w-[162px]"
-                        >
-                          No! keep it
-                        </Button>
-                        <Button
-                          onClick={handleDelete}
-                          className="h-[49px] items-center justify-center gap-2.5 rounded-xl bg-red-100 px-[30px] py-[15px] text-base text-red-500 hover:bg-red-200 lg:w-[162px]"
-                        >
-                          {' '}
-                          Yes! Remove
-                        </Button>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-
-                  <AccordionTrigger className="item-ceneter flex h-11 w-11 justify-center rounded-lg bg-slate-100 p-0 text-slate-600 hover:bg-black/10"></AccordionTrigger>
-                </div>
+                  );
+                })}
               </div>
             </div>
+          )}
 
-            <AccordionContent className="hide-scrollbar rounded-2xl bg-white dark:bg-[#161629]">
-              {/* <BankDepositForm /> */}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                WhatsApp Number
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <Phone className="h-4 w-4 text-slate-400" />
+                {whatsappNumber || 'N/A'}
+              </p>
+            </div>
 
-              {/*.................................. FORM BLOCK STARTS.................................... */}
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Tracking Number
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <Hash className="h-4 w-4 text-slate-400" />
+                {trackingNumber || 'Not provided'}
+              </p>
+            </div>
 
-              <div className="flex max-h-full w-96 flex-col gap-[20px] rounded-xl bg-white p-[25px] dark:bg-[#161629] max-xl:w-full xl:w-full">
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Shipment details submitted
-                </div>
-                <div className="text-base text-slate-600">
-                  These are the details you sent to us. A member of our team is
-                  already working with you.
-                </div>
-                <div className="">
-                  <Form {...form}>
-                    <form
-                      //onSubmit={form.handleSubmit(onSubmit)}
-                      className="flex flex-col gap-4"
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Expected Shipments
+              </p>
+              <p className="mt-1 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <Boxes className="h-4 w-4 text-slate-400" />
+                {expectedShipments || 'Not specified'}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Product Verification
+              </p>
+              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {boolLabel(wantProductVerification)}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Consolidation
+              </p>
+              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {boolLabel(wantConsolidation)}
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-[#161629]">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                Multiple Suppliers
+              </p>
+              <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {boolLabel(multipleSuppliers)}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-[#161629]">
+            <p className="mb-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Notes
+            </p>
+            <p className="text-sm text-slate-700 dark:text-slate-200">
+              {description || 'No additional details provided.'}
+            </p>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-[#161629]">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+              Invoices
+            </p>
+            {Array.isArray(invoices) && invoices.length > 0 ? (
+              <div className="mt-2 space-y-2">
+                {invoices.map((invoice) => {
+                  const invoiceLink = invoice.accessToken
+                    ? `/invoice/${encodeURIComponent(String(invoice.accessToken))}`
+                    : null;
+                  const invoiceStatus = String(invoice.payment_status || 'PENDING').toUpperCase();
+                  return (
+                    <div
+                      key={`${invoice.pidPayment}-${invoice.pidInvoice || ''}`}
+                      className="rounded-lg border border-slate-200 p-3 dark:border-slate-700"
                     >
-                      <FormField
-                        control={form.control}
-                        name="whatsappNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <div className="item-center relative flex">
-                                <Image
-                                  src="/icons/name.svg"
-                                  alt="search"
-                                  width={20}
-                                  height={20}
-                                  className="absolute m-2 xl:m-5"
-                                />
-                                <Input
-                                  placeholder={whatsappNumber}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                  disabled
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
+                      <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                        {invoice.invoiceNumber || invoice.pidPayment} • {invoice.currency_type || 'NGN'} {invoice.amount || '0.00'}
+                      </p>
+                      <p className="mt-1 text-[11px] text-slate-500">{invoiceStatus}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {invoiceLink && (
+                          <a
+                            href={invoiceLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500"
+                          >
+                            View Invoice
+                          </a>
                         )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="shippingName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="item-center relative flex">
-                              <Image
-                                src="/icons/specialsourcing/email.svg"
-                                alt="search"
-                                width={20}
-                                height={20}
-                                className="absolute m-2 xl:m-5"
-                              />
-
-                              <FormControl>
-                                <Input
-                                  placeholder={shippingName}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                />
-                              </FormControl>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="shippingTo"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="item-center relative flex">
-                              <Image
-                                src="/icons/country.svg"
-                                alt="search"
-                                width={20}
-                                height={20}
-                                className="absolute m-2 xl:m-5"
-                              />
-
-                              <FormControl>
-                                <Input
-                                  placeholder={shippingTo}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                />
-                              </FormControl>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="grossWeight"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <div className="item-center relative flex">
-                                <Image
-                                  src="/icons/specialsourcing/weight.svg"
-                                  alt="search"
-                                  width={20}
-                                  height={20}
-                                  className="absolute m-2 xl:m-5"
-                                />
-                                <Input
-                                  placeholder={grossWeight}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                />
-                              </div>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="trackingNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="item-center relative flex">
-                              <Image
-                                src="/icons/specialsourcing/email.svg"
-                                alt="search"
-                                width={20}
-                                height={20}
-                                className="absolute m-2 xl:m-5"
-                              />
-
-                              <FormControl>
-                                <Input
-                                  placeholder={trackingNumber}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                />
-                              </FormControl>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="shippingPlan"
-                        render={({ field }) => (
-                          <FormItem>
-                            <div className="item-center relative flex">
-                              <Image
-                                src="/icons/shipping.svg"
-                                alt="search"
-                                width={20}
-                                height={20}
-                                className="absolute m-2 xl:m-5"
-                              />
-
-                              <FormControl>
-                                <Input
-                                  placeholder={shippingPlan}
-                                  className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                                  {...field}
-                                  disabled
-                                />
-                              </FormControl>
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="wantProductVerification"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            {/* <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                                aria-checked
-                              />
-                            </FormControl> */}
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Want product verification?{' '}
-                                {wantProductVerification ? (
-                                  <div className="text-green-500"> - Yes</div>
-                                ) : (
-                                  <div className="text-red-500"> - No</div>
-                                )}
-                              </FormLabel>
-                              {field.value && (
-                                <p className="text-sm text-muted-foreground">
-                                  You will be charged 5RMB per kg.
-                                </p>
-                              )}
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="wantConsolidation"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            {/* <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl> */}
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Want consolidation?{' '}
-                                {wantConsolidation ? (
-                                  <div className="text-green-500"> - Yes</div>
-                                ) : (
-                                  <div className="text-red-500"> - No</div>
-                                )}
-                              </FormLabel>
-                              {field.value && (
-                                <p className="text-sm text-muted-foreground">
-                                  You will be charged 5RMB per kg.
-                                </p>
-                              )}
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="multipleSuppliers"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                            {/* <FormControl>
-                              <Checkbox
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl> */}
-                            <div className="space-y-1 leading-none">
-                              <FormLabel>
-                                Are you sending products from multiple
-                                suppliers?{' '}
-                                {multipleSuppliers ? (
-                                  <div className="text-green-500">
-                                    {' '}
-                                    - Yes, Qty: {expectedShipments ?? 0}
-                                  </div>
-                                ) : (
-                                  <div className="text-red-500"> - No</div>
-                                )}
-                              </FormLabel>
-                            </div>
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* {form.watch('multipleSuppliers') && (
-              <FormField
-                control={form.control}
-                name="multipleSuppliers"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="number"
-                        placeholder="How many shipments are we expecting?"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )} */}
-
-                      <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormControl>
-                              <Textarea
-                                placeholder={description}
-                                className="resize-none"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      {/* <div className="flex flex-col">
-              <Button type="submit" className="h-[54px]">
-                Submit
-              </Button>
-            </div> */}
-                    </form>
-                  </Form>
-                </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+            ) : (
+              <p className="mt-2 text-xs text-slate-500">No invoices yet.</p>
+            )}
+          </div>
 
-              {/*.................................. FORM BLOCK ENDS .................................... */}
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-      </div>
-    </>
+          <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+            <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+            <span>Created on {new Date(createdAt).toLocaleString()}</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
-};
-
-export default OrderCard;
-function setCurrency(value: string) {
-  throw new Error('Function not implemented.');
 }

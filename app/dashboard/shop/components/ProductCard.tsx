@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ShoppingCart, Check, Sparkles } from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
@@ -13,13 +13,15 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const { addToCart, isInCart } = useShopCart();
+  const shopBasePath = pathname?.startsWith('/shop') ? '/shop' : '/dashboard/shop';
 
   const imageUrl = resolveMediaUrl(product.productImage) || '/placeholder.svg?height=240&width=320';
   const inCart = isInCart(product.pidProduct);
 
   const handleViewDetails = () => {
-    router.push(`/dashboard/shop/${product.pidProduct}`);
+    router.push(`${shopBasePath}/${product.pidProduct}`);
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {

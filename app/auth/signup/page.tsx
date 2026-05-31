@@ -2,18 +2,15 @@ import React from 'react';
 import SignUpForm from './components/SignUpForm';
 import type { Metadata } from 'next';
 
-let titlex = 'SignUp Page';
-let descriptionx =
-  'Import from China. We guarantee the quality and accuracy of every product we source for you from China.';
 export const metadata: Metadata = {
-  title: titlex,
-  description: descriptionx,
+  title: 'Create an Account | Sure Imports',
+  description: 'Join Sure Imports and start managing your global import network. We guarantee the quality and accuracy of every product we source for you from China.',
   openGraph: {
-    title: titlex,
-    description: descriptionx,
+    title: 'Create an Account | Sure Imports',
+    description: 'Join Sure Imports and start managing your global import network. We guarantee the quality and accuracy of every product we source for you from China.',
     images: [
       {
-        url: 'https://www.sureimports.com/images/svg-logo-white.svg',
+        url: '/images/og-image.png',
         width: 1200,
         height: 630,
         alt: 'Sure Imports',
@@ -22,12 +19,10 @@ export const metadata: Metadata = {
   },
 };
 
-const SignUpFormx = () => {
+export default function RegisterPage() {
   return (
-    <div>
+    <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       <SignUpForm />
-    </div>
+    </main>
   );
-};
-
-export default SignUpFormx;
+}

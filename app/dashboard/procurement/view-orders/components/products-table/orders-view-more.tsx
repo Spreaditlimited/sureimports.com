@@ -505,10 +505,6 @@ export default function MoreOrders({
                 <span className="font-semibold text-slate-900 dark:text-white">{destinationCountry}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Port of Exit</span>
-                <span className="font-semibold text-slate-900 dark:text-white">HONG KONG</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-slate-500">Est. Total Weight</span>
                 <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(productsTotalWeight)} kg</span>
               </div>

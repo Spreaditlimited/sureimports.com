@@ -8,7 +8,7 @@ import {
   useEffect,
 } from 'react';
 
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import Loader from '@/components/uix/Loader';
 
 interface Record {

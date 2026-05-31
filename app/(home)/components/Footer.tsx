@@ -1,401 +1,118 @@
 'use client';
 
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import {
-  Facebook,
-  Instagram,
-  Youtube,
-  Mail,
-  MapPin,
-  Phone,
-} from 'lucide-react';
-import TikTokIcon from './icons/TikTokIcon';
 import { useState } from 'react';
-import logo from '../public/images/logo.png';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { Facebook, Instagram, Youtube, Mail, MapPin, Phone } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface FooterProps {
-  onNavigateToShippingPolicy?: () => void;
-  onNavigateToWarrantyPolicy?: () => void;
-  onNavigateToTermsConditions?: () => void;
-  onNavigateToPrivacyPolicy?: () => void;
-  onNavigateToAbout?: () => void;
-}
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import TikTokIcon from './icons/TikTokIcon';
 
-//USER DATA
-interface User {
-  userFirstname: string;
-  userLastname: string;
-  email: string;
-  phone: string;
-  password: string;
-  userAffiliateRef: string;
-}
-
-//API RESPONSE
-interface ApiResponse {
-  messagex: any;
-  statusx: string;
-  successx: boolean;
-  userx: User;
-  // Add other properties as needed
-}
-
-export default function Footer({
-  onNavigateToShippingPolicy,
-  onNavigateToWarrantyPolicy,
-  onNavigateToTermsConditions,
-  onNavigateToPrivacyPolicy,
-  onNavigateToAbout,
-}: FooterProps) {
+export default function Footer() {
   const [email, setEmail] = useState('');
-  const [service, setService] = useState('SUREIMPORTS');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [message, setMessage] = useState('');
-  const [messageStatus, setMessageStatus] = useState('');
-
   const router = useRouter();
-
-  // Email validation function
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
-  };
-
-  const handleEmailChange = (value: string) => {
-    setEmail(value);
-  };
 
   const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    toast.info('Subscribing to email list...');
-
-    // Only proceed if email is valid (button should be disabled if not)
-    if (!email.trim() || !isValidEmail(email)) {
-      return;
-    }
-
-    //MAKE REQUEST ATTEMPT
+    if (!email.trim()) return;
+    
+    setIsSubmitting(true);
+    toast.loading('Subscribing...');
     try {
-      setIsSubmitting(true);
-      //MAKE REQUEST
       const res = await fetch('/api/subscriptions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          service,
-        }),
+        body: JSON.stringify({ email, service: 'SUREIMPORTS' }),
       });
-
-      const data: ApiResponse = await res.json();
-
+      const data = await res.json();
       if (data.statusx === 'SUCCESS') {
-        //router.push('/auth/account-creation-success');
-        setMessageStatus('SUCCESS');
-        setMessage(data.messagex);
-        setIsSubscribed(true);
-        setIsSubmitting(false);
-
-        //toast.success(data.messagex);
+        toast.success(data.messagex || 'Subscribed successfully!');
+        setEmail('');
       } else {
-        //toast.error(data.messagex);
-        setMessageStatus('FAILED');
-        setMessage(data.messagex);
-        setIsSubscribed(false);
+        toast.error(data.messagex || 'Subscription failed.');
       }
-    } catch (error: any) {
-      //setError(error.message);
-      setMessage(error);
-      setIsSubscribed(false);
-      setIsSubmitting(false);
+    } catch {
+      toast.error('An error occurred.');
     } finally {
-      //setIsLoading(false);
-      //alert('Taking Final Action');
-      setIsSubscribed(false);
       setIsSubmitting(false);
     }
-
-    // Simulate API call to email list service
-    // try {
-    //   //await new Promise(resolve => setTimeout(resolve, 1000));
-
-    //   setIsSubmitting(true);
-    //   // Simulate successful subscription
-    //   setIsSubscribed(true);
-    //   setEmail("");
-
-    //   // Reset success message after 3 seconds
-    //   setTimeout(() => {
-    //     setIsSubscribed(false);
-    //   }, 3000);
-
-    // } catch (error) {
-    //     console.error("Subscription error:", error);
-    // } finally {
-    //     setIsSubmitting(false);
-    // }
   };
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950">
-      {/* Main Footer Content */}
-      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-          {/* Company Info */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-2">
-              <Image
-                src="/images/new/images/logo.png"
-                alt="Sure Imports Logo"
-                width={170}
-                height={24}
-                // priority
-                // loading="eager"
-                draggable={false}
-                // className="w-full h-full object-contain"
+    <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
+          
+          <div className="space-y-6">
+            <Image src="/images/svg-logo-white.svg" alt="Sure Imports" width={160} height={30} />
+            <p className="text-sm leading-relaxed">
+              Your trusted partner for China product sourcing. We connect businesses with verified manufacturers, ensuring quality and reliability.
+            </p>
+          </div>
+
+          <div>
+            <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-white">Contact</h3>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-start gap-3">
+                <Mail className="h-5 w-5 shrink-0 text-indigo-400" />
+                <a href="mailto:hello@sureimports.com" className="hover:text-white transition-colors">hello@sureimports.com</a>
+              </li>
+              <li className="flex items-start gap-3">
+                <Phone className="h-5 w-5 shrink-0 text-indigo-400" />
+                <div>
+                  <p>0803 764 9956</p>
+                  <p>0806 458 3664</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 shrink-0 text-indigo-400" />
+                <p>5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria</p>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-white">Legal</h3>
+            <ul className="space-y-3 text-sm">
+              <li><button onClick={() => router.push('/about')} className="hover:text-white transition-colors">About Us</button></li>
+              <li><button onClick={() => router.push('/terms-and-conditions')} className="hover:text-white transition-colors">Terms & Conditions</button></li>
+              <li><button onClick={() => router.push('/privacy-policy')} className="hover:text-white transition-colors">Privacy Policy</button></li>
+              <li><button onClick={() => router.push('/warranty-policy')} className="hover:text-white transition-colors">Warranty Policy</button></li>
+              <li><button onClick={() => router.push('/shipping-policy')} className="hover:text-white transition-colors">Shipping Policy</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-white">Stay Updated</h3>
+            <form onSubmit={handleSubscribe} className="mb-6 flex gap-2">
+              <Input
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="h-10 border-slate-800 bg-slate-900 text-sm text-white"
               />
-            </div>
-            <p className="text-sm leading-relaxed text-gray-400">
-              Your trusted partner for China product sourcing. We connect
-              businesses with verified Chinese suppliers and manufacturers,
-              ensuring quality and reliability.
-            </p>
-          </div>
-
-          {/* Contact */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-white">Contact</h3>
-            <div className="space-y-3">
-              <div className="flex items-start space-x-2">
-                <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
-                <a
-                  href="mailto:hello@sureimports.com"
-                  className="text-sm text-gray-400 transition-colors hover:text-blue-400"
-                >
-                  hello@sureimports.com
-                </a>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-start space-x-2">
-                  <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
-                  <div className="text-sm">
-                    <p className="font-medium text-white">Nigeria Office:</p>
-                    <p className="text-gray-400">
-                      5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria
-                    </p>
-                  </div>
-                </div>
-
-                <div className="ml-6 space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-3 w-3 text-gray-500" />
-                    <span className="text-xs text-gray-400">08037649956</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-3 w-3 text-gray-500" />
-                    <span className="text-xs text-gray-400">08064583664</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Phone className="h-3 w-3 text-gray-500" />
-                    <span className="text-xs text-gray-400">08068397263</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-2">
-                <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-400" />
-                <div className="text-sm">
-                  <p className="font-medium text-white">China Office:</p>
-                  <p className="text-gray-400">
-                    广州市白云区机场路111号建发广场5FB3-1
-                  </p>
-                </div>
-              </div>
+              <Button type="submit" disabled={isSubmitting} className="h-10 bg-brand-orange-500 text-white hover:bg-brand-orange-600 border-0">
+                Subscribe
+              </Button>
+            </form>
+            
+            <div className="flex gap-4">
+              <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-blue-500"><Facebook className="h-5 w-5" /></a>
+              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-pink-500"><Instagram className="h-5 w-5" /></a>
+              <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-white"><TikTokIcon className="h-5 w-5" /></a>
+              <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" className="text-slate-500 hover:text-red-500"><Youtube className="h-5 w-5" /></a>
             </div>
           </div>
 
-          {/* Legal & Support */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-white">Legal & Support</h3>
-            <div className="space-y-2">
-              <button
-                onClick={() => router.push('/about')}
-                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                About
-              </button>
-              <button
-                onClick={() => router.push('/terms-and-conditions')}
-                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Terms & Conditions
-              </button>
-              <button
-                onClick={() => router.push('/privacy-policy')}
-                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => router.push('/warranty-policy')}
-                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Warranty Policy
-              </button>
-              <button
-                onClick={() => router.push('/shipping-policy')}
-                className="block text-left text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Shipping Policy
-              </button>
-              <a
-                href="https://affiliate.sureimports.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-sm text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Affiliates
-              </a>
-            </div>
-          </div>
-
-          {/* Stay Connected */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-white">Stay Connected</h3>
-            <p className="text-sm text-gray-400">
-              Get the latest updates on China sourcing opportunities and
-              industry insights.
-            </p>
-
-            {/* Email Subscription */}
-            <div className="space-y-2">
-              {messageStatus == 'SUCCESS' && (
-                <p className="text-center text-sm text-green-500">{message}</p>
-              )}
-
-              {messageStatus == 'FAILED' && (
-                <p className="text-center text-sm text-red-500">{message}</p>
-              )}
-
-              {isSubscribed ? (
-                <div className="rounded-lg border border-green-600/20 bg-green-600/10 p-3">
-                  <p className="text-center text-sm text-green-400">
-                    Thank you for subscribing! 🎉
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <form onSubmit={handleSubscribe} className="flex space-x-2">
-                    <div className="min-w-0 flex-1">
-                      <Input
-                        type="email"
-                        placeholder="Your email"
-                        value={email}
-                        onChange={(e) => handleEmailChange(e.target.value)}
-                        disabled={isSubmitting}
-                        className="w-full border-slate-700 bg-slate-900 text-sm text-white placeholder:text-gray-500 disabled:opacity-50"
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={
-                        isSubmitting || !email.trim() || !isValidEmail(email)
-                      }
-                      className="flex-shrink-0 bg-blue-600 px-4 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {isSubmitting ? 'Submitting...' : 'Subscribe'}
-                    </Button>
-                  </form>
-                </div>
-              )}
-            </div>
-
-            {/* Social Links */}
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-white">Follow Us</p>
-              <div className="flex space-x-3">
-                <a
-                  href="https://www.facebook.com/share/1BEjP95X7E/?mibextid=wwXIfr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-blue-600"
-                >
-                  <Facebook className="h-4 w-4 text-gray-400 hover:text-white" />
-                </a>
-                <a
-                  href="https://www.instagram.com/sureimport?igsh=NjRtaHJpbXlnMGxo&utm_source=qr"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-pink-600"
-                >
-                  <Instagram className="h-4 w-4 text-gray-400 hover:text-white" />
-                </a>
-                <a
-                  href="https://www.tiktok.com/@tochukwunkwocha?_t=ZS-8yeC5xnNBmH&_r=1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-black"
-                >
-                  <TikTokIcon className="h-4 w-4 text-gray-400 hover:text-white" />
-                </a>
-                <a
-                  href="https://youtube.com/@sureimports?si=gP4cw3zUC1iQN3Rd"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-800 transition-colors hover:bg-red-600"
-                >
-                  <Youtube className="h-4 w-4 text-gray-400 hover:text-white" />
-                </a>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
-
-      {/* Bottom Bar */}
-      <div className="border-t border-slate-800 bg-slate-950">
-        <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
-            <p className="text-sm text-gray-500">
-              © 2025 Sure Imports Limited. All rights reserved.
-            </p>
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 sm:justify-end">
-              <button
-                onClick={() => router.push('/terms-and-conditions')}
-                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
-              >
-                Terms & Conditions
-              </button>
-              <button
-                onClick={() => router.push('/privacy-policy')}
-                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
-              >
-                Privacy Policy
-              </button>
-              <button
-                onClick={() => router.push('/shipping-policy')}
-                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
-              >
-                Shipping Policy
-              </button>
-              <button
-                //onClick={onNavigateToWarrantyPolicy}
-                onClick={() => router.push('/warranty-policy')}
-                className="text-sm text-gray-500 transition-colors hover:text-blue-400"
-              >
-                Warranty Policy
-              </button>
-            </div>
-          </div>
-        </div>
+      
+      <div className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs">
+        <p>© {new Date().getFullYear()} Sure Imports Limited. All rights reserved.</p>
       </div>
     </footer>
   );

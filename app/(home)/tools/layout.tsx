@@ -1,10 +1,12 @@
-import Navigation from '../components/Navigation';
-import Footer from '../components/Footer';
+import * as React from 'react';
 import type { Metadata } from 'next';
+
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
   title: {
-    default: 'Import Tools',
+    default: 'Import Tools | Sure Imports',
     template: '%s | Import Tools | Sure Imports',
   },
   description:
@@ -20,9 +22,9 @@ export default function ToolsLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen flex-col bg-slate-900">
-      <Navigation />
-      <main className="flex-grow">{children}</main>
+    <div className="flex min-h-screen flex-col bg-[#fcfcfd] dark:bg-slate-950">
+      <Navbar />
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );

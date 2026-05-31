@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { 
@@ -13,7 +13,8 @@ import {
   CheckCircle2, 
   Clock, 
   MapPin, 
-  ChevronRight,
+  ChevronDown,
+  ChevronUp,
   Info,
   Layers
 } from 'lucide-react';
@@ -114,6 +115,7 @@ export default function CorporateGiftsDashboardPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showOfflineModal, setShowOfflineModal] = useState(false);
+  const [expandedRequests, setExpandedRequests] = useState<Record<string, boolean>>({});
   const [offlineMessage, setOfflineMessage] = useState(
     'You appear to be offline. Check your internet connection and try again.',
   );
@@ -597,6 +599,7 @@ export default function CorporateGiftsDashboardPage() {
             requests.map((request) => {
               const activeIndex = STATUS_STEPS.indexOf(request.status as any);
               const isCancelled = String(request.status || '').toLowerCase() === 'cancelled';
+              const isExpanded = !!expandedRequests[request.pidRequest];
               return (
                 <div key={request.pidRequest} className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:shadow-md dark:border-slate-700 dark:bg-[#161629]">
                   <div className="flex flex-col p-6 lg:flex-row lg:items-center lg:gap-8">
@@ -637,7 +640,7 @@ export default function CorporateGiftsDashboardPage() {
                     </div>
 
                     {/* Status Badge */}
-                    <div className="flex items-center justify-between pt-4 lg:pt-0 lg:w-48">
+                    <div className="flex items-center justify-between gap-3 pt-4 lg:w-56 lg:justify-end lg:pt-0">
                       <div className={`rounded-full px-3 py-1 text-xs font-bold ring-1 ring-inset ${
                         isCancelled
                           ? 'bg-rose-50 text-rose-700 ring-rose-600/20 dark:bg-rose-950/50 dark:text-rose-300'
@@ -647,49 +650,67 @@ export default function CorporateGiftsDashboardPage() {
                       }`}>
                         {request.status}
                       </div>
-                      <ChevronRight className="h-5 w-5 text-slate-300 group-hover:translate-x-1 transition-transform" />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setExpandedRequests((prev) => ({
+                            ...prev,
+                            [request.pidRequest]: !prev[request.pidRequest],
+                          }))
+                        }
+                        className="rounded-lg bg-slate-100 p-2 text-slate-600 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                        title={isExpanded ? 'Hide details' : 'View details'}
+                      >
+                        {isExpanded ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
-                  {/* Progress Track */}
-                  <div className="bg-slate-50 px-6 py-4 dark:bg-[#0f1020]">
-                    {isCancelled ? (
-                      <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-300">
-                        <p className="font-bold uppercase tracking-wide">Project Cancelled</p>
-                        <p className="mt-1">
-                          {request.cancellationReason || 'A cancellation reason was not provided.'}
-                        </p>
+                  {isExpanded && (
+                    <>
+                      {/* Progress Track */}
+                      <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-[#0f1020]">
+                        {isCancelled ? (
+                          <div className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-300">
+                            <p className="font-bold uppercase tracking-wide">Project Cancelled</p>
+                            <p className="mt-1">
+                              {request.cancellationReason || 'A cancellation reason was not provided.'}
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                            {STATUS_STEPS.map((step, idx) => {
+                              const isPast = idx < activeIndex;
+                              const isCurrent = idx === activeIndex;
+                              return (
+                                <div key={step} className="flex min-w-0 flex-1 basis-0 items-center gap-2">
+                                  <div className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
+                                    isPast ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
+                                  }`}>
+                                    {isPast ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
+                                  </div>
+                                  <span className={`truncate text-[10px] font-bold uppercase tracking-tight ${
+                                    isCurrent ? 'text-blue-600 dark:text-blue-300' : 'text-slate-400 dark:text-slate-500'
+                                  }`}>
+                                    {step}
+                                  </span>
+                                  {idx !== STATUS_STEPS.length - 1 ? (
+                                    <div className="mx-1 h-[1px] flex-1 bg-slate-200 dark:bg-slate-800" />
+                                  ) : null}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                    ) : (
-                      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                        {STATUS_STEPS.map((step, idx) => {
-                          const isPast = idx < activeIndex;
-                          const isCurrent = idx === activeIndex;
-                          return (
-                            <div key={step} className="flex min-w-0 flex-1 basis-0 items-center gap-2">
-                              <div className={`relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-colors ${
-                                isPast ? 'bg-blue-600 text-white' : isCurrent ? 'bg-blue-100 text-blue-600 ring-2 ring-blue-600 dark:bg-blue-900 dark:text-blue-200' : 'bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
-                              }`}>
-                                {isPast ? <CheckCircle2 className="h-4 w-4" /> : idx + 1}
-                              </div>
-                              <span className={`truncate text-[10px] font-bold uppercase tracking-tight ${
-                                isCurrent ? 'text-blue-600 dark:text-blue-300' : 'text-slate-400 dark:text-slate-500'
-                              }`}>
-                                {step}
-                              </span>
-                              {idx !== STATUS_STEPS.length - 1 ? (
-                                <div className="mx-1 h-[1px] flex-1 bg-slate-200 dark:bg-slate-800" />
-                              ) : null}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Payments & Invoices */}
-                  <div className="border-t border-slate-100 px-6 py-4 dark:border-slate-800">
-                    <div className="grid gap-4 md:grid-cols-2">
+                      {/* Payments & Invoices */}
+                      <div className="border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                        <div className="grid gap-4 md:grid-cols-2">
                       <div>
                         <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
                           Invoices
@@ -784,8 +805,10 @@ export default function CorporateGiftsDashboardPage() {
                           <p className="mt-2 text-xs text-slate-500">No payments recorded yet.</p>
                         )}
                       </div>
-                    </div>
-                  </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               );
             })

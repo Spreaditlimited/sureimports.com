@@ -1,4 +1,3 @@
-// import { useAuth } from "@/lib/AuthContext"
 // import React from 'react';
 
 // const AuthLayout = ({ children }: { children: React.ReactNode }) => {
@@ -7,7 +6,6 @@
 
 // export default AuthLayout;
 
-import { AuthProvider } from '@/lib/AuthContext';
 import type React from 'react'; // Import React
 
 export default async function AuthLayout({
@@ -15,9 +13,5 @@ export default async function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <AuthProvider>{children}</AuthProvider>
-    </>
-  );
+  return <>{children}</>;
 }

@@ -27,25 +27,48 @@ type BankOption = {
   optionValue: string;
 };
 
-const ADMIN_BASE_URL =
-  process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com';
-
 async function getPaymentChannels(): Promise<AdminBankAccount[]> {
+  const adminBaseUrl =
+    process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com';
+  const endpoint = `${adminBaseUrl.replace(/\/$/, '')}/api/invoicing/bank-accounts`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+
   try {
-    const res = await fetch(`${ADMIN_BASE_URL}/api/invoicing/bank-accounts`, {
+    const response = await fetch(endpoint, {
       cache: 'no-store',
+      signal: controller.signal,
+      headers: {
+        Accept: 'application/json',
+      },
     });
 
-    if (!res.ok) return [];
+    if (!response.ok) return [];
+    const json = await response.json();
+    const records = Array.isArray(json?.data)
+      ? json.data
+      : Array.isArray(json)
+        ? json
+        : [];
 
-    const json = await res.json();
-    const data = Array.isArray(json?.data) ? json.data : [];
-
-    return data.filter(
-      (channel: AdminBankAccount) => channel?.status !== 'INACTIVE',
-    );
-  } catch {
+    return records
+      .filter((row: any) => row?.status !== 'INACTIVE')
+      .map((row: any) => ({
+        pidBankAccount: row?.pidBankAccount || undefined,
+        accountName: row?.accountName || undefined,
+        accountNumber: row?.accountNumber || undefined,
+        bankName: row?.bankName || undefined,
+        sortCode: row?.sortCode || undefined,
+        currency: row?.currency || undefined,
+        country: row?.country || undefined,
+        notes: row?.notes || undefined,
+        status: row?.status || undefined,
+      }));
+  } catch (error) {
+    console.error('Bank channels fetch error:', error);
     return [];
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

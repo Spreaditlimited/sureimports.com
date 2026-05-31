@@ -3,7 +3,6 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import DashboardLayoutProvider from './providers';
-import { AuthProvider } from '@/lib/AuthContext';
 import { RecordCountProcurementProvider } from '../context/RecordCountProcurementContext';
 import Header from './procurement/view-orders/components/header';
 import { LiveChatWidgetComponent } from '@/components/live-chat-widget';
@@ -39,11 +38,5 @@ export default async function ProtectedLayout({
     redirect('/auth/login');
   }
 
-  return (
-    <>
-      <AuthProvider>
-        <DashboardLayoutProvider>{children}</DashboardLayoutProvider>
-      </AuthProvider>
-    </>
-  );
+  return <DashboardLayoutProvider>{children}</DashboardLayoutProvider>;
 }

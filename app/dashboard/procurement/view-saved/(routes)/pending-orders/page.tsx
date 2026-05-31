@@ -1,13 +1,5 @@
-import React from 'react';
-import OrderSection from '../../components/order-section';
-import Orders from '@/content/general-procurement/pending-orders.json';
+import { redirect } from 'next/navigation';
 
-function PendingOrders() {
-  return (
-    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center">
-      <OrderSection initialOrders={Orders} />
-    </div>
-  );
+export default function PendingOrdersRedirectPage() {
+  redirect('/dashboard/procurement/view-orders/pending');
 }
-
-export default PendingOrders;

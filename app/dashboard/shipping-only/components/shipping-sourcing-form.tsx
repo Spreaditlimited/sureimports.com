@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Form,
   FormControl,
@@ -13,7 +13,19 @@ import { Button } from '@/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Check, ChevronDown } from 'lucide-react';
+import { 
+  Check, 
+  ChevronDown, 
+  Phone, 
+  User, 
+  Globe2, 
+  Scale, 
+  Hash, 
+  Truck, 
+  FileText,
+  Boxes,
+  Send
+} from 'lucide-react';
 import { cn } from '@/_lib/utils';
 import {
   Command,
@@ -27,15 +39,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Input } from '@/components/ui/input-with-dark-mode';
 import { CommandList } from 'cmdk';
-import Image from 'next/image';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useAuth } from '@/app/context/AuthContext';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
+import { Input } from '@/components/ui/input-with-dark-mode';
+
+type ShippingPlanOption = {
+  pidShippingPlan: string;
+  shippingPlanName: string;
+  shippingPlanRate: number;
+};
+
+type CountryOption = {
+  pidCountry: string;
+  countryName: string;
+  shippingPlans: ShippingPlanOption[];
+};
 
 const formSchema = z.object({
   pidUser: z.string(),
@@ -47,13 +69,8 @@ const formSchema = z.object({
   shippingTo: z.string().min(1, 'select the country you are shipping from'),
   grossWeight: z.string().min(1, 'select the gross weight of the product'),
   trackingNumber: z.string().optional(),
-  shippingPlan: z.enum([
-    'Normal Air Cargo',
-    'Express Air Cargo',
-    'Special Air Cargo',
-    'Sea Shipping',
-  ]),
-  expectedShipments: z.string(),
+  shippingPlan: z.string().min(1, 'select the shipping plan'),
+  expectedShipments: z.string().optional(),
   wantProductVerification: z.boolean().default(false),
   wantConsolidation: z.boolean().default(false),
   multipleSuppliers: z.boolean().default(false),
@@ -64,242 +81,23 @@ const formSchema = z.object({
   description: z.string().min(10, 'description is required'),
 });
 
-const plan = [
-  { label: 'Normal Air Cargo', value: 'Normal Air Cargo' },
-  { label: 'Express Air Cargo', value: 'Express Air Cargo' },
-  { label: 'Special Air Cargo', value: 'Special Air Cargo' },
-  { label: 'Sea Shipping', value: 'Sea Shipping' },
-] as const;
-
-const shippingfrom = [
-  { label: 'Afghanistan', value: 'Afghanistan' },
-  { label: 'Albania', value: 'Albania' },
-  { label: 'Algeria', value: 'Algeria' },
-  { label: 'Andorra', value: 'Andorra' },
-  { label: 'Angola', value: 'Angola' },
-  { label: 'Antigua and Barbuda', value: 'Antigua and Barbuda' },
-  { label: 'Argentina', value: 'Argentina' },
-  { label: 'Armenia', value: 'Armenia' },
-  { label: 'Australia', value: 'Australia' },
-  { label: 'Austria', value: 'Austria' },
-  { label: 'Azerbaijan', value: 'Azerbaijan' },
-  { label: 'Bahamas', value: 'Bahamas' },
-  { label: 'Bahrain', value: 'Bahrain' },
-  { label: 'Bangladesh', value: 'Bangladesh' },
-  { label: 'Barbados', value: 'Barbados' },
-  { label: 'Belarus', value: 'Belarus' },
-  { label: 'Belgium', value: 'Belgium' },
-  { label: 'Belize', value: 'Belize' },
-  { label: 'Benin', value: 'Benin' },
-  { label: 'Bhutan', value: 'Bhutan' },
-  { label: 'Bolivia', value: 'Bolivia' },
-  { label: 'Bosnia and Herzegovina', value: 'Bosnia and Herzegovina' },
-  { label: 'Botswana', value: 'Botswana' },
-  { label: 'Brazil', value: 'Brazil' },
-  { label: 'Brunei', value: 'Brunei' },
-  { label: 'Bulgaria', value: 'Bulgaria' },
-  { label: 'Burkina Faso', value: 'Burkina Faso' },
-  { label: 'Burundi', value: 'Burundi' },
-  { label: "Côte d'Ivoire", value: "Côte d'Ivoire" },
-  { label: 'Cabo Verde', value: 'Cabo Verde' },
-  { label: 'Cambodia', value: 'Cambodia' },
-  { label: 'Cameroon', value: 'Cameroon' },
-  { label: 'Canada', value: 'Canada' },
-  { label: 'Central African Republic', value: 'Central African Republic' },
-  { label: 'Chad', value: 'Chad' },
-  { label: 'Chile', value: 'Chile' },
-  { label: 'China', value: 'China' },
-  { label: 'Colombia', value: 'Colombia' },
-  { label: 'Comoros', value: 'Comoros' },
-  { label: 'Congo', value: 'Congo' },
-  { label: 'Costa Rica', value: 'Costa Rica' },
-  { label: 'Croatia', value: 'Croatia' },
-  { label: 'Cuba', value: 'Cuba' },
-  { label: 'Cyprus', value: 'Cyprus' },
-  { label: 'Czech Republic', value: 'Czech Republic' },
-  {
-    label: 'Democratic Republic of the Congo',
-    value: 'Democratic Republic of the Congo',
-  },
-  { label: 'Denmark', value: 'Denmark' },
-  { label: 'Djibouti', value: 'Djibouti' },
-  { label: 'Dominica', value: 'Dominica' },
-  { label: 'Dominican Republic', value: 'Dominican Republic' },
-  { label: 'Ecuador', value: 'Ecuador' },
-  { label: 'Egypt', value: 'Egypt' },
-  { label: 'El Salvador', value: 'El Salvador' },
-  { label: 'Equatorial Guinea', value: 'Equatorial Guinea' },
-  { label: 'Eritrea', value: 'Eritrea' },
-  { label: 'Estonia', value: 'Estonia' },
-  { label: 'Eswatini', value: 'Eswatini' },
-  { label: 'Ethiopia', value: 'Ethiopia' },
-  { label: 'Fiji', value: 'Fiji' },
-  { label: 'Finland', value: 'Finland' },
-  { label: 'France', value: 'France' },
-  { label: 'Gabon', value: 'Gabon' },
-  { label: 'Gambia', value: 'Gambia' },
-  { label: 'Georgia', value: 'Georgia' },
-  { label: 'Germany', value: 'Germany' },
-  { label: 'Ghana', value: 'Ghana' },
-  { label: 'Greece', value: 'Greece' },
-  { label: 'Grenada', value: 'Grenada' },
-  { label: 'Guatemala', value: 'Guatemala' },
-  { label: 'Guinea', value: 'Guinea' },
-  { label: 'Guinea-Bissau', value: 'Guinea-Bissau' },
-  { label: 'Guyana', value: 'Guyana' },
-  { label: 'Haiti', value: 'Haiti' },
-  { label: 'Holy See', value: 'Holy See' },
-  { label: 'Honduras', value: 'Honduras' },
-  { label: 'Hungary', value: 'Hungary' },
-  { label: 'Iceland', value: 'Iceland' },
-  { label: 'India', value: 'India' },
-  { label: 'Indonesia', value: 'Indonesia' },
-  { label: 'Iran', value: 'Iran' },
-  { label: 'Iraq', value: 'Iraq' },
-  { label: 'Ireland', value: 'Ireland' },
-  { label: 'Israel', value: 'Israel' },
-  { label: 'Italy', value: 'Italy' },
-  { label: 'Jamaica', value: 'Jamaica' },
-  { label: 'Japan', value: 'Japan' },
-  { label: 'Jordan', value: 'Jordan' },
-  { label: 'Kazakhstan', value: 'Kazakhstan' },
-  { label: 'Kenya', value: 'Kenya' },
-  { label: 'Kiribati', value: 'Kiribati' },
-  { label: 'Kuwait', value: 'Kuwait' },
-  { label: 'Kyrgyzstan', value: 'Kyrgyzstan' },
-  { label: 'Laos', value: 'Laos' },
-  { label: 'Latvia', value: 'Latvia' },
-  { label: 'Lebanon', value: 'Lebanon' },
-  { label: 'Lesotho', value: 'Lesotho' },
-  { label: 'Liberia', value: 'Liberia' },
-  { label: 'Libya', value: 'Libya' },
-  { label: 'Liechtenstein', value: 'Liechtenstein' },
-  { label: 'Lithuania', value: 'Lithuania' },
-  { label: 'Luxembourg', value: 'Luxembourg' },
-  { label: 'Madagascar', value: 'Madagascar' },
-  { label: 'Malawi', value: 'Malawi' },
-  { label: 'Malaysia', value: 'Malaysia' },
-  { label: 'Maldives', value: 'Maldives' },
-  { label: 'Mali', value: 'Mali' },
-  { label: 'Malta', value: 'Malta' },
-  { label: 'Marshall Islands', value: 'Marshall Islands' },
-  { label: 'Mauritania', value: 'Mauritania' },
-  { label: 'Mauritius', value: 'Mauritius' },
-  { label: 'Mexico', value: 'Mexico' },
-  { label: 'Micronesia', value: 'Micronesia' },
-  { label: 'Moldova', value: 'Moldova' },
-  { label: 'Monaco', value: 'Monaco' },
-  { label: 'Mongolia', value: 'Mongolia' },
-  { label: 'Montenegro', value: 'Montenegro' },
-  { label: 'Morocco', value: 'Morocco' },
-  { label: 'Mozambique', value: 'Mozambique' },
-  { label: 'Myanmar', value: 'Myanmar' },
-  { label: 'Namibia', value: 'Namibia' },
-  { label: 'Nauru', value: 'Nauru' },
-  { label: 'Nepal', value: 'Nepal' },
-  { label: 'Netherlands', value: 'Netherlands' },
-  { label: 'New Zealand', value: 'New Zealand' },
-  { label: 'Nicaragua', value: 'Nicaragua' },
-  { label: 'Niger', value: 'Niger' },
-  { label: 'Nigeria', value: 'Nigeria' },
-  { label: 'North Korea', value: 'North Korea' },
-  { label: 'North Macedonia', value: 'North Macedonia' },
-  { label: 'Norway', value: 'Norway' },
-  { label: 'Oman', value: 'Oman' },
-  { label: 'Pakistan', value: 'Pakistan' },
-  { label: 'Palau', value: 'Palau' },
-  { label: 'Palestine State', value: 'Palestine State' },
-  { label: 'Panama', value: 'Panama' },
-  { label: 'Papua New Guinea', value: 'Papua New Guinea' },
-  { label: 'Paraguay', value: 'Paraguay' },
-  { label: 'Peru', value: 'Peru' },
-  { label: 'Philippines', value: 'Philippines' },
-  { label: 'Poland', value: 'Poland' },
-  { label: 'Portugal', value: 'Portugal' },
-  { label: 'Qatar', value: 'Qatar' },
-  { label: 'Romania', value: 'Romania' },
-  { label: 'Russia', value: 'Russia' },
-  { label: 'Rwanda', value: 'Rwanda' },
-  { label: 'Saint Kitts and Nevis', value: 'Saint Kitts and Nevis' },
-  { label: 'Saint Lucia', value: 'Saint Lucia' },
-  {
-    label: 'Saint Vincent and the Grenadines',
-    value: 'Saint Vincent and the Grenadines',
-  },
-  { label: 'Samoa', value: 'Samoa' },
-  { label: 'San Marino', value: 'San Marino' },
-  { label: 'Sao Tome and Principe', value: 'Sao Tome and Principe' },
-  { label: 'Saudi Arabia', value: 'Saudi Arabia' },
-  { label: 'Senegal', value: 'Senegal' },
-  { label: 'Serbia', value: 'Serbia' },
-  { label: 'Seychelles', value: 'Seychelles' },
-  { label: 'Sierra Leone', value: 'Sierra Leone' },
-  { label: 'Singapore', value: 'Singapore' },
-  { label: 'Slovakia', value: 'Slovakia' },
-  { label: 'Slovenia', value: 'Slovenia' },
-  { label: 'Solomon Islands', value: 'Solomon Islands' },
-  { label: 'Somalia', value: 'Somalia' },
-  { label: 'South Africa', value: 'South Africa' },
-  { label: 'South Korea', value: 'South Korea' },
-  { label: 'South Sudan', value: 'South Sudan' },
-  { label: 'Spain', value: 'Spain' },
-  { label: 'Sri Lanka', value: 'Sri Lanka' },
-  { label: 'Sudan', value: 'Sudan' },
-  { label: 'Suriname', value: 'Suriname' },
-  { label: 'Sweden', value: 'Sweden' },
-  { label: 'Switzerland', value: 'Switzerland' },
-  { label: 'Syria', value: 'Syria' },
-  { label: 'Tajikistan', value: 'Tajikistan' },
-  { label: 'Tanzania', value: 'Tanzania' },
-  { label: 'Thailand', value: 'Thailand' },
-  { label: 'Timor-Leste', value: 'Timor-Leste' },
-  { label: 'Togo', value: 'Togo' },
-  { label: 'Tonga', value: 'Tonga' },
-  { label: 'Trinidad and Tobago', value: 'Trinidad and Tobago' },
-  { label: 'Tunisia', value: 'Tunisia' },
-  { label: 'Turkey', value: 'Turkey' },
-  { label: 'Turkmenistan', value: 'Turkmenistan' },
-  { label: 'Tuvalu', value: 'Tuvalu' },
-  { label: 'Uganda', value: 'Uganda' },
-  { label: 'Ukraine', value: 'Ukraine' },
-  { label: 'United Arab Emirates', value: 'United Arab Emirates' },
-  { label: 'United Kingdom', value: 'United Kingdom' },
-  { label: 'United States of America', value: 'United States of America' },
-  { label: 'Uruguay', value: 'Uruguay' },
-  { label: 'Uzbekistan', value: 'Uzbekistan' },
-  { label: 'Vanuatu', value: 'Vanuatu' },
-  { label: 'Venezuela', value: 'Venezuela' },
-  { label: 'Vietnam', value: 'Vietnam' },
-  { label: 'Yemen', value: 'Yemen' },
-  { label: 'Zambia', value: 'Zambia' },
-  { label: 'Zimbabwe', value: 'Zimbabwe' },
-] as const;
-
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-}
-
-//API RESPONSE
 interface ApiResponse {
   responsex: any;
   successx: boolean;
-  userx: User;
+  userx: any;
 }
 
-// SHIPPING ONLY CLIENT FORM PROCESSING STARTS
 function ShippingOnlyForm() {
-  //initialize alert system
-  let productID = 'SL' + new Date().getTime().toString();
+  const productID = 'SL' + new Date().getTime().toString();
   const navigateWithAlert = useNavigationWithAlert();
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [pidShippingOnly, setPidShippingOnly] = useState(productID);
-  const [email, setEmail] = useState(user?.userEmail);
-  const [message, setMessage] = React.useState('');
-  const router = useRouter();
+  const { user } = useAuth();
+  
+  const [pidUser] = useState(user?.pidUser || '');
+  const [pidShippingOnly] = useState(productID);
+  const [email] = useState(user?.userEmail || '');
+  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const [isCountryOpen, setIsCountryOpen] = useState(false);
+  const [isShippingPlanOpen, setIsShippingPlanOpen] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -320,435 +118,454 @@ function ShippingOnlyForm() {
       description: '',
     },
   });
+  const shippingTo = form.watch('shippingTo');
+  const selectedCountry = useMemo(
+    () => countries.find((country) => country.pidCountry === shippingTo),
+    [countries, shippingTo],
+  );
+  const shippingPlans = selectedCountry?.shippingPlans ?? [];
 
-  //SUBMIT FORM
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const res = await fetch('/api/get-data/countries-shipping-plan', {
+          cache: 'no-store',
+        });
+        if (!res.ok) {
+          throw new Error('Unable to fetch countries');
+        }
+        const data = (await res.json()) as CountryOption[];
+        setCountries(Array.isArray(data) ? data : []);
+      } catch (error) {
+        toast.error('Unable to load destination countries and shipping plans.');
+      }
+    };
+
+    fetchCountries();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const currentWhatsapp = form.getValues('whatsappNumber');
+    const currentName = form.getValues('shippingName');
+
+    const firstName = (user.userFirstname || '').trim();
+    const lastName = (user.userLastname || '').trim();
+    const fallbackName = (user.name || '').trim();
+
+    const fullNameRaw = [firstName, lastName].filter(Boolean).join(' ').trim();
+    const dedupedWords = Array.from(
+      new Set(fullNameRaw.split(/\s+/).filter(Boolean)),
+    );
+    const profileName = dedupedWords.join(' ') || fallbackName;
+
+    const rawPhone = user.userPhone ?? user.phone ?? '';
+    const profilePhone = String(rawPhone).trim();
+
+    form.setValue('pidUser', user.pidUser || '');
+    form.setValue('email', user.userEmail || '');
+
+    if (!currentWhatsapp && profilePhone) {
+      form.setValue('whatsappNumber', profilePhone);
+    }
+
+    if (!currentName && profileName) {
+      form.setValue('shippingName', profileName);
+    }
+  }, [form, user]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast.info('Processing . . .');
-    //await new Promise((resolve) => setTimeout(resolve, 3000));
+    toast.info('Processing request...');
 
-    const pidUser = values.pidUser;
-    const email = values.email;
-    const pidShippingOnly = values.pidShippingOnly;
-    const whatsappNumber = values.whatsappNumber;
-    const shippingName = values.shippingName;
-    const shippingTo = values.shippingTo;
-    const grossWeight = values.grossWeight;
-    const trackingNumber = values.trackingNumber;
-    const shippingPlan = values.shippingPlan;
-    const expectedShipments = values.expectedShipments;
-    const wantProductVerification = values.wantProductVerification;
-    const wantConsolidation = values.wantConsolidation;
-    const multipleSuppliers = values.multipleSuppliers;
-    const description = values.description;
-
-    //MAKE REQUEST ATTEMPT
     try {
-      //MAKE REQUEST
       const res = await fetch('/api/crud/shipping-only-create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pidUser,
-          email,
-          pidShippingOnly,
-          whatsappNumber,
-          shippingName,
-          grossWeight,
-          trackingNumber,
-          shippingPlan,
-          shippingTo,
-          expectedShipments,
-          wantProductVerification,
-          wantConsolidation,
-          multipleSuppliers,
-          description,
-        }),
+        body: JSON.stringify(values),
       });
 
       const data: ApiResponse = await res.json();
 
-      if (data.responsex.status == 'SUCCESS') {
+      if (data.responsex?.status === 'SUCCESS') {
         navigateWithAlert(
           '/dashboard/shipping-only/request-received',
           'success',
-          'Your request has been submitted!',
+          'Your request has been submitted!'
         );
-      }
-
-      // if (data.responsex.status == 'SUCCESS') {
-      //   openModal();
-      //   toast.success(data.responsex.message);
-      // }
-
-      if (data.responsex.status == 'EMPTY_FIELD') {
+      } else if (data.responsex?.status === 'EMPTY_FIELD' || data.responsex?.status === 'FAILED') {
         toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'FAILED') {
-        toast.warning(data.responsex.message);
+      } else {
+        toast.error('An unexpected error occurred. Please try again.');
       }
     } catch (error: any) {
-      console.log(error.message);
-    } finally {
-      //setLoading(false);
+      toast.error('Network error. Could not submit request.');
     }
   };
 
-  //------------------------ UI/UX DISPLAY STARTS ------------------------//
   return (
-    <div className="flex max-h-full w-96 flex-col gap-[20px] rounded-xl bg-white p-[25px] dark:bg-[#161629] max-xl:w-full xl:w-full">
-      <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-        Submit Shipment Details
+    <div className="rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all dark:border-slate-700 dark:bg-[#161629]">
+      <div className="border-b border-slate-100 p-6 dark:border-slate-700">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Submit Shipment Details</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Complete this form to alert our warehouse about your incoming goods.
+        </p>
       </div>
 
-      <div className="text-base text-slate-400">
-        Complete this short form and one of our customer representatives will
-        reach out to you within 1 business day.
-      </div>
-
-      <div className="">
+      <div className="p-6">
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
-            <FormField
-              control={form.control}
-              name="whatsappNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="item-center relative flex">
-                      <Image
-                        src="/icons/name.svg"
-                        alt="search"
-                        width={20}
-                        height={20}
-                        className="absolute m-2 xl:m-5"
-                      />
-                      <Input
-                        placeholder="Enter Your WhatsApp Number"
-                        className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="shippingName"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="item-center relative flex">
-                    <Image
-                      src="/icons/specialsourcing/email.svg"
-                      alt="search"
-                      width={20}
-                      height={20}
-                      className="absolute m-2 xl:m-5"
-                    />
-
-                    <FormControl>
-                      <Input
-                        placeholder="Name on Shipment"
-                        className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="shippingTo"
-              render={({ field }) => (
-                <FormItem>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'w-full justify-between rounded-[10px] bg-slate-100 dark:bg-slate-800 dark:text-gray-400 max-xl:pl-2 xl:h-[60px] xl:pl-5',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          <div className="flex gap-2 overflow-hidden max-xl:gap-5">
-                            <Image
-                              src="/icons/country.svg"
-                              alt="search"
-                              width={20}
-                              height={20}
-                              className=""
-                            />
-                            {field.value
-                              ? shippingfrom.find(
-                                  (shippingfrom) =>
-                                    shippingfrom.value === field.value,
-                                )?.label
-                              : 'Destination country'}
-                          </div>
-                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="p-0">
-                      <Command>
-                        <CommandInput placeholder="Search Type" />
-                        <CommandEmpty>No subjects</CommandEmpty>
-                        <CommandGroup>
-                          {shippingfrom.map((shippingfrom) => (
-                            <CommandList key={shippingfrom.value}>
-                              <CommandItem
-                                value={shippingfrom.label}
-                                key={shippingfrom.value}
-                                onSelect={() => {
-                                  form.setValue(
-                                    'shippingTo',
-                                    shippingfrom.value,
-                                  );
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    'mr-2 h-4 w-4',
-                                    shippingfrom.value === field.value
-                                      ? 'opacity-100'
-                                      : 'opacity-0',
-                                  )}
-                                />
-                                {shippingfrom.label}
-                              </CommandItem>
-                            </CommandList>
-                          ))}
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="grossWeight"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="item-center relative flex">
-                      <Image
-                        src="/icons/specialsourcing/weight.svg"
-                        alt="search"
-                        width={20}
-                        height={20}
-                        className="absolute m-2 xl:m-5"
-                      />
-                      <Input
-                        placeholder="Estimated weight of shipment"
-                        className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                        {...field}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="trackingNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <div className="item-center relative flex">
-                    <Image
-                      src="/icons/specialsourcing/email.svg"
-                      alt="search"
-                      width={20}
-                      height={20}
-                      className="absolute m-2 xl:m-5"
-                    />
-
-                    <FormControl>
-                      <Input
-                        placeholder="Enter Tracking No (Optional)"
-                        className="w-full rounded-[10px] bg-slate-100 pl-12 text-sm xl:h-[60px]"
-                        {...field}
-                      />
-                    </FormControl>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="shippingPlan"
-              render={({ field }) => (
-                <FormItem>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl className="col-span-6">
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            'w-full justify-between rounded-[10px] bg-slate-100 dark:bg-slate-800 dark:text-gray-400 xl:h-[60px]',
-                            !field.value && 'text-muted-foreground',
-                          )}
-                        >
-                          {field.value
-                            ? plan.find((plan) => plan.value === field.value)
-                                ?.label
-                            : 'Shipping Plan'}
-                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandInput placeholder="Search Type" />
-                        <CommandEmpty>No subjects</CommandEmpty>
-                        <CommandGroup>
-                          {plan.map((plan) => (
-                            <CommandList key={plan.value}>
-                              <CommandItem
-                                value={plan.label}
-                                onSelect={() => {
-                                  form.setValue('shippingPlan', plan.value);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    'mr-2 h-4 w-4',
-                                    plan.value === field.value
-                                      ? 'opacity-100'
-                                      : 'opacity-0',
-                                  )}
-                                />
-                                {plan.label}
-                              </CommandItem>
-                            </CommandList>
-                          ))}
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage className="col-span-8 flex justify-start" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="wantProductVerification"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Want product verification?</FormLabel>
-                    {field.value && (
-                      <p className="text-sm text-muted-foreground">
-                        You will be charged 0RMB per kg.
-                      </p>
-                    )}
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="wantConsolidation"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Want consolidation?</FormLabel>
-                    {field.value && (
-                      <p className="text-sm text-muted-foreground">
-                        You will be charged 0RMB per kg.
-                      </p>
-                    )}
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="multipleSuppliers"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>
-                      Are you sending products from multiple suppliers?
-                    </FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            {form.watch('multipleSuppliers') && (
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            
+            {/* Group 1: Basic Info */}
+            <div className="grid gap-4 sm:grid-cols-2">
               <FormField
                 control={form.control}
-                name="expectedShipments"
+                name="whatsappNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormControl>
-                      <Input
-                        {...(field as any)}
-                        type="number"
-                        placeholder="How many shipments are we expecting?"
-                      />
+                      <div className="relative">
+                        <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                          placeholder="WhatsApp Number"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-6 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:placeholder:text-slate-600"
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
+              <FormField
+                control={form.control}
+                name="shippingName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                          placeholder="Name on Shipment"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-6 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:placeholder:text-slate-600"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
+            {/* Group 2: Logistics */}
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="shippingTo"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover open={isCountryOpen} onOpenChange={setIsCountryOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'w-full justify-between rounded-xl border border-slate-200 bg-slate-50 py-6 pl-4 pr-4 text-sm text-slate-900 hover:bg-slate-100 focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:hover:bg-[#1d1f36]',
+                              !field.value && 'text-slate-400 dark:text-slate-600'
+                            )}
+                          >
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <Globe2 className="h-4 w-4 shrink-0 text-slate-400" />
+                              <span className="truncate">
+                                {field.value
+                                  ? countries.find((country) => country.pidCountry === field.value)?.countryName
+                                  : 'Destination Country'}
+                              </span>
+                            </div>
+                            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[calc(100vw-2rem)] max-w-[300px] p-0 border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-xl">
+                        <Command className="bg-transparent">
+                          <CommandInput placeholder="Search country..." className="border-none focus:ring-0 dark:text-white" />
+                          <CommandEmpty className="py-3 text-center text-sm text-slate-500">No country found.</CommandEmpty>
+                          <CommandGroup className="max-h-64 overflow-y-auto custom-scrollbar">
+                            {countries.map((country) => (
+                              <CommandList key={country.pidCountry}>
+                                <CommandItem
+                                  value={country.countryName}
+                                  onSelect={() => {
+                                    form.setValue('shippingTo', country.pidCountry);
+                                    form.setValue('shippingPlan', '');
+                                    setIsCountryOpen(false);
+                                  }}
+                                  className="cursor-pointer dark:text-slate-200 dark:hover:bg-slate-800"
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4',
+                                      country.pidCountry === field.value ? 'opacity-100 text-blue-500' : 'opacity-0'
+                                    )}
+                                  />
+                                  {country.countryName}
+                                </CommandItem>
+                              </CommandList>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="shippingPlan"
+                render={({ field }) => (
+                  <FormItem>
+                    <Popover
+                      open={isShippingPlanOpen}
+                      onOpenChange={setIsShippingPlanOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              'w-full justify-between rounded-xl border border-slate-200 bg-slate-50 py-6 pl-4 pr-4 text-sm text-slate-900 hover:bg-slate-100 focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:hover:bg-[#1d1f36]',
+                              !field.value && 'text-slate-400 dark:text-slate-600'
+                            )}
+                          >
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <Truck className="h-4 w-4 shrink-0 text-slate-400" />
+                              <span className="truncate">
+                                {field.value
+                                  ? shippingPlans
+                                      .find((plan) => plan.pidShippingPlan === field.value)
+                                      ?.shippingPlanName.replace(/_/g, ' ')
+                                  : 'Shipping Plan'}
+                              </span>
+                            </div>
+                            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[calc(100vw-2rem)] max-w-[300px] p-0 border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 shadow-xl">
+                        <Command className="bg-transparent">
+                          <CommandGroup>
+                            {shippingPlans.map((plan) => (
+                              <CommandList key={plan.pidShippingPlan}>
+                                <CommandItem
+                                  value={plan.shippingPlanName.replace(/_/g, ' ')}
+                                  onSelect={() =>
+                                    {
+                                      form.setValue('shippingPlan', plan.pidShippingPlan);
+                                      setIsShippingPlanOpen(false);
+                                    }}
+                                  className="cursor-pointer dark:text-slate-200 dark:hover:bg-slate-800"
+                                >
+                                  <Check
+                                    className={cn(
+                                      'mr-2 h-4 w-4',
+                                      plan.pidShippingPlan === field.value
+                                        ? 'opacity-100 text-blue-500'
+                                        : 'opacity-0'
+                                    )}
+                                  />
+                                  {plan.shippingPlanName.replace(/_/g, ' ')}
+                                </CommandItem>
+                              </CommandList>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="grossWeight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Scale className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                          placeholder="Est. Weight (kg) or CBM"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-6 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:placeholder:text-slate-600"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="trackingNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="relative">
+                        <Hash className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                        <Input
+                          placeholder="Tracking No (Optional)"
+                          className="w-full rounded-xl border border-slate-200 bg-slate-50 py-6 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:placeholder:text-slate-600"
+                          {...field}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Group 3: Options */}
+            <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-[#0f1020]">
+              <h3 className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                Additional Services
+              </h3>
+              
+              <FormField
+                control={form.control}
+                name="wantProductVerification"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1 border-slate-300 data-[state=checked]:bg-blue-600 dark:border-slate-600 dark:data-[state=checked]:bg-blue-500"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-medium text-slate-900 dark:text-slate-200 cursor-pointer">
+                        Want product verification?
+                      </FormLabel>
+                      {field.value && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          You will be charged 0 RMB per kg.
+                        </p>
+                      )}
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="wantConsolidation"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1 border-slate-300 data-[state=checked]:bg-blue-600 dark:border-slate-600 dark:data-[state=checked]:bg-blue-500"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-medium text-slate-900 dark:text-slate-200 cursor-pointer">
+                        Want consolidation?
+                      </FormLabel>
+                      {field.value && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                          You will be charged 0 RMB per kg.
+                        </p>
+                      )}
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="multipleSuppliers"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="mt-1 border-slate-300 data-[state=checked]:bg-blue-600 dark:border-slate-600 dark:data-[state=checked]:bg-blue-500"
+                      />
+                    </FormControl>
+                    <div className="space-y-1 leading-none">
+                      <FormLabel className="text-sm font-medium text-slate-900 dark:text-slate-200 cursor-pointer">
+                        Are you sending products from multiple suppliers?
+                      </FormLabel>
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch('multipleSuppliers') && (
+                <div className="pt-2 pl-7">
+                  <FormField
+                    control={form.control}
+                    name="expectedShipments"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Boxes className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                            <Input
+                              {...field}
+                              type="number"
+                              placeholder="How many shipments are we expecting?"
+                              className="w-full rounded-xl border border-slate-200 bg-white py-5 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-600 dark:bg-[#161629] dark:text-white dark:placeholder:text-slate-500"
+                            />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Group 4: Description */}
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Textarea
-                      placeholder="Tell us the exact products you are shipping. does it contain
-              battery, liquid, powder? Give us as much information as possible."
-                      className="resize-none"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <FileText className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                      <Textarea
+                        placeholder="Tell us the exact products you are shipping. Does it contain battery, liquid, powder? Give us as much information as possible."
+                        className="min-h-[120px] w-full resize-none rounded-xl border border-slate-200 bg-slate-50 py-4 pl-11 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 dark:border-slate-700 dark:bg-[#0f1020] dark:text-white dark:placeholder:text-slate-600"
+                        {...field}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="flex flex-col">
-              <Button type="submit" className="h-[54px]">
-                Submit
+            {/* Submit */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
+              <Button 
+                type="submit" 
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-6 text-base font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.98] dark:shadow-blue-900/40 sm:w-auto sm:px-10"
+              >
+                <Send className="h-4 w-4" /> Submit Shipment
               </Button>
             </div>
+            
           </form>
         </Form>
       </div>

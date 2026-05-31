@@ -1,8 +1,8 @@
 import * as React from 'react';
-import Home from './components/Home';
 import type { Metadata } from 'next';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { generateBreadcrumbSchema, generateFAQSchema } from '@/lib/seo/schema';
+import HomeClient from './HomeClient';
 
 const baseUrl = 'https://www.sureimports.com';
 
@@ -47,10 +47,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Home page breadcrumb
 const homeBreadcrumb = generateBreadcrumbSchema([{ name: 'Home', url: '/' }]);
 
-// FAQ Schema for home page
 const homeFAQ = generateFAQSchema([
   {
     question: 'How do I import products from China?',
@@ -79,11 +77,13 @@ const homeFAQ = generateFAQSchema([
   },
 ]);
 
-const HomePage: React.FC = () => (
-  <>
-    <JsonLdScript data={[homeBreadcrumb, homeFAQ]} />
-    <Home />
-  </>
-);
+const HomePage: React.FC = () => {
+  return (
+    <>
+      <JsonLdScript data={[homeBreadcrumb, homeFAQ]} />
+      <HomeClient />
+    </>
+  );
+};
 
 export default HomePage;

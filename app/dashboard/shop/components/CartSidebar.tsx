@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { X, Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import { useShopCart } from '@/app/context/ShopCartContext';
@@ -14,6 +14,8 @@ interface CartSidebarProps {
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const shopBasePath = pathname?.startsWith('/shop') ? '/shop' : '/dashboard/shop';
   const {
     cart,
     cartCount,
@@ -25,7 +27,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
   const handleCheckout = () => {
     onClose();
-    router.push('/dashboard/shop/checkout');
+    router.push(`${shopBasePath}/checkout`);
   };
 
   if (!isOpen) return null;

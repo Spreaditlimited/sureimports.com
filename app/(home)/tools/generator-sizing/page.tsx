@@ -13,7 +13,8 @@ import {
   Cpu,
   Activity,
   Maximize2,
-  ChevronDown
+  ChevronDown,
+  Info
 } from 'lucide-react';
 
 function toNumber(v: string): number | null {
@@ -65,7 +66,7 @@ export default function GeneratorSizingTool() {
   const lm = toNumber(largestMotor);
   const headroom = toNumber(headroomPct);
 
-  const canCalc = rKw !== null && rKw! > 0 && powerFactor !== null && lm !== null;
+  const canCalc = rKw !== null && rKw > 0 && powerFactor !== null && lm !== null;
 
   const nf2 = useMemo(() => new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), []);
 
@@ -160,34 +161,34 @@ export default function GeneratorSizingTool() {
   }, [rows, engPfFallback, engHeadroom, startScenario]);
 
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-200 pb-24">
-      <div className="max-w-6xl mx-auto px-4 pt-12 sm:pt-20">
+    <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
+      <div className="max-w-7xl mx-auto px-4 pt-48 sm:px-6 lg:px-8">
         
         {/* Header */}
         <header className="mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-6">
-            <Zap className="w-3 h-3" /> Industrial Power Tool
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:border-indigo-900/30 dark:text-indigo-400 text-xs font-black uppercase tracking-widest mb-6">
+            <Zap className="w-3.5 h-3.5" /> Industrial Power Tool
           </div>
-          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight mb-6">
-            Generator <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Sizing Calculator</span>
+          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+            Generator <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">Sizing Calculator</span>
           </h1>
-          <p className="text-lg text-slate-400 max-w-3xl leading-relaxed">
+          <p className="text-lg font-medium text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
             Ensure your factory line stays stable. Calculate required kVA capacity based on 
             running loads and critical motor startup surges.
           </p>
         </header>
 
         {/* Mode Toggles */}
-        <div className="flex p-1 bg-slate-900 border border-white/5 rounded-2xl w-fit mb-8">
+        <div className="flex p-1 bg-slate-50 border border-slate-200 rounded-2xl w-fit mb-8 dark:bg-slate-950/50 dark:border-slate-800">
           <button 
             onClick={() => setMode('quick')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${mode === 'quick' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${mode === 'quick' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 dark:bg-indigo-500' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
           >
             <Activity className="w-4 h-4" /> Quick Estimate
           </button>
           <button 
             onClick={() => setMode('engineer')}
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${mode === 'engineer' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' : 'text-slate-500 hover:text-slate-300'}`}
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${mode === 'engineer' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 dark:bg-indigo-500' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
           >
             <Cpu className="w-4 h-4" /> Engineer Mode
           </button>
@@ -198,16 +199,16 @@ export default function GeneratorSizingTool() {
             
             {/* Input Panel */}
             <section className="lg:col-span-7 space-y-6 min-w-0">
-              <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
+              <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 
                 {/* Phase Selection */}
                 <div className="mb-8">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-3 ml-1">Supply Configuration</label>
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest block mb-3 ml-1">Supply Configuration</label>
                   <div className="flex flex-wrap gap-3">
                     {(['three', 'single'] as const).map(p => (
                       <button 
                         key={p} onClick={() => setPhase(p)}
-                        className={`flex-1 min-w-[140px] py-3 rounded-xl border text-sm font-bold transition-all ${phase === p ? 'bg-white/10 border-white/20 text-white shadow-inner' : 'border-white/5 text-slate-500 hover:bg-white/5'}`}
+                        className={`flex-1 min-w-[140px] py-4 rounded-xl border text-sm font-bold transition-all ${phase === p ? 'bg-slate-900 border-slate-900 text-white shadow-md dark:bg-slate-800 dark:border-slate-700' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-950/50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-800/50'}`}
                       >
                         {p === 'three' ? '3-Phase' : 'Single-Phase'}
                       </button>
@@ -218,54 +219,57 @@ export default function GeneratorSizingTool() {
                 {/* Running Load Dims */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
                   <div className="space-y-2 min-w-0">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Running Load (kW)</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Running Load (kW)</label>
                     <input 
                       value={runningKw} 
                       onChange={(e) => setRunningKw(e.target.value)} 
-                      className="w-full box-border bg-slate-950 border border-white/10 rounded-2xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all" 
+                      className="w-full box-border bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600" 
                       placeholder="e.g. 45" 
+                      inputMode="decimal"
                     />
                   </div>
                   <div className="space-y-2 min-w-0">
-                    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Power Factor (PF)</label>
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Power Factor (PF)</label>
                     <input 
                       value={pf} 
                       onChange={(e) => setPf(e.target.value)} 
-                      className="w-full box-border bg-slate-950 border border-white/10 rounded-2xl px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all" 
+                      className="w-full box-border bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white" 
+                      inputMode="decimal"
                     />
                   </div>
                 </div>
 
                 {/* Motor Surge Dims */}
-                <div className="border-t border-white/5 pt-8">
-                  <h3 className="text-sm font-bold text-white mb-6 flex items-center gap-2 italic">
-                    <Maximize2 className="w-4 h-4 text-amber-400" /> Startup Surge Component
+                <div className="border-t border-slate-100 pt-8 dark:border-slate-800">
+                  <h3 className="text-sm font-bold text-slate-900 mb-6 flex items-center gap-2 dark:text-white">
+                    <Maximize2 className="w-5 h-5 text-brand-orange-500" /> Startup Surge Component
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2 min-w-0">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Largest Motor Size</label>
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Largest Motor Size</label>
                       <div className="flex w-full box-border">
                         <input 
                           value={largestMotor} 
                           onChange={(e) => setLargestMotor(e.target.value)} 
-                          className="flex-1 min-w-0 bg-slate-950 border border-white/10 rounded-l-2xl px-4 py-4 text-white focus:outline-none" 
+                          className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-l-xl px-4 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600" 
                           placeholder="e.g. 15" 
+                          inputMode="decimal"
                         />
                         <button 
                           onClick={() => setMotorUnit(motorUnit === 'kW' ? 'HP' : 'kW')} 
-                          className="bg-slate-800 border border-white/10 border-l-0 rounded-r-2xl px-4 text-xs font-bold text-blue-400 whitespace-nowrap"
+                          className="bg-slate-100 border border-slate-200 border-l-0 rounded-r-xl px-5 text-xs font-bold text-indigo-600 whitespace-nowrap hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:border-slate-800 dark:text-indigo-400 dark:hover:bg-slate-700"
                         >
                           {motorUnit}
                         </button>
                       </div>
                     </div>
                     <div className="space-y-2 min-w-0">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Starting Method</label>
+                      <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Starting Method</label>
                       <div className="relative w-full">
                         <select
                           value={startMethod}
                           onChange={(e) => setStartMethod(e.target.value as StartMethod)}
-                          className="block w-full appearance-none bg-slate-950 border border-white/10 rounded-2xl px-4 py-4 pr-10 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+                          className="block w-full appearance-none bg-slate-50 border border-slate-200 rounded-xl px-4 py-4 pr-10 text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white"
                         >
                           <option value="DOL">DOL (Direct-On-Line)</option>
                           <option value="STAR_DELTA">Star-Delta</option>
@@ -283,41 +287,42 @@ export default function GeneratorSizingTool() {
             {/* Quick Result Panel */}
             <section className="lg:col-span-5 lg:sticky lg:top-8 min-w-0">
               {!result ? (
-                <div className="h-full min-h-[300px] flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-white/10 bg-slate-900/20 p-8 text-center text-slate-500 italic">
-                  <Settings className="w-12 h-12 mb-4 opacity-20 animate-spin-slow" />
-                  <p>Complete the inputs to see sizing recommendations.</p>
+                <div className="h-full min-h-[300px] flex flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center text-slate-500 dark:border-slate-800 dark:bg-slate-900/50">
+                  <Settings className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-600 animate-[spin_4s_linear_infinite]" />
+                  <p className="font-bold text-slate-600 dark:text-slate-400">Analysis Pending</p>
+                  <p className="text-sm font-medium mt-2 leading-relaxed text-slate-500">Complete the inputs to see <br/> sizing recommendations.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="rounded-3xl border border-white/10 bg-slate-900 p-8 shadow-2xl relative overflow-hidden">
-                    <div className="absolute top-0 right-0 p-6 opacity-10"><ShieldCheck className="w-10 h-10" /></div>
-                    <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-8">Capacity Analysis</h3>
+                  <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                    <div className="absolute top-0 right-0 p-6 opacity-10"><ShieldCheck className="w-12 h-12 text-slate-900 dark:text-white" /></div>
+                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Capacity Analysis</h3>
                     
-                    <div className="space-y-4 mb-8">
+                    <div className="space-y-5 mb-8">
                       <div className="flex justify-between items-center gap-4">
-                        <span className="text-slate-400 font-medium whitespace-nowrap">Running kVA</span>
-                        <span className="text-xl font-mono font-bold text-white truncate">{nf2.format(result.runningKva)} kVA</span>
+                        <span className="text-slate-500 font-bold whitespace-nowrap dark:text-slate-400">Running kVA</span>
+                        <span className="text-2xl font-black text-slate-900 truncate dark:text-white">{nf2.format(result.runningKva)} kVA</span>
                       </div>
-                      <div className="flex justify-between items-center gap-4 text-amber-400">
-                        <span className="font-medium whitespace-nowrap">Startup Peak</span>
-                        <span className="text-xl font-mono font-bold truncate">{nf2.format(result.motorStartKva)} kVA</span>
+                      <div className="flex justify-between items-center gap-4">
+                        <span className="text-brand-orange-600 font-bold whitespace-nowrap dark:text-brand-orange-500">Startup Peak</span>
+                        <span className="text-2xl font-black text-brand-orange-500 truncate">{nf2.format(result.motorStartKva)} kVA</span>
                       </div>
-                      <div className="pt-4 border-t border-white/5 flex justify-between items-center gap-4">
-                        <span className="text-blue-400 font-bold uppercase text-xs whitespace-nowrap">Min Recommended</span>
-                        <span className="text-blue-400 font-bold text-3xl truncate">{nf2.format(result.minRecommendedKva)} kVA</span>
+                      <div className="pt-6 border-t border-slate-100 flex justify-between items-center gap-4 dark:border-slate-800">
+                        <span className="text-slate-400 font-black uppercase text-[10px] tracking-widest whitespace-nowrap">Min Recommended</span>
+                        <span className="text-indigo-600 font-black text-3xl truncate dark:text-indigo-400">{nf2.format(result.minRecommendedKva)} kVA</span>
                       </div>
                     </div>
 
-                    <div className={`p-4 rounded-2xl border ${result.risk === 'High' ? 'bg-red-500/10 border-red-500/20 text-red-400' : 'bg-green-500/10 border-green-500/20 text-green-400'}`}>
+                    <div className={`p-5 rounded-2xl border ${result.risk === 'High' ? 'bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/10 dark:border-rose-900/30 dark:text-rose-400' : 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400'}`}>
                       <div className="flex gap-3 items-center">
                         <AlertTriangle className="w-5 h-5 shrink-0" />
-                        <span className="text-xs font-bold uppercase tracking-tight">Starting Risk: {result.risk}</span>
+                        <span className="text-[11px] font-black uppercase tracking-widest">Starting Risk: {result.risk}</span>
                       </div>
                     </div>
 
                     <button 
                       onClick={() => alert("Copied to clipboard")} 
-                      className="w-full box-border mt-6 py-4 rounded-xl bg-blue-600 font-black text-white hover:bg-blue-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                      className="w-full box-border mt-6 py-4 rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 border-0 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                     >
                       <Clipboard className="w-4 h-4" /> Copy Recommendation
                     </button>
@@ -329,70 +334,84 @@ export default function GeneratorSizingTool() {
         ) : (
           /* --- ENGINEER MODE --- */
           <div className="space-y-6 min-w-0">
-             <div className="rounded-3xl border border-white/10 bg-slate-900/40 p-6 backdrop-blur-xl overflow-hidden shadow-2xl">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                 <h3 className="text-lg font-bold whitespace-nowrap">Load Schedule</h3>
-                 <button onClick={() => alert("Sample Added")} className="text-xs text-blue-400 hover:underline">Load Sample Factory Template</button>
+             <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-10 shadow-sm overflow-hidden dark:border-slate-800 dark:bg-slate-900">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                 <h3 className="text-xl font-bold text-slate-900 dark:text-white whitespace-nowrap flex items-center gap-2">
+                   <Settings className="w-5 h-5 text-indigo-500" /> Load Schedule
+                 </h3>
+                 <button onClick={() => alert("Sample Added")} className="text-xs font-bold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors">
+                   Load Sample Factory Template
+                 </button>
               </div>
               
-              <div className="overflow-x-auto w-full">
+              <div className="overflow-x-auto w-full custom-scrollbar pb-4">
                 <table className="w-full min-w-[800px] border-collapse">
                   <thead>
-                    <tr className="text-[10px] uppercase text-slate-500 tracking-widest border-b border-white/5">
-                      <th className="pb-4 text-left font-bold">Load Name</th>
-                      <th className="pb-4 text-left font-bold">Type</th>
-                      <th className="pb-4 text-left font-bold">Rating</th>
-                      <th className="pb-4 text-left font-bold">Start Type</th>
-                      <th className="pb-4 text-center font-bold">Qty</th>
-                      <th className="pb-4 text-right font-bold">Action</th>
+                    <tr className="text-[10px] uppercase text-slate-400 tracking-widest border-b border-slate-100 dark:border-slate-800">
+                      <th className="pb-4 text-left font-black">Load Name</th>
+                      <th className="pb-4 text-left font-black">Type</th>
+                      <th className="pb-4 text-left font-black">Rating</th>
+                      <th className="pb-4 text-left font-black">Start Type</th>
+                      <th className="pb-4 text-center font-black">Qty</th>
+                      <th className="pb-4 text-right font-black">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-white/5">
+                  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                     {rows.map(row => (
                       <tr key={row.id} className="group">
-                        <td className="py-4 pr-4"><input defaultValue={row.name} className="w-full bg-transparent text-sm font-medium focus:outline-none focus:text-blue-400 transition-colors" /></td>
-                        <td className="py-4 text-xs font-bold text-slate-400">{row.type}</td>
-                        <td className="py-4 text-sm font-mono whitespace-nowrap">{row.kwOrHp} {row.unit}</td>
-                        <td className="py-4"><span className="text-[10px] bg-white/5 px-2 py-1 rounded uppercase font-bold text-slate-300">{row.startMethod || 'Resistive'}</span></td>
-                        <td className="py-4 text-center text-sm font-bold">{row.qty}</td>
-                        <td className="py-4 text-right"><button className="text-slate-700 hover:text-red-400 transition-colors"><Trash2 className="w-4 h-4" /></button></td>
+                        <td className="py-4 pr-4">
+                          <input defaultValue={row.name} className="w-full bg-transparent text-sm font-bold text-slate-900 focus:outline-none focus:text-indigo-600 transition-colors dark:text-white dark:focus:text-indigo-400" />
+                        </td>
+                        <td className="py-4 text-xs font-bold text-slate-500 dark:text-slate-400">{row.type}</td>
+                        <td className="py-4 text-sm font-bold text-slate-900 whitespace-nowrap dark:text-white">{row.kwOrHp} {row.unit}</td>
+                        <td className="py-4">
+                          <span className="text-[10px] bg-slate-100 px-2 py-1 rounded-md uppercase font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                            {row.startMethod || 'Resistive'}
+                          </span>
+                        </td>
+                        <td className="py-4 text-center text-sm font-bold text-slate-900 dark:text-white">{row.qty}</td>
+                        <td className="py-4 text-right">
+                          <button className="text-slate-400 hover:text-rose-500 transition-colors dark:text-slate-500 dark:hover:text-rose-400">
+                            <Trash2 className="w-4 h-4 ml-auto" />
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
 
-              <button className="mt-6 w-full py-4 rounded-xl border border-dashed border-white/10 text-slate-500 hover:border-blue-500 hover:text-blue-400 transition-all flex items-center justify-center gap-2 text-sm font-bold">
+              <button className="mt-4 w-full py-4 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-all flex items-center justify-center gap-2 text-sm font-bold dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400 dark:hover:border-indigo-800 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400">
                 <Plus className="w-4 h-4" /> Add Load Row
               </button>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              <div className="p-6 rounded-2xl bg-blue-600/5 border border-blue-500/10 backdrop-blur-sm">
-                <p className="text-[10px] font-bold text-slate-500 uppercase mb-1 tracking-widest">Total Running</p>
-                <p className="text-2xl font-bold text-white truncate">{nf2.format(engineerResult?.totalKw || 0)} kW</p>
+              <div className="p-8 rounded-[32px] bg-indigo-50 border border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-900/20 shadow-sm">
+                <p className="text-[11px] font-black text-indigo-600 uppercase mb-2 tracking-widest dark:text-indigo-400">Total Running</p>
+                <p className="text-3xl font-black text-indigo-950 truncate dark:text-white">{nf2.format(engineerResult?.totalKw || 0)} kW</p>
               </div>
-              <div className="p-6 rounded-2xl bg-amber-600/5 border border-amber-500/10 backdrop-blur-sm">
-                <p className="text-[10px] font-bold text-slate-500 uppercase mb-1 tracking-widest">Max Surge</p>
-                <p className="text-2xl font-bold text-amber-400 truncate">{nf2.format(engineerResult?.motorStartKva || 0)} kVA</p>
+              <div className="p-8 rounded-[32px] bg-amber-50 border border-amber-200 dark:bg-amber-900/10 dark:border-amber-900/20 shadow-sm">
+                <p className="text-[11px] font-black text-amber-600 uppercase mb-2 tracking-widest dark:text-amber-500">Max Surge</p>
+                <p className="text-3xl font-black text-amber-600 truncate dark:text-amber-500">{nf2.format(engineerResult?.motorStartKva || 0)} kVA</p>
               </div>
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
-                <p className="text-[10px] font-bold text-slate-500 uppercase mb-1 tracking-widest">Recommended</p>
-                <p className="text-2xl font-bold text-white truncate">{nf2.format(engineerResult?.minKva || 0)} kVA</p>
+              <div className="p-8 rounded-[32px] bg-white border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                <p className="text-[11px] font-black text-slate-400 uppercase mb-2 tracking-widest">Recommended</p>
+                <p className="text-3xl font-black text-slate-900 truncate dark:text-white">{nf2.format(engineerResult?.minKva || 0)} kVA</p>
               </div>
             </div>
           </div>
         )}
 
         {/* FAQ Section */}
-        <section className="mt-24 max-w-4xl border-t border-white/5 pt-16">
-          <h2 className="text-3xl font-bold mb-8 tracking-tight">Industrial Power Considerations</h2>
+        <section className="mt-24 max-w-4xl border-t border-slate-200 pt-16 dark:border-slate-800">
+          <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">Industrial Power Considerations</h2>
           <div className="grid grid-cols-1 gap-12">
             <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-4 tracking-tight">
-                <Zap className="w-4 h-4 text-blue-400" /> The kVA vs kW Distinction
+              <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 mb-4 tracking-tight dark:text-white">
+                <Zap className="w-5 h-5 text-indigo-500" /> The kVA vs kW Distinction
               </h3>
-              <p className="text-slate-400 leading-relaxed text-sm">
+              <p className="text-slate-600 leading-relaxed text-sm font-medium dark:text-slate-400">
                 Generators are rated in kVA (Apparent Power), while industrial machine labels often highlight kW (Real Power). 
                 Motors require "Reactive Power" to generate magnetic fields—a component not reflected in kW. 
                 Sizing by kW alone leads to alternator strain and unstable voltage regulation.
@@ -410,9 +429,9 @@ export default function GeneratorSizingTool() {
                   a: "Simultaneous starts compound surges. A sequential logic allows the generator’s governor to stabilize between events, preventing total system collapse." 
                 }
               ].map(faq => (
-                <div key={faq.q} className="p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] transition-colors">
-                  <h4 className="font-bold text-blue-300 text-sm mb-3">{faq.q}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed italic">"{faq.a}"</p>
+                <div key={faq.q} className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                  <h4 className="font-bold text-slate-900 text-base mb-3 dark:text-white">{faq.q}</h4>
+                  <p className="text-sm text-slate-500 leading-relaxed font-medium dark:text-slate-400">"{faq.a}"</p>
                 </div>
               ))}
             </div>

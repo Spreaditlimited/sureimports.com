@@ -2,7 +2,7 @@
 
 import Footer from '../components/global/Footer';
 import Header from '../components/global/Header';
-import ScrollToTop from '../components/global/ScrollToTop';
+import { BackToTopButton } from '@/app/(home)/components/BackToTopButton';
 import Checkout from '../components/home/Checkout';
 import Faq from '../components/home/Faq';
 import Hero from '../components/home/Hero';
@@ -34,7 +34,7 @@ export default function Home() {
         <Checkout activeTab={activeTab} setActiveTab={setActiveTab} />
         <Faq />
         <ReadyToGet />
-        <ScrollToTop />
+        <BackToTopButton />
       </main>
     </>
   );

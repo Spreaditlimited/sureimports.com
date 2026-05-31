@@ -1,13 +1,5 @@
-import React from 'react';
-import OrderSection from '../../components/order-section';
-import Orders from '@/content/general-procurement/on-hold-orders.json';
+import { redirect } from 'next/navigation';
 
-function OnHoldOrders() {
-  return (
-    <div className="hide-scrollbar flex px-[25px] 2xl:justify-center">
-      <OrderSection initialOrders={Orders} />
-    </div>
-  );
+export default function OnHoldOrdersRedirectPage() {
+  redirect('/dashboard/procurement/view-orders/on-hold-orders');
 }
-
-export default OnHoldOrders;

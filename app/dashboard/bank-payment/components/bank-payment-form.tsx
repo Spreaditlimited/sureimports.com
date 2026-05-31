@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
-import { useAuth } from '@/lib/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import Loader from '@/components/uix/Loader';
 
 type BankOption = {

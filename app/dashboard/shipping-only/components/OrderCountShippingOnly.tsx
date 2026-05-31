@@ -45,8 +45,22 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
   //USER DATA
   const { user, logout } = useAuth(); //DATA FROM SESSION
   const { recordx } = useRecord();
+  const totalOrders =
+    (recordx?.requestReceivedOrder || 0) +
+    (recordx?.productShippedOrder || 0) +
+    (recordx?.productArrivedOrder || 0) +
+    (recordx?.invoicedOrder || 0) +
+    (recordx?.paidOrder || 0) +
+    (recordx?.productDeliveredOrder || 0) +
+    (recordx?.cancelledRequestOrder || 0);
 
   const cards = [
+    {
+      image: '/icons/pay-supplier/bank.svg',
+      title: 'All',
+      number: totalOrders,
+      href: '/dashboard/shipping-only/all',
+    },
     {
       image: '/icons/pay-supplier/bank.svg',
       title: 'Request Received',
@@ -55,25 +69,31 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
     },
     {
       image: '/icons/pay-supplier/pending.svg',
-      title: 'Ready to Ship',
-      number: recordx?.readyToShipOrder,
-      href: '/dashboard/shipping-only/ready-to-ship',
-    },
-    {
-      image: '/icons/pay-supplier/paid.svg',
-      title: 'Product(s) Shipped',
+      title: 'Shipped',
       number: recordx?.productShippedOrder,
       href: '/dashboard/shipping-only/product-shipped',
     },
     {
       image: '/icons/pay-supplier/paid.svg',
-      title: 'Product(s) Arrived',
+      title: 'Arrived',
       number: recordx?.productArrivedOrder,
       href: '/dashboard/shipping-only/product-arrived',
     },
     {
       image: '/icons/pay-supplier/paid.svg',
-      title: 'Product(s) Delivered',
+      title: 'Invoiced',
+      number: recordx?.invoicedOrder,
+      href: '/dashboard/shipping-only/invoiced',
+    },
+    {
+      image: '/icons/pay-supplier/paid.svg',
+      title: 'Paid',
+      number: recordx?.paidOrder,
+      href: '/dashboard/shipping-only/paid',
+    },
+    {
+      image: '/icons/pay-supplier/paid.svg',
+      title: 'Completed',
       number: recordx?.productDeliveredOrder,
       href: '/dashboard/shipping-only/product-delivered',
     },
@@ -87,14 +107,14 @@ const OrderCount: React.FC<productStatus> = ({ params }) => {
 
   return (
     <>
-      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-slate-800 xl:flex-row xl:items-start">
-        <div className="my-[20px] grid w-full justify-between gap-3 max-sm:justify-center md:grid-cols-2 xl:flex">
+      <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-[#161629] sm:p-5">
+        <div className="grid w-full justify-between gap-3 md:grid-cols-2 xl:flex">
           {cards.map((card, index) => (
             <div
               key={index}
               className={cn(
-                'flex items-center rounded-xl bg-white hover:cursor-pointer dark:bg-[#161629] max-sm:w-[380px] xl:w-full',
-                path.includes(card.href) && 'border shadow-md',
+                'flex items-center rounded-xl border border-slate-100 bg-slate-50 transition hover:cursor-pointer hover:border-slate-200 dark:border-slate-700 dark:bg-slate-800/70 dark:hover:border-slate-600 xl:w-full',
+                path.includes(card.href) && 'border-blue-200 shadow-md dark:border-blue-700/40',
               )}
               onClick={() => {
                 router.push(card.href);

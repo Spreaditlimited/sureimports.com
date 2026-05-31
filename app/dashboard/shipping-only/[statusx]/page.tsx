@@ -1,19 +1,13 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, use } from 'react';
+import { PackageX, RefreshCcw } from 'lucide-react';
+
 import Orders from '@/app/dashboard/shipping-only/components/orders';
-import PaymentData from '@/content/payments.json';
-//import { useAuthProductCount } from '@/app/context/OrderCountContext';
 import { useAuth } from '@/app/context/AuthContext';
-import Loader from '@/components/uix/Loader';
 import { useRecord } from '@/app/context/RecordCountShippingOnlyContext';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { cn } from '@/_lib/utils';
-import OrderCount from '@/app/dashboard/shipping-only/components/OrderCountShippingOnly';
-import { isEmpty } from 'lodash';
 
 interface ProductData {
-  //[x: string]: any;
   id: any;
   pidShippingOnly: string;
   pidUser: string;
@@ -29,115 +23,155 @@ interface ProductData {
   description: string;
   status: string;
   createdAt: string;
+  invoices?: Array<{
+    pidPayment: string;
+    pidInvoice?: string;
+    amount?: string;
+    currency_type?: string;
+    payment_status?: string;
+    payment_type?: string;
+    invoiceNumber?: string;
+    accessToken?: string | null;
+    source?: string;
+    createdAt?: string | null;
+    issuedAt?: string | null;
+  }>;
 }
 
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-}
-
-//API RESPONSE
-interface ApiResponse {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
-
-//API RESPONSE PRODUCT COUNT
-interface ProductCount {
-  responsex: any;
-  successx: boolean;
-  userx: User;
-}
-
-interface orderStatus {
+interface OrderStatusProps {
   params: Promise<{ statusx: string }>;
 }
 
-//const OrderList: React.FC<productStatus> = ({ params }) => {
-export function OrderList({ params }: orderStatus) {
-  // Unwrap the params Promise
-  const unwrappedParams = React.use(params);
+export default function OrderList({ params }: OrderStatusProps) {
+  const { statusx } = use(params);
+  const { user } = useAuth();
+  const { recordx } = useRecord(); 
 
-  // Access the property
-  const statusx = unwrappedParams.statusx;
+  const [productData, setProductData] = useState<Record<string, ProductData> | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const pidUser = user?.pidUser;
 
-  //USER DATA
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const { recordx } = useRecord();
-
-  const [productData, setProductData] = useState<ProductData>(); //DATA FROM API CALL
-  const [productCount, setProductCount] = useState<ProductCount>(); //DATA FROM API CALL
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-
-  const fetchProduct = async (pidUser: string, statusx: string) => {
-    try {
-      //request for users
-      const res = await fetch(
-        `/api/get-data/shipping-only/${pidUser}/${statusx}`,
-      );
-
-      //check if request was successful
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
-      }
-
-      //fetch json records into userData
-      const data: ProductData = await res.json();
-
-      //update user records variables
-      setProductData(data);
-      //setPidUser(data.pidUser);
-    } catch (err: any) {
-      //setError(err.message || 'An error occurred');
-    } finally {
-      //setLoading(false);
-    }
-  };
-
-  //run fetchUser function to get user records
   useEffect(() => {
-    if (pidUser) {
-      fetchProduct(pidUser, statusx);
-      //fetchProductCount(pidUser, status);
-    }
-  }, [pidUser]);
+    let isMounted = true;
 
-  //const product: ProductData[] = productData; //ARRAY FORMAT
-  //const jsonData = JSON.stringify(productData, null, 2); //JSON FORMAT
-  //CHECK IF USER DATA HAS BEEN FULLY LOADED TO DOM
+    const fetchProduct = async () => {
+      if (!pidUser) return;
+      setIsLoading(true);
+      try {
+        const [ordersRes, invoicesRes] = await Promise.all([
+          fetch(`/api/get-data/shipping-only/${pidUser}/${statusx}`),
+          fetch('/api/invoicing/user/invoices', { cache: 'no-store' }),
+        ]);
 
-  //GET RECORDS INTO ARRAY FOR COUNT
-  const countRecords: ProductData[] = [];
-  for (const key in productData) {
-    if (Object.prototype.hasOwnProperty.call(productData, key)) {
-      countRecords.push(productData[key as keyof typeof productData]);
-    }
+        if (!ordersRes.ok) {
+          const errorData = await ordersRes.json();
+          throw new Error(errorData.error || 'Failed to fetch data');
+        }
+
+        const ordersData = await ordersRes.json();
+        const invoicesJson = invoicesRes.ok ? await invoicesRes.json() : null;
+        const invoices = Array.isArray(invoicesJson?.data) ? invoicesJson.data : [];
+        const normalize = (value: unknown) =>
+          String(value || '')
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, '');
+
+        const invoicesByRequest = new Map<string, any[]>();
+        for (const inv of invoices) {
+          const linkedRequestId = String(inv?.linkedRequestId || '').trim();
+          if (!linkedRequestId) continue;
+          const existing = invoicesByRequest.get(linkedRequestId) || [];
+          existing.push(inv);
+          invoicesByRequest.set(linkedRequestId, existing);
+        }
+
+        const merged = Array.isArray(ordersData)
+          ? ordersData.map((order: any) => {
+              const orderId = String(order.pidShippingOnly || '').trim();
+              const normalizedOrderId = normalize(orderId);
+              const directMatches = invoicesByRequest.get(orderId) || [];
+              const fuzzyMatches = invoices.filter((inv: any) => {
+                const linked = String(inv?.linkedRequestId || '').trim();
+                if (!linked) return false;
+                const normalizedLinked = normalize(linked);
+                return (
+                  linked === orderId ||
+                  normalizedLinked === normalizedOrderId ||
+                  normalizedLinked.includes(normalizedOrderId) ||
+                  normalizedOrderId.includes(normalizedLinked)
+                );
+              });
+              const mergedInvoices = [...directMatches, ...fuzzyMatches];
+              const uniqueInvoices = mergedInvoices.filter(
+                (inv: any, idx: number, arr: any[]) =>
+                  idx ===
+                  arr.findIndex(
+                    (it: any) =>
+                      String(it?.pidInvoice || '') === String(inv?.pidInvoice || ''),
+                  ),
+              );
+
+              return {
+                ...order,
+                invoices: uniqueInvoices.map((inv: any) => ({
+                  pidPayment: String(inv.pidInvoice || ''),
+                  pidInvoice: String(inv.pidInvoice || ''),
+                  amount: String(inv.grandTotal || '0'),
+                  currency_type: String(inv.currency || 'NGN'),
+                  payment_status: String(inv.status || 'ISSUED'),
+                  payment_type: 'INVOICE',
+                  invoiceNumber: inv.invoiceNumber || null,
+                  accessToken: inv.accessToken || null,
+                  createdAt: inv.createdAt || null,
+                  issuedAt: inv.issuedAt || null,
+                  source: 'INVOICING_SYSTEM',
+                })),
+              };
+            })
+          : ordersData;
+
+        if (isMounted) setProductData(merged);
+      } catch (err) {
+        console.error("Failed to load orders:", err);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+
+    return () => { isMounted = false; };
+  }, [pidUser, statusx]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-[#161629]">
+        <RefreshCcw className="h-8 w-8 animate-spin text-blue-600" />
+        <p className="mt-4 text-slate-500">Loading your shipping requests...</p>
+      </div>
+    );
   }
 
-  if (!productData) return <Loader />;
-  if (countRecords.length == 0)
+  // Safely extract the object values into an array
+  const countRecords: ProductData[] = productData ? Object.values(productData) : [];
+  const statusLabel =
+    statusx === 'all' ? 'all statuses' : `"${statusx.replace(/-/g, ' ')}"`;
+
+  if (countRecords.length === 0) {
     return (
-      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold">
-        <div className="rounded border-2 border-dotted border-gray-500 p-4">
-          <p className="text-center text-gray-500">
-            No {statusx} request available
-          </p>
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center dark:border-slate-700 dark:bg-[#161629]">
+        <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
+          <PackageX className="h-8 w-8 text-slate-400" />
         </div>
+        <h3 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">No requests found</h3>
+        <p className="mt-1 text-slate-500">You currently have no shipping requests with {statusLabel}.</p>
       </div>
-    ); //CHECK IF RECORD IS EMPBY
+    );
+  }
 
   return (
-    <>
-      <div>
-        {/* God is Good */}
-        <Orders initialOrders={productData as any} statusx={statusx} />
-      </div>
-    </>
+    <div>
+      <Orders initialOrders={countRecords as any} statusx={statusx} />
+    </div>
   );
 }
-
-export default OrderList;

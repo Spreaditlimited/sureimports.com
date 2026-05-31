@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import {
   Smartphone,
   Laptop,
@@ -7,49 +9,71 @@ import {
   AlertTriangle,
   CheckCircle,
   XCircle,
+  AlertCircle,
+  Truck,
+  FileText
 } from 'lucide-react';
 
 export default function WarrantyPolicy() {
-  const phoneWarrantyFeatures = [
-    { title: '12 months warranty', description: 'From delivery date' },
-    {
-      title: 'Motherboard coverage',
-      description: 'Internal components protected',
-    },
-    {
-      title: 'Quality assurance',
-      description: 'Brand new and pre-owned devices',
-    },
+  const [activeSection, setActiveSection] = useState('phones-tablets');
+
+  // Smooth scroll and active section tracking
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: '-20% 0px -70% 0px' }
+    );
+
+    document.querySelectorAll('section[id]').forEach((section) => {
+      observer.observe(section);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    e.preventDefault();
+    const element = document.getElementById(id);
+    if (element) {
+      const y = element.getBoundingClientRect().top + window.scrollY - 100; // Offset for sticky header
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const sections = [
+    { id: 'phones-tablets', title: 'Phones & Tablets', icon: Smartphone },
+    { id: 'laptops', title: 'Laptops', icon: Laptop },
+    { id: 'void-conditions', title: 'Void Conditions', icon: AlertTriangle },
+    { id: 'claims-process', title: 'Claims Process', icon: Clock },
+    { id: 'faya-warranty', title: 'FAYA Products', icon: Shield },
+    { id: 'delivery-costs', title: 'Delivery Costs', icon: Truck },
+    { id: 'not-covered', title: 'Not Covered', icon: XCircle },
   ];
 
-  const laptopWarrantyFeatures = [
-    {
-      title: '3-12 months warranty',
-      description: '3 months pre-owned, 12 months new',
-    },
-    {
-      title: 'Motherboard coverage',
-      description: 'Internal processor-related issues',
-    },
-    {
-      title: 'Professional support',
-      description: 'Expert technical assistance',
-    },
+  const phoneFeatures = [
+    { title: '12 Months Warranty', desc: 'Active from delivery date' },
+    { title: 'Motherboard Coverage', desc: 'Internal components protected' },
+    { title: 'Quality Assurance', desc: 'For brand new & pre-owned devices' },
   ];
 
-  const fayaProducts = [
-    { name: 'FAYA Charging Cable', warranty: '12 months' },
-    { name: 'FAYA Charger', warranty: '12 months' },
-    { name: 'FAYA Power banks', warranty: '12 months' },
-    { name: 'FAYA Phone', warranty: '12 months' },
+  const laptopFeatures = [
+    { title: '3-12 Months Warranty', desc: '3mo pre-owned, 12mo new' },
+    { title: 'Motherboard Coverage', desc: 'Internal processor-related issues' },
+    { title: 'Professional Support', desc: 'Expert technical assistance' },
   ];
 
   const phoneExclusions = [
     'Screen damage (cracks, dead pixels, discoloration, touch malfunctions)',
     'Water or liquid damage',
     'Battery degradation due to age or misuse',
-    'Physical damage, including dents, broken buttons, charging port damage, or audio issues caused by mishandling',
-    'Software or operating system issues caused by third-party apps or modifications',
+    'Physical damage (dents, broken buttons, charging port damage)',
+    'Software/OS issues caused by third-party apps or modifications',
   ];
 
   const laptopExclusions = [
@@ -57,7 +81,7 @@ export default function WarrantyPolicy() {
     'Keyboard and trackpad issues caused by spills or physical wear',
     'Hinge breakage or casing cracks',
     'Battery or charger-related issues',
-    'Any software-related problems, including viruses or corrupted files',
+    'Any software-related problems (viruses, corrupted files)',
   ];
 
   const voidConditions = [
@@ -76,442 +100,257 @@ export default function WarrantyPolicy() {
     'Free products',
     'Repairs through 3rd parties',
     'Damage from outside sources',
-    'Damage from misuse of products (including, but not limited to: falls, extreme temperatures, water, operating devices improperly)',
+    'Damage from misuse of products (falls, extreme temps, water)',
   ];
 
   return (
-    <div className="bg-slate-900">
-      {/* Header */}
-      <div className="border-b border-slate-700 bg-gradient-to-b from-slate-800 to-slate-900">
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-              Warranty{' '}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-                Policy
-              </span>
+    <div className="bg-[#fcfcfd] dark:bg-slate-950">
+      
+      {/* Premium Page Header */}
+      <div className="border-b border-slate-200 bg-slate-50 pt-32 pb-16 dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+              <Shield className="h-3.5 w-3.5" /> Hardware Protection
+            </div>
+            <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+              Warranty Policy
             </h1>
-            <p className="text-xl text-gray-300">
-              Quality assurance and protection for all Sure Imports products
+            <p className="mt-4 text-lg font-medium text-slate-500 dark:text-slate-400">
+              Quality assurance and protection guidelines for all devices and accessories sourced through Sure Imports.
             </p>
+            <p className="mt-2 text-sm font-semibold text-slate-400">Last Updated: May 2026</p>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto max-w-4xl space-y-8 px-4 py-12 sm:px-6 lg:px-8">
-        {/* Introduction */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Shield className="h-5 w-5 text-blue-400" />
-              <span>Phone & Laptops Warranty Policy</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-gray-300">
-            <p>
-              At Sure Imports, we stand by the quality of the devices we ship —
-              whether brand new or pre-owned. We are committed to ensuring our
-              customers enjoy peace of mind with every purchase.
-            </p>
-          </CardContent>
-        </Card>
-
-        {/* Phones and Tablets Warranty */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Smartphone className="h-5 w-5 text-blue-400" />
-              <span>Phones and Tablets</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Features */}
-            <div className="grid gap-4 md:grid-cols-3">
-              {phoneWarrantyFeatures.map((feature, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-slate-700/50 bg-slate-800/50 p-4"
-                >
-                  <h4 className="mb-1 font-semibold text-white">
-                    {feature.title}
-                  </h4>
-                  <p className="text-sm text-gray-400">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Coverage */}
-            <div>
-              <h4 className="mb-3 flex items-center space-x-2 font-semibold text-white">
-                <CheckCircle className="h-4 w-4 text-green-400" />
-                <span>Coverage</span>
-              </h4>
-              <p className="text-gray-300">
-                Motherboard and internal components
-              </p>
-            </div>
-
-            {/* Exclusions */}
-            <div>
-              <h4 className="mb-3 flex items-center space-x-2 font-semibold text-white">
-                <XCircle className="h-4 w-4 text-red-400" />
-                <span>Exclusions</span>
-              </h4>
-              <ul className="space-y-2">
-                {phoneExclusions.map((exclusion, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start text-sm text-gray-300"
-                  >
-                    <span className="mr-3 mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400"></span>
-                    {exclusion}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Laptops Warranty */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Laptop className="h-5 w-5 text-blue-400" />
-              <span>Laptops (Brand New and Pre-owned Only)</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Features */}
-            <div className="grid gap-4 md:grid-cols-3">
-              {laptopWarrantyFeatures.map((feature, index) => (
-                <div
-                  key={index}
-                  className="rounded-lg border border-slate-700/50 bg-slate-800/50 p-4"
-                >
-                  <h4 className="mb-1 font-semibold text-white">
-                    {feature.title}
-                  </h4>
-                  <p className="text-sm text-gray-400">{feature.description}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Coverage */}
-            <div>
-              <h4 className="mb-3 flex items-center space-x-2 font-semibold text-white">
-                <CheckCircle className="h-4 w-4 text-green-400" />
-                <span>Coverage</span>
-              </h4>
-              <p className="text-gray-300">
-                Motherboard and internal processor-related issues
-              </p>
-            </div>
-
-            {/* Exclusions */}
-            <div>
-              <h4 className="mb-3 flex items-center space-x-2 font-semibold text-white">
-                <XCircle className="h-4 w-4 text-red-400" />
-                <span>Exclusions</span>
-              </h4>
-              <ul className="space-y-2">
-                {laptopExclusions.map((exclusion, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start text-sm text-gray-300"
-                  >
-                    <span className="mr-3 mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400"></span>
-                    {exclusion}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Warranty Void Conditions */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <AlertTriangle className="h-5 w-5 text-yellow-400" />
-              <span>Warranty Becomes Void Under These Conditions</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {voidConditions.map((condition, index) => (
-                <li
-                  key={index}
-                  className="flex items-start text-sm text-gray-300"
-                >
-                  <span className="mr-3 mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-yellow-400"></span>
-                  {condition}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Warranty Claims Process */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <Clock className="h-5 w-5 text-blue-400" />
-              <span>Warranty Claims Process</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg border border-blue-500/20 bg-blue-500/10 p-4">
-              <ol className="list-inside list-decimal space-y-3 text-gray-300">
-                <li>
-                  Contact our support team via WhatsApp or email -{' '}
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
+          
+          {/* LEFT: Sticky Table of Contents */}
+          <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
+            <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
+              Table of Contents
+            </h3>
+            <nav className="flex flex-col gap-1 border-l-2 border-slate-100 dark:border-slate-800">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                const isActive = activeSection === section.id;
+                return (
                   <a
-                    href="mailto:hello@sureimports.com"
-                    className="text-blue-400 transition-colors hover:text-blue-300"
+                    key={section.id}
+                    href={`#${section.id}`}
+                    onClick={(e) => scrollToSection(e, section.id)}
+                    className={`group flex items-center gap-3 border-l-2 py-2.5 pl-4 pr-3 text-sm font-semibold transition-all ${
+                      isActive
+                        ? '-ml-[2px] border-indigo-600 text-indigo-600 dark:border-indigo-400 dark:text-indigo-400'
+                        : '-ml-[2px] border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-white'
+                    }`}
                   >
-                    hello@sureimports.com
-                  </a>{' '}
-                  with your order number and a clear explanation of the issue.
-                </li>
-                <li>
-                  If the issue falls within warranty coverage, we will guide you
-                  on how to either return the device for inspection and
-                  replacement or send a replacement of the faulty part. You will
-                  bear the cost of installation if we send the faulty part
-                  replacement. You will also bear the cost to and from our Lagos
-                  office.
-                </li>
-                <li>
-                  After verification, we will either:
-                  <ul className="ml-4 mt-2 list-inside list-disc space-y-1">
-                    <li>Repair the device at no cost, or</li>
-                    <li>Offer a replacement (if repair is not feasible), or</li>
-                    <li>
-                      Refund the value (in rare cases where replacement or
-                      repair isn't possible)
-                    </li>
-                  </ul>
-                </li>
-              </ol>
-            </div>
-          </CardContent>
-        </Card>
+                    <Icon className={`h-4 w-4 ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`} />
+                    {section.title}
+                  </a>
+                );
+              })}
+            </nav>
+          </div>
 
-        {/* Note on Screens */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">
-              Note on Screens and External Damage
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="text-gray-300">
-            <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-              <p>
-                Screens are not covered under warranty due to their fragile
-                nature and vulnerability to damage from drops, pressure, or
-                spills. Similarly, any external parts damaged by user
-                mishandling are not covered. We encourage all customers to use
-                protective cases and handle devices with care.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* FAYA Warranty Policy */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">FAYA Warranty Policy</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <p className="text-gray-300">
-              Sure Importers Limited provides a straightforward warranty for all
-              FAYA products that is processed in the most hassle-free way
-              possible. Please refer to the Warranty Timeline section below for
-              the warranty timelines of various products, as warranty periods
-              may differ according to products.
-            </p>
-            <p className="text-sm text-gray-400">
-              This limited warranty provided by the manufacturer in no way
-              affects a potential statutory warranty provided by law.
-            </p>
-
-            {/* FAYA Product Timelines */}
-            <div>
-              <h4 className="mb-4 font-semibold text-white">
-                Warranty Timelines
-              </h4>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {fayaProducts.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between rounded-lg border border-slate-700/50 bg-slate-800/50 p-4"
-                  >
-                    <span className="text-gray-300">{product.name}</span>
-                    <span className="font-semibold text-blue-400">
-                      {product.warranty}
-                    </span>
+          {/* RIGHT: Document Content */}
+          <div className="flex-1 space-y-16 lg:max-w-3xl">
+            
+            {/* Phones & Tablets */}
+            <section id="phones-tablets" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <Smartphone className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                Phones and Tablets
+              </h2>
+              <div className="mb-6 grid gap-4 sm:grid-cols-3">
+                {phoneFeatures.map((f, i) => (
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <h4 className="mb-1 text-sm font-bold text-slate-900 dark:text-white">{f.title}</h4>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{f.desc}</p>
                   </div>
                 ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-900/30 dark:bg-emerald-900/10">
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-emerald-900 dark:text-emerald-300">
+                    <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Coverage Includes
+                  </h4>
+                  <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Motherboard and internal components.</p>
+                </div>
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 dark:border-rose-900/30 dark:bg-rose-900/10">
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-rose-900 dark:text-rose-300">
+                    <XCircle className="h-5 w-5 text-rose-600 dark:text-rose-400" /> Exclusions
+                  </h4>
+                  <ul className="space-y-2">
+                    {phoneExclusions.map((ex, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm font-medium text-rose-800 dark:text-rose-200">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-rose-400" /> {ex}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
 
-        {/* FAYA Warranty Claims */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">
-              Warranty Claims for Quality-Related Issues
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-gray-300">
-            <p>
-              All quality-related defects on items sold directly by Sure
-              Importers Limited or Sure Importers Limited's authorized resellers
-              are covered by an extensive warranty, starting from the date of
-              purchase.
-            </p>
-            <p>
-              Quality-related warranty claims on purchases made through Sure
-              Importers Limited's authorized distributors and retailers are
-              handled through Sure Importers Limited.
-            </p>
-            <p>
-              For quality-related warranty claims, items will be replaced with a
-              factory refurbished model of equal value when available, otherwise
-              a new item will be sent. In situations where a replacement is not
-              an available or preferred option, Sure Importers Limited will
-              offer a partial refund according to the usage time of the device.
-            </p>
-            <p>
-              Warranties on all replacements follow the same warranty timeframe
-              of the original defective item. Warranties on products are void
-              after having been fully refunded.
-            </p>
-          </CardContent>
-        </Card>
+            {/* Laptops */}
+            <section id="laptops" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <Laptop className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                Laptops
+              </h2>
+              <div className="mb-6 grid gap-4 sm:grid-cols-3">
+                {laptopFeatures.map((f, i) => (
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <h4 className="mb-1 text-sm font-bold text-slate-900 dark:text-white">{f.title}</h4>
+                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{f.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-6">
+                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 dark:border-emerald-900/30 dark:bg-emerald-900/10">
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-emerald-900 dark:text-emerald-300">
+                    <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Coverage Includes
+                  </h4>
+                  <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Motherboard and internal processor-related issues.</p>
+                </div>
+                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-6 dark:border-rose-900/30 dark:bg-rose-900/10">
+                  <h4 className="mb-3 flex items-center gap-2 font-bold text-rose-900 dark:text-rose-300">
+                    <XCircle className="h-5 w-5 text-rose-600 dark:text-rose-400" /> Exclusions
+                  </h4>
+                  <ul className="space-y-2">
+                    {laptopExclusions.map((ex, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm font-medium text-rose-800 dark:text-rose-200">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-rose-400" /> {ex}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </section>
 
-        {/* Warranty Claim Process */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">Warranty Claim Process</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <h4 className="font-semibold text-white">Requirements:</h4>
-              <ol className="list-inside list-decimal space-y-2 text-gray-300">
-                <li>Buyer must provide sufficient proof of purchase</li>
-                <li>
-                  Sure Importers must document what happens when buyers
-                  troubleshoot the product
-                </li>
-                <li>
-                  The defective item's serial number and/or visible proof
-                  depicting the defect are required
-                </li>
-                <li>
-                  It may be necessary to return an item for quality inspection
-                </li>
-                <li>
-                  For defective items that Sure Importers needs to have
-                  returned, warranties on those replacements are voided if the
-                  wrong item is returned to Sure Importers or if the defective
-                  item is not returned
-                </li>
-              </ol>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="font-semibold text-white">
-                Valid Proof of Purchase:
-              </h4>
-              <ul className="ml-4 list-inside list-disc space-y-2 text-gray-300">
-                <li>
-                  Order number from online purchases made through Sure Importers
-                  or Sure Importers' authorized dealers
-                </li>
-                <li>Sales invoice</li>
-                <li>
-                  Dated sales receipt from an authorized Sure Importers dealer
-                  that shows a description of the product along with its price
-                </li>
+            {/* Void Conditions */}
+            <section id="void-conditions" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <AlertTriangle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
+                Warranty Void Conditions
+              </h2>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {voidConditions.map((condition, i) => (
+                  <li key={i} className="flex items-start gap-3 rounded-xl bg-slate-50 p-4 dark:bg-slate-900/50">
+                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{condition}</span>
+                  </li>
+                ))}
               </ul>
-              <p className="text-sm text-gray-400">
-                Please note that more than one type of proof of purchase may be
-                required to process a warranty claim (such as receipt of money
-                transfer and confirmation of address item was originally shipped
-                to).
+              
+              <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/30 dark:bg-amber-900/10">
+                <h4 className="mb-2 font-bold text-amber-900 dark:text-amber-200">Note on Screens & External Damage</h4>
+                <p className="text-sm font-medium leading-relaxed text-amber-800 dark:text-amber-300">
+                  Screens are not covered under warranty due to their fragile nature and vulnerability to damage from drops, pressure, or spills. Any external parts damaged by user mishandling are not covered. We encourage all customers to use protective cases.
+                </p>
+              </div>
+            </section>
+
+            {/* Claims Process */}
+            <section id="claims-process" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <Clock className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                Warranty Claims Process
+              </h2>
+              <div className="space-y-4 border-l-2 border-indigo-100 pl-6 dark:border-indigo-900/30">
+                <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                  <strong className="text-slate-900 dark:text-white">1. Contact Us:</strong> Reach out via WhatsApp or email (hello@sureimports.com) with your order number and a clear explanation of the issue.
+                </p>
+                <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                  <strong className="text-slate-900 dark:text-white">2. Assessment:</strong> If covered, we will guide you on returning the device to our Lagos office or sending a replacement part. (You bear the transit cost to/from Lagos and any local installation costs).
+                </p>
+                <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                  <strong className="text-slate-900 dark:text-white">3. Resolution:</strong> After verification, we will repair the device at no cost, offer a replacement, or (in rare cases) refund the value.
+                </p>
+              </div>
+              
+              <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <h4 className="mb-4 font-bold text-slate-900 dark:text-white">Required for Claims</h4>
+                <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-500" /> Sufficient proof of purchase (Order # or Sales Invoice)</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-500" /> Documentation of troubleshooting steps taken</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-500" /> Serial number and visible proof of defect</li>
+                </ul>
+              </div>
+            </section>
+
+            {/* FAYA Products */}
+            <section id="faya-warranty" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <Shield className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                FAYA Products
+              </h2>
+              <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                Sure Imports provides a straightforward, hassle-free warranty for all FAYA products. Quality-related defects are covered starting from the purchase date.
+              </p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {['FAYA Charging Cable', 'FAYA Charger', 'FAYA Power banks', 'FAYA Phone'].map((item, i) => (
+                  <div key={i} className="flex items-center justify-between rounded-xl bg-slate-50 p-4 dark:bg-slate-900/50">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">{item}</span>
+                    <span className="rounded-md bg-indigo-100 px-2 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">12 Months</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Delivery Costs */}
+            <section id="delivery-costs" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <Truck className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                Delivery Costs (Buyer Responsibility)
+              </h2>
+              <p className="mb-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                The buyer must cover delivery costs in the following situations:
+              </p>
+              <ul className="space-y-3">
+                {[
+                  'Returning products for any reason other than a proven defect',
+                  'Warranty claims on items taken outside the original country of purchase',
+                  "Buyer's accidental returns or personal items",
+                  "Returning items claimed defective but found working by Sure Imports QA",
+                  'Returning defective items via international shipping',
+                  'Costs associated with unauthorized returns'
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <Truck className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Not Covered */}
+            <section id="not-covered" className="scroll-mt-32">
+              <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
+                <XCircle className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+                Not Covered Under Warranty
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {notCovered.map((item, i) => (
+                  <div key={i} className="flex items-start gap-3 rounded-xl border border-rose-100 bg-rose-50 p-4 dark:border-rose-900/30 dark:bg-rose-900/10">
+                    <XCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-500" />
+                    <span className="text-sm font-medium text-rose-900 dark:text-rose-200">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Footer Agreement */}
+            <div className="mt-16 rounded-[24px] bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
+              <p className="text-sm font-medium leading-relaxed text-slate-300">
+                This limited warranty provided by the manufacturer in no way affects a potential statutory warranty provided by law.
               </p>
             </div>
 
-            <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-4">
-              <p className="text-gray-300">
-                <strong>Important:</strong> Warranty claims for product defects
-                expire 90 days after opening a warranty claim. It is not
-                possible to process a warranty claim for items that have expired
-                their original warranty timeframe or 90-day warranty claim
-                request period, whichever is longer.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Delivery Costs */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-white">
-              Delivery Costs (Buyer Responsibility)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-4 text-gray-300">
-              Delivery cost must be covered by buyer in the following
-              situations:
-            </p>
-            <ul className="ml-4 list-inside list-disc space-y-2 text-gray-300">
-              <li>
-                Returning products for any reason other than a proven defect
-              </li>
-              <li>
-                Warranty claims on items taken outside the original country of
-                purchase
-              </li>
-              <li>Buyer's accidental returns</li>
-              <li>Returning personal items</li>
-              <li>
-                Returning items claimed to have defects but found by Sure
-                Importers' quality control to be in working condition
-              </li>
-              <li>Returning defective items in international shipping</li>
-              <li>
-                Costs associated with unauthorized returns (any returns made
-                outside of the approved warranty process)
-              </li>
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Not Covered */}
-        <Card className="border-slate-700/50 bg-white/5 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2 text-white">
-              <XCircle className="h-5 w-5 text-red-400" />
-              <span>Not Covered Under Warranty</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {notCovered.map((item, index) => (
-                <li
-                  key={index}
-                  className="flex items-start text-sm text-gray-300"
-                >
-                  <span className="mr-3 mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400"></span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
