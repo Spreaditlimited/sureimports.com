@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
 
@@ -37,6 +37,7 @@ declare global {
 
 function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const {
     cart,
@@ -48,19 +49,49 @@ function CheckoutContent() {
   } = useShopCart();
 
   const [loading, setLoading] = useState(false);
+  const [cartHydrated, setCartHydrated] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
   const [shippingAddress, setShippingAddress] = useState('');
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [savingAddress, setSavingAddress] = useState(false);
+  const [shippingAddressError, setShippingAddressError] = useState('');
 
   useEffect(() => {
-    if (cart.length === 0) {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('shopCart');
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCartHydrated(true);
+          return;
+        }
+      } catch {
+        // fall through to hydration check
+      }
+    }
+    setCartHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (cartHydrated && cart.length === 0) {
       toast.error('Your cart is empty');
       router.push('/shop');
     }
+  }, [cartHydrated, cart.length, router]);
 
+  useEffect(() => {
+    if (!user || searchParams.get('resumeCheckout') !== '1') return;
+    const toastKey = `shop-checkout-signin-toast:${user.pidUser}`;
+    if (sessionStorage.getItem(toastKey)) return;
+    toast.success('You are now signed in. Continue paying.', {
+      duration: 30000,
+    });
+    sessionStorage.setItem(toastKey, 'shown');
+  }, [user, searchParams]);
+
+  useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://js.paystack.co/v1/inline.js';
     script.async = true;
@@ -74,7 +105,7 @@ function CheckoutContent() {
     return () => {
       document.body.removeChild(script);
     };
-  }, [cart, router, user]);
+  }, [user]);
 
   const fetchWalletBalance = async () => {
     if (!user?.userEmail) return;
@@ -115,9 +146,11 @@ function CheckoutContent() {
   const saveShippingAddress = async () => {
     if (!user?.pidUser || !user?.userEmail) return false;
     if (!shippingAddress || shippingAddress.trim().length < 10) {
+      setShippingAddressError('Shipping address must be at least 10 characters long');
       toast.error('Shipping address must be at least 10 characters long');
       return false;
     }
+    setShippingAddressError('');
     setSavingAddress(true);
     try {
       const response = await fetch('/api/user/update-shipping-address', {
@@ -139,6 +172,33 @@ function CheckoutContent() {
     } finally {
       setSavingAddress(false);
     }
+  };
+
+  const ensurePaystackReady = async () => {
+    if (typeof window !== 'undefined' && window.PaystackPop?.setup) {
+      return true;
+    }
+
+    const existingScript = document.querySelector(
+      'script[src="https://js.paystack.co/v1/inline.js"]',
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      return Boolean(window.PaystackPop?.setup);
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+
+    await new Promise<void>((resolve, reject) => {
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Paystack script'));
+      document.body.appendChild(script);
+    });
+
+    return Boolean(window.PaystackPop?.setup);
   };
 
   const handlePaymentSuccess = (reference: string) => {
@@ -163,9 +223,29 @@ function CheckoutContent() {
   };
 
   const handlePaystackPayment = async () => {
-    if (!user) { router.push('/login'); return; }
+    if (processingPayment) return;
+    if (!user) {
+      router.push(
+        `/auth/login?next=${encodeURIComponent('/shop/checkout?resumeCheckout=1')}`,
+      );
+      return;
+    }
     if (!shippingAddress || shippingAddress.trim().length < 10) {
+      setShippingAddressError('Please enter a valid shipping address before proceeding');
       toast.error('Please enter a valid shipping address before proceeding'); return;
+    }
+    setShippingAddressError('');
+
+    let paystackReady = false;
+    try {
+      paystackReady = await ensurePaystackReady();
+    } catch (error) {
+      toast.error('Payment gateway failed to load. Please refresh and try again.');
+      return;
+    }
+    if (!paystackReady) {
+      toast.error('Payment gateway is not ready. Please refresh and try again.');
+      return;
     }
 
     setProcessingPayment(true);
@@ -225,10 +305,17 @@ function CheckoutContent() {
   };
 
   const handleWalletPayment = async () => {
-    if (!user) { router.push('/login'); return; }
+    if (!user) {
+      router.push(
+        `/auth/login?next=${encodeURIComponent('/shop/checkout?resumeCheckout=1')}`,
+      );
+      return;
+    }
     if (!shippingAddress || shippingAddress.trim().length < 10) {
+      setShippingAddressError('Please enter a valid shipping address before proceeding');
       toast.error('Please enter a valid shipping address before proceeding'); return;
     }
+    setShippingAddressError('');
     if (walletBalance === null) { toast.error('Loading wallet info. Please wait.'); return; }
     if (walletBalance === 0 && !loadingWallet) { toast.warning('Wallet not activated.'); return; }
     if (walletBalance < cartTotal) {
@@ -265,7 +352,7 @@ function CheckoutContent() {
   };
 
   if (loading) return <Loading />;
-  if (cart.length === 0) return null;
+  if (!cartHydrated || cart.length === 0) return null;
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
@@ -426,11 +513,26 @@ function CheckoutContent() {
                     <Textarea
                       placeholder="Enter your complete delivery address..."
                       value={shippingAddress}
-                      onChange={(e) => setShippingAddress(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setShippingAddress(value);
+                        if (value.trim().length >= 10) {
+                          setShippingAddressError('');
+                        }
+                      }}
                       disabled={processingPayment || savingAddress}
-                      className="min-h-[120px] resize-none rounded-xl border-slate-200 bg-slate-50 p-4 text-sm focus-visible:ring-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
+                      className={`min-h-[120px] resize-none rounded-xl bg-slate-50 p-4 text-sm focus-visible:ring-indigo-600 dark:bg-slate-950 dark:text-white ${
+                        shippingAddressError
+                          ? 'border-rose-400 focus-visible:ring-rose-500 dark:border-rose-500'
+                          : 'border-slate-200 dark:border-slate-800'
+                      }`}
                     />
                   )}
+                  {shippingAddressError ? (
+                    <p className="text-xs font-semibold text-rose-500">
+                      {shippingAddressError}
+                    </p>
+                  ) : null}
                   {shippingAddress.trim().length > 0 && (
                     <Button
                       type="button"
@@ -488,7 +590,7 @@ function CheckoutContent() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-slate-500">Shipping</span>
-                  <span className="rounded bg-slate-100 px-2 py-1 text-xs font-bold text-slate-500 dark:bg-slate-800">Calculated later</span>
+                  <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">FREE</span>
                 </div>
                 
                 <div className="my-6 border-t border-dashed border-slate-200 dark:border-slate-800" />

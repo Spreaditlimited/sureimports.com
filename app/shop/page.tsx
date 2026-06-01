@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/shop/ProductCard';
 import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
+import { useSearchParams } from 'next/navigation';
 import {
   Search,
   Filter,
@@ -29,6 +30,7 @@ type StoreProduct = {
 };
 
 export default function ShopPage() {
+  const searchParams = useSearchParams();
   const { cartCount } = useShopCart();
   const [activeCategory, setActiveCategory] = useState('All Products');
   const [searchQuery, setSearchQuery] = useState('');
@@ -95,6 +97,18 @@ export default function ShopPage() {
     // Prevent restoring a stale horizontal scroll offset that can hide the first chip.
     categoryRowRef.current?.scrollTo({ left: 0, behavior: 'auto' });
   }, [categories.length]);
+
+  useEffect(() => {
+    if (searchParams.get('openCart') === '1') {
+      setShowCartSidebar(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const handleOpenShopCart = () => setShowCartSidebar(true);
+    window.addEventListener('open-shop-cart', handleOpenShopCart);
+    return () => window.removeEventListener('open-shop-cart', handleOpenShopCart);
+  }, []);
 
   const mappedProducts = useMemo(
     () =>

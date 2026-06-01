@@ -4,12 +4,13 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import {
   Menu,
   MonitorPlay,
   Youtube,
   ShoppingCart,
+  LogOut,
   Ship,
   Search,
   Gift,
@@ -46,6 +47,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { useAuth } from '@/app/context/AuthContext';
 
 const MENU_ITEMS = {
   videos: [
@@ -143,7 +145,10 @@ const MENU_ITEMS = {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const isShopProductPage =
     Boolean(pathname?.startsWith('/shop/')) &&
     pathname !== '/shop/checkout' &&
@@ -161,11 +166,54 @@ export default function Navbar() {
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
   const useLightNavbar =
     isShopProductPage || isLegalPage || isToolsPage || isBlogPage;
+  const queryString = searchParams.toString();
+  const currentPath = `${pathname || '/'}${queryString ? `?${queryString}` : ''}`;
+  const signInHref = `/auth/login?next=${encodeURIComponent(currentPath)}`;
+  const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
+
+  const handleCartNavClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isOnShopPage) return;
+    event.preventDefault();
+    window.dispatchEvent(new Event('open-shop-cart'));
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const syncCartCount = () => {
+      try {
+        const raw = localStorage.getItem('shopCart');
+        if (!raw) {
+          setCartCount(0);
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) {
+          setCartCount(0);
+          return;
+        }
+        const count = parsed.reduce(
+          (total: number, item: { quantity?: number }) =>
+            total + Number(item?.quantity || 0),
+          0,
+        );
+        setCartCount(count);
+      } catch {
+        setCartCount(0);
+      }
+    };
+
+    syncCartCount();
+    window.addEventListener('storage', syncCartCount);
+    window.addEventListener('shop-cart-updated', syncCartCount);
+    return () => {
+      window.removeEventListener('storage', syncCartCount);
+      window.removeEventListener('shop-cart-updated', syncCartCount);
+    };
   }, []);
 
   return (
@@ -300,17 +348,55 @@ export default function Navbar() {
                     <Link href="/shop">Shop</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                      useLightNavbar
+                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    <Link href="/shop?openCart=1" onClick={handleCartNavClick}>
+                      <ShoppingCart className="h-5 w-5" />
+                      {cartCount > 0 && (
+                        <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
+                          {cartCount}
+                        </span>
+                      )}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
           </div>
 
           <div className="hidden items-center gap-4 lg:flex">
-            <Button
-              asChild
-              className="rounded-full border-0 bg-brand-orange-500 px-6 py-5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-95"
-            >
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  asChild
+                  className="rounded-full border-0 bg-brand-orange-500 px-6 py-5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-95"
+                >
+                  <Link href="/dashboard">Go to Dashboard</Link>
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => void logout()}
+                  className="rounded-full border-0 bg-slate-800 px-6 py-5 text-sm font-bold text-white shadow-lg transition-all hover:bg-slate-700 active:scale-95"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <Button
+                asChild
+                className="rounded-full border-0 bg-brand-orange-500 px-6 py-5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-95"
+              >
+                <Link href={signInHref}>Sign In</Link>
+              </Button>
+            )}
           </div>
 
           <div className="lg:hidden">
@@ -363,6 +449,21 @@ export default function Navbar() {
                         className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
                       >
                         Shop
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
+                        href="/shop?openCart=1"
+                        onClick={handleCartNavClick}
+                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
+                      >
+                        <ShoppingCart className="h-5 w-5" />
+                        Cart
+                        {cartCount > 0 && (
+                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
+                            {cartCount}
+                          </span>
+                        )}
                       </Link>
                     </SheetClose>
 
@@ -441,12 +542,31 @@ export default function Navbar() {
 
                   <div className="mt-8 border-t border-slate-800 pt-8">
                     <SheetClose asChild>
-                      <Button
-                        asChild
-                        className="w-full rounded-xl bg-brand-orange-500 py-6 text-lg font-bold text-white hover:bg-brand-orange-600"
-                      >
-                        <Link href="/auth/login">Sign In to Dashboard</Link>
-                      </Button>
+                      {user ? (
+                        <div className="space-y-3">
+                          <Button
+                            asChild
+                            className="w-full rounded-xl bg-brand-orange-500 py-6 text-lg font-bold text-white hover:bg-brand-orange-600"
+                          >
+                            <Link href="/dashboard">Go to Dashboard</Link>
+                          </Button>
+                          <Button
+                            type="button"
+                            onClick={() => void logout()}
+                            className="w-full rounded-xl bg-slate-800 py-6 text-lg font-bold text-white hover:bg-slate-700"
+                          >
+                            <LogOut className="mr-2 h-5 w-5" />
+                            Sign Out
+                          </Button>
+                        </div>
+                      ) : (
+                        <Button
+                          asChild
+                          className="w-full rounded-xl bg-brand-orange-500 py-6 text-lg font-bold text-white hover:bg-brand-orange-600"
+                        >
+                          <Link href={signInHref}>Sign In to Dashboard</Link>
+                        </Button>
+                      )}
                     </SheetClose>
                   </div>
                 </div>

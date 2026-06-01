@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -11,10 +12,15 @@ import { useAuth } from '@/app/context/AuthContext';
 
 export default function LoginForm() {
   const { login } = useAuth();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const nextParam = searchParams.get('next');
+  const signUpHref = nextParam
+    ? `/auth/signup?next=${encodeURIComponent(nextParam)}`
+    : '/auth/signup';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -183,7 +189,7 @@ export default function LoginForm() {
             <div className="mt-8 text-center text-sm font-medium text-slate-600 dark:text-slate-400">
               Don't have an account?{' '}
               <Link
-                href="/auth/signup"
+                href={signUpHref}
                 className="font-bold text-brand-orange-500 transition-colors hover:text-brand-orange-600"
               >
                 Register Now

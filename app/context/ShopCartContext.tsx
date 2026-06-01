@@ -57,6 +57,7 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('shopCart', JSON.stringify(cart));
+      window.dispatchEvent(new Event('shop-cart-updated'));
     }
   }, [cart, isInitialized]);
 

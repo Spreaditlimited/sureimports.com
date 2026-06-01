@@ -25,7 +25,7 @@ export default function ShopPage() {
   useEffect(() => {
     // Check if user is authenticated
     if (!user) {
-      router.push('/login');
+      router.push('/auth/login');
       return;
     }
     setLoading(false);

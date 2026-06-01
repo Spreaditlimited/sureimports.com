@@ -57,6 +57,11 @@ export default function SignUpFormContainer() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
+  const nextParam = searchParams.get('next');
+  const loginHref =
+    nextParam && nextParam.startsWith('/')
+      ? `/auth/login?next=${encodeURIComponent(nextParam)}`
+      : '/auth/login';
 
   // Affiliate Logic
   const getAffiliateRef = React.useCallback(() => {
@@ -75,7 +80,11 @@ export default function SignUpFormContainer() {
       const isAuthenticated = await checkAuth();
       if (!mounted) return;
       if (isAuthenticated) {
-        router.push('/dashboard');
+        if (nextParam && nextParam.startsWith('/')) {
+          router.push(nextParam);
+        } else {
+          router.push('/dashboard');
+        }
       } else {
         setAuthChecked(true);
       }
@@ -84,7 +93,7 @@ export default function SignUpFormContainer() {
     return () => {
       mounted = false;
     };
-  }, [checkAuth, router]);
+  }, [checkAuth, router, nextParam]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -119,7 +128,11 @@ export default function SignUpFormContainer() {
       
       if (responseData.successx) {
         toast.success('Account created successfully!');
-        router.push('/auth/account-creation-success');
+        if (nextParam && nextParam.startsWith('/')) {
+          router.push(loginHref);
+        } else {
+          router.push('/auth/account-creation-success');
+        }
       } else {
         toast.error(responseData.messagex?.message1 || 'Failed to create account.');
       }
@@ -331,7 +344,7 @@ export default function SignUpFormContainer() {
             <div className="mt-8 space-y-4 text-center">
               <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 Already have an account?{' '}
-                <Link href="/auth/login" className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                <Link href={loginHref} className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
                   Login here
                 </Link>
               </div>

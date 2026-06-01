@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -33,6 +33,7 @@ declare global {
 
 function CheckoutContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const {
     cart,
@@ -44,6 +45,7 @@ function CheckoutContent() {
   } = useShopCart();
 
   const [loading, setLoading] = useState(false);
+  const [cartHydrated, setCartHydrated] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
@@ -52,11 +54,39 @@ function CheckoutContent() {
   const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
-    if (cart.length === 0) {
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('shopCart');
+        const parsed = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCartHydrated(true);
+          return;
+        }
+      } catch {
+        // fall through to hydration check
+      }
+    }
+    setCartHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (cartHydrated && cart.length === 0) {
       toast.error('Your cart is empty');
       router.push('/dashboard/shop');
     }
+  }, [cartHydrated, cart.length, router]);
 
+  useEffect(() => {
+    if (!user || searchParams.get('resumeCheckout') !== '1') return;
+    const toastKey = `dashboard-shop-checkout-signin-toast:${user.pidUser}`;
+    if (sessionStorage.getItem(toastKey)) return;
+    toast.success('You are now signed in. Continue paying.', {
+      duration: 30000,
+    });
+    sessionStorage.setItem(toastKey, 'shown');
+  }, [user, searchParams]);
+
+  useEffect(() => {
     const script = document.createElement('script');
     script.src = 'https://js.paystack.co/v1/inline.js';
     script.async = true;
@@ -70,7 +100,7 @@ function CheckoutContent() {
     return () => {
       document.body.removeChild(script);
     };
-  }, [cart, router, user]);
+  }, [user]);
 
   const fetchWalletBalance = async () => {
     if (!user?.userEmail) return;
@@ -137,6 +167,33 @@ function CheckoutContent() {
     }
   };
 
+  const ensurePaystackReady = async () => {
+    if (typeof window !== 'undefined' && window.PaystackPop?.setup) {
+      return true;
+    }
+
+    const existingScript = document.querySelector(
+      'script[src="https://js.paystack.co/v1/inline.js"]',
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      await new Promise((resolve) => setTimeout(resolve, 250));
+      return Boolean(window.PaystackPop?.setup);
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+
+    await new Promise<void>((resolve, reject) => {
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('Failed to load Paystack script'));
+      document.body.appendChild(script);
+    });
+
+    return Boolean(window.PaystackPop?.setup);
+  };
+
   const handlePaymentSuccess = (reference: string) => {
     toast.info('Payment initiated successfully!');
   };
@@ -159,9 +216,27 @@ function CheckoutContent() {
   };
 
   const handlePaystackPayment = async () => {
-    if (!user) { router.push('/login'); return; }
+    if (processingPayment) return;
+    if (!user) {
+      router.push(
+        `/auth/login?next=${encodeURIComponent('/dashboard/shop/checkout?resumeCheckout=1')}`,
+      );
+      return;
+    }
     if (!shippingAddress || shippingAddress.trim().length < 10) {
       toast.error('Please enter a valid shipping address before proceeding'); return;
+    }
+
+    let paystackReady = false;
+    try {
+      paystackReady = await ensurePaystackReady();
+    } catch (error) {
+      toast.error('Payment gateway failed to load. Please refresh and try again.');
+      return;
+    }
+    if (!paystackReady) {
+      toast.error('Payment gateway is not ready. Please refresh and try again.');
+      return;
     }
 
     setProcessingPayment(true);
@@ -221,7 +296,12 @@ function CheckoutContent() {
   };
 
   const handleWalletPayment = async () => {
-    if (!user) { router.push('/login'); return; }
+    if (!user) {
+      router.push(
+        `/auth/login?next=${encodeURIComponent('/dashboard/shop/checkout?resumeCheckout=1')}`,
+      );
+      return;
+    }
     if (!shippingAddress || shippingAddress.trim().length < 10) {
       toast.error('Please enter a valid shipping address before proceeding'); return;
     }
@@ -261,7 +341,7 @@ function CheckoutContent() {
   };
 
   if (loading) return <Loading />;
-  if (cart.length === 0) return null;
+  if (!cartHydrated || cart.length === 0) return null;
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
@@ -471,7 +551,7 @@ function CheckoutContent() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-slate-500">Shipping</span>
-                  <span className="font-medium text-slate-400">Calculated later</span>
+                  <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">FREE</span>
                 </div>
                 
                 <div className="my-4 border-t border-dashed border-slate-200 dark:border-slate-800" />

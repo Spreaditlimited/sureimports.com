@@ -183,7 +183,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="font-medium text-slate-500 dark:text-slate-400">Shipping</span>
-                <span className="font-medium text-slate-400">Calculated at checkout</span>
+                <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">FREE</span>
               </div>
               
               <div className="my-2 border-t border-slate-200 border-dashed dark:border-slate-700" />
