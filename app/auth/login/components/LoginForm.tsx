@@ -81,10 +81,11 @@ export default function LoginForm() {
           <div className="mb-8 flex justify-center lg:hidden">
             <Link href="/">
               <Image
-                src="/images/new/images/logo.png"
+                src="/images/svg-logo.svg"
                 alt="Sure Imports"
                 width={160}
                 height={36}
+                className="h-10 w-auto"
               />
             </Link>
           </div>

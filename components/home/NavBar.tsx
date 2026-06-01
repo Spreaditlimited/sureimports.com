@@ -38,6 +38,7 @@ import {
   SheetContent,
   SheetTrigger,
   SheetClose,
+  SheetTitle,
 } from '@/components/ui/sheet';
 import {
   Accordion,
@@ -143,7 +144,10 @@ const MENU_ITEMS = {
 export default function Navbar() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
-  const isShopProductPage = Boolean(pathname?.startsWith('/shop/')) && pathname !== '/shop/checkout' && pathname !== '/shop/order-success';
+  const isShopProductPage =
+    Boolean(pathname?.startsWith('/shop/')) &&
+    pathname !== '/shop/checkout' &&
+    pathname !== '/shop/order-success';
   const LEGAL_PAGE_PATHS = [
     '/privacy-policy',
     '/terms-and-conditions',
@@ -183,7 +187,11 @@ export default function Navbar() {
             className="z-50 flex items-center transition-opacity hover:opacity-80"
           >
             <Image
-              src={useLightNavbar ? '/images/svg-logo.svg' : '/images/svg-logo-white.svg'}
+              src={
+                useLightNavbar
+                  ? '/images/svg-logo.svg'
+                  : '/images/svg-logo-white.svg'
+              }
               alt="Sure Imports"
               width={180}
               height={40}
@@ -213,11 +221,13 @@ export default function Navbar() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
-                    useLightNavbar
-                      ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
-                  }`}>
+                  <NavigationMenuTrigger
+                    className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
+                      useLightNavbar
+                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
+                        : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
+                    }`}
+                  >
                     Services
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -237,11 +247,13 @@ export default function Navbar() {
                 </NavigationMenuItem>
 
                 <NavigationMenuItem>
-                  <NavigationMenuTrigger className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
-                    useLightNavbar
-                      ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
-                      : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
-                  }`}>
+                  <NavigationMenuTrigger
+                    className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
+                      useLightNavbar
+                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
+                        : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
+                    }`}
+                  >
                     Tools
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -316,6 +328,7 @@ export default function Navbar() {
                 side="right"
                 className="w-full overflow-y-auto border-slate-800 bg-slate-950 p-0 sm:max-w-md"
               >
+                <SheetTitle className="sr-only">Main Navigation Menu</SheetTitle>
                 <div className="p-6">
                   <Image
                     src="/images/svg-logo-white.svg"
@@ -422,7 +435,6 @@ export default function Navbar() {
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
-
                   </div>
 
                   <div className="mt-8 border-t border-slate-800 pt-8">

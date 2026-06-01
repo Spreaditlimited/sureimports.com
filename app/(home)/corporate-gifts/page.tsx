@@ -95,13 +95,18 @@ export default function CorporateGiftsPage() {
               <p className="mb-8 text-center text-xs font-bold uppercase tracking-widest text-slate-500">
                 Trusted by organizations across Nigeria
               </p>
-              <div className="md:hidden relative overflow-hidden">
-                <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-slate-900 to-transparent" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-slate-900 to-transparent" />
-                <div className="mobile-logo-marquee flex w-max items-center gap-10">
-                  {[...clients, ...clients].map((client, idx) => (
-                    <div key={`${client.name}-${idx}`} className="flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity">
-                      <Image src={client.src} alt={client.name} width={260} height={100} quality={100} className={`h-auto object-contain ${client.widthClass ?? 'w-[180px]'} ${client.className ?? ''}`} />
+              <div className="md:hidden">
+                <div className="grid grid-cols-2 items-center gap-6">
+                  {clients.map((client) => (
+                    <div key={client.name} className="flex items-center justify-center opacity-80">
+                      <Image
+                        src={client.src}
+                        alt={client.name}
+                        width={220}
+                        height={90}
+                        quality={100}
+                        className={`h-auto object-contain ${client.widthClass ?? 'w-[150px]'} ${client.className ?? ''}`}
+                      />
                     </div>
                   ))}
                 </div>

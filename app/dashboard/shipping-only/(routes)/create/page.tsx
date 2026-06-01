@@ -40,7 +40,7 @@ export default function CreateShippingOnlyPage() {
                 Request Shipping Service
               </h1>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                Submit your shipment details and send your supplier to our China warehouse.
+                Submit your shipment details and send your products to our China warehouse.
               </p>
             </div>
           </div>

@@ -17,7 +17,7 @@ export default function ShippingPolicyPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] pt-48 dark:bg-slate-950">
+      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
         <ShippingPolicy />
       </main>
       <Footer />

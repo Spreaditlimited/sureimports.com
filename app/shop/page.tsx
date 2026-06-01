@@ -5,7 +5,14 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/shop/ProductCard';
 import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
-import { Search, Filter, ShieldCheck, Globe, Clock, ShoppingCart } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  ShieldCheck,
+  Globe,
+  Clock,
+  ShoppingCart,
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -36,7 +43,10 @@ export default function ShopPage() {
       try {
         const res = await fetch('/api/shop/filters', { cache: 'no-store' });
         const json = await res.json();
-        if (json?.statusx === 'SUCCESS' && Array.isArray(json?.data?.categories)) {
+        if (
+          json?.statusx === 'SUCCESS' &&
+          Array.isArray(json?.data?.categories)
+        ) {
           const cleanCategories = json.data.categories.filter(Boolean);
           setCategories(['All Products', ...cleanCategories]);
         }
@@ -66,9 +76,12 @@ export default function ShopPage() {
         if (json?.statusx !== 'SUCCESS') {
           throw new Error(json?.message || 'Failed to load products');
         }
-        setProducts(Array.isArray(json?.data?.products) ? json.data.products : []);
+        setProducts(
+          Array.isArray(json?.data?.products) ? json.data.products : [],
+        );
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Failed to load products';
+        const message =
+          error instanceof Error ? error.message : 'Failed to load products';
         toast.error(message);
         setProducts([]);
       } finally {
@@ -107,24 +120,29 @@ export default function ShopPage() {
                 <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
               </span>
               <h1 className="mb-6 text-4xl font-black tracking-tight sm:text-6xl">
-                Premium Tech & Gadgets, <span className="text-brand-orange-500">Sourced Direct.</span>
+                Premium Tech & Gadgets,{' '}
+                <span className="text-brand-orange-500">Sourced Direct.</span>
               </h1>
               <p className="mb-8 text-lg text-slate-400">
-                Order directly from verified Chinese manufacturers. Delivered to your doorstep in Nigeria within 10 business days.
+                Order directly from verified Chinese manufacturers. Delivered to
+                your doorstep in Nigeria within 10 business days.
               </p>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
               <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" /> 8+ Years Experience
+                <ShieldCheck className="h-5 w-5 text-emerald-400" /> 8+ Years
+                Experience
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
               <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <Clock className="h-5 w-5 text-indigo-400" /> 10-Day Shipping Guarantee
+                <Clock className="h-5 w-5 text-indigo-400" /> 10-Day Shipping
+                Guarantee
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
               <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <Globe className="h-5 w-5 text-brand-orange-400" /> Offices in Lagos & China
+                <Globe className="h-5 w-5 text-brand-orange-400" /> Offices in
+                Lagos & China
               </div>
             </div>
           </div>
@@ -181,16 +199,25 @@ export default function ShopPage() {
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {loading ? (
-              <p className="col-span-full py-12 text-center text-slate-500">Loading products...</p>
+              <p className="col-span-full py-12 text-center text-slate-500">
+                Loading products...
+              </p>
             ) : mappedProducts.length === 0 ? (
-              <p className="col-span-full py-12 text-center text-slate-500">No products found.</p>
+              <p className="col-span-full py-12 text-center text-slate-500">
+                No products found.
+              </p>
             ) : (
-              mappedProducts.map((product) => <ProductCard key={product.id} {...product} />)
+              mappedProducts.map((product) => (
+                <ProductCard key={product.id} {...product} />
+              ))
             )}
           </div>
         </section>
       </main>
-      <CartSidebar isOpen={showCartSidebar} onClose={() => setShowCartSidebar(false)} />
+      <CartSidebar
+        isOpen={showCartSidebar}
+        onClose={() => setShowCartSidebar(false)}
+      />
       <Footer />
     </>
   );

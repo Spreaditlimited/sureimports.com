@@ -17,7 +17,7 @@ export default function PrivacyPolicyPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] pt-48 dark:bg-slate-950">
+      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
         <PrivacyPolicy />
       </main>
       <Footer />

@@ -22,7 +22,7 @@ export default function ShippingInstructions() {
     {
       id: 'en-address',
       label: 'China Address in English',
-      value: 'Room 323 3/F Mingsheng Business Centre 12-20 Guangyang road, M. Baiyun District, Guangzhou, China.',
+      value: 'Guangzhou baiyun area NO.111 airport road jiangfa plaza office NO.3FB3-1',
       icon: MapPin,
       color: 'text-indigo-600 dark:text-indigo-400',
       bg: 'bg-indigo-100 dark:bg-indigo-900/30'
@@ -30,7 +30,7 @@ export default function ShippingInstructions() {
     {
       id: 'cn-address',
       label: 'China Address in Chinese',
-      value: '广州市白云区广源中路18号明圣商贸城明圣商贸城323档',
+      value: '广州市白云区机场路111号建发广场3FB3-1.',
       icon: Globe2,
       color: 'text-brand-orange-600 dark:text-brand-orange-400',
       bg: 'bg-brand-orange-100 dark:bg-brand-orange-900/30'

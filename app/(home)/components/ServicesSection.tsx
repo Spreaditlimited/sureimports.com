@@ -83,11 +83,7 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
               
               <Button
                 onClick={() => {
-                  if ('href' in service && service.href) {
-                    router.push(service.href);
-                    return;
-                  }
-                  onNavigateToSignUp?.();
+                  router.push('/auth/login');
                 }}
                 variant="ghost"
                 className="w-fit p-0 text-brand-orange-500 hover:bg-transparent hover:text-brand-orange-600 dark:hover:text-brand-orange-400"

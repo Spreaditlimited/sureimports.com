@@ -176,14 +176,14 @@ export default function SignUpFormContainer() {
         <div className="w-full max-w-[480px]">
           
           {/* Mobile Logo */}
-          <div className="mb-8 lg:hidden">
-            <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
+          <div className="mb-8 flex justify-center lg:hidden">
+            <Link href="/">
               <Image
                 src="/images/svg-logo.svg"
                 alt="Sure Imports"
-                width={180}
-                height={40}
-                className="h-8 w-auto"
+                width={160}
+                height={36}
+                className="h-10 w-auto"
               />
             </Link>
           </div>

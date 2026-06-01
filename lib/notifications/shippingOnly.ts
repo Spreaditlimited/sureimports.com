@@ -77,4 +77,3 @@ export async function notifyNewShippingOnlyRequest(
       adminResult.status === 'rejected' ? String(adminResult.reason) : null,
   };
 }
-
