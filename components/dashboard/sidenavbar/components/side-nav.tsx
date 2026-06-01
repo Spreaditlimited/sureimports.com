@@ -169,7 +169,7 @@ export function SideNav({ items, setOpen, className }: SideNavProps) {
         <div className="mt-4 text-center text-[10px] text-muted-foreground">
           <div className="mx-auto mb-2 h-px w-20 bg-white/10" />
           <p className="text-[10px] font-medium tracking-wide text-slate-400">
-            © {currentYear} Sure Imports
+            © {currentYear} Sure Importers Limited
           </p>
           <p className="text-[10px] text-slate-500">All rights reserved.</p>
         </div>

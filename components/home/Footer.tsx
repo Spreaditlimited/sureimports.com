@@ -72,7 +72,7 @@ const locations: Location[] = [
   {
     title: 'Guangzhou, China',
     address: [
-      'Guangzhou baiyun area NO.111 airport load jiangfa plaza office NO.3FB3-1',
+      'Guangzhou baiyun area NO.111 airport road jiangfa plaza office NO.3FB3-1',
       '广州市白云区机场路111号建发广场3FB3-1.',
       // 'Room 323 3/F Mingsheng Business Centre 12-20 Guangyang road',
       // 'M. Baiyun District, Guangzhou, China.',

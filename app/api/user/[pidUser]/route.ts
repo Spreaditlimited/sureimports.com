@@ -9,11 +9,18 @@ import { generateSlug } from '@/utils/slugGenerator';
 
 const prisma = new PrismaClient();
 
+async function ensureUsersBusinessNameColumn() {
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
+  );
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ pidUser: string }> },
 ) {
   try {
+    await ensureUsersBusinessNameColumn();
     const { pidUser } = await params;
     const user = await prisma.users.findUnique({
       where: {
@@ -25,7 +32,13 @@ export async function GET(
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    const rows = (await prisma.$queryRawUnsafe(
+      `SELECT businessName FROM users WHERE pidUser = ? LIMIT 1`,
+      pidUser,
+    )) as Array<{ businessName: string | null }>;
+    const businessName = rows[0]?.businessName || null;
+
+    return NextResponse.json({ ...user, businessName });
   } catch (error) {
     return NextResponse.json(
       { error: 'Failed to fetch user' },

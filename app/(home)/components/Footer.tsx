@@ -69,7 +69,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 shrink-0 text-indigo-400" />
-                <p>5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria</p>
+                <p>5 Olutosin Ajayi Street, Ajao Estate, Lagos, Nigeria</p>
               </li>
             </ul>
           </div>
@@ -112,7 +112,7 @@ export default function Footer() {
       </div>
       
       <div className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs">
-        <p>© {new Date().getFullYear()} Sure Imports Limited. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Sure Importers Limited. All rights reserved.</p>
       </div>
     </footer>
   );

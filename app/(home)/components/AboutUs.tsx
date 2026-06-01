@@ -116,7 +116,7 @@ export default function AboutUs() {
             <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Our Journey</h2>
             <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
               <p>
-                Since 2018, Sure Imports Limited has revolutionized the way businesses source products from China. What started as a vision to bridge the gap between African entrepreneurs and Chinese manufacturers has grown into a thriving global procurement platform.
+                Since 2018, Sure Importers Limited has revolutionized the way businesses source products from China. What started as a vision to bridge the gap between African entrepreneurs and Chinese manufacturers has grown into a thriving global procurement platform.
               </p>
               <p>
                 Our team has transformed the global procurement landscape by building trust, ensuring quality, and providing seamless service. We've successfully remitted millions of dollars to suppliers and delivered hundreds of thousands of products worldwide, creating lasting partnerships across continents.
@@ -187,7 +187,7 @@ export default function AboutUs() {
                     <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Digital & AI Influence
                   </div>
                   <p className="text-sm font-medium leading-relaxed text-blue-800 dark:text-blue-300">
-                    With over 80,000 followers, Tochukwu actively shares insights on how businesses can leverage AI and digital strategy to improve operations and thrive in the modern economy.
+                    With over 100,000 followers, Tochukwu actively shares insights on how businesses can leverage AI and digital strategy to improve operations and thrive in the modern economy.
                   </p>
                 </div>
               </div>

@@ -29,6 +29,7 @@ export default function ProfileUpdateForm() {
   const [form, setForm] = useState({
     email: '',
     fullName: '',
+    businessName: '',
     gender: '',
     dob: '',
     phone: '',
@@ -46,6 +47,7 @@ export default function ProfileUpdateForm() {
       setForm({
         email: data.userEmail || '',
         fullName: data.userFirstname || '',
+        businessName: data.businessName || '',
         gender: data.gender || '',
         dob: data.dob || '',
         phone: data.phone || '',
@@ -219,6 +221,13 @@ export default function ProfileUpdateForm() {
                     name="dob"
                     value={form.dob} 
                     onChange={(e: any) => setForm({...form, dob: e.target.value})} 
+                  />
+                  <RadText
+                    label="Business Name (Optional)"
+                    id="businessName"
+                    name="businessName"
+                    value={form.businessName}
+                    onChange={(e: any) => setForm({ ...form, businessName: e.target.value })}
                   />
                 </div>
               </div>

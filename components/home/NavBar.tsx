@@ -328,7 +328,9 @@ export default function Navbar() {
                 side="right"
                 className="w-full overflow-y-auto border-slate-800 bg-slate-950 p-0 sm:max-w-md"
               >
-                <SheetTitle className="sr-only">Main Navigation Menu</SheetTitle>
+                <SheetTitle className="sr-only">
+                  Main Navigation Menu
+                </SheetTitle>
                 <div className="p-6">
                   <Image
                     src="/images/svg-logo-white.svg"

@@ -325,7 +325,7 @@ export default function TermsAndConditions() {
                     China Office
                   </h5>
                   <p className="text-sm text-gray-300">
-                    Guangzhou baiyun area NO.111 airport load jiangfa plaza
+                    Guangzhou baiyun area NO.111 airport road jiangfa plaza
                     office NO.3FB3-1
                   </p>
                   <p className="mt-1 text-xs text-gray-400">

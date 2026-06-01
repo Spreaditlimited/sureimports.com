@@ -16,7 +16,7 @@ const Whitebtn: React.FC<WhitebtnProps> = ({
   return (
     <Link
       href={href}
-      className={`duration-[0.3s] inline-flex items-center justify-center rounded-[30px] bg-white p-[11px_33px] text-[18px] font-medium leading-[155%] text-black transition-all hover:opacity-70 ${className}`}
+      className={`duration-300 inline-flex items-center justify-center rounded-[30px] bg-white p-[11px_33px] text-[18px] font-medium leading-[155%] text-black transition-all hover:opacity-70 ${className}`}
     >
       {text}
     </Link>

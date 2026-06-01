@@ -54,7 +54,7 @@ const testimonials2: Testimonial[] = [
     role: 'Customer',
     avatar: '/images/reviewprofilemain.png',
     message:
-      'You want to import equipment? You want to source anything in China? You are so afraid of being defrauded. You just want an honest upright truthful sensible person. You want a person who will listen and execute every line of the agreement. You want a person who is deeply knowledgeable and not audio. You want a person whose integrity allows you pay him 100 million and go to sleep. You want a person who has a team (not audio) in China. You want a person with a brain who can make suggestions and guide you. Nwannem, run to Nkwocha Tochukwu (CEO of Sure Imports Limited). Pay him your money. Buy popcorn, cross leg and chop. Sleep with 2 eyes closed. Kobo no go miss.',
+      'You want to import equipment? You want to source anything in China? You are so afraid of being defrauded. You just want an honest upright truthful sensible person. You want a person who will listen and execute every line of the agreement. You want a person who is deeply knowledgeable and not audio. You want a person whose integrity allows you pay him 100 million and go to sleep. You want a person who has a team (not audio) in China. You want a person with a brain who can make suggestions and guide you. Nwannem, run to Nkwocha Tochukwu (CEO of Sure Importers Limited). Pay him your money. Buy popcorn, cross leg and chop. Sleep with 2 eyes closed. Kobo no go miss.',
   },
   {
     name: 'Martins Ohiarebu Airende',

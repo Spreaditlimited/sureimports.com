@@ -56,7 +56,7 @@ const Browse: React.FC = () => {
               <Link
                 key={index}
                 href={item.href}
-                className="duration-[0.3s] browse-link inline-flex min-w-[550px] items-center gap-[40px] rounded-[20px] border border-solid border-[#F4F4F4] bg-store-white p-[37px_30px_37px_55px] shadow-customboxshadow transition-all hover:bg-store-blue max-xl:min-w-[430px] max-xl:p-[30px] max-lg:min-w-[350px] max-lg:gap-[25px] max-lg:p-[25px] max-sm:rounded-[15px] max-[420px]:min-w-[260px] max-[420px]:p-[20px_15px]"
+                className="duration-300 browse-link inline-flex min-w-[550px] items-center gap-[40px] rounded-[20px] border border-solid border-[#F4F4F4] bg-store-white p-[37px_30px_37px_55px] shadow-customboxshadow transition-all hover:bg-store-blue max-xl:min-w-[430px] max-xl:p-[30px] max-lg:min-w-[350px] max-lg:gap-[25px] max-lg:p-[25px] max-sm:rounded-[15px] max-[420px]:min-w-[260px] max-[420px]:p-[20px_15px]"
               >
                 <Image
                   className="max-[420px]:max-w-[17%]"

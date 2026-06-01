@@ -110,7 +110,7 @@ export default function Footer({
                   <div className="text-sm">
                     <p className="font-medium text-white">Nigeria Office:</p>
                     <p className="text-gray-400">
-                      5 Olutosin Ajay Street, Ajao Estate, Lagos, Nigeria
+                      5 Olutosin Ajayi Street, Ajao Estate, Lagos, Nigeria
                     </p>
                   </div>
                 </div>
@@ -278,7 +278,7 @@ export default function Footer({
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between space-y-2 sm:flex-row sm:space-y-0">
             <p className="text-sm text-gray-500">
-              © 2025 Sure Imports Limited. All rights reserved.
+              © 2025 Sure Importers Limited. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 sm:justify-end">
               <button

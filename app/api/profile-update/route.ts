@@ -11,7 +11,14 @@ import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 
 const prisma = new PrismaClient();
 
+async function ensureUsersBusinessNameColumn() {
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
+  );
+}
+
 export async function POST(request: Request) {
+  await ensureUsersBusinessNameColumn();
   //GET FORM DATA
   const formData = await request.formData();
 
@@ -24,6 +31,7 @@ export async function POST(request: Request) {
   const phone = formData.get('phone') as string;
   const country = formData.get('country') as string;
   const address = formData.get('address') as string;
+  const businessName = String(formData.get('businessName') || '').trim();
 
   //CHECK IF USER PID AND CID EXISTS
   const user = await prisma.users.findUnique({
@@ -68,6 +76,13 @@ export async function POST(request: Request) {
       updatedAt: new Date(),
     },
   });
+
+  await prisma.$executeRawUnsafe(
+    `UPDATE users SET businessName = ?, updatedAt = NOW(3) WHERE pidUser = ? AND userEmail = ?`,
+    businessName || null,
+    pidUser,
+    email,
+  );
 
   let imageStatus = 'YES';
 

@@ -62,7 +62,7 @@ const Banner: React.FC = () => {
               <div className="banner-btn-group mt-[30px] flex gap-[15px] max-lg:justify-center max-sm:hidden">
                 <Link
                   href="/auth/signup-store"
-                  className="duration-[0.3s] inline-flex items-center justify-center rounded-[30px] border border-store-white bg-store-lightwhitebg p-[11px_42px] text-[18px] font-medium leading-[155%] text-store-white transition-all hover:bg-store-white hover:text-store-blue max-xl14:p-[11px_30px] max-xl14:text-[15px]"
+                  className="duration-300 inline-flex items-center justify-center rounded-[30px] border border-store-white bg-store-lightwhitebg p-[11px_42px] text-[18px] font-medium leading-[155%] text-store-white transition-all hover:bg-store-white hover:text-store-blue max-xl14:p-[11px_30px] max-xl14:text-[15px]"
                 >
                   Browse Devices
                 </Link>

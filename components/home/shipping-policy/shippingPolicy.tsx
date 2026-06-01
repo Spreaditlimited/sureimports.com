@@ -46,7 +46,7 @@ const PrivacyPolicy: React.FC = () => {
           <br /> */}
           <b>3. China:</b>
           <br />
-          Guangzhou baiyun area NO.111 airport load jiangfa plaza office
+          Guangzhou baiyun area NO.111 airport road jiangfa plaza office
           NO.3FB3-1 广州市白云区机场路111号建发广场3FB3-1.
           <br />
           <br />
@@ -73,7 +73,7 @@ const PrivacyPolicy: React.FC = () => {
           United Kingdom */}
           </address>
           <address className="mt-5 w-full not-italic">
-            China: Guangzhou baiyun area NO.111 airport load jiangfa plaza
+            China: Guangzhou baiyun area NO.111 airport road jiangfa plaza
             office NO.3FB3-1 广州市白云区机场路111号建发广场3FB3-1.
             {/* China: Room 323 3/F Mingsheng Business Centre, 12-20 Guangyang Road,
           M. Baiyun District, Guangzhou, China.

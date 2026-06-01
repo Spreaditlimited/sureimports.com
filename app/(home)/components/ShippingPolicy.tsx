@@ -172,7 +172,7 @@ export default function ShippingPolicy() {
                   <h4 className="mb-3 font-bold text-slate-900 dark:text-white">China Office</h4>
                   <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     Guangzhou baiyun area NO.111<br />
-                    airport load jiangfa plaza office NO.3FB3-1<br />
+                    airport road jiangfa plaza office NO.3FB3-1<br />
                     广州市白云区机场路111号建发广场3FB3-1
                   </p>
                 </div>

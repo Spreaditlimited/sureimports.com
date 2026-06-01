@@ -305,7 +305,7 @@ export default function TermsAndConditions() {
                 <div className="rounded-2xl bg-slate-50 p-6 dark:bg-slate-900/50">
                   <h4 className="mb-3 font-bold text-slate-900 dark:text-white">China Office</h4>
                   <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                    Guangzhou baiyun area NO.111 airport load jiangfa plaza office NO.3FB3-1
+                    Guangzhou baiyun area NO.111 airport road jiangfa plaza office NO.3FB3-1
                     <br />
                     <span className="mt-1 block text-xs text-slate-400">广州市白云区机场路111号建发广场3FB3-1</span>
                   </p>

@@ -5,6 +5,21 @@ import { cookies } from 'next/headers';
 
 const prisma = new PrismaClient();
 
+async function ensureUsersBusinessNameColumn() {
+  await prisma.$executeRawUnsafe(
+    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
+  );
+}
+
+async function getBusinessName(pidUser: string) {
+  await ensureUsersBusinessNameColumn();
+  const rows = (await prisma.$queryRawUnsafe(
+    `SELECT businessName FROM users WHERE pidUser = ? LIMIT 1`,
+    pidUser,
+  )) as Array<{ businessName: string | null }>;
+  return rows[0]?.businessName || null;
+}
+
 export async function GET() {
   const cookieStore = cookies();
   const token = (await cookieStore).get('token')?.value;
@@ -63,12 +78,14 @@ export async function GET() {
       return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
+    const businessName = await getBusinessName(user.pidUser);
     return NextResponse.json({
       user: {
         pidUser: user.pidUser,
         userEmail: user.userEmail,
         userFirstname: user.userFirstname,
         userLastname: user.userLastname,
+        businessName,
         userPhone: user.userPhone,
         phone: user.phone,
         userImage: user.userImage,
