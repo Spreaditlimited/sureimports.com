@@ -17,6 +17,11 @@ interface User {
   userStatus: string;
 }
 
+export type RegisterStoreResponse = {
+  statusx: 'SUCCESS' | 'FAILED_VALIDATION' | 'FAILED';
+  message: string;
+};
+
 interface AuthContextType {
   user: User | null;
   login: (
@@ -24,6 +29,7 @@ interface AuthContextType {
     userPassword: string,
     recaptchaToken?: string,
   ) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     userEmail: string,
@@ -38,11 +44,34 @@ interface AuthContextType {
     userPassword?: string,
     confirmPassword?: string,
     userAffiliateRef?: string,
-  ) => Promise<void>;
+  ) => Promise<RegisterStoreResponse>;
   checkAuth: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const DEFAULT_LOGIN_REDIRECT = '/dashboard/procurement';
+
+function getSafeLoginRedirect(redirectCandidate: string): string {
+  if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
+
+  try {
+    const url = new URL(redirectCandidate, 'https://sureimports.local');
+    const isSameOrigin = url.origin === 'https://sureimports.local';
+    const isDashboardPath = url.pathname.startsWith('/dashboard');
+    const isShopCheckoutResume =
+      url.pathname === '/shop/checkout' &&
+      url.searchParams.get('resumeCheckout') === '1';
+
+    if (isSameOrigin && (isDashboardPath || isShopCheckoutResume)) {
+      return `${url.pathname}${url.search}${url.hash}`;
+    }
+  } catch {
+    return DEFAULT_LOGIN_REDIRECT;
+  }
+
+  return DEFAULT_LOGIN_REDIRECT;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -97,12 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ? window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) || ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
-    const safeNextPath =
-      redirectCandidate &&
-      redirectCandidate.startsWith('/') &&
-      !redirectCandidate.startsWith('/auth/')
-        ? redirectCandidate
-        : '/dashboard/procurement';
+    const safeNextPath = getSafeLoginRedirect(redirectCandidate);
 
     const res = await fetch('/api/auth/login', {
       method: 'POST',
@@ -132,18 +156,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithGoogle = async (credential: string) => {
+    const searchParams =
+      typeof window !== 'undefined'
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const nextParam = searchParams?.get('next') || '';
+    const storedNextPath =
+      typeof window !== 'undefined'
+        ? window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) || ''
+        : '';
+    const redirectCandidate = nextParam || storedNextPath;
+    const safeNextPath = getSafeLoginRedirect(redirectCandidate);
+
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    });
+    const data = await res.json();
+
+    if (!res.ok || data.statusx !== 'SUCCESS') {
+      throw new Error(data.message || 'Google sign-in failed.');
+    }
+
+    setUser(data.user);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(POST_LOGOUT_REDIRECT_KEY);
+    }
+    router.push(safeNextPath);
+  };
+
   /////////////////////////////////// LOGOUT
   const logout = async () => {
     const currentPath =
       typeof window !== 'undefined'
         ? `${window.location.pathname}${window.location.search}`
         : '';
-    const safeCurrentPath =
-      currentPath &&
-      currentPath.startsWith('/') &&
-      !currentPath.startsWith('/auth/')
-        ? currentPath
-        : '/dashboard/procurement';
+    const safeCurrentPath = getSafeLoginRedirect(currentPath);
 
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
@@ -197,7 +247,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }),
     });
 
-    const data: any = await res.json();
+    const data = (await res.json()) as RegisterStoreResponse;
 
     if (res.ok) {
       //setUser(data.user);
@@ -211,6 +261,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (data.statusx == 'FAILED') {
         throw new Error(data.message);
       }
+      throw new Error(data.message || 'Registration failed.');
     } else {
       throw new Error(data.message);
     }
@@ -218,7 +269,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, logout, register, register_store, checkAuth }}
+      value={{
+        user,
+        login,
+        loginWithGoogle,
+        logout,
+        register,
+        register_store,
+        checkAuth,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -178,3 +178,7 @@
   animation: marquee 26s linear infinite;
   will-change: transform;
 }
+
+.grecaptcha-badge {
+  visibility: hidden;
+}

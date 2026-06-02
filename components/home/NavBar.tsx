@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   Menu,
   MonitorPlay,
@@ -12,7 +12,6 @@ import {
   ShoppingCart,
   LogOut,
   Ship,
-  Search,
   Gift,
   Sparkles,
   Calculator,
@@ -145,7 +144,6 @@ const MENU_ITEMS = {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
@@ -166,9 +164,7 @@ export default function Navbar() {
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
   const useLightNavbar =
     isShopProductPage || isLegalPage || isToolsPage || isBlogPage;
-  const queryString = searchParams.toString();
-  const currentPath = `${pathname || '/'}${queryString ? `?${queryString}` : ''}`;
-  const signInHref = `/auth/login?next=${encodeURIComponent(currentPath)}`;
+  const signInHref = '/auth/login';
   const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
 
   const handleCartNavClick = (event: React.MouseEvent<HTMLAnchorElement>) => {

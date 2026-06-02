@@ -362,7 +362,7 @@ function CheckoutContent() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <button 
-            onClick={() => router.back()} 
+            onClick={() => router.push('/shop')}
             disabled={processingPayment}
             className="group mb-8 flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 transition hover:text-white disabled:opacity-50"
           >

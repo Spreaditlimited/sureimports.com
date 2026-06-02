@@ -44,7 +44,7 @@ const SignupForm: React.FC = () => {
     try {
       toast.success('Processing . . .'); //return;
       setLoading(true);
-      const response: any = await register_store(
+      const response = await register_store(
         userFirstname,
         userLastname,
         userEmail,

@@ -8,7 +8,6 @@ import { z } from 'zod';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
-import ReCAPTCHA from 'react-google-recaptcha';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -23,6 +22,7 @@ import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 import { useAuth } from '@/app/context/AuthContext';
 import { getAffiliateReference } from '@/utils/affiliateUtils';
+import { useRecaptchaV3 } from '@/lib/security/useRecaptchaV3';
 
 ////////////////////// ZOD FORM SCHEMA //////////////////////
 const formSchema = z
@@ -56,10 +56,7 @@ export default function SignUpFormContainer() {
   const [authChecked, setAuthChecked] = React.useState(false);
 
   const [isLoading, setIsLoading] = React.useState(false);
-  const [recaptchaToken, setRecaptchaToken] = React.useState<string | null>(
-    null,
-  );
-  const siteKey = process.env.GOOGLE_CAPTCHA_SITE_KEY;
+  const executeRecaptcha = useRecaptchaV3();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const nextParam = searchParams.get('next');
@@ -122,13 +119,9 @@ export default function SignUpFormContainer() {
   }, [searchParams, form, getAffiliateRef]);
 
   const onSubmit = async (data: FormValues) => {
-    if (siteKey && !recaptchaToken) {
-      toast.error('Please complete captcha verification.');
-      return;
-    }
-
     setIsLoading(true);
     try {
+      const recaptchaToken = await executeRecaptcha('register');
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -337,16 +330,6 @@ export default function SignUpFormContainer() {
                     </FormItem>
                   )}
                 />
-
-                {siteKey ? (
-                  <div className="pt-2">
-                    <ReCAPTCHA
-                      sitekey={siteKey}
-                      onChange={(token) => setRecaptchaToken(token)}
-                      onExpired={() => setRecaptchaToken(null)}
-                    />
-                  </div>
-                ) : null}
 
                 {/* Submit Button */}
                 <div className="pt-4">

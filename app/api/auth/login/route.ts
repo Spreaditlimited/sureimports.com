@@ -10,7 +10,11 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   const { userEmail, userPassword, recaptchaToken } = await request.json();
 
-  const isCaptchaValid = await verifyRecaptchaToken(recaptchaToken);
+  const isCaptchaValid = await verifyRecaptchaToken(
+    recaptchaToken,
+    request,
+    'login',
+  );
   if (!isCaptchaValid) {
     return NextResponse.json(
       {

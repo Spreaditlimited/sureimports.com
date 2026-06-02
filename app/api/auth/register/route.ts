@@ -28,7 +28,11 @@ export async function POST(request: NextRequest) {
     recaptchaToken,
   } = await request.json();
 
-  const isCaptchaValid = await verifyRecaptchaToken(recaptchaToken);
+  const isCaptchaValid = await verifyRecaptchaToken(
+    recaptchaToken,
+    request,
+    'register',
+  );
   if (!isCaptchaValid) {
     const messagex = {
       message1: 'Captcha verification failed. Please try again.',

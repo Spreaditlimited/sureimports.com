@@ -1,7 +1,19 @@
+function isLocalhostRequest(request?: Request): boolean {
+  const hostHeader = request?.headers.get('host')?.toLowerCase();
+  const host = hostHeader?.startsWith('[::1]')
+    ? '::1'
+    : hostHeader?.split(':')[0];
+  return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+}
+
 export async function verifyRecaptchaToken(
   token: string | undefined | null,
+  request?: Request,
+  expectedAction?: string,
 ): Promise<boolean> {
   const secret = process.env.GOOGLE_CAPTCHA_SECRET_KEY;
+
+  if (isLocalhostRequest(request)) return true;
 
   // If not configured, keep behavior unchanged.
   if (!secret) return true;
@@ -29,11 +41,20 @@ export async function verifyRecaptchaToken(
       success?: boolean;
       score?: number;
       action?: string;
+      'error-codes'?: string[];
     };
 
-    if (!payload.success) return false;
+    if (!payload.success) {
+      console.error('reCAPTCHA verification rejected:', {
+        errorCodes: payload['error-codes'] || [],
+      });
+      return false;
+    }
 
-    // Optional v3 score gate. If score is absent (v2), accept.
+    if (expectedAction && payload.action !== expectedAction) return false;
+
+    if (expectedAction && typeof payload.score !== 'number') return false;
+
     if (typeof payload.score === 'number' && payload.score < 0.5) return false;
 
     return true;
