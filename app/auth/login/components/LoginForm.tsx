@@ -146,39 +146,42 @@ export default function LoginForm() {
 
   return (
     <div className="flex min-h-screen w-full bg-white dark:bg-slate-950">
-      {/* Left Marketing Panel - Hidden on Mobile */}
+      {/* LEFT PANEL: Brand & Visuals (Hidden on Mobile) */}
       <div className="relative hidden w-1/2 flex-col justify-between bg-slate-900 p-12 lg:flex xl:p-16">
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/hero-background-1.png"
             alt="Global Logistics Port"
             fill
-            className="object-cover opacity-20 mix-blend-luminosity"
+            className="object-cover opacity-30 mix-blend-luminosity"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
         </div>
 
         <div className="relative z-10">
-          <Link href="/">
+          <Link
+            href="/"
+            className="inline-flex items-center transition-opacity hover:opacity-80"
+          >
             <Image
               src="/images/svg-logo-white.svg"
               alt="Sure Imports"
-              width={160}
-              height={36}
-              className="transition-opacity hover:opacity-80"
+              width={180}
+              height={40}
+              className="h-8 w-auto"
             />
           </Link>
         </div>
 
-        <div className="relative z-10 max-w-xl">
-          <h1 className="mb-4 text-4xl font-bold leading-tight tracking-tight text-white xl:text-5xl">
-            Global logistics, <br />
-            <span className="text-brand-orange-500">streamlined.</span>
+        <div className="relative z-10 mb-10 max-w-xl">
+          <h1 className="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-white xl:text-5xl">
+            GLOBAL LOGISTICS,{' '}
+            <span className="text-brand-orange-500">STREAMLINED.</span>
           </h1>
-          <p className="text-lg text-slate-400">
-            Manage your global import network from one centralized platform.
-            Source, track, and trade with confidence.
+          <p className="text-lg font-medium leading-relaxed text-slate-300">
+            Securely manage your global import network from one centralized
+            platform. Source, track, and trade with absolute confidence.
           </p>
         </div>
       </div>
