@@ -17,6 +17,10 @@ declare global {
 const siteKey = process.env.NEXT_PUBLIC_GOOGLE_CAPTCHA_SITE_KEY;
 let recaptchaScriptPromise: Promise<void> | null = null;
 
+function isValidSiteKey(configuredSiteKey: string): boolean {
+  return /^[A-Za-z0-9_-]+$/.test(configuredSiteKey);
+}
+
 function isLocalhost(): boolean {
   return (
     window.location.hostname === 'localhost' ||
@@ -30,8 +34,15 @@ function loadRecaptchaScript(configuredSiteKey: string): Promise<void> {
   if (recaptchaScriptPromise) return recaptchaScriptPromise;
 
   recaptchaScriptPromise = new Promise((resolve, reject) => {
+    if (!isValidSiteKey(configuredSiteKey)) {
+      reject(new Error('Invalid reCAPTCHA site key.'));
+      return;
+    }
+
     const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${configuredSiteKey}`;
+    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(
+      configuredSiteKey,
+    )}`;
     script.async = true;
     script.defer = true;
     script.onload = () => resolve();

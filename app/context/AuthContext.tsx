@@ -54,17 +54,25 @@ const DEFAULT_LOGIN_REDIRECT = '/dashboard/procurement';
 
 function getSafeLoginRedirect(redirectCandidate: string): string {
   if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
+  if (
+    !redirectCandidate.startsWith('/') ||
+    redirectCandidate.startsWith('//') ||
+    redirectCandidate.startsWith('/auth/')
+  ) {
+    return DEFAULT_LOGIN_REDIRECT;
+  }
 
   try {
-    const url = new URL(redirectCandidate, 'https://sureimports.local');
-    const isSameOrigin = url.origin === 'https://sureimports.local';
-    const isDashboardPath = url.pathname.startsWith('/dashboard');
+    const [pathWithQuery, hash = ''] = redirectCandidate.split('#');
+    const [pathname, search = ''] = pathWithQuery.split('?');
+    const searchParams = new URLSearchParams(search);
+    const isDashboardPath = pathname.startsWith('/dashboard');
     const isShopCheckoutResume =
-      url.pathname === '/shop/checkout' &&
-      url.searchParams.get('resumeCheckout') === '1';
+      pathname === '/shop/checkout' &&
+      searchParams.get('resumeCheckout') === '1';
 
-    if (isSameOrigin && (isDashboardPath || isShopCheckoutResume)) {
-      return `${url.pathname}${url.search}${url.hash}`;
+    if (isDashboardPath || isShopCheckoutResume) {
+      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     }
   } catch {
     return DEFAULT_LOGIN_REDIRECT;

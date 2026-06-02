@@ -46,6 +46,7 @@ export default function LoginForm() {
   const { login, loginWithGoogle } = useAuth();
   const searchParams = useSearchParams();
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
+  const googleButtonRenderedRef = useRef(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -63,6 +64,7 @@ export default function LoginForm() {
 
     const renderGoogleButton = () => {
       if (!window.google?.accounts?.id || !googleButtonRef.current) return;
+      if (googleButtonRenderedRef.current) return;
 
       googleButtonRef.current.innerHTML = '';
       window.google.accounts.id.initialize({
@@ -88,7 +90,6 @@ export default function LoginForm() {
         },
       });
 
-      // Kept at 340px to ensure it safely fits mobile screens without overflowing
       window.google.accounts.id.renderButton(googleButtonRef.current, {
         theme: 'outline',
         size: 'large',
@@ -97,6 +98,7 @@ export default function LoginForm() {
         shape: 'rectangular',
         logo_alignment: 'center',
       });
+      googleButtonRenderedRef.current = true;
     };
 
     if (window.google?.accounts?.id) {
@@ -124,7 +126,12 @@ export default function LoginForm() {
     }
     setIsLoading(true);
     try {
-      const recaptchaToken = await executeRecaptcha('login');
+      let recaptchaToken: string | undefined;
+      try {
+        recaptchaToken = await executeRecaptcha('login');
+      } catch (error) {
+        console.error('reCAPTCHA execution failed:', error);
+      }
       await login(email, password, recaptchaToken || undefined);
     } catch (error) {
       const message =
@@ -216,7 +223,7 @@ export default function LoginForm() {
                   ref={googleButtonRef}
                   className={`flex w-full justify-center ${
                     isGoogleLoading ? 'pointer-events-none opacity-50' : ''
-                  }`}
+                  } min-h-[44px]`}
                 />
               </div>
             )}

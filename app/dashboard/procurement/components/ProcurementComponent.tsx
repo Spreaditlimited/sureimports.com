@@ -1,13 +1,19 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Stores from '@/components/dashboard/procurement/stores';
 import { useRouter } from 'next/navigation';
 import CreateOrder from '../create-order/components/createOrder';
-import { VideoIcon, ExternalLink, PlayCircle, Bookmark, Globe } from 'lucide-react';
+import {
+  VideoIcon,
+  ExternalLink,
+  PlayCircle,
+  Bookmark,
+  Globe,
+  X,
+} from 'lucide-react';
 import { useModal } from '@/app/context/ModalContext';
-import Modal from '@/components/uix/ModalLarge';
 import { useAuth } from '@/app/context/AuthContext';
 
 export default function Procurement() {
@@ -15,41 +21,84 @@ export default function Procurement() {
   const router = useRouter();
   const { isModalOpen, openModal, closeModal } = useModal();
 
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [isModalOpen]);
+
   const videoGuides = [
     { id: 'qpUBdhmVK7c', title: 'How to create Orders on SureImports' },
-    { id: 'zxkPU0ZCTlM', title: 'Where and How to Buy Authentic Designer Items' },
-    { id: 'nX5S-SIr_To', title: 'Import from 1688.com to the UK' }
+    {
+      id: 'zxkPU0ZCTlM',
+      title: 'Where and How to Buy Authentic Designer Items',
+    },
+    { id: 'nX5S-SIr_To', title: 'Import from 1688.com to the UK' },
   ];
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <div className="bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
-          <div className="p-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-              <PlayCircle className="text-red-500 h-5 w-5" /> Tutorial Guides
-            </h2>
-          </div>
-          <div className="max-h-[70vh] overflow-y-auto p-4 space-y-8">
-            {videoGuides.map((video, index) => (
-              <div key={video.id} className="space-y-3">
-                <h3 className="text-base font-bold text-slate-700 dark:text-slate-200">
-                  ({index + 1}) {video.title}
-                </h3>
-                <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-slate-800 shadow-sm">
-                  <iframe
-                    className="absolute inset-0 h-full w-full"
-                    src={`https://www.youtube.com/embed/${video.id}`}
-                    title={video.title}
-                    frameBorder="0"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-md transition-all">
+          <div className="relative max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-[#161629]">
+            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-r from-indigo-600/10 via-blue-500/5 to-transparent dark:from-indigo-600/20 dark:via-blue-500/10" />
+
+            <div className="relative flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800 sm:px-8">
+              <div>
+                <span className="mb-2 inline-flex items-center rounded-lg bg-indigo-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  Video Guide
+                </span>
+                <h2 className="flex items-center gap-2 text-2xl font-black text-slate-900 dark:text-white">
+                  <PlayCircle className="h-6 w-6 text-indigo-600 dark:text-indigo-500" />
+                  Tutorial Guides
+                </h2>
               </div>
-            ))}
+
+              <button
+                type="button"
+                onClick={closeModal}
+                className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-900 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+                aria-label="Close video guide modal"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="custom-scrollbar max-h-[calc(90vh-116px)] overflow-y-auto p-6 sm:p-8">
+              <div className="grid gap-8 lg:grid-cols-2">
+                {videoGuides.map((video, index) => (
+                  <div
+                    key={video.id}
+                    className="flex flex-col overflow-hidden rounded-[24px] border border-slate-200 bg-slate-50 p-5 shadow-sm transition-all hover:border-indigo-200 dark:border-slate-700 dark:bg-[#0f1020] dark:hover:border-slate-600"
+                  >
+                    <h3 className="mb-4 flex flex-col gap-3 text-sm font-bold text-slate-900 dark:text-white sm:flex-row sm:items-center">
+                      <span className="w-fit rounded-md bg-indigo-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400">
+                        Part {index + 1}
+                      </span>
+                      <span className="leading-snug">{video.title}</span>
+                    </h3>
+
+                    <div className="relative mt-auto aspect-video w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-200 shadow-inner dark:border-slate-800 dark:bg-slate-900">
+                      <iframe
+                        className="absolute inset-0 h-full w-full border-0"
+                        src={`https://www.youtube-nocookie.com/embed/${video.id}?rel=0`}
+                        title={video.title}
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
-      </Modal>
+      )}
 
       {/* Hero Section */}
       <div className="bg-slate-900 pb-24 pt-10 text-white md:pb-32 md:pt-16">
@@ -80,7 +129,7 @@ export default function Procurement() {
                 <Button
                   onClick={openModal}
                   variant="outline"
-                  className="flex-1 sm:flex-none bg-slate-800/40 border-slate-700 hover:bg-slate-800 text-white h-12 px-5 rounded-xl"
+                  className="flex-1 sm:flex-none bg-slate-800/40 border-slate-700 hover:bg-slate-800 text-white hover:!text-white h-12 px-5 rounded-xl"
                 >
                   <VideoIcon className="mr-2 h-4 w-4 text-red-500" />
                   <span className="text-sm">Video Guide</span>
