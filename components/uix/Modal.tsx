@@ -33,9 +33,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         .modal {
           background: white;
           padding: 20px;
-          border-radius: 10px;
+          border-radius: 32px;
           max-width: 500px;
-          width: 100%;
+          width: calc(100vw - 2rem);
           position: relative;
         }
         .close-button {

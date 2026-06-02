@@ -2,6 +2,7 @@
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -11,11 +12,12 @@ import {
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { useState } from 'react';
+import { Plus, X } from 'lucide-react';
 
 interface TopUpDialogProps {
-  bankName?: any;
-  accountName?: any;
-  accountNumber?: any;
+  bankName?: string;
+  accountName?: string;
+  accountNumber?: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -30,9 +32,9 @@ export default function TopUpDialog({
   const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const bankDetails = {
-    bankName: bankName,
-    accountName: accountName,
-    accountNumber: accountNumber,
+    bankName: bankName || '',
+    accountName: accountName || '',
+    accountNumber: accountNumber || '',
     sortCode: 'Not Applicable',
     transferReference: 'WALLET-TOPUP',
   };
@@ -45,33 +47,31 @@ export default function TopUpDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
-        <DialogHeader className="space-y-2">
-          <DialogTitle className="flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-              <svg
-                className="h-4 w-4 text-blue-600 dark:text-blue-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6V12M12 12V18M12 12H18M12 12H6"
-                />
-              </svg>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="flex max-h-[90dvh] max-h-[90vh] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-[#161629] sm:max-w-md [&>button]:hidden">
+        <DialogHeader className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white px-5 py-5 text-left dark:border-slate-800 dark:bg-[#161629] sm:px-6">
+          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-blue-600/10 via-indigo-500/5 to-transparent dark:from-blue-600/20 dark:via-indigo-500/10" />
+          <div className="relative flex items-start justify-between gap-4">
+            <div className="space-y-2">
+              <DialogTitle className="flex items-center gap-2 text-xl font-black text-slate-900 dark:text-white">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/30">
+                  <Plus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </span>
+                Top Up Your Wallet
+              </DialogTitle>
+              <DialogDescription className="text-sm text-slate-500 dark:text-slate-400">
+                Transfer to the account below. Funds reflect within 2-5 minutes.
+              </DialogDescription>
             </div>
-            Top Up Your Wallet
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
-            Transfer to the account below. Funds reflect within 2-5 minutes.
-          </DialogDescription>
+
+            <DialogClose className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-900 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close top up modal</span>
+            </DialogClose>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-3">
+        <div className="custom-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto bg-white px-5 py-5 dark:bg-[#161629] sm:px-6 sm:py-6">
           {/* Bank Account Details */}
           <Card className="border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-900/20">
             <h4 className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
@@ -93,10 +93,10 @@ export default function TopUpDialog({
 
             <div className="space-y-2">
               {/* Bank Name */}
-              <div className="flex items-center justify-between rounded border bg-background p-2">
-                <div>
+              <div className="flex items-center justify-between gap-3 rounded border bg-background p-2">
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Bank Name</p>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="break-words text-sm font-medium text-foreground">
                     {bankName}
                   </p>
                 </div>
@@ -106,7 +106,7 @@ export default function TopUpDialog({
                   onClick={() =>
                     copyToClipboard(bankDetails.bankName, 'bankName')
                   }
-                  className="h-8 w-8 p-0 text-blue-600 dark:text-blue-400"
+                  className="h-8 w-8 shrink-0 p-0 text-blue-600 dark:text-blue-400"
                 >
                   {copiedField === 'bankName' ? (
                     <svg
@@ -141,10 +141,10 @@ export default function TopUpDialog({
               </div>
 
               {/* Account Name */}
-              <div className="flex items-center justify-between rounded border bg-background p-2">
-                <div>
+              <div className="flex items-center justify-between gap-3 rounded border bg-background p-2">
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Account Name</p>
-                  <p className="text-sm font-medium text-foreground">
+                  <p className="break-words text-sm font-medium text-foreground">
                     {accountName}
                   </p>
                 </div>
@@ -154,7 +154,7 @@ export default function TopUpDialog({
                   onClick={() =>
                     copyToClipboard(bankDetails.accountName, 'accountName')
                   }
-                  className="h-8 w-8 p-0 text-blue-600 dark:text-blue-400"
+                  className="h-8 w-8 shrink-0 p-0 text-blue-600 dark:text-blue-400"
                 >
                   {copiedField === 'accountName' ? (
                     <svg
@@ -189,12 +189,12 @@ export default function TopUpDialog({
               </div>
 
               {/* Account Number */}
-              <div className="flex items-center justify-between rounded border bg-background p-2">
-                <div>
+              <div className="flex items-center justify-between gap-3 rounded border bg-background p-2">
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">
                     Account Number
                   </p>
-                  <p className="text-sm font-medium tracking-wider text-foreground">
+                  <p className="break-words text-sm font-medium tracking-wider text-foreground">
                     {accountNumber}
                   </p>
                 </div>
@@ -202,9 +202,9 @@ export default function TopUpDialog({
                   variant="ghost"
                   size="sm"
                   onClick={() =>
-                    copyToClipboard(accountNumber, 'accountNumber')
+                    copyToClipboard(bankDetails.accountNumber, 'accountNumber')
                   }
-                  className="h-8 w-8 p-0 text-blue-600 dark:text-blue-400"
+                  className="h-8 w-8 shrink-0 p-0 text-blue-600 dark:text-blue-400"
                 >
                   {copiedField === 'accountNumber' ? (
                     <svg
@@ -239,10 +239,10 @@ export default function TopUpDialog({
               </div>
 
               {/* Sort Code */}
-              <div className="flex items-center justify-between rounded border bg-background p-2">
-                <div>
+              <div className="flex items-center justify-between gap-3 rounded border bg-background p-2">
+                <div className="min-w-0">
                   <p className="text-xs text-muted-foreground">Sort Code</p>
-                  <p className="text-sm font-medium tracking-wider text-foreground">
+                  <p className="break-words text-sm font-medium tracking-wider text-foreground">
                     {bankDetails.sortCode}
                   </p>
                 </div>
@@ -252,7 +252,7 @@ export default function TopUpDialog({
                   onClick={() =>
                     copyToClipboard(bankDetails.sortCode, 'sortCode')
                   }
-                  className="h-8 w-8 p-0 text-blue-600 dark:text-blue-400"
+                  className="h-8 w-8 shrink-0 p-0 text-blue-600 dark:text-blue-400"
                 >
                   {copiedField === 'sortCode' ? (
                     <svg
@@ -336,9 +336,9 @@ export default function TopUpDialog({
           </div>
         </div>
 
-        <DialogFooter className="pt-3">
+        <DialogFooter className="shrink-0 border-t border-slate-100 bg-white px-5 py-4 dark:border-slate-800 dark:bg-[#161629] sm:px-6 sm:py-5">
           <Button onClick={onClose} className="w-full">
-            Got it, I'll make the transfer
+            Got it, I&apos;ll make the transfer
           </Button>
         </DialogFooter>
       </DialogContent>

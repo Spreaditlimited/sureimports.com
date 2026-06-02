@@ -51,7 +51,7 @@ type BrowserLeadEventInput = {
 
 export function trackBrowserLeadEvent(input: BrowserLeadEventInput) {
   if (typeof window === 'undefined') return;
-  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
+  const fbq = (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq;
   if (typeof fbq !== 'function') return;
 
   const payload: Record<string, string | number> = {};

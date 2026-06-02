@@ -15,7 +15,7 @@ import {
   ArrowUpRight,
   History,
   Banknote,
-  Search
+  Search,
 } from 'lucide-react';
 import {
   Dialog,
@@ -26,17 +26,34 @@ import {
 } from '../components/ui/dialog';
 
 const STATUS_MAP = {
-  Paid: { label: 'Paid', color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' },
-  Pending: { label: 'Pending', color: 'bg-amber-500/10 text-amber-600 border-amber-500/20' },
-  Requested: { label: 'Requested', color: 'bg-blue-500/10 text-blue-600 border-blue-500/20' },
-  Rejected: { label: 'Rejected', color: 'bg-rose-500/10 text-rose-600 border-rose-500/20' },
-  Cancelled: { label: 'Cancelled', color: 'bg-slate-500/10 text-slate-600 border-slate-500/20' },
+  Paid: {
+    label: 'Paid',
+    color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+  },
+  Pending: {
+    label: 'Pending',
+    color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+  },
+  Requested: {
+    label: 'Requested',
+    color: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
+  },
+  Rejected: {
+    label: 'Rejected',
+    color: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
+  },
+  Cancelled: {
+    label: 'Cancelled',
+    color: 'bg-slate-500/10 text-slate-600 border-slate-500/20',
+  },
 };
 
 function StatusTag({ status }: { status: string }) {
   const config = STATUS_MAP[status] || STATUS_MAP.Pending;
   return (
-    <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${config.color}`}>
+    <span
+      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${config.color}`}
+    >
       {config.label}
     </span>
   );
@@ -48,7 +65,8 @@ export default function RefundsPage({ records }: any) {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showRefundDestinationModal, setShowRefundDestinationModal] = useState(false);
+  const [showRefundDestinationModal, setShowRefundDestinationModal] =
+    useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
   const [showWalletModal, setShowWalletModal] = useState(false);
 
@@ -59,7 +77,10 @@ export default function RefundsPage({ records }: any) {
   // Handle outside click for dropdown
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setShowFilterDropdown(false);
       }
     };
@@ -69,13 +90,14 @@ export default function RefundsPage({ records }: any) {
 
   // Case-insensitive status filtering to avoid hiding valid records
   // when database values are lowercase (e.g. "pending") but UI filters are title case.
-  const filteredData = selectedFilter === 'All'
-    ? refundData
-    : refundData.filter(
-        (item: any) =>
-          String(item.refundStatus || '').toLowerCase() ===
-          selectedFilter.toLowerCase(),
-      );
+  const filteredData =
+    selectedFilter === 'All'
+      ? refundData
+      : refundData.filter(
+          (item: any) =>
+            String(item.refundStatus || '').toLowerCase() ===
+            selectedFilter.toLowerCase(),
+        );
 
   const transferRefundToWallet = async (pidRefund: string) => {
     try {
@@ -101,11 +123,19 @@ export default function RefundsPage({ records }: any) {
     }
   };
 
-  const totalAmount = filteredData.reduce((sum: number, item: any) => sum + parseFloat(item.amount || 0), 0);
-  const hasRefundableAmounts = refundData.some((item: any) => parseFloat(item.amount) > 0);
+  const totalAmount = filteredData.reduce(
+    (sum: number, item: any) => sum + parseFloat(item.amount || 0),
+    0,
+  );
+  const hasRefundableAmounts = refundData.some(
+    (item: any) => parseFloat(item.amount) > 0,
+  );
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const currentPageData = filteredData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const currentPageData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
@@ -114,24 +144,36 @@ export default function RefundsPage({ records }: any) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="bg-blue-500/10 text-blue-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-blue-500/20">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-400">
                   Wallet & Returns
                 </span>
               </div>
-              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Refund Management</h1>
-              <p className="mt-2 text-slate-400">View and track your return transactions across all Sure Imports services.</p>
+              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+                Refund Management
+              </h1>
+              <p className="mt-2 text-slate-400">
+                View and track your return transactions across all Sure Imports
+                services.
+              </p>
             </div>
 
-            <div className="flex items-center gap-4 rounded-2xl bg-white/5 p-6 backdrop-blur-sm border border-white/10 shrink-0">
+            <div className="flex shrink-0 items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <div className="flex flex-col">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Refundable</span>
-                <span className="text-3xl font-black text-white">₦{totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
+                  Total Refundable
+                </span>
+                <span className="text-3xl font-black text-white">
+                  ₦
+                  {totalAmount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                  })}
+                </span>
               </div>
               <button
                 onClick={() => setShowRefundDestinationModal(true)}
                 disabled={!hasRefundableAmounts}
-                className="ml-4 flex h-12 items-center gap-2 rounded-xl bg-blue-600 px-6 font-bold text-white transition hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-600/20"
+                className="ml-4 flex h-12 items-center gap-2 rounded-xl bg-blue-600 px-6 font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <ArrowUpRight className="h-5 w-5" />
                 Request Refund
@@ -142,12 +184,14 @@ export default function RefundsPage({ records }: any) {
       </div>
 
       <main className="mx-auto -mt-10 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {/* Table Toolbar */}
-          <div className="flex flex-col gap-4 border-b border-slate-100 p-6 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800">
+          <div className="flex flex-col gap-4 border-b border-slate-100 p-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
               <History className="h-5 w-5 text-slate-400" />
-              <h2 className="font-bold text-slate-900 dark:text-white">Transaction History</h2>
+              <h2 className="font-bold text-slate-900 dark:text-white">
+                Transaction History
+              </h2>
             </div>
 
             <div className="relative" ref={dropdownRef}>
@@ -157,7 +201,9 @@ export default function RefundsPage({ records }: any) {
               >
                 <Filter className="h-4 w-4 text-slate-400" />
                 Filter: <span className="text-blue-600">{selectedFilter}</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${showFilterDropdown ? 'rotate-180' : ''}`}
+                />
               </button>
 
               {showFilterDropdown && (
@@ -165,9 +211,15 @@ export default function RefundsPage({ records }: any) {
                   {filterOptions.map((option) => (
                     <button
                       key={option}
-                      onClick={() => { setSelectedFilter(option); setShowFilterDropdown(false); setCurrentPage(1); }}
+                      onClick={() => {
+                        setSelectedFilter(option);
+                        setShowFilterDropdown(false);
+                        setCurrentPage(1);
+                      }}
                       className={`w-full rounded-lg px-4 py-2 text-left text-sm font-medium transition ${
-                        selectedFilter === option ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20' : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400'
+                        selectedFilter === option
+                          ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20'
+                          : 'text-slate-600 hover:bg-slate-50 dark:text-slate-400'
                       }`}
                     >
                       {option}
@@ -194,22 +246,41 @@ export default function RefundsPage({ records }: any) {
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {currentPageData.length > 0 ? (
                   currentPageData.map((item: any, idx: number) => (
-                    <tr key={item.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                      <td className="px-6 py-4 text-sm text-slate-400 font-medium">{(currentPage - 1) * itemsPerPage + idx + 1}</td>
-                      <td className="px-6 py-4 text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">{item.pidRefund}</td>
-                      <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">₦{parseFloat(item.amount).toLocaleString()}</td>
-                      <td className="px-6 py-4 text-xs text-slate-500 font-medium">{item.serviceType}</td>
-                      <td className="px-6 py-4"><StatusTag status={item.refundStatus} /></td>
+                    <tr
+                      key={item.id}
+                      className="group transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/30"
+                    >
+                      <td className="px-6 py-4 text-sm font-medium text-slate-400">
+                        {(currentPage - 1) * itemsPerPage + idx + 1}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-bold uppercase tracking-tight text-slate-900 dark:text-white">
+                        {item.pidRefund}
+                      </td>
+                      <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">
+                        ₦{parseFloat(item.amount).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 text-xs font-medium text-slate-500">
+                        {item.serviceType}
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusTag status={item.refundStatus} />
+                      </td>
                       <td className="px-6 py-4 text-right">
-                        {['pending', 'requested'].includes(String(item.refundStatus || '').toLowerCase()) ? (
+                        {['pending', 'requested'].includes(
+                          String(item.refundStatus || '').toLowerCase(),
+                        ) ? (
                           <button
-                            onClick={() => transferRefundToWallet(item.pidRefund)}
+                            onClick={() =>
+                              transferRefundToWallet(item.pidRefund)
+                            }
                             className="text-xs font-bold text-blue-600 hover:underline"
                           >
                             Transfer to Wallet
                           </button>
                         ) : (
-                          <button className="text-xs font-bold text-blue-600 hover:underline">Details</button>
+                          <button className="text-xs font-bold text-blue-600 hover:underline">
+                            Details
+                          </button>
                         )}
                       </td>
                     </tr>
@@ -221,8 +292,13 @@ export default function RefundsPage({ records }: any) {
                         <div className="rounded-full bg-slate-50 p-4 dark:bg-slate-800">
                           <Search className="h-8 w-8 text-slate-300" />
                         </div>
-                        <h3 className="mt-4 font-bold text-slate-900 dark:text-white">No refunds found</h3>
-                        <p className="text-sm text-slate-500">Try adjusting your filter to find what you're looking for.</p>
+                        <h3 className="mt-4 font-bold text-slate-900 dark:text-white">
+                          No refunds found
+                        </h3>
+                        <p className="text-sm text-slate-500">
+                          Try adjusting your filter to find what you're looking
+                          for.
+                        </p>
                       </div>
                     </td>
                   </tr>
@@ -234,18 +310,20 @@ export default function RefundsPage({ records }: any) {
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-between border-t border-slate-100 p-6 dark:border-slate-800">
-              <span className="text-sm font-medium text-slate-500">Page {currentPage} of {totalPages}</span>
+              <span className="text-sm font-medium text-slate-500">
+                Page {currentPage} of {totalPages}
+              </span>
               <div className="flex gap-2">
                 <button
                   disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-30 dark:border-slate-700 dark:text-slate-400"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
                 <button
                   disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
                   className="rounded-lg border border-slate-200 p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-30 dark:border-slate-700 dark:text-slate-400"
                 >
                   <ChevronRight className="h-5 w-5" />
@@ -257,28 +335,49 @@ export default function RefundsPage({ records }: any) {
       </main>
 
       {/* MODALS - Redesigned for consistency */}
-      <Dialog open={showRefundDestinationModal} onOpenChange={setShowRefundDestinationModal}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
+      <Dialog
+        open={showRefundDestinationModal}
+        onOpenChange={setShowRefundDestinationModal}
+      >
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold">Withdraw Funds</DialogTitle>
-            <DialogDescription className="text-center">Choose where you want your refund sent.</DialogDescription>
+            <DialogTitle className="text-center text-2xl font-bold">
+              Withdraw Funds
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Choose where you want your refund sent.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-3 py-4">
             <button
-              onClick={() => { setShowRefundDestinationModal(false); setShowRefundModal(true); }}
+              onClick={() => {
+                setShowRefundDestinationModal(false);
+                setShowRefundModal(true);
+              }}
               className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-blue-600 hover:bg-blue-50/50 dark:border-slate-800 dark:hover:bg-blue-900/10"
             >
               <Banknote className="h-8 w-8 text-slate-400 group-hover:text-blue-600" />
-              <span className="font-bold text-slate-900 dark:text-white">Bank Transfer</span>
-              <span className="text-xs text-slate-500">To your saved settlement account</span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                Bank Transfer
+              </span>
+              <span className="text-xs text-slate-500">
+                To your saved settlement account
+              </span>
             </button>
             <button
-              onClick={() => { setShowRefundDestinationModal(false); setShowWalletModal(true); }}
+              onClick={() => {
+                setShowRefundDestinationModal(false);
+                setShowWalletModal(true);
+              }}
               className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-emerald-600 hover:bg-emerald-50/50 dark:border-slate-800 dark:hover:bg-emerald-900/10"
             >
               <Wallet className="h-8 w-8 text-slate-400 group-hover:text-emerald-600" />
-              <span className="font-bold text-slate-900 dark:text-white">Sure Wallet</span>
-              <span className="text-xs text-slate-500">Instant credit for future orders</span>
+              <span className="font-bold text-slate-900 dark:text-white">
+                Sure Wallet
+              </span>
+              <span className="text-xs text-slate-500">
+                Instant credit for future orders
+              </span>
             </button>
           </div>
         </DialogContent>
@@ -286,18 +385,26 @@ export default function RefundsPage({ records }: any) {
 
       {/* Processing Modal */}
       <Dialog open={showRefundModal} onOpenChange={setShowRefundModal}>
-        <DialogContent className="sm:max-w-md rounded-2xl text-center">
+        <DialogContent className="rounded-[32px] text-center sm:max-w-md">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
             <CheckCircle className="h-10 w-10 text-blue-600" />
           </div>
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold mt-4">Request Submitted</DialogTitle>
+            <DialogTitle className="mt-4 text-center text-2xl font-bold">
+              Request Submitted
+            </DialogTitle>
           </DialogHeader>
-          <p className="text-slate-500 leading-relaxed">
-            Your bank refund will be processed and credited within <span className="font-bold text-slate-900 dark:text-white">7 business days</span>. 
-            Ensure your bank details are up to date in your profile.
+          <p className="leading-relaxed text-slate-500">
+            Your bank refund will be processed and credited within{' '}
+            <span className="font-bold text-slate-900 dark:text-white">
+              7 business days
+            </span>
+            . Ensure your bank details are up to date in your profile.
           </p>
-          <button onClick={() => setShowRefundModal(false)} className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800">
+          <button
+            onClick={() => setShowRefundModal(false)}
+            className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800"
+          >
             Got it
           </button>
         </DialogContent>
@@ -305,17 +412,23 @@ export default function RefundsPage({ records }: any) {
 
       {/* Wallet Error Modal */}
       <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
-        <DialogContent className="sm:max-w-md rounded-2xl text-center">
+        <DialogContent className="rounded-[32px] text-center sm:max-w-md">
           <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-900/20">
             <X className="h-10 w-10 text-rose-600" />
           </div>
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold mt-4">Unavailable</DialogTitle>
+            <DialogTitle className="mt-4 text-center text-2xl font-bold">
+              Unavailable
+            </DialogTitle>
           </DialogHeader>
-          <p className="text-slate-500 leading-relaxed">
-            Wallet refunds are currently disabled for maintenance. Please use the <span className="font-bold">Bank Transfer</span> option instead.
+          <p className="leading-relaxed text-slate-500">
+            Wallet refunds are currently disabled for maintenance. Please use
+            the <span className="font-bold">Bank Transfer</span> option instead.
           </p>
-          <button onClick={() => setShowWalletModal(false)} className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800">
+          <button
+            onClick={() => setShowWalletModal(false)}
+            className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800"
+          >
             Close
           </button>
         </DialogContent>

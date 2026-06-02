@@ -176,9 +176,9 @@ export default function MyOrdersPage() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="mx-auto -mt-8 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         {/* Navigation Tabs */}
-        <div className="mb-8 flex items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl bg-white p-2 shadow-sm border border-slate-200 dark:bg-slate-900 dark:border-slate-800">
+        <div className="mb-10 flex items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl bg-white p-2 shadow-lg shadow-slate-200/40 border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:shadow-none">
           {[
             { id: 'active', label: 'Active', count: category.active.length, icon: Clock },
             { id: 'recent', label: 'Recent', count: category.recent.length, icon: CheckCircle },

@@ -120,7 +120,7 @@ export const columns: ColumnDef<Products>[] = [
                 />
               </Button>
             </DialogTrigger>
-            <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[20px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
+            <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[32px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
               <Image
                 src="/icons/deletewarning.svg"
                 alt="delete"

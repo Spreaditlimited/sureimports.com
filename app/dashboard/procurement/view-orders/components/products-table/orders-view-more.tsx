@@ -36,8 +36,7 @@ import {
   Wallet
 } from 'lucide-react';
 
-import FlutterwavePaymentButton from '@/components/FlutterwavePaymentButton';
-import FlutterwavePaymentButton2 from '@/components/FlutterwavePaymentButton2';
+import PaystackProcurementPaymentButton from '@/components/PaystackProcurementPaymentButton';
 
 interface ProductData {
   id: number;
@@ -684,7 +683,7 @@ export default function MoreOrders({
                 </label>
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <FlutterwavePaymentButton
+                <PaystackProcurementPaymentButton
                   amount={grandTotalCost}
                   amountNaira={amountNaira}
                   destinationCountry={destinationCountry}
@@ -699,6 +698,10 @@ export default function MoreOrders({
                   service_name={'PROCUREMENT'}
                   description={'General Procurement & Shipping Service'}
                   isDisabled={isDisabled}
+                  nextStatus="pending"
+                  newTotalAmount={grandTotalCost}
+                  newTotalWeight={productsTotalWeight}
+                  newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                   className={isDisabled 
                     ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                     : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -817,7 +820,7 @@ export default function MoreOrders({
 
                 {onHoldDifference > 0 && (
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <FlutterwavePaymentButton2
+                    <PaystackProcurementPaymentButton
                       amount={onHoldDifference}
                       amountNaira={amountNairaDifference}
                       destinationCountry={destinationCountry}
@@ -832,6 +835,10 @@ export default function MoreOrders({
                       service_name={'PROCUREMENT'}
                       description={'General Procurement & Shipping Service'}
                       isDisabled={isDisabled}
+                      nextStatus="pending"
+                      newTotalAmount={grandTotalCost}
+                      newTotalWeight={productsTotalWeight}
+                      newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                       className={isDisabled 
                         ? "flex h-12 flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                         : "flex h-12 flex-1 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -902,7 +909,7 @@ export default function MoreOrders({
                   </div>
                 </label>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <FlutterwavePaymentButton
+                  <PaystackProcurementPaymentButton
                     amount={actualTotalShippingCost - estimatedTotalShippingCost}
                     amountNaira={(actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar}
                     destinationCountry={destinationCountry}
@@ -917,6 +924,10 @@ export default function MoreOrders({
                     service_name={'PROCUREMENT'}
                     description={'General Procurement & Shipping Service'}
                     isDisabled={isDisabled}
+                    nextStatus="in-transit"
+                    newTotalAmount={grandTotalCost}
+                    newTotalWeight={productsTotalWeight}
+                    newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                     className={isDisabled 
                       ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                       : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}

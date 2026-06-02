@@ -11,6 +11,7 @@ import {
   HandCoins,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Image from 'next/image';
 import { BiMoney } from 'react-icons/bi';
 import Paystack from '@/components/uix/Paystack';
@@ -735,10 +736,10 @@ export default function ProductClaim({ product, status }: any) {
               {(status === 'SAVED' || status === 'STARTED') && (
                 <div className="flex flex-col md:flex-row">
                   No Product Found &nbsp;{' '}
-                  <a href="/dashboard/store?id=laptop">
+                  <Link href="/dashboard/shop">
                     {' '}
                     <b className="text-orange-600">Visit Store</b>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

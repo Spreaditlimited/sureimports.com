@@ -27,7 +27,7 @@ export default function SearchPage() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     const query = values.search.trim();
     if (query.length < 2) return;
-    router.push(`/dashboard/store/?id=all&q=${encodeURIComponent(query)}`);
+    router.push(`/dashboard/shop?search=${encodeURIComponent(query)}`);
   }
 
   return (

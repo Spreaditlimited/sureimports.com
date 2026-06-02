@@ -11,7 +11,7 @@ const BackButton: FC<BackButtonProps> = ({ className = '' }) => {
 
   const handleBack = () => {
     //router.back();
-    router.push('/dashboard/store?id=laptop');
+    router.push('/dashboard/shop');
   };
 
   return (

@@ -420,9 +420,7 @@ export default function WalletDashboard() {
 
                       {/* <ActionButton icon={<User />} label="Pay Small Small" /> */}
                       <button
-                        onClick={() =>
-                          router.push('/dashboard/store?id=laptop')
-                        }
+                        onClick={() => router.push('/dashboard/shop')}
                         className="flex h-auto flex-col items-center gap-2 rounded-lg border border-gray-200 px-2 py-4 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-700"
                       >
                         <div className="rounded-full bg-gray-100 p-2 dark:bg-gray-700">

@@ -188,7 +188,7 @@ export default function WithdrawDialog({
   if (withdrawalRequested) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
@@ -328,7 +328,7 @@ export default function WithdrawDialog({
   if (showConfirmation) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
@@ -445,7 +445,7 @@ export default function WithdrawDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[32px] sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">

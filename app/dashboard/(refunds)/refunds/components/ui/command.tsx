@@ -40,7 +40,7 @@ function CommandDialog({
 }) {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0">
+      <DialogContent className="overflow-hidden rounded-[32px] p-0">
         <DialogHeader className="sr-only">
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>

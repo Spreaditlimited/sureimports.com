@@ -176,7 +176,7 @@ export default async function RefundTable({ records }: any) {
                 Request Refund
               </Button>
             </DialogTrigger>
-            <DialogContent className="dark:bg-slate-800 sm:max-w-md">
+            <DialogContent className="rounded-[32px] dark:bg-slate-800 sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Create Refund Request</DialogTitle>
                 <DialogDescription>

@@ -6,7 +6,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -218,8 +223,10 @@ function DeleteAccountForm() {
                     Delete Account
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[20px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
-                  <DialogTitle className="sr-only">Delete Account Confirmation</DialogTitle>
+                <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[32px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
+                  <DialogTitle className="sr-only">
+                    Delete Account Confirmation
+                  </DialogTitle>
                   <Image
                     src="/icons/deletewarning.svg"
                     alt="delete"

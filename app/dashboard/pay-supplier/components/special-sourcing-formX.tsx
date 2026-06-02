@@ -339,7 +339,7 @@ function SpecialSourcingForm() {
                     view terms and conditions
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="flex h-[60vh] flex-col overflow-hidden p-0 dark:bg-[#161629] max-md:h-[90vh] lg:max-w-[800px]">
+                <DialogContent className="flex h-[60vh] flex-col overflow-hidden rounded-[32px] p-0 dark:bg-[#161629] max-md:h-[90vh] lg:max-w-[800px]">
                   <DialogHeader className="sticky top-0 bg-white px-6 py-4 dark:bg-[#161629]">
                     <DialogTitle>Read Our Terms</DialogTitle>
                   </DialogHeader>

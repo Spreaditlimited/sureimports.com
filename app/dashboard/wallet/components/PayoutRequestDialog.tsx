@@ -154,7 +154,7 @@ export default function PayoutRequestDialog({
   if (showNoBankDetails) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
@@ -363,7 +363,7 @@ export default function PayoutRequestDialog({
   if (payoutRequested && payoutData) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
@@ -560,7 +560,7 @@ export default function PayoutRequestDialog({
 
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="rounded-[32px] sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
@@ -658,7 +658,7 @@ export default function PayoutRequestDialog({
   // Main Input Screen
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="rounded-[32px] sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">

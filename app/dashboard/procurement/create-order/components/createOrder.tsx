@@ -33,8 +33,8 @@ function CreateOrder({ className }: CreateOrderProps) {
           Create Order
         </Button>
       </DialogTrigger>
-      <DialogContent className="block max-h-[90vh] w-[calc(100vw-2rem)] max-w-5xl overflow-hidden rounded-[32px] border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-[#161629] sm:rounded-[32px] lg:max-w-5xl [&>button]:hidden">
-        <div className="relative overflow-hidden border-b border-slate-100 bg-white px-6 py-5 dark:border-slate-800 dark:bg-[#161629] sm:px-8">
+      <DialogContent className="flex max-h-[90dvh] max-h-[90vh] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-[#161629] lg:max-w-5xl [&>button]:hidden">
+        <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white px-5 py-5 dark:border-slate-800 dark:bg-[#161629] sm:px-8">
           <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-blue-600/10 via-indigo-500/5 to-transparent dark:from-blue-600/20 dark:via-indigo-500/10" />
           <div className="relative flex items-center justify-between gap-4">
             <div>
@@ -54,7 +54,7 @@ function CreateOrder({ className }: CreateOrderProps) {
           </div>
         </div>
 
-        <div className="custom-scrollbar max-h-[calc(90vh-112px)] overflow-y-auto bg-white px-6 py-6 dark:bg-[#161629] sm:px-8">
+        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 dark:bg-[#161629] sm:px-8">
           <CreateOrderForm setIsOpen={setIsOpen} />
           {/* <CreateOrderForm /> */}
         </div>

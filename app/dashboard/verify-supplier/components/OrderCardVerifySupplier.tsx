@@ -275,7 +275,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                         />
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[20px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
+                    <DialogContent className="flex w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col items-center justify-center overflow-auto rounded-[32px] py-[30px] dark:bg-[#161629] sm:max-w-[396px]">
                       <Image
                         src="/icons/deletewarning.svg"
                         alt="delete"
@@ -470,7 +470,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                           </Button>
                       </DialogTrigger>
 
-                      <DialogContent className="flex h-[60vh] flex-col overflow-hidden p-0 dark:bg-[#161629] max-md:h-[90vh] lg:max-w-[800px]">
+                      <DialogContent className="flex h-[60vh] flex-col overflow-hidden p-0 dark:bg-[#161629] max-md:h-[90vh] lg:max-w-[800px] rounded-[32px]">
                         <DialogHeader className="sticky top-0 bg-white px-6 py-4 dark:bg-[#161629]">
                           <DialogTitle>Read Our Terms</DialogTitle>
                         </DialogHeader>
