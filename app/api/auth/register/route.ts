@@ -13,6 +13,7 @@ import { redirect } from 'next/navigation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import { secureInput } from '@/utils/secureInput';
+import { verifyRecaptchaToken } from '@/lib/security/recaptcha';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
@@ -24,7 +25,21 @@ export async function POST(request: NextRequest) {
     password,
     confirmPassword,
     userAffiliateRef,
+    recaptchaToken,
   } = await request.json();
+
+  const isCaptchaValid = await verifyRecaptchaToken(recaptchaToken);
+  if (!isCaptchaValid) {
+    const messagex = {
+      message1: 'Captcha verification failed. Please try again.',
+      message2: 'SUCCESS',
+      message3: 200,
+    };
+    return NextResponse.json(
+      { messagex, statusx: 'FAILED_CAPTCHA', success: false, userx: null },
+      { status: 400 },
+    );
+  }
 
   // Clean affiliate code
   const userAffiliateRefx = secureInput(userAffiliateRef);

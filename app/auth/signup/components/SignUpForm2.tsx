@@ -28,6 +28,7 @@ import { Loader2 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { Metadata } from 'next';
 import { useAuth } from '@/app/context/AuthContext';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 ////////////////////// ZOD FORM SCHEMA //////////////////////
 const formSchema = z
@@ -142,7 +143,9 @@ interface SignupPageProps {
   form: UseFormReturn<FormValues>;
   isPasswordVisible: boolean;
   isLoading: boolean;
+  siteKey?: string;
   togglePasswordVisibility: () => void;
+  onCaptchaChange: (token: string | null) => void;
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
@@ -151,7 +154,9 @@ const SignupPage: React.FC<SignupPageProps> = ({
   form,
   isPasswordVisible,
   isLoading,
+  siteKey,
   togglePasswordVisibility,
+  onCaptchaChange,
   onSubmit,
 }) => (
   <Card className="relative mb-5 w-full rounded-3xl bg-white p-5 shadow-2xl max-lg:w-full sm:p-10 lg:mb-10 lg:mt-24">
@@ -236,6 +241,13 @@ const SignupPage: React.FC<SignupPageProps> = ({
             placeholder="*****************"
             iconSrc="/icons/password.svg"
           />
+          {siteKey ? (
+            <ReCAPTCHA
+              sitekey={siteKey}
+              onChange={onCaptchaChange}
+              onExpired={() => onCaptchaChange(null)}
+            />
+          ) : null}
           <Button
             type="submit"
             className="mt-8 h-14 py-3.5"
@@ -385,12 +397,21 @@ const SignupPageContainer: React.FC = () => {
   const [message, setMessage] = React.useState('') as any;
   const [isPasswordVisible, setPasswordVisible] = React.useState(false);
   const [isLoading, setLoading] = React.useState(false);
+  const [recaptchaToken, setRecaptchaToken] = React.useState<string | null>(
+    null,
+  );
+  const siteKey = process.env.GOOGLE_CAPTCHA_SITE_KEY;
 
   const togglePasswordVisibility = () => {
     setPasswordVisible(!isPasswordVisible);
   };
 
   const onSubmit = async (data: FormValues) => {
+    if (siteKey && !recaptchaToken) {
+      setMessage('Please complete captcha verification.');
+      return;
+    }
+
     setLoading(true);
     console.log(data);
     //await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -417,6 +438,7 @@ const SignupPageContainer: React.FC = () => {
           password,
           confirmPassword,
           userAffiliateRef,
+          recaptchaToken,
         }),
       });
       const data: ApiResponse = await res.json();
@@ -446,7 +468,9 @@ const SignupPageContainer: React.FC = () => {
           form={form}
           isPasswordVisible={isPasswordVisible}
           isLoading={isLoading}
+          siteKey={siteKey}
           togglePasswordVisibility={togglePasswordVisibility}
+          onCaptchaChange={setRecaptchaToken}
           onSubmit={onSubmit}
         />
       )}

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { notifyNewShippingOnlyRequest } from '@/lib/notifications/shippingOnly';
+import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 
 type Payload = {
   account?: {
@@ -24,10 +25,25 @@ type Payload = {
     wantConsolidation?: boolean;
     multipleSuppliers?: boolean;
   };
+  fbEventId?: string;
+  fbp?: string;
+  fbc?: string;
+  pageUrl?: string;
 };
 
 function normalize(value: string | undefined): string {
   return (value || '').trim();
+}
+
+function getIpAddress(req: Request) {
+  const forwardedFor = req.headers.get('x-forwarded-for');
+  if (forwardedFor) {
+    const first = forwardedFor.split(',')[0]?.trim();
+    if (first) return first;
+  }
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp) return realIp;
+  return null;
 }
 
 export async function POST(request: NextRequest) {
@@ -184,6 +200,41 @@ export async function POST(request: NextRequest) {
       });
     } catch (emailError) {
       console.error('shipping-only bootstrap email notification failed:', emailError);
+    }
+
+    // Non-blocking CAPI lead event for shipping-only submissions.
+    try {
+      const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
+      const accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
+      if (pixelId && accessToken && body.fbEventId) {
+        await sendFacebookLeadCapiEvent({
+          pixelId,
+          accessToken,
+          eventId: body.fbEventId,
+          eventSourceUrl: body.pageUrl || null,
+          testEventCode: process.env.FACEBOOK_TEST_EVENT_CODE || null,
+          userData: {
+            email: body?.account?.email || user.userEmail || null,
+            phone:
+              body?.request?.whatsappNumber ||
+              body?.account?.phone ||
+              user.userPhone ||
+              null,
+            clientIpAddress: getIpAddress(request),
+            clientUserAgent: request.headers.get('user-agent'),
+            fbp: body.fbp || null,
+            fbc: body.fbc || null,
+          },
+          customData: {
+            content_name: 'Shipping Only Submission',
+            content_category: 'Shipping Only',
+            value: 1,
+            currency: 'NGN',
+          },
+        });
+      }
+    } catch (capiError) {
+      console.error('shipping-only bootstrap Facebook CAPI failed:', capiError);
     }
 
     const authToken = generateToken({

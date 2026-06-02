@@ -89,6 +89,10 @@ export async function GET(request: NextRequest) {
     const pidUser = metadata.pidUser;
     const cartItems = metadata.cart_items || [];
     const amount = transactionData.amount / 100; // Convert from kobo to naira
+    const shippingAddressSnapshot =
+      typeof metadata?.shipping_address === 'string'
+        ? metadata.shipping_address.trim()
+        : '';
 
     // Get user details
     const user: any = await prisma.users.findUnique({
@@ -140,6 +144,7 @@ export async function GET(request: NextRequest) {
           serviceDescription: 'Online Shop Purchase',
           affiliatePayStatus: 'pending',
           affiliateRefId: user.userAffiliateRef || 'NO_REF',
+          paymentExt1: shippingAddressSnapshot || null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -273,7 +278,7 @@ export async function GET(request: NextRequest) {
                             </table>
                             <hr />
                             <h4>Total Amount: <b>₦${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> (NGN)</h4><hr />
-                            <h4>Address: <b>${user?.address || 'Not provided'}</b></h4><hr />
+                            <h4>Address: <b>${shippingAddressSnapshot || user?.userShippingAddress2 || user?.userShippingAddress || 'Not provided'}</b></h4><hr />
                             Kind regards,<br />
                             Sureimports.com Automated System`;
 

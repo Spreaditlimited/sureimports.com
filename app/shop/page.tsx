@@ -107,7 +107,8 @@ export default function ShopPage() {
   useEffect(() => {
     const handleOpenShopCart = () => setShowCartSidebar(true);
     window.addEventListener('open-shop-cart', handleOpenShopCart);
-    return () => window.removeEventListener('open-shop-cart', handleOpenShopCart);
+    return () =>
+      window.removeEventListener('open-shop-cart', handleOpenShopCart);
   }, []);
 
   const mappedProducts = useMemo(

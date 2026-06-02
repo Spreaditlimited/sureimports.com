@@ -28,6 +28,9 @@ interface Order {
   id: string; pidStore: string; pidProduct: string; pidUser: string;
   product_name: string; unit_price: string; total_price: string;
   quantity: string; status: string; ext1: string | null; ext2: string | null;
+  paymentMethod?: string | null;
+  shippingAddressSnapshot?: string | null;
+  trackingNumber?: string | null;
   createdAt: Date; updatedAt: Date;
 }
 
@@ -104,7 +107,15 @@ export default function MyOrdersPage() {
       const orderDate = validTimes.length > 0 ? new Date(Math.min(...validTimes)) : new Date();
       const statusPriority: Record<string, number> = { PAID: 1, PROCESSING: 2, SHIPPED: 3, DELIVERED: 4, COMPLETED: 5, CANCELLED: 6 };
       const status = products.reduce((prev, curr) => (statusPriority[curr.status] || 999) < (statusPriority[prev] || 999) ? curr.status : prev, products[0].status);
-      grouped.push({ transactionRef, products, totalAmount, status, paymentMethod: products[0].ext2, orderDate, orderIds: products.map(p => p.pidStore) });
+      grouped.push({
+        transactionRef,
+        products,
+        totalAmount,
+        status,
+        paymentMethod: products[0].paymentMethod || products[0].ext2,
+        orderDate,
+        orderIds: products.map((p) => p.pidStore),
+      });
     });
     return grouped.sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
   };

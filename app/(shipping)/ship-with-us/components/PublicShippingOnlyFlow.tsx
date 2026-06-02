@@ -21,6 +21,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { convertToTitleCase } from '@/app/utils/stringUtils';
+import {
+  buildFacebookLeadMeta,
+  trackBrowserLeadEvent,
+} from '@/lib/marketing/facebookLeadMeta';
 
 type ShippingPlan = {
   pidShippingPlan: string;
@@ -132,7 +136,8 @@ export default function PublicShippingOnlyFlow() {
       return;
     }
 
-    const payload = { account, request };
+    const leadMeta = buildFacebookLeadMeta();
+    const payload = { account, request, ...leadMeta };
     setSubmitting(true);
     try {
       const response = await fetch('/api/public/shipping-only/bootstrap-request', {
@@ -144,6 +149,13 @@ export default function PublicShippingOnlyFlow() {
       const data = await response.json();
 
       if (data?.statusx === 'SUCCESS') {
+        trackBrowserLeadEvent({
+          eventId: leadMeta.fbEventId,
+          contentName: 'Shipping Only Submission',
+          contentCategory: 'Shipping Only',
+          value: 1,
+          currency: 'NGN',
+        });
         window.localStorage.removeItem(PENDING_KEY);
         toast.success('Shipment created successfully!');
         router.push(data.redirectTo);

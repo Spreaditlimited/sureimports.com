@@ -20,6 +20,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { convertToTitleCase } from '@/app/utils/stringUtils';
+import {
+  buildFacebookLeadMeta,
+  trackBrowserLeadEvent,
+} from '@/lib/marketing/facebookLeadMeta';
 
 type ShippingPlan = {
   pidShippingPlan: string;
@@ -220,6 +224,7 @@ export default function PublicOrderFlow() {
       return;
     }
 
+    const leadMeta = buildFacebookLeadMeta();
     const payload = {
       account,
       order,
@@ -229,6 +234,7 @@ export default function PublicOrderFlow() {
         productWeight: Number(item.productWeight),
         productQuantity: Number(item.productQuantity),
       })),
+      ...leadMeta,
     };
 
     setSubmitting(true);
@@ -242,6 +248,14 @@ export default function PublicOrderFlow() {
       const data = await response.json();
 
       if (data?.statusx === 'SUCCESS') {
+        trackBrowserLeadEvent({
+          eventId: leadMeta.fbEventId,
+          contentName: 'Buy From Chinese Websites Submission',
+          contentCategory: 'Procurement',
+          numItems: payload.products.length,
+          value: totalEstimatedValue,
+          currency: order.currencyType || 'USD',
+        });
         if (typeof window !== 'undefined') {
           window.localStorage.removeItem(PENDING_CHECKOUT_KEY);
         }

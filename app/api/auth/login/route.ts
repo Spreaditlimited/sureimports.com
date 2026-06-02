@@ -3,11 +3,23 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { verifyRecaptchaToken } from '@/lib/security/recaptcha';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
-  const { userEmail, userPassword } = await request.json();
+  const { userEmail, userPassword, recaptchaToken } = await request.json();
+
+  const isCaptchaValid = await verifyRecaptchaToken(recaptchaToken);
+  if (!isCaptchaValid) {
+    return NextResponse.json(
+      {
+        statusx: 'FAILED_CAPTCHA',
+        message: 'Captcha verification failed. Please try again.',
+      },
+      { status: 400 },
+    );
+  }
 
   /////////////////////////// START
   // Lookup the user in database

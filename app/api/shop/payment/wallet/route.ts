@@ -29,7 +29,7 @@ import xMail from '@/lib/email/xMail3';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { pidUser, cartItems, totalAmount } = body;
+    const { pidUser, cartItems, totalAmount, shippingAddress } = body;
 
     // Validate required parameters
     if (!pidUser || !cartItems || !totalAmount) {
@@ -74,6 +74,10 @@ export async function POST(request: NextRequest) {
     const first_name = user.userFirstname;
     const last_name = user.userLastname;
     const phone = user.phone;
+    const shippingAddressSnapshot =
+      typeof shippingAddress === 'string' && shippingAddress.trim().length > 0
+        ? shippingAddress.trim()
+        : user.userShippingAddress2?.trim() || user.userShippingAddress?.trim() || '';
 
     // Fetch customer wallet data from Paystack API
     console.log('Fetching customer wallet data for email:', email);
@@ -303,6 +307,7 @@ export async function POST(request: NextRequest) {
 
           affiliatePayStatus: 'pending',
           affiliateRefId: affiliateRefId || 'NO_REF',
+          paymentExt1: shippingAddressSnapshot || null,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

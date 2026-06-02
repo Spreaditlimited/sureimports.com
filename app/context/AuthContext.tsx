@@ -19,7 +19,11 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (userEmail: string, userPassword: string) => Promise<void>;
+  login: (
+    userEmail: string,
+    userPassword: string,
+    recaptchaToken?: string,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   register: (
     userEmail: string,
@@ -78,7 +82,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []); //This was the line that needed to be updated to include the dependency
 
   //////////////////////////////////// LOGIN
-  const login = async (userEmail: string, userPassword: string) => {
+  const login = async (
+    userEmail: string,
+    userPassword: string,
+    recaptchaToken?: string,
+  ) => {
     const searchParams =
       typeof window !== 'undefined'
         ? new URLSearchParams(window.location.search)
@@ -99,7 +107,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail, userPassword }),
+      body: JSON.stringify({ userEmail, userPassword, recaptchaToken }),
     });
     const data = await res.json();
     if (res.ok) {

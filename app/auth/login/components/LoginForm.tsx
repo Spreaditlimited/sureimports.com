@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/app/context/AuthContext';
@@ -17,6 +18,8 @@ export default function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const siteKey = process.env.GOOGLE_CAPTCHA_SITE_KEY;
   const nextParam = searchParams.get('next');
   const signUpHref = nextParam
     ? `/auth/signup?next=${encodeURIComponent(nextParam)}`
@@ -29,10 +32,14 @@ export default function LoginForm() {
       toast.error('Please enter both email and password.');
       return;
     }
+    if (siteKey && !recaptchaToken) {
+      toast.error('Please complete captcha verification.');
+      return;
+    }
 
     setIsLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, recaptchaToken || undefined);
     } catch (error) {
       const message =
         error instanceof Error
@@ -169,6 +176,15 @@ export default function LoginForm() {
               </div>
 
               <div className="pt-4">
+                {siteKey ? (
+                  <div className="mb-4">
+                    <ReCAPTCHA
+                      sitekey={siteKey}
+                      onChange={(token) => setRecaptchaToken(token)}
+                      onExpired={() => setRecaptchaToken(null)}
+                    />
+                  </div>
+                ) : null}
                 <Button
                   type="submit"
                   disabled={isLoading}
