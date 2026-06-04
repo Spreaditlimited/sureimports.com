@@ -51,7 +51,7 @@ const RadText: React.FC<Props> = ({
           <select
             id={id}
             name={name}
-            value={value}
+            value={value ?? ''}
             onClick={onClick}
             onChange={onChange}
             onSelect={onSelect}

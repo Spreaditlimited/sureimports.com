@@ -53,7 +53,7 @@ const RadText: React.FC<Props> = ({
             onChange={onChange}
             onSelect={onSelect}
             defaultValue={defaultValue}
-            value={value}
+            value={value ?? ''}
             required
             className="max-sm:w-340px flex h-10 w-full items-center justify-between rounded-md border border-input bg-background bg-slate-100 p-5 px-3 py-2 pl-14 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"
           >

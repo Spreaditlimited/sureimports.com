@@ -174,6 +174,7 @@ export async function POST(request: NextRequest) {
       userPassword: passwordHash,
       userSession: sessionHash,
       userPhone: userPhone,
+      phone: userPhone,
       userCid: cid,
       loginStatus: 'RESET',
       userStatus: 'AL1',

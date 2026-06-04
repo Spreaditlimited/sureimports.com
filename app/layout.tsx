@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
+import { Toaster as SonnerToaster } from 'sonner';
 import { AuthProvider } from '@/app/context/AuthContext';
 import { Suspense } from 'react';
 import { FacebookPixel } from '@/components/FacebookPixel';
@@ -175,6 +176,7 @@ export default async function RootLayout({
               <FacebookPixel />
               <Analytics />
               <Toaster />
+              <SonnerToaster position="top-right" richColors />
             </Suspense>
           </body>
         </AuthProvider>

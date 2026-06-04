@@ -50,7 +50,7 @@ export default function ProfileUpdateForm() {
         businessName: data.businessName || '',
         gender: data.gender || '',
         dob: data.dob || '',
-        phone: data.phone || '',
+        phone: data.phone || data.userPhone || '',
         country: data.country || '',
         address: data.address || '',
         imagex: data.userImage || ''

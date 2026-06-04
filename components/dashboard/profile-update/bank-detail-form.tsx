@@ -21,11 +21,11 @@ import { RiBankFill } from 'react-icons/ri';
 import Loader from '@/components/uix/Loader';
 
 interface userData {
-  bank_name: string;
-  bank_code: string;
-  bank_account_number: string;
-  bank_account_name: string;
-  bank_transfer_code: string;
+  bank_name: string | null;
+  bank_code: string | null;
+  bank_account_number: string | null;
+  bank_account_name: string | null;
+  bank_transfer_code: string | null;
 }
 
 //USER DATA
@@ -133,9 +133,10 @@ export default function UpdateBankDetailsFrom() {
 
       //update user records variables
       setUserData(data);
-      setBankName(data.bank_name);
-      setAccountNumber(data.bank_account_number);
-      setAccountName(data.bank_account_name);
+      setBankName(data.bank_name ?? '');
+      setBankCode(data.bank_code ?? '');
+      setAccountNumber(data.bank_account_number ?? '');
+      setAccountName(data.bank_account_name ?? '');
     } catch (err: any) {
       //setError(err.message || 'An error occurred');
     }

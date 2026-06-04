@@ -43,10 +43,12 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 interface ApiResponse {
-  messagex: any;
-  statusx: string;
-  successx: boolean;
-  userx: any;
+  messagex?: {
+    message1?: string;
+  } | null;
+  statusx?: string | null;
+  successx?: boolean;
+  userx?: unknown;
 }
 
 export default function SignUpFormContainer() {
@@ -56,6 +58,7 @@ export default function SignUpFormContainer() {
   const [authChecked, setAuthChecked] = React.useState(false);
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState('');
   const executeRecaptcha = useRecaptchaV3();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
@@ -119,17 +122,29 @@ export default function SignUpFormContainer() {
   }, [searchParams, form, getAffiliateRef]);
 
   const onSubmit = async (data: FormValues) => {
+    setSubmitError('');
     setIsLoading(true);
     try {
-      const recaptchaToken = await executeRecaptcha('register');
+      let recaptchaToken: string | undefined;
+      try {
+        recaptchaToken = await executeRecaptcha('register');
+      } catch (error) {
+        console.error('reCAPTCHA execution failed:', error);
+        const message =
+          'Captcha verification could not be started. Please refresh the page and try again.';
+        setSubmitError(message);
+        toast.error(message);
+        return;
+      }
+
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...data, recaptchaToken }),
       });
-      const responseData: ApiResponse = await res.json();
-      
-      if (responseData.successx) {
+      const responseData = (await res.json()) as ApiResponse;
+
+      if (res.ok && responseData.successx) {
         toast.success('Account created successfully!');
         if (nextParam && nextParam.startsWith('/')) {
           router.push(loginHref);
@@ -137,10 +152,16 @@ export default function SignUpFormContainer() {
           router.push('/auth/account-creation-success');
         }
       } else {
-        toast.error(responseData.messagex?.message1 || 'Failed to create account.');
+        const message =
+          responseData.messagex?.message1 || 'Failed to create account.';
+        setSubmitError(message);
+        toast.error(message);
       }
-    } catch (error: any) {
-      toast.error('A network error occurred. Please try again.');
+    } catch (error) {
+      console.error('Registration request failed:', error);
+      const message = 'A network error occurred. Please try again.';
+      setSubmitError(message);
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -330,6 +351,15 @@ export default function SignUpFormContainer() {
                     </FormItem>
                   )}
                 />
+
+                {submitError ? (
+                  <div
+                    role="alert"
+                    className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300"
+                  >
+                    {submitError}
+                  </div>
+                ) : null}
 
                 {/* Submit Button */}
                 <div className="pt-4">

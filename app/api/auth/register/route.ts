@@ -1,6 +1,6 @@
 'use server';
 
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import validateEmail from '@/lib/helpers/validateEmail';
 import validatePassword from '@/lib/helpers/validatePassword';
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       message3: 200,
     };
     return NextResponse.json(
-      { messagex, statusx: 'FAILED_CAPTCHA', success: false, userx: null },
+      { messagex, statusx: 'FAILED_CAPTCHA', successx: false, userx: null },
       { status: 400 },
     );
   }
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 401 },
     );
   }
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 200 },
     );
   }
@@ -111,7 +111,8 @@ export async function POST(request: NextRequest) {
   // }
 
   // Validate email
-  if (!validateEmail(email)) {
+  const emailValidation = validateEmail(email);
+  if (!emailValidation.isValid) {
     //GET RESPONSE MESSAGE FOR THE FORM FEEDBACK
     const messagex = {
       message1: 'Please provide a valid email',
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 200 },
     );
   }
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 200 },
     );
   }
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest) {
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 200 },
     );
   }
@@ -196,6 +197,7 @@ export async function POST(request: NextRequest) {
       userPassword: passwordHash,
       userSession: sessionHash,
       userPhone: phone,
+      phone: phone,
       userCid: cid,
       loginStatus: 'RESET',
       userStatus: 'AL1',
@@ -204,23 +206,24 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  //send mail
-  try {
-    ////////////////////// SEND REGISTRATION EMAIL BLOCK STARTS //////////////////////
-    //import { xMail } from '@/lib/email/xMail';
-    const xEmail = email as string;
-    const xTitle = `Registration Successful!`;
-    const xBodyTitle = `Registration Successful!`;
-    const xButtonTitle = `Validate Email`;
-    const xButtonLink =
-      process.env.ROOT_URL +
-      `/api/auth/email-verification?pidUser=${pidUser}&cid=${cid}`;
+  // Send the verification email after responding so SMTP delays do not block signup.
+  after(async () => {
+    try {
+      ////////////////////// SEND REGISTRATION EMAIL BLOCK STARTS //////////////////////
+      //import { xMail } from '@/lib/email/xMail';
+      const xEmail = email as string;
+      const xTitle = `Registration Successful!`;
+      const xBodyTitle = `Registration Successful!`;
+      const xButtonTitle = `Validate Email`;
+      const xButtonLink =
+        process.env.ROOT_URL +
+        `/api/auth/email-verification?pidUser=${pidUser}&cid=${cid}`;
 
-    const xBody1 =
-      `Hello ` +
-      userFirstname +
-      `,<br /><br />` +
-      `I thank you for taking this step to simplify buying products from China for yourself, and perhaps, others.<br /><br />
+      const xBody1 =
+        `Hello ` +
+        userFirstname +
+        `,<br /><br />` +
+        `I thank you for taking this step to simplify buying products from China for yourself, and perhaps, others.<br /><br />
 
 To gain access to your own dashboard where you can see all you can accomplish using our website, click the Validate Email button below to complete registration.
 
@@ -255,21 +258,22 @@ See you inside.<br /><br />
 <i>CEO, Spreadit Limited</i>
 `;
 
-    await xMail2({
-      xEmail,
-      xTitle,
-      xBodyTitle,
-      xBody1,
-      //xBody2,
-      xButtonTitle,
-      xButtonLink,
-    });
-    ////////////////////// SEND REGISTRATION EMAIL BLOCK STARTS //////////////////////
+      await xMail2({
+        xEmail,
+        xTitle,
+        xBodyTitle,
+        xBody1,
+        //xBody2,
+        xButtonTitle,
+        xButtonLink,
+      });
+      ////////////////////// SEND REGISTRATION EMAIL BLOCK STARTS //////////////////////
 
-    console.log('Email was Successfully sent!');
-  } catch (error) {
-    console.error('Failed to send email:', error);
-  }
+      console.log('Email was Successfully sent!');
+    } catch (error) {
+      console.error('Failed to send email:', error);
+    }
+  });
 
   // Redirect to login if success
   if (create) {
@@ -288,7 +292,7 @@ See you inside.<br /><br />
     const statusx = 'SUCCESS';
     //RETURN RESPONSE
     return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
+      { messagex, statusx, successx: false, userx: null },
       { status: 401 },
     );
   }

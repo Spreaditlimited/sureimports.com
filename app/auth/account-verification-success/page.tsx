@@ -54,7 +54,15 @@ export default function AccountVerificationSuccessPage() {
           
           {/* Mobile Logo */}
           <div className="mb-8 flex justify-center lg:hidden">
-            <Image src="/images/new/images/logo.png" alt="Sure Imports" width={160} height={36} />
+            <Link href="/">
+              <Image
+                src="/images/svg-logo.svg"
+                alt="Sure Imports"
+                width={160}
+                height={36}
+                className="h-10 w-auto"
+              />
+            </Link>
           </div>
 
           <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-slate-200/40 dark:border dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-12 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:border-none dark:lg:bg-transparent">

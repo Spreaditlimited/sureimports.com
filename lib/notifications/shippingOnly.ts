@@ -38,11 +38,7 @@ async function resolveCountryName(value: string) {
 
   const country = await prisma.country.findFirst({
     where: {
-      OR: [
-        { pidCountry: raw },
-        { countrySlug: raw },
-        { countryName: raw },
-      ],
+      OR: [{ pidCountry: raw }, { countrySlug: raw }, { countryName: raw }],
     },
     select: { countryName: true },
   });
@@ -65,7 +61,9 @@ async function resolveShippingPlanName(value: string) {
     select: { shippingPlanName: true },
   });
 
-  return plan?.shippingPlanName ? readableFallback(plan.shippingPlanName) : readableFallback(raw);
+  return plan?.shippingPlanName
+    ? readableFallback(plan.shippingPlanName)
+    : readableFallback(raw);
 }
 
 export async function notifyNewShippingOnlyRequest(
