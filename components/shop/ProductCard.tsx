@@ -41,6 +41,7 @@ export default function ProductCard({
       productBrand: brand,
       productCategory: category,
     });
+    window.dispatchEvent(new Event('open-shop-cart'));
   };
 
   return (

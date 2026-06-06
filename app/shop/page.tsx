@@ -101,6 +101,9 @@ export default function ShopPage() {
   useEffect(() => {
     if (searchParams.get('openCart') === '1') {
       setShowCartSidebar(true);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('openCart');
+      window.history.replaceState(null, '', `${url.pathname}${url.search}`);
     }
   }, [searchParams]);
 

@@ -23,6 +23,7 @@ import { useShopCart } from '@/app/context/ShopCartContext';
 import { toast } from 'sonner';
 import Loading from '@/app/dashboard/loading';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
+import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
 
 function ProductDetailsContent({
   params,
@@ -37,10 +38,18 @@ function ProductDetailsContent({
   const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [showCartSidebar, setShowCartSidebar] = useState(false);
 
   useEffect(() => {
     fetchProduct();
   }, [resolvedParams.slug]);
+
+  useEffect(() => {
+    const handleOpenShopCart = () => setShowCartSidebar(true);
+    window.addEventListener('open-shop-cart', handleOpenShopCart);
+    return () =>
+      window.removeEventListener('open-shop-cart', handleOpenShopCart);
+  }, []);
 
   const fetchProduct = async () => {
     try {
@@ -63,7 +72,7 @@ function ProductDetailsContent({
     }
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (openCart = true) => {
     if (!product) return;
     const imageUrl =
       resolveMediaUrl(product.productImage) ||
@@ -79,10 +88,13 @@ function ProductDetailsContent({
       },
       quantity,
     );
+    if (openCart) {
+      setShowCartSidebar(true);
+    }
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    handleAddToCart(false);
     router.push('/shop/checkout');
   };
 
@@ -219,7 +231,7 @@ function ProductDetailsContent({
               <div className="mb-8 space-y-4">
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button
-                    onClick={handleAddToCart}
+                    onClick={() => handleAddToCart()}
                     disabled={inCart}
                     className={`flex-1 rounded-2xl py-6 text-sm font-bold shadow-lg transition-all ${
                       inCart
@@ -391,6 +403,10 @@ function ProductDetailsContent({
           )}
         </main>
       </div>
+      <CartSidebar
+        isOpen={showCartSidebar}
+        onClose={() => setShowCartSidebar(false)}
+      />
       <Footer />
     </>
   );
