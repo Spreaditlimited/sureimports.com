@@ -73,6 +73,8 @@ export async function POST(request: Request) {
       statusz = 'bank-pending-saved-orders';
     }
 
+    const shouldUpdateOrderTotals = currentStatus !== 'pay-for-shipping';
+
     /////////////// UPDATE BANK RECORDS ///////////////
     const createx = await prisma.bank_payment.create({
       data: {
@@ -126,9 +128,11 @@ export async function POST(request: Request) {
         pidOrder: serviceID,
       },
       data: {
-        orderTotalCost: newTotalAmount,
-        orderWeight: newTotalWeight,
-        orderShippingCost: newEstimatedTotalShippingCost,
+        orderTotalCost: shouldUpdateOrderTotals ? newTotalAmount : undefined,
+        orderWeight: shouldUpdateOrderTotals ? newTotalWeight : undefined,
+        orderShippingCost: shouldUpdateOrderTotals
+          ? newEstimatedTotalShippingCost
+          : undefined,
         status: statusz,
         updatedAt: new Date(),
       },

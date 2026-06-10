@@ -63,11 +63,10 @@ export async function GET(request: NextRequest) {
     });
 
     //SHIPPING RATE
-    const shippingRate: any = await prisma.shippingplan.findFirst({
+    const shippingRate: any = await prisma.shippingplan.findUnique({
       where: {
-        countryId: orderRecord?.destinationCountry as any,
         pidShippingPlan: orderRecord?.shippingPlan as any,
-      },
+      } as any,
       select: {
         shippingPlanName: true,
         shippingPlanRate: true,
@@ -179,18 +178,6 @@ export async function GET(request: NextRequest) {
     let exYuanToDollar = exRate?.exYuanToDollar ?? 7.5;
     let exNairaToYuan = exRate?.exNairaToYuan ?? 205;
 
-    //ACTUAL WEIGHT & DOMESTIC SHIPPING COST
-    let actualWeight = orderRecord?.orderWeight;
-    let actualDomesticShippingCost =
-      parseFloat((orderRecord?.shippingCost1 as any) ?? 0) /
-      parseFloat((exYuanToDollar as any) ?? 0);
-    let actualInternationalShippingCost =
-      parseFloat((actualWeight as any) ?? 0) *
-      parseFloat((shippingPlanRate as any) ?? 0);
-    let actualTotalShippingCost =
-      actualDomesticShippingCost + actualInternationalShippingCost;
-    let costDifference = actualTotalShippingCost - estimatedTotalShippingCost;
-
     console.log('JESUS CHRIST IS GREAT!!!');
 
     // console.log('ACTUAL WEIGHT:', actualWeight);
@@ -229,6 +216,18 @@ export async function GET(request: NextRequest) {
       exYuanToDollar = parseFloat(order?.exchangeRate2 as any);
       exNairaToYuan = parseFloat(order?.exchangeRate3 as any);
     }
+
+    //ACTUAL WEIGHT & DOMESTIC SHIPPING COST
+    let actualWeight = orderRecord?.orderWeight;
+    let actualDomesticShippingCost =
+      parseFloat((orderRecord?.shippingCost1 as any) ?? 0) /
+      parseFloat((exYuanToDollar as any) ?? 0);
+    let actualInternationalShippingCost =
+      parseFloat((actualWeight as any) ?? 0) *
+      parseFloat((shippingPlanRate as any) ?? 0);
+    let actualTotalShippingCost =
+      actualDomesticShippingCost + actualInternationalShippingCost;
+    let costDifference = actualTotalShippingCost - estimatedTotalShippingCost;
 
     //--------------------------------//RESPONSE//--------------------------------//
     return NextResponse.json({

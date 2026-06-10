@@ -100,6 +100,21 @@ export async function POST(request: Request) {
     const user = await prisma.users.findUnique({
       where: { pidUser: consumer_id },
     });
+    const order = await prisma.orders.findFirst({
+      where: { pidOrder: service_id, pidUser: consumer_id },
+      select: { status: true },
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { status: 'error', message: 'Order not found' },
+        { status: 404 },
+      );
+    }
+
+    const currentOrderStatus = String(order.status || '');
+    const targetStatus = String(nextStatus || '');
+    const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
 
     await prisma.$transaction(async (tx) => {
       await tx.payments.create({
@@ -125,16 +140,23 @@ export async function POST(request: Request) {
         },
       });
 
-      if (nextStatus) {
+      if (targetStatus) {
         await tx.orders.update({
           where: { pidOrder: service_id },
           data: {
-            status: String(nextStatus),
-            orderTotalCost: newTotalAmount ? String(newTotalAmount) : undefined,
-            orderWeight: newTotalWeight ? String(newTotalWeight) : undefined,
-            orderShippingCost: newEstimatedTotalShippingCost
-              ? String(newEstimatedTotalShippingCost)
-              : undefined,
+            status: targetStatus,
+            orderTotalCost:
+              shouldUpdateOrderTotals && newTotalAmount
+                ? String(newTotalAmount)
+                : undefined,
+            orderWeight:
+              shouldUpdateOrderTotals && newTotalWeight
+                ? String(newTotalWeight)
+                : undefined,
+            orderShippingCost:
+              shouldUpdateOrderTotals && newEstimatedTotalShippingCost
+                ? String(newEstimatedTotalShippingCost)
+                : undefined,
             updatedAt: new Date(),
           },
         });

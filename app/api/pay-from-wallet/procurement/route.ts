@@ -134,7 +134,9 @@ export async function POST(request: NextRequest) {
     const txRef = `PROCWAL${randomGenerator(10)}`;
     const txID = `PROCWALTX${randomGenerator(10)}`;
     const fullName = `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() || 'Customer';
+    const currentOrderStatus = String(order.status || '');
     const targetStatus = String(nextStatus || 'pending');
+    const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
 
     await prisma.$transaction(async (tx) => {
       await tx.debits.create({
@@ -181,11 +183,18 @@ export async function POST(request: NextRequest) {
         where: { pidOrder: String(pidOrder) },
         data: {
           status: targetStatus,
-          orderTotalCost: newTotalAmount ? String(newTotalAmount) : undefined,
-          orderWeight: newTotalWeight ? String(newTotalWeight) : undefined,
-          orderShippingCost: newEstimatedTotalShippingCost
-            ? String(newEstimatedTotalShippingCost)
-            : undefined,
+          orderTotalCost:
+            shouldUpdateOrderTotals && newTotalAmount
+              ? String(newTotalAmount)
+              : undefined,
+          orderWeight:
+            shouldUpdateOrderTotals && newTotalWeight
+              ? String(newTotalWeight)
+              : undefined,
+          orderShippingCost:
+            shouldUpdateOrderTotals && newEstimatedTotalShippingCost
+              ? String(newEstimatedTotalShippingCost)
+              : undefined,
           updatedAt: new Date(),
         },
       });
@@ -194,6 +203,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       statusx: 'SUCCESS',
       message: 'Wallet payment successful.',
+      nextStatus: targetStatus,
     });
   } catch (error) {
     console.error('Procurement wallet payment failed:', error);

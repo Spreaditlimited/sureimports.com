@@ -77,6 +77,13 @@ export default function MoreOrders({
   
   const status = statusOverride || params.statusx || '';
   const status2 = statusOverride || params.statusx || '';
+  const showActualShippingBreakdown = [
+    'pay-for-shipping',
+    'bank-pending-shipping-orders',
+    'in-transit',
+    'ready-for-pickup',
+    'completed',
+  ].includes(status);
 
   const [loading, setLoading] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -507,7 +514,7 @@ export default function MoreOrders({
                 <span className="text-slate-500">Est. Total Weight</span>
                 <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(productsTotalWeight)} kg</span>
               </div>
-              {status === 'pay-for-shipping' && (
+              {showActualShippingBreakdown && (
                 <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
                   <span className="text-slate-500 font-bold">Actual Confirmed Weight</span>
                   <span className="font-black text-indigo-600 dark:text-indigo-400">{formatCurrency(actualWeightValue)} kg</span>
@@ -553,8 +560,20 @@ export default function MoreOrders({
               </div>
 
               {/* Shipping Breakdowns */}
-              {status === 'pay-for-shipping' ? (
+              {showActualShippingBreakdown ? (
                 <>
+                  <div className="flex justify-between text-slate-500">
+                    <span>Est. Domestic Shipping</span>
+                    <span>${formatCurrency(domesticShippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-500">
+                    <span>Est. Intl. Shipping</span>
+                    <span>${formatCurrency(estimatedTotalShippingCost - domesticShippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
+                    <span className="font-semibold text-slate-900 dark:text-white">Est. Total Shipping</span>
+                    <span className="font-bold text-slate-900 dark:text-white">${formatCurrency(estimatedTotalShippingCost)}</span>
+                  </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Actual Domestic Shipping</span>
                     <span>${formatCurrency(actualDomesticShippingCostValue)}</span>
@@ -630,7 +649,7 @@ export default function MoreOrders({
             </div>
 
             {/* Differential / Outstanding Calculations */}
-            {(status2 === 'on-hold' || status === 'pay-for-shipping') && (
+            {(status2 === 'on-hold' || showActualShippingBreakdown) && (
               <div className={`rounded-xl border p-4 ${
                 (status2 === 'on-hold' ? onHoldDifference : actualTotalShippingCost - estimatedTotalShippingCost) > 0 
                   ? 'border-rose-200 bg-rose-50 dark:border-rose-900/30 dark:bg-rose-900/10' 
@@ -702,6 +721,7 @@ export default function MoreOrders({
                   newTotalAmount={grandTotalCost}
                   newTotalWeight={productsTotalWeight}
                   newEstimatedTotalShippingCost={estimatedTotalShippingCost}
+                  enforceMinimumOrderRules
                   className={isDisabled 
                     ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                     : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}

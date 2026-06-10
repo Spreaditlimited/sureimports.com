@@ -30,8 +30,8 @@ export function UserAvatar({ userx }: UserAvatarProps) {
   const [isMounted, setIsMounted] = useState(false);
   const { theme } = useTheme();
 
-  const imageUser = resolveMediaUrl(user?.userImage);
-  const imageDefault = '../../../images/default.png';
+  const imageDefault = '/images/default.png';
+  const avatarSrc = resolveMediaUrl(user?.userImage) || imageDefault;
 
   useEffect(() => {
     setIsMounted(true);
@@ -54,50 +54,28 @@ export function UserAvatar({ userx }: UserAvatarProps) {
     <div className="inline-flex items-center justify-start gap-2.5 text-slate-800 hover:cursor-pointer dark:text-white md:mr-4 md:h-[50px]">
       {/* DESKTOP VIEW */}
       <Avatar className="hidden h-12 w-12 border-collapse border transition-all duration-300 hover:border-[#0E0E1F] dark:hover:border-white lg:block">
-        {user?.userImage != null ? (
-          <Image
-            src={imageUser}
-            alt={`${userx.userFirstname || 'User'} avatar`}
-            height={48}
-            width={48}
-            unoptimized
-            className="h-full w-full object-fill"
-          />
-        ) : (
-          <Image
-            src={imageDefault}
-            alt="Default avatar"
-            height={48}
-            width={48}
-            unoptimized
-            className="h-full w-full object-fill"
-          />
-        )}
+        <Image
+          src={avatarSrc}
+          alt={`${userx.userFirstname || 'User'} avatar`}
+          height={48}
+          width={48}
+          unoptimized
+          className="h-full w-full object-fill"
+        />
       </Avatar>
 
       <Sheet open={open} onOpenChange={setOpen}>
         {/* MOBILE VIEW */}
         <SheetTrigger asChild>
           <Avatar className="h-12 w-12 border-collapse border transition-all duration-300 hover:border-[#0E0E1F] dark:hover:border-white lg:hidden">
-            {user?.userImage != null ? (
-              <Image
-                src={imageUser}
-                alt={`${userx.userFirstname || 'User'} avatar`}
-                height={48}
-                width={48}
-                unoptimized
-                className="h-full w-full object-fill"
-              />
-            ) : (
-              <Image
-                src={imageDefault}
-                alt="Default avatar"
-                height={48}
-                width={48}
-                unoptimized
-                className="h-full w-full object-fill"
-              />
-            )}
+            <Image
+              src={avatarSrc}
+              alt={`${userx.userFirstname || 'User'} avatar`}
+              height={48}
+              width={48}
+              unoptimized
+              className="h-full w-full object-fill"
+            />
           </Avatar>
         </SheetTrigger>
 
@@ -112,25 +90,14 @@ export function UserAvatar({ userx }: UserAvatarProps) {
             {/* MOBILE SLIDE OUT MENU ON AVATER CLICK */}
             <div className="flex gap-2">
               <Avatar className="hover:border-solid-black h-[50px] w-[50px] border-collapse border transition-all duration-300 dark:hover:border-white">
-                {user?.userImage != null ? (
-                  <Image
-                    src={imageUser}
-                    alt={`${userx.userFirstname || 'User'} avatar`}
-                    height={50}
-                    width={50}
-                    unoptimized
-                    className="h-full w-full object-fill"
-                  />
-                ) : (
-                  <Image
-                    src={imageDefault}
-                    alt="Default avatar"
-                    height={50}
-                    width={50}
-                    unoptimized
-                    className="h-full w-full object-fill"
-                  />
-                )}
+                <Image
+                  src={avatarSrc}
+                  alt={`${userx.userFirstname || 'User'} avatar`}
+                  height={50}
+                  width={50}
+                  unoptimized
+                  className="h-full w-full object-fill"
+                />
               </Avatar>
               <div className="hide-scrollbar w-[256px] overflow-y-auto">
                 <div className="flex flex-col items-start justify-center gap-2">

@@ -25,6 +25,7 @@ interface PaymentButtonProps {
   newTotalAmount?: number;
   newTotalWeight?: number;
   newEstimatedTotalShippingCost?: number;
+  enforceMinimumOrderRules?: boolean;
 }
 
 const ensurePaystackScript = () =>
@@ -77,6 +78,7 @@ export default function PaystackProcurementPaymentButton({
   newTotalAmount,
   newTotalWeight,
   newEstimatedTotalShippingCost,
+  enforceMinimumOrderRules,
 }: PaymentButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -93,21 +95,21 @@ export default function PaystackProcurementPaymentButton({
       return;
     }
 
-    if (amount < 200 && !isNigeria) {
+    if (enforceMinimumOrderRules && amount < 200 && !isNigeria) {
       alert(
         'We cannot process orders of less than $200 for orders going to your destination. Please, edit your order',
       );
       return;
     }
 
-    if (amountNairax < 100000 && isNigeria) {
+    if (enforceMinimumOrderRules && amountNairax < 100000 && isNigeria) {
       alert(
         'We do not process orders less than N100,000. Please, edit your order.',
       );
       return;
     }
 
-    if (totalWeightx < 10 && !isNigeria) {
+    if (enforceMinimumOrderRules && totalWeightx < 10 && !isNigeria) {
       alert(
         'We cannot ship orders with weight less than 10kg to your destination. Please, edit your order.',
       );
