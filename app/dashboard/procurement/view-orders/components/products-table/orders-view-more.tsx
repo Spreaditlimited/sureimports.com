@@ -88,6 +88,7 @@ export default function MoreOrders({
   const [loading, setLoading] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isDisabled2, setIsDisabled2] = useState(false);
+  const [showMinimumOrderModal, setShowMinimumOrderModal] = useState(false);
 
   const [pidOrder] = useState<string>(products[0]?.pidOrder || '');
   const [actionType, setActionType] = useState<string>('');
@@ -132,9 +133,11 @@ export default function MoreOrders({
   const shouldShowYuanRate =
     normalizedCurrency === 'CNY' && Number(exYuanToDollar) > 0;
   const isWalletEligibleForOrder = normalizedDestination.includes('nigeria');
-  const returnTo = encodeURIComponent(
-    `/dashboard/procurement/view-orders/${status || 'saved'}`,
-  );
+  const isSavedNigeriaOrderBelowMinimum =
+    status === 'saved' &&
+    normalizedDestination.includes('nigeria') &&
+    Number(amountNaira || 0) < 100000;
+  const returnTo = `/dashboard/procurement/view-orders/${status || 'saved'}`;
 
   function replaceNullWithZero<T>(value: T | null): T | number {
     return value === null ? 0 : value;
@@ -188,6 +191,42 @@ export default function MoreOrders({
   useEffect(() => {
     getProductsDetails();
   }, []);
+
+  const showMinimumOrderNotice = () => {
+    setShowMinimumOrderModal(true);
+  };
+
+  const goToBankPayment = (params: {
+    amount: number;
+    amountNaira: number;
+    status: string;
+    newEstimatedTotalShippingCost: number;
+    newTotalAmount: number;
+    newTotalWeight: number;
+  }) => {
+    if (isSavedNigeriaOrderBelowMinimum) {
+      showMinimumOrderNotice();
+      return;
+    }
+
+    const query = new URLSearchParams({
+      service: 'procurement',
+      amount: String(params.amount),
+      amountNaira: String(params.amountNaira),
+      currencyType,
+      exNairaToDollar: String(exNairaToDollar),
+      destinationCountry,
+      status: params.status,
+      newEstimatedTotalShippingCost: String(params.newEstimatedTotalShippingCost),
+      newTotalAmount: String(params.newTotalAmount),
+      newTotalWeight: String(params.newTotalWeight),
+      serviceID: pidOrder,
+      serviceDescription: 'Pay for General Procurement Service',
+      returnTo,
+    });
+
+    router.push(`/dashboard/bank-payment/?${query.toString()}`);
+  };
 
   const actionProductDelete = async (pidProductx: string) => {
     try {
@@ -292,6 +331,11 @@ export default function MoreOrders({
     newTotalWeight?: number;
     newEstimatedTotalShippingCost?: number;
   }) => {
+    if (isSavedNigeriaOrderBelowMinimum) {
+      showMinimumOrderNotice();
+      return;
+    }
+
     try {
       toast.info('Processing wallet payment...');
       const res = await fetch('/api/pay-from-wallet/procurement', {
@@ -315,6 +359,10 @@ export default function MoreOrders({
         data = null;
       }
       if (!res.ok || data?.statusx !== 'SUCCESS') {
+        if (data?.statusx === 'MINIMUM_ORDER_AMOUNT') {
+          showMinimumOrderNotice();
+          return;
+        }
         if (data?.statusx === 'NO_WALLET') {
           toast.warning(data.message || 'Please activate your wallet first.');
           router.push('/dashboard/wallet');
@@ -416,6 +464,43 @@ export default function MoreOrders({
 
   return (
     <div className="flex flex-col gap-6 p-6">
+      {showMinimumOrderModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="minimum-order-title"
+        >
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-900">
+            <div className="bg-slate-900 p-5 text-white">
+              <h2
+                id="minimum-order-title"
+                className="flex items-center gap-2 text-xl font-bold text-white"
+              >
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/20">
+                  <AlertCircle className="h-5 w-5 text-amber-300" />
+                </span>
+                Minimum Order Required
+              </h2>
+              <p className="pt-2 text-sm leading-relaxed text-slate-200">
+                We cannot process Nigeria-bound procurement orders below{' '}
+                <span className="font-bold text-white">₦100,000</span>. Please edit
+                your order and increase the total before choosing Paystack, wallet,
+                or bank deposit.
+              </p>
+            </div>
+
+            <div className="bg-white p-5 dark:bg-slate-900">
+              <Button
+                onClick={() => setShowMinimumOrderModal(false)}
+                className="h-11 w-full rounded-xl bg-indigo-600 font-bold text-white hover:bg-indigo-500"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Top Action Bar */}
       <div className="flex items-center justify-between">
@@ -722,6 +807,7 @@ export default function MoreOrders({
                   newTotalWeight={productsTotalWeight}
                   newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                   enforceMinimumOrderRules
+                  onMinimumOrderBlocked={showMinimumOrderNotice}
                   className={isDisabled 
                     ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                     : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -732,8 +818,14 @@ export default function MoreOrders({
                     ? "h-12 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
                     : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                   onClick={() => {
-                    // Logic retained
-                    router.push(`/dashboard/bank-payment/?service=procurement&amount=${grandTotalCost}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
+                    goToBankPayment({
+                      amount: grandTotalCost,
+                      amountNaira,
+                      status,
+                      newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                      newTotalAmount: grandTotalCost,
+                      newTotalWeight: productsTotalWeight,
+                    });
                   }}
                 >
                   <Banknote className="mr-2 h-4 w-4" /> Bank Deposit
@@ -869,8 +961,14 @@ export default function MoreOrders({
                         ? "h-12 flex-1 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
                         : "h-12 flex-1 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                       onClick={() => {
-                        // Routing logic retained
-                        router.push(`/dashboard/bank-payment/?service=procurement&amount=${onHoldDifference}&amountNaira=${amountNaira}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
+                        goToBankPayment({
+                          amount: onHoldDifference,
+                          amountNaira: amountNairaDifference,
+                          status,
+                          newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                          newTotalAmount: grandTotalCost,
+                          newTotalWeight: productsTotalWeight,
+                        });
                       }}
                     >
                       <Banknote className="mr-2 h-4 w-4" /> Bank Deposit
@@ -958,8 +1056,16 @@ export default function MoreOrders({
                       ? "h-12 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
                       : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                     onClick={() => {
-                      // Routing logic retained
-                      router.push(`/dashboard/bank-payment/?service=procurement&amount=${actualTotalShippingCost - estimatedTotalShippingCost}&amountNaira=${(actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar}&currencyType=${currencyType}&exNairaToDollar=${exNairaToDollar}&destinationCountry=${destinationCountry}&status=${status}&newEstimatedTotalShippingCost=${estimatedTotalShippingCost}&newTotalAmount=${grandTotalCost}&newTotalWeight=${productsTotalWeight}&serviceID=${pidOrder}&serviceDescription=Pay for General Procurement Service&returnTo=${returnTo}`);
+                      goToBankPayment({
+                        amount: actualTotalShippingCost - estimatedTotalShippingCost,
+                        amountNaira:
+                          (actualTotalShippingCost - estimatedTotalShippingCost) *
+                          exNairaToDollar,
+                        status,
+                        newEstimatedTotalShippingCost: estimatedTotalShippingCost,
+                        newTotalAmount: grandTotalCost,
+                        newTotalWeight: productsTotalWeight,
+                      });
                     }}
                   >
                     <Banknote className="mr-2 h-4 w-4" /> Bank Deposit

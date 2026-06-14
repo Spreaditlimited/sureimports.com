@@ -31,6 +31,7 @@ import Loading from '../../loading';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import WalletTransactionTable from './WalletTransactionTable';
+import DebitTransactionTable from './DebitTransactionTable';
 //import GetDedicatedAccount from './GetDedicatedAccount';
 //import GetPaystackCustomer from './GetPaystackCustomer';
 
@@ -459,7 +460,25 @@ export default function WalletDashboard() {
                           {transactions.transactions.length == 0 && (
                             <div className="flex items-center justify-center p-4">
                               <p className="text-sm text-gray-600 dark:text-gray-800">
-                                No transactions available
+                                No credit transactions available
+                              </p>
+                            </div>
+                          )}
+                        </Suspense>
+                      </div>
+
+                      <div className="rounded-lg bg-gray-200 p-1 shadow dark:bg-gray-500">
+                        <h3 className="px-3 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-100">
+                          Debit Transactions
+                        </h3>
+                        <Suspense fallback={<Loading />}>
+                          {transactions.debits?.length > 0 && (
+                            <DebitTransactionTable debits={transactions.debits} />
+                          )}
+                          {(!transactions.debits || transactions.debits.length == 0) && (
+                            <div className="flex items-center justify-center p-4">
+                              <p className="text-sm text-gray-600 dark:text-gray-800">
+                                No debit transactions available
                               </p>
                             </div>
                           )}

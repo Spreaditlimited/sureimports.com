@@ -46,6 +46,47 @@ export async function POST(request: Request) {
       );
     }
 
+    const requestedAmount = Number(amount || 0);
+    const requestedCurrency = String(currency || '').toUpperCase();
+    const order = await prisma.orders.findFirst({
+      where: { pidOrder: service_id, pidUser: consumer_id },
+      select: { status: true, destinationCountry: true },
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        { status: 'error', message: 'Order not found' },
+        { status: 404 },
+      );
+    }
+
+    const destinationCountry = order.destinationCountry
+      ? await prisma.country.findUnique({
+          where: { pidCountry: String(order.destinationCountry) },
+          select: { countryName: true },
+        })
+      : null;
+    const destinationName = String(
+      destinationCountry?.countryName || order.destinationCountry || '',
+    )
+      .trim()
+      .toLowerCase();
+
+    if (
+      String(order.status || '') === 'saved' &&
+      destinationName.includes('nigeria') &&
+      (requestedCurrency !== 'NGN' || requestedAmount < 100000)
+    ) {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message:
+            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+        },
+        { status: 400 },
+      );
+    }
+
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
@@ -69,10 +110,8 @@ export async function POST(request: Request) {
 
     const paymentData = data.data;
     const verifiedAmount = Number(paymentData.amount || 0) / 100;
-    const requestedAmount = Number(amount || 0);
     const paidAmount = verifiedAmount || requestedAmount;
     const paidCurrency = String(paymentData.currency || currency || 'NGN');
-    const requestedCurrency = String(currency || '').toUpperCase();
 
     if (
       !Number.isFinite(verifiedAmount) ||
@@ -80,7 +119,10 @@ export async function POST(request: Request) {
       (requestedCurrency && paidCurrency.toUpperCase() !== requestedCurrency)
     ) {
       return NextResponse.json(
-        { status: 'error', message: 'Verified payment amount does not match order amount' },
+        {
+          status: 'error',
+          message: 'Verified payment amount does not match order amount',
+        },
         { status: 400 },
       );
     }
@@ -100,18 +142,6 @@ export async function POST(request: Request) {
     const user = await prisma.users.findUnique({
       where: { pidUser: consumer_id },
     });
-    const order = await prisma.orders.findFirst({
-      where: { pidOrder: service_id, pidUser: consumer_id },
-      select: { status: true },
-    });
-
-    if (!order) {
-      return NextResponse.json(
-        { status: 'error', message: 'Order not found' },
-        { status: 404 },
-      );
-    }
-
     const currentOrderStatus = String(order.status || '');
     const targetStatus = String(nextStatus || '');
     const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';

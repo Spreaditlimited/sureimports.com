@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import xMail from '@/lib/email/xMail3';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { recordWalletDebit } from '@/lib/walletLedger';
 
 export async function GET(request: NextRequest) {
   try {
@@ -190,6 +191,18 @@ export async function GET(request: NextRequest) {
           currency: 'NGN',
           createdAt: new Date(),
         },
+      });
+
+      await recordWalletDebit(tx, {
+        pidUser: pidUser as string,
+        userEmail: email,
+        userFirstname: first_name,
+        userLastname: last_name,
+      }, {
+        amount: claimAmount,
+        reference: `DEBIT:${pidDebit}`,
+        description: 'Pay Small Small Claim',
+        currency: 'NGN',
       });
 
       // Create payment record

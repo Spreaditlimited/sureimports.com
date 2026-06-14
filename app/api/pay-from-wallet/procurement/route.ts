@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { recordWalletDebit } from '@/lib/walletLedger';
 
 const formatNaira = (value: number) =>
   value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -20,7 +21,10 @@ export async function POST(request: NextRequest) {
 
     if (!pidUser || !pidOrder || !amount) {
       return NextResponse.json(
-        { statusx: 'FAILED', message: 'pidUser, pidOrder and amount are required' },
+        {
+          statusx: 'FAILED',
+          message: 'pidUser, pidOrder and amount are required',
+        },
         { status: 400 },
       );
     }
@@ -68,8 +72,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           statusx: 'UNSUPPORTED_DESTINATION',
+          message: 'Wallet payment is only available for Nigeria-bound orders.',
+        },
+        { status: 400 },
+      );
+    }
+
+    if (String(order.status || '') === 'saved' && payAmount < 100000) {
+      return NextResponse.json(
+        {
+          statusx: 'MINIMUM_ORDER_AMOUNT',
           message:
-            'Wallet payment is only available for Nigeria-bound orders.',
+            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
         },
         { status: 400 },
       );
@@ -79,7 +93,10 @@ export async function POST(request: NextRequest) {
       process.env.NEXT_PUBLIC_APP_URL ||
       process.env.ROOT_URL ||
       'http://localhost:3000';
-    let walletData: any = null;
+    let walletData: {
+      statusx?: string;
+      transactionDetails?: { totalAmount?: number | string };
+    } | null = null;
     try {
       const walletCheck = await fetch(
         `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`,
@@ -96,7 +113,7 @@ export async function POST(request: NextRequest) {
         );
       }
       walletData = await walletCheck.json();
-    } catch (walletError) {
+    } catch {
       return NextResponse.json(
         {
           statusx: 'FAILED',
@@ -114,7 +131,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const walletBalance = Number(walletData?.transactionDetails?.totalAmount || 0);
+    const walletBalance = Number(
+      walletData?.transactionDetails?.totalAmount || 0,
+    );
     if (walletBalance < payAmount) {
       const shortfall = Number((payAmount - walletBalance).toFixed(2));
       return NextResponse.json(
@@ -133,15 +152,18 @@ export async function POST(request: NextRequest) {
 
     const txRef = `PROCWAL${randomGenerator(10)}`;
     const txID = `PROCWALTX${randomGenerator(10)}`;
-    const fullName = `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() || 'Customer';
+    const fullName =
+      `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() ||
+      'Customer';
     const currentOrderStatus = String(order.status || '');
     const targetStatus = String(nextStatus || 'pending');
     const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
+    const pidDebit = `DEB${randomGenerator(12)}`;
 
     await prisma.$transaction(async (tx) => {
       await tx.debits.create({
         data: {
-          pidDebit: `DEB${randomGenerator(12)}`,
+          pidDebit,
           pidUser: String(pidUser),
           email: user.userEmail as string,
           payerName: fullName,
@@ -157,6 +179,18 @@ export async function POST(request: NextRequest) {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+      });
+
+      await recordWalletDebit(tx, {
+        pidUser: String(pidUser),
+        userEmail: user.userEmail,
+        userFirstname: user.userFirstname,
+        userLastname: user.userLastname,
+      }, {
+        amount: payAmount,
+        reference: `DEBIT:${pidDebit}`,
+        description: 'General procurement payment via wallet',
+        currency: 'NGN',
       });
 
       await tx.payments.create({

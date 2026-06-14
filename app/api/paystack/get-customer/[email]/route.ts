@@ -1,237 +1,118 @@
 import { prisma } from '@/lib/prisma';
+import {
+  dedupeWalletLedger,
+  getWalletLedger,
+  syncLegacyWalletDebits,
+  syncPaystackDedicatedNubanCredits,
+} from '@/lib/walletLedger';
+
 import { NextResponse } from 'next/server';
-
-type PaystackDedicatedAccountResponse = {
-  status: boolean;
-  message: string;
-  data?: any;
-};
-
-type RequestBody = {
-  customer: number;
-  preferred_bank: string;
-};
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ email: string }> },
 ) {
   try {
-    // Await params first - required in Next.js 15
     const { email } = await params;
+    const normalizedEmail = decodeURIComponent(email).trim().toLowerCase();
 
-    console.log('WORKING' + email);
-    //sum all the amount from debits table where pidUser = pidUser and paymentStatus = 'PAID'
-    // Sum all amounts from debits where pidUser matches and paymentStatus is PAID
-    const user: any = await prisma.users.findUnique({
+    const user = await prisma.users.findFirst({
       where: {
-        userEmail: email as string | undefined,
+        OR: [
+          { userEmail: normalizedEmail },
+          { email: normalizedEmail },
+        ],
+      },
+      select: {
+        pidUser: true,
+        userEmail: true,
+        email: true,
+        userFirstname: true,
+        userLastname: true,
       },
     });
 
-    const debitAggregate = await prisma.debits.aggregate({
-      where: {
-        email: user?.userEmail,
+    if (!user) {
+      return NextResponse.json(
+        {
+          customerDetails: [],
+          transactionDetails: [],
+          statusx: 'NO_CUSTOMER',
+          message: 'No customer found for this email',
+        },
+        { status: 200 },
+      );
+    }
+
+    const walletSync = await syncPaystackDedicatedNubanCredits(user);
+    if (walletSync.statusx !== 'WALLET_READY') {
+      return NextResponse.json(
+        {
+          customerDetails: [],
+          transactionDetails: [],
+          statusx: 'NO_ACCOUNT',
+          message: 'No Dedicated Account found for this email',
+        },
+        { status: 200 },
+      );
+    }
+
+    await syncLegacyWalletDebits(prisma, user);
+    await dedupeWalletLedger(prisma, user);
+    const ledger = await getWalletLedger(prisma, user);
+
+    const creditTransactions = ledger.transactions
+      .filter((transaction) => transaction.type === 'CREDIT')
+      .map((transaction) => ({
+        id: transaction.id,
+        reference: transaction.categoryId || transaction.id,
+        amount: transaction.amount * 100,
+        currency: ledger.wallet.currency,
+        status: 'success',
+        channel: transaction.categoryId?.startsWith('PAYSTACK:')
+          ? 'dedicated_nuban'
+          : 'wallet_credit',
+        gateway_response: transaction.description,
+        fees: 0,
+        created_at: transaction.date.toISOString(),
+        customer: {
+          email: user.userEmail || user.email || normalizedEmail,
+          first_name: user.userFirstname || '',
+          last_name: user.userLastname || '',
+        },
+      }));
+
+    const debitTransactions = ledger.transactions
+      .filter((transaction) => transaction.type === 'DEBIT')
+      .map((transaction) => ({
+        id: transaction.id,
+        pidDebit: transaction.categoryId || transaction.id,
+        pidUser: user.pidUser,
+        email: user.userEmail || user.email || normalizedEmail,
+        payerName: ledger.customerName,
+        txID: transaction.categoryId || transaction.id,
+        txRef: transaction.categoryId || transaction.id,
         paymentStatus: 'DEBITED',
-      },
-      _sum: {
-        amount: true,
-      },
-    });
+        paymentType: 'WALLET',
+        currency: ledger.wallet.currency,
+        amount: transaction.amount,
+        serviceName: 'Wallet Debit',
+        serviceDescription: transaction.description,
+        xStatus: 'success',
+        createdAt: transaction.date,
+      }));
 
-    const refundCreditAggregate = await prisma.debits.aggregate({
-      where: {
-        email: user?.userEmail,
-        paymentStatus: 'REFUND_CREDIT',
-      },
-      _sum: {
-        amount: true,
-      },
-    });
-
-    const totalDebit = debitAggregate._sum.amount ?? 0;
-    const totalRefundCredit = refundCreditAggregate._sum.amount ?? 0;
-    const netDebit = totalDebit - totalRefundCredit;
-
-    console.log('Total Debit Amount:', totalDebit, 'Total Refund Credit:', totalRefundCredit);
-    console.log('WORKING OK 1 ...' + email);
-    //////////////////// GET CUSTOMER PROFILE DETAILS ////////////////////
-    const data = await fetch(`https://api.paystack.co/customer/${email}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::' + data);
-
-    const response_customer_details = await data.json();
-    console.log(
-      '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:::1' +
-        JSON.stringify(response_customer_details),
-    );
-    if (
-      data.ok == false ||
-      response_customer_details.data.dedicated_accounts == undefined ||
-      response_customer_details.data.dedicated_accounts.length == null ||
-      response_customer_details.data.dedicated_accounts.length == 0
-    ) {
-      return NextResponse.json(
-        {
-          customerDetails: [],
-          transactionDetails: [],
-          statusx: 'NO_ACCOUNT',
-          message: 'No Dedicated Account found for this email',
-        },
-        { status: 200 },
-      );
-    }
-
-    ////////// INITIALIZE CUSTOMER DATA //////////
-    let customerData = {
-      bankName: null,
-      bankAccountName: null,
-      bankAccountNumber: null,
-      currency: null,
-    };
-
-    if (data.ok) {
-      customerData = {
-        bankName: response_customer_details.data.dedicated_account.bank.name,
-        bankAccountName:
-          response_customer_details.data.dedicated_account.account_name,
-        bankAccountNumber:
-          response_customer_details.data.dedicated_account.account_number,
-        currency: response_customer_details.data.dedicated_account.currency,
-      };
-    }
-
-    if (!data.ok) {
-      return NextResponse.json(
-        {
-          customerDetails: [],
-          transactionDetails: [],
-          statusx: 'NO_ACCOUNT',
-          message: 'No Dedicated Account found for this email',
-        },
-        { status: 200 },
-      );
-    }
-
-    //////////////////// GET CUSTOMER TRANSACTIONS ////////////////////
-    const customer_id = response_customer_details.data.id;
-    //console.log('Customer ID:', customer_id);
-    const datav = await fetch(
-      `https://api.paystack.co/transaction?customer=${customer_id}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-        },
-      },
-    );
-    const response_transaction = await datav.json();
-    //console.log(':::::::::::::::::::PLAY:::::::::::::::::::'+response_transactionx);
-
-    const filteredTransaction = response_transaction.data.filter(
-      (transaction: any) =>
-        //transaction.customer.email.toLowerCase() === email.toLowerCase() &&
-        //transaction.status.toLowerCase() === 'success',
-        transaction.channel.toLowerCase() === 'dedicated_nuban',
-    );
-
-    //console.log(':::::::::::::::::::Response Transaction:::::::::::::::::::'+filteredTransactionx);
-
-    function calculateTotalAmount(transactions: any): any {
-      return transactions.reduce((total: any, transaction: any) => {
-        // Only sum successful transactions
-        if (transaction.status === 'success') {
-          return total + transaction.amount;
-        }
-        return total;
-      }, 0);
-    }
-
-    //calculate total amount
-    const totalAmount = calculateTotalAmount(filteredTransaction);
-
-    //initialize transaction data
-    let transactionData = {
-      transactions: [],
-      totalAmount: 0 - netDebit,
-      totalDebit: netDebit,
-    };
-    if (
-      filteredTransaction.length > 0 ||
-      !filteredTransaction[0] == undefined
-    ) {
-      transactionData = {
-        transactions: filteredTransaction,
-        totalAmount: totalAmount / 100 - netDebit,
-        totalDebit: netDebit,
-      };
-    } else {
-    }
-
-    //console.log(':::::::::::::::::::TOTAL:::::::::::::::::::'+totalAmountx);
-
-    //////////////////// GET CUSTOMER TRANSACTIONS ////////////////////
-    // const response_transaction = await fetch(
-    //   `https://api.paystack.co/transaction?perPage=1000`,
-    //   {
-    //     method: 'GET',
-    //     headers: {
-    //       Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-    //     },
-    //   },
-    // );
-
-    // const dataz = await response_transaction.json();
-    // const channel = 'dedicated_nuban';
-
-    // //if (!transactionsData?.data) return [];
-
-    // const filteredTransaction = dataz.data.filter(
-    //   (transaction: any) =>
-    //     transaction.customer.email.toLowerCase() === email.toLowerCase() &&
-    //     transaction.channel.toLowerCase() === channel.toLowerCase(),
-    // );
-
-    // function calculateTotalAmount(transactions: any): any {
-    //   return transactions.reduce((total: any, transaction: any) => {
-    //     // Only sum successful transactions
-    //     if (transaction.status === 'success') {
-    //       return total + transaction.amount;
-    //     }
-    //     return total;
-    //   }, 0);
-    // }
-
-    // //calculate total amount
-    // const totalAmount = calculateTotalAmount(filteredTransaction);
-
-    // //initialize transaction data
-    // let transactionData = {
-    //   transactions: [],
-    //   totalAmount: 0,
-    // };
-    // if (
-    //   filteredTransaction.length > 0 ||
-    //   !filteredTransaction[0] == undefined
-    // ) {
-    //   transactionData = {
-    //     transactions: filteredTransaction,
-    //     totalAmount: totalAmount / 100,
-    //   };
-    // } else {
-    // }
-
-    ////////// ACCOUNT FOUND //////////
     return NextResponse.json(
       {
-        customerDetails: customerData,
-        transactionDetails: transactionData,
+        customerDetails: walletSync.customerDetails,
+        transactionDetails: {
+          transactions: creditTransactions,
+          debits: debitTransactions,
+          ledger: ledger.transactions,
+          totalAmount: ledger.balance,
+          totalCredit: ledger.credits,
+          totalDebit: ledger.debits,
+        },
         statusx: 'WALLET_READY',
         message: 'Wallet Activation was Successful!',
       },
@@ -240,7 +121,8 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       {
-        error:
+        statusx: 'FAILED',
+        message:
           error instanceof Error ? error.message : 'An unknown error occurred',
       },
       { status: 500 },

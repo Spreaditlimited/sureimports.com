@@ -50,6 +50,7 @@ const CheckboxIcon = React.memo(({ checked }: { checked: boolean }) => (
     )}
   </div>
 ));
+CheckboxIcon.displayName = 'CheckboxIcon';
 
 function WalletPaymentDialog({
   isOpen,
@@ -802,3 +803,4 @@ const CountdownTimer = React.memo(({ startDate }: { startDate: string }) => {
     </div>
   );
 });
+CountdownTimer.displayName = 'CountdownTimer';

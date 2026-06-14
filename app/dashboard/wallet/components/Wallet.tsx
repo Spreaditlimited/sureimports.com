@@ -81,7 +81,8 @@ export default function Wallet() {
 
   const mergedTransactions = [
     ...(transactionsx?.transactions || []).map((tx: any) => ({
-      id: `c-${tx.reference}`,
+      id: `c-${tx.id || tx.reference}`,
+      reference: tx.reference,
       type: 'credit',
       title: tx.gateway_response || 'Wallet Top-up',
       amount: Number(tx.amount || 0) / 100,
@@ -354,7 +355,7 @@ export default function Wallet() {
                               {tx.title}
                             </p>
                             <p className="font-mono text-[10px] text-slate-400">
-                              ID: {tx.id.split('-').pop()}
+                              ID: {tx.reference || tx.id.split('-').pop()}
                             </p>
                           </div>
                         </div>

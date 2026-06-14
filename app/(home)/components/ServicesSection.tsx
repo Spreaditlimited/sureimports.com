@@ -42,7 +42,7 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
 
   return (
     <section id="services-section" className="bg-[#fcfcfd] py-24 dark:bg-slate-950">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         
         <div className="mb-16 max-w-2xl">
           <span className="mb-3 inline-block rounded-full bg-indigo-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">

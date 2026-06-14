@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { verifyToken } from '@/lib/jwt';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { recordWalletCredit } from '@/lib/walletLedger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -97,13 +98,14 @@ export async function POST(request: NextRequest) {
     const txRef = `RFWAL${randomGenerator(10)}`;
     const txID = `RFWALTX${randomGenerator(10)}`;
     const fullName = `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() || 'Customer';
+    const pidDebit = `DEB${randomGenerator(12)}`;
 
     await prisma.$transaction(async (tx) => {
       // Credit wallet ledger through debits table using a dedicated credit status.
       // Wallet balance APIs compute net debits minus this credit stream.
       await tx.debits.create({
         data: {
-          pidDebit: `DEB${randomGenerator(12)}`,
+          pidDebit,
           pidUser: user.pidUser,
           email: user.userEmail as string,
           payerName: fullName,
@@ -119,6 +121,13 @@ export async function POST(request: NextRequest) {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+      });
+
+      await recordWalletCredit(tx, user, {
+        amount: transferAmount,
+        reference: `REFUND:${pidDebit}`,
+        description: `Refund transfer to wallet (${refund.pidRefund})`,
+        currency: 'NGN',
       });
 
       await tx.refund_records.update({
@@ -143,4 +152,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

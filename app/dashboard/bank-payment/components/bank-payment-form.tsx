@@ -46,6 +46,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
   
   const service = searchParams.get('service') || '';
   const amount = parseFloat(searchParams.get('amount') || '0');
+  const amountNaira = parseFloat(searchParams.get('amountNaira') || '0');
   const exNairaToDollar = parseFloat(searchParams.get('exNairaToDollar') || '0');
   
   const newTotalAmount = searchParams.get('newTotalAmount') || '';
@@ -84,8 +85,10 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
     formData.append('userEmail', user?.userEmail || '');
     formData.append('pidBankPayment', pidBankPayment);
     formData.append('amount', amount.toString());
+    formData.append('amountNaira', amountNaira.toString());
     formData.append('currencyType', currencyType);
     formData.append('destinationCountry', destinationCountry);
+    formData.append('exNairaToDollar', exNairaToDollar.toString());
     formData.append('bank', bank === SELECT_BANK_SENTINEL ? '' : bank);
     formData.append('depositor', depositor);
     formData.append('newTotalAmount', newTotalAmount);
@@ -110,7 +113,11 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
           'success',
           'Payment details successfully submitted! Awaiting payment status confirmation.'
         );
-      } else if (data.statusx === 'ACTION_FAILED' || data.statusx === 'EMPTY_BANK_PAYMENT_DETAILS') {
+      } else if (
+        data.statusx === 'ACTION_FAILED' ||
+        data.statusx === 'EMPTY_BANK_PAYMENT_DETAILS' ||
+        data.statusx === 'MINIMUM_ORDER_AMOUNT'
+      ) {
         toast.warning(data.message || data.responsex?.message, { id: 'submit-payment' });
       } else {
         toast.error('Failed to submit details. Please try again.', { id: 'submit-payment' });

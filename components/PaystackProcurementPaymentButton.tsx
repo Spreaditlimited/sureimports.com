@@ -26,7 +26,28 @@ interface PaymentButtonProps {
   newTotalWeight?: number;
   newEstimatedTotalShippingCost?: number;
   enforceMinimumOrderRules?: boolean;
+  onMinimumOrderBlocked?: () => void;
 }
+
+type PaystackHandler = {
+  openIframe: () => void;
+};
+
+type PaystackPop = {
+  setup(config: {
+    key: string;
+    email: string;
+    amount: number;
+    currency: string;
+    ref: string;
+    metadata: Record<string, string | undefined>;
+    callback: () => void;
+    onClose: () => void;
+  }): PaystackHandler;
+};
+
+const getPaystackPop = () =>
+  (window as Window & { PaystackPop?: PaystackPop }).PaystackPop;
 
 const ensurePaystackScript = () =>
   new Promise<boolean>((resolve) => {
@@ -35,7 +56,7 @@ const ensurePaystackScript = () =>
       return;
     }
 
-    if ((window as any).PaystackPop?.setup) {
+    if (getPaystackPop()?.setup) {
       resolve(true);
       return;
     }
@@ -45,15 +66,19 @@ const ensurePaystackScript = () =>
     );
 
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(true), { once: true });
-      existingScript.addEventListener('error', () => resolve(false), { once: true });
+      existingScript.addEventListener('load', () => resolve(true), {
+        once: true,
+      });
+      existingScript.addEventListener('error', () => resolve(false), {
+        once: true,
+      });
       return;
     }
 
     const script = document.createElement('script');
     script.src = 'https://js.paystack.co/v1/inline.js';
     script.async = true;
-    script.onload = () => resolve(Boolean((window as any).PaystackPop?.setup));
+    script.onload = () => resolve(Boolean(getPaystackPop()?.setup));
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
@@ -79,6 +104,7 @@ export default function PaystackProcurementPaymentButton({
   newTotalWeight,
   newEstimatedTotalShippingCost,
   enforceMinimumOrderRules,
+  onMinimumOrderBlocked,
 }: PaymentButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -103,9 +129,13 @@ export default function PaystackProcurementPaymentButton({
     }
 
     if (enforceMinimumOrderRules && amountNairax < 100000 && isNigeria) {
-      alert(
-        'We do not process orders less than N100,000. Please, edit your order.',
-      );
+      if (onMinimumOrderBlocked) {
+        onMinimumOrderBlocked();
+      } else {
+        alert(
+          'We do not process orders less than N100,000. Please, edit your order.',
+        );
+      }
       return;
     }
 
@@ -131,13 +161,14 @@ export default function PaystackProcurementPaymentButton({
     const reference = `PROCPAY_${Date.now()}`;
 
     const paystackReady = await ensurePaystackScript();
-    if (!paystackReady || !(window as any).PaystackPop?.setup) {
+    const paystack = getPaystackPop();
+    if (!paystackReady || !paystack?.setup) {
       setIsLoading(false);
       alert('Unable to load Paystack. Please try again.');
       return;
     }
 
-    const handler = (window as any).PaystackPop.setup({
+    const handler = paystack.setup({
       key: publicKey,
       email,
       amount: Math.round(payAmount * 100),

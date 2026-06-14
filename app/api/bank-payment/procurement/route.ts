@@ -1,11 +1,6 @@
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
 import xMail from '@/lib/email/xMail2';
 
 const prisma = new PrismaClient();
@@ -17,6 +12,7 @@ export async function POST(request: Request) {
   const email = formData.get('userEmail') as string;
   const pidBankPayment = formData.get('pidBankPayment') as string;
   const amount = formData.get('amount') as string;
+  const amountNaira = formData.get('amountNaira') as string;
   const currencyType = formData.get('currencyType') as string;
   const destinationCountry = formData.get('destinationCountry') as string;
   const bank = formData.get('bank') as string;
@@ -53,12 +49,69 @@ export async function POST(request: Request) {
   //CHECK IF USER PID AND CID EXISTS
   const user = await prisma.users.findUnique({
     where: {
-      pidUser: pidUser,
+      pidUser,
       userEmail: email,
     },
   });
 
   if (user) {
+    //GET ORDER RECORD
+    const order = await prisma.orders.findUnique({
+      where: {
+        pidUser,
+        pidOrder: serviceID,
+      },
+    });
+
+    if (!order) {
+      return NextResponse.json(
+        {
+          statusx: 'ACTION_FAILED',
+          message: 'Order not found.',
+        },
+        { status: 404 },
+      );
+    }
+
+    const destinationRecord = order.destinationCountry
+      ? await prisma.country.findUnique({
+          where: { pidCountry: String(order.destinationCountry) },
+          select: { countryName: true },
+        })
+      : null;
+    const destinationName = String(
+      destinationRecord?.countryName ||
+        destinationCountry ||
+        order.destinationCountry ||
+        '',
+    )
+      .trim()
+      .toLowerCase();
+    const amountValue = Number(amount || 0);
+    const amountNairaValue = Number(amountNaira || 0);
+    const exchangeRateValue = Number(formData.get('exNairaToDollar') || 0);
+    const submittedNairaAmount =
+      destinationName.includes('nigeria') && amountNairaValue > 0
+        ? amountNairaValue
+        : destinationName.includes('nigeria') && exchangeRateValue > 0
+          ? amountValue * exchangeRateValue
+          : amountValue;
+
+    if (
+      currentStatus === 'saved' &&
+      destinationName.includes('nigeria') &&
+      submittedNairaAmount < 100000
+    ) {
+      return NextResponse.json(
+        {
+          statusx: 'MINIMUM_ORDER_AMOUNT',
+          message:
+            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+        },
+        { status: 400 },
+      );
+    }
+
     let statusz = 'saved';
 
     if (currentStatus == 'saved') {
@@ -76,13 +129,13 @@ export async function POST(request: Request) {
     const shouldUpdateOrderTotals = currentStatus !== 'pay-for-shipping';
 
     /////////////// UPDATE BANK RECORDS ///////////////
-    const createx = await prisma.bank_payment.create({
+    await prisma.bank_payment.create({
       data: {
-        pidUser: pidUser,
+        pidUser,
         pidOrder: serviceID,
-        pidBankPayment: pidBankPayment,
+        pidBankPayment,
         pidBank: bank,
-        amount: amount,
+        amount,
         currency: currencyType,
         depositorName: depositor,
         trxNumber: pidBankPayment,
@@ -94,22 +147,14 @@ export async function POST(request: Request) {
       },
     });
 
-    //GET ORDER RECORD
-    const order = await prisma.orders.findUnique({
-      where: {
-        pidUser: pidUser,
-        pidOrder: serviceID,
-      },
-    });
-
     const orderTotalCost = order?.orderTotalCost || null;
     const orderWeight = order?.orderWeight || null;
     const orderShippingCost = order?.orderShippingCost || null;
 
     //UPDATE ORDER & SERVICE STATUS for old values
-    const updatex = await prisma.orders.update({
+    await prisma.orders.update({
       where: {
-        pidUser: pidUser,
+        pidUser,
         pidOrder: serviceID,
       },
       data: {
@@ -122,9 +167,9 @@ export async function POST(request: Request) {
     });
 
     //UPDATE ORDER & SERVICE STATUS for new values
-    const updatex2 = await prisma.orders.update({
+    await prisma.orders.update({
       where: {
-        pidUser: pidUser,
+        pidUser,
         pidOrder: serviceID,
       },
       data: {

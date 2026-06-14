@@ -25,6 +25,7 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import xMail from '@/lib/email/xMail3';
+import { recordWalletDebit } from '@/lib/walletLedger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -281,6 +282,18 @@ export async function POST(request: NextRequest) {
           currency: 'NGN',
           createdAt: new Date(),
         },
+      });
+
+      await recordWalletDebit(tx, {
+        pidUser: pidUser as string,
+        userEmail: email,
+        userFirstname: first_name,
+        userLastname: last_name,
+      }, {
+        amount: purchaseAmount,
+        reference: `DEBIT:${pidDebit}`,
+        description: 'SureStore Purchase - Wallet Payment',
+        currency: 'NGN',
       });
 
       // Create payment record

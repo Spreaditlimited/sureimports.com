@@ -34,7 +34,7 @@ export default function CustomerReviews({ onNavigateToSignUp }: CustomerReviewsP
 
   return (
     <section className="bg-slate-50 py-24 dark:bg-slate-900/50">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         
         <div className="mb-16 flex flex-col items-center text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900">

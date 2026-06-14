@@ -48,7 +48,7 @@ export default function CorporateGiftsPage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-indigo-600/20 blur-[120px] pointer-events-none z-0" />
           </div>
           
-          <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative z-20 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
               <div>
                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange-400 backdrop-blur-sm">
@@ -124,7 +124,7 @@ export default function CorporateGiftsPage() {
 
         {/* --- PROCESS STEPS --- */}
         <section className="bg-slate-50 py-24 dark:bg-slate-900/50">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="mb-16 text-3xl font-black tracking-tight text-slate-900 dark:text-white md:text-5xl">The Sourcing Workflow</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
                 <div className="hidden md:block absolute top-1/2 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent -translate-y-12" />

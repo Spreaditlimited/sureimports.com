@@ -214,7 +214,7 @@ export default function HeroSection({
       <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-600/10 blur-3xl" />
       <div className="absolute bottom-0 left-0 h-96 w-96 rounded-full bg-gradient-to-tr from-purple-500/10 to-blue-600/10 blur-3xl" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-20 pt-20 sm:px-6 lg:px-8">
+      <div className="relative mx-auto max-w-[1440px] px-4 pb-20 pt-20 sm:px-6 lg:px-8">
         <div className="grid min-h-[calc(100vh-160px)] items-center gap-12 lg:grid-cols-2 lg:gap-16">
           {/* Left Column - Content */}
           <div className="flex flex-col justify-center space-y-8">
