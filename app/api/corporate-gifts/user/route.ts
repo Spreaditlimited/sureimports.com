@@ -253,7 +253,7 @@ export async function GET() {
       data: enriched,
     });
   } catch (error) {
-    console.error('Failed to fetch user corporate gift requests:', error);
+    console.error('Failed to fetch user corporate sourcing requests:', error);
     return NextResponse.json(
       { statusx: 'ERROR', message: 'Failed to fetch requests' },
       { status: 500 },

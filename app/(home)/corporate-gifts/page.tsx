@@ -15,16 +15,39 @@ import Footer from '@/app/(home)/components/Footer';
 import CorporateGiftsClient from './CorporateGiftsClient';
 
 export const metadata: Metadata = {
-  title: 'Corporate Gift Sourcing from China | Sure Imports',
+  title: 'Corporate Sourcing from China | Sure Imports',
   description: 'Submit requirements for branded gift items or customized bulk products. Professional sourcing for Nigerian companies.',
 };
 
 const clients = [
-  { name: 'Moppet', src: '/Moppet.PNG' },
-  { name: 'Microware', src: '/Microware.PNG', className: 'drop-shadow-[0_0_10px_rgba(255,255,255,0.35)]', widthClass: 'w-[280px] md:w-[360px]' },
-  { name: 'Sterling', src: '/Sterling.PNG' },
-  { name: 'CafeOne', src: '/cafeOne.PNG', className: 'invert brightness-200 contrast-125' },
+  {
+    name: 'Moppet',
+    src: '/Moppet.PNG',
+    frameClass: 'h-20 w-[190px] sm:h-24 sm:w-[220px] lg:h-24 lg:w-[230px] xl:h-28 xl:w-[280px]',
+    imageClass: 'object-cover object-center',
+  },
+  {
+    name: 'Microware',
+    src: '/Microware_dark.PNG',
+    frameClass: 'h-20 w-[210px] sm:h-24 sm:w-[240px] lg:h-24 lg:w-[250px] xl:h-28 xl:w-[310px]',
+    imageClass: 'object-cover object-center',
+  },
+  {
+    name: 'Sterling',
+    src: '/Sterling.PNG',
+    frameClass: 'h-20 w-[190px] sm:h-24 sm:w-[220px] lg:h-24 lg:w-[230px] xl:h-28 xl:w-[280px]',
+    imageClass: 'object-cover object-center',
+  },
+  {
+    name: 'CafeOne',
+    src: '/cafe-one-dark-transparent.png',
+    frameClass: 'h-20 w-[170px] sm:h-24 sm:w-[190px] lg:h-24 lg:w-[200px] xl:h-28 xl:w-[240px]',
+    imageClass: 'object-cover object-center',
+  },
 ];
+
+const marqueeClients = [...clients, ...clients];
+const logoSlotClass = 'flex w-[280px] shrink-0 items-center justify-center';
 
 const productExamples = [
   { name: 'Branded Drinkware', desc: 'Mugs, tumblers, and smart flasks', icon: '☕' },
@@ -42,7 +65,7 @@ export default function CorporateGiftsPage() {
       <main className="bg-[#fcfcfd] dark:bg-slate-950 antialiased">
         
         {/* --- HERO SECTION --- */}
-        <section className="relative flex min-h-[85vh] items-center overflow-hidden bg-slate-900 pb-20 pt-48 text-white">
+        <section className="relative overflow-hidden bg-slate-900 pb-16 pt-32 text-white sm:pb-20 sm:pt-40 lg:flex lg:min-h-[85vh] lg:items-center lg:pt-48">
           <div className="absolute inset-0 z-0">
             <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90 z-10" />
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-indigo-600/20 blur-[120px] pointer-events-none z-0" />
@@ -55,7 +78,7 @@ export default function CorporateGiftsPage() {
                   <Briefcase className="h-3.5 w-3.5" /> Direct Factory Sourcing
                 </div>
                 <h1 className="text-4xl font-black tracking-tight sm:text-6xl leading-[1.1]">
-                  Premium Corporate Gifts{' '}
+                  Premium Branded Products{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">
                     Sourced From China.
                   </span>
@@ -91,30 +114,53 @@ export default function CorporateGiftsPage() {
             </div>
 
             {/* --- CLIENT TRUST BAR --- */}
-            <div className="mt-20 border-t border-slate-800 pt-10">
+            <div className="mt-14 pt-6 sm:mt-16 sm:pt-8 lg:mt-20 lg:pt-10">
               <p className="mb-8 text-center text-xs font-bold uppercase tracking-widest text-slate-500">
                 Trusted by organizations across Nigeria
               </p>
-              <div className="md:hidden">
-                <div className="grid grid-cols-2 items-center gap-6">
-                  {clients.map((client) => (
-                    <div key={client.name} className="flex items-center justify-center opacity-80">
-                      <Image
-                        src={client.src}
-                        alt={client.name}
-                        width={220}
-                        height={90}
-                        quality={100}
-                        className={`h-auto object-contain ${client.widthClass ?? 'w-[150px]'} ${client.className ?? ''}`}
-                      />
+
+              <div className="-mx-4 overflow-hidden sm:-mx-6 lg:hidden">
+                <div className="mobile-logo-marquee flex w-max items-center gap-0 px-4 sm:px-6">
+                  {marqueeClients.map((client, index) => (
+                    <div
+                      key={`${client.name}-${index}`}
+                      className={logoSlotClass}
+                    >
+                      <div
+                        className={`relative overflow-hidden ${client.frameClass}`}
+                      >
+                        <Image
+                          src={client.src}
+                          alt={client.name}
+                          fill
+                          sizes="280px"
+                          className={client.imageClass}
+                          quality={100}
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="hidden w-full grid-cols-2 place-items-center gap-10 md:grid md:grid-cols-4 md:gap-12">
+
+              <div className="hidden w-full grid-cols-4 place-items-center gap-5 lg:grid xl:gap-6">
                 {clients.map((client) => (
-                  <div key={client.name} className="flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity filter grayscale hover:grayscale-0">
-                    <Image src={client.src} alt={client.name} width={260} height={100} quality={100} className={`h-auto object-contain ${client.widthClass ?? 'w-[180px] md:w-[240px]'} ${client.className ?? ''}`} />
+                  <div
+                    key={client.name}
+                    className="flex w-full items-center justify-center"
+                  >
+                    <div
+                      className={`relative max-w-full overflow-hidden ${client.frameClass}`}
+                    >
+                      <Image
+                        src={client.src}
+                        alt={client.name}
+                        fill
+                        sizes="25vw"
+                        className={client.imageClass}
+                        quality={100}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>

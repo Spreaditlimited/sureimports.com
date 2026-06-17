@@ -79,7 +79,7 @@ const MENU_ITEMS = {
       color: 'from-emerald-500 to-teal-600',
     },
     {
-      title: 'Corporate Gifts',
+      title: 'Corporate Sourcing',
       href: '/corporate-gifts',
       icon: Gift,
       desc: 'Branded gift sourcing and bulk customization',

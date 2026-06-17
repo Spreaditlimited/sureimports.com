@@ -47,6 +47,7 @@ async function sendWhatsAppTemplate(input: NotifyInput) {
       channel: 'whatsapp',
       useTemplate: true,
       templateKey: 'corporate_gift_status_update',
+      serviceLabel: 'Corporate Sourcing',
       requestId: input.requestId,
       businessName: input.businessName,
       contactPersonFullName: input.contactPersonFullName,
@@ -88,17 +89,17 @@ After your first login, this temporary password expires and you will be prompted
 
   const introLine =
     input.status === 'Pending'
-      ? `Hello ${input.contactPersonFullName || 'Customer'},<br />Your corporate gift sourcing request has been received.`
-      : `Hello ${input.contactPersonFullName || 'Customer'},<br />We have an update on your corporate gift sourcing request.`;
+      ? `Hello ${input.contactPersonFullName || 'Customer'},<br />Your corporate sourcing request has been received.`
+      : `Hello ${input.contactPersonFullName || 'Customer'},<br />We have an update on your corporate sourcing request.`;
 
   const [emailResult, whatsappResult] = await Promise.allSettled([
     xMail({
       xEmail: input.contactEmail,
-      xTitle: `Corporate Gift Request Update - ${input.requestId} (${input.status})`,
-      xBodyTitle: 'Corporate Gift Status Update',
+      xTitle: `Corporate Sourcing Request Update - ${input.requestId} (${input.status})`,
+      xBodyTitle: 'Corporate Sourcing Status Update',
       xBody1: introLine,
       xBody2: `${emailBody}${onboardingBlock}<br /><br />Thank you for choosing Sure Imports.`,
-      xButtonTitle: 'Open Corporate Gifts Dashboard',
+      xButtonTitle: 'Open Corporate Sourcing Dashboard',
       xButtonLink: dashboardLink,
     }),
     sendWhatsAppTemplate(input),

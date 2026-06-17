@@ -176,7 +176,7 @@ export default function CorporateGiftsDashboardPage() {
         openOfflineModal();
         return;
       }
-      toast.error(error.message || 'Failed to fetch corporate gift projects');
+      toast.error(error.message || 'Failed to fetch corporate sourcing projects');
     } finally {
       setLoading(false);
     }
@@ -381,7 +381,7 @@ export default function CorporateGiftsDashboardPage() {
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Corporate Sourcing</h1>
-              <p className="mt-2 text-slate-400">Manage your bulk orders and corporate gifting projects in real-time.</p>
+              <p className="mt-2 text-slate-400">Manage your bulk orders and corporate sourcing projects in real-time.</p>
             </div>
             <div className="flex gap-3">
               <button

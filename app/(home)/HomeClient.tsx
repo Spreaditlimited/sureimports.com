@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
+import TrustedOrganizations from './components/TrustedOrganizations';
 import ServicesSection from './components/ServicesSection';
 import WhyChooseUs from './components/WhyChooseUs';
 import CustomerReviews from './components/CustomerReviews';
@@ -32,6 +33,7 @@ export default function HomeClient() {
           size="large"
           showCTA
         />
+        <TrustedOrganizations />
         <ServicesSection onNavigateToSignUp={handleExternalAuth} />
         <WhyChooseUs />
         <CustomerReviews onNavigateToSignUp={handleExternalAuth} />

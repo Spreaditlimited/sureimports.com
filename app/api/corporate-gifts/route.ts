@@ -317,7 +317,7 @@ export async function POST(req: Request) {
 
     // 6. Construct Email Body
     const emailText = `
-New Corporate Gift Sourcing Request
+New Corporate Sourcing Request
 -----------------------------------
 
 Request ID: ${pidRequest}
@@ -367,15 +367,15 @@ Page URL: ${data.pageUrl || 'N/A'}
 
       await xMail({
         xEmail: 'hello@sureimports.com',
-        xTitle: `New Corporate Gift Sourcing Request - ${data.businessName}`,
-        xBodyTitle: 'New Corporate Gift Sourcing Request',
-        xBody1: `A new corporate gift sourcing request has been submitted.<br /><b>Request ID:</b> ${pidRequest}`,
+        xTitle: `New Corporate Sourcing Request - ${data.businessName}`,
+        xBodyTitle: 'New Corporate Sourcing Request',
+        xBody1: `A new corporate sourcing request has been submitted.<br /><b>Request ID:</b> ${pidRequest}`,
         xBody2: `<pre>${emailText}</pre><p><strong>Attachments:</strong> ${attachmentNames}</p>`,
         xButtonTitle: 'Open Admin Dashboard',
         xButtonLink: 'https://admin.sureimports.com/dashboard/corporate-gifts',
       });
     } catch (emailError) {
-      console.error('Corporate gifts email notification failed:', emailError);
+      console.error('Corporate sourcing email notification failed:', emailError);
     }
 
     // 8. Send Facebook CAPI Lead event (non-blocking for user success)
@@ -399,15 +399,15 @@ Page URL: ${data.pageUrl || 'N/A'}
             fbc: data.fbc,
           },
           customData: {
-            content_name: 'Corporate Gift Submission',
-            content_category: 'Corporate Gifts',
+            content_name: 'Corporate Sourcing Submission',
+            content_category: 'Corporate Sourcing',
             value: quantityNeeded,
             currency: 'NGN',
           },
         });
       }
     } catch (capiError) {
-      console.error('Corporate gifts Facebook CAPI failed:', capiError);
+      console.error('Corporate sourcing Facebook CAPI failed:', capiError);
     }
 
     return NextResponse.json(

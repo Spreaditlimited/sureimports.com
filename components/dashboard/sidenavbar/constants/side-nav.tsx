@@ -51,7 +51,7 @@ export const NavItems: NavItem[] = [
     color: 'text-white',
   },
   {
-    title: 'Corporate Gifts',
+    title: 'Corporate Sourcing',
     icon: Package2,
     href: '/dashboard/corporate-gifts',
     color: 'text-white',
@@ -140,7 +140,7 @@ export const MobileNavItems: NavItem[] = [
     color: 'text-white',
   },
   {
-    title: 'Corporate Gifts',
+    title: 'Corporate Sourcing',
     icon: Package2,
     href: '/dashboard/corporate-gifts',
     color: 'text-white',

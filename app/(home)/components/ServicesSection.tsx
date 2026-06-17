@@ -25,9 +25,9 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
       href: '/ship-with-us',
     },
     {
-      title: 'Corporate Gifts',
+      title: 'Corporate Sourcing',
       icon: Gift,
-      desc: 'Order premium branded gifts for your team, partners, and clients. We source, customize, and deliver high-quality corporate gift packs tailored to your brand.',
+      desc: 'Order premium branded products for your team, partners, and clients. We source, customize, and deliver high-quality corporate sourcing projects tailored to your brand.',
       tags: ['Branded Gifts', 'Bulk Orders', 'Custom Packaging'],
       href: '/corporate-gifts',
     },

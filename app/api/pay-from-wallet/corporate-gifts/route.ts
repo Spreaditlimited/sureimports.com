@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             statusx: 'INVOICE_NOT_FOUND',
-            message: 'Invoice record not found for this corporate gift request.',
+            message: 'Invoice record not found for this corporate sourcing request.',
           },
           { status: 404 },
         );
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
           amount: payAmount,
           serviceID: String(pidRequest),
           serviceName: 'CORPORATE_GIFTS',
-          serviceDescription: 'Corporate gifts payment via wallet',
+          serviceDescription: 'Corporate sourcing payment via wallet',
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
           amount: payAmount,
           serviceID: String(pidRequest),
           serviceName: 'CORPORATE_GIFTS',
-          serviceDescription: `Corporate gifts project payment (${pidRequest})`,
+          serviceDescription: `Corporate sourcing project payment (${pidRequest})`,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
