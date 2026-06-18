@@ -7,7 +7,12 @@ interface YouTubeFrameProps {
   src?: string;
   title?: string;
   className?: string;
-  thumbnailQuality?: 'default' | 'hqdefault' | 'mqdefault' | 'sddefault' | 'maxresdefault';
+  thumbnailQuality?:
+    | 'default'
+    | 'hqdefault'
+    | 'mqdefault'
+    | 'sddefault'
+    | 'maxresdefault';
   width?: string;
   height?: string;
 }
