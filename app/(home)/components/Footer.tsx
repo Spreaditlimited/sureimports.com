@@ -69,7 +69,10 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 shrink-0 text-indigo-400" />
-                <p>5 Olutosin Ajayi Street, Ajao Estate, Lagos, Nigeria</p>
+                <div className="space-y-2">
+                  <p>5 Olutosin Ajayi Street, Ajao Estate, Lagos, Nigeria</p>
+                  <p>China: 广州市白云区机场路111号建发广场3FB3-1.</p>
+                </div>
               </li>
             </ul>
           </div>
