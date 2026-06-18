@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type ComponentProps } from 'react';
 import {
   Search,
   Calendar,
@@ -21,8 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-import type { ImgHTMLAttributes } from 'react';
-import type { StaticImageData } from 'next/image';
+import Image, { type StaticImageData } from 'next/image';
 import type { BlogListPost } from '../actions/blogActions';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -65,26 +64,32 @@ function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
 type ImageSource = string | StaticImageData;
 
 type ImageWithFallbackProps = Omit<
-  ImgHTMLAttributes<HTMLImageElement>,
-  'src'
+  ComponentProps<typeof Image>,
+  'src' | 'width' | 'height'
 > & {
   src: ImageSource;
   fallbackSrc?: string;
+  width?: number;
+  height?: number;
 };
 
 function ImageWithFallback({
   src,
   alt = '',
-  fallbackSrc,
+  fallbackSrc = '/images/new/images/logo.png',
+  width = 900,
+  height = 560,
   ...props
 }: ImageWithFallbackProps) {
   const [currentSrc, setCurrentSrc] = useState<string>(
     typeof src === 'string' ? src : src.src,
   );
   return (
-    <img
+    <Image
       src={currentSrc}
       alt={alt}
+      width={width}
+      height={height}
       onError={() => {
         if (fallbackSrc && currentSrc !== fallbackSrc) {
           setCurrentSrc(fallbackSrc);

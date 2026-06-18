@@ -18,6 +18,7 @@ import type { BlogPost, BlogPublisher } from '../actions/blogActions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 // X (Twitter) icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -61,21 +62,28 @@ const ImageWithFallback = ({
   src,
   alt,
   className,
+  width = 900,
+  height = 560,
+  fallbackSrc = '/images/new/images/logo.png',
 }: {
   src: string | { src: string };
   alt: string;
   className?: string;
+  width?: number;
+  height?: number;
+  fallbackSrc?: string;
 }) => {
   const [hasError, setHasError] = useState(false);
+  const source = typeof src === 'string' ? src : src && (src as any).src;
   const resolvedSrc = hasError
-    ? 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw=='
-    : typeof src === 'string'
-      ? src
-      : src && (src as any).src;
+    ? fallbackSrc
+    : source || fallbackSrc;
   return (
-    <img
+    <Image
       src={resolvedSrc}
       alt={alt}
+      width={width}
+      height={height}
       className={className}
       onError={() => setHasError(true)}
     />

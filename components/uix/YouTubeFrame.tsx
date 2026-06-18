@@ -1,34 +1,82 @@
-import React from 'react';
+'use client';
+
+import React, { useMemo, useState } from 'react';
 
 interface YouTubeFrameProps {
-  videoId: string; // YouTube video ID (e.g., "dQw4w9WgXcQ")
-  width?: string; // Optional width, default to "100%"
-  height?: string; // Optional height, default to "315"
+  videoId?: string;
+  src?: string;
+  title?: string;
+  className?: string;
+  thumbnailQuality?: 'default' | 'hqdefault' | 'mqdefault' | 'sddefault' | 'maxresdefault';
+  width?: string;
+  height?: string;
+}
+
+function getYouTubeVideoId(input: string): string {
+  try {
+    const url = new URL(input);
+    if (url.hostname.includes('youtu.be')) {
+      return url.pathname.replace('/', '');
+    }
+    if (url.pathname.startsWith('/embed/')) {
+      return url.pathname.split('/embed/')[1]?.split('/')[0] || input;
+    }
+    return url.searchParams.get('v') || input;
+  } catch {
+    return input;
+  }
 }
 
 const YouTubeFrame: React.FC<YouTubeFrameProps> = ({
   videoId,
+  src,
+  title = 'YouTube video',
+  className = '',
+  thumbnailQuality = 'hqdefault',
   width = '100%',
-  height = '1200',
+  height = '100%',
 }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const resolvedVideoId = useMemo(
+    () => getYouTubeVideoId(videoId || src || ''),
+    [src, videoId],
+  );
+  const thumbnailUrl = `https://i.ytimg.com/vi/${resolvedVideoId}/${thumbnailQuality}.jpg`;
+  const embedUrl = `https://www.youtube-nocookie.com/embed/${resolvedVideoId}?autoplay=1&rel=0`;
+
+  if (!resolvedVideoId) return null;
+
   return (
-    <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
-      <iframe
-        src={`https://www.youtube.com/embed/${videoId}`}
-        title="YouTube video"
-        width={width}
-        height={height}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-        }}
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
+    <div
+      className={`relative overflow-hidden bg-slate-950 ${className}`}
+      style={{ aspectRatio: '16 / 9' }}
+    >
+      {isLoaded ? (
+        <iframe
+          src={embedUrl}
+          title={title}
+          width={width}
+          height={height}
+          className="absolute inset-0 h-full w-full"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+      ) : (
+        <button
+          type="button"
+          aria-label={`Play ${title}`}
+          onClick={() => setIsLoaded(true)}
+          className="absolute inset-0 block h-full w-full bg-cover bg-center"
+          style={{ backgroundImage: `url(${thumbnailUrl})` }}
+        >
+          <span className="absolute inset-0 bg-black/20 transition hover:bg-black/10" />
+          <span className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/95 shadow-xl transition hover:scale-105">
+            <span className="ml-1 h-0 w-0 border-y-[12px] border-l-[18px] border-y-transparent border-l-slate-950" />
+          </span>
+        </button>
+      )}
     </div>
   );
 };

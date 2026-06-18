@@ -5,6 +5,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import linkArrow from '@/public/images/linkArrow.svg';
 import Link from 'next/link';
+import YouTubeFrame from '@/components/uix/YouTubeFrame';
 
 type StepItemProps = {
   number: string;
@@ -75,17 +76,11 @@ const HowWorks: React.FC<WorksProps> = ({
               </h3>
               <div className="mt-[30px] rounded-2xl border border-white/15 bg-white/70 p-[10px] shadow-customboxshadow lg:rounded-[30px] lg:p-5 xl:mt-12">
                 <div className="h-[257px] sm:h-96 lg:h-[440px] xl:h-[550px]">
-                  <iframe
-                    width="100%"
-                    height="100%"
+                  <YouTubeFrame
                     src={videoUrl}
                     title="How it works video"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    className="rounded-[14px] max-lg:mx-auto lg:rounded-[22px]"
-                  ></iframe>
+                    className="h-full w-full rounded-[14px] max-lg:mx-auto lg:rounded-[22px]"
+                  />
                 </div>
               </div>
             </div>

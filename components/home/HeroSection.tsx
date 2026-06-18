@@ -26,18 +26,12 @@ const HeroSection: React.FC = () => {
             time.
           </p>
 
-          <div className="min-h-screenx mt-10 flex items-center justify-center rounded-lg bg-gray-100 lg:mt-5">
-            <iframe
-              className="rounded-lg p-3"
-              width="100%"
-              height="426"
-              src="https://www.youtube.com/embed/g5U0QY4LuNk"
+          <div className="min-h-screenx mt-10 flex items-center justify-center rounded-lg bg-gray-100 p-3 lg:mt-5">
+            <YouTubeFrame
+              videoId="g5U0QY4LuNk"
               title="Explore the various ways we work with you to deliver the exact products you want from China."
-              //frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              referrerPolicy="strict-origin-when-cross-origin"
-              allowFullScreen
-            ></iframe>
+              className="w-full rounded-lg"
+            />
           </div>
         </div>
 

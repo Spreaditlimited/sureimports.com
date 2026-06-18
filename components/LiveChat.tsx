@@ -37,7 +37,7 @@ export default function LiveChat() {
     <>
       <Script
         id="livechat-init"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.__lc = window.__lc || {};
@@ -51,7 +51,7 @@ export default function LiveChat() {
       <Script
         id="livechat-script"
         src="https://cdn.livechatinc.com/tracking.js"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         onError={() => {
           console.warn('LiveChat script failed to load.');
         }}

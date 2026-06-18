@@ -2,7 +2,7 @@
 
 import type React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface User {
   pidUser: string;
@@ -84,6 +84,7 @@ function getSafeLoginRedirect(redirectCandidate: string): string {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
 
   //////////////////////////////////// CHECK AUTH
@@ -115,8 +116,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   //////////////////////////////////// RUN AUTH-CHECK
   useEffect(() => {
+    const shouldHydrateAuth =
+      pathname.startsWith('/dashboard') ||
+      pathname.startsWith('/auth') ||
+      pathname === '/login' ||
+      pathname.startsWith('/shop/checkout');
+
+    if (!shouldHydrateAuth) {
+      setUser(null);
+      return;
+    }
+
     checkAuth();
-  }, []); //This was the line that needed to be updated to include the dependency
+  }, [pathname]);
 
   //////////////////////////////////// LOGIN
   const login = async (

@@ -9,6 +9,7 @@ import banner from '@/public/images/banner.png';
 import mobilebanner from '@/public/images/mobilebanner.png';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import YouTubeFrame from '@/components/uix/YouTubeFrame';
 
 const Banner: React.FC = () => {
   useEffect(() => {
@@ -78,17 +79,11 @@ const Banner: React.FC = () => {
               data-aos="fade-up"
             >
               <div className="youtube-video-block ml-[10px] w-full max-sm:ml-[0px]">
-                <iframe
-                  width="100%"
-                  height="347"
-                  src="https://www.youtube.com/embed/kmFhSImPW4A?si=bMTxCbaixnMlYQZu"
-                  title="YouTube video player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
+                <YouTubeFrame
+                  videoId="kmFhSImPW4A"
+                  title="Buying premium phones and laptops from China"
                   className="rounded-[20px] max-lg:mx-auto"
-                ></iframe>
+                />
               </div>
               <p className="mx-auto mt-[15px] max-w-[291px] text-center text-[18px] font-normal leading-[155%] text-store-white max-sm:hidden">
                 Buying premium phones and laptops from China has never been
