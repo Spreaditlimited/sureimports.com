@@ -358,7 +358,7 @@ export default function PublicOrderFlow() {
           <div className="lg:col-span-8 space-y-6">
             
             {/* Step 1: Account Details */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
+            <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
               <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                   <User className="h-5 w-5" />
@@ -491,7 +491,7 @@ export default function PublicOrderFlow() {
                 </div>
               </div>
 
-              <div className="space-y-5 rounded-2xl bg-slate-50 p-6 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+              <div className="space-y-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50 sm:p-6">
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Name</label>
                   <Input placeholder="e.g., Wireless Bluetooth Earbuds" value={productDraft.productName} onChange={(e) => setProductDraft((prev) => ({ ...prev, productName: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
@@ -501,7 +501,7 @@ export default function PublicOrderFlow() {
                   <Input placeholder="https://1688.com/..." value={productDraft.productLink} onChange={(e) => setProductDraft((prev) => ({ ...prev, productLink: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Unit Price</label>
                     <Input placeholder="0.00" type="number" value={productDraft.productPrice} onChange={(e) => setProductDraft((prev) => ({ ...prev, productPrice: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />

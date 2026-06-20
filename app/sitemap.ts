@@ -49,6 +49,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/shipping-rate`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/buy-phones-from-china`,
       lastModified: currentDate,
       changeFrequency: 'daily',

@@ -44,7 +44,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           
           <div className="space-y-6">
             <Image src="/images/svg-logo-white.svg" alt="Sure Imports" width={160} height={30} />
@@ -74,6 +74,16 @@ export default function Footer() {
                   <p>China: 广州市白云区机场路111号建发广场3FB3-1.</p>
                 </div>
               </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-white">Services</h3>
+            <ul className="space-y-3 text-sm">
+              <li><button onClick={() => router.push('/buy-from-chinese-websites')} className="hover:text-white transition-colors">Buy From Chinese Websites</button></li>
+              <li><button onClick={() => router.push('/ship-with-us')} className="hover:text-white transition-colors">Ship With Us</button></li>
+              <li><button onClick={() => router.push('/shipping-rate')} className="hover:text-white transition-colors">Shipping Rates</button></li>
+              <li><button onClick={() => router.push('/corporate-gifts')} className="hover:text-white transition-colors">Corporate Sourcing</button></li>
             </ul>
           </div>
 
