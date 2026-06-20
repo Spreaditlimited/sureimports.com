@@ -12,6 +12,7 @@ export async function GET() {
             pidShippingPlan: true,
             shippingPlanName: true,
             shippingPlanRate: true,
+            shippingPlanUnit: true,
           },
         },
       },

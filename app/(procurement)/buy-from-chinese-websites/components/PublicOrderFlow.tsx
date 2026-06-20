@@ -29,6 +29,7 @@ type ShippingPlan = {
   pidShippingPlan: string;
   shippingPlanName: string;
   shippingPlanRate: number;
+  shippingPlanUnit?: string | null;
 };
 
 type Country = {
@@ -117,6 +118,9 @@ export default function PublicOrderFlow() {
     () => countries.find((country) => country.pidCountry === order.destinationCountry),
     [countries, order.destinationCountry],
   );
+
+  const formatPlanUnit = (unit?: string | null) =>
+    unit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
 
   useEffect(() => {
     if (!shouldResumeCheckout || resuming) return;
@@ -438,7 +442,7 @@ export default function PublicOrderFlow() {
                     </option>
                     {selectedCountry?.shippingPlans.map((plan) => (
                       <option key={plan.pidShippingPlan} value={plan.pidShippingPlan} className="dark:bg-slate-900">
-                        {convertToTitleCase(plan.shippingPlanName)} (${plan.shippingPlanRate}/kg)
+                        {convertToTitleCase(plan.shippingPlanName)} (${plan.shippingPlanRate}/{formatPlanUnit(plan.shippingPlanUnit)})
                       </option>
                     ))}
                   </select>

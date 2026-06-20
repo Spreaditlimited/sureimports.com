@@ -83,8 +83,8 @@ function formatPlanLabel(value: string) {
   );
 }
 
-function getPlanUnit(value: string) {
-  return value === 'SEA_SHIPPING' ? 'CBM' : 'kg';
+function formatPlanUnit(value: string | null | undefined) {
+  return value?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
 }
 
 function formatMoney(value: number, currency: 'USD' | 'NGN') {
@@ -112,6 +112,7 @@ async function getShippingRates(): Promise<ShippingRateRow[]> {
         select: {
           shippingPlanName: true,
           shippingPlanRate: true,
+          shippingPlanUnit: true,
         },
       },
     },
@@ -144,7 +145,9 @@ async function getShippingRates(): Promise<ShippingRateRow[]> {
             label: formatPlanLabel(name),
             rate: isNigeriaSeaRate ? 470000 : Number(plan.shippingPlanRate || 0),
             currency,
-            unit: getPlanUnit(name),
+            unit: isNigeriaSeaRate
+              ? 'CBM'
+              : formatPlanUnit(plan.shippingPlanUnit),
           };
         }),
     }))
