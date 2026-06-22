@@ -2,6 +2,7 @@
 
 import {
   HandCoins,
+  Landmark,
   Package,
   ShoppingBag,
   Wallet,
@@ -60,6 +61,12 @@ export const NavItems: NavItem[] = [
     title: 'Ship with us',
     icon: Package2,
     href: '/dashboard/shipping-only',
+    color: 'text-white',
+  },
+  {
+    title: 'Pay Supplier',
+    icon: Landmark,
+    href: '/dashboard/pay-supplier/saved',
     color: 'text-white',
   },
   // {
@@ -149,6 +156,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'Ship with us',
     icon: Package2,
     href: '/dashboard/shipping-only',
+    color: 'text-white',
+  },
+  {
+    title: 'Pay Supplier',
+    icon: Landmark,
+    href: '/dashboard/pay-supplier/saved',
     color: 'text-white',
   },
   // {

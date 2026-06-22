@@ -41,7 +41,6 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
   const navigateWithAlert = useNavigationWithAlert();
   const { user } = useAuth();
 
-  const [pidUser] = useState(user?.pidUser || '');
   const [pidBankPayment] = useState('BANK' + new Date().getTime().toString());
   
   const service = searchParams.get('service') || '';
@@ -57,6 +56,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
   const serviceID = searchParams.get('serviceID') || '';
   const serviceDescription = searchParams.get('serviceDescription') || '';
   const currentStatus = searchParams.get('status') || '';
+  const isPaySupplierPayment = service === 'pay-supplier';
 
   const [bank, setBank] = useState(SELECT_BANK_SENTINEL);
   const [depositor, setDepositor] = useState('');
@@ -76,12 +76,16 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
       toast.error('Please enter the full name of the depositor.');
       return;
     }
+    if (!user?.pidUser || !user?.userEmail) {
+      toast.error('Your session is still loading. Please try again.');
+      return;
+    }
 
     setIsSubmitting(true);
     toast.loading('Submitting payment details...', { id: 'submit-payment' });
 
     const formData = new FormData();
-    formData.append('pidUser', pidUser);
+    formData.append('pidUser', user?.pidUser || '');
     formData.append('userEmail', user?.userEmail || '');
     formData.append('pidBankPayment', pidBankPayment);
     formData.append('amount', amount.toString());
@@ -109,7 +113,9 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
       if (data.statusx === 'SUCCESS') {
         toast.success('Payment details submitted successfully.', { id: 'submit-payment' });
         navigateWithAlert(
-          '/dashboard',
+          isPaySupplierPayment
+            ? '/dashboard/pay-supplier/pending-payment'
+            : '/dashboard',
           'success',
           'Payment details successfully submitted! Awaiting payment status confirmation.'
         );
@@ -155,7 +161,11 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
           </div>
           
           <div className="text-left sm:text-right">
-            {destinationCountry === 'Nigeria' && exNairaToDollar > 0 ? (
+            {isPaySupplierPayment || currencyType === 'NGN' ? (
+              <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
+                ₦{formatCurrency(amount)}
+              </div>
+            ) : destinationCountry === 'Nigeria' && exNairaToDollar > 0 ? (
               <>
                 <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
                   ₦{formatCurrency(amount * exNairaToDollar)}

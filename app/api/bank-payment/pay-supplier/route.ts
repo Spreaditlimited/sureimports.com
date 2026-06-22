@@ -1,11 +1,6 @@
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
 import xMail from '@/lib/email/xMail2';
 
 const prisma = new PrismaClient();
@@ -26,14 +21,12 @@ export async function POST(request: Request) {
 
   //CHECK FOR EMPTY PAYMENT DETAILS
   if (bank == '' || depositor == '' || amount == '') {
-    /////////////// RETURN RESPONSE ///////////////
-    const responsex = {
-      message: 'Bank payment details cannot be empty',
-      status: 'EMPTY_BANK_PAYMENT_DETAILS',
-    };
     return NextResponse.json(
-      { responsex, successx: true, userx: null },
-      { status: 401 },
+      {
+        statusx: 'EMPTY_BANK_PAYMENT_DETAILS',
+        message: 'Bank payment details cannot be empty',
+      },
+      { status: 200 },
     );
   }
 
@@ -46,18 +39,40 @@ export async function POST(request: Request) {
   });
 
   if (user) {
+    const request = await prisma.pay_supplier.findUnique({
+      where: {
+        pidPaySupplier: serviceID,
+      },
+      select: {
+        pidUser: true,
+        pidPaySupplier: true,
+        status: true,
+      },
+    });
+
+    if (!request || request.pidUser !== pidUser) {
+      return NextResponse.json(
+        {
+          statusx: 'ACTION_FAILED',
+          message: 'Pay Supplier request not found.',
+        },
+        { status: 404 },
+      );
+    }
+
     /////////////// RETURN RESPONSE ///////////////
     //create account payment
-    const createx = await prisma.bank_payment.create({
+    await prisma.bank_payment.create({
       data: {
         pidUser: pidUser,
+        pidOrder: serviceID,
         pidBankPayment: pidBankPayment,
         pidBank: bank,
         amount: amount,
         currency: currencyType,
         depositorName: depositor,
         trxNumber: pidBankPayment,
-        serviceType: serviceID,
+        serviceType: 'pay-supplier',
         bankStatus: 'PENDING',
         ext1: serviceDescription,
         createdAt: new Date(),
@@ -66,9 +81,8 @@ export async function POST(request: Request) {
     });
 
     //UPDATE SERVICE STATUS
-    const updatex = await prisma.pay_supplier.update({
+    await prisma.pay_supplier.update({
       where: {
-        pidUser: pidUser,
         pidPaySupplier: serviceID,
       },
       data: {
@@ -111,23 +125,28 @@ export async function POST(request: Request) {
       console.error('Failed to send email:', error);
     }
 
-    //success update
-    const responsex = {
-      message: 'Bank details uploaded',
-      status: 'SUCCESS',
-    };
-    return NextResponse.json(
-      { responsex, successx: true, userx: null },
+      //success update
+      const responsex = {
+        message: 'Bank details uploaded',
+        status: 'SUCCESS',
+      };
+      return NextResponse.json(
+      {
+        statusx: 'SUCCESS',
+        message: responsex.message,
+        responsex,
+        successx: true,
+        userx: null,
+      },
       { status: 200 },
     );
   } else {
-    const responsex = {
-      message:
-        'Action Failed! You may need to re-login try again, or contact the Admin.',
-      status: 'ACTION_FAILED',
-    };
     return NextResponse.json(
-      { responsex, successx: true, userx: null },
+      {
+        statusx: 'ACTION_FAILED',
+        message:
+          'Action Failed! You may need to re-login try again, or contact the Admin.',
+      },
       { status: 401 },
     );
   }

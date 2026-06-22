@@ -15,7 +15,6 @@ import {
 import { CheckCircle2, Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
-const MIN_CORPORATE_GIFT_QUANTITY = 500;
 const MIN_DELIVERY_LEAD_DAYS = 60;
 
 type FormErrors = Record<string, string>;
@@ -102,8 +101,6 @@ export default function CorporateGiftsClient() {
       const quantity = Number(values.quantity_needed);
       if (!values.quantity_needed || Number.isNaN(quantity) || quantity <= 0) {
         nextErrors.quantity_needed = 'Quantity must be a positive number.';
-      } else if (quantity < MIN_CORPORATE_GIFT_QUANTITY) {
-        nextErrors.quantity_needed = `Minimum quantity is ${MIN_CORPORATE_GIFT_QUANTITY} units.`;
       }
     }
 
@@ -217,7 +214,7 @@ export default function CorporateGiftsClient() {
               <ErrorText text={errors.detailed_specifications} />
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <TextField label="Quantity Needed (Min 500)" required value={values.quantity_needed} onChange={(v) => onChange('quantity_needed', v)} type="number" min={MIN_CORPORATE_GIFT_QUANTITY} placeholder="500" error={errors.quantity_needed} />
+              <TextField label="Quantity Needed" required value={values.quantity_needed} onChange={(v) => onChange('quantity_needed', v)} type="number" min={1} placeholder="Enter quantity" error={errors.quantity_needed} />
               <PremiumSelect label="Preferred Quality" required value={values.preferred_quality_level} onValueChange={(v) => onChange('preferred_quality_level', v)} options={qualityOptions} placeholder="Select quality..." error={errors.preferred_quality_level} />
             </div>
           </div>

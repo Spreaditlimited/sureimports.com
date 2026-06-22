@@ -1,16 +1,44 @@
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
 import getFileExt from '@/app/utils/fileExt';
 import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
-import { PaystackButton } from 'react-paystack';
-import { useRouter } from 'next/navigation';
 import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 
 const prisma = new PrismaClient();
+
+function getUploadFile(formData: FormData, key: string) {
+  const value = formData.get(key);
+  if (!(value instanceof File) || value.size === 0) return null;
+  return value;
+}
+
+function getStoredFileName(file: File | null, pidPaySupplier: string, index: number) {
+  if (!file) return null;
+
+  const fileExt = getFileExt(file.name || 'default.noimage');
+  const allowedExt = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG', 'pdf', 'PDF'];
+
+  if (!fileFilter(fileExt, allowedExt)) return null;
+
+  return `IMG${pidPaySupplier}${index}`;
+}
+
+async function uploadPaySupplierFile(file: File | null, publicId: string | null) {
+  if (!file || !publicId) return null;
+
+  const buffer = await file.arrayBuffer();
+  const uploaded = await uploadBufferToCloudinary(Buffer.from(buffer), {
+    folder: 'sureimports/pay-supplier',
+    publicId,
+    resourceType: 'auto',
+    useFilename: false,
+    uniqueFilename: false,
+    overwrite: true,
+  });
+
+  return uploaded.url;
+}
 
 export async function POST(request: Request) {
   //GET FORM DATA
@@ -22,13 +50,15 @@ export async function POST(request: Request) {
   const supplierName = formData.get('supplierName') as string;
   const supplierPhone = formData.get('supplierPhone') as string;
   const supplierEmail = formData.get('supplierEmail') as string;
-  const aliPayAccountQRCodeImage = formData.get(
+  const aliPayAccountQRCodeImage = getUploadFile(
+    formData,
     'aliPayAccountQRCodeImage',
-  ) as File;
-  const weChatAccountQRCodeImage = formData.get(
+  );
+  const weChatAccountQRCodeImage = getUploadFile(
+    formData,
     'weChatAccountQRCodeImage',
-  ) as File;
-  const proformaInvoiceImage = formData.get('proformaInvoiceImage') as File;
+  );
+  const proformaInvoiceImage = getUploadFile(formData, 'proformaInvoiceImage');
   const supplierBankAccountDetails = formData.get(
     'supplierBankAccountDetails',
   ) as string;
@@ -55,39 +85,9 @@ export async function POST(request: Request) {
   }
 
   // Check if the file exists and is of type File
-  if (
-    !aliPayAccountQRCodeImage ||
-    !(aliPayAccountQRCodeImage instanceof File)
-  ) {
-    // const responsex = {
-    //   message: 'Please select an image file for AliPay',
-    //   status: 'ALIPAY_IMAGE_NOT_SELECTED',
-    // };
-    // return NextResponse.json(
-    //   { responsex, successx: true, userx: null },
-    //   { status: 401 },
-    // );
-  }
-
-  // Check if the file exists and is of type File
-  if (
-    !weChatAccountQRCodeImage ||
-    !(weChatAccountQRCodeImage instanceof File)
-  ) {
-    // const responsex = {
-    //   message: 'Please select an image file for WeChat',
-    //   status: 'WECHAT_IMAGE_NOT_SELECTED',
-    // };
-    // return NextResponse.json(
-    //   { responsex, successx: true, userx: null },
-    //   { status: 401 },
-    // );
-  }
-
-  // Check if the file exists and is of type File
-  if (!proformaInvoiceImage || !(proformaInvoiceImage instanceof File)) {
+  if (!proformaInvoiceImage) {
     const responsex = {
-      message: 'Please select an image file for ProForma',
+      message: 'Please select an image or PDF file for ProForma',
       status: 'PROFORMA_IMAGE_NOT_SELECTED',
     };
     return NextResponse.json(
@@ -117,63 +117,19 @@ export async function POST(request: Request) {
     );
   }
 
-  //const pidSpecialSourcing: string = randomGenerator(20);
+  const newFileName1 = getStoredFileName(aliPayAccountQRCodeImage, pidPaySupplier, 1);
+  const newFileName2 = getStoredFileName(weChatAccountQRCodeImage, pidPaySupplier, 2);
+  const newFileName3 = getStoredFileName(proformaInvoiceImage, pidPaySupplier, 3);
 
-  //::::::: 1 ::::::: aliPayAccountQRCodeImage SET FILE NAME & GET FILE PARAMS
-  const originalFileName1 = aliPayAccountQRCodeImage.name
-    ? aliPayAccountQRCodeImage.name
-    : 'default.noimage';
-  const fileType1 = aliPayAccountQRCodeImage.type;
-  const fileExt1 = getFileExt(originalFileName1);
-  const fileSize1 = aliPayAccountQRCodeImage.size;
-  let newFileName1 = ('IMG' + pidPaySupplier + '1') as string | null;
-
-  //CHECK FILE VALIDITY
-  const allowedExt1: string[] = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']; //enter only permitted extensions
-  const fileOK1 = fileFilter(fileExt1, allowedExt1);
-
-  if (fileOK1) {
-  } else {
-    newFileName1 = null;
-    //
-  }
-
-  //::::::: 2 ::::::: weChatAccountQRCodeImage SET FILE NAME & GET FILE PARAMS
-  const originalFileName2 = weChatAccountQRCodeImage.name
-    ? weChatAccountQRCodeImage.name
-    : 'default.noimage';
-  const fileType2 = weChatAccountQRCodeImage.type;
-  const fileExt2 = getFileExt(originalFileName2);
-  const fileSize2 = weChatAccountQRCodeImage.size;
-  let newFileName2 = ('IMG' + pidPaySupplier + '2') as string | null;
-
-  //CHECK FILE VALIDITY
-  const allowedExt2: string[] = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']; //enter only permitted extensions
-  const fileOK2 = fileFilter(fileExt2, allowedExt2);
-
-  if (fileOK2) {
-  } else {
-    newFileName2 = null;
-    //
-  }
-
-  //::::::: 3 ::::::: proformaInvoiceImage SET FILE NAME & GET FILE PARAMS
-  const originalFileName3 = proformaInvoiceImage.name
-    ? proformaInvoiceImage.name
-    : 'default.noimage';
-  const fileType3 = proformaInvoiceImage.type;
-  const fileExt3 = getFileExt(originalFileName3);
-  const fileSize3 = proformaInvoiceImage.size;
-  let newFileName3 = ('IMG' + pidPaySupplier + '3') as string | null;
-
-  //CHECK FILE VALIDITY
-  const allowedExt3: string[] = ['png', 'jpg', 'jpeg', 'PNG', 'JPG', 'JPEG']; //enter only permitted extensions
-  const fileOK3 = fileFilter(fileExt3, allowedExt3);
-
-  if (fileOK3) {
-  } else {
-    newFileName3 = null;
-    //
+  if (!newFileName3) {
+    const responsex = {
+      message: 'Please upload a valid proforma invoice image or PDF.',
+      status: 'INVALID_IMAGE_UPLOAD',
+    };
+    return NextResponse.json(
+      { responsex, successx: true, userx: null },
+      { status: 401 },
+    );
   }
 
   //CHECK IF USER PID AND CID EXISTS
@@ -220,71 +176,20 @@ export async function POST(request: Request) {
       try {
         //GET FILE PAYLOAD
 
-        //----------------------------- IMAGE 1 UPLOAD
-        if (newFileName1 == null) {
-        } else {
-          const bufferAliPay = await aliPayAccountQRCodeImage.arrayBuffer();
-          await uploadBufferToCloudinary(Buffer.from(bufferAliPay), {
-            folder: 'sureimports/pay-supplier',
-            publicId: newFileName1 as string,
-            useFilename: false,
-            uniqueFilename: false,
-            overwrite: true,
-          });
-          //RETURN SUCCESS ON FILE UPLOAD
-          // const responsex = {
-          //   message: 'Sourced Product was successfully placed',
-          //   status: 'SUCCESS',
-          // };
-          // return NextResponse.json(
-          //   { responsex, successx: true, userx: null },
-          //   { status: 200 },
-          // );
-        }
+        const [aliPayUrl, weChatUrl, proformaUrl] = await Promise.all([
+          uploadPaySupplierFile(aliPayAccountQRCodeImage, newFileName1),
+          uploadPaySupplierFile(weChatAccountQRCodeImage, newFileName2),
+          uploadPaySupplierFile(proformaInvoiceImage, newFileName3),
+        ]);
 
-        //----------------------------- IMAGE 2 UPLOAD
-        if (newFileName2 == null) {
-        } else {
-          const bufferWeChat = await weChatAccountQRCodeImage.arrayBuffer();
-          await uploadBufferToCloudinary(Buffer.from(bufferWeChat), {
-            folder: 'sureimports/pay-supplier',
-            publicId: newFileName2 as string,
-            useFilename: false,
-            uniqueFilename: false,
-            overwrite: true,
-          });
-          //RETURN SUCCESS ON FILE UPLOAD
-          // const responsex = {
-          //   message: 'Sourced Product was successfully placed',
-          //   status: 'SUCCESS',
-          // };
-          // return NextResponse.json(
-          //   { responsex, successx: true, userx: null },
-          //   { status: 200 },
-          // );
-        }
-
-        //----------------------------- IMAGE 3 UPLOAD
-        if (newFileName3 == null) {
-        } else {
-          const bufferProForma = await proformaInvoiceImage.arrayBuffer();
-          await uploadBufferToCloudinary(Buffer.from(bufferProForma), {
-            folder: 'sureimports/pay-supplier',
-            publicId: newFileName3 as string,
-            useFilename: false,
-            uniqueFilename: false,
-            overwrite: true,
-          });
-          //RETURN SUCCESS ON FILE UPLOAD
-          // const responsex = {
-          //   message: 'Sourced Product was successfully placed',
-          //   status: 'SUCCESS',
-          // };
-          // return NextResponse.json(
-          //   { responsex, successx: true, userx: null },
-          //   { status: 200 },
-          // );
-        }
+        await prisma.pay_supplier.update({
+          where: { pidPaySupplier },
+          data: {
+            aliPayAccountQRCodeImage: aliPayUrl || newFileName1,
+            weChatAccountQRCodeImage: weChatUrl || newFileName2,
+            proformaInvoiceImage: proformaUrl || newFileName3,
+          },
+        });
 
         //RETURN SUCCESS ON FILE UPLOAD
         const responsex = {

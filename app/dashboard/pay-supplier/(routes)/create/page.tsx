@@ -24,22 +24,8 @@ export const metadata: Metadata = {
 
 function PaySupplier() {
   return (
-    <div className="h-full">
-      <div className="p-[25px]">
-        <div className="text-[28px] font-bold text-slate-800 dark:text-white max-sm:pb-4">
-          Pay Supplier
-        </div>
-        <div className="text-base font-normal text-slate-600 dark:text-slate-300 xl:w-[930px]">
-          Give us <b>Naira</b> & get <b>Yuan</b> in China within <b>24hours</b>{' '}
-          - You or your Supplier.
-        </div>
-      </div>
-      <div className="flex w-full flex-col items-center bg-slate-50 px-4 dark:bg-slate-800 lg:flex-row xl:items-start">
-        <div className="w-full">
-          <FormPaySupplier />
-        </div>
-        <div>{/* <SpecialInstructions /> */}</div>
-      </div>
+    <div className="mt-8">
+      <FormPaySupplier />
     </div>
   );
 }

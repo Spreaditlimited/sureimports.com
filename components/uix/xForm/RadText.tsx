@@ -12,6 +12,7 @@ interface Props {
   errorx?: any;
   disable?: boolean;
   value?: string;
+  readOnly?: boolean;
   onClick?: (e: any) => void;
   onChange?: (e: any) => void;
 }
@@ -28,6 +29,7 @@ const RadText: React.FC<Props> = ({
   errorx,
   disable,
   value,
+  readOnly,
   onClick,
   onChange,
   ...props
@@ -54,6 +56,7 @@ const RadText: React.FC<Props> = ({
             autoComplete={autoComplete}
             placeholder={placeholder}
             value={value}
+            readOnly={readOnly}
             onClick={onClick}
             onChange={onChange}
             className="items-centerx max-sm:w-340px flex h-10 w-full justify-between rounded-md border border-input bg-background bg-slate-200 p-5 px-3 py-2 pl-14 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-[60px] lg:w-full [&>span]:line-clamp-1"

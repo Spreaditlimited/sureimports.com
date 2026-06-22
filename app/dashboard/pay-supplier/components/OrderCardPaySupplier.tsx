@@ -76,6 +76,59 @@ interface ApiResponse {
   userx: User;
 }
 
+function buildPaySupplierAssetUrl(value?: string | null) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+
+  const base = process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL?.replace(/\/$/, '');
+  if (!base) return '';
+
+  if (raw.includes('/')) return `${base}/${raw}`;
+  return `${base}/sureimports/pay-supplier/${raw}`;
+}
+
+function isPdfAsset(value: string) {
+  return /\.pdf($|\?)/i.test(value);
+}
+
+function PaySupplierAsset({
+  label,
+  value,
+}: {
+  label: string;
+  value?: string | null;
+}) {
+  const url = buildPaySupplierAssetUrl(value);
+  if (!url) return null;
+
+  return (
+    <div className="w-full p-2 md:w-1/3">
+      <label>{label}</label>
+      {isPdfAsset(url) ? (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 block rounded-md border border-slate-200 p-4 text-sm font-semibold text-indigo-700 hover:bg-slate-50 dark:border-slate-700 dark:text-indigo-300 dark:hover:bg-slate-800"
+        >
+          View PDF
+        </a>
+      ) : (
+        <a href={url} target="_blank" rel="noopener noreferrer">
+          <Image
+            src={url}
+            alt={label}
+            height={300}
+            width={300}
+            className="rounded-md"
+          />
+        </a>
+      )}
+    </div>
+  );
+}
+
 // Use the interface to annotate the props of the component
 //const OrderCard: React.FC<ProductsProps> = ({ products }) => {
 const OrderCard: React.FC<ProductsProps> = ({
@@ -192,7 +245,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                       {supplierName}
                     </div>
                     <div className="text-base font-normal text-slate-950 dark:text-slate-100">
-                      Order Id: <b>{pidPaySupplier}</b>
+                      Request ID: <b>{pidPaySupplier}</b>
                       <span className="text-slate-600">
                         {' '}
                         (Email: <b>{supplierEmail}</b>, Phone:{' '}
@@ -327,59 +380,18 @@ const OrderCard: React.FC<ProductsProps> = ({
                   </div>
 
                   <div className="flex flex-col md:flex-row">
-                    {/* ALIPAY IMAGE */}
-                    {aliPayAccountQRCodeImage && (
-                      <div className="w-full p-2 md:w-1/3">
-                        <label>Supplier`s AliPay Account Details Image</label>
-                        <Image
-                          src={
-                            process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
-                            '/' +
-                            aliPayAccountQRCodeImage
-                          }
-                          alt={'AliPayImage'}
-                          height={300}
-                          width={300}
-                          className="rounded-md"
-                        />
-                      </div>
-                    )}
-
-                    {/* WECHAT IMAGE */}
-                    {weChatAccountQRCodeImage && (
-                      <div className="w-full p-2 md:w-1/3">
-                        <label>Supplier`s WeChat Account Details Image</label>
-                        <Image
-                          src={
-                            process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
-                            '/' +
-                            weChatAccountQRCodeImage
-                          }
-                          alt={'AliPayImage'}
-                          height={300}
-                          width={300}
-                          className="rounded-md"
-                        />
-                      </div>
-                    )}
-
-                    {/* PROFORMA IMAGE */}
-                    {proformaInvoiceImage && (
-                      <div className="w-full p-2 md:w-1/3">
-                        <label>Proforma Invoice Image</label>
-                        <Image
-                          src={
-                            process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL +
-                            '/' +
-                            proformaInvoiceImage
-                          }
-                          alt={'Proforma Invoice'}
-                          height={300}
-                          width={300}
-                          className="rounded-md"
-                        />
-                      </div>
-                    )}
+                    <PaySupplierAsset
+                      label="Supplier`s AliPay Account Details"
+                      value={aliPayAccountQRCodeImage}
+                    />
+                    <PaySupplierAsset
+                      label="Supplier`s WeChat Account Details"
+                      value={weChatAccountQRCodeImage}
+                    />
+                    <PaySupplierAsset
+                      label="Proforma Invoice"
+                      value={proformaInvoiceImage}
+                    />
                   </div>
 
                   {/* TWO COLUMN: Supplier`s Bank Account Details (Optional) */}
@@ -462,7 +474,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                                     amountToPayInNaira +
                                     '&currencyType=NGN&destinationCountry=NONE&serviceID=' +
                                     pidPaySupplier +
-                                    '&serviceDescription=Pay for General Procurement Service',
+                                    '&serviceDescription=Pay Supplier Service',
                                 );
                               }}
                             >

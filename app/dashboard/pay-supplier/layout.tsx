@@ -2,16 +2,10 @@
 
 import { Button } from '@/components/ui/button';
 import React from 'react';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import Payments from '@/content/payments.json';
-import { cn } from '@/_lib/utils';
-import { OrderCountProvider } from '@/app/context/OrderCountContext';
-//import { RecordCountSpecialSourcingProvider } from '@/app/context/CountRecordsSpecialSourcingContext';
+import { useRouter } from 'next/navigation';
 import OrderCount from '@/app/dashboard/pay-supplier/components/OrderCountPaySupplier';
 import { RecordCountPaySupplierProvider } from '@/app/context/RecordCountPaySupplierContext';
-import { useAuth } from '@/app/context/AuthContext';
-import { useRecord } from '@/app/context/RecordCountContext';
+import { Plus, RefreshCcw } from 'lucide-react';
 
 type UserLayoutProps = {
   children: React.ReactNode;
@@ -19,42 +13,54 @@ type UserLayoutProps = {
 
 function PaySupplier(props: UserLayoutProps) {
   const router = useRouter();
-  const path = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
-      <div className="p-4">
-        <div className="flex justify-between max-sm:flex-col">
-          <div
-            className="text-[28px] font-bold text-slate-800 dark:text-slate-200 max-sm:pb-4"
-            onClick={() => {
-              router.push('/dashboard/pay-supplier/create');
-            }}
-          >
-            Pay Supplier
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+      <RecordCountPaySupplierProvider>
+        <div className="bg-slate-900 pb-32 pt-12 text-white dark:bg-[#0b0c16]">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight">
+                  Pay Supplier
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
+                  Pay suppliers in China from your Naira balance. Submit payment
+                  details, upload the invoice, and track the request from your
+                  dashboard.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]"
+                  onClick={() => router.refresh()}
+                >
+                  <RefreshCcw className="h-4 w-4" />
+                  Sync
+                </Button>
+                <Button
+                  type="button"
+                  className="flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-500 dark:shadow-blue-950/40"
+                  onClick={() => {
+                    router.push('/dashboard/pay-supplier/create');
+                  }}
+                >
+                  <Plus className="h-4 w-4" />
+                  Pay Supplier
+                </Button>
+              </div>
+            </div>
+
+            <OrderCount params={{ statusx: 'saved' }} />
           </div>
-          <Button
-            className="font-medium xl:h-[49px] xl:w-[255px]"
-            onClick={() => {
-              router.push('/dashboard/pay-supplier/create');
-            }}
-          >
-            Pay Supplier
-          </Button>
         </div>
 
-        <div className="mt-[20px] items-start justify-center gap-2 rounded-xl bg-white p-5 py-[15px] text-base font-normal text-slate-600 dark:bg-[#161629] dark:text-white max-sm:pl-4 md:flex-row">
-          Give us <span className="font-semibold">Naira</span> & get{' '}
-          <span className="font-semibold">Yuan</span> in China within{' '}
-          <span className="font-semibold">24hours</span> - You or your Supplier.
-        </div>
-      </div>
-      <main>
-        <RecordCountPaySupplierProvider>
-          <OrderCount params={{ statusx: 'saved' }} />
+        <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
           {props.children}
-        </RecordCountPaySupplierProvider>
-      </main>
+        </main>
+      </RecordCountPaySupplierProvider>
     </div>
   );
 }

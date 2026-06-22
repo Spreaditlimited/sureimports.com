@@ -1,128 +1,90 @@
 'use client';
 
-import React, {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-
-import { Button } from '@/components/ui/button';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { Input } from '@/components/ui/input-with-dark-mode';
-import Image from 'next/image';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
+  Banknote,
+  FileImage,
+  Landmark,
+  Loader2,
+  Mail,
+  Phone,
+  QrCode,
+  ShieldCheck,
+  User,
+  WalletCards,
+} from 'lucide-react';
 import { toast } from 'sonner';
+
 import { useAuth } from '@/app/context/AuthContext';
-import { Currency, Loader2, Phone, User } from 'lucide-react';
-
-import ImageBox from '@/components/uix/ImageBox';
-import ImageBoxLarge from '@/components/uix/ImageBoxLarge';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
-import RadFormLayout from '@/components/uix/xForm/RadFormLayout';
-import { MdEmail } from 'react-icons/md';
-import { FaUserCheck } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
-import RadButtonIcon from '@/components/uix/xForm/RadButtonIcon';
-import RadTextArea from '@/components/uix/xForm/RadTextArea';
-import RadText from '@/components/uix/xForm/RadText';
-import { FaCalendarAlt, FaPhone } from 'react-icons/fa';
-import RadSelectGender from '@/components/uix/xForm/RadSelectGender';
-import { PiGenderIntersex } from 'react-icons/pi';
-import countries from '@/lib/data/countries';
-import RadSelectOption from '@/components/uix/xForm/RadSelectOption';
-import { BiWorld } from 'react-icons/bi';
-import { FaUserEdit } from 'react-icons/fa';
-import RadDateSelector from '@/components/uix/xForm/RadDateSelector';
-import { FaBox } from 'react-icons/fa';
-import { IoLogoWhatsapp } from 'react-icons/io';
-import RadNumber from '@/components/uix/xForm/RadNumber';
-import { FaBoxesStacked } from 'react-icons/fa6';
-import { FaMoneyBill } from 'react-icons/fa';
-import Paystack from '@/components/uix/Paystack';
-import { useModal } from '@/app/context/ModalContext';
-import Modal from '@/components/uix/Modal';
-import RadSelectCurrency from '@/components/uix/xForm/RadSelectCurrency';
-import {
-  CurrencyDollarIcon,
-  PhoneArrowDownLeftIcon,
-  PhoneIcon,
-} from '@heroicons/react/16/solid';
-import { RiBankFill } from 'react-icons/ri';
-import { FaPhoneAlt } from 'react-icons/fa';
-import { FaUser } from 'react-icons/fa';
-import { FaAlipay } from 'react-icons/fa';
-import { AiFillWechat } from 'react-icons/ai';
-import { FaFileInvoice } from 'react-icons/fa6';
-import { MdCurrencyYuan } from 'react-icons/md';
-import { TbCurrencyNaira } from 'react-icons/tb';
-import RadImage from '@/components/uix/xForm/RadImage';
 
-interface FormProps {}
-
-interface userData {
-  address: unknown;
-  id: number;
-  pidUser: string;
-  userEmail: string;
-  userFirstname: string;
-  gender: string;
-  dob: Date | undefined;
-  phone: string;
-  country: string;
-  userImage: string;
-}
-
-//USER DATA
-interface User {
-  pidUser: string;
-  email: string;
-  name: string;
-  userImage: string;
-  userStatus: string;
-}
-
-//API RESPONSE
 interface ApiResponse {
-  responsex: any;
+  responsex: {
+    message?: string;
+    status: string;
+  };
   successx: boolean;
-  userx: User;
+  userx: unknown;
 }
+
+type FileUploadCardProps = {
+  label: string;
+  helper: string;
+  required?: boolean;
+  file: File | null;
+  onChange: (file: File | null) => void;
+};
+
+function FileUploadCard({
+  label,
+  helper,
+  required,
+  file,
+  onChange,
+}: FileUploadCardProps) {
+  return (
+    <label className="group block cursor-pointer rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-blue-400 hover:bg-blue-50/50 dark:border-slate-700 dark:bg-[#0f1020] dark:hover:border-blue-500 dark:hover:bg-blue-950/20">
+      <input
+        type="file"
+        accept="image/*,.pdf,application/pdf"
+        className="sr-only"
+        onChange={(event) => onChange(event.target.files?.[0] || null)}
+      />
+      <div className="flex items-start gap-3">
+        <div className="rounded-lg bg-white p-2 text-blue-600 shadow-sm dark:bg-[#161629] dark:text-blue-300">
+          <FileImage className="h-5 w-5" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-bold text-slate-900 dark:text-white">
+              {label}
+            </p>
+            {required ? (
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-600 ring-1 ring-rose-100 dark:bg-rose-950/40 dark:text-rose-300 dark:ring-rose-900">
+                Required
+              </span>
+            ) : null}
+          </div>
+          <p className="mt-1 text-xs leading-5 text-slate-500 dark:text-slate-400">
+            {file ? file.name : helper}
+          </p>
+        </div>
+      </div>
+    </label>
+  );
+}
+
+const inputClass =
+  'w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-500';
 
 function PaySupplierForm() {
-  let productID = 'PS' + new Date().getTime().toString();
-
-  //initialize alert system
   const navigateWithAlert = useNavigationWithAlert();
-  const { user, logout } = useAuth(); //DATA FROM SESSION
-  const { isModalOpen, openModal, closeModal } = useModal();
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [pidPaySupplier, setPidSpecialSourcing] = useState(productID);
-  const [email, setEmail] = useState(user?.userEmail);
+  const { user } = useAuth();
 
-  const [supplierName, setSupplierName] = React.useState('');
-  const [supplierPhone, setSupplierPhone] = React.useState('');
-  const [supplierEmail, setSupplierEmail] = React.useState('');
+  const [pidPaySupplier] = useState(() => `PS${Date.now()}`);
+  const [supplierName, setSupplierName] = useState('');
+  const [supplierPhone, setSupplierPhone] = useState('');
+  const [supplierEmail, setSupplierEmail] = useState('');
   const [aliPayAccountQRCodeImage, setAliPayAccountQRCodeImage] =
     useState<File | null>(null);
   const [weChatAccountQRCodeImage, setWeChatAccountQRCodeImage] =
@@ -131,293 +93,355 @@ function PaySupplierForm() {
     null,
   );
   const [supplierBankAccountDetails, setSupplierBankAccountDetails] =
-    React.useState('');
-  const [amountToPayInYuan, setAmountToPayInYuan] = React.useState<string>('');
-  const [amountToPayInNaira, setAmountToPayInNaira] =
-    React.useState<string>('');
-  const [serviceCharge, setServiceCharge] = React.useState(0);
+    useState('');
+  const [amountToPayInYuan, setAmountToPayInYuan] = useState('');
+  const [amountToPayInNaira, setAmountToPayInNaira] = useState('');
+  const [serviceCharge] = useState(0);
+  const [nairaPerYuanRate, setNairaPerYuanRate] = useState<number | null>(null);
+  const [loadingRate, setLoadingRate] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleInputBChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const newValueB = e.target.value;
-    setAmountToPayInNaira((parseFloat(newValueB) * 237.87).toFixed(2) as any);
-    setAmountToPayInYuan(newValueB as any);
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadExchangeRate = async () => {
+      try {
+        const response = await fetch('/api/get-data/exchange-rate-data-one', {
+          cache: 'no-store',
+        });
+        if (!response.ok) throw new Error('Unable to load exchange rate');
+
+        const data = await response.json();
+        const rate = Number(data?.getOneRecord?.exNairaToYuan);
+
+        if (!cancelled && Number.isFinite(rate) && rate > 0) {
+          setNairaPerYuanRate(rate);
+        }
+      } catch {
+        if (!cancelled) {
+          toast.error('Unable to load exchange rate settings right now.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingRate(false);
+        }
+      }
+    };
+
+    loadExchangeRate();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const formattedNairaAmount = useMemo(() => {
+    const value = Number(amountToPayInNaira);
+    if (!Number.isFinite(value) || value <= 0) return '₦0.00';
+
+    return new Intl.NumberFormat('en-NG', {
+      style: 'currency',
+      currency: 'NGN',
+      maximumFractionDigits: 2,
+    }).format(value);
+  }, [amountToPayInNaira]);
+
+  const handleYuanAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setAmountToPayInYuan(value);
+
+    const yuanAmount = parseFloat(value);
+    if (!Number.isFinite(yuanAmount) || !nairaPerYuanRate) {
+      setAmountToPayInNaira('');
+      return;
+    }
+
+    setAmountToPayInNaira((yuanAmount * nairaPerYuanRate).toFixed(2));
   };
 
-  //FORM DATA SUBMISSION
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    //console.log(file);
-    //setLoading(true);
 
-    //await new Promise((resolve) => setTimeout(resolve, 3000));
+    if (!nairaPerYuanRate) {
+      toast.warning('Exchange rate settings are still loading. Please try again.');
+      return;
+    }
 
-    const formData = new FormData() as any;
+    if (!proformaInvoiceImage) {
+      toast.warning('Please upload the proforma invoice from your supplier.');
+      return;
+    }
 
-    formData.append('pidUser', pidUser);
-    formData.append('userEmail', user?.userEmail);
+    const formData = new FormData();
+    formData.append('pidUser', user?.pidUser || '');
+    formData.append('userEmail', user?.userEmail || '');
     formData.append('pidPaySupplier', pidPaySupplier);
     formData.append('supplierName', supplierName);
     formData.append('supplierPhone', supplierPhone);
     formData.append('supplierEmail', supplierEmail);
-    formData.append('aliPayAccountQRCodeImage', aliPayAccountQRCodeImage);
-    formData.append('weChatAccountQRCodeImage', weChatAccountQRCodeImage);
+    if (aliPayAccountQRCodeImage) {
+      formData.append('aliPayAccountQRCodeImage', aliPayAccountQRCodeImage);
+    }
+    if (weChatAccountQRCodeImage) {
+      formData.append('weChatAccountQRCodeImage', weChatAccountQRCodeImage);
+    }
     formData.append('proformaInvoiceImage', proformaInvoiceImage);
     formData.append('supplierBankAccountDetails', supplierBankAccountDetails);
     formData.append('amountToPayInYuan', amountToPayInYuan);
     formData.append('amountToPayInNaira', amountToPayInNaira);
-    formData.append('serviceCharge', serviceCharge);
+    formData.append('serviceCharge', String(serviceCharge));
 
-    //MAKE REQUEST ATTEMPT
+    setSubmitting(true);
     try {
-      toast.info('Processing . . .');
-      //MAKE REQUEST
+      toast.info('Processing payment request...');
       const res = await fetch('/api/crud/pay-supplier-create', {
         method: 'POST',
         body: formData,
       });
 
-      // GET & PROCESS RESPONSE FROM API
-      const data: ApiResponse = await res.json();
-      if (data.responsex.status == 'SUCCESS') {
+      const data = (await res.json()) as ApiResponse;
+
+      if (data.responsex.status === 'SUCCESS') {
         navigateWithAlert(
-          '/dashboard/bank-payment/?service=pay-supplier&amount=' +
-            amountToPayInNaira +
-            '&currencyType=NGN&destinationCountry=NONE&serviceID=' +
-            pidPaySupplier +
-            '&serviceDescription=Pay Supplier Service',
+          `/dashboard/bank-payment/?service=pay-supplier&amount=${amountToPayInNaira}&currencyType=NGN&destinationCountry=NONE&serviceID=${pidPaySupplier}&serviceDescription=Pay Supplier Service`,
           'success',
           'We have received your request!',
         );
+        return;
       }
-      // if (data.responsex.status == 'SUCCESS') {
-      //   openModal();
-      //   toast.success(data.responsex.message);
-      // }
-      if (data.responsex.status == 'VALUE_NOT_A_NUMBER') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'ALIPAY_IMAGE_NOT_SELECTED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'WECHAT_IMAGE_NOT_SELECTED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'PROFORMA_IMAGE_NOT_SELECTED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'EMPTY_DETAILS') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'INVALID_IMAGE_UPLOAD') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'IMAGE_NOT_SELECTED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'IMAGE_UPLOAD_FAILED') {
-        toast.warning(data.responsex.message);
-      }
-      if (data.responsex.status == 'ACTION_FAILED') {
-        toast.error(data.responsex.message);
-      }
-    } catch (error: any) {
-      console.log(error.message);
-    } finally {
-      //setLoading(false);
-    }
 
-    //FORM SUBMISSION ENDS
+      const warningStatuses = [
+        'VALUE_NOT_A_NUMBER',
+        'ALIPAY_IMAGE_NOT_SELECTED',
+        'WECHAT_IMAGE_NOT_SELECTED',
+        'PROFORMA_IMAGE_NOT_SELECTED',
+        'EMPTY_DETAILS',
+        'INVALID_IMAGE_UPLOAD',
+        'IMAGE_NOT_SELECTED',
+        'IMAGE_UPLOAD_FAILED',
+      ];
+
+      if (warningStatuses.includes(data.responsex.status)) {
+        toast.warning(data.responsex.message || 'Please check your request.');
+        return;
+      }
+
+      toast.error(data.responsex.message || 'Unable to create payment request.');
+    } catch (error: any) {
+      toast.error(error?.message || 'Unable to create payment request.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
-    <>
-      {/*.................................. FORM BLOCK STARTS.................................... */}
-      <RadFormLayout title="" subtitle="">
-        <form onSubmit={submitForm}>
-          <div className="flex flex-col p-2 md:flex-row">
-            <div className="md:w-1/1 w-full">
-              <label className="block text-[16px] font-medium text-slate-400">
-                Provide the details of the supplier you want us to pay.
-              </label>
-            </div>
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-[#161629]">
+      <div className="border-b border-slate-100 p-6 dark:border-slate-700">
+        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              New Supplier Payment
+            </h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-300">
+              Send us the supplier details and invoice. We will receive Naira
+              and pay your supplier in RMB.
+            </p>
           </div>
-
-          {/* TWO COLUMN: SUPPLIER NAME & PHONE*/}
-          <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadText
-                  label={'Supplier Name'}
-                  reacticon={<FaUser />}
-                  name={'supplierName'}
-                  id={'supplierName'}
-                  value={supplierName}
-                  onChange={(e) => setSupplierName(e.target.value)}
-                  placeholder={'Provide Suppliers Name'}
-                  disable={false}
-                />
-              </div>
-            </div>
-
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadText
-                  label={'Supplier Phone'}
-                  reacticon={<FaPhoneAlt />}
-                  name={'supplierPhone'}
-                  id={'supplierPhone'}
-                  value={supplierPhone}
-                  onChange={(e) => setSupplierPhone(e.target.value)}
-                  placeholder={'Provide Suppliers Phone Number'}
-                  disable={false}
-                />
-              </div>
-            </div>
+          <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-200">
+            <p className="text-[10px] font-black uppercase tracking-widest">
+              Exchange Rate
+            </p>
+            <p className="mt-1 font-bold">
+              {loadingRate
+                ? 'Loading...'
+                : nairaPerYuanRate
+                  ? `₦${nairaPerYuanRate.toLocaleString()} / ¥1`
+                  : 'Unavailable'}
+            </p>
           </div>
+        </div>
+      </div>
 
-          {/* TWO COLUMN: SUPPLIER EMAIL & ALIPAY ACCOUNT */}
-          <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadText
-                  label={'Email'}
-                  reacticon={<MdEmail />}
-                  name={'spplierEmail'}
-                  id={'spplierEmail'}
-                  value={supplierEmail}
-                  onChange={(e) => setSupplierEmail(e.target.value)}
-                  placeholder={'Provide Suppliers Email'}
-                  disable={false}
-                />
+      <form onSubmit={submitForm} className="p-6">
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <section className="space-y-5">
+            <div>
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300">
+                <User className="h-3.5 w-3.5" />
+                Supplier Details
+              </h3>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                    Supplier name
+                  </label>
+                  <input
+                    className={inputClass}
+                    value={supplierName}
+                    onChange={(e) => setSupplierName(e.target.value)}
+                    placeholder="Supplier or company name"
+                    required
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                    Supplier phone
+                  </label>
+                  <div className="relative">
+                    <Phone className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      className={`${inputClass} pl-10`}
+                      value={supplierPhone}
+                      onChange={(e) => setSupplierPhone(e.target.value)}
+                      placeholder="Phone or WeChat number"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                    Supplier email
+                  </label>
+                  <div className="relative">
+                    <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="email"
+                      className={`${inputClass} pl-10`}
+                      value={supplierEmail}
+                      onChange={(e) => setSupplierEmail(e.target.value)}
+                      placeholder="supplier@example.com"
+                      required
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadImage
-                  label="Supplier`s AliPay Account Details (Optional)"
-                  name={'aliPayAccountQRCodeImage'}
-                  id={'aliPayAccountQRCodeImage'}
-                  reacticon={<FaAlipay />}
-                  className="h-[60px] rounded-md border-slate-700 bg-slate-100 pl-7 text-gray-500 max-sm:w-[340px] lg:w-full"
+            <div>
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300">
+                <QrCode className="h-3.5 w-3.5" />
+                Account Details & Invoice
+              </h3>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <FileUploadCard
+                  label="AliPay account image"
+                  helper="Optional. Upload QR code or account screenshot."
+                  file={aliPayAccountQRCodeImage}
                   onChange={setAliPayAccountQRCodeImage}
-                  maxSizeMB={2}
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* TWO COLUMN: SUPPLIER WECHAT AND PROFORMA INVOICE */}
-          <div className="flex flex-col md:flex-row">
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadImage
-                  label="Supplier`s WeChat Account Details (Optional)"
-                  reacticon={<AiFillWechat />}
-                  name={'weChatAccountQRCodeImage'}
-                  id={'weChatAccountQRCodeImage'}
-                  className="h-[60px] rounded-md border-slate-50 bg-slate-100 pl-7 text-gray-500 max-sm:w-[340px] lg:w-full"
+                <FileUploadCard
+                  label="WeChat account image"
+                  helper="Optional. Upload QR code or account screenshot."
+                  file={weChatAccountQRCodeImage}
                   onChange={setWeChatAccountQRCodeImage}
-                  maxSizeMB={2}
                 />
+                <div className="md:col-span-2">
+                  <FileUploadCard
+                    label="Proforma invoice"
+                    helper="Upload the invoice or payment instruction from the supplier. Images and PDFs are accepted."
+                    required
+                    file={proformaInvoiceImage}
+                    onChange={setProformaInvoiceImage}
+                  />
+                </div>
               </div>
-            </div>
-
-            <div className="w-full p-2 md:w-1/2">
-              {/* COL 1 */}
-              <div>
-                <RadImage
-                  label="Proforma Invoice"
-                  reacticon={<FaFileInvoice />}
-                  name={'proformaInvoiceImage'}
-                  id={'proformaInvoiceImage'}
-                  className="h-[60px] rounded-md border-slate-50 bg-slate-100 pl-7 text-gray-500 max-sm:w-[340px] lg:w-full"
-                  onChange={setProformaInvoiceImage}
-                  maxSizeMB={2}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* TWO COLUMN: Supplier`s Bank Account Details (Optional) */}
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/1 w-full p-2">
-              {/* COL 2 */}
-              <div>
-                <RadTextArea
-                  label={'Supplier`s Bank Account Details (Optional)'}
-                  name="supplierBankAccountDetails"
-                  id="supplierBankAccountDetails"
+              <div className="mt-3 space-y-1.5">
+                <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                  Supplier bank account details
+                </label>
+                <textarea
+                  className={`${inputClass} min-h-28 resize-y`}
                   value={supplierBankAccountDetails}
-                  onChange={(e) =>
-                    setSupplierBankAccountDetails(e.target.value)
-                  }
-                  //defaultValue={''}
-                  placeholder="Provide your supplier bank account details"
+                  onChange={(e) => setSupplierBankAccountDetails(e.target.value)}
+                  placeholder="Optional. Paste bank account details if the supplier wants a bank transfer."
                 />
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* SINGLE COLUMN: Amount to Pay (¥ Yuan) (RMB) */}
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/1 w-full p-2">
-              {/* COL 2 */}
-              <div>
-                <RadText
-                  label={'Amount to Pay (¥ Yuan) (RMB)'}
-                  reacticon={<MdCurrencyYuan />}
-                  name={'input1'}
-                  id={'input1'}
-                  value={amountToPayInYuan as any}
-                  onChange={handleInputBChange}
-                  placeholder={'Enter Amount in Yuan'}
-                  disable={false}
-                />
-              </div>
-            </div>
-          </div>
+          <aside className="space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-[#0f1020]">
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300">
+                <WalletCards className="h-3.5 w-3.5" />
+                Payment Amount
+              </h3>
 
-          {/* SINGLE COLUMN: Equivalent Amount in (₦ Naira) */}
-          <div className="flex flex-col md:flex-row">
-            <div className="md:w-1/1 w-full p-2">
-              {/* COL 2 */}
-              <div>
-                <RadText
-                  label={'Equivalent Amount in (₦ Naira)'}
-                  reacticon={<TbCurrencyNaira />}
-                  name={'amountToPayInNaira'}
-                  id={'amountToPayInNaira'}
-                  value={amountToPayInNaira as any}
-                  //onChange={handleInputBChange}
-                  placeholder={'Enter Amount in Naira'}
-                  disable={false}
-                />
-              </div>
-            </div>
-          </div>
+              <div className="mt-4 space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
+                    Amount to pay supplier in RMB
+                  </label>
+                  <div className="relative">
+                    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-500">
+                      ¥
+                    </span>
+                    <input
+                      type="number"
+                      min="1"
+                      step="0.01"
+                      className={`${inputClass} pl-9`}
+                      value={amountToPayInYuan}
+                      onChange={handleYuanAmountChange}
+                      placeholder={
+                        nairaPerYuanRate
+                          ? 'Enter RMB amount'
+                          : 'Loading exchange rate...'
+                      }
+                      disabled={!nairaPerYuanRate}
+                      required
+                    />
+                  </div>
+                </div>
 
-          {/* ///////////////////// SUBMIT BUTTON ///////////////////// */}
-          <div className="flex justify-end">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/1 w-full p-2">
-                <RadButtonIcon
-                  label="Bank Deposit"
-                  reacticon={<RiBankFill />}
-                  value={'formaction'}
-                />
+                <div className="rounded-xl bg-white p-4 shadow-sm dark:bg-[#161629]">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    Naira Equivalent
+                  </p>
+                  <p className="mt-2 text-3xl font-black text-slate-900 dark:text-white">
+                    {formattedNairaAmount}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                    This amount is calculated from the prevailing market rate.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
-      </RadFormLayout>
-      {/*.................................. FORM BLOCK ENDS .................................... */}
-    </>
+
+            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5 text-emerald-950 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-100">
+              <div className="flex gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+                <div>
+                  <p className="text-sm font-bold">How this works</p>
+                  <p className="mt-1 text-xs leading-6">
+                    Submit the request, pay the Naira equivalent by bank deposit,
+                    and we process the RMB payment to your supplier after
+                    confirmation.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitting || !nairaPerYuanRate}
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:hover:bg-blue-500"
+            >
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Landmark className="h-4 w-4" />
+              )}
+              Continue to Bank Deposit
+            </button>
+
+            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+              <Banknote className="h-4 w-4" />
+              Payments are reviewed before supplier transfer.
+            </div>
+          </aside>
+        </div>
+      </form>
+    </div>
   );
 }
 

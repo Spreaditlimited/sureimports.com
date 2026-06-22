@@ -101,7 +101,6 @@ const SOURCE_OPTIONS = [
   'Returning Customer',
   'Other',
 ];
-const MIN_CORPORATE_GIFT_QUANTITY = 500;
 const MIN_DELIVERY_LEAD_DAYS = 60;
 
 const formatNaira = (value: number) =>
@@ -124,7 +123,7 @@ export default function CorporateGiftsDashboardPage() {
     contactPersonFullName: '',
     productOrItemNeeded: '',
     detailedSpecifications: '',
-    quantityNeeded: MIN_CORPORATE_GIFT_QUANTITY,
+    quantityNeeded: 1,
     preferredQualityLevel: 'Mid-range corporate quality',
     brandingCustomizationRequired: 'Yes',
     expectedDeliveryDate: '',
@@ -203,8 +202,8 @@ export default function CorporateGiftsDashboardPage() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (Number(form.quantityNeeded) < MIN_CORPORATE_GIFT_QUANTITY) {
-      toast.error(`Minimum quantity is ${MIN_CORPORATE_GIFT_QUANTITY} units.`);
+    if (Number(form.quantityNeeded) <= 0) {
+      toast.error('Quantity must be a positive number.');
       return;
     }
     const expectedDate = new Date(`${form.expectedDeliveryDate}T00:00:00`);
@@ -248,7 +247,7 @@ export default function CorporateGiftsDashboardPage() {
         businessName: '',
         productOrItemNeeded: '',
         detailedSpecifications: '',
-        quantityNeeded: MIN_CORPORATE_GIFT_QUANTITY,
+        quantityNeeded: 1,
         expectedDeliveryDate: '',
         finalDeliveryLocationNigeria: '',
         proceedTimeline: '',
@@ -445,7 +444,7 @@ export default function CorporateGiftsDashboardPage() {
                   <div className="space-y-3">
                     <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="What items do you need?" value={form.productOrItemNeeded} onChange={(e) => setForm(p => ({ ...p, productOrItemNeeded: e.target.value }))} required />
                     <div className="grid grid-cols-2 gap-3">
-                      <input type="number" min={MIN_CORPORATE_GIFT_QUANTITY} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Quantity (minimum 500)" value={form.quantityNeeded} onChange={(e) => setForm(p => ({ ...p, quantityNeeded: Number(e.target.value) }))} required />
+                      <input type="number" min={1} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Quantity needed" value={form.quantityNeeded} onChange={(e) => setForm(p => ({ ...p, quantityNeeded: Number(e.target.value) }))} required />
                       <Select
                         value={form.preferredQualityLevel}
                         onValueChange={(value) => setForm((p) => ({ ...p, preferredQualityLevel: value }))}

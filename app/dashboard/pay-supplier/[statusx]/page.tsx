@@ -124,10 +124,21 @@ export function OrderList({ params }: orderStatus) {
   if (!productData) return <Loader />;
   if (countRecords.length == 0)
     return (
-      <div className="m-7 flex border-spacing-1 items-center justify-center p-7 font-bold">
-        <div className="rounded border-2 border-dotted border-gray-500 p-4">
-          <p className="text-center text-gray-500">
-            No {statusx} request available
+      <div className="pt-24">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center dark:border-slate-700 dark:bg-[#161629]">
+          <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
+            <Image
+              src="/icons/pay-supplier/bank.svg"
+              alt=""
+              width={32}
+              height={32}
+            />
+          </div>
+          <h3 className="mt-4 text-xl font-bold text-slate-900 dark:text-white">
+            No {statusx.replace(/-/g, ' ')} requests available
+          </h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            New supplier payment requests will appear here.
           </p>
         </div>
       </div>
