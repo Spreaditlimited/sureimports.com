@@ -241,7 +241,7 @@ export default function LaptopsForBusinessPage() {
             </div>
 
             {/* Hero Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
               {[
                 { label: 'Use cases', value: 'Staff, schools, resellers', icon: BriefcaseBusiness },
                 { label: 'Strict Checks', value: 'Battery, SSD, screen, ports', icon: MonitorCheck },

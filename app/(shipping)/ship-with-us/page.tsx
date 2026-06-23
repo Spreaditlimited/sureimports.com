@@ -257,7 +257,7 @@ export default function ShipWithUsPage() {
             </div>
 
             {/* Hero Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
               {[
                 { label: 'Best for', value: 'Goods already bought', icon: PackageCheck },
                 { label: 'Options', value: 'Consolidation & tracking', icon: ShieldCheck },

@@ -315,7 +315,7 @@ export default function CorporateGiftsPage() {
             </div>
 
             {/* Hero Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
               {[
                 { label: 'Best for', value: 'Branded gifts & staff kits', icon: Gift },
                 { label: 'Built for', value: 'Companies, schools & agencies', icon: ShieldCheck },

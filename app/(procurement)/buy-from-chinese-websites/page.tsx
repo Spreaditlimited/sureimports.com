@@ -254,7 +254,7 @@ export default function BuyFromChineseWebsitesPage() {
             </div>
 
             {/* Hero Stats Grid */}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
               {[
                 { label: 'Platforms', value: '1688, Alibaba, Taobao, DHGate, Pinduoduo...', icon: Globe2 },
                 { label: 'Best for', value: 'Product links, samples, resale stock', icon: PackageCheck },
