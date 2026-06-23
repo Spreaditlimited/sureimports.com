@@ -9,7 +9,7 @@ import {
   VideoIcon,
   ExternalLink,
   PlayCircle,
-  Bookmark,
+  ClipboardList,
   Globe,
   X,
 } from 'lucide-react';
@@ -140,8 +140,8 @@ export default function Procurement() {
                   variant="ghost"
                   className="flex-1 sm:flex-none text-slate-400 hover:text-white hover:bg-slate-800 h-12 px-5 rounded-xl"
                 >
-                  <Bookmark className="mr-2 h-4 w-4" />
-                  <span className="text-sm">Saved</span>
+                  <ClipboardList className="mr-2 h-4 w-4" />
+                  <span className="text-sm">My Orders</span>
                 </Button>
               </div>
             </div>
