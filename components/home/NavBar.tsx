@@ -21,6 +21,7 @@ import {
   DollarSign,
   Tags,
   Smartphone,
+  Laptop,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -84,6 +85,13 @@ const MENU_ITEMS = {
       icon: Gift,
       desc: 'Branded gift sourcing and bulk customization',
       color: 'from-amber-400 to-orange-500',
+    },
+    {
+      title: 'Laptops for Business',
+      href: '/laptops-for-business',
+      icon: Laptop,
+      desc: 'Bulk laptop sourcing for teams, schools and resellers',
+      color: 'from-slate-600 to-slate-900',
     },
     {
       title: 'LineScout',

@@ -67,6 +67,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${baseUrl}/laptops-for-business`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/tools/air-vs-sea-calculator`,
       lastModified: currentDate,
       changeFrequency: 'monthly',
@@ -141,6 +147,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: {
         blogPublished: true,
         xStaus: 'active',
+        AND: [{ OR: [{ createdAt: null }, { createdAt: { lte: new Date() } }] }],
       },
       select: {
         blogSlug: true,

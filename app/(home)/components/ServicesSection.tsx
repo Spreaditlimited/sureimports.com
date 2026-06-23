@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Search, Gift, Ship, ShoppingCart, ArrowRight } from 'lucide-react';
+import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface ServicesSectionProps {
@@ -30,6 +30,13 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
       desc: 'Order premium branded products for your team, partners, and clients. We source, customize, and deliver high-quality corporate sourcing projects tailored to your brand.',
       tags: ['Branded Gifts', 'Bulk Orders', 'Custom Packaging'],
       href: '/corporate-gifts',
+    },
+    {
+      title: 'Laptops for Business',
+      icon: Laptop,
+      desc: 'Source tested laptops from China for staff, schools, startups, resellers, and business teams with supplier checks, inspection, and delivery support.',
+      tags: ['Bulk Laptops', 'Inspection', 'Business Procurement'],
+      href: '/laptops-for-business',
     },
     {
       title: 'Buy Gadgets from China',
@@ -83,7 +90,7 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
               
               <Button
                 onClick={() => {
-                  router.push('/auth/login');
+                  router.push(service.href || '/auth/login');
                 }}
                 variant="ghost"
                 className="w-fit p-0 text-brand-orange-500 hover:bg-transparent hover:text-brand-orange-600 dark:hover:text-brand-orange-400"

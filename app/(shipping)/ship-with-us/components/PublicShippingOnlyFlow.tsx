@@ -187,61 +187,41 @@ export default function PublicShippingOnlyFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Hero Header - Corrected to Brand Slate and Indigo */}
-      <section className="relative overflow-hidden bg-slate-900 pb-24 pt-48 text-white">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-500/10 blur-[120px]" />
-        </div>
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-400/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-400">
-            <Ship className="h-3.5 w-3.5" /> Self-Procured Logistics
-          </div>
-          <h1 className="max-w-4xl text-4xl font-black tracking-tight sm:text-5xl lg:text-7xl leading-[1.1]">
-            Already have a supplier? <br />
-            <span className="text-indigo-400">We handle the rest.</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg font-medium text-slate-300">
-            Send your goods to our China warehouse. We verify, consolidate, and ship to your doorstep with full tracking.
-          </p>
-        </div>
-      </section>
-
+    <div className="bg-transparent">
       {/* Main Grid */}
-      <section className="relative z-20 mx-auto -mt-12 max-w-7xl px-4 pb-24 sm:px-6 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-12">
+      <section className="w-full">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)] 2xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start">
           
           {/* Form Side */}
-          <div className="space-y-6 lg:col-span-8">
+          <div className="space-y-6">
             
             {/* 1. Contact */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
-              <div className="mb-8 flex items-center gap-4 border-b border-slate-100 pb-6 dark:border-slate-800">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                  <User className="h-6 w-6" />
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  <User className="h-5 w-5" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">1. Contact Information</h2>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Personal details for tracking & alerts.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Personal details for tracking and alerts.</p>
                 </div>
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">First Name</label>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
                   <Input placeholder="John" value={account.firstName} onChange={(e) => setAccount(p => ({ ...p, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Last Name</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
                   <Input placeholder="Doe" value={account.lastName} onChange={(e) => setAccount(p => ({ ...p, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Email Address</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
                   <Input type="email" placeholder="john@company.com" value={account.email} onChange={(e) => setAccount(p => ({ ...p, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">WhatsApp Number</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">WhatsApp Number</label>
                   <Input
                     placeholder="+234..."
                     value={request.whatsappNumber}
@@ -257,24 +237,24 @@ export default function PublicShippingOnlyFlow() {
             </div>
 
             {/* 2. Shipment details */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
-              <div className="mb-8 flex items-center gap-4 border-b border-slate-100 pb-6 dark:border-slate-800">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
-                  <Globe className="h-6 w-6" />
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+                  <Globe className="h-5 w-5" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-slate-900 dark:text-white">2. Shipment Particulars</h2>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">What are we expecting at the warehouse?</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">What are we expecting at the warehouse?</p>
                 </div>
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Name on Shipment</label>
+              <div className="grid gap-5 sm:grid-cols-2">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Name on Shipment</label>
                   <Input placeholder="Package label name" value={request.shippingName} onChange={(e) => setRequest(p => ({ ...p, shippingName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Destination</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination</label>
                   <select
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm shadow-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:focus:ring-slate-300"
                     value={request.shippingTo}
@@ -289,8 +269,8 @@ export default function PublicShippingOnlyFlow() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500">Shipping Mode</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Mode</label>
                   <select
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm shadow-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:focus:ring-slate-300"
                     value={request.shippingPlan}
@@ -306,12 +286,12 @@ export default function PublicShippingOnlyFlow() {
                   </select>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 italic flex items-center gap-1"><Weight className="h-3 w-3" /> Est. Gross Weight (kg)</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Weight className="h-3 w-3" /> Est. Gross Weight (kg)</label>
                   <Input placeholder="e.g. 15" value={request.grossWeight} onChange={(e) => setRequest(p => ({ ...p, grossWeight: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 italic flex items-center gap-1"><Hash className="h-3 w-3" /> Tracking ID (Optional)</label>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Hash className="h-3 w-3" /> Tracking ID (Optional)</label>
                   <Input placeholder="Supplier's tracking number" value={request.trackingNumber} onChange={(e) => setRequest(p => ({ ...p, trackingNumber: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
               </div>
@@ -327,7 +307,7 @@ export default function PublicShippingOnlyFlow() {
                     key={s.key}
                     type="button"
                     onClick={() => setRequest(p => ({ ...p, [s.key]: !p[s.key as keyof typeof p] }))}
-                    className={`flex flex-col items-center justify-center gap-3 rounded-2xl border p-5 transition-all active:scale-95 ${
+                    className={`flex min-h-[112px] flex-col items-center justify-center gap-3 rounded-2xl border p-4 transition-all active:scale-95 ${
                       request[s.key as keyof typeof request]
                         ? 'border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
                         : 'border-slate-100 bg-slate-50 text-slate-500 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400'
@@ -339,8 +319,8 @@ export default function PublicShippingOnlyFlow() {
                 ))}
               </div>
 
-              <div className="mt-8 space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-widest text-slate-500 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Expected Shipment (Notes)</label>
+              <div className="mt-8 space-y-1.5">
+                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Expected Shipment (Notes)</label>
                 <Textarea 
                   placeholder="What's inside? Batteries, liquids, powders? Please be detailed." 
                   value={request.expectedShipments}
@@ -352,11 +332,11 @@ export default function PublicShippingOnlyFlow() {
           </div>
 
           {/* Sticky Summary - Corrected to Brand Indigo */}
-          <div className="lg:col-span-4 lg:sticky lg:top-8">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-              <div className="mb-8 flex items-center gap-3">
-                <FileText className="h-5 w-5 text-indigo-500" />
-                <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">Summary</h3>
+          <div className="space-y-6 xl:sticky xl:top-28">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-6">
+              <div className="mb-6 flex items-center gap-2">
+                <FileText className="h-5 w-5 text-brand-orange-500" />
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">Shipment Summary</h3>
               </div>
 
               <div className="space-y-4 text-sm font-medium">

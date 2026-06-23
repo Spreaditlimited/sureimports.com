@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import { toast } from 'sonner';
 import {
   ArrowRight,
@@ -291,78 +290,16 @@ export default function PublicOrderFlow() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Premium Header */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-900 pb-24 pt-48 dark:border-slate-800 text-white">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
-        </div>
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-400/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange-400">
-            <ShoppingCart className="h-3.5 w-3.5" /> Buy From Chinese Websites
-          </div>
-          <h1 className="max-w-3xl text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl leading-[1.1]">
-            Build Your Order. <br/>
-            <span className="text-brand-orange-500">We Handle the Rest.</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-lg font-medium text-slate-300">
-            Submit your product links below. Once complete, we'll automatically generate your secure account and transition you to the payment dashboard.
-          </p>
-          <div className="mt-6">
-            <p className="text-xs font-black uppercase tracking-widest text-slate-400">
-              Supported Websites
-            </p>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              {[
-                {
-                  src: '/icons/storelogos/1688.png',
-                  alt: '1688',
-                  className:
-                    'h-7 w-auto object-contain invert brightness-200 contrast-125 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]',
-                },
-                {
-                  src: '/icons/storelogos/pinduoduo.png',
-                  alt: 'Pinduoduo',
-                  className:
-                    'h-7 w-auto object-contain invert brightness-200 contrast-125 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]',
-                },
-                {
-                  src: '/icons/storelogos/dhgate.png',
-                  alt: 'DHgate',
-                  className:
-                    'h-7 w-auto object-contain invert brightness-200 contrast-125 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]',
-                },
-                {
-                  src: '/icons/storelogos/vip.png',
-                  alt: 'VIP.com',
-                  className:
-                    'h-7 w-auto object-contain invert brightness-200 contrast-125 drop-shadow-[0_2px_4px_rgba(0,0,0,0.55)]',
-                },
-              ].map((site) => (
-                <Image
-                  key={site.src}
-                  src={site.src}
-                  alt={site.alt}
-                  width={72}
-                  height={28}
-                  className={site.className}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
+    <div className="bg-transparent">
       {/* Main Flow Content */}
-      <section className="mx-auto max-w-7xl px-4 pb-24 sm:px-6 lg:px-8 -mt-10 relative z-20">
-        <div className="grid gap-8 lg:grid-cols-12 lg:items-start">
+      <section className="w-full">
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)] 2xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start">
           
-          {/* LEFT COLUMN: Data Entry (8 cols) */}
-          <div className="lg:col-span-8 space-y-6">
+          {/* LEFT COLUMN: Data Entry */}
+          <div className="space-y-6">
             
             {/* Step 1: Account Details */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
               <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                   <User className="h-5 w-5" />
@@ -394,7 +331,7 @@ export default function PublicOrderFlow() {
             </div>
 
             {/* Step 2: Shipping Details */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
               <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                   <Globe className="h-5 w-5" />
@@ -484,7 +421,7 @@ export default function PublicOrderFlow() {
             </div>
 
             {/* Step 3: Add Products */}
-            <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
               <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
                   <Package className="h-5 w-5" />
@@ -534,9 +471,9 @@ export default function PublicOrderFlow() {
 
           </div>
 
-          {/* RIGHT COLUMN: Order Summary (4 cols) */}
-          <div className="lg:col-span-4 lg:sticky lg:top-8 space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-8">
+          {/* RIGHT COLUMN: Order Summary */}
+          <div className="space-y-6 xl:sticky xl:top-28">
+            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-6">
               
               <h3 className="mb-6 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
                 <FileText className="h-5 w-5 text-brand-orange-500" /> Order Summary
