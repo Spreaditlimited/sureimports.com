@@ -8,6 +8,38 @@ const MEDIA_PUBLIC_URL =
   process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
   '';
 
+function resolveBlogImageUrl(imagePath: string | null): string {
+  if (!imagePath) return '/images/new/images/logo.png';
+
+  const media = imagePath.trim();
+
+  if (
+    media.startsWith('http://') ||
+    media.startsWith('https://') ||
+    media.startsWith('/')
+  ) {
+    return media;
+  }
+
+  const base = MEDIA_PUBLIC_URL.replace(/\/$/, '');
+
+  // Admin blog uploads may store only the generated public ID.
+  // Cloudinary can serve the asset by public ID when the admin folder is restored.
+  if (base && /^BLOG_[A-Z0-9]+$/.test(media)) {
+    return `${base}/admin-sureimports/blog/${media}`;
+  }
+
+  return base ? `${base}/${media.replace(/^\//, '')}` : media;
+}
+
+function getPublishedBlogWhere() {
+  return {
+    blogPublished: true,
+    xStaus: 'active',
+    AND: [{ OR: [{ createdAt: null }, { createdAt: { lte: new Date() } }] }],
+  };
+}
+
 // SEO metadata interface
 export interface BlogSEO {
   // General SEO
@@ -229,13 +261,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
   const readTime = Math.ceil(wordCount / 200);
 
   // Get image URL
-  const imageUrl = dbBlog.blogImage
-    ? dbBlog.blogImage.startsWith('http')
-      ? dbBlog.blogImage
-      : MEDIA_PUBLIC_URL
-        ? `${MEDIA_PUBLIC_URL.replace(/\/$/, '')}/${dbBlog.blogImage}`
-        : dbBlog.blogImage
-    : '/images/new/images/logo.png';
+  const imageUrl = resolveBlogImageUrl(dbBlog.blogImage);
 
   // Helper to construct media image URL - handles various path formats
   const getMediaImageUrl = (imagePath: string | null): string | undefined => {
@@ -310,10 +336,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
 export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
   try {
     const blogs = await prisma.blog.findMany({
-      where: {
-        blogPublished: true,
-        xStaus: 'active',
-      },
+      where: getPublishedBlogWhere(),
       include: {
         publisher: true,
         category: true,
@@ -340,10 +363,7 @@ export async function fetchPublishedBlogsLite(
       Number.isFinite(pageSize) && pageSize > 0
         ? Math.min(9, Math.floor(pageSize))
         : 9;
-    const where = {
-      blogPublished: true,
-      xStaus: 'active',
-    };
+    const where = getPublishedBlogWhere();
 
     const totalPosts = await prisma.blog.count({ where });
 
@@ -436,10 +456,7 @@ export async function fetchPublishedBlogsLite(
 export async function fetchPublishedBlogSlugs(): Promise<string[]> {
   try {
     const blogs = await prisma.blog.findMany({
-      where: {
-        blogPublished: true,
-        xStaus: 'active',
-      },
+      where: getPublishedBlogWhere(),
       select: {
         blogSlug: true,
         pidBlog: true,
@@ -463,8 +480,7 @@ export async function fetchRelatedBlogs(
   try {
     const blogs = await prisma.blog.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
+        ...getPublishedBlogWhere(),
         pidBlog: { not: excludeId },
         category: {
           is: {
@@ -493,9 +509,8 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
   try {
     const blog = await prisma.blog.findFirst({
       where: {
+        ...getPublishedBlogWhere(),
         OR: [{ blogSlug: slug }, { pidBlog: slug }],
-        blogPublished: true,
-        xStaus: 'active',
       },
       include: {
         publisher: true,
@@ -516,8 +531,7 @@ export async function searchBlogs(query: string): Promise<BlogPost[]> {
   try {
     const blogs = await prisma.blog.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
+        ...getPublishedBlogWhere(),
         OR: [
           { blogTitle: { contains: query } },
           { blogContent: { contains: query } },
@@ -546,8 +560,7 @@ export async function fetchBlogsByTag(tag: string): Promise<BlogPost[]> {
   try {
     const blogs = await prisma.blog.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
+        ...getPublishedBlogWhere(),
         blogExt2: { contains: tag },
       },
       include: {
@@ -572,8 +585,7 @@ export async function fetchBlogsByCategory(
   try {
     const blogs = await prisma.blog.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
+        ...getPublishedBlogWhere(),
         category: { is: { categoryName: category } },
       },
       include: {
@@ -596,8 +608,7 @@ export async function fetchAllTags(): Promise<string[]> {
   try {
     const blogs = await prisma.blog.findMany({
       where: {
-        blogPublished: true,
-        xStaus: 'active',
+        ...getPublishedBlogWhere(),
         blogExt2: { not: null },
       },
       select: {
