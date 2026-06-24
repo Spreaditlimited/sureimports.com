@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -27,6 +26,7 @@ import {
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/app/(home)/components/Footer';
+import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import CorporateGiftsClient from './CorporateGiftsClient';
 
@@ -74,36 +74,6 @@ export const metadata: Metadata = {
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
-
-const clients = [
-  {
-    name: 'Moppet',
-    src: '/Moppet.PNG',
-    frameClass: 'h-20 w-[190px] sm:h-24 sm:w-[220px] lg:h-24 lg:w-[230px] xl:h-28 xl:w-[280px]',
-    imageClass: 'object-cover object-center',
-  },
-  {
-    name: 'Microware',
-    src: '/Microware_dark.PNG',
-    frameClass: 'h-20 w-[210px] sm:h-24 sm:w-[240px] lg:h-24 lg:w-[250px] xl:h-28 xl:w-[310px]',
-    imageClass: 'object-cover object-center',
-  },
-  {
-    name: 'Sterling',
-    src: '/Sterling.PNG',
-    frameClass: 'h-20 w-[190px] sm:h-24 sm:w-[220px] lg:h-24 lg:w-[230px] xl:h-28 xl:w-[280px]',
-    imageClass: 'object-cover object-center',
-  },
-  {
-    name: 'CafeOne',
-    src: '/cafe-one-dark-transparent.png',
-    frameClass: 'h-20 w-[170px] sm:h-24 sm:w-[190px] lg:h-24 lg:w-[200px] xl:h-28 xl:w-[240px]',
-    imageClass: 'object-cover object-center',
-  },
-];
-
-const marqueeClients = [...clients, ...clients];
-const logoSlotClass = 'flex w-[280px] shrink-0 items-center justify-center';
 
 const productCategories = [
   {
@@ -283,20 +253,20 @@ export default function CorporateGiftsPage() {
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
-          <div className="relative mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8">
-            <div>
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-4xl flex-col items-center">
+              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
                 <Briefcase className="h-4 w-4" />
                 Corporate Sourcing
               </div>
-              <h1 className="max-w-3xl text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
+              <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
                 Corporate gifts and bulk products <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">sourced from China.</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
                 Sure Imports helps Nigerian businesses source branded gifts, promotional items, and staff kits. We handle supplier checks, branding, inspection, and door-to-door delivery.
               </p>
               
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <a
                   href="#corporate-gifts-form"
                   className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
@@ -313,80 +283,11 @@ export default function CorporateGiftsPage() {
                 </Link>
               </div>
             </div>
-
-            {/* Hero Stats Grid */}
-            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
-              {[
-                { label: 'Best for', value: 'Branded gifts & staff kits', icon: Gift },
-                { label: 'Built for', value: 'Companies, schools & agencies', icon: ShieldCheck },
-                { label: 'Handled', value: 'Sourcing, branding & logistics', icon: Truck },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="group flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:bg-white/[0.06] hover:border-brand-orange-500/30"
-                >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-orange-500/20 text-brand-orange-400 transition-colors group-hover:bg-brand-orange-500 group-hover:text-white">
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      {stat.label}
-                    </p>
-                    <p className="mt-1 text-base font-bold text-white">{stat.value}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
 
-          <div className="relative mx-auto mt-14 max-w-[1440px] px-4 pt-6 sm:mt-16 sm:px-6 sm:pt-8 lg:mt-20 lg:px-8 lg:pt-10">
-            <p className="mb-8 text-center text-xs font-bold uppercase tracking-widest text-slate-500">
-              Trusted by organizations across Nigeria
-            </p>
-
-            <div className="-mx-4 overflow-hidden sm:-mx-6 lg:hidden">
-              <div className="mobile-logo-marquee flex w-max items-center gap-0 px-4 sm:px-6">
-                {marqueeClients.map((client, index) => (
-                  <div
-                    key={`${client.name}-${index}`}
-                    className={logoSlotClass}
-                  >
-                    <div className={`relative overflow-hidden ${client.frameClass}`}>
-                      <Image
-                        src={client.src}
-                        alt={client.name}
-                        fill
-                        sizes="280px"
-                        className={client.imageClass}
-                        quality={100}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="hidden w-full grid-cols-4 place-items-center gap-5 lg:grid xl:gap-6">
-              {clients.map((client) => (
-                <div
-                  key={client.name}
-                  className="flex w-full items-center justify-center"
-                >
-                  <div className={`relative max-w-full overflow-hidden ${client.frameClass}`}>
-                    <Image
-                      src={client.src}
-                      alt={client.name}
-                      fill
-                      sizes="25vw"
-                      className={client.imageClass}
-                      quality={100}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </section>
+
+        <TrustedOrganizations />
 
         {/* --- CATEGORIES BENTO --- */}
         <section className="py-20 md:py-28">

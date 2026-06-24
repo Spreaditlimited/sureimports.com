@@ -225,20 +225,20 @@ export default function ShipWithUsPage() {
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
-          <div className="relative mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:px-8">
-            <div>
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+            <div className="mx-auto flex max-w-4xl flex-col items-center">
+              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
                 <Ship className="h-4 w-4" />
                 Shipping-only logistics
               </div>
-              <h1 className="max-w-3xl text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
+              <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
                 Ship goods from China to Nigeria <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">after buying.</span>
               </h1>
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
                 Already bought goods from 1688, Alibaba, Taobao or a private Chinese supplier? Send them to our China warehouse and let Sure Imports handle shipping, consolidation, and delivery.
               </p>
               
-              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <a
                   href="#start-shipment"
                   className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
@@ -254,30 +254,6 @@ export default function ShipWithUsPage() {
                   Compare Air vs Sea
                 </Link>
               </div>
-            </div>
-
-            {/* Hero Stats Grid */}
-            <div className="hidden gap-4 sm:grid sm:grid-cols-2 lg:grid-cols-1">
-              {[
-                { label: 'Best for', value: 'Goods already bought', icon: PackageCheck },
-                { label: 'Options', value: 'Consolidation & tracking', icon: ShieldCheck },
-                { label: 'Routes', value: 'China warehouse to destination', icon: Truck },
-              ].map((stat) => (
-                <div
-                  key={stat.label}
-                  className="group flex items-center gap-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md transition-all hover:bg-white/[0.06] hover:border-brand-orange-500/30"
-                >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand-orange-500/20 text-brand-orange-400 transition-colors group-hover:bg-brand-orange-500 group-hover:text-white">
-                    <stat.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      {stat.label}
-                    </p>
-                    <p className="mt-1 text-base font-bold text-white">{stat.value}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>

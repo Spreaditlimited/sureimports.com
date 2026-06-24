@@ -8,6 +8,7 @@ import { AuthProvider } from '@/app/context/AuthContext';
 import { Suspense } from 'react';
 import { FacebookPixel } from '@/components/FacebookPixel';
 import { Analytics } from '@/components/GoogleAnalytics';
+import LeadCapturePopup from '@/components/lead-capture/LeadCapturePopup';
 import Loading from './dashboard/loading';
 import LiveChat from '@/components/LiveChat';
 import { JsonLdScript } from '@/components/seo/JsonLd';
@@ -173,6 +174,7 @@ export default async function RootLayout({
 
               {children}
 
+              <LeadCapturePopup />
               <LiveChat />
               <Script
                 src="https://checkout.flutterwave.com/v3.js"
