@@ -71,7 +71,9 @@ function getSafeLoginRedirect(redirectCandidate: string): string {
       pathname === '/shop/checkout' &&
       searchParams.get('resumeCheckout') === '1';
 
-    if (isDashboardPath || isShopCheckoutResume) {
+    const isIntelligencePath = pathname.startsWith('/intelligence');
+
+    if (isDashboardPath || isShopCheckoutResume || isIntelligencePath) {
       return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     }
   } catch {
@@ -118,6 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const shouldHydrateAuth =
       pathname.startsWith('/dashboard') ||
+      pathname.startsWith('/intelligence') ||
       pathname.startsWith('/auth') ||
       pathname === '/login' ||
       pathname.startsWith('/shop/checkout');

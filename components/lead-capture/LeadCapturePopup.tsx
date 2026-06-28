@@ -61,7 +61,9 @@ function getAttribution(pathname: string) {
     utm_term: getParam('utm_term'),
     fbclid: getParam('fbclid'),
     first_seen_at: window.localStorage.getItem(FIRST_SEEN_KEY),
-    dismiss_count: Number(window.localStorage.getItem(DISMISS_COUNT_KEY) || '0'),
+    dismiss_count: Number(
+      window.localStorage.getItem(DISMISS_COUNT_KEY) || '0',
+    ),
   };
 }
 
@@ -88,7 +90,8 @@ export default function LeadCapturePopup() {
 
     if (typeof window === 'undefined') return;
 
-    const hasSubscribed = window.localStorage.getItem(SUBSCRIBED_KEY) === 'true';
+    const hasSubscribed =
+      window.localStorage.getItem(SUBSCRIBED_KEY) === 'true';
     const dismissedThisSession =
       window.sessionStorage.getItem(SESSION_DISMISSED_KEY) === 'true';
 
@@ -225,8 +228,7 @@ export default function LeadCapturePopup() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[80] px-4 pb-4 sm:bottom-6 sm:left-auto sm:right-6 sm:w-[380px] sm:px-0 sm:pb-0">
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 sm:p-7 shadow-2xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900">
-        
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900 sm:p-7">
         {/* Subtle top indicator bar */}
         <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-orange-500/80" />
 
@@ -234,28 +236,28 @@ export default function LeadCapturePopup() {
         <button
           type="button"
           onClick={closePopup}
-          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
+          className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
 
         {hasSubmitted ? (
-          <div className="flex min-h-[220px] flex-col justify-center text-center items-center py-4">
+          <div className="flex min-h-[220px] flex-col items-center justify-center py-4 text-center">
             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
               <CheckCircle2 className="h-5 w-5" />
             </div>
             <h2 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white">
               {successTitle}
             </h2>
-            <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400 max-w-[260px]">
+            <p className="mt-2 max-w-[260px] text-xs leading-relaxed text-slate-500 dark:text-slate-400">
               {successMessage}
             </p>
           </div>
         ) : (
           <>
             {/* Context Badge */}
-            <div className="text-[11px] font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400 mb-2">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
               Weekly Dispatch
             </div>
 
@@ -273,14 +275,14 @@ export default function LeadCapturePopup() {
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
                   placeholder="First name"
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-900 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-brand-orange-500/40"
+                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
                 />
                 <Input
                   type="email"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="Email address"
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-900 placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-950 dark:text-white focus-visible:ring-brand-orange-500/40"
+                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-900 placeholder:text-slate-400 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-950 dark:text-white"
                 />
               </div>
 
@@ -301,12 +303,15 @@ export default function LeadCapturePopup() {
             </form>
 
             {/* Integrated, Elegant Sign-off */}
-            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <div className="mt-5 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-800">
               <span className="text-[10px] tracking-wide text-slate-400 dark:text-slate-500">
                 Zero spam. Value only.
               </span>
-              <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400 italic">
-                — Tochukwu Nkwocha, <span className="not-italic text-[9px] uppercase tracking-wider font-bold opacity-70">CEO</span>
+              <span className="text-[10px] font-medium italic text-slate-500 dark:text-slate-400">
+                — Tochukwu Nkwocha,{' '}
+                <span className="text-[9px] font-bold uppercase not-italic tracking-wider opacity-70">
+                  CEO
+                </span>
               </span>
             </div>
           </>

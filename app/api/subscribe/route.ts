@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
+import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
 
 const DEFAULT_SEGMENT_ID = '67699403ee348d7f8cb68f3a';
@@ -30,6 +31,10 @@ interface SubscriberData {
   fbp?: string | null;
   fbc?: string | null;
   pageUrl?: string | null;
+  lead_magnet_slug?: string | null;
+  lead_magnet_title?: string | null;
+  lead_magnet_download_url?: string | null;
+  offer_cta?: string | null;
 }
 
 function getIpAddress(request: Request) {
@@ -58,6 +63,25 @@ function isAlreadySubscribedResponse(status: number, responseBody: string) {
   return /already|exists|exist|duplicate|previously subscribed|subscriber.+email/i.test(
     responseBody,
   );
+}
+
+async function ensureLeadMagnetLeadColumns() {
+  const statements = [
+    'ALTER TABLE marketing_leads ADD COLUMN leadMagnetSlug VARCHAR(255) NULL',
+    'ALTER TABLE marketing_leads ADD COLUMN leadMagnetTitle VARCHAR(255) NULL',
+    'ALTER TABLE marketing_leads ADD COLUMN leadMagnetDownloadUrl TEXT NULL',
+    'ALTER TABLE marketing_leads ADD COLUMN offerCta VARCHAR(120) NULL',
+  ];
+
+  for (const statement of statements) {
+    try {
+      await prisma.$executeRawUnsafe(statement);
+    } catch (error: any) {
+      if (error?.code !== 'P2010' && !/Duplicate column|ER_DUP_FIELDNAME/i.test(String(error?.message || ''))) {
+        throw error;
+      }
+    }
+  }
 }
 
 export async function POST(request: Request) {
@@ -91,6 +115,14 @@ export async function POST(request: Request) {
     }
 
     const cleanedSegmentIds = cleanSegmentIds(segment_ids);
+    const leadMagnetSlug = cleanString(body.lead_magnet_slug);
+    const leadMagnetTitle = cleanString(body.lead_magnet_title);
+    const leadMagnetDownloadUrl = cleanString(body.lead_magnet_download_url);
+    const offerCta = cleanString(body.offer_cta);
+
+    if (leadMagnetSlug || leadMagnetDownloadUrl) {
+      await ensureLeadMagnetLeadColumns();
+    }
 
     const response = await fetch('https://api.flodesk.com/v1/subscribers', {
       method: 'POST',
@@ -146,6 +178,10 @@ export async function POST(request: Request) {
             fbclid,
             fbp,
             fbc,
+            leadMagnetSlug,
+            leadMagnetTitle,
+            leadMagnetDownloadUrl,
+            offerCta,
             updatedAt
           ) VALUES (
             ${pidLead},
@@ -165,6 +201,10 @@ export async function POST(request: Request) {
             ${cleanString(body.fbclid)},
             ${cleanString(body.fbp)},
             ${cleanString(body.fbc)},
+            ${leadMagnetSlug},
+            ${leadMagnetTitle},
+            ${leadMagnetDownloadUrl},
+            ${offerCta},
             ${new Date()}
           )
         `,
@@ -205,9 +245,11 @@ export async function POST(request: Request) {
             fbc: body.fbc || null,
           },
           customData: {
-            content_name: 'Website Lead Capture Popup',
+            content_name: leadMagnetTitle || 'Website Lead Capture Popup',
             content_category: body.page_type || body.message_variant || 'site',
             source: body.source || 'lead_capture_popup',
+            lead_magnet_slug: leadMagnetSlug,
+            offer_cta: offerCta,
             page_type: body.page_type,
             pathname: body.pathname,
             referrer: body.referrer,
@@ -230,10 +272,31 @@ export async function POST(request: Request) {
       }
     }
 
+    if (leadMagnetDownloadUrl) {
+      try {
+        await xMail2({
+          xEmail: normalizedEmail,
+          xTitle: leadMagnetTitle || 'Your SureImports guide is ready',
+          xBodyTitle: leadMagnetTitle || 'Your guide is ready',
+          xBody1:
+            `Hello ${firstName},<br /><br />` +
+            `Here is the guide you requested from SureImports.<br /><br />` +
+            `${cleanString(body.lead_magnet_title) ? `<b>${cleanString(body.lead_magnet_title)}</b><br /><br />` : ''}` +
+            `You can download it right away using the button below.<br /><br />` +
+            `Next week, I will send you the first lesson in our practical China importation series.`,
+          xButtonTitle: 'Download the guide',
+          xButtonLink: leadMagnetDownloadUrl,
+        });
+      } catch (error) {
+        console.error('Lead magnet delivery email failed', error);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       alreadySubscribed,
       analyticsSaved,
+      leadMagnetDownloadUrl,
       message: alreadySubscribed
         ? 'This email is already subscribed.'
         : 'Subscription successful.',

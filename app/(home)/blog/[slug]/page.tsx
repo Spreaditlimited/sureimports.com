@@ -19,6 +19,8 @@ type PageProps = {
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateStaticParams() {
   const slugs = await fetchPublishedBlogSlugs();
   return slugs.map((slug) => ({ slug }));

@@ -40,6 +40,43 @@ function getPublishedBlogWhere() {
   };
 }
 
+function normalizeSearchQuery(query: string | undefined): string[] {
+  return String(query || '')
+    .toLowerCase()
+    .replace(/^https?:\/\/[^/]+\/blog\//, '')
+    .replace(/^\/?blog\//, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/[^a-z0-9\s]+/g, ' ')
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 2);
+}
+
+function buildPublishedBlogWhere(searchQuery?: string) {
+  const baseWhere = getPublishedBlogWhere();
+  const searchTerms = normalizeSearchQuery(searchQuery);
+
+  if (!searchTerms.length) return baseWhere;
+
+  return {
+    ...baseWhere,
+    AND: [
+      ...baseWhere.AND,
+      ...searchTerms.map((term) => ({
+        OR: [
+          { blogTitle: { contains: term } },
+          { blogSlug: { contains: term } },
+          { blogContent: { contains: term } },
+          { blogExt2: { contains: term } },
+          { blogBy: { contains: term } },
+          { category: { is: { categoryName: { contains: term } } } },
+          { publisher: { is: { publisherName: { contains: term } } } },
+        ],
+      })),
+    ],
+  };
+}
+
 // SEO metadata interface
 export interface BlogSEO {
   // General SEO
@@ -99,6 +136,15 @@ export interface BlogPost {
   image: string;
   slug: string;
   seo?: BlogSEO;
+  leadMagnet?: {
+    slug: string;
+    title: string;
+    offerHeadline?: string;
+    description?: string;
+    buttonText?: string;
+    bullets: string[];
+    recommendedCta?: string;
+  } | null;
 }
 
 export interface BlogListPost extends Omit<BlogPost, 'content'> {
@@ -124,6 +170,81 @@ function toLitePost(dbBlog: DbBlog): BlogListPost {
         ? transformed.excerpt
         : `Read insights from ${transformed.title}.`,
   };
+}
+
+function parseJsonArray(value: string | null): string[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((item): item is string => typeof item === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+async function getActiveLeadMagnet(pidBlog: string) {
+  try {
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS blog_lead_magnets (
+        id INT NOT NULL AUTO_INCREMENT,
+        pidMagnet VARCHAR(80) NOT NULL,
+        pidBlog VARCHAR(80) NOT NULL,
+        blogSlug VARCHAR(500) NULL,
+        slug VARCHAR(255) NOT NULL,
+        status VARCHAR(40) NOT NULL DEFAULT 'draft',
+        title VARCHAR(255) NOT NULL,
+        offerHeadline VARCHAR(255) NULL,
+        description TEXT NULL,
+        buttonText VARCHAR(120) NULL,
+        bulletsJson LONGTEXT NULL,
+        emailSubject VARCHAR(255) NULL,
+        deliveryMessage TEXT NULL,
+        pdfJson LONGTEXT NULL,
+        recommendedCta VARCHAR(120) NULL,
+        sourceQuery VARCHAR(700) NULL,
+        model VARCHAR(120) NULL,
+        createdAt DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+        updatedAt DATETIME NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY blog_lead_magnets_pidMagnet_key (pidMagnet),
+        UNIQUE KEY blog_lead_magnets_pidBlog_key (pidBlog),
+        UNIQUE KEY blog_lead_magnets_slug_key (slug)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    const rows = await prisma.$queryRaw<
+      Array<{
+        slug: string;
+        title: string;
+        offerHeadline: string | null;
+        description: string | null;
+        buttonText: string | null;
+        bulletsJson: string | null;
+        recommendedCta: string | null;
+      }>
+    >`
+      SELECT slug, title, offerHeadline, description, buttonText, bulletsJson, recommendedCta
+      FROM blog_lead_magnets
+      WHERE pidBlog = ${pidBlog}
+        AND status IN ('draft', 'active')
+      LIMIT 1
+    `;
+    const row = rows[0];
+    if (!row) return null;
+    return {
+      slug: row.slug,
+      title: row.title,
+      offerHeadline: row.offerHeadline || undefined,
+      description: row.description || undefined,
+      buttonText: row.buttonText || undefined,
+      bullets: parseJsonArray(row.bulletsJson),
+      recommendedCta: row.recommendedCta || undefined,
+    };
+  } catch (error) {
+    console.error('Lead magnet lookup failed', error);
+    return null;
+  }
 }
 
 // Database publisher model
@@ -211,7 +332,7 @@ function parseSEOData(blogExt2: string | null): BlogSEO {
     return {
       // General SEO
       focusKeyword: parsed.focusKeyword || undefined,
-      seoTitle: parsed.seoTitle || undefined,
+      seoTitle: parsed.seoTitle || parsed.metaTitle || undefined,
       metaDescription: parsed.metaDescription || undefined,
       keywords: Array.isArray(parsed.keywords) ? parsed.keywords : [],
       // Open Graph
@@ -356,6 +477,7 @@ export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
 export async function fetchPublishedBlogsLite(
   page = 1,
   pageSize = 9,
+  searchQuery = '',
 ): Promise<BlogListPageResult> {
   try {
     const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
@@ -363,7 +485,7 @@ export async function fetchPublishedBlogsLite(
       Number.isFinite(pageSize) && pageSize > 0
         ? Math.min(9, Math.floor(pageSize))
         : 9;
-    const where = getPublishedBlogWhere();
+    const where = buildPublishedBlogWhere(searchQuery);
 
     const totalPosts = await prisma.blog.count({ where });
 
@@ -520,7 +642,9 @@ export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
 
     if (!blog) return null;
 
-    return transformBlogPost(blog as DbBlog);
+    const post = transformBlogPost(blog as DbBlog);
+    post.leadMagnet = await getActiveLeadMagnet(post.id);
+    return post;
   } catch (error) {
     console.error('Error fetching blog:', error);
     return null;

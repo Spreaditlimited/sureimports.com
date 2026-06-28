@@ -60,16 +60,18 @@ const blogBreadcrumbSchema = generateBreadcrumbSchema([
 ]);
 
 type PageProps = {
-  searchParams: Promise<{ tag?: string; page?: string }>;
+  searchParams: Promise<{ tag?: string; page?: string; q?: string }>;
 };
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const { tag, page } = await searchParams;
+  const { tag, page, q } = await searchParams;
   const currentPage = Number.parseInt(page || '1', 10);
+  const searchQuery = typeof q === 'string' ? q.trim() : '';
   const { posts, featuredPosts, totalPages, totalPosts, page: resolvedPage } =
     await fetchPublishedBlogsLite(
       Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1,
       9,
+      searchQuery,
     );
 
   return (
@@ -80,6 +82,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
         <BlogList
           blogPosts={posts}
           featuredPosts={featuredPosts}
+          initialSearchQuery={searchQuery}
           initialTag={tag}
           currentPage={resolvedPage}
           totalPages={totalPages}

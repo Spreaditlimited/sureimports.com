@@ -5,8 +5,6 @@ import Image from 'next/image';
 import { PaystackButton } from 'react-paystack';
 import '@/app/styles/App.css';
 import { useRouter } from 'next/navigation';
-import sendEmail from '@/lib/email/config/sendEmail';
-import mailTemplate from '@/lib/email/temp/mailTemplate';
 import xMail from '@/lib/email/xMail';
 
 interface Props {

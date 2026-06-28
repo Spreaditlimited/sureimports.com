@@ -10,6 +10,7 @@ import {
   Package2,
   Video,
   ReceiptText,
+  Database,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import { BsTiktok, BsYoutube } from 'react-icons/bs';
@@ -55,6 +56,12 @@ export const NavItems: NavItem[] = [
     title: 'Corporate Sourcing',
     icon: Package2,
     href: '/dashboard/corporate-gifts',
+    color: 'text-white',
+  },
+  {
+    title: 'Supplier Intelligence',
+    icon: Database,
+    href: '/dashboard/intelligence',
     color: 'text-white',
   },
   {
@@ -150,6 +157,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'Corporate Sourcing',
     icon: Package2,
     href: '/dashboard/corporate-gifts',
+    color: 'text-white',
+  },
+  {
+    title: 'Supplier Intelligence',
+    icon: Database,
+    href: '/dashboard/intelligence',
     color: 'text-white',
   },
   {

@@ -22,6 +22,8 @@ import {
   Tags,
   Smartphone,
   Laptop,
+  BookOpen,
+  Database,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -52,6 +54,12 @@ import { useAuth } from '@/app/context/AuthContext';
 const MENU_ITEMS = {
   videos: [
     {
+      title: 'Import Hub',
+      href: '/import-from-china-to-nigeria',
+      icon: BookOpen,
+      desc: 'Start here for Nigeria-focused import guides',
+    },
+    {
       title: 'YouTube',
       href: 'https://youtube.com/@sureimports?si=sAunkYlz_EUyT5nM',
       icon: Youtube,
@@ -65,6 +73,13 @@ const MENU_ITEMS = {
     },
   ],
   services: [
+    {
+      title: 'Supplier Intelligence',
+      href: '/supplier-intelligence',
+      icon: Database,
+      desc: 'Verified supplier research for Nigerian importers',
+      color: 'from-slate-700 to-slate-950',
+    },
     {
       title: 'Buy from Chinese Websites',
       href: '/buy-from-chinese-websites',
@@ -325,6 +340,23 @@ export default function Navbar() {
 
                 <NavigationMenuItem>
                   <Link
+                    href="/import-from-china-to-nigeria"
+                    className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                      pathname === '/import-from-china-to-nigeria'
+                        ? useLightNavbar
+                          ? 'bg-slate-900/10 text-slate-900'
+                          : 'bg-white/10 text-white'
+                        : useLightNavbar
+                          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                          : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    Import Hub
+                  </Link>
+                </NavigationMenuItem>
+
+                <NavigationMenuItem>
+                  <Link
                     href="/blog"
                     className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
                       pathname?.startsWith('/blog')
@@ -441,6 +473,14 @@ export default function Navbar() {
                     </SheetClose>
                     <SheetClose asChild>
                       <Link
+                        href="/import-from-china-to-nigeria"
+                        className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
+                      >
+                        Import Hub
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link
                         href="/blog"
                         className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
                       >
@@ -531,8 +571,16 @@ export default function Navbar() {
                             <SheetClose asChild key={item.title}>
                               <Link
                                 href={item.href}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                target={
+                                  item.href.startsWith('http')
+                                    ? '_blank'
+                                    : undefined
+                                }
+                                rel={
+                                  item.href.startsWith('http')
+                                    ? 'noopener noreferrer'
+                                    : undefined
+                                }
                                 className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-white"
                               >
                                 <item.icon className="h-5 w-5" /> {item.title}

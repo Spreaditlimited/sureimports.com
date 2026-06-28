@@ -80,6 +80,8 @@ export default function Footer() {
           <div>
             <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-white">Services</h3>
             <ul className="space-y-3 text-sm">
+              <li><button onClick={() => router.push('/import-from-china-to-nigeria')} className="hover:text-white transition-colors">Import Hub</button></li>
+              <li><button onClick={() => router.push('/supplier-intelligence')} className="hover:text-white transition-colors">Supplier Intelligence</button></li>
               <li><button onClick={() => router.push('/buy-from-chinese-websites')} className="hover:text-white transition-colors">Buy From Chinese Websites</button></li>
               <li><button onClick={() => router.push('/ship-with-us')} className="hover:text-white transition-colors">Ship With Us</button></li>
               <li><button onClick={() => router.push('/shipping-rate')} className="hover:text-white transition-colors">Shipping Rates</button></li>

@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, type ComponentProps } from 'react';
+import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import {
   Search,
   Calendar,
@@ -24,7 +24,7 @@ import {
 import Image, { type StaticImageData } from 'next/image';
 import type { BlogListPost } from '../actions/blogActions';
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   Pagination,
   PaginationContent,
@@ -50,14 +50,42 @@ function getBlogPostsByCategory(
 }
 
 function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
-  const lowerQuery = query.toLowerCase();
-  return posts.filter(
-    (post) =>
-      post.title.toLowerCase().includes(lowerQuery) ||
-      post.excerpt.toLowerCase().includes(lowerQuery) ||
-      post.author.name.toLowerCase().includes(lowerQuery) ||
-      post.tags.some((tag) => tag.toLowerCase().includes(lowerQuery)),
-  );
+  const terms = normalizeSearchQuery(query);
+  if (!terms.length) return posts;
+
+  return posts.filter((post) => {
+    const searchableContent = normalizeSearchText(
+      [
+        post.title,
+        post.slug,
+        post.slug.replace(/-/g, ' '),
+        post.excerpt,
+        post.category,
+        post.author.name,
+        ...post.tags,
+      ].join(' '),
+    );
+
+    return terms.every((term) => searchableContent.includes(term));
+  });
+}
+
+function normalizeSearchText(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/^https?:\/\/[^/]+\/blog\//, '')
+    .replace(/^\/?blog\//, '')
+    .replace(/[-_]+/g, ' ')
+    .replace(/[^a-z0-9\s]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function normalizeSearchQuery(query: string): string[] {
+  return normalizeSearchText(query)
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter((term) => term.length >= 2);
 }
 
 // Lightweight image component that supports StaticImageData and provides a simple fallback
@@ -104,6 +132,7 @@ function ImageWithFallback({
 interface BlogListProps {
   blogPosts: BlogListPost[];
   featuredPosts: BlogListPost[];
+  initialSearchQuery?: string;
   initialTag?: string;
   currentPage: number;
   totalPages: number;
@@ -113,14 +142,16 @@ interface BlogListProps {
 export default function BlogList({
   blogPosts,
   featuredPosts,
+  initialSearchQuery = '',
   initialTag,
   currentPage,
   totalPages,
   totalPosts,
 }: BlogListProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedTag, setSelectedTag] = useState<string | null>(
     initialTag || null,
@@ -128,6 +159,35 @@ export default function BlogList({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>(
     'newest',
   );
+
+  useEffect(() => {
+    setSearchQuery(initialSearchQuery);
+  }, [initialSearchQuery]);
+
+  useEffect(() => {
+    const nextSearch = searchQuery.trim();
+    const currentSearch = searchParams?.get('q') || '';
+
+    if (nextSearch === currentSearch) return;
+
+    const timeoutId = window.setTimeout(() => {
+      const params = new URLSearchParams(searchParams?.toString() || '');
+      params.delete('page');
+
+      if (nextSearch) {
+        params.set('q', nextSearch);
+      } else {
+        params.delete('q');
+      }
+
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname || '/blog', {
+        scroll: false,
+      });
+    }, 350);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [pathname, router, searchParams, searchQuery]);
 
   // Handle tag click - filter posts by tag
   const handleTagClick = (tag: string, e: React.MouseEvent) => {
@@ -368,7 +428,7 @@ export default function BlogList({
                     <>
                       Found{' '}
                       <span className="font-black text-indigo-600 dark:text-indigo-400">
-                        {filteredPosts.length}
+                        {totalPosts}
                       </span>{' '}
                       articles for "
                       <span className="text-slate-900 dark:text-white">{searchQuery}</span>"
@@ -533,7 +593,7 @@ export default function BlogList({
                 ))}
               </div>
 
-              {searchQuery === '' && selectedCategory === 'All' && !selectedTag && totalPages > 1 && (
+              {selectedCategory === 'All' && !selectedTag && totalPages > 1 && (
                 <div className="mt-16 flex justify-center">
                   <Pagination>
                     <PaginationContent>

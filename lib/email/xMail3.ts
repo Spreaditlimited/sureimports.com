@@ -1,6 +1,7 @@
 'use server';
 import sendEmail from '@/lib/email/config/sendEmail';
-import mailTemplate from '@/lib/email/temp/mailTemplate3';
+import mailTemplate from '@/lib/email/temp/mailTemplate2';
+import { cleanLegacyEmailBody } from '@/lib/email/cleanBody';
 
 interface Props {
   xEmail: any;
@@ -18,12 +19,15 @@ export default async function xMail({
 }: Props) {
   let zTitle: string = xTitle;
   let zBodyTitle: any = xBodyTitle;
-  let zBody: any = xBody;
+  let zBody1: any = cleanLegacyEmailBody(xBody);
 
   const mail = mailTemplate({
     zTitle,
     zBodyTitle,
-    zBody,
+    zBody1,
+    zBody2: '',
+    zButtonTitle: '',
+    zButtonLink: '',
   }) as any;
 
   try {

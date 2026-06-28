@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import mailTemplate from '@/lib/email/temp/mailTemplate2';
 
 const transporter = nodemailer.createTransport({
   host: 'smtp.hostinger.com',
@@ -18,15 +19,25 @@ export async function sendEmail({
 }: {
   to: string;
   subject: string;
-  text: string;
+  text?: string;
   html?: string;
 }) {
+  const body = html || text || '';
+  const wrappedHtml = mailTemplate({
+    zTitle: subject,
+    zBodyTitle: subject,
+    zBody1: body,
+    zBody2: '',
+    zButtonTitle: '',
+    zButtonLink: '',
+  }) as string;
+
   const mailOptions = {
     from: 'hello@sureimports.com',
     to,
     subject,
-    text,
-    html,
+    text: text || '',
+    html: wrappedHtml,
   };
 
   try {

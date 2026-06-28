@@ -10,7 +10,10 @@ import {
   Facebook,
   Instagram,
   CheckCircle2,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Mail,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -26,6 +29,171 @@ const XIcon = ({ className }: { className?: string }) => (
     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
   </svg>
 );
+
+const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
+  const magnet = post.leadMagnet;
+  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [downloadUrl, setDownloadUrl] = useState('');
+
+  if (!magnet) return null;
+
+  const computedDownloadUrl = `/api/lead-magnets/${encodeURIComponent(magnet.slug)}/download`;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
+
+    if (!firstName.trim()) {
+      setError('Please enter your first name.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.sureimports.com';
+      const urlWithEmail = `${origin}${computedDownloadUrl}?email=${encodeURIComponent(email.trim().toLowerCase())}&source=blog_lead_magnet`;
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          first_name: firstName.trim(),
+          segment_ids: ['67699403ee348d7f8cb68f3a'],
+          source: 'blog_lead_magnet',
+          message_variant: 'blog_lead_magnet',
+          page_type: 'blog',
+          page_url: typeof window !== 'undefined' ? window.location.href : null,
+          pathname: typeof window !== 'undefined' ? window.location.pathname : `/blog/${post.slug}`,
+          referrer: typeof document !== 'undefined' ? document.referrer || null : null,
+          lead_magnet_slug: magnet.slug,
+          lead_magnet_title: magnet.title,
+          lead_magnet_download_url: urlWithEmail,
+          offer_cta: magnet.recommendedCta || null,
+        }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(data?.error || 'Could not deliver the guide right now.');
+      setDownloadUrl(data?.leadMagnetDownloadUrl || urlWithEmail);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Could not deliver the guide right now.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="relative my-12 overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-6 shadow-2xl sm:p-10 lg:p-12">
+      {/* Subtle background glow */}
+      <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-brand-orange-500/10 blur-[80px]" />
+
+      <div className="relative mx-auto grid max-w-3xl gap-8">
+        {/* Left Column: Copy */}
+        <div className="space-y-6 text-left">
+          <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-400">
+            Free Import Guide
+          </div>
+
+          <div>
+            <h2 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
+              {magnet.offerHeadline || magnet.title}
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate-400">
+              {magnet.description}
+            </p>
+          </div>
+
+          {magnet.bullets.length > 0 && (
+            <ul className="grid gap-3 pt-2">
+              {magnet.bullets.slice(0, 5).map((item) => (
+                <li key={item} className="flex items-start gap-3 text-sm text-slate-300">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-400" />
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Right Column: Form / Success State */}
+        <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl sm:p-8">
+          {downloadUrl ? (
+            <div className="flex flex-col items-center justify-center space-y-5 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
+                <CheckCircle2 className="h-7 w-7" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">You're all set!</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-400">
+                  The guide has been sent to your email. You can also access it directly below.
+                </p>
+              </div>
+              <a
+                href={downloadUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600"
+              >
+                <Download className="h-4 w-4" />
+                Download Guide Now
+              </a>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-3">
+                <input
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
+                  placeholder="First name"
+                  required
+                />
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
+                  placeholder="Email address"
+                  type="email"
+                  required
+                />
+              </div>
+
+              {error && (
+                <p className="rounded-lg bg-red-500/10 px-3 py-2 text-xs font-medium text-red-400">
+                  {error}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                )}
+                {isSubmitting ? 'Sending guide...' : magnet.buttonText || 'Send me the guide'}
+              </button>
+
+              <p className="text-center text-[10px] font-medium tracking-wide text-slate-500">
+                Your information is secure. No spam.
+              </p>
+            </form>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
 
 // Publisher Social Links Component
 const PublisherSocialLinks = ({ publisher }: { publisher: BlogPublisher }) => {
@@ -209,6 +377,8 @@ export default function BlogDetail({
               </div>
             )}
           </div>
+
+          <BlogLeadMagnetCta post={post} />
 
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (

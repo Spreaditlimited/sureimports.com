@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
-import * as handlebars from 'handlebars';
-import { mailTemplate } from '@/lib/email/temp/mailTemplate';
+import mailTemplate from '@/lib/email/temp/mailTemplate2';
 
 export async function sendMail({
   to,
@@ -35,7 +34,14 @@ export async function sendMail({
       from: SMTP_EMAIL,
       to,
       subject,
-      html: body,
+      html: mailTemplate({
+        zTitle: subject,
+        zBodyTitle: subject,
+        zBody1: body,
+        zBody2: '',
+        zButtonTitle: '',
+        zButtonLink: '',
+      }) as string,
     });
     console.log(sendResult);
   } catch (error) {
@@ -44,10 +50,12 @@ export async function sendMail({
 }
 
 export function compileWelcomeTemplate(name: string, url: string) {
-  const template = handlebars.compile(mailTemplate);
-  const htmlBody = template({
-    name: name,
-    url: url,
-  });
-  return htmlBody;
+  return mailTemplate({
+    zTitle: 'Welcome to Sure Imports',
+    zBodyTitle: `Welcome, ${name}`,
+    zBody1: 'Your Sure Imports account is ready.',
+    zBody2: '',
+    zButtonTitle: 'Open Sure Imports',
+    zButtonLink: url,
+  }) as string;
 }

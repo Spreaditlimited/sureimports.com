@@ -90,7 +90,7 @@ export async function POST(request: Request) {
       const xEmail = userEmail as string;
       const xTitle = `Password Reset Successful!`;
       const xBodyTitle = `Password Reset Successful!`;
-      const xBody1 = `The Password has been successfuly reset.`;
+      const xBody1 = `Your password has been successfully reset.`;
       const xBody2 = `You can now login with the new password.`;
       const xButtonTitle = `Login`;
       const xButtonLink = process.env.ROOT_URL + `/auth/login`;

@@ -10,6 +10,8 @@
     "lint": "next lint",
     "backfill:media:dry": "DRY_RUN=true node scripts/media/backfill-r2-to-cloudinary.js",
     "backfill:media": "DRY_RUN=false node scripts/media/backfill-r2-to-cloudinary.js",
+    "blog:images": "node scripts/blog/generate-blog-feature-images.js",
+    "blog:images:dry": "node scripts/blog/generate-blog-feature-images.js --dry-run",
     "lint:fix": "next lint --fix",
     "lint:strict": "next lint '*/**/*.{js,jsx,ts,tsx}'",
     "prettier": "prettier --no-error-on-unmatched-pattern --write */**/*.{js,jsx,json,ts,tsx,scss,css,md}",
