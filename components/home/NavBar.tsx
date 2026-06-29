@@ -7,8 +7,6 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   Menu,
-  MonitorPlay,
-  Youtube,
   ShoppingCart,
   LogOut,
   Ship,
@@ -20,9 +18,7 @@ import {
   Zap,
   DollarSign,
   Tags,
-  Smartphone,
   Laptop,
-  BookOpen,
   CalendarClock,
   Database,
   type LucideIcon,
@@ -53,26 +49,6 @@ import {
 import { useAuth } from '@/app/context/AuthContext';
 
 const MENU_ITEMS = {
-  videos: [
-    {
-      title: 'Import Hub',
-      href: '/import-from-china-to-nigeria',
-      icon: BookOpen,
-      desc: 'Start here for Nigeria-focused import guides',
-    },
-    {
-      title: 'YouTube',
-      href: 'https://youtube.com/@sureimports?si=sAunkYlz_EUyT5nM',
-      icon: Youtube,
-      desc: 'Detailed tutorials and sourcing guides',
-    },
-    {
-      title: 'TikTok',
-      href: 'https://www.tiktok.com/@tochukwunkwocha',
-      icon: MonitorPlay,
-      desc: 'Quick tips and behind-the-scenes content',
-    },
-  ],
   services: [
     {
       title: 'Supplier Intelligence',
@@ -162,16 +138,53 @@ const MENU_ITEMS = {
       desc: 'Turn landed cost into selling price',
     },
   ],
-  shop: [
-    {
-      title: 'Shop',
-      href: '/shop',
-      icon: Smartphone,
-      desc: 'Phones and electronics at wholesale prices',
-      color: 'from-brand-orange-400 to-brand-orange-600',
-    },
-  ],
 };
+
+const TOP_LEVEL_NAV = [
+  {
+    type: 'link',
+    title: 'Home',
+    href: '/',
+    match: 'exact',
+  },
+  {
+    type: 'dropdown',
+    title: 'Services',
+    value: 'services',
+    items: MENU_ITEMS.services,
+    panelClassName: 'w-[600px]',
+  },
+  {
+    type: 'dropdown',
+    title: 'Tools',
+    value: 'tools',
+    items: MENU_ITEMS.tools,
+    panelClassName: 'w-[650px]',
+  },
+  {
+    type: 'link',
+    title: 'Import Hub',
+    href: '/import-from-china-to-nigeria',
+    match: 'exact',
+  },
+  {
+    type: 'link',
+    title: 'Blog',
+    href: '/blog',
+    match: 'prefix',
+  },
+  {
+    type: 'link',
+    title: 'Shop',
+    href: '/shop',
+    match: 'prefix',
+  },
+  {
+    type: 'cart',
+    title: 'Cart',
+    href: '/shop?openCart=1',
+  },
+] as const;
 
 type NavbarProps = {
   forceLightNavbar?: boolean;
@@ -211,6 +224,29 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
     event.preventDefault();
     window.dispatchEvent(new Event('open-shop-cart'));
   };
+
+  const isNavItemActive = (item: (typeof TOP_LEVEL_NAV)[number]) => {
+    if (item.type !== 'link' || !pathname) return false;
+    if (item.match === 'prefix') return pathname.startsWith(item.href);
+    return pathname === item.href;
+  };
+
+  const desktopNavLinkClass = (active = false) =>
+    `rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+      active
+        ? useLightNavbar
+          ? 'bg-slate-900/10 text-slate-900'
+          : 'bg-white/10 text-white'
+        : useLightNavbar
+          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+          : 'text-slate-300 hover:bg-white/10 hover:text-white'
+    }`;
+
+  const desktopDropdownClass = `rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
+    useLightNavbar
+      ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
+      : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
+  }`;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -286,139 +322,64 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
           <div className="hidden lg:block">
             <NavigationMenu>
               <NavigationMenuList className="gap-2">
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    asChild
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                      pathname === '/'
-                        ? useLightNavbar
-                          ? 'bg-slate-900/10 text-slate-900'
-                          : 'bg-white/10 text-white'
-                        : useLightNavbar
-                          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                          : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <Link href="/">Home</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                {TOP_LEVEL_NAV.map((item) => {
+                  if (item.type === 'dropdown') {
+                    return (
+                      <NavigationMenuItem key={item.title}>
+                        <NavigationMenuTrigger className={desktopDropdownClass}>
+                          {item.title}
+                        </NavigationMenuTrigger>
+                        <NavigationMenuContent>
+                          <ul
+                            className={`grid ${item.panelClassName} grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl`}
+                          >
+                            {item.items.map((child) => (
+                              <ListItem
+                                key={child.title}
+                                title={child.title}
+                                href={child.href}
+                                desc={child.desc}
+                                icon={child.icon}
+                                color={'color' in child ? child.color : undefined}
+                              />
+                            ))}
+                          </ul>
+                        </NavigationMenuContent>
+                      </NavigationMenuItem>
+                    );
+                  }
 
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger
-                    className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
-                      useLightNavbar
-                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
-                    }`}
-                  >
-                    Services
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[600px] grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl">
-                      {MENU_ITEMS.services.map((item) => (
-                        <ListItem
-                          key={item.title}
-                          title={item.title}
-                          href={item.href}
-                          desc={item.desc}
-                          icon={item.icon}
-                          color={item.color}
-                        />
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
+                  if (item.type === 'cart') {
+                    return (
+                      <NavigationMenuItem key={item.title}>
+                        <NavigationMenuLink
+                          asChild
+                          className={`relative ${desktopNavLinkClass(false)}`}
+                        >
+                          <Link href={item.href} onClick={handleCartNavClick}>
+                            <ShoppingCart className="h-5 w-5" />
+                            {cartCount > 0 && (
+                              <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
+                                {cartCount}
+                              </span>
+                            )}
+                          </Link>
+                        </NavigationMenuLink>
+                      </NavigationMenuItem>
+                    );
+                  }
 
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger
-                    className={`rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
-                      useLightNavbar
-                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
-                    }`}
-                  >
-                    Tools
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid w-[650px] grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl">
-                      {MENU_ITEMS.tools.map((item) => (
-                        <ListItem
-                          key={item.title}
-                          title={item.title}
-                          href={item.href}
-                          desc={item.desc}
-                          icon={item.icon}
-                        />
-                      ))}
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <Link
-                    href="/import-from-china-to-nigeria"
-                    className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                      pathname === '/import-from-china-to-nigeria'
-                        ? useLightNavbar
-                          ? 'bg-slate-900/10 text-slate-900'
-                          : 'bg-white/10 text-white'
-                        : useLightNavbar
-                          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                          : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    Import Hub
-                  </Link>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <Link
-                    href="/blog"
-                    className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                      pathname?.startsWith('/blog')
-                        ? useLightNavbar
-                          ? 'bg-slate-900/10 text-slate-900'
-                          : 'bg-white/10 text-white'
-                        : useLightNavbar
-                          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                          : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    Blog
-                  </Link>
-                </NavigationMenuItem>
-
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    asChild
-                    className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                      useLightNavbar
-                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <Link href="/shop">Shop</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    asChild
-                    className={`relative rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                      useLightNavbar
-                        ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                        : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <Link href="/shop?openCart=1" onClick={handleCartNavClick}>
-                      <ShoppingCart className="h-5 w-5" />
-                      {cartCount > 0 && (
-                        <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
-                          {cartCount}
-                        </span>
-                      )}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                  return (
+                    <NavigationMenuItem key={item.title}>
+                      <NavigationMenuLink
+                        asChild
+                        className={desktopNavLinkClass(isNavItemActive(item))}
+                      >
+                        <Link href={item.href}>{item.title}</Link>
+                      </NavigationMenuLink>
+                    </NavigationMenuItem>
+                  );
+                })}
               </NavigationMenuList>
             </NavigationMenu>
           </div>
@@ -479,133 +440,85 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                   />
 
                   <div className="flex flex-col gap-2">
-                    <SheetClose asChild>
-                      <Link
-                        href="/"
-                        className="rounded-xl px-4 py-3 text-lg font-semibold text-white hover:bg-slate-900"
-                      >
-                        Home
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/import-from-china-to-nigeria"
-                        className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
-                      >
-                        Import Hub
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/blog"
-                        className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
-                      >
-                        Blog
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/shop"
-                        className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
-                      >
-                        Shop
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link
-                        href="/shop?openCart=1"
-                        onClick={handleCartNavClick}
-                        className="flex items-center gap-3 rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
-                      >
-                        <ShoppingCart className="h-5 w-5" />
-                        Cart
-                        {cartCount > 0 && (
-                          <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
-                            {cartCount}
-                          </span>
-                        )}
-                      </Link>
-                    </SheetClose>
+                    {TOP_LEVEL_NAV.map((item) => {
+                      if (item.type === 'dropdown') {
+                        return (
+                          <Accordion
+                            key={item.title}
+                            type="single"
+                            collapsible
+                            className="w-full border-none"
+                          >
+                            <AccordionItem
+                              value={item.value}
+                              className="border-none"
+                            >
+                              <AccordionTrigger className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white hover:no-underline">
+                                {item.title}
+                              </AccordionTrigger>
+                              <AccordionContent className="space-y-2 pb-0 pl-4 pt-2">
+                                {item.items.map((child) => (
+                                  <SheetClose asChild key={child.title}>
+                                    <Link
+                                      href={child.href}
+                                      target={
+                                        child.href.startsWith('http')
+                                          ? '_blank'
+                                          : undefined
+                                      }
+                                      rel={
+                                        child.href.startsWith('http')
+                                          ? 'noopener noreferrer'
+                                          : undefined
+                                      }
+                                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-white"
+                                    >
+                                      <child.icon className="h-5 w-5" />
+                                      {child.title}
+                                    </Link>
+                                  </SheetClose>
+                                ))}
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        );
+                      }
 
-                    <Accordion
-                      type="single"
-                      collapsible
-                      className="w-full border-none"
-                    >
-                      <AccordionItem value="services" className="border-none">
-                        <AccordionTrigger className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white hover:no-underline">
-                          Services
-                        </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-0 pl-4 pt-2">
-                          {MENU_ITEMS.services.map((item) => (
-                            <SheetClose asChild key={item.title}>
-                              <Link
-                                href={item.href}
-                                target={
-                                  item.href.startsWith('http')
-                                    ? '_blank'
-                                    : undefined
-                                }
-                                rel={
-                                  item.href.startsWith('http')
-                                    ? 'noopener noreferrer'
-                                    : undefined
-                                }
-                                className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-white"
-                              >
-                                <item.icon className="h-5 w-5" /> {item.title}
-                              </Link>
-                            </SheetClose>
-                          ))}
-                        </AccordionContent>
-                      </AccordionItem>
+                      if (item.type === 'cart') {
+                        return (
+                          <SheetClose asChild key={item.title}>
+                            <Link
+                              href={item.href}
+                              onClick={handleCartNavClick}
+                              className="flex items-center gap-3 rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white"
+                            >
+                              <ShoppingCart className="h-5 w-5" />
+                              {item.title}
+                              {cartCount > 0 && (
+                                <span className="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-500 px-1.5 text-[10px] font-black text-white">
+                                  {cartCount}
+                                </span>
+                              )}
+                            </Link>
+                          </SheetClose>
+                        );
+                      }
 
-                      <AccordionItem value="tools" className="border-none">
-                        <AccordionTrigger className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white hover:no-underline">
-                          Tools
-                        </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-0 pl-4 pt-2">
-                          {MENU_ITEMS.tools.map((item) => (
-                            <SheetClose asChild key={item.title}>
-                              <Link
-                                href={item.href}
-                                className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-white"
-                              >
-                                <item.icon className="h-5 w-5" /> {item.title}
-                              </Link>
-                            </SheetClose>
-                          ))}
-                        </AccordionContent>
-                      </AccordionItem>
-
-                      <AccordionItem value="videos" className="border-none">
-                        <AccordionTrigger className="rounded-xl px-4 py-3 text-lg font-semibold text-slate-300 hover:bg-slate-900 hover:text-white hover:no-underline">
-                          Videos
-                        </AccordionTrigger>
-                        <AccordionContent className="space-y-2 pb-0 pl-4 pt-2">
-                          {MENU_ITEMS.videos.map((item) => (
-                            <SheetClose asChild key={item.title}>
-                              <Link
-                                href={item.href}
-                                target={
-                                  item.href.startsWith('http')
-                                    ? '_blank'
-                                    : undefined
-                                }
-                                rel={
-                                  item.href.startsWith('http')
-                                    ? 'noopener noreferrer'
-                                    : undefined
-                                }
-                                className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-slate-900 hover:text-white"
-                              >
-                                <item.icon className="h-5 w-5" /> {item.title}
-                              </Link>
-                            </SheetClose>
-                          ))}
-                        </AccordionContent>
-                      </AccordionItem>
-                    </Accordion>
+                      return (
+                        <SheetClose asChild key={item.title}>
+                          <Link
+                            href={item.href}
+                            className={`rounded-xl px-4 py-3 text-lg font-semibold hover:bg-slate-900 hover:text-white ${
+                              isNavItemActive(item)
+                                ? 'text-white'
+                                : 'text-slate-300'
+                            }`}
+                          >
+                            {item.title}
+                          </Link>
+                        </SheetClose>
+                      );
+                    })}
                   </div>
 
                   <div className="mt-8 border-t border-slate-800 pt-8">
