@@ -24,9 +24,9 @@ export async function fetchPaystackSubscription(subscriptionCode: string) {
     },
   );
 
-  const data = (await response.json().catch(() => null)) as
-    | PaystackResponse<PaystackSubscription>
-    | null;
+  const data = (await response
+    .json()
+    .catch(() => null)) as PaystackResponse<PaystackSubscription> | null;
 
   if (!response.ok || !data?.status || !data.data) return null;
   return data.data;
@@ -47,9 +47,9 @@ export async function disablePaystackSubscription(input: {
     body: JSON.stringify(input),
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | PaystackResponse<unknown>
-    | null;
+  const data = (await response
+    .json()
+    .catch(() => null)) as PaystackResponse<unknown> | null;
 
   return response.ok && Boolean(data?.status);
 }
@@ -69,9 +69,9 @@ export async function generatePaystackManageLink(subscriptionCode: string) {
     },
   );
 
-  const data = (await response.json().catch(() => null)) as
-    | PaystackResponse<{ link?: string }>
-    | null;
+  const data = (await response.json().catch(() => null)) as PaystackResponse<{
+    link?: string;
+  }> | null;
 
   if (!response.ok || !data?.status || !data.data?.link) return null;
   return data.data.link;

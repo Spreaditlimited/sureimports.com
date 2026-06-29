@@ -18,6 +18,11 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true,
       },
+    experimental: {
+      serverActions: {
+        bodySizeLimit: '55mb',
+      },
+    },
     images: {
         remotePatterns: [
           {

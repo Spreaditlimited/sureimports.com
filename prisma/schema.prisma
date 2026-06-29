@@ -548,6 +548,7 @@ model intelligence_niches {
   createdAt   DateTime? @default(now())
   updatedAt   DateTime?
   suppliers   intelligence_suppliers[]
+  supplierCategories intelligence_supplier_categories[]
 
   @@index([status])
   @@index([sortOrder])
@@ -569,17 +570,49 @@ model intelligence_suppliers {
   sourceType          String               @db.VarChar(80)
   verifiedFrom        String               @db.LongText
   buyerNotes          String               @db.LongText
+  productsMade        String?              @db.LongText
   verificationStatus  String               @db.VarChar(80)
   lastVerifiedAt      DateTime?
   status              String               @default("draft") @db.VarChar(40)
   createdAt           DateTime?            @default(now())
   updatedAt           DateTime?
   niche               intelligence_niches  @relation(fields: [nicheId], references: [pidNiche], onDelete: Cascade)
+  supplierCategories  intelligence_supplier_categories[]
 
   @@index([nicheId])
   @@index([status])
   @@index([verificationStatus])
   @@index([lastVerifiedAt])
+}
+
+model intelligence_supplier_categories {
+  id                  Int                    @id @default(autoincrement())
+  pidSupplierCategory String                 @unique() @db.VarChar(80)
+  supplierId          String                 @db.VarChar(80)
+  nicheId             String                 @db.VarChar(80)
+  source              String                 @default("admin") @db.VarChar(80)
+  createdAt           DateTime?              @default(now())
+  updatedAt           DateTime?
+  supplier            intelligence_suppliers @relation(fields: [supplierId], references: [pidSupplier], onDelete: Cascade)
+  niche               intelligence_niches    @relation(fields: [nicheId], references: [pidNiche], onDelete: Cascade)
+
+  @@unique([supplierId, nicheId])
+  @@index([supplierId])
+  @@index([nicheId])
+}
+
+model intelligence_plan_settings {
+  id               Int       @id @default(autoincrement())
+  pidSetting       String    @unique() @db.VarChar(80)
+  planKey          String    @unique() @db.VarChar(40)
+  name             String    @db.VarChar(120)
+  priceNaira       Int
+  paystackPlanCode String?   @db.VarChar(160)
+  status           String    @default("ACTIVE") @db.VarChar(40)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+
+  @@index([status])
 }
 
 model intelligence_subscriptions {

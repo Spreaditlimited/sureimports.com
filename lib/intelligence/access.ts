@@ -6,7 +6,9 @@ const planRank: Record<string, number> = {
   pro: 2,
 };
 
-export async function getActiveIntelligenceSubscription(pidUser?: string | null) {
+export async function getActiveIntelligenceSubscription(
+  pidUser?: string | null,
+) {
   if (!pidUser) return null;
 
   const now = new Date();
@@ -15,7 +17,7 @@ export async function getActiveIntelligenceSubscription(pidUser?: string | null)
     where: {
       pidUser,
       status: { in: Array.from(activeStatuses) },
-      OR: [{ currentPeriodEnd: null }, { currentPeriodEnd: { gt: now } }],
+      currentPeriodEnd: { gt: now },
     },
     orderBy: [{ currentPeriodEnd: 'desc' }, { createdAt: 'desc' }],
   });
@@ -28,7 +30,8 @@ export async function getActiveIntelligenceSubscription(pidUser?: string | null)
 
       const secondPeriodEnd = second.currentPeriodEnd?.getTime() || 0;
       const firstPeriodEnd = first.currentPeriodEnd?.getTime() || 0;
-      if (secondPeriodEnd !== firstPeriodEnd) return secondPeriodEnd - firstPeriodEnd;
+      if (secondPeriodEnd !== firstPeriodEnd)
+        return secondPeriodEnd - firstPeriodEnd;
 
       return (
         (second.createdAt?.getTime() || 0) - (first.createdAt?.getTime() || 0)

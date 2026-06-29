@@ -8,7 +8,8 @@ import {
   LockKeyhole,
   Sparkles,
   Link as LinkIcon,
-  Package
+  Package,
+  Paperclip
 } from 'lucide-react';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
@@ -52,6 +53,31 @@ function formatDate(date: Date | null) {
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(date);
+}
+
+type ReviewAttachment = {
+  name?: string;
+  url?: string;
+  type?: string;
+  size?: number;
+};
+
+function parseAttachments(value: string | null): ReviewAttachment[] {
+  if (!value) return [];
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((item) => item && typeof item.url === 'string')
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+function formatFileSize(size?: number) {
+  if (!size) return '';
+  if (size < 1024 * 1024) return `${Math.round(size / 1024)}KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)}MB`;
 }
 
 export default async function IntelligenceReviewsPage({ searchParams }: PageProps) {
@@ -190,10 +216,23 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
               ) : (
                 <div className="space-y-6">
                   {requests.map((request) => (
-                    <article
-                      key={request.pidRequest}
-                      className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8 transition-shadow hover:shadow-md"
-                    >
+                    <ReviewCard key={request.pidRequest} request={request} />
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+        )}
+      </div>
+    </main>
+  );
+}
+
+function ReviewCard({ request }: { request: Awaited<ReturnType<typeof getUserIntelligenceReviewRequests>>[number] }) {
+  const attachments = parseAttachments(request.attachmentsJson);
+
+  return (
+    <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8 transition-shadow hover:shadow-md">
                       {/* Request Header */}
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b border-slate-100 pb-6">
                         <div>
@@ -246,6 +285,31 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
                         </p>
                       </div>
 
+                      {attachments.length > 0 ? (
+                        <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-5">
+                          <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            <Paperclip className="h-3.5 w-3.5" />
+                            Supporting Files
+                          </p>
+                          <div className="grid gap-2">
+                            {attachments.map((file) => (
+                              <a
+                                key={file.url}
+                                href={file.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand-orange-200 hover:bg-brand-orange-50"
+                              >
+                                <span className="min-w-0 truncate">{file.name || 'Attachment'}</span>
+                                <span className="shrink-0 text-xs text-slate-400">
+                                  {formatFileSize(file.size)}
+                                </span>
+                              </a>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+
                       {/* --- ADMIN RESPONSE AREA --- */}
                       {request.adminResponse ? (
                         <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-6">
@@ -293,13 +357,5 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
                         </div>
                       )}
                     </article>
-                  ))}
-                </div>
-              )}
-            </section>
-          </div>
-        )}
-      </div>
-    </main>
   );
 }

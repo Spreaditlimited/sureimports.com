@@ -15,7 +15,7 @@ import {
 
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
-import { getIntelligencePlan, intelligencePlans } from '@/lib/intelligence/plans';
+import { getConfiguredIntelligencePlan, getIntelligencePlans } from '@/lib/intelligence/plans';
 import SubscribeButton from '@/components/intelligence/SubscribeButton';
 import ManagePaystackButton from '@/components/intelligence/ManagePaystackButton';
 
@@ -39,6 +39,7 @@ function formatDate(date?: Date | null) {
 export default async function ManageIntelligencePlanPage() {
   const user = await checkAuth();
   const subscription = await getActiveIntelligenceSubscription(user?.pidUser);
+  const intelligencePlans = await getIntelligencePlans();
 
   // ---------------------------------------------------------------------------
   // STATE 1: NO ACTIVE SUBSCRIPTION
@@ -93,7 +94,7 @@ export default async function ManageIntelligencePlanPage() {
   // ---------------------------------------------------------------------------
   // STATE 2: ACTIVE SUBSCRIPTION
   // ---------------------------------------------------------------------------
-  const currentPlan = getIntelligencePlan(subscription.plan);
+  const currentPlan = await getConfiguredIntelligencePlan(subscription.plan);
   const proPlan = intelligencePlans.pro;
   const canUpgrade = subscription.plan !== 'pro';
 

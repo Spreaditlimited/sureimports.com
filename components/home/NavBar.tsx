@@ -23,6 +23,7 @@ import {
   Smartphone,
   Laptop,
   BookOpen,
+  CalendarClock,
   Database,
   type LucideIcon,
 } from 'lucide-react';
@@ -79,6 +80,13 @@ const MENU_ITEMS = {
       icon: Database,
       desc: 'Verified supplier research for Nigerian importers',
       color: 'from-slate-700 to-slate-950',
+    },
+    {
+      title: 'Book Consultation',
+      href: '/book-consultation',
+      icon: CalendarClock,
+      desc: 'Paid call for sourcing, supplier, cost and shipping decisions',
+      color: 'from-brand-orange-400 to-brand-orange-600',
     },
     {
       title: 'Buy from Chinese Websites',
@@ -165,7 +173,11 @@ const MENU_ITEMS = {
   ],
 };
 
-export default function Navbar() {
+type NavbarProps = {
+  forceLightNavbar?: boolean;
+};
+
+export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
@@ -186,7 +198,7 @@ export default function Navbar() {
   const isToolsPage = Boolean(pathname?.startsWith('/tools'));
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
   const useLightNavbar =
-    isShopProductPage || isLegalPage || isToolsPage || isBlogPage;
+    forceLightNavbar || isShopProductPage || isLegalPage || isToolsPage || isBlogPage;
   const signInHref = '/auth/login';
   const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
 

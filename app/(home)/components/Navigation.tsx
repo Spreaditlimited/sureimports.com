@@ -7,9 +7,9 @@ type NavigationProps = {
   onNavigateSignIn?: () => void;
   onNavigateBlog?: () => void;
   onNavigateToMacBooks?: () => void;
+  forceLightNavbar?: boolean;
 };
 
 export default function Navigation(props: NavigationProps) {
-  void props;
-  return <Navbar />;
+  return <Navbar forceLightNavbar={props.forceLightNavbar} />;
 }

@@ -8,6 +8,7 @@ import {
   FileSearch,
   MessageSquareText,
   ReceiptText,
+  UploadCloud,
 } from 'lucide-react';
 
 type ReviewType =
@@ -139,10 +140,14 @@ export default function IntelligenceReviewForm({
   nicheSlug = '',
   nicheName = '',
 }: IntelligenceReviewFormProps) {
-  const normalizedDefaultType = reviewTypes.some((item) => item.value === defaultType)
+  const normalizedDefaultType = reviewTypes.some(
+    (item) => item.value === defaultType,
+  )
     ? (defaultType as ReviewType)
     : 'supplier_review';
-  const [reviewType, setReviewType] = useState<ReviewType>(normalizedDefaultType);
+  const [reviewType, setReviewType] = useState<ReviewType>(
+    normalizedDefaultType,
+  );
   const config = useMemo(() => fieldsByType[reviewType], [reviewType]);
 
   return (
@@ -337,6 +342,30 @@ export default function IntelligenceReviewForm({
           required
           className="mt-2 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-brand-orange-400 focus:ring-2 focus:ring-brand-orange-100"
           placeholder={config.decisionPlaceholder}
+        />
+      </label>
+
+      <label className="block rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-brand-orange-300 hover:bg-brand-orange-50/40">
+        <span className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-orange-500 shadow-sm">
+            <UploadCloud className="h-5 w-5" />
+          </span>
+          <span className="min-w-0">
+            <span className="block text-xs font-bold uppercase tracking-wider text-slate-500">
+              Supporting files
+            </span>
+            <span className="mt-1 block text-sm leading-relaxed text-slate-600">
+              Upload invoice, quote, supplier screenshots, chat screenshots,
+              product photos or PDFs. Max 5 files, 10MB each.
+            </span>
+          </span>
+        </span>
+        <input
+          name="attachments"
+          type="file"
+          multiple
+          accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.txt,image/*,application/pdf"
+          className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-orange-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-orange-600"
         />
       </label>
 

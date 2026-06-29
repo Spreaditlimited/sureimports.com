@@ -6,8 +6,8 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { prisma } from '@/lib/prisma';
 import {
-  getIntelligencePlan,
   getPaystackPlanCode,
+  getConfiguredIntelligencePlan,
   type IntelligencePlanKey,
 } from '@/lib/intelligence/plans';
 
@@ -87,8 +87,8 @@ export async function POST(request: Request) {
 
   const body = await request.json().catch(() => ({}));
   const planKey = body.plan === 'pro' ? 'pro' : 'starter';
-  const plan = getIntelligencePlan(planKey);
-  const paystackPlanCode = getPaystackPlanCode(plan.key);
+  const plan = await getConfiguredIntelligencePlan(planKey);
+  const paystackPlanCode = await getPaystackPlanCode(plan.key);
   const authUser = await checkAuth();
   const email = String(body.email || authUser?.userEmail || '')
     .trim()

@@ -22,7 +22,10 @@ function loadEnv(filePath) {
     if (idx === -1) continue;
 
     const key = trimmed.slice(0, idx).trim();
-    const value = trimmed.slice(idx + 1).trim().replace(/^['"]|['"]$/g, '');
+    const value = trimmed
+      .slice(idx + 1)
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     if (key && process.env[key] === undefined) {
       process.env[key] = value;
     }
@@ -165,7 +168,11 @@ function getCreativeDirection(post) {
     ].join(' ');
   }
 
-  if (text.includes('1688') || text.includes('taobao') || text.includes('alibaba')) {
+  if (
+    text.includes('1688') ||
+    text.includes('taobao') ||
+    text.includes('alibaba')
+  ) {
     return [
       'Concept: China website buying comparison without people.',
       'Show a clean comparison workspace with unbranded product samples in separate trays, generic blank browser windows on a screen, category tiles without text, cartons, and neutral color-coded tabs.',

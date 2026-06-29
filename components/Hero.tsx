@@ -74,11 +74,7 @@ export default function Hero({
               Start Sourcing Now <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
-              onClick={() =>
-                router.push(
-                  'https://calendly.com/sureimports/product-sourcing-one-one-one-session/',
-                )
-              }
+              onClick={() => router.push('/book-consultation')}
               variant="outline"
               className="h-14 rounded-full border-slate-700 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
             >

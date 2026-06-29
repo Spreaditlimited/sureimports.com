@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
+import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { prisma } from '@/lib/prisma';
 
@@ -23,6 +24,7 @@ export type IntelligenceReviewRequest = {
   targetQuantity: string | null;
   budgetRange: string | null;
   decisionNeeded: string | null;
+  attachmentsJson: string | null;
   status: string;
   adminResponse: string | null;
   adminRecommendations: string | null;
@@ -35,6 +37,39 @@ export type IntelligenceReviewRequest = {
 
 function clean(value: FormDataEntryValue | null, max = 4000) {
   return String(value || '').trim().slice(0, max);
+}
+
+type ReviewAttachment = {
+  name: string;
+  url: string;
+  type: string;
+  size: number;
+  publicId: string;
+};
+
+const MAX_REVIEW_FILES = 5;
+const MAX_REVIEW_FILE_SIZE = 10 * 1024 * 1024;
+const ALLOWED_REVIEW_EXTENSIONS = new Set([
+  'pdf',
+  'png',
+  'jpg',
+  'jpeg',
+  'webp',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'txt',
+]);
+
+function getExtension(filename: string) {
+  return filename.split('.').pop()?.toLowerCase() || '';
+}
+
+function getReviewFiles(formData: FormData) {
+  return formData
+    .getAll('attachments')
+    .filter((value): value is File => value instanceof File && value.size > 0);
 }
 
 async function hasProReviewAccess(input: { pidUser: string; email: string }) {
@@ -72,6 +107,7 @@ export async function getUserIntelligenceReviewRequests(pidUser: string) {
       targetQuantity,
       budgetRange,
       decisionNeeded,
+      attachmentsJson,
       status,
       adminResponse,
       adminRecommendations,
@@ -115,6 +151,7 @@ export async function createIntelligenceReviewRequest(formData: FormData) {
   const decisionNeeded = clean(formData.get('decisionNeeded'));
   const nicheSlug = clean(formData.get('nicheSlug'), 180);
   const nicheName = clean(formData.get('nicheName'), 180);
+  const files = getReviewFiles(formData);
 
   if (!supplierName && !supplierWebsite && !productDetails) {
     throw new Error('Add at least a supplier name, supplier link, or product details.');
@@ -124,7 +161,48 @@ export async function createIntelligenceReviewRequest(formData: FormData) {
     throw new Error('Tell us the decision you need help making.');
   }
 
+  if (files.length > MAX_REVIEW_FILES) {
+    throw new Error(`Upload at most ${MAX_REVIEW_FILES} supporting files.`);
+  }
+
   const pidRequest = `INTREV${randomGenerator(12)}`;
+  const attachments: ReviewAttachment[] = [];
+
+  for (let index = 0; index < files.length; index += 1) {
+    const file = files[index];
+    const extension = getExtension(file.name || '');
+
+    if (!ALLOWED_REVIEW_EXTENSIONS.has(extension)) {
+      throw new Error(
+        'Only PDF, image, Word, Excel and text files are allowed for review uploads.',
+      );
+    }
+
+    if (file.size > MAX_REVIEW_FILE_SIZE) {
+      throw new Error('Each review file must be 10MB or less.');
+    }
+
+    const uploaded = await uploadBufferToCloudinary(
+      Buffer.from(await file.arrayBuffer()),
+      {
+        folder: 'sureimports/intelligence-reviews',
+        publicId: `${pidRequest}-${index + 1}`,
+        resourceType: 'auto',
+        useFilename: false,
+        uniqueFilename: false,
+        overwrite: true,
+        tags: ['supplier-intelligence', pidRequest],
+      },
+    );
+
+    attachments.push({
+      name: file.name || uploaded.originalFilename || `Attachment ${index + 1}`,
+      url: uploaded.url,
+      type: file.type || uploaded.resourceType || 'application/octet-stream',
+      size: file.size,
+      publicId: uploaded.publicId,
+    });
+  }
 
   await prisma.$executeRaw`
     INSERT INTO intelligence_review_requests (
@@ -143,6 +221,7 @@ export async function createIntelligenceReviewRequest(formData: FormData) {
       targetQuantity,
       budgetRange,
       decisionNeeded,
+      attachmentsJson,
       status,
       createdAt,
       updatedAt
@@ -162,6 +241,7 @@ export async function createIntelligenceReviewRequest(formData: FormData) {
       ${targetQuantity || null},
       ${budgetRange || null},
       ${decisionNeeded},
+      ${attachments.length ? JSON.stringify(attachments) : null},
       'submitted',
       ${new Date()},
       ${new Date()}

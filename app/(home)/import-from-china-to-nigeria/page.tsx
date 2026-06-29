@@ -4,7 +4,6 @@ import {
   ArrowRight,
   BookOpen,
   Calculator,
-  CheckCircle2,
   Factory,
   FileSearch,
   Globe2,
@@ -15,15 +14,20 @@ import {
   Smartphone,
   Truck,
   ChevronDown,
-  Info
 } from 'lucide-react';
 
 import Navigation from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
+import {
+  fetchPublishedBlogsLite,
+  fetchPublishedBlogSlugs,
+} from '@/app/(home)/actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/import-from-china-to-nigeria`;
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Import From China to Nigeria: Complete Sure Imports Hub',
@@ -140,36 +144,6 @@ const calculators = [
   ['Carton Optimization', '/tools/carton-optimization-tool'],
 ];
 
-const guideClusters = [
-  {
-    title: 'Supplier and risk checks',
-    links: [
-      ['Supplier verification checklist', '/blog/china-supplier-verification-checklist-for-nigerian-importers'],
-      ['Avoid China import scams', '/blog/how-to-avoid-china-import-scams-as-a-nigerian-buyer'],
-      ['Compare supplier quotes', '/blog/how-to-compare-china-supplier-quotes-like-a-serious-nigerian-buyer'],
-      ['Quality inspection in China', '/blog/quality-inspection-in-china-for-nigerian-importers-what-to-check-before-shipment'],
-    ],
-  },
-  {
-    title: 'Cost, margin and planning',
-    links: [
-      ['Build an import budget', '/blog/how-to-build-a-china-import-budget-before-you-contact-any-supplier'],
-      ['Landed cost to selling price', '/blog/the-profit-blueprint-how-to-turn-your-landed-cost-into-a-confident-selling-price'],
-      ['Import cash flow for SMEs', '/blog/china-import-cash-flow-for-nigerian-smes-how-to-avoid-tying-down-too-much-money'],
-      ['Plan around Chinese holidays', '/blog/how-nigerian-importers-should-plan-around-chinese-holidays-and-factory-closures'],
-    ],
-  },
-  {
-    title: 'Product opportunities',
-    links: [
-      ['Best products to import in 2026', '/blog/25-best-products-to-import-from-china-to-nigeria-in-2026-high-demand-opportunities'],
-      ['Fast-moving mini import products', '/blog/top-50-fast-moving-mini-importation-products-nigerians-buy-every-day'],
-      ['Most profitable products', '/blog/most-profitable-mini-importation-products-in-nigeria-right-now'],
-      ['Choosing for the Nigerian market', '/blog/how-to-choose-products-to-import-from-china-for-the-nigerian-market'],
-    ],
-  },
-];
-
 const faqs = [
   {
     question: 'What is the best way to import from China to Nigeria?',
@@ -221,7 +195,35 @@ const schema = [
   },
 ];
 
-export default function ImportFromChinaHubPage() {
+function getBlogSlugFromHref(href: string) {
+  if (!href.startsWith('/blog/')) return null;
+  return href.replace(/^\/blog\//, '').replace(/\/$/, '');
+}
+
+function isPublishedHref(href: string, publishedSlugs: Set<string>) {
+  const slug = getBlogSlugFromHref(href);
+  return !slug || publishedSlugs.has(slug);
+}
+
+function resolvePublicHref(href: string, publishedSlugs: Set<string>) {
+  return isPublishedHref(href, publishedSlugs) ? href : '/blog';
+}
+
+export default async function ImportFromChinaHubPage() {
+  const [publishedBlogSlugs, latestBlogResult] = await Promise.all([
+    fetchPublishedBlogSlugs(),
+    fetchPublishedBlogsLite(1, 9),
+  ]);
+  const publishedSlugs = new Set(publishedBlogSlugs);
+  const latestPublishedGuides = latestBlogResult.posts;
+  const visibleFeaturedGuides = featuredGuides.filter((guide) =>
+    isPublishedHref(guide.href, publishedSlugs),
+  );
+  const visiblePathways = pathways.map((pathway) => ({
+    ...pathway,
+    href: resolvePublicHref(pathway.href, publishedSlugs),
+  }));
+
   return (
     <main className="min-h-screen bg-[#fcfcfd] text-slate-950 antialiased dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
       <JsonLdScript data={schema} />
@@ -246,11 +248,11 @@ export default function ImportFromChinaHubPage() {
             
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/tools/landed-cost-estimator"
+                href="/supplier-intelligence"
                 className="group relative inline-flex h-14 w-full sm:w-auto items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Estimate Landed Cost <Calculator className="h-4 w-4" />
+                  Supplier Intelligence <ShieldCheck className="h-4 w-4" />
                 </span>
               </Link>
               <Link
@@ -264,41 +266,42 @@ export default function ImportFromChinaHubPage() {
         </div>
       </section>
 
-      {/* --- FEATURED GUIDES BENTO --- */}
-      <section className="py-20 md:py-28">
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-12">
-            <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
-              Foundation Knowledge
-            </span>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-              Start with these core guides.
-            </h2>
-          </div>
+      {visibleFeaturedGuides.length > 0 && (
+        <section className="py-20 md:py-28">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl mb-12">
+              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+                Foundation Knowledge
+              </span>
+              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+                Start with these core guides.
+              </h2>
+            </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {featuredGuides.map((guide) => (
-              <Link 
-                key={guide.href} 
-                href={guide.href} 
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-brand-orange-200 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700"
-              >
-                <div>
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500 group-hover:scale-110 transition-transform">
-                    <guide.icon className="h-6 w-6" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {visibleFeaturedGuides.map((guide) => (
+                <Link 
+                  key={guide.href} 
+                  href={guide.href} 
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl hover:border-brand-orange-200 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700"
+                >
+                  <div>
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500 group-hover:scale-110 transition-transform">
+                      <guide.icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-950 dark:text-white leading-tight group-hover:text-brand-orange-600 dark:group-hover:text-brand-orange-400 transition-colors">
+                      {guide.title}
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-slate-950 dark:text-white leading-tight group-hover:text-brand-orange-600 dark:group-hover:text-brand-orange-400 transition-colors">
-                    {guide.title}
-                  </h3>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                  {guide.text}
-                </p>
-              </Link>
-            ))}
+                  <p className="mt-4 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    {guide.text}
+                  </p>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* --- PATHWAYS --- */}
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
@@ -316,7 +319,7 @@ export default function ImportFromChinaHubPage() {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {pathways.map((pathway) => (
+            {visiblePathways.map((pathway) => (
               <Link 
                 key={pathway.title} 
                 href={pathway.href} 
@@ -372,41 +375,57 @@ export default function ImportFromChinaHubPage() {
         </div>
       </section>
 
-      {/* --- DEEP DIVE GUIDES --- */}
-      <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
-        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 max-w-3xl">
-            <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500 flex items-center gap-2">
-              <Info className="h-4 w-4" /> Import Education
-            </span>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-              Deepen your knowledge.
-            </h2>
-          </div>
+      {latestPublishedGuides.length > 0 && (
+        <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 max-w-3xl">
+              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+                Published Import Guides
+              </span>
+              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+                Deepen your knowledge.
+              </h2>
+              <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                Read current Sure Imports guides that are already live on the blog.
+              </p>
+            </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {guideClusters.map((cluster) => (
-              <div key={cluster.title} className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-                <h3 className="text-xl font-bold text-slate-950 dark:text-white mb-6">
-                  {cluster.title}
-                </h3>
-                <div className="space-y-4">
-                  {cluster.links.map(([label, href]) => (
-                    <Link 
-                      key={href} 
-                      href={href} 
-                      className="group flex items-start gap-3 text-sm leading-relaxed text-slate-600 transition-colors hover:text-brand-orange-600 dark:text-slate-400 dark:hover:text-brand-orange-400"
-                    >
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500 dark:text-emerald-500/70" />
-                      <span className="font-medium">{label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            ))}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {latestPublishedGuides.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="group flex min-h-[260px] flex-col justify-between rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:border-brand-orange-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+                >
+                  <div>
+                    <p className="mb-5 text-[10px] font-black uppercase tracking-widest text-brand-orange-500">
+                      {post.category || 'Import Guide'}
+                    </p>
+                    <h3 className="text-xl font-bold leading-tight text-slate-950 transition-colors group-hover:text-brand-orange-600 dark:text-white dark:group-hover:text-brand-orange-400">
+                      {post.title}
+                    </h3>
+                    <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {post.excerpt}
+                    </p>
+                  </div>
+                  <span className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-slate-900 transition-colors group-hover:text-brand-orange-600 dark:text-white dark:group-hover:text-brand-orange-400">
+                    Read guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="mt-10">
+              <Link
+                href="/blog"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-6 text-sm font-bold text-slate-950 transition hover:border-brand-orange-300 hover:text-brand-orange-600 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:hover:border-slate-600 dark:hover:text-brand-orange-400"
+              >
+                Browse all published guides <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* --- CTA SECTION --- */}
       <section className="py-20 md:py-28">

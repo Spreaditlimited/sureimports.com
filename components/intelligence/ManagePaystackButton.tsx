@@ -56,7 +56,9 @@ export default function ManagePaystackButton({
           </>
         )}
       </button>
-      {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+      {error ? (
+        <p className="text-sm font-medium text-red-600">{error}</p>
+      ) : null}
     </div>
   );
 }

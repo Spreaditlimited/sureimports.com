@@ -18,14 +18,30 @@ import {
 
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
+import { getCompanyContactSettings } from '@/lib/intelligence/companyContacts';
 import {
-  getNicheBySlug,
+  getNicheBySlugWithDb,
   getSupplierCheckSummary,
 } from '@/lib/intelligence/data';
+import { supplierEnquiryTemplate } from '@/lib/intelligence/warehouse';
 
 type NichePageProps = {
   params: Promise<{ nicheSlug: string }>;
 };
+
+function parseProductsMade(value: unknown) {
+  if (!value) return [];
+  if (Array.isArray(value)) return value.map(String).filter(Boolean);
+  try {
+    const parsed = JSON.parse(String(value));
+    return Array.isArray(parsed) ? parsed.map(String).filter(Boolean) : [];
+  } catch {
+    return String(value)
+      .split(/[,;\n]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+}
 
 export default async function DashboardIntelligenceNichePage({
   params,
@@ -38,7 +54,8 @@ export default async function DashboardIntelligenceNichePage({
   }
 
   const { nicheSlug } = await params;
-  const niche = getNicheBySlug(nicheSlug);
+  const niche = await getNicheBySlugWithDb(nicheSlug);
+  const companyContacts = await getCompanyContactSettings();
   const isPro = subscription.plan === 'pro';
 
   if (!niche) notFound();
@@ -103,16 +120,26 @@ export default async function DashboardIntelligenceNichePage({
                 Supplier enquiry template
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                When contacting any supplier in this category, ask for unit
-                price, MOQ, sample cost, production lead time, carton details,
-                payment terms, warranty route, and whether the invoice name
-                matches the company you are checking.
+                Start like a serious buyer. Mention the exact product, ask for
+                MOQ and FOB price in RMB to Guangzhou, then ask for CBM or total
+                weight based on how you plan to ship.
               </p>
               <div className="mt-5 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-slate-300">
-                Hello, I am reviewing suppliers for {niche.name}. Please send
-                your best export price, MOQ, sample cost, production time,
-                carton size/weight, payment terms, warranty process, and your
-                official company invoice details.
+                <p className="whitespace-pre-line">{supplierEnquiryTemplate}</p>
+                <div className="mt-4 border-t border-white/10 pt-4">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    Freight forwarder address
+                  </p>
+                  <p className="mt-1 font-semibold text-white">
+                    {companyContacts.chinaAddress}
+                  </p>
+                  <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                    China contact
+                  </p>
+                  <p className="mt-1 font-semibold text-white">
+                    {companyContacts.chinaContact}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -166,6 +193,9 @@ export default async function DashboardIntelligenceNichePage({
           </div>
 
           {niche.suppliers.map((supplier) => (
+            (() => {
+              const productsMade = parseProductsMade((supplier as any).productsMade);
+              return (
             <article
               key={`${supplier.niche}-${supplier.supplierName}`}
               className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md sm:p-8"
@@ -184,6 +214,18 @@ export default async function DashboardIntelligenceNichePage({
                   <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
                     {supplier.productFit}
                   </p>
+                  {productsMade.length > 0 ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {productsMade.map((product) => (
+                        <span
+                          key={product}
+                          className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[11px] font-bold text-slate-600"
+                        >
+                          {product}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
                 
                 <a
@@ -287,6 +329,8 @@ export default async function DashboardIntelligenceNichePage({
                 </div>
               </div>
             </article>
+              );
+            })()
           ))}
         </div>
       </div>

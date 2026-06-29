@@ -10,10 +10,7 @@ export function cleanLegacyEmailBody(value: unknown) {
       /You can also copy the following link and paste in your browser if you were unable to click the above button\.[\s\S]*?Link:\s*<div>[\s\S]*?<\/div>\s*<br\s*\/?>/gi,
       '',
     )
-    .replace(
-      /Link:\s*<div>[\s\S]*?<\/div>\s*<br\s*\/?>/gi,
-      '',
-    )
+    .replace(/Link:\s*<div>[\s\S]*?<\/div>\s*<br\s*\/?>/gi, '')
     .replace(
       /See you inside\.<br\s*\/?><br\s*\/?>\s*<b>Tochukwu Nkwocha<\/b><br\s*\/?>\s*<i>CEO,\s*Spreadit Limited<\/i>/gi,
       '',

@@ -44,7 +44,9 @@ export default function IntelligenceSignupForm({
 
       window.location.href = data.authorizationUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to start checkout.');
+      setError(
+        err instanceof Error ? err.message : 'Unable to start checkout.',
+      );
       setIsLoading(false);
     }
   }
@@ -81,7 +83,9 @@ export default function IntelligenceSignupForm({
         placeholder="Phone or WhatsApp number"
         required
       />
-      {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+      {error ? (
+        <p className="text-sm font-medium text-red-600">{error}</p>
+      ) : null}
       <button
         type="submit"
         disabled={isLoading}

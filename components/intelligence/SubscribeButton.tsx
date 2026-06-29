@@ -43,7 +43,9 @@ export default function SubscribeButton({
 
       window.location.href = data.authorizationUrl;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unable to start checkout.');
+      setError(
+        err instanceof Error ? err.message : 'Unable to start checkout.',
+      );
       setIsLoading(false);
     }
   }
@@ -65,7 +67,9 @@ export default function SubscribeButton({
           children
         )}
       </button>
-      {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+      {error ? (
+        <p className="text-sm font-medium text-red-600">{error}</p>
+      ) : null}
     </div>
   );
 }
