@@ -77,7 +77,8 @@ export async function getResearchSuppliersWithDb() {
   const seen = new Set<string>();
 
   return [...baseSuppliers, ...dbSuppliers].filter((supplier) => {
-    const key = `${supplier.niche}|${supplier.supplierName}|${supplier.officialWebsite}`.toLowerCase();
+    const key =
+      `${supplier.niche}|${supplier.supplierName}|${supplier.officialWebsite}`.toLowerCase();
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -139,7 +140,10 @@ export function getNicheBySlug(slug: string) {
 }
 
 export async function getNicheBySlugWithDb(slug: string) {
-  return (await getPassingNichesWithDb()).find((niche) => niche.slug === slug) || null;
+  return (
+    (await getPassingNichesWithDb()).find((niche) => niche.slug === slug) ||
+    null
+  );
 }
 
 export function getSupplierCheckSummary(supplier: SupplierResearchRecord) {

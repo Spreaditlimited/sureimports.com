@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop } from 'lucide-react';
+import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface ServicesSectionProps {
@@ -16,6 +16,13 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
       icon: Search,
       desc: 'Search for products on over 100 Chinese websites. Provide the link, and we handle the purchasing, quality verification, secure payment, and consolidation.',
       tags: ['1688', 'Alibaba', 'Pinduoduo', 'Taobao'],
+    },
+    {
+      title: 'Supplier Intelligence',
+      icon: ShieldCheck,
+      desc: 'Access a growing database of verified China suppliers checked by Sure Imports, with buyer notes and Pro review support before you pay.',
+      tags: ['Verified Suppliers', 'Buyer Notes', 'Pre-payment Review'],
+      href: '/supplier-intelligence',
     },
     {
       title: 'Ship with us',

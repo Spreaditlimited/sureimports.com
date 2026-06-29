@@ -6,9 +6,15 @@ import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 
 type Status = 'loading' | 'success' | 'error';
 
-export default function ConsultationVerifyClient({ reference }: { reference: string }) {
+export default function ConsultationVerifyClient({
+  reference,
+}: {
+  reference: string;
+}) {
   const [status, setStatus] = useState<Status>('loading');
-  const [message, setMessage] = useState('Verifying your payment and creating your Zoom meeting...');
+  const [message, setMessage] = useState(
+    'Verifying your payment and creating your Zoom meeting...',
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -63,7 +69,9 @@ export default function ConsultationVerifyClient({ reference }: { reference: str
               : 'bg-brand-orange-50 text-brand-orange-600'
         }`}
       >
-        {status === 'loading' ? <Loader2 className="h-8 w-8 animate-spin" /> : null}
+        {status === 'loading' ? (
+          <Loader2 className="h-8 w-8 animate-spin" />
+        ) : null}
         {status === 'success' ? <CheckCircle2 className="h-8 w-8" /> : null}
         {status === 'error' ? <XCircle className="h-8 w-8" /> : null}
       </div>

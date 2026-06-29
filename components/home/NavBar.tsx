@@ -198,7 +198,11 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
   const isToolsPage = Boolean(pathname?.startsWith('/tools'));
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
   const useLightNavbar =
-    forceLightNavbar || isShopProductPage || isLegalPage || isToolsPage || isBlogPage;
+    forceLightNavbar ||
+    isShopProductPage ||
+    isLegalPage ||
+    isToolsPage ||
+    isBlogPage;
   const signInHref = '/auth/login';
   const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
 

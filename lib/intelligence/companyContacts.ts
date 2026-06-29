@@ -33,13 +33,17 @@ export async function getCompanyContactSettings(): Promise<CompanyContactSetting
 
     return {
       chinaAddress:
-        settings.chinaAddress?.trim() || defaultCompanyContactSettings.chinaAddress,
+        settings.chinaAddress?.trim() ||
+        defaultCompanyContactSettings.chinaAddress,
       chinaContact:
-        settings.chinaContact?.trim() || defaultCompanyContactSettings.chinaContact,
+        settings.chinaContact?.trim() ||
+        defaultCompanyContactSettings.chinaContact,
       lagosAddress:
-        settings.lagosAddress?.trim() || defaultCompanyContactSettings.lagosAddress,
+        settings.lagosAddress?.trim() ||
+        defaultCompanyContactSettings.lagosAddress,
       lagosContact:
-        settings.lagosContact?.trim() || defaultCompanyContactSettings.lagosContact,
+        settings.lagosContact?.trim() ||
+        defaultCompanyContactSettings.lagosContact,
     };
   } catch {
     return defaultCompanyContactSettings;

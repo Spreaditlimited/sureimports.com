@@ -37,7 +37,9 @@ function searchableText(niche: CategorySearchGridProps['niches'][number]) {
     .toLowerCase();
 }
 
-export default function CategorySearchGrid({ niches }: CategorySearchGridProps) {
+export default function CategorySearchGrid({
+  niches,
+}: CategorySearchGridProps) {
   const [query, setQuery] = useState('');
   const trimmedQuery = query.trim().toLowerCase();
 
@@ -55,7 +57,9 @@ export default function CategorySearchGrid({ niches }: CategorySearchGridProps) 
     <div className="mt-12">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h2 className="text-lg font-bold text-slate-900">Available Categories</h2>
+          <h2 className="text-lg font-bold text-slate-900">
+            Available Categories
+          </h2>
           <p className="mt-1 text-sm text-slate-500">
             Search by category, supplier name, product type, or location.
           </p>
@@ -93,7 +97,9 @@ export default function CategorySearchGrid({ niches }: CategorySearchGridProps) 
 
       {filteredNiches.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-          <p className="text-sm font-bold text-slate-900">No matching category found.</p>
+          <p className="text-sm font-bold text-slate-900">
+            No matching category found.
+          </p>
           <p className="mt-2 text-sm text-slate-500">
             Try a broader product name, supplier name, or related product term.
           </p>

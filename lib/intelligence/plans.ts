@@ -73,7 +73,9 @@ function envPrice(value: string | undefined, fallback: number) {
   return Number.isFinite(amount) && amount > 0 ? Math.round(amount) : fallback;
 }
 
-function applyEnvOverrides(plans: Record<IntelligencePlanKey, IntelligencePlan>) {
+function applyEnvOverrides(
+  plans: Record<IntelligencePlanKey, IntelligencePlan>,
+) {
   for (const key of Object.keys(plans) as IntelligencePlanKey[]) {
     const plan = plans[key];
     plans[key] = {
@@ -147,7 +149,9 @@ export function getIntelligencePlan(planKey: string | null | undefined) {
   return intelligencePlans.starter;
 }
 
-export async function getConfiguredIntelligencePlan(planKey: string | null | undefined) {
+export async function getConfiguredIntelligencePlan(
+  planKey: string | null | undefined,
+) {
   const plans = await getIntelligencePlans();
   if (planKey === 'pro') return plans.pro;
   return plans.starter;

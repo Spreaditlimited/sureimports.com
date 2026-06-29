@@ -20,7 +20,11 @@ function formatAmount(kobo: number) {
   return `₦${Math.round(kobo / 100).toLocaleString()}`;
 }
 
-export default function ConsultationBookingForm({ amountKobo }: { amountKobo: number }) {
+export default function ConsultationBookingForm({
+  amountKobo,
+}: {
+  amountKobo: number;
+}) {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [selectedSlot, setSelectedSlot] = useState('');
   const [isLoadingSlots, setIsLoadingSlots] = useState(true);
@@ -41,9 +45,12 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
       setIsLoadingSlots(true);
       setError('');
       try {
-        const response = await fetch('/api/consultation/slots', { cache: 'no-store' });
+        const response = await fetch('/api/consultation/slots', {
+          cache: 'no-store',
+        });
         const data = (await response.json()) as SlotsResponse;
-        if (!response.ok || !data.ok) throw new Error('Could not load available slots.');
+        if (!response.ok || !data.ok)
+          throw new Error('Could not load available slots.');
         if (!mounted) return;
         setSlots(data.slots || []);
         setSelectedSlot(data.slots?.[0]?.startIso || '');
@@ -119,8 +126,9 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
 
         <div className="mt-6 space-y-4 text-sm leading-6 text-slate-600">
           <p>
-            This is a focused 30-minute call for importers who need clear direction
-            before paying a supplier, choosing a buying route, or committing money.
+            This is a focused 30-minute call for importers who need clear
+            direction before paying a supplier, choosing a buying route, or
+            committing money.
           </p>
           <div className="space-y-3">
             {[
@@ -184,7 +192,8 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
             </div>
           ) : (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
-              No consultation slots are available right now. Please check again later.
+              No consultation slots are available right now. Please check again
+              later.
             </div>
           )}
         </div>
@@ -214,7 +223,9 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
           />
           <input
             value={form.businessName}
-            onChange={(event) => updateField('businessName', event.target.value)}
+            onChange={(event) =>
+              updateField('businessName', event.target.value)
+            }
             className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
             placeholder="Business name, optional"
           />
@@ -222,7 +233,9 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
 
         <textarea
           value={form.consultationGoal}
-          onChange={(event) => updateField('consultationGoal', event.target.value)}
+          onChange={(event) =>
+            updateField('consultationGoal', event.target.value)
+          }
           className="mt-4 min-h-32 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
           placeholder="What do you need help with? Include product, supplier, budget, shipping concern, or decision you want to make."
           required
@@ -236,16 +249,21 @@ export default function ConsultationBookingForm({ amountKobo }: { amountKobo: nu
 
         <button
           type="submit"
-          disabled={isSubmitting || isLoadingSlots || !slots.length || !selectedSlot}
+          disabled={
+            isSubmitting || isLoadingSlots || !slots.length || !selectedSlot
+          }
           className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-6 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition hover:bg-brand-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {isSubmitting ? 'Redirecting to Paystack...' : 'Pay and book consultation'}
+          {isSubmitting
+            ? 'Redirecting to Paystack...'
+            : 'Pay and book consultation'}
           {!isSubmitting ? <ArrowRight className="h-4 w-4" /> : null}
         </button>
 
         <p className="mt-3 text-center text-xs font-medium text-slate-500">
-          Secure payment is processed by Paystack. The Zoom link is sent after payment is verified.
+          Secure payment is processed by Paystack. The Zoom link is sent after
+          payment is verified.
         </p>
       </form>
     </div>

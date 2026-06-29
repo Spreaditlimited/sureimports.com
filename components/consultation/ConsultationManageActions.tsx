@@ -41,11 +41,16 @@ export default function ConsultationManageActions({
     async function loadSlots() {
       setIsLoadingSlots(true);
       try {
-        const response = await fetch('/api/consultation/slots', { cache: 'no-store' });
+        const response = await fetch('/api/consultation/slots', {
+          cache: 'no-store',
+        });
         const data = (await response.json()) as SlotsResponse;
-        if (!response.ok || !data.ok) throw new Error('Could not load available slots.');
+        if (!response.ok || !data.ok)
+          throw new Error('Could not load available slots.');
         if (!mounted) return;
-        const available = (data.slots || []).filter((slot) => slot.startIso !== currentSlotIso);
+        const available = (data.slots || []).filter(
+          (slot) => slot.startIso !== currentSlotIso,
+        );
         setSlots(available);
         setSelectedSlot(available[0]?.startIso || '');
       } catch (slotError) {
@@ -169,7 +174,9 @@ export default function ConsultationManageActions({
         <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
           <div className="flex items-center gap-2">
             <CalendarClock className="h-4 w-4 text-slate-500" />
-            <h2 className="text-sm font-bold text-slate-950">Reschedule booking</h2>
+            <h2 className="text-sm font-bold text-slate-950">
+              Reschedule booking
+            </h2>
           </div>
 
           {isLoadingSlots ? (
@@ -196,7 +203,9 @@ export default function ConsultationManageActions({
                 disabled={isRescheduling || isCancelling || !selectedSlot}
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isRescheduling ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                {isRescheduling ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : null}
                 Reschedule
               </button>
             </div>
