@@ -340,7 +340,9 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                                 href={child.href}
                                 desc={child.desc}
                                 icon={child.icon}
-                                color={'color' in child ? child.color : undefined}
+                                color={
+                                  'color' in child ? child.color : undefined
+                                }
                               />
                             ))}
                           </ul>

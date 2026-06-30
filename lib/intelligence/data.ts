@@ -1,5 +1,9 @@
 import supplierResearch from '@/docs/products/china-supplier-directory-v1/SUPPLIERS.json';
 import { prisma } from '@/lib/prisma';
+import {
+  canonicalCategoryKey,
+  categoriesAreCloselyRelated,
+} from '@/lib/intelligence/categoryNormalization';
 
 export type SupplierResearchRecord = (typeof supplierResearch)[number];
 export type SupplierResearchRecordWithProducts = SupplierResearchRecord & {
@@ -86,24 +90,25 @@ export async function getResearchSuppliersWithDb() {
 }
 
 export function getPassingNiches(minimumVerifiedContacts = 3) {
-  const grouped = new Map<string, SupplierResearchRecord[]>();
+  const grouped = new Map<string, { name: string; suppliers: SupplierResearchRecord[] }>();
 
   for (const supplier of getResearchSuppliers()) {
     if (supplier.verificationStatus !== 'official_site_contact_confirmed') {
       continue;
     }
 
-    const current = grouped.get(supplier.niche) || [];
-    current.push(supplier);
-    grouped.set(supplier.niche, current);
+    const key = findGroupedCategoryKey(grouped, supplier.niche);
+    const current = grouped.get(key) || { name: supplier.niche, suppliers: [] };
+    current.suppliers.push(supplier);
+    grouped.set(key, current);
   }
 
-  return Array.from(grouped.entries())
-    .filter(([, suppliers]) => suppliers.length >= minimumVerifiedContacts)
-    .map(([name, suppliers]) => ({
+  return Array.from(grouped.values())
+    .filter(({ suppliers }) => suppliers.length >= minimumVerifiedContacts)
+    .map(({ name, suppliers }) => ({
       name,
       slug: slugifyNiche(name),
-      suppliers: suppliers.sort((a, b) =>
+      suppliers: dedupeSuppliers(suppliers).sort((a, b) =>
         a.supplierName.localeCompare(b.supplierName),
       ),
     }))
@@ -111,28 +116,82 @@ export function getPassingNiches(minimumVerifiedContacts = 3) {
 }
 
 export async function getPassingNichesWithDb(minimumVerifiedContacts = 3) {
-  const grouped = new Map<string, SupplierResearchRecord[]>();
+  const grouped = new Map<string, { name: string; suppliers: SupplierResearchRecord[] }>();
 
   for (const supplier of await getResearchSuppliersWithDb()) {
     if (supplier.verificationStatus !== 'official_site_contact_confirmed') {
       continue;
     }
 
-    const current = grouped.get(supplier.niche) || [];
-    current.push(supplier);
-    grouped.set(supplier.niche, current);
+    const key = findGroupedCategoryKey(grouped, supplier.niche);
+    const current = grouped.get(key) || { name: supplier.niche, suppliers: [] };
+    current.suppliers.push(supplier);
+    grouped.set(key, current);
   }
 
-  return Array.from(grouped.entries())
-    .filter(([, suppliers]) => suppliers.length >= minimumVerifiedContacts)
-    .map(([name, suppliers]) => ({
+  return Array.from(grouped.values())
+    .filter(({ suppliers }) => suppliers.length >= minimumVerifiedContacts)
+    .map(({ name, suppliers }) => ({
       name,
       slug: slugifyNiche(name),
-      suppliers: suppliers.sort((a, b) =>
+      suppliers: dedupeSuppliers(suppliers).sort((a, b) =>
         a.supplierName.localeCompare(b.supplierName),
       ),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export async function findPublishedNicheMatches(query: string, limit = 5) {
+  const cleanQuery = query.trim();
+  if (!cleanQuery) return [];
+
+  const niches = await getPassingNichesWithDb();
+  const querySlug = slugifyNiche(cleanQuery);
+  const queryCanonical = canonicalCategoryKey(cleanQuery);
+  const queryLower = cleanQuery.toLowerCase();
+
+  return niches
+    .filter((niche) => {
+      const nameLower = niche.name.toLowerCase();
+      return (
+        niche.slug === querySlug ||
+        canonicalCategoryKey(niche.name) === queryCanonical ||
+        categoriesAreCloselyRelated(niche.name, cleanQuery) ||
+        nameLower.includes(queryLower) ||
+        queryLower.includes(nameLower)
+      );
+    })
+    .slice(0, limit)
+    .map((niche) => ({
+      name: niche.name,
+      slug: niche.slug,
+      supplierCount: niche.suppliers.length,
+    }));
+}
+
+function findGroupedCategoryKey(
+  grouped: Map<string, { name: string; suppliers: SupplierResearchRecord[] }>,
+  name: string,
+) {
+  const canonicalKey = canonicalCategoryKey(name) || slugifyNiche(name);
+  const related = Array.from(grouped.entries()).find(
+    ([, group]) =>
+      canonicalCategoryKey(group.name) === canonicalKey ||
+      categoriesAreCloselyRelated(group.name, name),
+  );
+
+  return related?.[0] || canonicalKey;
+}
+
+function dedupeSuppliers(suppliers: SupplierResearchRecord[]) {
+  const seen = new Set<string>();
+  return suppliers.filter((supplier) => {
+    const key =
+      `${supplier.supplierName}|${supplier.officialWebsite}`.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 export function getNicheBySlug(slug: string) {

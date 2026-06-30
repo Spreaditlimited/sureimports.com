@@ -46,44 +46,54 @@ export default async function ManageIntelligencePlanPage() {
   // ---------------------------------------------------------------------------
   if (!subscription) {
     return (
-      <main className="min-h-screen bg-slate-50/50 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/50 sm:p-16 text-center">
-          
-          {/* Subtle Ambient Glow */}
-          <div className="absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[100px] pointer-events-none" />
-          
-          <div className="relative flex flex-col items-center">
-            <Link
-              href="/dashboard/intelligence"
-              className="absolute left-0 top-0 hidden md:inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
-            >
-              <ChevronLeft className="h-4 w-4" /> Back
-            </Link>
+      <main className="flex min-h-screen flex-col bg-slate-50/50 text-slate-950 antialiased selection:bg-brand-orange-500/30">
+        
+        {/* Consistent Top Navigation */}
+        <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+          <Link
+            href="/dashboard/intelligence"
+            className="group inline-flex items-center gap-3 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
+          >
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition-colors group-hover:bg-slate-50">
+              <ChevronLeft className="h-4 w-4" />
+            </span>
+            Back to Directory
+          </Link>
+        </div>
 
-            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-50 border border-slate-100 shadow-sm text-brand-orange-500">
-              <LockKeyhole className="h-8 w-8" />
-            </div>
+        {/* Centered Empty State Card */}
+        <div className="flex flex-1 items-center justify-center px-4 pb-20 sm:px-6 lg:px-8">
+          <div className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-2xl shadow-slate-200/50 sm:p-16">
             
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-              No Active Plan
-            </h1>
-            <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-600">
-              You do not have an active Supplier Intelligence plan. Subscribe to gain access to our verified China supplier database and buyer notes.
-            </p>
+            {/* Subtle Ambient Glow */}
+            <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px]" />
             
-            <div className="mt-10 flex w-full max-w-md flex-col gap-4 sm:flex-row">
-              <SubscribeButton
-                plan="starter"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:text-slate-900 shadow-sm hover:shadow-md"
-              >
-                Start with Basic
-              </SubscribeButton>
-              <SubscribeButton
-                plan="pro"
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600"
-              >
-                Go Pro <Sparkles className="h-4 w-4" />
-              </SubscribeButton>
+            <div className="relative flex flex-col items-center">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-slate-100 bg-slate-50 text-brand-orange-500 shadow-sm">
+                <LockKeyhole className="h-8 w-8" />
+              </div>
+              
+              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                No Active Plan
+              </h1>
+              <p className="mt-4 max-w-md text-base leading-relaxed text-slate-600">
+                You do not have an active Supplier Intelligence plan. Subscribe to gain access to our verified China supplier database and buyer notes.
+              </p>
+              
+              <div className="mt-10 flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
+                <SubscribeButton
+                  plan="starter"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 sm:w-auto"
+                >
+                  Start with Basic
+                </SubscribeButton>
+                <SubscribeButton
+                  plan="pro"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 sm:w-auto"
+                >
+                  Go Pro <Sparkles className="h-4 w-4" />
+                </SubscribeButton>
+              </div>
             </div>
           </div>
         </div>
@@ -99,7 +109,7 @@ export default async function ManageIntelligencePlanPage() {
   const canUpgrade = subscription.plan !== 'pro';
 
   return (
-    <main className="min-h-screen bg-slate-50/50 px-4 py-10 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-slate-50/50 px-4 py-8 text-slate-950 antialiased selection:bg-brand-orange-500/30 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-5xl">
         
         {/* --- Top Navigation --- */}
@@ -108,7 +118,7 @@ export default async function ManageIntelligencePlanPage() {
             href="/dashboard/intelligence"
             className="group inline-flex items-center gap-3 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white transition-colors group-hover:bg-slate-100">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition-colors group-hover:bg-slate-50">
               <ChevronLeft className="h-4 w-4" />
             </span>
             Back to Directory
@@ -121,24 +131,24 @@ export default async function ManageIntelligencePlanPage() {
             <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-600">
               Billing & Subscription
             </p>
-            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900">
+            <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl text-balance">
               Manage Plan
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
               Review your current access, manage your Paystack billing details, or upgrade your plan to unlock more capabilities.
             </p>
           </div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold capitalize text-emerald-800 shadow-sm">
+          <div className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold capitalize text-emerald-800 shadow-sm">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             Active {currentPlan.name}
           </div>
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:gap-10">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_380px] lg:gap-10">
           
           {/* --- LEFT COLUMN: Current Plan Details --- */}
-          <section className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm sm:p-10">
-            <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-8">
+          <section className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 border-b border-slate-100 pb-8">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Current Plan</p>
                 <h2 className="mt-2 text-3xl font-bold text-slate-900">
@@ -148,7 +158,7 @@ export default async function ManageIntelligencePlanPage() {
                   {formatNaira(currentPlan.priceNaira)} / month
                 </p>
               </div>
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500">
+              <div className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500">
                 <CreditCard className="h-6 w-6" />
               </div>
             </div>
@@ -172,7 +182,7 @@ export default async function ManageIntelligencePlanPage() {
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <div className="mb-3 text-slate-400"><Hash className="h-4 w-4" /></div>
                 <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Reference</p>
-                <p className="mt-1 truncate text-sm font-bold text-slate-900" title={subscription.paystackReference || subscription.pidSubscription}>
+                <p className="mt-1 break-all text-sm font-bold text-slate-900" title={subscription.paystackReference || subscription.pidSubscription}>
                   {subscription.paystackReference || subscription.pidSubscription.split('-')[0]}
                 </p>
               </div>
@@ -191,31 +201,37 @@ export default async function ManageIntelligencePlanPage() {
               </ul>
             </div>
 
-            {/* Billing Action */}
-            <div className="mt-auto pt-10">
-              {subscription.paystackSubscriptionCode ? (
-                <ManagePaystackButton 
-                  className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900" 
-                />
-              ) : (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5 h-4 w-4 shrink-0 text-amber-600"><Zap className="h-4 w-4"/></div>
-                    <p className="text-sm font-medium leading-relaxed text-amber-900">
-                      Paystack billing management will be available here after the subscription is linked to a recurring plan.
-                    </p>
+            {/* Billing Action Area */}
+            <div className="mt-10 pt-8 border-t border-slate-100">
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm text-brand-orange-600">
+                      <Zap className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900">
+                        Paystack billing
+                      </h3>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                        Update your card, cancel renewal, or manage billing details.
+                      </p>
+                    </div>
                   </div>
+                  <ManagePaystackButton
+                    className="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-100 hover:text-slate-900"
+                  />
                 </div>
-              )}
+              </div>
             </div>
           </section>
 
           {/* --- RIGHT COLUMN: Upgrade / Highest Plan --- */}
-          <aside className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-8 text-white shadow-2xl sm:p-10">
+          <aside className="relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-8 text-white shadow-2xl sm:p-10 h-fit">
             {canUpgrade ? (
               <>
                 {/* Accent glow */}
-                <div className="absolute right-0 top-0 h-48 w-48 -translate-y-12 translate-x-12 rounded-full bg-brand-orange-500/20 blur-[60px]" />
+                <div className="pointer-events-none absolute right-0 top-0 h-48 w-48 -translate-y-12 translate-x-12 rounded-full bg-brand-orange-500/20 blur-[60px]" />
                 
                 <div className="relative">
                   <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-300">
@@ -230,7 +246,7 @@ export default async function ManageIntelligencePlanPage() {
                   
                   <div className="mt-8 border-t border-white/10 pt-8">
                     <p className="text-4xl font-black tracking-tight">
-                      <span className="text-2xl font-bold text-slate-500 mr-1">₦</span>
+                      <span className="mr-1 text-2xl font-bold text-slate-500">₦</span>
                       {proPlan.priceNaira.toLocaleString()}
                       <span className="ml-2 text-sm font-medium text-slate-500">/ month</span>
                     </p>
@@ -260,7 +276,7 @@ export default async function ManageIntelligencePlanPage() {
                 </div>
               </>
             ) : (
-              <div className="flex h-full flex-col items-center justify-center text-center">
+              <div className="flex h-full flex-col items-center justify-center text-center py-6">
                 <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
                   <Crown className="h-8 w-8" />
                 </div>

@@ -5,7 +5,12 @@ import { generateToken } from '@/lib/jwt';
 import {
   disablePaystackSubscription,
   fetchPaystackSubscription,
+  getPaymentSubscriptionCode,
 } from '@/lib/intelligence/paystack';
+import {
+  grantIntelligenceCredits,
+} from '@/lib/intelligence/credits';
+import { getConfiguredIntelligencePlan } from '@/lib/intelligence/plans';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -32,16 +37,6 @@ function addMonths(date: Date, months: number) {
   const next = new Date(date);
   next.setMonth(next.getMonth() + months);
   return next;
-}
-
-function getPaymentSubscriptionCode(payment: any) {
-  if (typeof payment?.subscription === 'string') return payment.subscription;
-  return (
-    payment?.subscription?.subscription_code ||
-    payment?.subscription_code ||
-    payment?.metadata?.subscription_code ||
-    null
-  );
 }
 
 export async function POST(request: Request) {
@@ -138,6 +133,16 @@ export async function POST(request: Request) {
   }
 
   if (subscription.plan === 'pro') {
+    const proPlan = await getConfiguredIntelligencePlan('pro');
+    await grantIntelligenceCredits({
+      pidUser: subscription.pidUser,
+      amount: proPlan.monthlySearchCredits,
+      reason: 'pro_monthly_search_credits',
+      reference:
+        payment.reference ||
+        `${subscription.pidSubscription}:${periodEnd.toISOString().slice(0, 10)}`,
+    });
+
     const olderSubscriptions = await prisma.$queryRaw<
       Pick<
         IntelligenceSubscriptionRow,

@@ -8,6 +8,8 @@ export type IntelligencePlan = {
   envPlanCode: string;
   envPriceNaira: string;
   paystackPlanCode?: string;
+  monthlySearchCredits: number;
+  extraCreditPriceNaira: number;
   features: string[];
 };
 
@@ -20,8 +22,11 @@ export const intelligencePlans: Record<IntelligencePlanKey, IntelligencePlan> =
       interval: 'monthly',
       envPlanCode: 'PAYSTACK_INTELLIGENCE_STARTER_PLAN_CODE',
       envPriceNaira: 'PAYSTACK_INTELLIGENCE_STARTER_PRICE_NAIRA',
+      monthlySearchCredits: 0,
+      extraCreditPriceNaira: 5000,
       features: [
         'Access the supplier intelligence database',
+        'Browse all approved supplier categories and supplier leads',
         'Supplier leads checked across 10 data points',
         'Company profiles, contact details and Sure Imports notes',
         'Buyer risks and Nigeria-specific notes for each category',
@@ -34,8 +39,11 @@ export const intelligencePlans: Record<IntelligencePlanKey, IntelligencePlan> =
       interval: 'monthly',
       envPlanCode: 'PAYSTACK_INTELLIGENCE_PRO_PLAN_CODE',
       envPriceNaira: 'PAYSTACK_INTELLIGENCE_PRO_PRICE_NAIRA',
+      monthlySearchCredits: 3,
+      extraCreditPriceNaira: 5000,
       features: [
         'Everything in Starter Database',
+        'Monthly supplier search credits',
         'Submit supplier details for review before paying',
         'Submit quotes for price, MOQ, lead time and hidden cost review',
         'Submit invoice and payment details for pre-payment checks',
@@ -49,6 +57,8 @@ type PlanSettingsRow = {
   name: string;
   priceNaira: number;
   paystackPlanCode: string | null;
+  monthlySearchCredits: number;
+  extraCreditPriceNaira: number;
 };
 
 function isLocalPlanConfigMode() {
@@ -82,8 +92,31 @@ function applyEnvOverrides(
       ...plan,
       priceNaira: envPrice(process.env[plan.envPriceNaira], plan.priceNaira),
       paystackPlanCode: process.env[plan.envPlanCode] || plan.paystackPlanCode,
+      monthlySearchCredits: envPrice(
+        process.env[`INTELLIGENCE_${key.toUpperCase()}_MONTHLY_SEARCH_CREDITS`],
+        plan.monthlySearchCredits,
+      ),
+      extraCreditPriceNaira: envPrice(
+        process.env[`INTELLIGENCE_${key.toUpperCase()}_EXTRA_CREDIT_PRICE_NAIRA`],
+        plan.extraCreditPriceNaira,
+      ),
     };
   }
+
+  return plans;
+}
+
+function applyCreditFeatureText(
+  plans: Record<IntelligencePlanKey, IntelligencePlan>,
+) {
+  plans.pro = {
+    ...plans.pro,
+    features: plans.pro.features.map((feature) =>
+      feature === 'Monthly supplier search credits'
+        ? `${plans.pro.monthlySearchCredits} monthly supplier search credits`
+        : feature,
+    ),
+  };
 
   return plans;
 }
@@ -100,6 +133,8 @@ async function getPlanSettingsRows(): Promise<PlanSettingsRow[]> {
         name VARCHAR(120) NOT NULL,
         priceNaira INT NOT NULL,
         paystackPlanCode VARCHAR(160) NULL,
+        monthlySearchCredits INT NOT NULL DEFAULT 0,
+        extraCreditPriceNaira INT NOT NULL DEFAULT 5000,
         status VARCHAR(40) NOT NULL DEFAULT 'ACTIVE',
         createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
         updatedAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
@@ -110,8 +145,25 @@ async function getPlanSettingsRows(): Promise<PlanSettingsRow[]> {
       ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     `);
 
+    for (const statement of [
+      'ALTER TABLE intelligence_plan_settings ADD COLUMN monthlySearchCredits INT NOT NULL DEFAULT 0',
+      'ALTER TABLE intelligence_plan_settings ADD COLUMN extraCreditPriceNaira INT NOT NULL DEFAULT 5000',
+    ]) {
+      try {
+        await prisma.$executeRawUnsafe(statement);
+      } catch {
+        // Existing databases may already have these columns.
+      }
+    }
+
     return prisma.$queryRaw<PlanSettingsRow[]>`
-      SELECT planKey, name, priceNaira, paystackPlanCode
+      SELECT
+        planKey,
+        name,
+        priceNaira,
+        paystackPlanCode,
+        monthlySearchCredits,
+        extraCreditPriceNaira
       FROM intelligence_plan_settings
       WHERE status = 'ACTIVE'
         AND planKey IN ('starter', 'pro')
@@ -125,7 +177,7 @@ export async function getIntelligencePlans() {
   const plans = structuredClone(intelligencePlans);
 
   if (isLocalPlanConfigMode()) {
-    return applyEnvOverrides(plans);
+    return applyCreditFeatureText(applyEnvOverrides(plans));
   }
 
   const rows = await getPlanSettingsRows();
@@ -138,10 +190,16 @@ export async function getIntelligencePlans() {
       name: row.name || plans[row.planKey].name,
       priceNaira: Number(row.priceNaira || plans[row.planKey].priceNaira),
       paystackPlanCode: row.paystackPlanCode || undefined,
+      monthlySearchCredits: Number(
+        row.monthlySearchCredits || plans[row.planKey].monthlySearchCredits,
+      ),
+      extraCreditPriceNaira: Number(
+        row.extraCreditPriceNaira || plans[row.planKey].extraCreditPriceNaira,
+      ),
     };
   }
 
-  return applyEnvOverrides(plans);
+  return applyCreditFeatureText(applyEnvOverrides(plans));
 }
 
 export function getIntelligencePlan(planKey: string | null | undefined) {

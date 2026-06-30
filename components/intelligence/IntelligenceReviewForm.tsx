@@ -68,6 +68,9 @@ const fieldsByType: Record<
     showQuote: boolean;
     showQuantity: boolean;
     showBudget: boolean;
+    showAttachments: boolean;
+    attachmentLabel?: string;
+    attachmentDescription?: string;
     decisionLabel: string;
     decisionPlaceholder: string;
   }
@@ -83,6 +86,7 @@ const fieldsByType: Record<
     showQuote: false,
     showQuantity: false,
     showBudget: false,
+    showAttachments: false,
     decisionLabel: 'Decision needed',
     decisionPlaceholder:
       'Example: Is this supplier worth contacting further, and what should I verify first?',
@@ -98,6 +102,10 @@ const fieldsByType: Record<
     showQuote: true,
     showQuantity: true,
     showBudget: true,
+    showAttachments: true,
+    attachmentLabel: 'Quote files',
+    attachmentDescription:
+      'Upload quote sheets, supplier screenshots, chat screenshots, product photos or PDFs. Max 5 files, 10MB each.',
     decisionLabel: 'Decision needed',
     decisionPlaceholder:
       'Example: Does this quote look reasonable, and what hidden costs or risks should I check?',
@@ -113,6 +121,7 @@ const fieldsByType: Record<
     showQuote: false,
     showQuantity: true,
     showBudget: true,
+    showAttachments: false,
     decisionLabel: 'What should Sure Imports research?',
     decisionPlaceholder:
       'Example: I need reliable manufacturers for rechargeable fans with lithium batteries for Nigeria.',
@@ -128,6 +137,10 @@ const fieldsByType: Record<
     showQuote: true,
     showQuantity: false,
     showBudget: false,
+    showAttachments: true,
+    attachmentLabel: 'Invoice or payment files',
+    attachmentDescription:
+      'Upload invoice, payment details, supplier screenshots, chat screenshots or PDFs. Max 5 files, 10MB each.',
     decisionLabel: 'Decision needed',
     decisionPlaceholder:
       'Example: Does the invoice/payment detail match the supplier, and what should I confirm before paying?',
@@ -345,29 +358,31 @@ export default function IntelligenceReviewForm({
         />
       </label>
 
-      <label className="block rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-brand-orange-300 hover:bg-brand-orange-50/40">
-        <span className="flex items-start gap-3">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-orange-500 shadow-sm">
-            <UploadCloud className="h-5 w-5" />
-          </span>
-          <span className="min-w-0">
-            <span className="block text-xs font-bold uppercase tracking-wider text-slate-500">
-              Supporting files
+      {config.showAttachments ? (
+        <label className="block rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-brand-orange-300 hover:bg-brand-orange-50/40">
+          <span className="flex items-start gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-brand-orange-500 shadow-sm">
+              <UploadCloud className="h-5 w-5" />
             </span>
-            <span className="mt-1 block text-sm leading-relaxed text-slate-600">
-              Upload invoice, quote, supplier screenshots, chat screenshots,
-              product photos or PDFs. Max 5 files, 10MB each.
+            <span className="min-w-0">
+              <span className="block text-xs font-bold uppercase tracking-wider text-slate-500">
+                {config.attachmentLabel || 'Supporting files'}
+              </span>
+              <span className="mt-1 block text-sm leading-relaxed text-slate-600">
+                {config.attachmentDescription ||
+                  'Upload supporting screenshots, documents or PDFs. Max 5 files, 10MB each.'}
+              </span>
             </span>
           </span>
-        </span>
-        <input
-          name="attachments"
-          type="file"
-          multiple
-          accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.txt,image/*,application/pdf"
-          className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-orange-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-orange-600"
-        />
-      </label>
+          <input
+            name="attachments"
+            type="file"
+            multiple
+            accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,.txt,image/*,application/pdf"
+            className="mt-4 block w-full text-sm text-slate-600 file:mr-4 file:rounded-full file:border-0 file:bg-brand-orange-500 file:px-4 file:py-2 file:text-sm file:font-bold file:text-white hover:file:bg-brand-orange-600"
+          />
+        </label>
+      ) : null}
 
       <button
         type="submit"

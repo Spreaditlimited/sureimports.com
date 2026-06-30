@@ -3,8 +3,10 @@ import type { ReactNode } from 'react';
 import { 
   Crown, 
   Database, 
-  LockKeyhole, 
+  Gift,
+  LockKeyhole,
   MapPin,
+  Search,
   ShieldCheck, 
   Sparkles,
   Star,
@@ -13,10 +15,15 @@ import {
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
 import { getCompanyContactSettings } from '@/lib/intelligence/companyContacts';
+import {
+  getOrCreateIntelligenceCreditAccount,
+  getUserIntelligenceSearchRequests,
+} from '@/lib/intelligence/credits';
 import { getPassingNichesWithDb } from '@/lib/intelligence/data';
 import { getConfiguredIntelligencePlan, getIntelligencePlans } from '@/lib/intelligence/plans';
 import SubscribeButton from '@/components/intelligence/SubscribeButton';
 import CategorySearchGrid from '@/components/intelligence/CategorySearchGrid';
+import SearchCreditRequestForm from '@/components/intelligence/SearchCreditRequestForm';
 
 export default async function DashboardIntelligencePage() {
   const user = await checkAuth();
@@ -25,6 +32,8 @@ export default async function DashboardIntelligencePage() {
   const companyContacts = await getCompanyContactSettings();
   const intelligencePlans = await getIntelligencePlans();
   const currentPlan = subscription ? await getConfiguredIntelligencePlan(subscription.plan) : null;
+  const creditAccount = await getOrCreateIntelligenceCreditAccount(user?.pidUser);
+  const searchRequests = await getUserIntelligenceSearchRequests(user?.pidUser);
   const isPro = subscription?.plan === 'pro';
   const availableSupplierCount = niches.reduce(
     (total, niche) => total + niche.suppliers.length,
@@ -32,52 +41,82 @@ export default async function DashboardIntelligencePage() {
   );
 
   // ---------------------------------------------------------------------------
-  // STATE 1: LOCKED / UNSUBSCRIBED
+  // STATE 1: FREEMIUM / UNSUBSCRIBED
   // ---------------------------------------------------------------------------
   if (!subscription) {
     return (
       <main className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
-        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 shadow-2xl shadow-slate-200/50 sm:p-12">
+        <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/50 sm:p-10 lg:p-12">
           {/* Subtle Ambient Glow */}
           <div className="absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px] pointer-events-none" />
           
-          <div className="relative flex flex-col items-center text-center">
-            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-50 border border-slate-100 shadow-sm text-brand-orange-500">
-              <LockKeyhole className="h-8 w-8" />
-            </div>
-            
-            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-              Supplier Intelligence is locked
-            </h1>
-            <p className="mt-4 max-w-lg text-base leading-relaxed text-slate-600">
-              Subscribe to access a growing database of verified suppliers in
-              China checked by Sure Imports across multiple data points, with
-              buyer notes and support from our team on ground in China.
-            </p>
-          </div>
-
-          <section className="relative mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left sm:p-6">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-600">
-                  What is inside today
-                </p>
-                <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">
-                  {niches.length} product categories with{' '}
-                  {availableSupplierCount} checked supplier leads
-                </h2>
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600">
-                  Every visible category has at least 3 checked supplier leads,
-                  buyer notes and contact routes reviewed by Sure Imports
-                  before it is shown in the dashboard.
-                </p>
+          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-700">
+                <Gift className="h-3.5 w-3.5" />
+                Free supplier search included
               </div>
 
-              <div className="grid grid-cols-3 gap-3 sm:w-[360px]">
+              <h1 className="mt-5 max-w-3xl text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Start with one free supplier search
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+                Use your free credit to ask Sure Imports to research a product
+                category. Our team reviews the result before anything is added
+                to the supplier database.
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                {[
+                  {
+                    icon: Search,
+                    title: 'Request research',
+                    body: 'Tell us the product category you want checked.',
+                  },
+                  {
+                    icon: ShieldCheck,
+                    title: 'Admin review',
+                    body: 'We review supplier candidates before publishing.',
+                  },
+                  {
+                    icon: Database,
+                    title: 'Upgrade for access',
+                    body: 'Subscribe when you need the full database.',
+                  },
+                ].map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
+                  >
+                    <item.icon className="h-5 w-5 text-brand-orange-500" />
+                    <h2 className="mt-3 text-sm font-extrabold text-slate-900">
+                      {item.title}
+                    </h2>
+                    <p className="mt-1 text-xs leading-relaxed text-slate-600">
+                      {item.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-600">
+                Database preview
+              </p>
+              <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">
+                {niches.length} categories already available
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                Subscribe to unlock the approved supplier leads, contact routes
+                and buyer notes behind these categories.
+              </p>
+
+              <div className="mt-5 grid grid-cols-3 gap-3">
                 {[
                   { label: 'Categories', value: niches.length },
                   { label: 'Supplier leads', value: availableSupplierCount },
-                  { label: 'Minimum per category', value: '3' },
+                  { label: 'Free credit', value: creditAccount?.balance || 1 },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -93,8 +132,53 @@ export default async function DashboardIntelligencePage() {
                 ))}
               </div>
             </div>
+          </div>
 
-            <div className="mt-6 flex flex-wrap gap-2">
+          {user?.pidUser ? (
+            <div className="relative mt-10">
+              <SearchCreditRequestForm
+                account={creditAccount}
+                requests={searchRequests}
+                proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
+                extraCreditPriceNaira={intelligencePlans.pro.extraCreditPriceNaira}
+                canOpenCategories={false}
+                compact
+              />
+            </div>
+          ) : (
+            <section className="relative mt-10 rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+              <h2 className="text-lg font-extrabold text-slate-900">
+                Create an account to use your free search credit
+              </h2>
+              <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
+                Free users can request one new supplier category for admin
+                review before deciding whether to subscribe.
+              </p>
+              <Link
+                href="/auth/login"
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-brand-orange-600"
+              >
+                Log in to continue
+              </Link>
+            </section>
+          )}
+
+          <section className="relative mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-left sm:p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-600">
+                  Available categories
+                </p>
+                <h2 className="mt-2 text-xl font-extrabold tracking-tight text-slate-900">
+                  Preview what subscribers can unlock
+                </h2>
+              </div>
+              <p className="text-sm font-semibold text-slate-500">
+                {availableSupplierCount} checked supplier leads
+              </p>
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
               {niches.map((niche) => (
                 <span
                   key={niche.slug}
@@ -105,6 +189,15 @@ export default async function DashboardIntelligencePage() {
               ))}
             </div>
           </section>
+
+          <div className="relative mt-10 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+              Need full access?
+            </p>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900">
+              Choose the plan that matches how much support you need
+            </h2>
+          </div>
 
           <div className="relative mt-10 grid gap-5 lg:grid-cols-2">
             <LockedPlanCard
@@ -257,6 +350,16 @@ export default async function DashboardIntelligencePage() {
             </div>
           </section>
         )}
+
+        <div className="mt-8">
+          <SearchCreditRequestForm
+            account={creditAccount}
+            requests={searchRequests}
+            proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
+            extraCreditPriceNaira={intelligencePlans.pro.extraCreditPriceNaira}
+            canOpenCategories={true}
+          />
+        </div>
 
         <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">

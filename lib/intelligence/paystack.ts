@@ -11,6 +11,16 @@ type PaystackSubscription = {
   email_token?: string;
 };
 
+export function getPaymentSubscriptionCode(payment: any) {
+  if (typeof payment?.subscription === 'string') return payment.subscription;
+  return (
+    payment?.subscription?.subscription_code ||
+    payment?.subscription_code ||
+    payment?.metadata?.subscription_code ||
+    null
+  );
+}
+
 export async function fetchPaystackSubscription(subscriptionCode: string) {
   if (!PAYSTACK_SECRET_KEY) return null;
 
@@ -27,6 +37,25 @@ export async function fetchPaystackSubscription(subscriptionCode: string) {
   const data = (await response
     .json()
     .catch(() => null)) as PaystackResponse<PaystackSubscription> | null;
+
+  if (!response.ok || !data?.status || !data.data) return null;
+  return data.data;
+}
+
+export async function verifyPaystackTransaction(reference: string) {
+  if (!PAYSTACK_SECRET_KEY || !reference) return null;
+
+  const response = await fetch(
+    `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+      },
+      cache: 'no-store',
+    },
+  );
+
+  const data = (await response.json().catch(() => null)) as PaystackResponse<any> | null;
 
   if (!response.ok || !data?.status || !data.data) return null;
   return data.data;

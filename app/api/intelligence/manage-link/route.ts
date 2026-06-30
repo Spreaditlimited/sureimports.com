@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
-import { generatePaystackManageLink } from '@/lib/intelligence/paystack';
+import { prisma } from '@/lib/prisma';
+import {
+  fetchPaystackSubscription,
+  generatePaystackManageLink,
+  getPaymentSubscriptionCode,
+  verifyPaystackTransaction,
+} from '@/lib/intelligence/paystack';
 
 export async function POST() {
   const user = await checkAuth();
@@ -20,16 +26,39 @@ export async function POST() {
     );
   }
 
-  if (!subscription.paystackSubscriptionCode) {
+  let subscriptionCode = subscription.paystackSubscriptionCode;
+
+  if (!subscriptionCode && subscription.paystackReference) {
+    const payment = await verifyPaystackTransaction(subscription.paystackReference);
+    subscriptionCode = getPaymentSubscriptionCode(payment);
+
+    if (subscriptionCode) {
+      const paystackSubscription =
+        await fetchPaystackSubscription(subscriptionCode);
+
+      await prisma.$executeRaw`
+        UPDATE intelligence_subscriptions
+        SET
+          paystackSubscriptionCode = ${subscriptionCode},
+          paystackEmailToken = ${paystackSubscription?.email_token || subscription.paystackEmailToken || null},
+          paystackCustomerCode = ${payment?.customer?.customer_code || subscription.paystackCustomerCode || null},
+          updatedAt = ${new Date()}
+        WHERE pidSubscription = ${subscription.pidSubscription}
+      `;
+    }
+  }
+
+  if (!subscriptionCode) {
     return NextResponse.json(
-      { message: 'This subscription is not linked to Paystack management yet.' },
+      {
+        message:
+          'This subscription is active, but Paystack has not returned a recurring subscription link for it yet.',
+      },
       { status: 400 },
     );
   }
 
-  const manageLink = await generatePaystackManageLink(
-    subscription.paystackSubscriptionCode,
-  );
+  const manageLink = await generatePaystackManageLink(subscriptionCode);
 
   if (!manageLink) {
     return NextResponse.json(

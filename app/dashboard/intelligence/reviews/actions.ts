@@ -49,6 +49,7 @@ type ReviewAttachment = {
 
 const MAX_REVIEW_FILES = 5;
 const MAX_REVIEW_FILE_SIZE = 10 * 1024 * 1024;
+const REVIEW_TYPES_WITH_ATTACHMENTS = new Set(['quote_review', 'invoice_check']);
 const ALLOWED_REVIEW_EXTENSIONS = new Set([
   'pdf',
   'png',
@@ -151,7 +152,9 @@ export async function createIntelligenceReviewRequest(formData: FormData) {
   const decisionNeeded = clean(formData.get('decisionNeeded'));
   const nicheSlug = clean(formData.get('nicheSlug'), 180);
   const nicheName = clean(formData.get('nicheName'), 180);
-  const files = getReviewFiles(formData);
+  const files = REVIEW_TYPES_WITH_ATTACHMENTS.has(requestType)
+    ? getReviewFiles(formData)
+    : [];
 
   if (!supplierName && !supplierWebsite && !productDetails) {
     throw new Error('Add at least a supplier name, supplier link, or product details.');
