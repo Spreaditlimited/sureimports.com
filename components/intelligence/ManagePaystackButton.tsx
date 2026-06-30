@@ -77,8 +77,8 @@ export default function ManagePaystackButton({
       ) : null}
       {opened ? (
         <p className="w-full max-w-2xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold leading-relaxed text-emerald-700">
-          Paystack opened in a new tab. This dashboard will stay here so you
-          can return after managing your billing.
+          Paystack opened in a new tab. This dashboard will stay here so you can
+          return after managing your billing.
         </p>
       ) : null}
     </div>

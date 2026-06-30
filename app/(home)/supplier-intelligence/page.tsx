@@ -540,53 +540,126 @@ export default async function SupplierIntelligencePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl text-center mx-auto md:text-left md:mx-0">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
-              Subscription
+              Plans
             </p>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl text-balance">
-              Choose database access or add pre-payment review support.
+              Start free, unlock the database, or add pre-payment review support.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate-600">
-              Starter gives you the supplier intelligence database. Pro adds
-              Sure Imports review support for suppliers, quotes and invoices
-              before you send money.
+              Free gives you one supplier search credit. Starter gives you the
+              supplier intelligence database. Pro adds Sure Imports review
+              support for suppliers, quotes and invoices before you send money.
             </p>
           </div>
 
-          <div className="mt-12 grid gap-8 lg:grid-cols-2">
-            {Object.values(intelligencePlans).map((plan) => (
-              <div
-                key={plan.key}
-                className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50 sm:p-10"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-6 border-b border-slate-100 pb-8">
+          <div className="mt-12 grid gap-8 lg:grid-cols-3">
+            <div className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50 sm:p-10">
+              <div className="border-b border-slate-100 pb-8">
+                <div className="min-h-[58px]">
                   <div>
-                    <h3 className="text-2xl font-bold text-slate-900">{plan.name}</h3>
+                    <h3 className="text-2xl font-bold text-slate-900">
+                      Free Search
+                    </h3>
                     <p className="mt-2 text-sm font-medium text-slate-500">
-                      Billed monthly • Cancel anytime
-                    </p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="text-4xl font-black tracking-tight text-slate-900">
-                      <span className="text-2xl text-slate-400 font-bold mr-1">₦</span>
-                      {plan.priceNaira.toLocaleString()}
+                      No monthly fee
                     </p>
                   </div>
                 </div>
-
-                <ul className="my-8 flex-1 space-y-4 text-sm leading-relaxed text-slate-700">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange-500" />
-                      <span className="font-medium">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="mt-auto pt-4">
-                  <IntelligenceSignupForm plan={plan.key} />
+                <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
+                  <p className="text-4xl font-black tracking-tight text-slate-900">
+                    ₦0
+                  </p>
+                  <p className="pb-1 text-sm font-bold text-slate-500">
+                    one free search
+                  </p>
                 </div>
               </div>
-            ))}
+
+              <ul className="my-8 flex-1 space-y-4 text-sm leading-relaxed text-slate-700">
+                {[
+                  'Create a Sure Imports account',
+                  'Get 1 free supplier search credit',
+                  'Search for one product category',
+                  'Receive a result summary when intelligence is available',
+                  'Subscribe when you want full supplier details',
+                ].map((feature) => (
+                  <li key={feature} className="flex items-start gap-3">
+                    <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange-500" />
+                    <span className="font-medium">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-auto min-h-[316px] pt-4">
+                <IntelligenceSignupForm
+                  plan="free"
+                  note="Includes one free supplier search credit. Full supplier details are available on the paid plans."
+                />
+              </div>
+            </div>
+
+            {Object.values(intelligencePlans).map((plan) => {
+              const isPro = plan.key === 'pro';
+
+              return (
+                <div
+                  key={plan.key}
+                  className={`relative flex flex-col rounded-[2rem] border p-8 shadow-xl sm:p-10 ${
+                    isPro
+                      ? 'border-brand-orange-300 bg-brand-orange-50/40 shadow-brand-orange-100/70'
+                      : 'border-slate-200 bg-white shadow-slate-200/50'
+                  }`}
+                >
+                  <div
+                    className={`border-b pb-8 ${
+                      isPro ? 'border-brand-orange-200' : 'border-slate-100'
+                    }`}
+                  >
+                    <div className="flex min-h-[58px] items-start justify-between gap-4">
+                      <div>
+                        <h3 className="text-2xl font-bold text-slate-900">
+                          {plan.name}
+                        </h3>
+                        <p className="mt-2 text-sm font-medium text-slate-500">
+                          Billed monthly • Cancel anytime
+                        </p>
+                      </div>
+
+                      {isPro ? (
+                        <span className="shrink-0 rounded-full bg-brand-orange-500 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-brand-orange-500/20">
+                          Best Value
+                        </span>
+                      ) : null}
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
+                      <p className="text-4xl font-black tracking-tight text-slate-900">
+                        <span className="mr-1 text-2xl font-bold text-slate-400">
+                          ₦
+                        </span>
+                        {plan.priceNaira.toLocaleString()}
+                      </p>
+                      <p className="pb-1 text-sm font-bold text-slate-500">
+                        / month
+                      </p>
+                    </div>
+                  </div>
+
+                  <ul className="my-8 flex-1 space-y-4 text-sm leading-relaxed text-slate-700">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3">
+                        <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange-500" />
+                        <span className="font-medium">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-auto min-h-[316px] pt-4">
+                    <IntelligenceSignupForm plan={plan.key} />
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

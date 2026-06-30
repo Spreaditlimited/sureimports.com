@@ -4,31 +4,35 @@ const clients = [
   {
     name: 'Moppet',
     src: '/Moppet.PNG',
-    frameClass: 'h-24 w-[220px] md:h-28 md:w-[280px]',
-    imageClass: 'object-cover object-center',
+    logoClass: 'max-h-24 max-w-[240px] md:max-h-28 md:max-w-[300px]',
   },
   {
     name: 'Microware',
     src: '/Microware.PNG',
-    frameClass: 'h-24 w-[240px] md:h-28 md:w-[310px]',
-    imageClass: 'object-cover object-center',
+    logoClass: 'max-h-24 max-w-[240px] md:max-h-28 md:max-w-[300px]',
   },
   {
     name: 'Sterling',
     src: '/Sterling.PNG',
-    frameClass: 'h-24 w-[220px] md:h-28 md:w-[280px]',
-    imageClass: 'object-cover object-center',
+    logoClass: 'max-h-24 max-w-[240px] md:max-h-28 md:max-w-[300px]',
   },
   {
     name: 'CafeOne',
     src: '/cafeOne.PNG',
-    frameClass: 'h-24 w-[190px] md:h-28 md:w-[240px]',
-    imageClass: 'object-cover object-center',
+    logoClass: 'max-h-24 max-w-[220px] md:max-h-28 md:max-w-[270px]',
+  },
+  {
+    name: 'Dr. Muibat Adeniran',
+    src: '/Dr-Muibat-Adeniran-OBGYN-p.png',
+    logoClass: 'max-h-24 max-w-[340px] md:max-h-28 md:max-w-[440px]',
   },
 ];
 
 const marqueeClients = [...clients, ...clients];
-const logoSlotClass = 'flex w-[280px] shrink-0 items-center justify-center';
+const mobileLogoSlotClass =
+  'flex h-36 w-[300px] shrink-0 items-center justify-center px-3 md:h-40 md:w-[390px]';
+const desktopLogoSlotClass =
+  'flex h-40 min-w-0 flex-1 items-center justify-center px-2';
 
 export default function TrustedOrganizations() {
   return (
@@ -45,46 +49,40 @@ export default function TrustedOrganizations() {
             TRUSTED BY ORGANIZATIONS ACROSS NIGERIA
           </p>
 
-          <div className="-mx-4 overflow-hidden sm:-mx-6 md:hidden">
-            <div className="mobile-logo-marquee flex w-max items-center gap-0 px-4 sm:px-6">
+          <div className="-mx-4 overflow-hidden sm:-mx-6 lg:hidden">
+            <div className="mobile-logo-marquee flex w-max items-center px-4 sm:px-6">
               {marqueeClients.map((client, index) => (
                 <div
                   key={`${client.name}-${index}`}
-                  className={logoSlotClass}
+                  className={mobileLogoSlotClass}
+                  aria-hidden={index >= clients.length}
                 >
-                  <div className={`relative overflow-hidden ${client.frameClass}`}>
-                    <Image
-                      src={client.src}
-                      alt={client.name}
-                      fill
-                      sizes="280px"
-                      className={client.imageClass}
-                      quality={100}
-                    />
-                  </div>
+                  <Image
+                    src={client.src}
+                    alt={client.name}
+                    width={360}
+                    height={120}
+                    sizes="(min-width: 768px) 330px, 260px"
+                    className={`h-auto w-auto object-contain ${client.logoClass}`}
+                    quality={100}
+                  />
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="hidden items-center justify-items-center md:grid md:grid-cols-4 md:gap-x-6">
+          <div className="hidden items-center justify-center gap-3 lg:flex xl:gap-5">
             {clients.map((client) => (
-              <div
-                key={client.name}
-                className="flex w-full items-center justify-center"
-              >
-                <div
-                  className={`relative max-w-full overflow-hidden ${client.frameClass}`}
-                >
-                  <Image
-                    src={client.src}
-                    alt={client.name}
-                    fill
-                    sizes="25vw"
-                    className={client.imageClass}
-                    quality={100}
-                  />
-                </div>
+              <div key={client.name} className={desktopLogoSlotClass}>
+                <Image
+                  src={client.src}
+                  alt={client.name}
+                  width={360}
+                  height={120}
+                  sizes="260px"
+                  className={`h-auto w-auto object-contain ${client.logoClass}`}
+                  quality={100}
+                />
               </div>
             ))}
           </div>

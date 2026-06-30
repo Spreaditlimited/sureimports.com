@@ -6,11 +6,13 @@ import { Loader2 } from 'lucide-react';
 import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
 
 type IntelligenceSignupFormProps = {
-  plan: IntelligencePlanKey;
+  plan: IntelligencePlanKey | 'free';
+  note?: string;
 };
 
 export default function IntelligenceSignupForm({
   plan,
+  note,
 }: IntelligenceSignupFormProps) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -18,6 +20,7 @@ export default function IntelligenceSignupForm({
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const isFreePlan = plan === 'free';
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -25,6 +28,19 @@ export default function IntelligenceSignupForm({
     setIsLoading(true);
 
     try {
+      if (isFreePlan) {
+        const params = new URLSearchParams({
+          next: '/dashboard/intelligence',
+          affRef: 'supplier-intelligence-free',
+          firstName,
+          lastName,
+          email,
+          phone,
+        });
+        window.location.href = `/auth/signup?${params.toString()}`;
+        return;
+      }
+
       const response = await fetch('/api/intelligence/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,15 +110,17 @@ export default function IntelligenceSignupForm({
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Starting checkout...
+            {isFreePlan ? 'Opening signup...' : 'Starting checkout...'}
           </>
         ) : (
-          `Subscribe now`
+          isFreePlan ? 'Create free account' : 'Subscribe now'
         )}
       </button>
       <p className="text-xs leading-5 text-slate-500">
-        Payment creates or links your Sure Imports account automatically. After
-        payment, you will be signed in and taken to the supplier research area.
+        {note ||
+          (isFreePlan
+            ? 'Create your Sure Imports account to use your free supplier search credit.'
+            : 'Payment creates or links your Sure Imports account automatically. After payment, you will be signed in and taken to the supplier research area.')}
       </p>
     </form>
   );

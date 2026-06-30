@@ -79,33 +79,38 @@ export async function findPaystackSubscription(input: {
 }) {
   if (!PAYSTACK_SECRET_KEY) return null;
 
-  const response = await fetch('https://api.paystack.co/subscription?perPage=100', {
-    headers: {
-      Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+  const response = await fetch(
+    'https://api.paystack.co/subscription?perPage=100',
+    {
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+      },
+      cache: 'no-store',
     },
-    cache: 'no-store',
-  });
+  );
 
-  const data = (await response
-    .json()
-    .catch(() => null)) as PaystackResponse<PaystackSubscription[]> | null;
+  const data = (await response.json().catch(() => null)) as PaystackResponse<
+    PaystackSubscription[]
+  > | null;
 
   if (!response.ok || !data?.status || !Array.isArray(data.data)) return null;
 
   const customerCode = String(input.customerCode || '').trim();
-  const customerEmail = String(input.customerEmail || '').trim().toLowerCase();
+  const customerEmail = String(input.customerEmail || '')
+    .trim()
+    .toLowerCase();
   const planCode = String(input.planCode || '').trim();
 
   const matches = data.data.filter((subscription) => {
     const subscriptionCustomerCode = String(
       subscription.customer?.customer_code || '',
     ).trim();
-    const subscriptionCustomerEmail = String(
-      subscription.customer?.email || '',
-    )
+    const subscriptionCustomerEmail = String(subscription.customer?.email || '')
       .trim()
       .toLowerCase();
-    const subscriptionPlanCode = String(subscription.plan?.plan_code || '').trim();
+    const subscriptionPlanCode = String(
+      subscription.plan?.plan_code || '',
+    ).trim();
 
     const customerMatches =
       Boolean(customerCode && subscriptionCustomerCode === customerCode) ||

@@ -63,6 +63,10 @@ export default function SignUpFormContainer() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
   const nextParam = searchParams.get('next');
+  const initialFirstName = searchParams.get('firstName') || '';
+  const initialLastName = searchParams.get('lastName') || '';
+  const initialEmail = searchParams.get('email') || '';
+  const initialPhone = searchParams.get('phone') || '';
   const loginHref =
     nextParam && nextParam.startsWith('/')
       ? `/auth/login?next=${encodeURIComponent(nextParam)}`
@@ -104,10 +108,10 @@ export default function SignUpFormContainer() {
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
-      userFirstname: '',
-      userLastname: '',
-      email: '',
-      phone: '',
+      userFirstname: initialFirstName,
+      userLastname: initialLastName,
+      email: initialEmail,
+      phone: initialPhone,
       password: '',
       confirmPassword: '',
       userAffiliateRef: userAffiliateRefx,
