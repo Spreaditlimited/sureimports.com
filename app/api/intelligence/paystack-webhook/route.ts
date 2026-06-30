@@ -33,6 +33,15 @@ function getPaymentSubscriptionCode(payment: any) {
   );
 }
 
+function getSubscriptionCodeFromEvent(data: any) {
+  return (
+    data?.subscription_code ||
+    data?.subscription?.subscription_code ||
+    data?.data?.subscription_code ||
+    null
+  );
+}
+
 function signatureIsValid(body: string, signature: string | null) {
   if (!PAYSTACK_SECRET_KEY || !signature) return false;
 
@@ -54,6 +63,37 @@ export async function POST(request: Request) {
   }
 
   const payload = JSON.parse(rawBody);
+  const event = String(payload?.event || '').trim();
+
+  if (event.startsWith('subscription.')) {
+    const subscriptionCode = getSubscriptionCodeFromEvent(payload.data);
+    if (!subscriptionCode) {
+      return NextResponse.json({ received: true });
+    }
+
+    const eventStatus = String(payload.data?.status || '')
+      .trim()
+      .toLowerCase();
+
+    if (
+      event === 'subscription.disable' ||
+      event === 'subscription.not_renew' ||
+      eventStatus === 'non-renewing'
+    ) {
+      await prisma.$executeRaw`
+        UPDATE intelligence_subscriptions
+        SET
+          status = 'non_renewing',
+          cancelledAt = COALESCE(cancelledAt, ${new Date()}),
+          updatedAt = ${new Date()}
+        WHERE paystackSubscriptionCode = ${subscriptionCode}
+          AND status IN ('active', 'non_renewing')
+      `;
+    }
+
+    return NextResponse.json({ received: true });
+  }
+
   if (payload?.event !== 'charge.success' || payload?.data?.status !== 'success') {
     return NextResponse.json({ received: true });
   }

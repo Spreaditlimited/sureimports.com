@@ -38,7 +38,9 @@ export const FREE_INITIAL_SEARCH_CREDITS = 1;
 export const PRO_MONTHLY_SEARCH_CREDITS = 3;
 
 function clean(value: unknown, max = 4000) {
-  return String(value || '').trim().slice(0, max);
+  return String(value || '')
+    .trim()
+    .slice(0, max);
 }
 
 async function ensureCreditTables() {
@@ -99,7 +101,9 @@ async function ensureCreditTables() {
   `);
 }
 
-export async function getOrCreateIntelligenceCreditAccount(pidUser?: string | null) {
+export async function getOrCreateIntelligenceCreditAccount(
+  pidUser?: string | null,
+) {
   if (!pidUser) return null;
   await ensureCreditTables();
 
@@ -228,7 +232,9 @@ export async function createSearchRequestWithReservedCredit(input: {
     `;
     const latestAccount = accounts[0];
     if (!latestAccount || latestAccount.balance < SEARCH_CREDIT_COST) {
-      throw new Error('You do not have enough search credits for this request.');
+      throw new Error(
+        'You do not have enough search credits for this request.',
+      );
     }
 
     await tx.$executeRaw`
@@ -319,7 +325,9 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
     `;
     const latestAccount = accounts[0];
     if (!latestAccount || latestAccount.balance < SEARCH_CREDIT_COST) {
-      throw new Error('You do not have enough search credits for this request.');
+      throw new Error(
+        'You do not have enough search credits for this request.',
+      );
     }
 
     await tx.$executeRaw`
@@ -383,7 +391,9 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
   return pidSearch;
 }
 
-export async function getUserIntelligenceSearchRequests(pidUser?: string | null) {
+export async function getUserIntelligenceSearchRequests(
+  pidUser?: string | null,
+) {
   if (!pidUser) return [];
   await ensureCreditTables();
 

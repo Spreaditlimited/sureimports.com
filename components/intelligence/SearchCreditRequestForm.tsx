@@ -3,7 +3,14 @@
 import { useActionState, useEffect, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
-import { Bot, Clock3, Database, Loader2, Search, ShieldCheck } from 'lucide-react';
+import {
+  Bot,
+  Clock3,
+  Database,
+  Loader2,
+  Search,
+  ShieldCheck,
+} from 'lucide-react';
 
 import {
   createIntelligenceSearchRequest,
@@ -29,7 +36,8 @@ function statusClass(status: string) {
   if (status === 'approved' || status === 'fulfilled_existing') {
     return 'border-emerald-200 bg-emerald-50 text-emerald-700';
   }
-  if (status === 'rejected' || status === 'failed') return 'border-red-200 bg-red-50 text-red-700';
+  if (status === 'rejected' || status === 'failed')
+    return 'border-red-200 bg-red-50 text-red-700';
   if (status === 'running' || status === 'awaiting_approval') {
     return 'border-blue-200 bg-blue-50 text-blue-700';
   }
@@ -45,7 +53,11 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       disabled={disabled || pending}
       className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition hover:bg-brand-orange-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
     >
-      {pending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+      {pending ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <Search className="h-4 w-4" />
+      )}
       {pending ? 'Searching...' : 'Search suppliers'}
     </button>
   );
@@ -94,8 +106,8 @@ export default function SearchCreditRequestForm({
             {canOpenCategories
               ? 'Search for a supplier category. If the category already exists, we link you to it without using a credit. If it needs fresh research, one credit is reserved while admin reviews the request.'
               : 'Search for a supplier category. If a result is ready, you will see it immediately. If it needs fresh research, our team reviews the request before results are delivered. Each search uses one credit.'}{' '}
-            Pro includes {proMonthlyCredits} credits monthly. Extra credits
-            are priced at ₦{extraCreditPriceNaira.toLocaleString('en-NG')} each.
+            Pro includes {proMonthlyCredits} credits monthly. Extra credits are
+            priced at ₦{extraCreditPriceNaira.toLocaleString('en-NG')} each.
           </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
@@ -133,7 +145,7 @@ export default function SearchCreditRequestForm({
                     defaultChecked={count === 5}
                     className="peer sr-only"
                   />
-                  <span className="flex h-11 items-center justify-center rounded-xl border border-transparent bg-white px-3 text-sm font-black text-slate-600 shadow-sm transition peer-checked:border-brand-orange-300 peer-checked:bg-brand-orange-500 peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-orange-200 group-hover:text-slate-900 peer-checked:group-hover:text-white">
+                  <span className="flex h-11 items-center justify-center rounded-xl border border-transparent bg-white px-3 text-sm font-black text-slate-600 shadow-sm transition group-hover:text-slate-900 peer-checked:border-brand-orange-300 peer-checked:bg-brand-orange-500 peer-checked:text-white peer-checked:group-hover:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-orange-200">
                     {count}
                   </span>
                 </label>

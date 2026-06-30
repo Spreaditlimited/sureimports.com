@@ -5,6 +5,7 @@ import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
 import { prisma } from '@/lib/prisma';
 import {
   fetchPaystackSubscription,
+  findPaystackSubscription,
   generatePaystackManageLink,
   getPaymentSubscriptionCode,
   verifyPaystackTransaction,
@@ -31,6 +32,23 @@ export async function POST() {
   if (!subscriptionCode && subscription.paystackReference) {
     const payment = await verifyPaystackTransaction(subscription.paystackReference);
     subscriptionCode = getPaymentSubscriptionCode(payment);
+    const planCode =
+      typeof payment?.plan === 'string' ? payment.plan : payment?.plan?.plan_code;
+
+    if (!subscriptionCode) {
+      const matchingSubscription = await findPaystackSubscription({
+        customerCode:
+          payment?.customer?.customer_code || subscription.paystackCustomerCode,
+        customerEmail: payment?.customer?.email || subscription.email,
+        planCode,
+      });
+
+      subscriptionCode = matchingSubscription?.subscription_code || null;
+
+      if (matchingSubscription?.email_token) {
+        subscription.paystackEmailToken = matchingSubscription.email_token;
+      }
+    }
 
     if (subscriptionCode) {
       const paystackSubscription =

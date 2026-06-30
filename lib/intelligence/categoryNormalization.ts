@@ -17,7 +17,8 @@ const GENERIC_CATEGORY_WORDS = new Set([
 ]);
 
 function singularize(token: string) {
-  if (token.endsWith('ies') && token.length > 4) return `${token.slice(0, -3)}y`;
+  if (token.endsWith('ies') && token.length > 4)
+    return `${token.slice(0, -3)}y`;
   if (token.endsWith('ses') && token.length > 4) return token.slice(0, -2);
   if (token.endsWith('s') && token.length > 3) return token.slice(0, -1);
   return token;
@@ -36,7 +37,9 @@ export function normalizeCategoryTokens(value: string) {
 }
 
 export function canonicalCategoryKey(value: string) {
-  return Array.from(new Set(normalizeCategoryTokens(value))).sort().join('-');
+  return Array.from(new Set(normalizeCategoryTokens(value)))
+    .sort()
+    .join('-');
 }
 
 export function categoriesAreCloselyRelated(a: string, b: string) {
@@ -44,9 +47,10 @@ export function categoriesAreCloselyRelated(a: string, b: string) {
   const bTokens = new Set(normalizeCategoryTokens(b));
   if (!aTokens.size || !bTokens.size) return false;
 
-  const intersection = Array.from(aTokens).filter((token) => bTokens.has(token));
+  const intersection = Array.from(aTokens).filter((token) =>
+    bTokens.has(token),
+  );
   const smallerSize = Math.min(aTokens.size, bTokens.size);
 
   return intersection.length === smallerSize;
 }
-

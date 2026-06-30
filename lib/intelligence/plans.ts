@@ -97,7 +97,9 @@ function applyEnvOverrides(
         plan.monthlySearchCredits,
       ),
       extraCreditPriceNaira: envPrice(
-        process.env[`INTELLIGENCE_${key.toUpperCase()}_EXTRA_CREDIT_PRICE_NAIRA`],
+        process.env[
+          `INTELLIGENCE_${key.toUpperCase()}_EXTRA_CREDIT_PRICE_NAIRA`
+        ],
         plan.extraCreditPriceNaira,
       ),
     };

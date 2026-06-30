@@ -107,6 +107,7 @@ export default async function ManageIntelligencePlanPage() {
   const currentPlan = await getConfiguredIntelligencePlan(subscription.plan);
   const proPlan = intelligencePlans.pro;
   const canUpgrade = subscription.plan !== 'pro';
+  const isNonRenewing = subscription.status === 'non_renewing' || Boolean(subscription.cancelledAt);
 
   return (
     <main className="min-h-screen bg-slate-50/50 px-4 py-8 text-slate-950 antialiased selection:bg-brand-orange-500/30 sm:px-6 lg:px-8">
@@ -140,7 +141,7 @@ export default async function ManageIntelligencePlanPage() {
           </div>
           <div className="inline-flex shrink-0 items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-bold capitalize text-emerald-800 shadow-sm">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-            Active {currentPlan.name}
+            {isNonRenewing ? 'Cancels' : 'Active'} {currentPlan.name}
           </div>
         </div>
 
@@ -174,7 +175,9 @@ export default async function ManageIntelligencePlanPage() {
               </div>
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
                 <div className="mb-3 text-slate-400"><Calendar className="h-4 w-4" /></div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Renews On</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  {isNonRenewing ? 'Access Ends On' : 'Renews On'}
+                </p>
                 <p className="mt-1 text-sm font-bold text-slate-900">
                   {formatDate(subscription.currentPeriodEnd)}
                 </p>
@@ -187,6 +190,25 @@ export default async function ManageIntelligencePlanPage() {
                 </p>
               </div>
             </div>
+
+            {/* Features */}
+            {isNonRenewing ? (
+              <div className="mt-8 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+                <div className="flex items-start gap-3">
+                  <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+                  <div>
+                    <h3 className="text-sm font-extrabold text-amber-950">
+                      Your subscription has been cancelled
+                    </h3>
+                    <p className="mt-1 text-sm font-medium leading-relaxed text-amber-900">
+                      You still have Supplier Intelligence access until{' '}
+                      <strong>{formatDate(subscription.currentPeriodEnd)}</strong>.
+                      After this date, access will stop unless you subscribe again.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {/* Features */}
             <div className="mt-10">
@@ -204,22 +226,22 @@ export default async function ManageIntelligencePlanPage() {
             {/* Billing Action Area */}
             <div className="mt-10 pt-8 border-t border-slate-100">
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
-                <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm text-brand-orange-600">
-                      <Zap className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-bold text-slate-900">
-                        Paystack billing
-                      </h3>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                        Update your card, cancel renewal, or manage billing details.
-                      </p>
-                    </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white border border-slate-200 shadow-sm text-brand-orange-600">
+                    <Zap className="h-4 w-4" />
                   </div>
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-slate-900">
+                      Paystack billing
+                    </h3>
+                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
+                      Update your card, cancel renewal, or manage billing details.
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5">
                   <ManagePaystackButton
-                    className="inline-flex w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-100 hover:text-slate-900"
+                    className="inline-flex w-full min-w-[170px] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-100 hover:text-slate-900 sm:w-auto"
                   />
                 </div>
               </div>

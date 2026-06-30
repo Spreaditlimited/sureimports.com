@@ -5,7 +5,9 @@ import { generateToken } from '@/lib/jwt';
 import {
   disablePaystackSubscription,
   fetchPaystackSubscription,
+  findPaystackSubscription,
   getPaymentSubscriptionCode,
+  verifyPaystackTransaction,
 } from '@/lib/intelligence/paystack';
 import {
   grantIntelligenceCredits,
@@ -82,7 +84,19 @@ export async function POST(request: Request) {
   const payment = data.data;
   const paidAt = payment.paid_at ? new Date(payment.paid_at) : new Date();
   const periodEnd = addMonths(paidAt, 1);
-  const paystackSubscriptionCode = getPaymentSubscriptionCode(payment);
+  let paystackSubscriptionCode = getPaymentSubscriptionCode(payment);
+  const paymentPlanCode =
+    typeof payment?.plan === 'string' ? payment.plan : payment?.plan?.plan_code;
+
+  if (!paystackSubscriptionCode) {
+    const matchingSubscription = await findPaystackSubscription({
+      customerCode: payment.customer?.customer_code,
+      customerEmail: payment.customer?.email || payment.email,
+      planCode: paymentPlanCode,
+    });
+    paystackSubscriptionCode = matchingSubscription?.subscription_code || null;
+  }
+
   const paystackSubscription = paystackSubscriptionCode
     ? await fetchPaystackSubscription(paystackSubscriptionCode)
     : null;
@@ -146,18 +160,87 @@ export async function POST(request: Request) {
     const olderSubscriptions = await prisma.$queryRaw<
       Pick<
         IntelligenceSubscriptionRow,
-        'pidSubscription' | 'paystackSubscriptionCode' | 'paystackEmailToken'
+        | 'pidSubscription'
+        | 'paystackReference'
+        | 'paystackSubscriptionCode'
+        | 'paystackEmailToken'
+        | 'paystackCustomerCode'
+        | 'email'
+        | 'plan'
       >[]
     >`
-      SELECT pidSubscription, paystackSubscriptionCode, paystackEmailToken
+      SELECT
+        pidSubscription,
+        paystackReference,
+        paystackSubscriptionCode,
+        paystackEmailToken,
+        paystackCustomerCode,
+        email,
+        plan
       FROM intelligence_subscriptions
       WHERE pidUser = ${subscription.pidUser}
         AND pidSubscription <> ${subscription.pidSubscription}
         AND status IN ('active', 'non_renewing')
     `;
 
+    const olderSubscriptionsWithCodes = await Promise.all(
+      olderSubscriptions.map(async (olderSubscription) => {
+        if (
+          olderSubscription.paystackSubscriptionCode &&
+          olderSubscription.paystackEmailToken
+        ) {
+          return olderSubscription;
+        }
+
+        const olderPayment = olderSubscription.paystackReference
+          ? await verifyPaystackTransaction(olderSubscription.paystackReference)
+          : null;
+        const olderPlanCode =
+          typeof olderPayment?.plan === 'string'
+            ? olderPayment.plan
+            : olderPayment?.plan?.plan_code;
+        const matchingSubscription = await findPaystackSubscription({
+          customerCode:
+            olderPayment?.customer?.customer_code ||
+            olderSubscription.paystackCustomerCode,
+          customerEmail: olderPayment?.customer?.email || olderSubscription.email,
+          planCode: olderPlanCode,
+        });
+        const olderSubscriptionCode =
+          olderSubscription.paystackSubscriptionCode ||
+          matchingSubscription?.subscription_code ||
+          null;
+
+        if (!olderSubscriptionCode) return olderSubscription;
+
+        const paystackSubscription =
+          await fetchPaystackSubscription(olderSubscriptionCode);
+        const emailToken =
+          olderSubscription.paystackEmailToken ||
+          paystackSubscription?.email_token ||
+          matchingSubscription?.email_token ||
+          null;
+
+        await prisma.$executeRaw`
+          UPDATE intelligence_subscriptions
+          SET
+            paystackSubscriptionCode = ${olderSubscriptionCode},
+            paystackEmailToken = ${emailToken},
+            paystackCustomerCode = ${olderPayment?.customer?.customer_code || olderSubscription.paystackCustomerCode || null},
+            updatedAt = ${new Date()}
+          WHERE pidSubscription = ${olderSubscription.pidSubscription}
+        `;
+
+        return {
+          ...olderSubscription,
+          paystackSubscriptionCode: olderSubscriptionCode,
+          paystackEmailToken: emailToken,
+        };
+      }),
+    );
+
     await Promise.allSettled(
-      olderSubscriptions
+      olderSubscriptionsWithCodes
         .filter(
           (olderSubscription) =>
             olderSubscription.paystackSubscriptionCode &&

@@ -90,7 +90,10 @@ export async function getResearchSuppliersWithDb() {
 }
 
 export function getPassingNiches(minimumVerifiedContacts = 3) {
-  const grouped = new Map<string, { name: string; suppliers: SupplierResearchRecord[] }>();
+  const grouped = new Map<
+    string,
+    { name: string; suppliers: SupplierResearchRecord[] }
+  >();
 
   for (const supplier of getResearchSuppliers()) {
     if (supplier.verificationStatus !== 'official_site_contact_confirmed') {
@@ -116,7 +119,10 @@ export function getPassingNiches(minimumVerifiedContacts = 3) {
 }
 
 export async function getPassingNichesWithDb(minimumVerifiedContacts = 3) {
-  const grouped = new Map<string, { name: string; suppliers: SupplierResearchRecord[] }>();
+  const grouped = new Map<
+    string,
+    { name: string; suppliers: SupplierResearchRecord[] }
+  >();
 
   for (const supplier of await getResearchSuppliersWithDb()) {
     if (supplier.verificationStatus !== 'official_site_contact_confirmed') {
