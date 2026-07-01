@@ -1,13 +1,13 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { 
-  Crown, 
-  Database, 
+import {
+  Crown,
+  Database,
   Gift,
   LockKeyhole,
   MapPin,
   Search,
-  ShieldCheck, 
+  ShieldCheck,
   Sparkles,
   Star,
 } from 'lucide-react';
@@ -20,7 +20,10 @@ import {
   getUserIntelligenceSearchRequests,
 } from '@/lib/intelligence/credits';
 import { getPassingNichesWithDb } from '@/lib/intelligence/data';
-import { getConfiguredIntelligencePlan, getIntelligencePlans } from '@/lib/intelligence/plans';
+import {
+  getConfiguredIntelligencePlan,
+  getIntelligencePlans,
+} from '@/lib/intelligence/plans';
 import SubscribeButton from '@/components/intelligence/SubscribeButton';
 import CategorySearchGrid from '@/components/intelligence/CategorySearchGrid';
 import SearchCreditRequestForm from '@/components/intelligence/SearchCreditRequestForm';
@@ -31,8 +34,12 @@ export default async function DashboardIntelligencePage() {
   const niches = await getPassingNichesWithDb();
   const companyContacts = await getCompanyContactSettings();
   const intelligencePlans = await getIntelligencePlans();
-  const currentPlan = subscription ? await getConfiguredIntelligencePlan(subscription.plan) : null;
-  const creditAccount = await getOrCreateIntelligenceCreditAccount(user?.pidUser);
+  const currentPlan = subscription
+    ? await getConfiguredIntelligencePlan(subscription.plan)
+    : null;
+  const creditAccount = await getOrCreateIntelligenceCreditAccount(
+    user?.pidUser,
+  );
   const searchRequests = await getUserIntelligenceSearchRequests(user?.pidUser);
   const isPro = subscription?.plan === 'pro';
   const availableSupplierCount = niches.reduce(
@@ -48,8 +55,8 @@ export default async function DashboardIntelligencePage() {
       <main className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/50 sm:p-10 lg:p-12">
           {/* Subtle Ambient Glow */}
-          <div className="absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px] pointer-events-none" />
-          
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px]" />
+
           <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-700">
@@ -140,7 +147,9 @@ export default async function DashboardIntelligencePage() {
                 account={creditAccount}
                 requests={searchRequests}
                 proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
-                extraCreditPriceNaira={intelligencePlans.pro.extraCreditPriceNaira}
+                extraCreditPriceNaira={
+                  intelligencePlans.pro.extraCreditPriceNaira
+                }
                 canOpenCategories={false}
                 compact
               />
@@ -242,7 +251,6 @@ export default async function DashboardIntelligencePage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        
         {/* --- HEADER --- */}
         <div className="flex flex-col gap-6 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
           <div>
@@ -258,7 +266,7 @@ export default async function DashboardIntelligencePage() {
               10-point supplier check.
             </p>
           </div>
-          
+
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-bold capitalize text-amber-800 shadow-sm">
               <Crown className="h-4 w-4 text-amber-500" />
@@ -356,7 +364,10 @@ export default async function DashboardIntelligencePage() {
             account={creditAccount}
             requests={searchRequests}
             proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
-            extraCreditPriceNaira={intelligencePlans.pro.extraCreditPriceNaira}
+            extraCreditPriceNaira={
+              currentPlan?.extraCreditPriceNaira ||
+              intelligencePlans.pro.extraCreditPriceNaira
+            }
             canOpenCategories={true}
           />
         </div>
@@ -421,17 +432,30 @@ export default async function DashboardIntelligencePage() {
         {/* --- METRICS --- */}
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {[
-            { label: 'Product categories', value: niches.length, icon: Database },
+            {
+              label: 'Product categories',
+              value: niches.length,
+              icon: Database,
+            },
             { label: 'Data points reviewed', value: '10', icon: ShieldCheck },
-            { label: 'Dashboard-only access', value: 'No PDFs', icon: LockKeyhole },
+            {
+              label: 'Dashboard-only access',
+              value: 'No PDFs',
+              icon: LockKeyhole,
+            },
           ].map((stat, i) => (
-            <div key={i} className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div
+              key={i}
+              className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+            >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500">
                 <stat.icon className="h-5 w-5" />
               </div>
               <div>
                 <p className="text-xl font-bold text-slate-900">{stat.value}</p>
-                <p className="text-xs font-medium text-slate-500">{stat.label}</p>
+                <p className="text-xs font-medium text-slate-500">
+                  {stat.label}
+                </p>
               </div>
             </div>
           ))}
@@ -439,7 +463,6 @@ export default async function DashboardIntelligencePage() {
 
         {/* --- NICHE DIRECTORY --- */}
         <CategorySearchGrid niches={niches} />
-
       </div>
     </main>
   );
@@ -490,7 +513,10 @@ function LockedPlanCard({
 
       <ul className="mt-6 grid gap-3">
         {features.map((feature) => (
-          <li key={feature} className="flex gap-3 text-sm leading-relaxed text-slate-700">
+          <li
+            key={feature}
+            className="flex gap-3 text-sm leading-relaxed text-slate-700"
+          >
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-500" />
             <span>{feature}</span>
           </li>

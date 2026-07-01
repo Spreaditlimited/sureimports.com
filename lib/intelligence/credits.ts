@@ -182,7 +182,7 @@ export async function grantIntelligenceCredits(input: {
   reason: string;
   reference?: string | null;
 }) {
-  if (!input.pidUser || input.amount <= 0) return;
+  if (!input.pidUser || input.amount <= 0) return false;
   await ensureCreditTables();
   await getOrCreateIntelligenceCreditAccount(input.pidUser);
 
@@ -194,7 +194,7 @@ export async function grantIntelligenceCredits(input: {
         AND reference = ${input.reference}
         AND reason = ${input.reason}
     `;
-    if (Number(existing[0]?.total || 0) > 0) return;
+    if (Number(existing[0]?.total || 0) > 0) return false;
   }
 
   await prisma.$executeRaw`
@@ -223,6 +223,8 @@ export async function grantIntelligenceCredits(input: {
       ${new Date()}
     )
   `;
+
+  return true;
 }
 
 export async function createSearchRequestWithReservedCredit(input: {

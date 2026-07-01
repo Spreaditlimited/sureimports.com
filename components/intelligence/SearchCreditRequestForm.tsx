@@ -6,6 +6,7 @@ import Link from 'next/link';
 import {
   Bot,
   Clock3,
+  CreditCard,
   Database,
   Loader2,
   Search,
@@ -95,6 +96,106 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       )}
       {pending ? 'Searching...' : 'Search suppliers'}
     </button>
+  );
+}
+
+function BuyCreditsPanel({
+  extraCreditPriceNaira,
+}: {
+  extraCreditPriceNaira: number;
+}) {
+  const [quantity, setQuantity] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const total = quantity * extraCreditPriceNaira;
+
+  async function handleCheckout() {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/intelligence/credits/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity }),
+      });
+
+      if (response.status === 401) {
+        window.location.href = `/auth/login?next=${encodeURIComponent(
+          '/dashboard/intelligence',
+        )}`;
+        return;
+      }
+
+      const data = await response.json();
+      if (!response.ok || !data.authorizationUrl) {
+        throw new Error(data.message || 'Unable to start credit checkout.');
+      }
+
+      window.location.href = data.authorizationUrl;
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Unable to start credit checkout.',
+      );
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
+            Buy extra credits
+          </p>
+          <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-700">
+            ₦{extraCreditPriceNaira.toLocaleString('en-NG')} per supplier search
+            credit.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="grid grid-cols-4 gap-2 rounded-xl border border-slate-200 bg-white p-1.5">
+            {[1, 3, 5, 10].map((count) => (
+              <button
+                key={count}
+                type="button"
+                onClick={() => setQuantity(count)}
+                className={`h-10 rounded-lg px-3 text-sm font-black transition ${
+                  quantity === count
+                    ? 'bg-brand-orange-500 text-white'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                }`}
+              >
+                {count}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={handleCheckout}
+            disabled={isLoading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <CreditCard className="h-4 w-4" />
+            )}
+            {isLoading
+              ? 'Starting checkout...'
+              : `Pay ₦${total.toLocaleString('en-NG')}`}
+          </button>
+        </div>
+      </div>
+
+      {error ? (
+        <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+          {error}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -201,6 +302,10 @@ export default function SearchCreditRequestForm({
             Credits available
           </p>
         </div>
+      </div>
+
+      <div className="mt-5">
+        <BuyCreditsPanel extraCreditPriceNaira={extraCreditPriceNaira} />
       </div>
 
       <form ref={formRef} action={formAction} className="mt-6 grid gap-4">
