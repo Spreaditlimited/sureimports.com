@@ -47,9 +47,7 @@ export default async function ManageIntelligencePlanPage() {
   if (!subscription) {
     return (
       <main className="flex min-h-screen flex-col bg-slate-50/50 text-slate-950 antialiased selection:bg-brand-orange-500/30">
-        
-        {/* Consistent Top Navigation */}
-        <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
           <Link
             href="/dashboard/intelligence"
             className="group inline-flex items-center gap-3 text-sm font-medium text-slate-500 transition-colors hover:text-slate-900"
@@ -59,43 +57,122 @@ export default async function ManageIntelligencePlanPage() {
             </span>
             Back to Directory
           </Link>
-        </div>
 
-        {/* Centered Empty State Card */}
-        <div className="flex flex-1 items-center justify-center px-4 pb-20 sm:px-6 lg:px-8">
-          <div className="relative w-full max-w-2xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-8 text-center shadow-2xl shadow-slate-200/50 sm:p-16">
-            
-            {/* Subtle Ambient Glow */}
-            <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px]" />
-            
-            <div className="relative flex flex-col items-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl border border-slate-100 bg-slate-50 text-brand-orange-500 shadow-sm">
-                <LockKeyhole className="h-8 w-8" />
+          <section className="mt-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-10">
+            <div className="grid gap-8 lg:grid-cols-[1fr_320px] lg:items-end">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-600">
+                  Choose Your Access
+                </p>
+                <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                  Upgrade your Supplier Intelligence plan
+                </h1>
+                <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600">
+                  Pick the plan that matches how you buy from China. Starter gives you the supplier database. Pro adds review support before you pay any supplier.
+                </p>
               </div>
-              
-              <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
-                No Active Plan
-              </h1>
-              <p className="mt-4 max-w-md text-base leading-relaxed text-slate-600">
-                You do not have an active Supplier Intelligence plan. Subscribe to gain access to our verified China supplier database and buyer notes.
-              </p>
-              
-              <div className="mt-10 flex w-full flex-col gap-4 sm:flex-row sm:justify-center">
-                <SubscribeButton
-                  plan="starter"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-3.5 text-sm font-bold text-slate-700 shadow-sm transition-all hover:bg-slate-50 hover:text-slate-900 sm:w-auto"
-                >
-                  Start with Basic
-                </SubscribeButton>
-                <SubscribeButton
-                  plan="pro"
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 sm:w-auto"
-                >
-                  Go Pro <Sparkles className="h-4 w-4" />
-                </SubscribeButton>
+              <div className="rounded-2xl border border-brand-orange-100 bg-brand-orange-50 p-5">
+                <div className="flex items-start gap-3">
+                  <LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange-600" />
+                  <p className="text-sm font-medium leading-relaxed text-slate-700">
+                    You do not currently have an active paid plan. Select Starter or Pro below to continue.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+
+            <div className="mt-10 grid gap-6 lg:grid-cols-2">
+              {(['starter', 'pro'] as const).map((planKey) => {
+                const plan = intelligencePlans[planKey];
+                const isPro = planKey === 'pro';
+
+                return (
+                  <article
+                    key={plan.key}
+                    className={`relative flex h-full flex-col rounded-[2rem] border p-6 shadow-sm sm:p-8 ${
+                      isPro
+                        ? 'border-brand-orange-300 bg-slate-950 text-white shadow-brand-orange-500/10'
+                        : 'border-slate-200 bg-white text-slate-950'
+                    }`}
+                  >
+                    {isPro ? (
+                      <div className="absolute right-6 top-6 rounded-full bg-brand-orange-500 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white">
+                        Best Value
+                      </div>
+                    ) : null}
+
+                    <div className="pr-28">
+                      <p
+                        className={`text-xs font-bold uppercase tracking-widest ${
+                          isPro ? 'text-brand-orange-300' : 'text-brand-orange-600'
+                        }`}
+                      >
+                        {planKey === 'starter' ? 'Database Access' : 'Database + Review'}
+                      </p>
+                      <h2 className="mt-3 text-2xl font-extrabold tracking-tight">
+                        {plan.name}
+                      </h2>
+                    </div>
+
+                    <div className="mt-6 flex items-end gap-2">
+                      <p className="text-4xl font-black tracking-tight">
+                        {formatNaira(plan.priceNaira)}
+                      </p>
+                      <p
+                        className={`pb-1 text-sm font-semibold ${
+                          isPro ? 'text-slate-400' : 'text-slate-500'
+                        }`}
+                      >
+                        / month
+                      </p>
+                    </div>
+
+                    <p
+                      className={`mt-5 text-sm leading-relaxed ${
+                        isPro ? 'text-slate-300' : 'text-slate-600'
+                      }`}
+                    >
+                      {planKey === 'starter'
+                        ? 'Best for importers who want access to the researched supplier database and buyer notes.'
+                        : 'Best for importers who want supplier data plus quote, invoice, and supplier review support before payment.'}
+                    </p>
+
+                    <ul className="mt-7 grid flex-1 gap-4">
+                      {plan.features.map((feature) => (
+                        <li
+                          key={feature}
+                          className={`flex items-start gap-3 text-sm ${
+                            isPro ? 'text-slate-300' : 'text-slate-600'
+                          }`}
+                        >
+                          <CheckCircle2
+                            className={`mt-0.5 h-4 w-4 shrink-0 ${
+                              isPro ? 'text-brand-orange-400' : 'text-brand-orange-500'
+                            }`}
+                          />
+                          <span className="leading-relaxed">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-8">
+                      <SubscribeButton
+                        plan={plan.key}
+                        className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-bold transition-all ${
+                          isPro
+                            ? 'bg-brand-orange-500 text-white shadow-lg shadow-brand-orange-500/20 hover:bg-brand-orange-600'
+                            : 'border border-slate-200 bg-slate-950 text-white hover:bg-slate-800'
+                        }`}
+                      >
+                        {isPro ? 'Upgrade to Pro' : 'Subscribe to Starter'}
+                        <ArrowRight className="h-4 w-4" />
+                      </SubscribeButton>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
         </div>
       </main>
     );
