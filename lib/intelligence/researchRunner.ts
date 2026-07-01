@@ -36,7 +36,9 @@ type ResearchDraft = {
 };
 
 function clean(value: unknown, max = 4000) {
-  return String(value || '').trim().slice(0, max);
+  return String(value || '')
+    .trim()
+    .slice(0, max);
 }
 
 function randomId(prefix: string) {
@@ -194,8 +196,10 @@ async function runSupplierResearch(input: {
           address: '',
           countryRegion: 'China/city or region if verified',
           sourceType: 'official website + web research',
-          verifiedFrom: 'Concise verification summary with evidence types, not raw scraping language.',
-          buyerNotes: 'Practical buyer notes for Nigerian importers before payment.',
+          verifiedFrom:
+            'Concise verification summary with evidence types, not raw scraping language.',
+          buyerNotes:
+            'Practical buyer notes for Nigerian importers before payment.',
           verificationStatus: 'official_site_contact_confirmed',
         },
       ],
@@ -204,7 +208,10 @@ async function runSupplierResearch(input: {
     .filter(Boolean)
     .join('\n\n');
 
-  await input.onProgress('Searching official supplier and manufacturer sources', 34);
+  await input.onProgress(
+    'Searching official supplier and manufacturer sources',
+    34,
+  );
 
   const response = await fetch('https://api.openai.com/v1/responses', {
     method: 'POST',
@@ -227,7 +234,9 @@ async function runSupplierResearch(input: {
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => '');
-    throw new Error(`OpenAI research failed: ${response.status} ${clean(errorText, 500)}`);
+    throw new Error(
+      `OpenAI research failed: ${response.status} ${clean(errorText, 500)}`,
+    );
   }
 
   const data = await response.json();
@@ -264,7 +273,10 @@ async function runSupplierResearch(input: {
         whatsapp: clean(supplier.whatsapp, 120),
         address: clean(supplier.address, 1000),
         countryRegion: clean(supplier.countryRegion, 180),
-        sourceType: clean(supplier.sourceType || 'official website + web research', 80),
+        sourceType: clean(
+          supplier.sourceType || 'official website + web research',
+          80,
+        ),
         verifiedFrom: clean(supplier.verifiedFrom, 4000),
         buyerNotes: clean(supplier.buyerNotes, 4000),
         verificationStatus: clean(
@@ -292,7 +304,10 @@ export async function startUserSupplierResearch(input: {
   const search = rows[0];
   if (!search) throw new Error('Search request was not found.');
 
-  if (search.relatedPidJob && ['running', 'awaiting_approval', 'approved'].includes(search.status)) {
+  if (
+    search.relatedPidJob &&
+    ['running', 'awaiting_approval', 'approved'].includes(search.status)
+  ) {
     return { pidJob: search.relatedPidJob, alreadyStarted: true };
   }
 
@@ -379,7 +394,13 @@ export async function startUserSupplierResearch(input: {
       WHERE pidJob = ${pidJob}
     `;
 
-    await setProgress(search.pidSearch, 'failed', 'Research could not be completed', 100, message);
+    await setProgress(
+      search.pidSearch,
+      'failed',
+      'Research could not be completed',
+      100,
+      message,
+    );
     throw error;
   }
 }

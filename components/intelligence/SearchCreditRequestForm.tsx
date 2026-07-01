@@ -50,7 +50,10 @@ type ResearchProgress = {
 const progressSteps = [
   { percent: 10, label: 'Starting supplier research' },
   { percent: 18, label: 'Preparing the supplier research query' },
-  { percent: 34, label: 'Searching official supplier and manufacturer sources' },
+  {
+    percent: 34,
+    label: 'Searching official supplier and manufacturer sources',
+  },
   { percent: 62, label: 'Checking contact routes and company evidence' },
   { percent: 82, label: 'Building supplier shortlist and buyer notes' },
   {
@@ -359,6 +362,16 @@ export default function SearchCreditRequestForm({
                     {request.adminNotes}
                   </p>
                 ) : null}
+                {request.status === 'approved' && request.resultSlug ? (
+                  <div className="mt-3">
+                    <Link
+                      href={`/dashboard/intelligence/${request.resultSlug}`}
+                      className="inline-flex items-center justify-center rounded-lg bg-brand-orange-500 px-4 py-2 text-xs font-bold text-white transition hover:bg-brand-orange-600"
+                    >
+                      Open approved supplier details
+                    </Link>
+                  </div>
+                ) : null}
                 {['awaiting_admin', 'running', 'awaiting_approval'].includes(
                   request.status,
                 ) ? (
@@ -484,7 +497,9 @@ function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
             <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
               Draft result preview
             </p>
-            <h4 className="mt-2 text-xl font-black">{progress.draft.nicheName}</h4>
+            <h4 className="mt-2 text-xl font-black">
+              {progress.draft.nicheName}
+            </h4>
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
               {progress.draft.summary}
             </p>
@@ -509,7 +524,8 @@ function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
 
       {isFailed ? (
         <div className="border-t border-red-400/20 bg-red-500/10 p-5 text-sm font-semibold text-red-200">
-          {progress.adminNotes || 'Research failed. The credit will be reviewed by Sure Imports.'}
+          {progress.adminNotes ||
+            'Research failed. The credit will be reviewed by Sure Imports.'}
         </div>
       ) : null}
     </div>

@@ -74,3 +74,25 @@ export async function hasIntelligenceAccess(pidUser?: string | null) {
   const subscription = await getActiveIntelligenceSubscription(pidUser);
   return Boolean(subscription);
 }
+
+export async function hasApprovedSearchResultAccess(
+  pidUser?: string | null,
+  resultSlug?: string | null,
+) {
+  if (!pidUser || !resultSlug) return false;
+
+  try {
+    const rows = await prisma.$queryRaw<Array<{ total: bigint }>>`
+      SELECT COUNT(*) AS total
+      FROM intelligence_search_requests
+      WHERE pidUser = ${pidUser}
+        AND status = 'approved'
+        AND resultSlug = ${resultSlug}
+      LIMIT 1
+    `;
+
+    return Number(rows[0]?.total || 0) > 0;
+  } catch {
+    return false;
+  }
+}

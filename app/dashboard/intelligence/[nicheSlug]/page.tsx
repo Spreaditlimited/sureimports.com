@@ -17,7 +17,10 @@ import {
 } from 'lucide-react';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
-import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
+import {
+  getActiveIntelligenceSubscription,
+  hasApprovedSearchResultAccess,
+} from '@/lib/intelligence/access';
 import { getCompanyContactSettings } from '@/lib/intelligence/companyContacts';
 import {
   getNicheBySlugWithDb,
@@ -43,20 +46,33 @@ function parseProductsMade(value: unknown) {
   }
 }
 
+function emailHref(value: string) {
+  return `mailto:${value.trim()}`;
+}
+
+function whatsappHref(value: string) {
+  const digits = value.replace(/[^\d]/g, '');
+  return digits ? `https://wa.me/${digits}` : '';
+}
+
 export default async function DashboardIntelligenceNichePage({
   params,
 }: NichePageProps) {
   const user = await checkAuth();
   const subscription = await getActiveIntelligenceSubscription(user?.pidUser);
-
-  if (!subscription) {
-    redirect('/dashboard/intelligence');
-  }
-
   const { nicheSlug } = await params;
   const niche = await getNicheBySlugWithDb(nicheSlug);
   const companyContacts = await getCompanyContactSettings();
-  const isPro = subscription.plan === 'pro';
+  const hasSearchResultAccess = await hasApprovedSearchResultAccess(
+    user?.pidUser,
+    nicheSlug,
+  );
+
+  if (!subscription && !hasSearchResultAccess) {
+    redirect('/dashboard/intelligence');
+  }
+
+  const isPro = subscription?.plan === 'pro';
 
   if (!niche) notFound();
 
@@ -249,7 +265,12 @@ export default async function DashboardIntelligenceNichePage({
                       <Mail className="mt-0.5 h-4 w-4 text-slate-400 shrink-0" />
                       <div>
                         <p className="text-xs font-semibold text-slate-900">Email</p>
-                        <p className="text-sm text-slate-600 truncate">{supplier.email}</p>
+                        <a
+                          href={emailHref(supplier.email)}
+                          className="block truncate text-sm font-semibold text-brand-orange-600 hover:text-brand-orange-700 hover:underline"
+                        >
+                          {supplier.email}
+                        </a>
                       </div>
                     </div>
                   )}
@@ -267,7 +288,15 @@ export default async function DashboardIntelligenceNichePage({
                       <MessageCircle className="mt-0.5 h-4 w-4 text-emerald-500 shrink-0" />
                       <div>
                         <p className="text-xs font-semibold text-slate-900">WhatsApp</p>
-                        <p className="text-sm text-slate-600">{supplier.whatsapp}</p>
+                        <a
+                          href={whatsappHref(supplier.whatsapp)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
+                        >
+                          {supplier.whatsapp}
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
                       </div>
                     </div>
                   )}

@@ -15,6 +15,7 @@ export type IntelligenceSearchRequest = {
   adminNotes: string | null;
   progressStage: string | null;
   progressPercent: number | null;
+  resultSlug: string | null;
   createdAt: Date;
   updatedAt: Date | null;
 };
@@ -94,6 +95,7 @@ async function ensureCreditTables() {
       adminNotes LONGTEXT NULL,
       progressStage VARCHAR(180) NULL,
       progressPercent INT NOT NULL DEFAULT 0,
+      resultSlug VARCHAR(180) NULL,
       createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
       updatedAt DATETIME(3) NULL,
       UNIQUE KEY intelligence_search_requests_pid_key (pidSearch),
@@ -107,6 +109,7 @@ async function ensureCreditTables() {
   for (const statement of [
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressStage VARCHAR(180) NULL',
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressPercent INT NOT NULL DEFAULT 0',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN resultSlug VARCHAR(180) NULL',
   ]) {
     try {
       await prisma.$executeRawUnsafe(statement);
@@ -292,6 +295,7 @@ export async function createSearchRequestWithReservedCredit(input: {
         creditReserved,
         progressStage,
         progressPercent,
+        resultSlug,
         createdAt,
         updatedAt
       ) VALUES (
@@ -390,6 +394,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         adminNotes,
         progressStage,
         progressPercent,
+        resultSlug,
         createdAt,
         updatedAt
       ) VALUES (
@@ -405,6 +410,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         ${`Result delivered: ${resultSummary}`},
         'Existing supplier intelligence returned',
         100,
+        ${input.matches[0]?.slug || null},
         ${new Date()},
         ${new Date()}
       )
@@ -435,6 +441,7 @@ export async function getUserIntelligenceSearchRequests(
       adminNotes,
       progressStage,
       progressPercent,
+      resultSlug,
       createdAt,
       updatedAt
     FROM intelligence_search_requests
