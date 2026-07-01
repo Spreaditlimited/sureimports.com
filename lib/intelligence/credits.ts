@@ -310,6 +310,7 @@ export async function createSearchRequestWithReservedCredit(input: {
         1,
         'Search request received',
         5,
+        NULL,
         ${new Date()},
         ${new Date()}
       )

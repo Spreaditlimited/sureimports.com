@@ -113,6 +113,7 @@ export async function ensureUserResearchTables() {
       adminNotes LONGTEXT NULL,
       progressStage VARCHAR(180) NULL,
       progressPercent INT NOT NULL DEFAULT 0,
+      resultSlug VARCHAR(180) NULL,
       createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
       updatedAt DATETIME(3) NULL,
       UNIQUE KEY intelligence_search_requests_pid_key (pidSearch),
@@ -126,6 +127,7 @@ export async function ensureUserResearchTables() {
   for (const statement of [
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressStage VARCHAR(180) NULL',
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressPercent INT NOT NULL DEFAULT 0',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN resultSlug VARCHAR(180) NULL',
     'ALTER TABLE intelligence_research_jobs ADD COLUMN sourceSearchRequestId VARCHAR(80) NULL',
     'ALTER TABLE intelligence_research_jobs ADD COLUMN requestedByPidUser VARCHAR(80) NULL',
     'ALTER TABLE intelligence_research_jobs ADD COLUMN requestedByEmail VARCHAR(255) NULL',
