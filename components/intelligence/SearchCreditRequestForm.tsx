@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect, useRef } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
 import {
@@ -26,6 +26,38 @@ const initialState: SearchCreditRequestState = {
   message: '',
   existingMatches: [],
 };
+
+type ResearchProgress = {
+  pidSearch: string;
+  query: string;
+  status: string;
+  progressStage: string | null;
+  progressPercent: number;
+  adminNotes: string | null;
+  draft?: {
+    nicheName: string;
+    summary: string;
+    suppliers: Array<{
+      supplierName: string;
+      productFit: string;
+      officialWebsite?: string;
+      countryRegion?: string;
+      buyerNotes?: string;
+    }>;
+  } | null;
+};
+
+const progressSteps = [
+  { percent: 10, label: 'Starting supplier research' },
+  { percent: 18, label: 'Preparing the supplier research query' },
+  { percent: 34, label: 'Searching official supplier and manufacturer sources' },
+  { percent: 62, label: 'Checking contact routes and company evidence' },
+  { percent: 82, label: 'Building supplier shortlist and buyer notes' },
+  {
+    percent: 100,
+    label: 'Manual Sure Imports specialist check',
+  },
+];
 
 function statusLabel(status: string) {
   if (status === 'fulfilled_existing') return 'result delivered';
@@ -83,6 +115,8 @@ export default function SearchCreditRequestForm({
     createIntelligenceSearchRequest,
     initialState,
   );
+  const [activeSearchId, setActiveSearchId] = useState<string | null>(null);
+  const [progress, setProgress] = useState<ResearchProgress | null>(null);
   const balance = account?.balance || 0;
 
   useEffect(() => {
@@ -90,6 +124,54 @@ export default function SearchCreditRequestForm({
       formRef.current?.reset();
     }
   }, [state.success]);
+
+  useEffect(() => {
+    if (!state.success || !state.pidSearch) return;
+    setActiveSearchId(state.pidSearch);
+    setProgress(null);
+  }, [state.success, state.pidSearch]);
+
+  useEffect(() => {
+    if (!activeSearchId) return;
+    const searchId = activeSearchId;
+
+    let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    async function poll() {
+      try {
+        const response = await fetch(
+          `/api/intelligence/search/status?pidSearch=${encodeURIComponent(
+            searchId,
+          )}`,
+          { cache: 'no-store' },
+        );
+        const data = await response.json();
+
+        if (!cancelled && response.ok && data.data) {
+          setProgress(data.data);
+          if (
+            !['awaiting_approval', 'approved', 'rejected', 'failed'].includes(
+              data.data.status,
+            )
+          ) {
+            timeoutId = setTimeout(poll, 2500);
+          }
+        } else if (!cancelled) {
+          timeoutId = setTimeout(poll, 3500);
+        }
+      } catch {
+        if (!cancelled) timeoutId = setTimeout(poll, 3500);
+      }
+    }
+
+    poll();
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [activeSearchId]);
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm sm:p-8">
@@ -177,6 +259,8 @@ export default function SearchCreditRequestForm({
             {state.message}
           </p>
         ) : null}
+
+        {progress ? <ResearchProgressPanel progress={progress} /> : null}
 
         {state.existingMatches && state.existingMatches.length > 0 ? (
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
@@ -275,11 +359,159 @@ export default function SearchCreditRequestForm({
                     {request.adminNotes}
                   </p>
                 ) : null}
+                {['awaiting_admin', 'running', 'awaiting_approval'].includes(
+                  request.status,
+                ) ? (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                      <span>
+                        {request.progressStage || statusLabel(request.status)}
+                      </span>
+                      <span>{request.progressPercent || 0}%</span>
+                    </div>
+                    <div className="mt-2 overflow-hidden rounded-full bg-slate-200">
+                      <div
+                        className="h-1.5 rounded-full bg-brand-orange-500"
+                        style={{
+                          width: `${Math.max(
+                            0,
+                            Math.min(100, request.progressPercent || 0),
+                          )}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
         </div>
       ) : null}
     </section>
+  );
+}
+
+function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
+  const percent = Math.max(
+    0,
+    Math.min(100, Math.round(Number(progress.progressPercent || 0))),
+  );
+  const isComplete = progress.status === 'awaiting_approval';
+  const isFailed = progress.status === 'failed';
+  const currentStage =
+    progress.progressStage ||
+    (isComplete
+      ? 'Research complete. Now being manually checked by Sure Imports specialists.'
+      : 'Research in progress');
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 text-white shadow-xl">
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-widest text-brand-orange-300">
+              Live supplier search
+            </p>
+            <h3 className="mt-2 text-lg font-extrabold">{progress.query}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-300">
+              {currentStage}
+            </p>
+          </div>
+          <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center">
+            <p className="text-2xl font-black">{percent}%</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+              Progress
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-2 rounded-full bg-brand-orange-500 transition-all duration-700"
+            style={{ width: `${percent}%` }}
+          />
+        </div>
+
+        <div className="mt-5 grid gap-2">
+          {progressSteps.map((step) => {
+            const done = percent >= step.percent;
+            const active =
+              percent < step.percent &&
+              progressSteps.find((item) => percent < item.percent)?.percent ===
+                step.percent;
+
+            return (
+              <div
+                key={step.label}
+                className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-xs font-semibold ${
+                  done
+                    ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'
+                    : active
+                      ? 'border-brand-orange-400/30 bg-brand-orange-400/10 text-brand-orange-100'
+                      : 'border-white/10 bg-white/[0.03] text-slate-400'
+                }`}
+              >
+                {done ? (
+                  <ShieldCheck className="h-4 w-4 shrink-0" />
+                ) : active ? (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                ) : (
+                  <Clock3 className="h-4 w-4 shrink-0" />
+                )}
+                {step.label}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {isComplete && progress.draft ? (
+        <div className="relative border-t border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-slate-950/55 px-5 backdrop-blur-[3px]">
+            <div className="max-w-md rounded-2xl border border-brand-orange-400/30 bg-slate-950/90 p-5 text-center shadow-2xl">
+              <ShieldCheck className="mx-auto h-8 w-8 text-brand-orange-300" />
+              <h4 className="mt-3 text-base font-extrabold">
+                Now being manually checked by Sure Imports specialists.
+              </h4>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300">
+                The first research pass is complete. Our team is checking the
+                supplier shortlist before the result is released.
+              </p>
+            </div>
+          </div>
+
+          <div className="blur-[2px]">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">
+              Draft result preview
+            </p>
+            <h4 className="mt-2 text-xl font-black">{progress.draft.nicheName}</h4>
+            <p className="mt-2 text-sm leading-relaxed text-slate-300">
+              {progress.draft.summary}
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              {progress.draft.suppliers.slice(0, 4).map((supplier) => (
+                <div
+                  key={supplier.supplierName}
+                  className="rounded-xl border border-white/10 bg-white/[0.04] p-4"
+                >
+                  <p className="text-sm font-extrabold">
+                    {supplier.supplierName}
+                  </p>
+                  <p className="mt-2 line-clamp-3 text-xs leading-relaxed text-slate-300">
+                    {supplier.productFit}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isFailed ? (
+        <div className="border-t border-red-400/20 bg-red-500/10 p-5 text-sm font-semibold text-red-200">
+          {progress.adminNotes || 'Research failed. The credit will be reviewed by Sure Imports.'}
+        </div>
+      ) : null}
+    </div>
   );
 }

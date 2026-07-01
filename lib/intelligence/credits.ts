@@ -13,6 +13,8 @@ export type IntelligenceSearchRequest = {
   creditReserved: boolean;
   relatedPidJob: string | null;
   adminNotes: string | null;
+  progressStage: string | null;
+  progressPercent: number | null;
   createdAt: Date;
   updatedAt: Date | null;
 };
@@ -90,6 +92,8 @@ async function ensureCreditTables() {
       creditReserved TINYINT(1) NOT NULL DEFAULT 1,
       relatedPidJob VARCHAR(80) NULL,
       adminNotes LONGTEXT NULL,
+      progressStage VARCHAR(180) NULL,
+      progressPercent INT NOT NULL DEFAULT 0,
       createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
       updatedAt DATETIME(3) NULL,
       UNIQUE KEY intelligence_search_requests_pid_key (pidSearch),
@@ -99,6 +103,17 @@ async function ensureCreditTables() {
       PRIMARY KEY (id)
     ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
   `);
+
+  for (const statement of [
+    'ALTER TABLE intelligence_search_requests ADD COLUMN progressStage VARCHAR(180) NULL',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN progressPercent INT NOT NULL DEFAULT 0',
+  ]) {
+    try {
+      await prisma.$executeRawUnsafe(statement);
+    } catch {
+      // Existing databases may already have these columns.
+    }
+  }
 }
 
 export async function getOrCreateIntelligenceCreditAccount(
@@ -275,6 +290,8 @@ export async function createSearchRequestWithReservedCredit(input: {
         status,
         creditCost,
         creditReserved,
+        progressStage,
+        progressPercent,
         createdAt,
         updatedAt
       ) VALUES (
@@ -287,6 +304,8 @@ export async function createSearchRequestWithReservedCredit(input: {
         'awaiting_admin',
         ${SEARCH_CREDIT_COST},
         1,
+        'Search request received',
+        5,
         ${new Date()},
         ${new Date()}
       )
@@ -369,6 +388,8 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         creditCost,
         creditReserved,
         adminNotes,
+        progressStage,
+        progressPercent,
         createdAt,
         updatedAt
       ) VALUES (
@@ -382,6 +403,8 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         ${SEARCH_CREDIT_COST},
         0,
         ${`Result delivered: ${resultSummary}`},
+        'Existing supplier intelligence returned',
+        100,
         ${new Date()},
         ${new Date()}
       )
@@ -410,6 +433,8 @@ export async function getUserIntelligenceSearchRequests(
       creditReserved,
       relatedPidJob,
       adminNotes,
+      progressStage,
+      progressPercent,
       createdAt,
       updatedAt
     FROM intelligence_search_requests

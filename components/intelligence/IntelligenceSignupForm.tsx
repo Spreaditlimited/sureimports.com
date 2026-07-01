@@ -112,8 +112,10 @@ export default function IntelligenceSignupForm({
             <Loader2 className="h-4 w-4 animate-spin" />
             {isFreePlan ? 'Opening signup...' : 'Starting checkout...'}
           </>
+        ) : isFreePlan ? (
+          'Create free account'
         ) : (
-          isFreePlan ? 'Create free account' : 'Subscribe now'
+          'Subscribe now'
         )}
       </button>
       <p className="text-xs leading-5 text-slate-500">

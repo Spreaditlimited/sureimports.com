@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { after } from 'next/server';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
@@ -10,10 +11,12 @@ import {
   type ExistingNicheSearchMatch,
 } from '@/lib/intelligence/credits';
 import { findPublishedNicheMatches } from '@/lib/intelligence/data';
+import { startUserSupplierResearch } from '@/lib/intelligence/researchRunner';
 
 export type SearchCreditRequestState = {
   success: boolean;
   message: string;
+  pidSearch?: string;
   existingMatches?: ExistingNicheSearchMatch[];
 };
 
@@ -81,7 +84,7 @@ export async function createIntelligenceSearchRequest(
       };
     }
 
-    await createSearchRequestWithReservedCredit({
+    const pidSearch = await createSearchRequestWithReservedCredit({
       pidUser: user.pidUser,
       email: user.userEmail,
       query,
@@ -91,10 +94,23 @@ export async function createIntelligenceSearchRequest(
 
     revalidatePath('/dashboard/intelligence');
 
+    after(async () => {
+      try {
+        await startUserSupplierResearch({
+          pidSearch,
+          pidUser: user.pidUser,
+        });
+      } catch {
+        // The user dashboard also attempts to start/poll the search. Failures are
+        // written to the request record by the research runner where possible.
+      }
+    });
+
     return {
       success: true,
       message:
-        'Search request submitted. Sure Imports will review and approve the research before results are delivered.',
+        'Search started. You can follow the research progress below while Sure Imports prepares the first result for specialist review.',
+      pidSearch,
     };
   } catch (error: any) {
     return {
