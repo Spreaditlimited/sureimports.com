@@ -28,6 +28,7 @@ import {
   getSupplierCheckSummary,
 } from '@/lib/intelligence/data';
 import { supplierEnquiryTemplate } from '@/lib/intelligence/warehouse';
+import { getWhatsAppHref } from '@/lib/intelligence/whatsapp';
 
 type NichePageProps = {
   params: Promise<{ nicheSlug: string }>;
@@ -51,9 +52,9 @@ function emailHref(value: string) {
   return `mailto:${value.trim()}`;
 }
 
-function whatsappHref(value: string) {
-  const digits = value.replace(/[^\d]/g, '');
-  return digits ? `https://wa.me/${digits}` : '';
+function whatsappHref(value: string, url?: string | null) {
+  const cleanUrl = String(url || '').trim();
+  return cleanUrl || getWhatsAppHref(value);
 }
 
 export default async function DashboardIntelligenceNichePage({
@@ -327,7 +328,10 @@ export default async function DashboardIntelligenceNichePage({
                             WhatsApp
                           </p>
                           <a
-                            href={whatsappHref(supplier.whatsapp)}
+                            href={whatsappHref(
+                              supplier.whatsapp,
+                              (supplier as any).whatsappUrl,
+                            )}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 hover:text-emerald-700 hover:underline"
@@ -372,7 +376,7 @@ export default async function DashboardIntelligenceNichePage({
                         <ExternalLink className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-500" />
                         <div>
                           <p className="text-xs font-semibold text-slate-900">
-                            Verification Link
+                            Supplier Contact Page
                           </p>
                           <a
                             href={supplier.officialContactPage}

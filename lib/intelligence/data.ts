@@ -8,6 +8,7 @@ import {
 export type SupplierResearchRecord = (typeof supplierResearch)[number];
 export type SupplierResearchRecordWithProducts = SupplierResearchRecord & {
   productsMade?: string | string[] | null;
+  whatsappUrl?: string | null;
 };
 
 export function slugifyNiche(value: string) {

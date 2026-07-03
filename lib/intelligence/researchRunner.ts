@@ -1,4 +1,10 @@
 import { prisma } from '@/lib/prisma';
+import {
+  normalizeSupplierResearchCandidate,
+  supplierPassesResearchRules,
+  supplierResearchJsonShape,
+  SUPPLIER_RESEARCH_RULES,
+} from '@/lib/intelligence/supplierResearchRules';
 
 type SearchRequestRow = {
   pidSearch: string;
@@ -21,8 +27,12 @@ type ResearchSupplierDraft = {
   email?: string;
   phone?: string;
   whatsapp?: string;
+  whatsappUrl?: string;
   address?: string;
   countryRegion?: string;
+  supplierType?: string;
+  manufacturerEvidence?: string;
+  chinaRegistryCheck?: string;
   sourceType: string;
   verifiedFrom: string;
   buyerNotes: string;
@@ -53,21 +63,6 @@ function extractJson(text: string) {
   if (trimmed.startsWith('{')) return trimmed;
   const match = trimmed.match(/\{[\s\S]*\}/);
   return match?.[0] || '';
-}
-
-function normalizeList(value: unknown, maxItems = 12) {
-  if (Array.isArray(value)) {
-    return value
-      .map((item) => clean(item, 140))
-      .filter(Boolean)
-      .slice(0, maxItems);
-  }
-
-  return String(value || '')
-    .split(/[,;\n]/)
-    .map((item) => clean(item, 140))
-    .filter(Boolean)
-    .slice(0, maxItems);
 }
 
 export async function ensureUserResearchTables() {
@@ -175,37 +170,9 @@ async function runSupplierResearch(input: {
     `Research the niche: ${input.nicheName}.`,
     `Return ${input.targetSupplierCount} solid supplier candidates.`,
     input.requestNotes ? `Customer notes: ${input.requestNotes}` : '',
-    'Use web search to prioritize official company websites, official contact pages, manufacturer pages, and credible company information.',
-    'Do not invent phone numbers, WhatsApp numbers, addresses, emails, websites, certifications, factory locations, or contacts.',
-    'If a direct contact detail is not clearly verified, leave that field empty and use the official contact page.',
-    'Use professional, confident, simple language. Do not say "footer says" or "I found on the website".',
-    'Every supplier must have an officialWebsite and officialContactPage when possible.',
+    ...SUPPLIER_RESEARCH_RULES,
     'Return only JSON with this exact shape:',
-    JSON.stringify({
-      nicheName: input.nicheName,
-      summary: 'Short practical summary for Nigerian importers.',
-      suppliers: [
-        {
-          supplierName: 'Company name',
-          productFit: 'Products this supplier fits',
-          productsMade: ['Baby diapers', 'Sanitary pads', 'Adult diapers'],
-          suggestedCategories: ['Baby diapers', 'Sanitary pads'],
-          officialWebsite: 'https://example.com',
-          officialContactPage: 'https://example.com/contact',
-          email: '',
-          phone: '',
-          whatsapp: '',
-          address: '',
-          countryRegion: 'China/city or region if verified',
-          sourceType: 'official website + web research',
-          verifiedFrom:
-            'Concise verification summary with evidence types, not raw scraping language.',
-          buyerNotes:
-            'Practical buyer notes for Nigerian importers before payment.',
-          verificationStatus: 'official_site_contact_confirmed',
-        },
-      ],
-    }),
+    JSON.stringify(supplierResearchJsonShape(input.nicheName)),
   ]
     .filter(Boolean)
     .join('\n\n');
@@ -258,36 +225,22 @@ async function runSupplierResearch(input: {
 
   await input.onProgress('Building supplier shortlist and buyer notes', 82);
 
-  return {
+  const result = {
     nicheName: clean(draft.nicheName || input.nicheName, 180),
     summary: clean(draft.summary, 1200),
     suppliers: draft.suppliers
       .slice(0, input.targetSupplierCount)
-      .map((supplier) => ({
-        supplierName: clean(supplier.supplierName, 180),
-        productFit: clean(supplier.productFit, 2000),
-        productsMade: normalizeList(supplier.productsMade),
-        suggestedCategories: normalizeList(supplier.suggestedCategories, 8),
-        officialWebsite: clean(supplier.officialWebsite, 500),
-        officialContactPage: clean(supplier.officialContactPage, 500),
-        email: clean(supplier.email, 255),
-        phone: clean(supplier.phone, 120),
-        whatsapp: clean(supplier.whatsapp, 120),
-        address: clean(supplier.address, 1000),
-        countryRegion: clean(supplier.countryRegion, 180),
-        sourceType: clean(
-          supplier.sourceType || 'official website + web research',
-          80,
-        ),
-        verifiedFrom: clean(supplier.verifiedFrom, 4000),
-        buyerNotes: clean(supplier.buyerNotes, 4000),
-        verificationStatus: clean(
-          supplier.verificationStatus || 'official_site_contact_confirmed',
-          80,
-        ),
-      }))
-      .filter((supplier) => supplier.supplierName && supplier.officialWebsite),
+      .map(normalizeSupplierResearchCandidate)
+      .filter(supplierPassesResearchRules),
   };
+
+  if (result.suppliers.length === 0) {
+    throw new Error(
+      'Research returned no manufacturer suppliers with public WhatsApp evidence.',
+    );
+  }
+
+  return result;
 }
 
 export async function startUserSupplierResearch(input: {
