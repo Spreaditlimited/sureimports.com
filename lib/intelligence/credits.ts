@@ -16,6 +16,7 @@ export type IntelligenceSearchRequest = {
   progressStage: string | null;
   progressPercent: number | null;
   resultSlug: string | null;
+  creditSource: string | null;
   createdAt: Date;
   updatedAt: Date | null;
 };
@@ -96,6 +97,7 @@ async function ensureCreditTables() {
       progressStage VARCHAR(180) NULL,
       progressPercent INT NOT NULL DEFAULT 0,
       resultSlug VARCHAR(180) NULL,
+      creditSource VARCHAR(40) NULL,
       createdAt DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
       updatedAt DATETIME(3) NULL,
       UNIQUE KEY intelligence_search_requests_pid_key (pidSearch),
@@ -110,6 +112,7 @@ async function ensureCreditTables() {
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressStage VARCHAR(180) NULL',
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressPercent INT NOT NULL DEFAULT 0',
     'ALTER TABLE intelligence_search_requests ADD COLUMN resultSlug VARCHAR(180) NULL',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN creditSource VARCHAR(40) NULL',
   ]) {
     try {
       await prisma.$executeRawUnsafe(statement);
@@ -117,6 +120,62 @@ async function ensureCreditTables() {
       // Existing databases may already have these columns.
     }
   }
+}
+
+async function getNextCreditSource(pidUser: string) {
+  const rows = await prisma.$queryRaw<
+    Array<{
+      freeGranted: bigint | number | null;
+      paidGranted: bigint | number | null;
+      subscriptionGranted: bigint | number | null;
+      freeUsed: bigint | number | null;
+      paidUsed: bigint | number | null;
+      subscriptionUsed: bigint | number | null;
+    }>
+  >`
+    SELECT
+      COALESCE(SUM(CASE WHEN t.reason = 'free_signup_credit' THEN t.amount ELSE 0 END), 0) AS freeGranted,
+      COALESCE(SUM(CASE WHEN t.reason = 'extra_search_credits_purchase' THEN t.amount ELSE 0 END), 0) AS paidGranted,
+      COALESCE(SUM(CASE WHEN t.reason IN ('starter_monthly_search_credits', 'pro_monthly_search_credits') THEN t.amount ELSE 0 END), 0) AS subscriptionGranted,
+      (
+        SELECT COUNT(*)
+        FROM intelligence_search_requests r
+        WHERE r.pidUser = ${pidUser}
+          AND r.creditCost > 0
+          AND r.creditSource = 'free'
+      ) AS freeUsed,
+      (
+        SELECT COUNT(*)
+        FROM intelligence_search_requests r
+        WHERE r.pidUser = ${pidUser}
+          AND r.creditCost > 0
+          AND r.creditSource = 'paid'
+      ) AS paidUsed,
+      (
+        SELECT COUNT(*)
+        FROM intelligence_search_requests r
+        WHERE r.pidUser = ${pidUser}
+          AND r.creditCost > 0
+          AND r.creditSource = 'subscription'
+      ) AS subscriptionUsed
+    FROM intelligence_credit_transactions t
+    WHERE t.pidUser = ${pidUser}
+      AND t.amount > 0
+  `;
+  const row = rows[0];
+  const paidRemaining =
+    Number(row?.paidGranted || 0) - Number(row?.paidUsed || 0);
+  if (paidRemaining > 0) return 'paid';
+
+  const subscriptionRemaining =
+    Number(row?.subscriptionGranted || 0) - Number(row?.subscriptionUsed || 0);
+  if (subscriptionRemaining > 0) return 'subscription';
+
+  const freeRemaining =
+    Number(row?.freeGranted || 0) - Number(row?.freeUsed || 0);
+  if (freeRemaining > 0) return 'free';
+
+  return 'paid';
 }
 
 export async function getOrCreateIntelligenceCreditAccount(
@@ -242,6 +301,7 @@ export async function createSearchRequestWithReservedCredit(input: {
   }
 
   const pidSearch = `INTSRCH${randomGenerator(12)}`;
+  const creditSource = await getNextCreditSource(input.pidUser);
 
   await prisma.$transaction(async (tx) => {
     const accounts = await tx.$queryRaw<IntelligenceCreditAccount[]>`
@@ -298,6 +358,7 @@ export async function createSearchRequestWithReservedCredit(input: {
         progressStage,
         progressPercent,
         resultSlug,
+        creditSource,
         createdAt,
         updatedAt
       ) VALUES (
@@ -313,6 +374,7 @@ export async function createSearchRequestWithReservedCredit(input: {
         'Search request received',
         5,
         NULL,
+        ${creditSource},
         ${new Date()},
         ${new Date()}
       )
@@ -338,6 +400,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
   }
 
   const pidSearch = `INTSRCH${randomGenerator(12)}`;
+  const creditSource = await getNextCreditSource(input.pidUser);
   const resultSummary = input.matches
     .map((match) => `${match.name} (${match.supplierCount} suppliers)`)
     .join(', ');
@@ -398,6 +461,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         progressStage,
         progressPercent,
         resultSlug,
+        creditSource,
         createdAt,
         updatedAt
       ) VALUES (
@@ -414,6 +478,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         'Existing supplier intelligence returned',
         100,
         ${input.matches[0]?.slug || null},
+        ${creditSource},
         ${new Date()},
         ${new Date()}
       )
@@ -445,6 +510,7 @@ export async function getUserIntelligenceSearchRequests(
       progressStage,
       progressPercent,
       resultSlug,
+      creditSource,
       createdAt,
       updatedAt
     FROM intelligence_search_requests

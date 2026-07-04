@@ -142,7 +142,7 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
                 Upgrade to unlock expert reviews
               </h2>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-400">
-                The Starter plan gives you access to the verified supplier directory. Upgrading to <strong>Pro</strong> unlocks hands-on supplier vetting and quote review support before you commit money.
+                The Starter plan gives you access to the verified supplier directory plus one monthly supplier search credit. Upgrading to <strong>Pro</strong> unlocks hands-on supplier vetting and quote review support before you commit money.
               </p>
               
               <div className="mt-10">

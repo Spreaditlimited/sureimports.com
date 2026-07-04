@@ -32,7 +32,7 @@ const pageUrl = 'https://www.sureimports.com/supplier-intelligence';
 export const metadata: Metadata = {
   title: 'China Supplier Intelligence for Nigerian Importers | Sure Imports',
   description:
-    'Access researched China supplier leads for Nigerian importers. Starter gives you the supplier intelligence database. Pro adds supplier, quote and invoice review support before payment.',
+    'Access researched China supplier leads for Nigerian importers. Starter gives you the supplier intelligence database plus one monthly supplier search credit. Pro adds supplier, quote and invoice review support before payment.',
   keywords: [
     'China supplier intelligence Nigeria',
     'China suppliers for Nigerian importers',
@@ -162,7 +162,7 @@ const faqs = [
   {
     question: 'What is Sure Imports Supplier Intelligence?',
     answer:
-      'It is a paid supplier research service for Nigerian importers. Starter gives access to researched China supplier leads by product category. Pro adds review support for supplier details, quotes, invoices and payment details before you pay.',
+      'It is a paid supplier research service for Nigerian importers. Starter gives access to researched China supplier leads by product category plus one monthly supplier search credit. Pro adds review support for supplier details, quotes, invoices and payment details before you pay.',
   },
   {
     question: 'Is this just a supplier list?',
@@ -177,7 +177,7 @@ const faqs = [
   {
     question: 'What is the difference between Starter and Pro?',
     answer:
-      'Starter is access to the supplier intelligence database. Pro includes the database plus review support before payment for supplier details, quotes, invoices and payment information.',
+      'Starter is access to the supplier intelligence database plus one monthly supplier search credit. Pro includes the database, more monthly search credits and review support before payment for supplier details, quotes, invoices and payment information.',
   },
   {
     question: 'Can I request a new product category?',
@@ -547,8 +547,9 @@ export default async function SupplierIntelligencePage() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate-600">
               Free gives you one supplier search credit. Starter gives you the
-              supplier intelligence database. Pro adds Sure Imports review
-              support for suppliers, quotes and invoices before you send money.
+              supplier intelligence database plus one monthly supplier search
+              credit. Pro adds Sure Imports review support for suppliers,
+              quotes and invoices before you send money.
             </p>
           </div>
 
@@ -593,7 +594,7 @@ export default async function SupplierIntelligencePage() {
               <div className="mt-auto min-h-[316px] pt-4">
                 <IntelligenceSignupForm
                   plan="free"
-                  note="Includes one free supplier search credit. Full supplier details are available on the paid plans."
+                  note="Includes one free supplier search credit for one product category. Full supplier details are available on the paid plans."
                 />
               </div>
             </div>

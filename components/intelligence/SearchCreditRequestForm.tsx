@@ -202,6 +202,7 @@ function BuyCreditsPanel({
 export default function SearchCreditRequestForm({
   account,
   requests,
+  starterMonthlyCredits,
   proMonthlyCredits,
   extraCreditPriceNaira,
   canOpenCategories,
@@ -209,6 +210,7 @@ export default function SearchCreditRequestForm({
 }: {
   account: IntelligenceCreditAccount | null;
   requests: IntelligenceSearchRequest[];
+  starterMonthlyCredits: number;
   proMonthlyCredits: number;
   extraCreditPriceNaira: number;
   canOpenCategories: boolean;
@@ -292,7 +294,10 @@ export default function SearchCreditRequestForm({
             {canOpenCategories
               ? 'Search for a supplier category. If the category already exists, we link you to it without using a credit. If it needs fresh research, one credit is reserved while admin reviews the request.'
               : 'Search for a supplier category. If a result is ready, you will see it immediately. If it needs fresh research, our team reviews the request before results are delivered. Each search uses one credit.'}{' '}
-            Pro includes {proMonthlyCredits} credits monthly. Extra credits are
+            Starter includes {starterMonthlyCredits} monthly supplier search{' '}
+            {starterMonthlyCredits === 1 ? 'credit' : 'credits'}; Pro includes{' '}
+            {proMonthlyCredits} monthly supplier search{' '}
+            {proMonthlyCredits === 1 ? 'credit' : 'credits'}. Extra credits are
             priced at ₦{extraCreditPriceNaira.toLocaleString('en-NG')} each.
           </p>
         </div>
@@ -411,9 +416,12 @@ export default function SearchCreditRequestForm({
                       Open category
                     </Link>
                   ) : (
-                    <span className="text-xs font-bold text-slate-500">
-                      Subscribe to unlock details
-                    </span>
+                    <Link
+                      href={`/dashboard/intelligence/${match.slug}`}
+                      className="text-xs font-bold text-brand-orange-600 hover:text-brand-orange-700"
+                    >
+                      Open result
+                    </Link>
                   )}
                 </div>
               ))}

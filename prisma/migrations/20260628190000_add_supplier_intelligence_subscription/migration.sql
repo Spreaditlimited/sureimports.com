@@ -1,5 +1,5 @@
 -- CreateTable
-CREATE TABLE `intelligence_niches` (
+CREATE TABLE IF NOT EXISTS `intelligence_niches` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pidNiche` VARCHAR(80) NOT NULL,
     `name` VARCHAR(160) NOT NULL,
@@ -18,7 +18,7 @@ CREATE TABLE `intelligence_niches` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `intelligence_suppliers` (
+CREATE TABLE IF NOT EXISTS `intelligence_suppliers` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pidSupplier` VARCHAR(80) NOT NULL,
     `nicheId` VARCHAR(80) NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE `intelligence_suppliers` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `intelligence_subscriptions` (
+CREATE TABLE IF NOT EXISTS `intelligence_subscriptions` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `pidSubscription` VARCHAR(80) NOT NULL,
     `pidUser` VARCHAR(191) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
@@ -78,8 +78,38 @@ CREATE TABLE `intelligence_subscriptions` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- AddForeignKey
-ALTER TABLE `intelligence_suppliers` ADD CONSTRAINT `intelligence_suppliers_nicheId_fkey` FOREIGN KEY (`nicheId`) REFERENCES `intelligence_niches`(`pidNiche`) ON DELETE CASCADE ON UPDATE CASCADE;
+SET @supplier_niche_fk_exists := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'intelligence_suppliers'
+    AND CONSTRAINT_NAME = 'intelligence_suppliers_nicheId_fkey'
+);
 
--- AddForeignKey
-ALTER TABLE `intelligence_subscriptions` ADD CONSTRAINT `intelligence_subscriptions_pidUser_fkey` FOREIGN KEY (`pidUser`) REFERENCES `users`(`pidUser`) ON DELETE CASCADE ON UPDATE CASCADE;
+SET @add_supplier_niche_fk_sql := IF(
+  @supplier_niche_fk_exists = 0,
+  'ALTER TABLE `intelligence_suppliers` ADD CONSTRAINT `intelligence_suppliers_nicheId_fkey` FOREIGN KEY (`nicheId`) REFERENCES `intelligence_niches`(`pidNiche`) ON DELETE CASCADE ON UPDATE CASCADE',
+  'SELECT 1'
+);
+
+PREPARE add_supplier_niche_fk_statement FROM @add_supplier_niche_fk_sql;
+EXECUTE add_supplier_niche_fk_statement;
+DEALLOCATE PREPARE add_supplier_niche_fk_statement;
+
+SET @subscription_user_fk_exists := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'intelligence_subscriptions'
+    AND CONSTRAINT_NAME = 'intelligence_subscriptions_pidUser_fkey'
+);
+
+SET @add_subscription_user_fk_sql := IF(
+  @subscription_user_fk_exists = 0,
+  'ALTER TABLE `intelligence_subscriptions` ADD CONSTRAINT `intelligence_subscriptions_pidUser_fkey` FOREIGN KEY (`pidUser`) REFERENCES `users`(`pidUser`) ON DELETE CASCADE ON UPDATE CASCADE',
+  'SELECT 1'
+);
+
+PREPARE add_subscription_user_fk_statement FROM @add_subscription_user_fk_sql;
+EXECUTE add_subscription_user_fk_statement;
+DEALLOCATE PREPARE add_subscription_user_fk_statement;

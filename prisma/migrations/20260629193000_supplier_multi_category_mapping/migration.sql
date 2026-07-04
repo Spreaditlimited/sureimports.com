@@ -1,5 +1,5 @@
 ALTER TABLE `intelligence_suppliers`
-  ADD COLUMN `productsMade` LONGTEXT NULL;
+  ADD COLUMN IF NOT EXISTS `productsMade` LONGTEXT NULL;
 
 CREATE TABLE IF NOT EXISTS `intelligence_supplier_categories` (
   `id` INT NOT NULL AUTO_INCREMENT,

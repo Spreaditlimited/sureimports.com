@@ -69,8 +69,9 @@ export default async function DashboardIntelligencePage() {
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
                 Use your free credit to ask Sure Imports to research a product
-                category. Our team reviews the result before anything is added
-                to the supplier database.
+                category. When intelligence is available, you can view a result
+                summary and one approved supplier lead before subscribing for
+                full supplier details.
               </p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -82,13 +83,13 @@ export default async function DashboardIntelligencePage() {
                   },
                   {
                     icon: ShieldCheck,
-                    title: 'Admin review',
-                    body: 'We review supplier candidates before publishing.',
+                    title: 'Result summary',
+                    body: 'See the first approved supplier lead when intelligence is available.',
                   },
                   {
                     icon: Database,
-                    title: 'Upgrade for access',
-                    body: 'Subscribe when you need the full database.',
+                    title: 'Full details',
+                    body: 'Subscribe when you want all approved suppliers and the full database.',
                   },
                 ].map((item) => (
                   <div
@@ -146,6 +147,9 @@ export default async function DashboardIntelligencePage() {
               <SearchCreditRequestForm
                 account={creditAccount}
                 requests={searchRequests}
+                starterMonthlyCredits={
+                  intelligencePlans.starter.monthlySearchCredits
+                }
                 proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
                 extraCreditPriceNaira={
                   intelligencePlans.pro.extraCreditPriceNaira
@@ -160,8 +164,9 @@ export default async function DashboardIntelligencePage() {
                 Create an account to use your free search credit
               </h2>
               <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-slate-600">
-                Free users can request one new supplier category for admin
-                review before deciding whether to subscribe.
+                Free users can search one product category and view a limited
+                result when intelligence is available. Subscribe when you want
+                full supplier details.
               </p>
               <Link
                 href="/auth/login"
@@ -212,7 +217,7 @@ export default async function DashboardIntelligencePage() {
             <LockedPlanCard
               title={intelligencePlans.starter.name}
               price={intelligencePlans.starter.priceNaira}
-              description="For importers who want access to the supplier intelligence database."
+              description="For importers who want database access plus one monthly supplier search credit."
               features={intelligencePlans.starter.features}
               action={
                 <SubscribeButton
@@ -363,6 +368,9 @@ export default async function DashboardIntelligencePage() {
           <SearchCreditRequestForm
             account={creditAccount}
             requests={searchRequests}
+            starterMonthlyCredits={
+              intelligencePlans.starter.monthlySearchCredits
+            }
             proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
             extraCreditPriceNaira={
               currentPlan?.extraCreditPriceNaira ||

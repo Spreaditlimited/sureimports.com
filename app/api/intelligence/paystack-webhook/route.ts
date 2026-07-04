@@ -108,14 +108,14 @@ export async function POST(request: Request) {
         SELECT pidSubscription, pidUser, email, plan, status
         FROM intelligence_subscriptions
         WHERE paystackSubscriptionCode = ${subscriptionCode}
-          AND plan = 'pro'
+          AND plan IN ('starter', 'pro')
         ORDER BY createdAt DESC
         LIMIT 1
       `
     : await prisma.$queryRaw<IntelligenceSubscriptionRow[]>`
         SELECT pidSubscription, pidUser, email, plan, status
         FROM intelligence_subscriptions
-        WHERE plan = 'pro'
+        WHERE plan IN ('starter', 'pro')
           AND status IN ('active', 'non_renewing')
           AND (
             paystackCustomerCode = ${customerCode}
@@ -126,7 +126,10 @@ export async function POST(request: Request) {
       `;
 
   const subscription = subscriptions[0];
-  if (!subscription || subscription.plan !== 'pro') {
+  if (
+    !subscription ||
+    (subscription.plan !== 'starter' && subscription.plan !== 'pro')
+  ) {
     return NextResponse.json({ received: true });
   }
 
@@ -143,12 +146,12 @@ export async function POST(request: Request) {
     WHERE pidSubscription = ${subscription.pidSubscription}
   `;
 
-  const proPlan = await getConfiguredIntelligencePlan('pro');
+  const paidPlan = await getConfiguredIntelligencePlan(subscription.plan);
 
   await grantIntelligenceCredits({
     pidUser: subscription.pidUser,
-    amount: proPlan.monthlySearchCredits,
-    reason: 'pro_monthly_search_credits',
+    amount: paidPlan.monthlySearchCredits,
+    reason: `${subscription.plan}_monthly_search_credits`,
     reference:
       payment.reference ||
       `${subscription.pidSubscription}:${periodEnd.toISOString().slice(0, 10)}`,

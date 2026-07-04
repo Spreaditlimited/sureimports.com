@@ -68,7 +68,7 @@ export default async function ManageIntelligencePlanPage() {
                   Upgrade your Supplier Intelligence plan
                 </h1>
                 <p className="mt-4 max-w-2xl text-sm leading-relaxed text-slate-600">
-                  Pick the plan that matches how you buy from China. Starter gives you the supplier database. Pro adds review support before you pay any supplier.
+                  Pick the plan that matches how you buy from China. Starter gives you the supplier database plus one monthly supplier search credit. Pro adds more search credits and review support before you pay any supplier.
                 </p>
               </div>
               <div className="rounded-2xl border border-brand-orange-100 bg-brand-orange-50 p-5">
@@ -133,7 +133,7 @@ export default async function ManageIntelligencePlanPage() {
                       }`}
                     >
                       {planKey === 'starter'
-                        ? 'Best for importers who want access to the researched supplier database and buyer notes.'
+                        ? 'Best for importers who want the researched supplier database, buyer notes, and one fresh supplier search each month.'
                         : 'Best for importers who want supplier data plus quote, invoice, and supplier review support before payment.'}
                     </p>
 

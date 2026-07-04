@@ -44,7 +44,8 @@ export type NormalizedSupplierResearchCandidate = {
   verificationStatus: string;
 };
 
-export const SUPPLIER_RESEARCH_RULE_VERSION = 'manufacturer-whatsapp-registry-v1';
+export const SUPPLIER_RESEARCH_RULE_VERSION =
+  'manufacturer-whatsapp-registry-v1';
 
 export const SUPPLIER_RESEARCH_RULES = [
   'Use web search to prioritize official company websites, official contact pages, manufacturer pages, and credible company information.',

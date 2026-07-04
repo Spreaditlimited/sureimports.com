@@ -19,8 +19,8 @@ import {
 
 import { checkAuth } from '@/lib/auth/checkAuth';
 import {
+  getApprovedSearchResultAccess,
   getActiveIntelligenceSubscription,
-  hasApprovedSearchResultAccess,
 } from '@/lib/intelligence/access';
 import { getCompanyContactSettings } from '@/lib/intelligence/companyContacts';
 import {
@@ -65,17 +65,21 @@ export default async function DashboardIntelligenceNichePage({
   const { nicheSlug } = await params;
   const niche = await getNicheBySlugWithDb(nicheSlug);
   const companyContacts = await getCompanyContactSettings();
-  const hasSearchResultAccess = await hasApprovedSearchResultAccess(
+  const searchResultAccess = await getApprovedSearchResultAccess(
     user?.pidUser,
     nicheSlug,
   );
+  const hasSearchResultAccess = Boolean(searchResultAccess);
 
   if (!subscription && !hasSearchResultAccess) {
     redirect('/dashboard/intelligence');
   }
 
   const isPro = subscription?.plan === 'pro';
-  const hasFullSupplierAccess = Boolean(subscription);
+  const hasFullSupplierAccess =
+    Boolean(subscription) ||
+    (typeof searchResultAccess === 'object' &&
+      searchResultAccess.unlocksAllSuppliers);
   const visibleSuppliers = hasFullSupplierAccess
     ? niche?.suppliers || []
     : (niche?.suppliers || []).slice(0, 1);
@@ -204,21 +208,27 @@ export default async function DashboardIntelligenceNichePage({
               <div className="min-w-0">
                 <h2 className="text-lg font-extrabold text-slate-900">
                   {hasSearchResultAccess
-                    ? 'Upgrade to unlock every supplier in this result'
+                    ? hasFullSupplierAccess
+                      ? 'Paid search result unlocked'
+                      : 'Upgrade to unlock every supplier in this result'
                     : 'Pro adds buying templates'}
                 </h2>
                 <p className="mt-2 text-sm leading-relaxed text-slate-700">
                   {hasSearchResultAccess
-                    ? 'Your free search shows one supplier lead. Upgrade to see all suppliers in this result plus the entire Sure Imports Supplier Intelligence database.'
+                    ? hasFullSupplierAccess
+                      ? 'Your paid supplier search credit unlocks every admin-approved supplier in this result.'
+                      : 'Your free search shows one supplier lead. Upgrade to see all suppliers in this result plus the entire Sure Imports Supplier Intelligence database.'
                     : 'Upgrade to get supplier enquiry prompts and priority category requests inside each supplier category.'}
                 </p>
               </div>
-              <Link
-                href="/dashboard/intelligence/manage"
-                className="inline-flex w-fit max-w-full shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-brand-orange-500 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-brand-orange-500/15 transition hover:bg-brand-orange-600"
-              >
-                {hasSearchResultAccess ? 'Upgrade' : 'Upgrade plan'}
-              </Link>
+              {!hasFullSupplierAccess ? (
+                <Link
+                  href="/dashboard/intelligence/manage"
+                  className="inline-flex w-fit max-w-full shrink-0 items-center justify-center whitespace-nowrap rounded-lg bg-brand-orange-500 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-brand-orange-500/15 transition hover:bg-brand-orange-600"
+                >
+                  {hasSearchResultAccess ? 'Upgrade' : 'Upgrade plan'}
+                </Link>
+              ) : null}
             </div>
           </section>
         )}
@@ -232,6 +242,10 @@ export default async function DashboardIntelligenceNichePage({
             {!hasFullSupplierAccess ? (
               <span className="rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-700">
                 1 free result shown
+              </span>
+            ) : hasSearchResultAccess && !subscription ? (
+              <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-700">
+                Paid search unlocked
               </span>
             ) : null}
           </div>

@@ -146,17 +146,19 @@ export async function POST(request: Request) {
     );
   }
 
-  if (subscription.plan === 'pro') {
-    const proPlan = await getConfiguredIntelligencePlan('pro');
+  if (subscription.plan === 'starter' || subscription.plan === 'pro') {
+    const paidPlan = await getConfiguredIntelligencePlan(subscription.plan);
     await grantIntelligenceCredits({
       pidUser: subscription.pidUser,
-      amount: proPlan.monthlySearchCredits,
-      reason: 'pro_monthly_search_credits',
+      amount: paidPlan.monthlySearchCredits,
+      reason: `${subscription.plan}_monthly_search_credits`,
       reference:
         payment.reference ||
         `${subscription.pidSubscription}:${periodEnd.toISOString().slice(0, 10)}`,
     });
+  }
 
+  if (subscription.plan === 'pro') {
     const olderSubscriptions = await prisma.$queryRaw<
       Pick<
         IntelligenceSubscriptionRow,

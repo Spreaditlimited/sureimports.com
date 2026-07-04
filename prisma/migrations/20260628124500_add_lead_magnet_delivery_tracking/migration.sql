@@ -1,8 +1,8 @@
 ALTER TABLE `marketing_leads`
-  ADD COLUMN `leadMagnetSlug` VARCHAR(255) NULL,
-  ADD COLUMN `leadMagnetTitle` VARCHAR(255) NULL,
-  ADD COLUMN `leadMagnetDownloadUrl` TEXT NULL,
-  ADD COLUMN `offerCta` VARCHAR(120) NULL;
+  ADD COLUMN IF NOT EXISTS `leadMagnetSlug` VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS `leadMagnetTitle` VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS `leadMagnetDownloadUrl` TEXT NULL,
+  ADD COLUMN IF NOT EXISTS `offerCta` VARCHAR(120) NULL;
 
 CREATE TABLE IF NOT EXISTS `blog_lead_magnet_downloads` (
   `id` INT NOT NULL AUTO_INCREMENT,

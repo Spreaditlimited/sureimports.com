@@ -22,10 +22,11 @@ export const intelligencePlans: Record<IntelligencePlanKey, IntelligencePlan> =
       interval: 'monthly',
       envPlanCode: 'PAYSTACK_INTELLIGENCE_STARTER_PLAN_CODE',
       envPriceNaira: 'PAYSTACK_INTELLIGENCE_STARTER_PRICE_NAIRA',
-      monthlySearchCredits: 0,
+      monthlySearchCredits: 1,
       extraCreditPriceNaira: 5000,
       features: [
         'Access the supplier intelligence database',
+        'Monthly supplier search credits',
         'Browse all approved supplier categories and supplier leads',
         'Supplier leads checked across 10 data points',
         'Company profiles, contact details and Sure Imports notes',
@@ -111,14 +112,18 @@ function applyEnvOverrides(
 function applyCreditFeatureText(
   plans: Record<IntelligencePlanKey, IntelligencePlan>,
 ) {
-  plans.pro = {
-    ...plans.pro,
-    features: plans.pro.features.map((feature) =>
-      feature === 'Monthly supplier search credits'
-        ? `${plans.pro.monthlySearchCredits} monthly supplier search credits`
-        : feature,
-    ),
-  };
+  for (const key of Object.keys(plans) as IntelligencePlanKey[]) {
+    plans[key] = {
+      ...plans[key],
+      features: plans[key].features.map((feature) =>
+        feature === 'Monthly supplier search credits'
+          ? `${plans[key].monthlySearchCredits} monthly supplier search ${
+              plans[key].monthlySearchCredits === 1 ? 'credit' : 'credits'
+            }`
+          : feature,
+      ),
+    };
+  }
 
   return plans;
 }

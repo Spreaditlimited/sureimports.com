@@ -7,6 +7,16 @@ const planRank: Record<string, number> = {
   pro: 2,
 };
 
+async function ensureSearchResultAccessColumns() {
+  try {
+    await prisma.$executeRawUnsafe(
+      'ALTER TABLE intelligence_search_requests ADD COLUMN creditSource VARCHAR(40) NULL',
+    );
+  } catch {
+    // Existing databases may already have this column.
+  }
+}
+
 export async function getActiveIntelligenceSubscription(
   pidUser?: string | null,
 ) {
@@ -79,19 +89,45 @@ export async function hasApprovedSearchResultAccess(
   pidUser?: string | null,
   resultSlug?: string | null,
 ) {
+  const access = await getApprovedSearchResultAccess(pidUser, resultSlug);
+  return Boolean(access);
+}
+
+export async function getApprovedSearchResultAccess(
+  pidUser?: string | null,
+  resultSlug?: string | null,
+) {
   if (!pidUser || !resultSlug) return false;
 
   try {
-    const rows = await prisma.$queryRaw<Array<{ total: bigint }>>`
-      SELECT COUNT(*) AS total
+    await ensureSearchResultAccessColumns();
+    const rows = await prisma.$queryRaw<
+      Array<{ creditSource: string | null }>
+    >`
+      SELECT creditSource
       FROM intelligence_search_requests
       WHERE pidUser = ${pidUser}
-        AND status = 'approved'
+        AND status IN ('approved', 'fulfilled_existing')
         AND resultSlug = ${resultSlug}
+      ORDER BY
+        CASE
+          WHEN creditSource IN ('paid', 'subscription') THEN 1
+          WHEN creditSource = 'free' THEN 2
+          ELSE 3
+        END,
+        createdAt DESC
       LIMIT 1
     `;
 
-    return Number(rows[0]?.total || 0) > 0;
+    const row = rows[0];
+    if (!row) return false;
+
+    return {
+      creditSource: row.creditSource || 'free',
+      unlocksAllSuppliers: ['paid', 'subscription'].includes(
+        row.creditSource || '',
+      ),
+    };
   } catch {
     return false;
   }
