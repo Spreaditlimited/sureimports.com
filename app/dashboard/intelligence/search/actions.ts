@@ -4,8 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
+import xMail from '@/lib/email/xMail2';
 import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
 import {
+  createExistingNicheSearchLog,
   createExistingNicheSearchResultWithConsumedCredit,
   createSearchRequestWithReservedCredit,
   type ExistingNicheSearchMatch,
@@ -22,6 +24,46 @@ export type SearchCreditRequestState = {
 
 function clean(value: FormDataEntryValue | null, max = 4000) {
   return String(value || '').trim().slice(0, max);
+}
+
+function notifyAdminOfSearch(input: {
+  pidSearch: string;
+  userEmail: string;
+  query: string;
+  targetSupplierCount: number;
+  notes?: string | null;
+  status: string;
+  creditCost: number;
+  resultSlugs?: string[];
+}) {
+  after(async () => {
+    await xMail({
+      xEmail: 'hello@sureimports.com',
+      xTitle: 'New Supplier Intelligence search',
+      xBodyTitle: 'A user searched Supplier Intelligence',
+      xBody1: [
+        `Search ID: ${input.pidSearch}`,
+        `User: ${input.userEmail}`,
+        `Query: ${input.query}`,
+        `Target suppliers: ${input.targetSupplierCount}`,
+        `Status: ${input.status.replace(/_/g, ' ')}`,
+        `Credit cost: ${input.creditCost}`,
+        `Search time: ${new Date().toLocaleString('en-GB', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+          timeZone: 'Europe/London',
+        })}`,
+        input.resultSlugs?.length
+          ? `Matched result: ${input.resultSlugs.join(', ')}`
+          : '',
+      ]
+        .filter(Boolean)
+        .join('<br />'),
+      xBody2: input.notes ? `Notes: ${input.notes}` : '',
+      xButtonTitle: 'Open admin dashboard',
+      xButtonLink: 'https://admin.sureimports.com/dashboard/intelligence/research',
+    });
+  });
 }
 
 export async function createIntelligenceSearchRequest(
@@ -57,6 +99,27 @@ export async function createIntelligenceSearchRequest(
 
     if (existingMatches.length > 0) {
       if (subscription) {
+        const pidSearch = await createExistingNicheSearchLog({
+          pidUser: user.pidUser,
+          email: user.userEmail,
+          query,
+          targetSupplierCount,
+          notes,
+          matches: existingMatches,
+        });
+
+        notifyAdminOfSearch({
+          pidSearch,
+          userEmail: user.userEmail,
+          query,
+          targetSupplierCount,
+          notes,
+          status: 'fulfilled_existing',
+          creditCost: 0,
+          resultSlugs: existingMatches.map((match) => match.slug),
+        });
+        revalidatePath('/dashboard/intelligence');
+
         return {
           success: true,
           message:
@@ -65,13 +128,23 @@ export async function createIntelligenceSearchRequest(
         };
       }
 
-      await createExistingNicheSearchResultWithConsumedCredit({
+      const pidSearch = await createExistingNicheSearchResultWithConsumedCredit({
         pidUser: user.pidUser,
         email: user.userEmail,
         query,
         targetSupplierCount,
         notes,
         matches: existingMatches,
+      });
+      notifyAdminOfSearch({
+        pidSearch,
+        userEmail: user.userEmail,
+        query,
+        targetSupplierCount,
+        notes,
+        status: 'fulfilled_existing',
+        creditCost: 1,
+        resultSlugs: existingMatches.map((match) => match.slug),
       });
 
       revalidatePath('/dashboard/intelligence');
@@ -90,6 +163,15 @@ export async function createIntelligenceSearchRequest(
       query,
       targetSupplierCount,
       notes,
+    });
+    notifyAdminOfSearch({
+      pidSearch,
+      userEmail: user.userEmail,
+      query,
+      targetSupplierCount,
+      notes,
+      status: 'awaiting_admin',
+      creditCost: 1,
     });
 
     revalidatePath('/dashboard/intelligence');

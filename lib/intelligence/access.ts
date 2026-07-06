@@ -101,9 +101,7 @@ export async function getApprovedSearchResultAccess(
 
   try {
     await ensureSearchResultAccessColumns();
-    const rows = await prisma.$queryRaw<
-      Array<{ creditSource: string | null }>
-    >`
+    const rows = await prisma.$queryRaw<Array<{ creditSource: string | null }>>`
       SELECT creditSource
       FROM intelligence_search_requests
       WHERE pidUser = ${pidUser}

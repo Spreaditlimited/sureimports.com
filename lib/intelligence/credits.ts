@@ -488,6 +488,62 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
   return pidSearch;
 }
 
+export async function createExistingNicheSearchLog(input: {
+  pidUser: string;
+  email: string;
+  query: string;
+  targetSupplierCount: number;
+  notes?: string | null;
+  matches: ExistingNicheSearchMatch[];
+}) {
+  await ensureCreditTables();
+
+  const pidSearch = `INTSRCH${randomGenerator(12)}`;
+  const resultSummary = input.matches
+    .map((match) => `${match.name} (${match.supplierCount} suppliers)`)
+    .join(', ');
+
+  await prisma.$executeRaw`
+    INSERT INTO intelligence_search_requests (
+      pidSearch,
+      pidUser,
+      email,
+      query,
+      targetSupplierCount,
+      notes,
+      status,
+      creditCost,
+      creditReserved,
+      adminNotes,
+      progressStage,
+      progressPercent,
+      resultSlug,
+      creditSource,
+      createdAt,
+      updatedAt
+    ) VALUES (
+      ${pidSearch},
+      ${input.pidUser},
+      ${clean(input.email, 255)},
+      ${clean(input.query, 220)},
+      ${Math.min(10, Math.max(3, Math.round(input.targetSupplierCount || 3)))},
+      ${clean(input.notes) || null},
+      'fulfilled_existing',
+      0,
+      0,
+      ${`Subscriber result delivered: ${resultSummary}`},
+      'Existing supplier intelligence returned',
+      100,
+      ${input.matches[0]?.slug || null},
+      'subscription',
+      ${new Date()},
+      ${new Date()}
+    )
+  `;
+
+  return pidSearch;
+}
+
 export async function getUserIntelligenceSearchRequests(
   pidUser?: string | null,
 ) {

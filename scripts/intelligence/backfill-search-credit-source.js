@@ -12,7 +12,9 @@ async function main() {
   const tableExists = Number(tableRows[0]?.total || 0) > 0;
 
   if (!tableExists) {
-    console.log('intelligence_search_requests does not exist; nothing to backfill.');
+    console.log(
+      'intelligence_search_requests does not exist; nothing to backfill.',
+    );
     return;
   }
 
@@ -31,7 +33,9 @@ async function main() {
     );
     console.log('Added intelligence_search_requests.creditSource.');
   } else {
-    console.log('Confirmed intelligence_search_requests.creditSource already exists.');
+    console.log(
+      'Confirmed intelligence_search_requests.creditSource already exists.',
+    );
   }
 
   const updated = await prisma.$executeRawUnsafe(`
