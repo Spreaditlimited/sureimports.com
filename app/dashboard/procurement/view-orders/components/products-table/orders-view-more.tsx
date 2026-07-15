@@ -640,7 +640,7 @@ export default function MoreOrders({
               <div className="flex justify-between">
                 <span className="text-slate-500">Products Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  ${formatCurrency(currencyType === 'CNY' ? productsTotalPrice / exYuanToDollar : productsTotalPrice)}
+                  ${formatCurrency(productsTotalPrice)}
                 </span>
               </div>
 
