@@ -18,9 +18,23 @@ export async function GET(
     );
 
     const body = await upstream.text();
-    return new NextResponse(body, {
+
+    if (!upstream.ok) {
+      return new NextResponse(body, {
+        status: upstream.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    const payload = JSON.parse(body);
+    if (payload?.data?.token) {
+      payload.data.token.pdfDownloadUrl =
+        `/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}/pdf`;
+    }
+
+    return NextResponse.json(payload, {
       status: upstream.status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Cache-Control': 'private, no-store' },
     });
   } catch (error: any) {
     return NextResponse.json(
@@ -29,4 +43,3 @@ export async function GET(
     );
   }
 }
-
