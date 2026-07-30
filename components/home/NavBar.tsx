@@ -21,6 +21,7 @@ import {
   Laptop,
   CalendarClock,
   Database,
+  PackageSearch,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -77,6 +78,13 @@ const MENU_ITEMS = {
       icon: Ship,
       desc: 'Submit shipping-only requests for goods you already bought',
       color: 'from-emerald-500 to-teal-600',
+    },
+    {
+      title: 'Track Shipment',
+      href: '/track',
+      icon: PackageSearch,
+      desc: 'Follow the progress of your Ship With Us shipment',
+      color: 'from-blue-600 to-indigo-700',
     },
     {
       title: 'Corporate Sourcing',
