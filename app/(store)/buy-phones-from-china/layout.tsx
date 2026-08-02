@@ -1,6 +1,6 @@
 import NavBar from '@/components/home/NavBar';
 import './globals.css';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import { CookieConsent } from '@/components/home/CookieConsent';
 import WhatsAppButton from '@/components/WhatsAppButton';
 //import Footer from '@/components/home/Footer';
@@ -27,7 +27,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <div className="relative">
         <Header />
         {/* <LiveChatWidgetComponent /> */}
-        {children}
+        <Suspense fallback={null}>{children}</Suspense>
         <CookieConsent />
         {/* Add the WhatsApp button */}
         <WhatsAppButton

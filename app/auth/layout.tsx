@@ -6,12 +6,12 @@
 
 // export default AuthLayout;
 
-import type React from 'react'; // Import React
+import { Suspense, type ReactNode } from 'react';
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
-  return <>{children}</>;
+  return <Suspense fallback={null}>{children}</Suspense>;
 }

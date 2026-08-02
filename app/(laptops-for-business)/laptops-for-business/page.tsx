@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -25,6 +24,7 @@ import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/laptops-for-business`;
@@ -198,16 +198,7 @@ export default function LaptopsForBusinessPage() {
         
         {/* --- HERO SECTION --- */}
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-32 md:pt-44">
-          <div className="absolute inset-0 opacity-30 mix-blend-overlay">
-            <Image
-              src="/images/laptops.png"
-              alt=""
-              fill
-              priority
-              className="object-cover"
-            />
-          </div>
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/80 to-slate-950" />
+          <PublicHeroBackground />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-4xl flex-col items-center">
@@ -215,8 +206,8 @@ export default function LaptopsForBusinessPage() {
                 <Laptop className="h-4 w-4" />
                 Enterprise Hardware Sourcing
               </div>
-              <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
-                Business laptops from China, <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">verified before shipping.</span>
+              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+                Business laptops from China, <span className="text-white">verified before shipping</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
                 Sure Imports helps Nigerian businesses, schools, and resellers source bulk laptops from China. We handle supplier verification, strict technical inspections, and end-to-door delivery.
@@ -224,8 +215,8 @@ export default function LaptopsForBusinessPage() {
               
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <Link
-                  href="/corporate-gifts"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
+                  href="/corporate-sourcing"
+                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Request a Business Quote <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -233,7 +224,7 @@ export default function LaptopsForBusinessPage() {
                 </Link>
                 <Link
                   href="/shop"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
+                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
                 >
                   Browse Available Stock
                 </Link>
@@ -519,7 +510,7 @@ export default function LaptopsForBusinessPage() {
               </Link>
               
               <Link
-                href="/corporate-gifts"
+                href="/corporate-sourcing"
                 className="group flex flex-col items-center text-center rounded-[2.5rem] border-2 border-brand-orange-500 bg-brand-orange-50/50 p-10 shadow-md transition-all hover:bg-brand-orange-50 dark:border-brand-orange-500/50 dark:bg-brand-orange-500/5 dark:hover:bg-brand-orange-500/10"
               >
                 <div className="h-16 w-16 rounded-2xl bg-brand-orange-100 dark:bg-brand-orange-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">

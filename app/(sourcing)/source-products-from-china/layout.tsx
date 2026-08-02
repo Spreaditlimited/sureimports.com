@@ -1,6 +1,6 @@
 import WhatsAppButton from '@/components/WhatsAppButton';
 import './globals.css';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 import type { Metadata } from 'next';
 import { BackToTopButton } from '@/app/(home)/components/BackToTopButton';
 
@@ -20,7 +20,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
-      {children}
+      <Suspense fallback={null}>{children}</Suspense>
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
         message="Hello! I'd like to ask about your services."

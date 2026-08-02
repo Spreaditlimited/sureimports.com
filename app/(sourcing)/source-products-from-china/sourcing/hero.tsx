@@ -6,9 +6,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import heroBg from '@/public/images/heroBg-lines.png';
-import heroBgM from '@/public/images/heroBgMobile.png';
 import linkArrow from '@/public/images/linkArrow.svg';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const Hero = () => {
   useEffect(() => {
@@ -19,7 +18,8 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative p-[70px_0_70px] md:p-[105px_0_85px] xl15:p-[145px_0_188px]">
+    <section className="relative overflow-hidden bg-slate-950 p-[70px_0_70px] md:p-[105px_0_85px] xl15:p-[145px_0_188px]">
+      <PublicHeroBackground />
       <div className="px-[30px] max-sm:px-[20px]">
         <div className="fix-width">
           <div
@@ -39,35 +39,23 @@ const Hero = () => {
               </p>
             </div>
             {/* <h1 className="text-center text-[42px] font-semibold capitalize leading-tight text-buy-sourcing-white max-xl:text-[26px] max-sm:text-[34px] max-[420px]:text-[26px]"> */}
-            <h1 className="text-[42px] font-semibold capitalize leading-tight text-white max-xl:text-[26px] max-sm:text-[34px] max-[375px]:text-[28px]">
+            <h1 className="text-5xl font-black capitalize leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
               Get Exactly What You Want from China{' '}
               <span className="hidden sm:block">Without Lifting a Finger</span>
             </h1>
-            <p className="mt-4 px-5 text-base font-normal leading-relaxed text-white md:px-28 md:text-lg lg:px-14 xl:px-20 xl14:px-32">
+            <p className="mt-4 px-5 text-base font-normal leading-relaxed text-slate-300 md:px-28 md:text-lg lg:px-14 xl:px-20 xl14:px-32">
               We’ve Helped Hundreds of Businesses Source Machines, Equipment &
               Custom Products Since 2018. Now Let’s Do It for You.
             </p>
             <Link
               href={'/auth/signup-sourcing'}
-              className="mx-auto mt-5 flex w-fit items-center justify-center gap-[10px] rounded-[30px] bg-buy-sourcing-blue p-[10px_30px] text-base font-medium leading-[155%] text-buy-sourcing-white transition-all hover:bg-indigo-700 md:mt-[30px] md:text-lg"
+              className="mx-auto mt-5 flex w-fit items-center justify-center gap-[10px] rounded-[30px] bg-buy-sourcing-blue p-[10px_30px] text-base font-bold leading-[155%] text-white transition-all hover:bg-indigo-700 md:mt-[30px]"
             >
               Submit Sourcing Request
               <Image src={linkArrow} alt="linkArrow" className="w-5" />
             </Link>
           </div>
         </div>
-      </div>
-      <div className="from-0 absolute inset-0 z-[-1] bg-gradient-to-tr from-[#161629] to-[#474784] to-95%">
-        <Image
-          src={heroBg}
-          alt="image"
-          className="hidden h-full w-full object-cover md:block"
-        />
-        <Image
-          src={heroBgM}
-          alt="image"
-          className="block h-full w-full md:hidden"
-        />
       </div>
     </section>
   );

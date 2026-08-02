@@ -1,15 +1,11 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop, ShieldCheck } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 interface ServicesSectionProps {
   onNavigateToSignUp?: () => void;
 }
 
-export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionProps) {
-  const router = useRouter();
+export default function ServicesSection(_: ServicesSectionProps) {
   const services = [
     {
       title: 'Buy From Chinese Websites',
@@ -34,9 +30,9 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
     {
       title: 'Corporate Sourcing',
       icon: Gift,
-      desc: 'Order premium branded products for your team, partners, and clients. We source, customize, and deliver high-quality corporate sourcing projects tailored to your brand.',
-      tags: ['Branded Gifts', 'Bulk Orders', 'Custom Packaging'],
-      href: '/corporate-gifts',
+      desc: 'Source machinery, equipment, branded products and bulk business supplies from China with supplier checks, customization, inspection and delivery support.',
+      tags: ['Machinery & Equipment', 'Bulk Orders', 'Branded Products'],
+      href: '/corporate-sourcing',
     },
     {
       title: 'Laptops for Business',
@@ -95,15 +91,12 @@ export default function ServicesSection({ onNavigateToSignUp }: ServicesSectionP
                 </div>
               </div>
               
-              <Button
-                onClick={() => {
-                  router.push(service.href || '/auth/login');
-                }}
-                variant="ghost"
-                className="w-fit p-0 text-brand-orange-500 hover:bg-transparent hover:text-brand-orange-600 dark:hover:text-brand-orange-400"
+              <Link
+                href={service.href || '/auth/login'}
+                className="inline-flex w-fit items-center p-0 text-brand-orange-500 hover:bg-transparent hover:text-brand-orange-600 dark:hover:text-brand-orange-400"
               >
                 <span className="font-bold">Get Started</span> <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
+              </Link>
             </div>
           ))}
         </div>

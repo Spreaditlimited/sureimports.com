@@ -15,6 +15,7 @@ import ConsultationBookingForm from '@/components/consultation/ConsultationBooki
 import ConsultationManageActions from '@/components/consultation/ConsultationManageActions';
 import { clean, consultationAmountKobo, slotLabel } from '@/lib/consultation';
 import { prisma } from '@/lib/prisma';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const pageUrl = 'https://www.sureimports.com/book-consultation';
 
@@ -153,6 +154,7 @@ export default async function BookConsultationPage({
 
       {/* --- HERO SECTION --- */}
       <section className="relative overflow-hidden bg-slate-950 px-4 pb-16 pt-32 text-center text-white sm:px-6 sm:pb-24 sm:pt-44 lg:px-8">
+        <PublicHeroBackground />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand-orange-500/15 blur-[100px] sm:h-[600px] sm:w-[800px]" />
         
         <div className="relative mx-auto max-w-4xl">
@@ -161,24 +163,24 @@ export default async function BookConsultationPage({
             1-on-1 Strategy Call
           </div>
           
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-            Get clear direction before you <br className="hidden md:block" /> send money to China.
+          <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+            Get clear direction before you <br className="hidden md:block" /> send money to China
           </h1>
           
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-400 sm:mt-6 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg">
             Book a focused call with Sure Imports to review your import plan, vet a supplier concern, or calculate your true landed costs.
           </p>
           
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
             <a
               href="#booking"
-              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 sm:w-auto sm:rounded-full"
+              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 sm:w-auto sm:rounded-full"
             >
               Choose a slot <ArrowRight className="h-4 w-4" />
             </a>
             <Link
               href="/supplier-intelligence"
-              className="inline-flex h-14 w-full items-center justify-center rounded-xl border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto sm:rounded-full"
+              className="inline-flex h-14 w-full items-center justify-center rounded-xl border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto sm:rounded-full"
             >
               Supplier Intelligence
             </Link>

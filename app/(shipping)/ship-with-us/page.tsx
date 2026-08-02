@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -26,6 +27,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicShippingOnlyFlow from './components/PublicShippingOnlyFlow';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/ship-with-us`;
@@ -129,7 +131,7 @@ const relatedServices = [
   {
     title: 'Corporate Sourcing',
     text: 'Use this for branded gifts, custom products, staff kits and bulk procurement that requires supplier comparison.',
-    href: '/corporate-gifts',
+    href: '/corporate-sourcing',
     icon: BadgeCheck,
   },
   {
@@ -223,6 +225,7 @@ export default function ShipWithUsPage() {
         
         {/* --- HERO SECTION --- */}
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+          <PublicHeroBackground />
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
@@ -231,8 +234,8 @@ export default function ShipWithUsPage() {
                 <Ship className="h-4 w-4" />
                 Shipping-only logistics
               </div>
-              <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
-                Ship goods from China to Nigeria <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">after buying.</span>
+              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+                Ship goods from China to Nigeria <span className="text-white">after buying</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
                 Already bought goods from 1688, Alibaba, Taobao or a private Chinese supplier? Send them to our China warehouse and let Sure Imports handle shipping, consolidation, and delivery.
@@ -241,7 +244,7 @@ export default function ShipWithUsPage() {
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <a
                   href="#start-shipment"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
+                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Start Shipment Request <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -249,7 +252,7 @@ export default function ShipWithUsPage() {
                 </a>
                 <Link
                   href="/tools/air-vs-sea-calculator"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
+                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
                 >
                   Compare Air vs Sea
                 </Link>
@@ -277,7 +280,7 @@ export default function ShipWithUsPage() {
                   Buy From Chinese Websites
                 </Link>
                 . If you need branded procurement, use{' '}
-                <Link href="/corporate-gifts" className={inlineLinkClass}>
+                <Link href="/corporate-sourcing" className={inlineLinkClass}>
                   Corporate Sourcing
                 </Link>
                 . If you need payment support, use{' '}
@@ -454,7 +457,9 @@ export default function ShipWithUsPage() {
               </div>
 
               <div className="p-4 sm:p-6 lg:p-8">
-                <PublicShippingOnlyFlow />
+                <Suspense fallback={null}>
+                  <PublicShippingOnlyFlow />
+                </Suspense>
               </div>
               
               <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">

@@ -9,7 +9,6 @@ import { Suspense } from 'react';
 import { FacebookPixel } from '@/components/FacebookPixel';
 import { Analytics } from '@/components/GoogleAnalytics';
 import LeadCapturePopup from '@/components/lead-capture/LeadCapturePopup';
-import Loading from './dashboard/loading';
 import LiveChat from '@/components/LiveChat';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import {
@@ -112,21 +111,19 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <html lang="en" suppressHydrationWarning>
-        <head>
-          <link rel="icon" type="image/png" href="/favico.png" />
-        </head>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" type="image/png" href="/favico.png" />
+      </head>
 
+      <body className={`${inter.className} hide-scrollbar`}>
         <AuthProvider>
-          <body className={`${inter.className} 'hide-scrollbar'`}>
-            <Suspense fallback={<Loading />}>
               {/* Google Tag Manager (noscript) */}
               <noscript>
                 <iframe
@@ -180,14 +177,14 @@ export default async function RootLayout({
                 src="https://checkout.flutterwave.com/v3.js"
                 strategy="lazyOnload"
               />
-              <FacebookPixel />
+              <Suspense fallback={null}>
+                <FacebookPixel />
+              </Suspense>
               <Analytics />
               <Toaster />
               <SonnerToaster position="top-right" richColors />
-            </Suspense>
-          </body>
         </AuthProvider>
-      </html>
-    </>
+      </body>
+    </html>
   );
 }

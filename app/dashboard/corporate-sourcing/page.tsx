@@ -35,10 +35,17 @@ type CorporateGiftRequest = {
   detailedSpecifications: string;
   quantityNeeded: number;
   preferredQualityLevel: string;
+  brandingCustomizationRequired: string;
   expectedDeliveryDate: string;
   finalDeliveryLocationNigeria: string;
   contactEmail: string;
   whatsappNumber: string;
+  proceedTimeline?: string | null;
+  additionalNotes?: string | null;
+  referenceFileUrl?: string | null;
+  referenceFileName?: string | null;
+  logoFileUrl?: string | null;
+  logoFileName?: string | null;
   status: string;
   cancellationReason?: string | null;
   createdAt: string;
@@ -83,8 +90,8 @@ const STATUS_STEPS = [
   'Delivered',
 ] as const;
 
-const QUALITY_LEVELS = ['Basic', 'Mid-range corporate quality', 'Premium executive gift'];
-const BRANDING_OPTIONS = ['Yes', 'No', 'Not sure yet'];
+const QUALITY_LEVELS = ['Budget-conscious', 'Commercial grade', 'Heavy-duty or premium', 'Not sure, advise us'];
+const BRANDING_OPTIONS = ['Yes, with our logo', 'Yes, product or machine customization', 'No branding or customization needed', 'Not sure yet'];
 const PROCEED_OPTIONS = [
   'Immediately (within 1-3 days)',
   'Within 1 week',
@@ -124,8 +131,8 @@ export default function CorporateGiftsDashboardPage() {
     productOrItemNeeded: '',
     detailedSpecifications: '',
     quantityNeeded: 1,
-    preferredQualityLevel: 'Mid-range corporate quality',
-    brandingCustomizationRequired: 'Yes',
+    preferredQualityLevel: 'Commercial grade',
+    brandingCustomizationRequired: 'Not sure yet',
     expectedDeliveryDate: '',
     finalDeliveryLocationNigeria: '',
     contactEmail: '',
@@ -380,7 +387,7 @@ export default function CorporateGiftsDashboardPage() {
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Corporate Sourcing</h1>
-              <p className="mt-2 text-slate-400">Manage your bulk orders and corporate sourcing projects in real-time.</p>
+              <p className="mt-2 text-slate-400">Manage machinery, equipment, bulk product and branded sourcing projects in real-time.</p>
             </div>
             <div className="flex gap-3">
               <button
@@ -423,7 +430,7 @@ export default function CorporateGiftsDashboardPage() {
           <div className="mb-12 rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-slate-700 dark:bg-[#161629]">
             <div className="border-b border-slate-100 p-6 dark:border-slate-700">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Start New Project</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-300">Provide details about your corporate needs.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-300">Provide details about the products, machinery or equipment your business needs.</p>
             </div>
             <form onSubmit={onSubmit} className="p-6">
               <div className="grid gap-6 md:grid-cols-2">
@@ -440,9 +447,9 @@ export default function CorporateGiftsDashboardPage() {
                 </section>
 
                 <section className="space-y-4">
-                  <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300"><Package className="h-3 w-3" /> Product Specs</h3>
+                  <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300"><Package className="h-3 w-3" /> Product or Machine Specs</h3>
                   <div className="space-y-3">
-                    <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="What items do you need?" value={form.productOrItemNeeded} onChange={(e) => setForm(p => ({ ...p, productOrItemNeeded: e.target.value }))} required />
+                    <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="What product, machine or equipment do you need?" value={form.productOrItemNeeded} onChange={(e) => setForm(p => ({ ...p, productOrItemNeeded: e.target.value }))} required />
                     <div className="grid grid-cols-2 gap-3">
                       <input type="number" min={1} className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Quantity needed" value={form.quantityNeeded} onChange={(e) => setForm(p => ({ ...p, quantityNeeded: Number(e.target.value) }))} required />
                       <Select
@@ -450,7 +457,7 @@ export default function CorporateGiftsDashboardPage() {
                         onValueChange={(value) => setForm((p) => ({ ...p, preferredQualityLevel: value }))}
                       >
                         <SelectTrigger className="h-[46px] rounded-xl border-slate-200 bg-slate-50 text-sm text-slate-900 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100">
-                          <SelectValue placeholder="Preferred quality level" />
+                          <SelectValue placeholder="Quality or duty level" />
                         </SelectTrigger>
                         <SelectContent>
                           {QUALITY_LEVELS.map((q) => (
@@ -504,11 +511,11 @@ export default function CorporateGiftsDashboardPage() {
                 </section>
 
                 <div className="md:col-span-2 space-y-3">
-                  <textarea className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Detailed Specifications..." value={form.detailedSpecifications} onChange={(e) => setForm(p => ({ ...p, detailedSpecifications: e.target.value }))} required />
+                  <textarea className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Specifications: intended use, capacity, power/voltage, dimensions, material, model or packaging..." value={form.detailedSpecifications} onChange={(e) => setForm(p => ({ ...p, detailedSpecifications: e.target.value }))} required />
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                     <div className="space-y-1">
                       <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-300">
-                        Is branding/customization required?
+                        Is branding or product customization required?
                       </label>
                       <Select
                         value={form.brandingCustomizationRequired}
@@ -549,12 +556,12 @@ export default function CorporateGiftsDashboardPage() {
                   </div>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center dark:border-slate-700 dark:bg-[#0f1020]">
-                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Reference Image</p>
-                      <input type="file" accept="image/*" onChange={(e) => setReferenceImage(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
+                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Reference Image or Specification Sheet</p>
+                      <input type="file" accept="image/*,.pdf" onChange={(e) => setReferenceImage(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
                     </div>
                     <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center dark:border-slate-700 dark:bg-[#0f1020]">
-                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Company Logo</p>
-                      <input type="file" accept="image/*" onChange={(e) => setCompanyLogo(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
+                      <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Company Logo for Branded Orders</p>
+                      <input type="file" accept=".png,.jpg,.jpeg,.svg,.pdf" onChange={(e) => setCompanyLogo(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
                     </div>
                   </div>
                 </div>
@@ -671,6 +678,50 @@ export default function CorporateGiftsDashboardPage() {
 
                   {isExpanded && (
                     <>
+                      {/* Request Details */}
+                      <div className="grid gap-4 border-t border-slate-100 px-6 py-5 dark:border-slate-800 md:grid-cols-2">
+                        <div className="rounded-xl bg-slate-50 p-4 dark:bg-[#0f1020]">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Product or Machine Specifications</p>
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-slate-700 dark:text-slate-200">{request.detailedSpecifications}</p>
+                        </div>
+                        <div className="rounded-xl bg-slate-50 p-4 dark:bg-[#0f1020]">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Quality / Duty Level</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{request.preferredQualityLevel}</p>
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Branding / Customization</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{request.brandingCustomizationRequired}</p>
+                            </div>
+                            <div>
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Proceed Timeline</p>
+                              <p className="mt-1 text-sm font-semibold text-slate-700 dark:text-slate-200">{request.proceedTimeline || 'Not specified'}</p>
+                            </div>
+                          </div>
+                          {request.additionalNotes ? (
+                            <div className="mt-4 border-t border-slate-200 pt-3 dark:border-slate-800">
+                              <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Additional Requirements</p>
+                              <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700 dark:text-slate-200">{request.additionalNotes}</p>
+                            </div>
+                          ) : null}
+                          {(request.referenceFileUrl || request.logoFileUrl) ? (
+                            <div className="mt-4 flex flex-wrap gap-2 border-t border-slate-200 pt-3 dark:border-slate-800">
+                              {request.referenceFileUrl ? (
+                                <a href={request.referenceFileUrl} target="_blank" rel="noopener noreferrer" className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-indigo-500">
+                                  {request.referenceFileName || 'View specification file'}
+                                </a>
+                              ) : null}
+                              {request.logoFileUrl ? (
+                                <a href={request.logoFileUrl} target="_blank" rel="noopener noreferrer" className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800">
+                                  {request.logoFileName || 'View company logo'}
+                                </a>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+
                       {/* Progress Track */}
                       <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 dark:border-slate-800 dark:bg-[#0f1020]">
                         {isCancelled ? (

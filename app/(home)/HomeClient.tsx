@@ -1,7 +1,4 @@
-'use client';
-
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
@@ -13,16 +10,6 @@ import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
 
 export default function HomeClient() {
-  const router = useRouter();
-
-  const handleExternalAuth = React.useCallback(() => {
-    router.push('/auth/login');
-  }, [router]);
-
-  const handleNavigateToPrivacyPolicy = React.useCallback(() => {
-    router.push('/privacy-policy');
-  }, [router]);
-
   return (
     <>
       <Navbar />
@@ -34,14 +21,12 @@ export default function HomeClient() {
           showCTA
         />
         <TrustedOrganizations />
-        <ServicesSection onNavigateToSignUp={handleExternalAuth} />
+        <ServicesSection />
         <WhyChooseUs />
-        <CustomerReviews onNavigateToSignUp={handleExternalAuth} />
+        <CustomerReviews />
         <Footer />
       </main>
-      <CookieConsent
-        onNavigateToPrivacyPolicy={handleNavigateToPrivacyPolicy}
-      />
+      <CookieConsent />
     </>
   );
 }

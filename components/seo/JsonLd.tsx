@@ -1,7 +1,3 @@
-'use client';
-
-import Script from 'next/script';
-
 interface JsonLdProps {
   data: object | object[];
 }
@@ -11,21 +7,7 @@ interface JsonLdProps {
  * Use this in page components to add schema.org structured data
  */
 export function JsonLd({ data }: JsonLdProps) {
-  const jsonLd = Array.isArray(data) ? data : [data];
-
-  return (
-    <>
-      {jsonLd.map((item, index) => (
-        <Script
-          key={index}
-          id={`json-ld-${index}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(item) }}
-          strategy="afterInteractive"
-        />
-      ))}
-    </>
-  );
+  return <JsonLdScript data={data} />;
 }
 
 /**

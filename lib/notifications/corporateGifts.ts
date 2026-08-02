@@ -71,7 +71,7 @@ export async function notifyCustomerCorporateGiftStatus(input: NotifyInput) {
   const statusLine = `Current Status: ${input.status}`;
   const dashboardLink =
     input.onboarding?.dashboardLink ||
-    'https://sureimports.com/dashboard/corporate-gifts';
+    'https://sureimports.com/dashboard/corporate-sourcing';
 
   const emailBody = `
 <table style="width:100%;border-collapse:collapse;margin-top:6px;border:1px solid #e5e7eb;">

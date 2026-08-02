@@ -301,7 +301,7 @@ export async function POST(req: Request) {
       onboarding: {
         accountCreated: createdDashboardAccount,
         temporaryPassword: temporaryPassword || undefined,
-        dashboardLink: 'https://sureimports.com/dashboard/corporate-gifts',
+        dashboardLink: 'https://sureimports.com/dashboard/corporate-sourcing',
       },
     });
 
@@ -317,12 +317,12 @@ Contact Person: ${data.contactPersonFullName}
 Email: ${data.contactEmail}
 WhatsApp: ${data.whatsappNumber}
 
-PRODUCT DETAILS
----------------
-Product Needed: ${data.productOrItemNeeded}
+PRODUCT OR MACHINE DETAILS
+--------------------------
+Product or Machine Needed: ${data.productOrItemNeeded}
 Quantity: ${quantityNeeded}
-Quality Level: ${data.preferredQualityLevel}
-Branding Required: ${data.brandingCustomizationRequired}
+Quality / Duty Level: ${data.preferredQualityLevel}
+Branding / Customization: ${data.brandingCustomizationRequired}
 
 Specifications:
 ${data.detailedSpecifications}
@@ -362,7 +362,7 @@ Page URL: ${data.pageUrl || 'N/A'}
         xBody1: `A new corporate sourcing request has been submitted.<br /><b>Request ID:</b> ${pidRequest}`,
         xBody2: `<pre>${emailText}</pre><p><strong>Attachments:</strong> ${attachmentNames}</p>`,
         xButtonTitle: 'Open Admin Dashboard',
-        xButtonLink: 'https://admin.sureimports.com/dashboard/corporate-gifts',
+        xButtonLink: 'https://admin.sureimports.com/dashboard/corporate-sourcing',
       });
     } catch (emailError) {
       console.error('Corporate sourcing email notification failed:', emailError);

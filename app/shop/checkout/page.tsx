@@ -28,6 +28,7 @@ import {
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { useAuth } from '@/app/context/AuthContext';
 import Loading from '@/app/dashboard/loading';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 declare global {
   interface Window {
@@ -358,8 +359,9 @@ function CheckoutContent() {
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       
       {/* Deep Slate Hero Header */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="relative overflow-hidden bg-slate-900 pb-32 pt-12 text-white">
+        <PublicHeroBackground />
+        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           
           <button 
             onClick={() => router.push('/shop')}
@@ -378,7 +380,7 @@ function CheckoutContent() {
                 </span>
               </div>
               <h1 className="text-3xl font-black tracking-tight md:text-5xl">Checkout</h1>
-              <p className="mt-3 text-sm font-medium text-slate-400 md:text-base">
+              <p className="mt-3 text-sm font-medium text-slate-300 md:text-base">
                 Review your order and securely complete your purchase.
               </p>
             </div>
@@ -678,5 +680,9 @@ function CheckoutContent() {
 }
 
 export default function CheckoutPage() {
-  return <CheckoutContent />;
+  return (
+    <React.Suspense fallback={<Loading />}>
+      <CheckoutContent />
+    </React.Suspense>
+  );
 }

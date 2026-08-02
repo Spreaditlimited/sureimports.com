@@ -6,17 +6,19 @@ import heroImg from '@/public/assets/img/hero-img.png';
 import Image from 'next/image';
 import Button from '../global/Button';
 import { motion } from 'framer-motion';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 export default function Hero() {
   return (
     <section
-      className="overflow-hidden pb-[35px] pt-[70px] sm:pb-[25px] xl:pt-[102px]"
+      className="relative overflow-hidden pb-[35px] pt-[70px] sm:pb-[25px] xl:pt-[102px]"
       style={{
         background:
           'linear-gradient(96deg, #161629 0%, #474784 95.54%), #D9D9D9',
       }}
     >
-      <div className="container">
+      <PublicHeroBackground />
+      <div className="container relative z-10">
         <div className="flex flex-col items-center justify-between gap-y-0 xl:flex-row 2xl:items-start 2xl:gap-10">
           {/* left side */}
           <motion.div
@@ -42,15 +44,17 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <h1 className="text-center text-[32px] font-semibold uppercase leading-[44px] text-white sm:whitespace-nowrap sm:text-[48px] sm:font-bold sm:leading-[80px] xl:-mr-20 xl:text-start 2xl:-mr-40">
+              <h1 className="text-center text-5xl font-black uppercase leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl xl:text-start">
                 Type-C to Type-C
               </h1>
 
-              <p className="text-center text-[20px] font-normal leading-[36px] tracking-[2px] text-white sm:text-[36px] sm:leading-[200%] xl:text-start">
+              <p className="text-center text-[20px] font-normal leading-[36px] tracking-[2px] text-slate-300 sm:text-[36px] sm:leading-[200%] xl:text-start">
                 Fast Charging Cable
               </p>
             </div>
-            <Button href="/faya#buy-now">Buy Now</Button>
+            <Button href="/faya#buy-now" className="!text-base !font-bold !text-white">
+              Buy Now
+            </Button>
           </motion.div>
 
           {/* image */}

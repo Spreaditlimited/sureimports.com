@@ -29,20 +29,23 @@ import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import CorporateGiftsClient from './CorporateGiftsClient';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
-const pageUrl = `${baseUrl}/corporate-gifts`;
+const pageUrl = `${baseUrl}/corporate-sourcing`;
 
 export const metadata: Metadata = {
   title: 'Corporate Sourcing from China for Nigerian Businesses | Sure Imports',
   description:
-    'Source branded corporate gifts, promotional items, staff kits and bulk custom products from China. Sure Imports handles supplier search, branding, inspection, shipping and delivery to Nigeria.',
+    'Source machinery, equipment, branded corporate gifts and bulk business products from China. Sure Imports handles supplier search, verification, inspection, shipping and delivery to Nigeria.',
   keywords: [
     'corporate sourcing Nigeria',
     'corporate gifts from China Nigeria',
     'branded corporate gifts Nigeria',
     'promotional items from China',
     'bulk product sourcing from China',
+    'machine sourcing from China Nigeria',
+    'industrial equipment sourcing Nigeria',
     'custom branded products Nigeria',
     'staff welcome kits Nigeria',
     'China sourcing agent Nigeria',
@@ -53,7 +56,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Corporate Sourcing from China for Nigerian Businesses',
     description:
-      'Source branded gifts, promotional items, staff kits and bulk custom products from China with supplier checks, branding support, inspection and delivery.',
+      'Source machinery, equipment, branded gifts and bulk business products from China with supplier checks, customization support, inspection and delivery.',
     url: pageUrl,
     siteName: 'Sure Imports',
     type: 'website',
@@ -70,12 +73,17 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Corporate Sourcing from China for Nigerian Businesses',
     description:
-      'Branded corporate gifts, promotional items, staff kits and bulk custom products sourced from China for Nigerian businesses.',
+      'Machinery, equipment, branded corporate gifts and bulk products sourced from China for Nigerian businesses.',
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
 
 const productCategories = [
+  {
+    title: 'Machinery and equipment',
+    text: 'Production, packaging, processing, agricultural and commercial machines sourced to match your required capacity, power and use case.',
+    icon: Factory,
+  },
   {
     title: 'Branded corporate gifts',
     text: 'Mugs, flasks, notebooks, pens, umbrellas, gift boxes and executive items customized with your company identity.',
@@ -101,32 +109,27 @@ const productCategories = [
     text: 'Boxes, sleeves, labels, inserts and branded packaging that make the final delivery feel complete and consistent.',
     icon: Package,
   },
-  {
-    title: 'Bulk business products',
-    text: 'Repeatable items for schools, teams, retailers, churches, agencies, ecommerce operators and corporate departments.',
-    icon: PackageCheck,
-  },
 ];
 
 const workflow = [
   {
     title: 'Share your brief',
-    text: 'Send product ideas, reference photos, quantity, brand assets, budget range, delivery deadline and preferred finish.',
+    text: 'Send the product or machine name, intended use, specifications, quantity, reference files, budget range and delivery deadline.',
     icon: ClipboardCheck,
   },
   {
     title: 'Supplier search',
-    text: 'We search China supplier options, compare product quality, minimum order quantity, branding method and pricing.',
+    text: 'We search China supplier options and compare specifications, production capacity, quality, minimum order quantity and pricing.',
     icon: Factory,
   },
   {
     title: 'Quote and approval',
-    text: 'You receive a practical cost breakdown covering item cost, branding, packaging, inspection, shipping and local delivery.',
+    text: 'You receive a practical cost breakdown covering the product or machine, customization, inspection, shipping and local delivery.',
     icon: FileSearch,
   },
   {
-    title: 'Branding and sample checks',
-    text: 'Artwork, mockups, samples or production proofs are reviewed before full production where the order requires it.',
+    title: 'Specification and sample checks',
+    text: 'Machine configurations, technical documents, artwork, samples or production proofs are reviewed where the order requires it.',
     icon: PenTool,
   },
   {
@@ -136,18 +139,19 @@ const workflow = [
   },
   {
     title: 'Delivery support',
-    text: 'Your items are delivered with updates so your team can plan distribution, events, launches or client gifting.',
+    text: 'Your order is delivered with updates so your team can plan installation, operations, distribution, events or launches.',
     icon: Truck,
   },
 ];
 
 const buyerChecks = [
-  'Product type, quantity and expected use case',
-  'Logo files, brand colors and packaging requirements',
+  'Product or machine type, quantity and intended business use',
+  'Required capacity, output, power, voltage, dimensions or model',
+  'Logo files, brand colors, customization or packaging requirements',
   'Target unit budget and delivery deadline',
   'Preferred material, size, model or finish',
-  'Event date, distribution plan or campaign timeline',
-  'Whether you need samples before production',
+  'Delivery deadline, installation plan, event date or campaign timeline',
+  'Whether you need samples, testing or technical documentation',
 ];
 
 const serviceLinks = [
@@ -181,7 +185,12 @@ const faqs = [
   {
     question: 'What is corporate sourcing?',
     answer:
-      'Corporate sourcing is the process of finding, verifying, customizing, inspecting and importing products for business use. For Sure Imports, this commonly includes branded corporate gifts, promotional items, staff kits, event merchandise and bulk custom products from China.',
+      'Corporate sourcing is the process of finding, verifying, customizing, inspecting and importing products for business use. For Sure Imports, this includes machinery and equipment, branded corporate gifts, promotional items, staff kits and bulk business products from China.',
+  },
+  {
+    question: 'Can Sure Imports source machines and equipment for my business?',
+    answer:
+      'Yes. We can source production, packaging, processing, agricultural and other commercial machinery from China. Share the machine\'s intended use, required capacity, power or voltage, preferred model and delivery location so we can compare suitable suppliers and configurations.',
   },
   {
     question: 'Can Sure Imports source branded corporate gifts from China?',
@@ -201,7 +210,7 @@ const faqs = [
   {
     question: 'How early should I start a corporate sourcing order?',
     answer:
-      'Start as early as possible, especially for festive campaigns, conferences and branded gifts. Eight to twelve weeks is safer for custom production, packaging, international shipping and final delivery.',
+      'Start as early as possible. Allow at least eight to twelve weeks for supplier checks, customization or production, inspection, international shipping and delivery. Complex or made-to-order machines may require a longer timeline.',
   },
   {
     question: 'What if I already have a supplier?',
@@ -224,9 +233,9 @@ const serviceSchema = {
     '@type': 'Country',
     name: 'Nigeria',
   },
-  serviceType: 'Corporate sourcing, branded merchandise procurement and bulk product sourcing from China',
+  serviceType: 'Machinery and equipment sourcing, branded merchandise procurement and bulk product sourcing from China',
   description:
-    'Corporate sourcing service for Nigerian businesses that need branded gifts, promotional items, staff kits and bulk custom products sourced from China.',
+    'Corporate sourcing service for Nigerian businesses that need machinery, equipment, branded gifts, promotional items and bulk products sourced from China.',
 };
 
 const faqSchema = {
@@ -251,6 +260,7 @@ export default function CorporateGiftsPage() {
         
         {/* --- HERO SECTION --- */}
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+          <PublicHeroBackground />
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
@@ -259,17 +269,17 @@ export default function CorporateGiftsPage() {
                 <Briefcase className="h-4 w-4" />
                 Corporate Sourcing
               </div>
-              <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
-                Corporate gifts and bulk products <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">sourced from China.</span>
+              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+                Machines, equipment and bulk products <span className="text-white">sourced from China</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Sure Imports helps Nigerian businesses source branded gifts, promotional items, and staff kits. We handle supplier checks, branding, inspection, and door-to-door delivery.
+                Sure Imports helps Nigerian businesses source machinery, equipment, branded gifts and other bulk products. We handle supplier checks, specifications, customization, inspection and door-to-door delivery.
               </p>
               
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <a
-                  href="#corporate-gifts-form"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
+                  href="#corporate-sourcing-form"
+                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Start a Sourcing Request <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -277,7 +287,7 @@ export default function CorporateGiftsPage() {
                 </a>
                 <Link
                   href="/buy-from-chinese-websites"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
+                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
                 >
                   Submit Product Links
                 </Link>
@@ -297,10 +307,10 @@ export default function CorporateGiftsPage() {
                 Built for business buying
               </span>
               <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
-                Source branded products without gambling on random suppliers.
+                Source business products and machines without gambling on random suppliers.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Corporate sourcing isn't casual shopping. It involves exact quantities, firm deadlines, strict logo placement, and internal approvals. A bad supplier can miss your event, botch your brand colors, or ship inferior materials.
+                Corporate sourcing isn't casual shopping. It can involve technical specifications, production capacity, exact quantities, firm deadlines, customization and internal approvals. A poor supplier can deliver the wrong machine configuration, miss your deadline or ship inferior materials.
               </p>
             </div>
 
@@ -331,7 +341,7 @@ export default function CorporateGiftsPage() {
                 A sourcing workflow your team can actually follow.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-400">
-                The goal isn't just cheap products. The goal is the right item, accurate branding, correct quantity, and exact landed cost before a single Naira is committed.
+                The goal isn't just a low price. It is the right product or machine, correct specifications and quantity, and a clear landed cost before a single Naira is committed.
               </p>
             </div>
 
@@ -386,20 +396,20 @@ export default function CorporateGiftsPage() {
                   <CalendarClock className="h-6 w-6" />
                 </div>
                 <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
-                  Start early for campaigns and festive gifts.
+                  Start early for machinery, campaigns and custom orders.
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Corporate orders involve product search, artwork approval, sample review, production, and shipping. Starting early protects your event or gifting timeline.
+                  Corporate orders may involve technical confirmation, supplier checks, samples or testing, production and shipping. Starting early protects your operational or campaign timeline.
                 </p>
               </div>
               
               <div className="space-y-6">
                 <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-bold leading-relaxed text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
                   <Info className="inline-block h-4 w-4 mr-2 mb-1" />
-                  For festive seasons and annual client gifting, plan 8 to 12 weeks ahead.
+                  Allow at least 8 to 12 weeks; complex or made-to-order machines may require longer.
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {['Logo placement', 'Custom Packaging', 'Production proofing', 'Export Inspection'].map((item) => (
+                  {['Machine specifications', 'Custom packaging', 'Production proofing', 'Export inspection'].map((item) => (
                     <div key={item} className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-bold text-center text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
                       {item}
                     </div>
@@ -412,7 +422,7 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- FORM SECTION --- */}
-        <section id="corporate-gifts-form" className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/50 md:py-28">
+        <section id="corporate-sourcing-form" className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/50 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
              <div className="text-center mb-12">
                <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
@@ -422,7 +432,7 @@ export default function CorporateGiftsPage() {
                  Submit your sourcing brief.
                </h2>
                <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-                 Share your product, quantity, deadline, and branding needs. Our team will review the details and contact you.
+                 Share the product or machine, specifications, quantity, deadline and any customization needs. Our team will review the details and contact you.
                </p>
              </div>
              <div className="mx-auto max-w-4xl">
@@ -442,7 +452,7 @@ export default function CorporateGiftsPage() {
                 Choose the right route for your order.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Corporate Sourcing is best when you need supplier comparison and custom branding. Other Sure Imports services may fit better if your supplier is already decided.
+                Corporate Sourcing is best when you need help finding and comparing suppliers for machinery, business products or custom-branded orders. Other Sure Imports services may fit better if your supplier is already decided.
               </p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">

@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlertTriangle, ArrowLeft, Home } from 'lucide-react';
 
-export default function LoginAliasFallbackPage() {
+function LoginAliasFallbackContent() {
   const router = useRouter();
   const params = useSearchParams();
 
@@ -52,5 +52,13 @@ export default function LoginAliasFallbackPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function LoginAliasFallbackPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginAliasFallbackContent />
+    </Suspense>
   );
 }

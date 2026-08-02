@@ -88,9 +88,9 @@ const MENU_ITEMS = {
     },
     {
       title: 'Corporate Sourcing',
-      href: '/corporate-gifts',
+      href: '/corporate-sourcing',
       icon: Gift,
-      desc: 'Branded gift sourcing and bulk customization',
+      desc: 'Machinery, equipment, branded products and bulk sourcing',
       color: 'from-amber-400 to-orange-500',
     },
     {

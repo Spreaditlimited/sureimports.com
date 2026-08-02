@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 type StoreProduct = {
   pidProduct: string;
@@ -29,7 +30,7 @@ type StoreProduct = {
   productCategory: string | null;
 };
 
-export default function ShopPage() {
+function ShopContent() {
   const searchParams = useSearchParams();
   const { cartCount } = useShopCart();
   const [activeCategory, setActiveCategory] = useState('All Products');
@@ -131,17 +132,18 @@ export default function ShopPage() {
     <>
       <Navbar />
       <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-        <section className="bg-slate-900 pb-20 pt-48 text-white">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white">
+          <PublicHeroBackground />
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
               <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-400 backdrop-blur-sm">
                 <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
               </span>
-              <h1 className="mb-6 text-4xl font-black tracking-tight sm:text-6xl">
+              <h1 className="mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 Premium Tech & Gadgets,{' '}
-                <span className="text-brand-orange-500">Sourced Direct.</span>
+                <span className="text-white">Sourced Direct</span>
               </h1>
-              <p className="mb-8 text-lg text-slate-400">
+              <p className="mb-8 text-lg text-slate-300">
                 Order directly from verified Chinese manufacturers. Delivered to
                 your doorstep in Nigeria within 10 business days.
               </p>
@@ -238,5 +240,13 @@ export default function ShopPage() {
       />
       <Footer />
     </>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <React.Suspense fallback={null}>
+      <ShopContent />
+    </React.Suspense>
   );
 }

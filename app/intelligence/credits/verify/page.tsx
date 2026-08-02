@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 
-export default function IntelligenceCreditsVerifyPage() {
+function IntelligenceCreditsVerifyContent() {
   const searchParams = useSearchParams();
   const reference =
     searchParams.get('reference') || searchParams.get('trxref') || '';
@@ -83,5 +83,13 @@ export default function IntelligenceCreditsVerifyPage() {
         </Link>
       </div>
     </main>
+  );
+}
+
+export default function IntelligenceCreditsVerifyPage() {
+  return (
+    <Suspense fallback={null}>
+      <IntelligenceCreditsVerifyContent />
+    </Suspense>
   );
 }

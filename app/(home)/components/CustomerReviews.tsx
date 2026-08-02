@@ -1,6 +1,6 @@
 import { Star, Quote } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const chiomaImage = '/images/new/images/img1.jpg';
 const chukwuedozieImage = '/images/new/images/img2.jpg';
@@ -10,7 +10,7 @@ interface CustomerReviewsProps {
   onNavigateToSignUp?: () => void;
 }
 
-export default function CustomerReviews({ onNavigateToSignUp }: CustomerReviewsProps) {
+export default function CustomerReviews(_: CustomerReviewsProps) {
   const reviews = [
     {
       name: 'Chioma Ifeanyi-Eze',
@@ -58,10 +58,13 @@ export default function CustomerReviews({ onNavigateToSignUp }: CustomerReviewsP
                 <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">"{review.content}"</p>
               </div>
               <div className="mt-8 flex items-center gap-4 border-t border-slate-100 pt-6 dark:border-slate-800">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={review.image} alt={review.name} className="object-cover" />
-                  <AvatarFallback className="bg-indigo-100 text-indigo-700">{review.name.charAt(0)}</AvatarFallback>
-                </Avatar>
+                <Image
+                  src={review.image}
+                  alt={review.name}
+                  width={48}
+                  height={48}
+                  className="h-12 w-12 rounded-full object-cover"
+                />
                 <div>
                   <div className="font-bold text-slate-900 dark:text-white">{review.name}</div>
                   <div className="text-xs text-slate-500">{review.role}</div>
@@ -75,12 +78,12 @@ export default function CustomerReviews({ onNavigateToSignUp }: CustomerReviewsP
           <div className="mx-auto max-w-3xl rounded-[32px] bg-indigo-900 p-10 text-white shadow-2xl sm:p-16">
             <h3 className="mb-4 text-3xl font-black">Ready to scale your business?</h3>
             <p className="mb-8 text-indigo-200">Join thousands of businesses importing effortlessly from China.</p>
-            <Button
-              onClick={onNavigateToSignUp}
-              className="h-14 rounded-full bg-brand-orange-500 px-10 text-base font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98] border-0"
+            <Link
+              href="/auth/login"
+              className="inline-flex h-14 items-center justify-center rounded-full border-0 bg-brand-orange-500 px-10 text-base font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98]"
             >
               Start Sourcing Today
-            </Button>
+            </Link>
           </div>
         </div>
 

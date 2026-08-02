@@ -12,6 +12,7 @@ import {
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { prisma } from '@/lib/prisma';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 export const dynamic = 'force-dynamic';
 
@@ -166,6 +167,7 @@ export default async function ShippingRatePage() {
       <Navbar />
       <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white">
         <section className="relative overflow-hidden bg-slate-950 px-4 pb-16 pt-48 text-white sm:px-6 lg:px-8">
+          <PublicHeroBackground />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%)]" />
           <div className="relative mx-auto max-w-7xl">
             <div className="max-w-3xl">
@@ -173,7 +175,7 @@ export default async function ShippingRatePage() {
                 <Ship className="h-3.5 w-3.5" />
                 Live Shipping Estimates
               </div>
-              <h1 className="text-4xl font-black tracking-tight sm:text-6xl">
+              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 Shipping Rates
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
@@ -183,14 +185,14 @@ export default async function ShippingRatePage() {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="/ship-with-us"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 text-sm font-black text-white transition hover:bg-orange-600"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 text-base font-bold text-white transition hover:bg-orange-600"
                 >
                   Ship with us
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
                   href="/shipping-policy"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-6 text-sm font-black text-white transition hover:bg-white/10"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-6 text-base font-bold text-white transition hover:bg-white/10"
                 >
                   Shipping policy
                   <ExternalLink className="h-4 w-4" />

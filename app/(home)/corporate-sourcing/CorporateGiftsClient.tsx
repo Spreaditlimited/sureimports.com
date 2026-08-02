@@ -45,8 +45,8 @@ const initialValues: FormValues = {
   proceed_timeline: '', hear_about_sureimports: '', additional_notes: '',
 };
 
-const qualityOptions = ['Basic but decent', 'Mid-range corporate quality', 'Premium executive gift', 'Not sure, advise us'];
-const brandingOptions = ['Yes, with our logo', 'Yes, but we need design guidance', 'No branding needed', 'Not sure yet'];
+const qualityOptions = ['Budget-conscious', 'Commercial grade', 'Heavy-duty or premium', 'Not sure, advise us'];
+const brandingOptions = ['Yes, with our logo', 'Yes, product or machine customization', 'Yes, but we need guidance', 'No branding or customization needed', 'Not sure yet'];
 const proceedOptions = ['Immediately', 'Within 1 week', 'Within 2 - 4 weeks', 'Still comparing options'];
 const sourceOptions = ['Facebook', 'Instagram', 'Google', 'Referral', 'Existing customer', 'WhatsApp', 'Other'];
 
@@ -64,7 +64,7 @@ export default function CorporateGiftsClient() {
     return date.toISOString().split('T')[0];
   }, []);
 
-  const steps = ['Business Details', 'Product Details', 'Branding & Files', 'Delivery Info'];
+  const steps = ['Business Details', 'Product or Machine', 'Customization & Files', 'Delivery Info'];
   const isLastStep = currentStep === steps.length - 1;
 
   const onChange = (name: keyof FormValues, value: string) => {
@@ -82,8 +82,8 @@ export default function CorporateGiftsClient() {
     const nextErrors: FormErrors = {};
     const requiredByStep: [keyof FormValues, string][][] = [
       [['business_name', 'Business name is required.'], ['contact_person_full_name', 'Full name is required.']],
-      [['product_or_item_needed', 'Item needed is required.'], ['detailed_specifications', 'Specifications are required.'], ['quantity_needed', 'Quantity is required.'], ['preferred_quality_level', 'Quality level is required.']],
-      [['branding_customization_required', 'Please choose a branding option.']],
+      [['product_or_item_needed', 'Product or machine needed is required.'], ['detailed_specifications', 'Specifications are required.'], ['quantity_needed', 'Quantity is required.'], ['preferred_quality_level', 'Quality or duty level is required.']],
+      [['branding_customization_required', 'Please choose a customization option.']],
       [['expected_delivery_date', 'Delivery date is required.'], ['final_delivery_location_nigeria', 'Location is required.'], ['contact_email', 'Email is required.'], ['whatsapp_number', 'WhatsApp number is required.']],
     ];
 
@@ -206,27 +206,27 @@ export default function CorporateGiftsClient() {
 
         {currentStep === 1 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">What do you want to source?</h3>
-            <TextField label="Product Name" required value={values.product_or_item_needed} onChange={(v) => onChange('product_or_item_needed', v)} placeholder="E.g. Branded Ceramic Mugs" error={errors.product_or_item_needed} />
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">What product or machine do you want to source?</h3>
+            <TextField label="Product or Machine Name" required value={values.product_or_item_needed} onChange={(v) => onChange('product_or_item_needed', v)} placeholder="E.g. Sachet packaging machine or branded ceramic mugs" error={errors.product_or_item_needed} />
             <div>
               <Label className="mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500">Detailed specifications <span className="text-rose-500">*</span></Label>
-              <Textarea value={values.detailed_specifications} onChange={(e) => onChange('detailed_specifications', e.target.value)} rows={4} placeholder="Include size, color, material, packaging requirements..." className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-900" />
+              <Textarea value={values.detailed_specifications} onChange={(e) => onChange('detailed_specifications', e.target.value)} rows={4} placeholder="Include intended use, output capacity, power/voltage, dimensions, material, model, color or packaging requirements..." className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-900" />
               <ErrorText text={errors.detailed_specifications} />
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <TextField label="Quantity Needed" required value={values.quantity_needed} onChange={(v) => onChange('quantity_needed', v)} type="number" min={1} placeholder="Enter quantity" error={errors.quantity_needed} />
-              <PremiumSelect label="Preferred Quality" required value={values.preferred_quality_level} onValueChange={(v) => onChange('preferred_quality_level', v)} options={qualityOptions} placeholder="Select quality..." error={errors.preferred_quality_level} />
+              <TextField label="Quantity / Number of Units" required value={values.quantity_needed} onChange={(v) => onChange('quantity_needed', v)} type="number" min={1} placeholder="Enter number of units" error={errors.quantity_needed} />
+              <PremiumSelect label="Preferred Quality / Duty Level" required value={values.preferred_quality_level} onValueChange={(v) => onChange('preferred_quality_level', v)} options={qualityOptions} placeholder="Select level..." error={errors.preferred_quality_level} />
             </div>
           </div>
         )}
 
         {currentStep === 2 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Branding Requirements</h3>
-            <PremiumSelect label="Do you need custom branding?" required value={values.branding_customization_required} onValueChange={(v) => onChange('branding_customization_required', v)} options={brandingOptions} placeholder="Select an option..." error={errors.branding_customization_required} />
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Customization and Supporting Files</h3>
+            <PremiumSelect label="Do you need branding or product customization?" required value={values.branding_customization_required} onValueChange={(v) => onChange('branding_customization_required', v)} options={brandingOptions} placeholder="Select an option..." error={errors.branding_customization_required} />
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FileField label="Reference Image/Design (Optional)" accept="image/*,.pdf" onChange={setReferenceFile} error={errors.reference_image_upload} />
-              <FileField label="Company Logo (Optional)" accept=".png,.jpg,.svg,.pdf" onChange={setLogoFile} error={errors.company_logo_upload} />
+              <FileField label="Reference Image or Specification Sheet (Optional)" accept="image/*,.pdf" onChange={setReferenceFile} error={errors.reference_image_upload} />
+              <FileField label="Company Logo for Branded Orders (Optional)" accept=".png,.jpg,.svg,.pdf" onChange={setLogoFile} error={errors.company_logo_upload} />
             </div>
             <p className="text-xs font-semibold text-slate-500">Accepted: Images & PDFs. Max size: 10MB per file.</p>
           </div>
@@ -238,7 +238,7 @@ export default function CorporateGiftsClient() {
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <TextField label="Expected Delivery Date" required value={values.expected_delivery_date} onChange={(v) => onChange('expected_delivery_date', v)} type="date" min={minDeliveryDate} error={errors.expected_delivery_date} />
-                <p className="mt-1 text-[10px] font-semibold text-slate-500">Must allow 2+ months lead time for production.</p>
+                <p className="mt-1 text-[10px] font-semibold text-slate-500">Must allow 2+ months; complex machines may take longer.</p>
               </div>
               <TextField label="Delivery City/State" required value={values.final_delivery_location_nigeria} onChange={(v) => onChange('final_delivery_location_nigeria', v)} placeholder="E.g. Lekki, Lagos" error={errors.final_delivery_location_nigeria} />
               <TextField label="Work Email" required value={values.contact_email} onChange={(v) => onChange('contact_email', v)} type="email" placeholder="you@company.com" error={errors.contact_email} />
@@ -250,7 +250,7 @@ export default function CorporateGiftsClient() {
             </div>
             <div>
               <Label className="mb-2 block text-xs font-bold uppercase tracking-widest text-slate-500">Additional Notes (Optional)</Label>
-              <Textarea value={values.additional_notes} onChange={(e) => onChange('additional_notes', e.target.value)} rows={3} placeholder="Any extra context?" className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-900" />
+              <Textarea value={values.additional_notes} onChange={(e) => onChange('additional_notes', e.target.value)} rows={3} placeholder="Add installation, certification, testing or other requirements..." className="resize-none rounded-xl border-slate-200 bg-slate-50 focus-visible:ring-brand-orange-500/40 dark:border-slate-800 dark:bg-slate-900" />
             </div>
           </div>
         )}

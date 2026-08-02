@@ -1,5 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    async redirects() {
+      return [
+        {
+          source: '/corporate-gifts',
+          destination: '/corporate-sourcing',
+          permanent: true,
+        },
+        {
+          source: '/dashboard/corporate-gifts',
+          destination: '/dashboard/corporate-sourcing',
+          permanent: true,
+        },
+      ];
+    },
     env: {
       NEXT_PUBLIC_GOOGLE_CAPTCHA_SITE_KEY:
         process.env.NEXT_PUBLIC_GOOGLE_CAPTCHA_SITE_KEY ||

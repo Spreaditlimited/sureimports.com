@@ -23,6 +23,7 @@ import {
   fetchPublishedBlogSlugs,
 } from '@/app/(home)/actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/import-from-china-to-nigeria`;
@@ -110,7 +111,7 @@ const pathways = [
     eyebrow: 'I need sourcing help',
     title: 'Use Corporate Sourcing',
     text: 'For supplier search, branded/custom products, bulk orders and business procurement planning.',
-    href: '/corporate-gifts',
+    href: '/corporate-sourcing',
     icon: FileSearch,
   },
   {
@@ -231,6 +232,7 @@ export default async function ImportFromChinaHubPage() {
 
       {/* --- HERO SECTION --- */}
       <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+        <PublicHeroBackground />
         <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
         
         <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 text-center">
@@ -239,8 +241,8 @@ export default async function ImportFromChinaHubPage() {
               <BookOpen className="h-4 w-4" />
               Sure Imports Resource Hub
             </div>
-            <h1 className="text-4xl font-black leading-[1.1] tracking-tight sm:text-5xl lg:text-[64px]">
-              Import from China to Nigeria <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-400 to-amber-300">without guessing.</span>
+            <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+              Import from China to Nigeria <span className="text-white">without guessing</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
               Use this hub to learn the process, choose the right service, estimate costs, avoid supplier mistakes and move from research to a practical import plan.
@@ -249,7 +251,7 @@ export default async function ImportFromChinaHubPage() {
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
                 href="/supplier-intelligence"
-                className="group relative inline-flex h-14 w-full sm:w-auto items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
+                className="group relative inline-flex h-14 w-full sm:w-auto items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
               >
                 <span className="relative z-10 flex items-center gap-2">
                   Supplier Intelligence <ShieldCheck className="h-4 w-4" />
@@ -257,7 +259,7 @@ export default async function ImportFromChinaHubPage() {
               </Link>
               <Link
                 href="/blog"
-                className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
+                className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
               >
                 Browse All Guides <ArrowRight className="h-4 w-4" />
               </Link>
@@ -443,7 +445,7 @@ export default async function ImportFromChinaHubPage() {
             
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link 
-                href="/corporate-gifts" 
+                href="/corporate-sourcing"
                 className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition hover:bg-brand-orange-600"
               >
                 Explore Corporate Sourcing <PackageCheck className="h-4 w-4" />

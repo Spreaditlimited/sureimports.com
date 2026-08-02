@@ -84,17 +84,18 @@ const existingPublicCtaPaths = new Set([
   '/ship-with-us',
   '/buy-phones-from-china',
   '/laptops-for-business',
-  '/corporate-gifts',
+  '/corporate-sourcing',
   '/shipping-rate',
   '/tools/landed-cost-estimator',
 ]);
 
 const legacyCtaPathMap: Record<string, string> = {
   '/procurement': '/buy-from-chinese-websites',
-  '/source-products-from-china': '/corporate-gifts',
-  '/pay-supplier': '/corporate-gifts',
-  '/verify-supplier': '/corporate-gifts',
-  '/contact': '/corporate-gifts',
+  '/corporate-gifts': '/corporate-sourcing',
+  '/source-products-from-china': '/corporate-sourcing',
+  '/pay-supplier': '/corporate-sourcing',
+  '/verify-supplier': '/corporate-sourcing',
+  '/contact': '/corporate-sourcing',
 };
 
 const serviceCtaCopy: Record<string, { headline: string; body: string }> = {
@@ -106,9 +107,9 @@ const serviceCtaCopy: Record<string, { headline: string; body: string }> = {
     headline: 'Already paid a supplier and only need shipping?',
     body: 'Use Ship With Us when your goods are ready in China. Your supplier sends the items to the SureImports China warehouse and we coordinate shipping, consolidation updates and delivery support.',
   },
-  '/corporate-gifts': {
+  '/corporate-sourcing': {
     headline: 'Need structured sourcing with a clearer cost view?',
-    body: 'Use Corporate Sourcing for supplier search, product comparison, branding or customization, quote review, inspection planning, shipping and delivery support for business or bulk orders.',
+    body: 'Use Corporate Sourcing for machinery, equipment, business products or branded bulk orders that need supplier comparison, specification review, inspection planning, shipping and delivery support.',
   },
   '/buy-phones-from-china': {
     headline: 'Buying phones or mobile devices from China?',
@@ -135,7 +136,7 @@ const lineScoutCtaCopy = {
 
 function normalizeUrl(value: unknown, baseUrl: string) {
   const raw = clean(value);
-  if (!raw) return new URL('/corporate-gifts', baseUrl).toString();
+  if (!raw) return new URL('/corporate-sourcing', baseUrl).toString();
 
   try {
     const parsed = new URL(raw);
@@ -144,7 +145,7 @@ function normalizeUrl(value: unknown, baseUrl: string) {
     }
     const mappedPath = legacyCtaPathMap[parsed.pathname] || parsed.pathname;
     if (!existingPublicCtaPaths.has(mappedPath)) {
-      return new URL('/corporate-gifts', baseUrl).toString();
+      return new URL('/corporate-sourcing', baseUrl).toString();
     }
     return new URL(
       `${mappedPath}${parsed.search}${parsed.hash}`,
@@ -156,14 +157,14 @@ function normalizeUrl(value: unknown, baseUrl: string) {
       const parsed = new URL(path, baseUrl);
       const mappedPath = legacyCtaPathMap[parsed.pathname] || parsed.pathname;
       if (!existingPublicCtaPaths.has(mappedPath)) {
-        return new URL('/corporate-gifts', baseUrl).toString();
+        return new URL('/corporate-sourcing', baseUrl).toString();
       }
       return new URL(
         `${mappedPath}${parsed.search}${parsed.hash}`,
         baseUrl,
       ).toString();
     } catch {
-      return new URL('/corporate-gifts', baseUrl).toString();
+      return new URL('/corporate-sourcing', baseUrl).toString();
     }
   }
 }
@@ -174,10 +175,10 @@ function getServiceCtaCopy(url: string) {
     if (parsed.hostname === 'linescout.sureimports.com')
       return lineScoutCtaCopy;
     return (
-      serviceCtaCopy[parsed.pathname] || serviceCtaCopy['/corporate-gifts']
+      serviceCtaCopy[parsed.pathname] || serviceCtaCopy['/corporate-sourcing']
     );
   } catch {
-    return serviceCtaCopy['/corporate-gifts'];
+    return serviceCtaCopy['/corporate-sourcing'];
   }
 }
 

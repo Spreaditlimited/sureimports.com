@@ -12,6 +12,7 @@ import {
   Clock,
   Home
 } from 'lucide-react';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 function OrderSuccessContent() {
   const router = useRouter();
@@ -40,15 +41,16 @@ function OrderSuccessContent() {
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       
       {/* Deep Slate Celebratory Hero */}
-      <div className="bg-slate-900 pb-40 pt-16 text-center text-white">
-        <div className="mx-auto max-w-3xl px-4">
+      <div className="relative overflow-hidden bg-slate-900 pb-40 pt-16 text-center text-white">
+        <PublicHeroBackground />
+        <div className="relative z-10 mx-auto max-w-3xl px-4">
           <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-500/20 ring-4 ring-emerald-500/10">
             <CheckCircle2 className="h-12 w-12 text-emerald-400" />
           </div>
           <h1 className="text-3xl font-black tracking-tight sm:text-5xl">
             Order Confirmed
           </h1>
-          <p className="mt-4 text-lg font-medium text-slate-400">
+          <p className="mt-4 text-lg font-medium text-slate-300">
             Thank you for your purchase. We're getting everything ready.
           </p>
         </div>
@@ -177,5 +179,9 @@ function OrderSuccessContent() {
 }
 
 export default function OrderSuccessPage() {
-  return <OrderSuccessContent />;
+  return (
+    <React.Suspense fallback={null}>
+      <OrderSuccessContent />
+    </React.Suspense>
+  );
 }

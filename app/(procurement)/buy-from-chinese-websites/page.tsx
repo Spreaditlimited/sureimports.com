@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import {
   ArrowRight,
   BadgeCheck,
@@ -20,6 +21,7 @@ import PublicOrderFlow from './components/PublicOrderFlow';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/buy-from-chinese-websites`;
@@ -219,6 +221,7 @@ export default function BuyFromChineseWebsitesPage() {
         
         {/* --- HERO SECTION --- */}
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+          <PublicHeroBackground />
           <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
@@ -228,36 +231,21 @@ export default function BuyFromChineseWebsitesPage() {
                 Trusted China buying support
               </div>
 
-              <h1 className="text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-[64px]">
+              <h1 className="text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
                 Buy from Chinese websites with{' '}
-                <span className="bg-gradient-to-r from-brand-orange-400 to-amber-300 bg-clip-text text-transparent">
+                <span className="text-white">
                   confidence
                 </span>
               </h1>
 
-              <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-gray-300">
+              <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-slate-300">
                 Paste links from 1688, Alibaba, Taobao, and Pinduoduo. We handle the checkout, RMB supplier payments, shipping routes, and door-to-door delivery.
               </p>
-
-              <div className="mt-8 flex flex-wrap justify-center gap-3">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm backdrop-blur-md">
-                  <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span className="text-gray-300">1688, Alibaba, Taobao and more</span>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm backdrop-blur-md">
-                  <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span className="text-gray-300">Secure order records</span>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-sm backdrop-blur-md">
-                  <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span className="text-gray-300">End-to-end shipping support</span>
-                </div>
-              </div>
 
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <a
                   href="#start-order"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
+                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     Start Your Order <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -265,7 +253,7 @@ export default function BuyFromChineseWebsitesPage() {
                 </a>
                 <Link
                   href="/blog/1688-vs-taobao-vs-alibaba-vs-aliexpress-best-china-website-for-nigerians"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
+                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
                 >
                   Compare China Websites
                 </Link>
@@ -386,7 +374,9 @@ export default function BuyFromChineseWebsitesPage() {
               </div>
 
               <div className="p-4 sm:p-6 lg:p-8">
-                <PublicOrderFlow />
+                <Suspense fallback={null}>
+                  <PublicOrderFlow />
+                </Suspense>
               </div>
               
               <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
@@ -438,7 +428,7 @@ export default function BuyFromChineseWebsitesPage() {
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
                   Buy From Chinese Websites works best when you already have product links. For large custom branding projects, use{' '}
-                  <Link href="/corporate-gifts" className={inlineServiceLinkClass}>
+                  <Link href="/corporate-sourcing" className={inlineServiceLinkClass}>
                     Corporate Sourcing
                   </Link>
                   .
@@ -460,7 +450,7 @@ export default function BuyFromChineseWebsitesPage() {
                       {item.title === 'Product samples' ? (
                         <>
                           Small trial orders before committing to higher-volume sourcing, white label or{' '}
-                          <Link href="/corporate-gifts" className={inlineServiceLinkClass}>
+                          <Link href="/corporate-sourcing" className={inlineServiceLinkClass}>
                             corporate procurement
                           </Link>
                           .

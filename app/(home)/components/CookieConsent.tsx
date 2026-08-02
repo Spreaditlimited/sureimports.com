@@ -1,9 +1,12 @@
+'use client';
+
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { X, Cookie } from 'lucide-react';
 
 interface CookieConsentProps {
-  onNavigateToPrivacyPolicy: () => void;
+  onNavigateToPrivacyPolicy?: () => void;
 }
 
 export default function CookieConsent({ onNavigateToPrivacyPolicy }: CookieConsentProps) {
@@ -34,7 +37,12 @@ export default function CookieConsent({ onNavigateToPrivacyPolicy }: CookieConse
         <div>
           <h3 className="text-sm font-bold text-white">We use cookies</h3>
           <p className="mt-1 text-xs text-slate-400">
-            We use cookies to improve your experience. <button onClick={onNavigateToPrivacyPolicy} className="text-indigo-400 hover:underline">Learn more</button>.
+            We use cookies to improve your experience.{' '}
+            {onNavigateToPrivacyPolicy ? (
+              <button onClick={onNavigateToPrivacyPolicy} className="text-indigo-400 hover:underline">Learn more</button>
+            ) : (
+              <Link href="/privacy-policy" className="text-indigo-400 hover:underline">Learn more</Link>
+            )}.
           </p>
         </div>
       </div>

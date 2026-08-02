@@ -1,8 +1,6 @@
-'use client';
-
 import * as React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 
@@ -21,8 +19,6 @@ export default function Hero({
   size = 'large',
   showCTA = false,
 }: HeroProps) {
-  const router = useRouter();
-
   return (
     <section
       className={`relative flex w-full flex-col items-center justify-center overflow-hidden bg-slate-950 ${
@@ -66,19 +62,21 @@ export default function Hero({
         )}
 
         {showCTA && (
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row">
+          <div className="mt-10 flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row">
             <Button
-              onClick={() => router.push('/auth/login')}
-              className="h-14 rounded-full border-0 bg-brand-orange-500 px-8 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98]"
+              asChild
+              className="h-14 w-full rounded-full border-0 bg-brand-orange-500 px-8 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98] sm:w-auto"
             >
-              Start Sourcing Now <ArrowRight className="ml-2 h-5 w-5" />
+              <Link href="/auth/login">
+                Start Sourcing Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button
-              onClick={() => router.push('/book-consultation')}
+              asChild
               variant="outline"
-              className="h-14 rounded-full border-slate-700 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white"
+              className="h-14 w-full rounded-full border-slate-700 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 hover:text-white sm:w-auto"
             >
-              Talk to an Expert
+              <Link href="/book-consultation">Talk to an Expert</Link>
             </Button>
           </div>
         )}
