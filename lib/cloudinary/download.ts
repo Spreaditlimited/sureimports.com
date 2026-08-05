@@ -10,7 +10,9 @@ export async function downloadCloudinaryPdf(publicId: string) {
   });
   const response = await fetch(signedUrl, { cache: 'no-store' });
   if (!response.ok) {
-    throw new Error(`Unable to retrieve PDF from storage (${response.status}).`);
+    throw new Error(
+      `Unable to retrieve PDF from storage (${response.status}).`,
+    );
   }
   const pdf = Buffer.from(await response.arrayBuffer());
   if (pdf.length < 5 || pdf.subarray(0, 5).toString('ascii') !== '%PDF-') {
