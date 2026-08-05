@@ -55,7 +55,7 @@ const MENU_ITEMS = {
       title: 'Supplier Intelligence',
       href: '/supplier-intelligence',
       icon: Database,
-      desc: 'Verified supplier research for Nigerian importers',
+      desc: 'Verified supplier research for global importers',
       color: 'from-slate-700 to-slate-950',
     },
     {
@@ -218,12 +218,17 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
   const isLegalPage = Boolean(pathname && LEGAL_PAGE_PATHS.includes(pathname));
   const isToolsPage = Boolean(pathname?.startsWith('/tools'));
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
+  const isSupplierReportProductPage = Boolean(
+    pathname &&
+      /^\/supplier-intelligence\/reports\/[^/]+\/?$/.test(pathname),
+  );
   const useLightNavbar =
     forceLightNavbar ||
     isShopProductPage ||
     isLegalPage ||
     isToolsPage ||
-    isBlogPage;
+    isBlogPage ||
+    isSupplierReportProductPage;
   const signInHref = '/auth/login';
   const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
 
