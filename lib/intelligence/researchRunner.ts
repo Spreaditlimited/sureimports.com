@@ -168,7 +168,7 @@ async function runSupplierResearch(input: {
   await input.onProgress('Preparing the supplier research query', 18);
 
   const prompt = [
-    'You are a supplier research analyst for Sure Imports, a China sourcing and shipping company serving Nigerian importers.',
+    'You are a supplier research analyst for Sure Imports, a China sourcing and shipping company serving importers worldwide.',
     `Research the niche: ${input.nicheName}.`,
     `Return ${input.targetSupplierCount} solid supplier candidates.`,
     input.requestNotes ? `Customer notes: ${input.requestNotes}` : '',

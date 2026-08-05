@@ -124,7 +124,7 @@ const fieldsByType: Record<
     showAttachments: false,
     decisionLabel: 'What should Sure Imports research?',
     decisionPlaceholder:
-      'Example: I need reliable manufacturers for rechargeable fans with lithium batteries for Nigeria.',
+      'Example: I need reliable manufacturers for rechargeable fans with lithium batteries that meet my destination market requirements.',
   },
   invoice_check: {
     intro:

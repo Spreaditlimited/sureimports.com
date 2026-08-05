@@ -169,19 +169,19 @@ model marketing_leads {
 }
 
 model search_console_import_runs {
-  id             Int       @id @default(autoincrement())
-  pidRun         String    @unique() @db.VarChar(80)
-  siteUrl        String    @db.VarChar(255)
-  startDate      DateTime
-  endDate        DateTime
-  dimensions     String    @db.VarChar(255)
-  rowCount       Int       @default(0)
-  status         String    @default("started") @db.VarChar(40)
-  errorMessage   String?   @db.Text
-  startedAt      DateTime  @default(now())
-  completedAt    DateTime?
-  createdAt      DateTime? @default(now())
-  updatedAt      DateTime?
+  id           Int       @id @default(autoincrement())
+  pidRun       String    @unique() @db.VarChar(80)
+  siteUrl      String    @db.VarChar(255)
+  startDate    DateTime
+  endDate      DateTime
+  dimensions   String    @db.VarChar(255)
+  rowCount     Int       @default(0)
+  status       String    @default("started") @db.VarChar(40)
+  errorMessage String?   @db.Text
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+  createdAt    DateTime? @default(now())
+  updatedAt    DateTime?
 
   @@index([siteUrl])
   @@index([status])
@@ -285,48 +285,48 @@ model admin {
 }
 
 model users {
-  id                   Int       @id @default(autoincrement())
-  pidUser              String    @unique()
-  userFirstname        String?
-  userLastname         String?
-  userEmail            String    @unique()
-  userPassword         String?
-  userSession          String?
-  cidStatus            String?
-  loginStatus          String?
-  loginKey             String?
-  loginStamp           String?
-  gender               String?
-  dob                  String?
-  email                String?
-  phone                String?
-  address              String?
-  country              String?
-  bank_name            String?
-  bank_account_number  String?
-  bank_account_name    String?
-  bank_code            String?
-  bank_transfer_code   String?
-  ref_id               String?
-  userPhone            String?
-  userCid              String?
-  userShippingAddress  String?
-  userShippingAddress2 String?
-  userCountry          String?
-  userState            String?
-  userAffiliateCode    String?
-  userAffiliateRef     String?
-  userStatus           String?
-  userImage            String?
-  userFile             String?
-  userExt1             String?
-  userExt2             String?
-  xStatus              String?
-  createdAt            DateTime? @default(now())
-  updatedAt            DateTime?
-  orders               orders[]
-  wallets              Wallet[]
-  accounts             Account[]
+  id                        Int                          @id @default(autoincrement())
+  pidUser                   String                       @unique()
+  userFirstname             String?
+  userLastname              String?
+  userEmail                 String                       @unique()
+  userPassword              String?
+  userSession               String?
+  cidStatus                 String?
+  loginStatus               String?
+  loginKey                  String?
+  loginStamp                String?
+  gender                    String?
+  dob                       String?
+  email                     String?
+  phone                     String?
+  address                   String?
+  country                   String?
+  bank_name                 String?
+  bank_account_number       String?
+  bank_account_name         String?
+  bank_code                 String?
+  bank_transfer_code        String?
+  ref_id                    String?
+  userPhone                 String?
+  userCid                   String?
+  userShippingAddress       String?
+  userShippingAddress2      String?
+  userCountry               String?
+  userState                 String?
+  userAffiliateCode         String?
+  userAffiliateRef          String?
+  userStatus                String?
+  userImage                 String?
+  userFile                  String?
+  userExt1                  String?
+  userExt2                  String?
+  xStatus                   String?
+  createdAt                 DateTime?                    @default(now())
+  updatedAt                 DateTime?
+  orders                    orders[]
+  wallets                   Wallet[]
+  accounts                  Account[]
   intelligenceSubscriptions intelligence_subscriptions[]
 }
 
@@ -538,16 +538,16 @@ model subscriptions {
 }
 
 model intelligence_niches {
-  id          Int       @id @default(autoincrement())
-  pidNiche    String    @unique() @db.VarChar(80)
-  name        String    @db.VarChar(160)
-  slug        String    @unique() @db.VarChar(180)
-  summary     String?   @db.Text
-  status      String    @default("draft") @db.VarChar(40)
-  sortOrder   Int       @default(0)
-  createdAt   DateTime? @default(now())
-  updatedAt   DateTime?
-  suppliers   intelligence_suppliers[]
+  id                 Int                                @id @default(autoincrement())
+  pidNiche           String                             @unique() @db.VarChar(80)
+  name               String                             @db.VarChar(160)
+  slug               String                             @unique() @db.VarChar(180)
+  summary            String?                            @db.Text
+  status             String                             @default("draft") @db.VarChar(40)
+  sortOrder          Int                                @default(0)
+  createdAt          DateTime?                          @default(now())
+  updatedAt          DateTime?
+  suppliers          intelligence_suppliers[]
   supplierCategories intelligence_supplier_categories[]
 
   @@index([status])
@@ -555,28 +555,28 @@ model intelligence_niches {
 }
 
 model intelligence_suppliers {
-  id                  Int                  @id @default(autoincrement())
-  pidSupplier         String               @unique() @db.VarChar(80)
-  nicheId             String               @db.VarChar(80)
-  supplierName        String               @db.VarChar(180)
-  productFit          String               @db.Text
-  officialWebsite     String               @db.VarChar(500)
-  officialContactPage String?              @db.VarChar(500)
-  email               String?              @db.VarChar(255)
-  phone               String?              @db.VarChar(120)
-  whatsapp            String?              @db.VarChar(120)
-  address             String?              @db.Text
-  countryRegion       String?              @db.VarChar(180)
-  sourceType          String               @db.VarChar(80)
-  verifiedFrom        String               @db.LongText
-  buyerNotes          String               @db.LongText
-  productsMade        String?              @db.LongText
-  verificationStatus  String               @db.VarChar(80)
+  id                  Int                                @id @default(autoincrement())
+  pidSupplier         String                             @unique() @db.VarChar(80)
+  nicheId             String                             @db.VarChar(80)
+  supplierName        String                             @db.VarChar(180)
+  productFit          String                             @db.Text
+  officialWebsite     String                             @db.VarChar(500)
+  officialContactPage String?                            @db.VarChar(500)
+  email               String?                            @db.VarChar(255)
+  phone               String?                            @db.VarChar(120)
+  whatsapp            String?                            @db.VarChar(120)
+  address             String?                            @db.Text
+  countryRegion       String?                            @db.VarChar(180)
+  sourceType          String                             @db.VarChar(80)
+  verifiedFrom        String                             @db.LongText
+  buyerNotes          String                             @db.LongText
+  productsMade        String?                            @db.LongText
+  verificationStatus  String                             @db.VarChar(80)
   lastVerifiedAt      DateTime?
-  status              String               @default("draft") @db.VarChar(40)
-  createdAt           DateTime?            @default(now())
+  status              String                             @default("draft") @db.VarChar(40)
+  createdAt           DateTime?                          @default(now())
   updatedAt           DateTime?
-  niche               intelligence_niches  @relation(fields: [nicheId], references: [pidNiche], onDelete: Cascade)
+  niche               intelligence_niches                @relation(fields: [nicheId], references: [pidNiche], onDelete: Cascade)
   supplierCategories  intelligence_supplier_categories[]
 
   @@index([nicheId])
@@ -602,44 +602,119 @@ model intelligence_supplier_categories {
 }
 
 model intelligence_plan_settings {
-  id               Int       @id @default(autoincrement())
-  pidSetting       String    @unique() @db.VarChar(80)
-  planKey          String    @unique() @db.VarChar(40)
-  name             String    @db.VarChar(120)
+  id               Int      @id @default(autoincrement())
+  pidSetting       String   @unique() @db.VarChar(80)
+  planKey          String   @unique() @db.VarChar(40)
+  name             String   @db.VarChar(120)
   priceNaira       Int
-  paystackPlanCode String?   @db.VarChar(160)
-  status           String    @default("ACTIVE") @db.VarChar(40)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @default(now())
+  paystackPlanCode String?  @db.VarChar(160)
+  status           String   @default("ACTIVE") @db.VarChar(40)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @default(now())
 
   @@index([status])
 }
 
 model intelligence_subscriptions {
-  id                   Int       @id @default(autoincrement())
-  pidSubscription      String    @unique() @db.VarChar(80)
-  pidUser              String    @db.VarChar(191)
-  email                String    @db.VarChar(255)
-  plan                 String    @db.VarChar(60)
-  status               String    @default("pending") @db.VarChar(40)
-  paystackReference    String?   @unique() @db.VarChar(120)
-  paystackCustomerCode String?   @db.VarChar(120)
-  paystackSubscriptionCode String? @db.VarChar(120)
-  paystackEmailToken   String?   @db.VarChar(120)
-  amountKobo           Int
-  currency             String    @default("NGN") @db.VarChar(10)
-  currentPeriodStart   DateTime?
-  currentPeriodEnd     DateTime?
-  cancelledAt          DateTime?
-  createdAt            DateTime? @default(now())
-  updatedAt            DateTime?
-  user                 users     @relation(fields: [pidUser], references: [pidUser], onDelete: Cascade)
+  id                       Int       @id @default(autoincrement())
+  pidSubscription          String    @unique() @db.VarChar(80)
+  pidUser                  String    @db.VarChar(191)
+  email                    String    @db.VarChar(255)
+  plan                     String    @db.VarChar(60)
+  status                   String    @default("pending") @db.VarChar(40)
+  paystackReference        String?   @unique() @db.VarChar(120)
+  paystackCustomerCode     String?   @db.VarChar(120)
+  paystackSubscriptionCode String?   @db.VarChar(120)
+  paystackEmailToken       String?   @db.VarChar(120)
+  amountKobo               Int
+  currency                 String    @default("NGN") @db.VarChar(10)
+  currentPeriodStart       DateTime?
+  currentPeriodEnd         DateTime?
+  cancelledAt              DateTime?
+  createdAt                DateTime? @default(now())
+  updatedAt                DateTime?
+  user                     users     @relation(fields: [pidUser], references: [pidUser], onDelete: Cascade)
 
   @@index([pidUser])
   @@index([email])
   @@index([status])
   @@index([plan])
   @@index([currentPeriodEnd])
+}
+
+model intelligence_report_products {
+  id               Int       @id @default(autoincrement())
+  pidReport        String    @unique() @db.VarChar(80)
+  nicheId          String    @unique() @db.VarChar(80)
+  slug             String    @unique() @db.VarChar(180)
+  title            String    @db.VarChar(220)
+  subtitle         String?   @db.VarChar(255)
+  description      String?   @db.Text
+  editionLabel     String    @db.VarChar(120)
+  coverImageUrl    String?   @db.VarChar(1000)
+  priceNaira       Int
+  priceUsdCents    Int
+  status           String    @default("draft") @db.VarChar(40)
+  currentVersionId String?   @db.VarChar(80)
+  supplierCount    Int       @default(0)
+  publishedAt      DateTime?
+  createdByPidUser String?   @db.VarChar(191)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+
+  @@index([status, publishedAt])
+  @@index([currentVersionId])
+}
+
+model intelligence_report_versions {
+  id                 Int       @id @default(autoincrement())
+  pidVersion         String    @unique() @db.VarChar(80)
+  reportId           String    @db.VarChar(80)
+  versionNumber      Int
+  editionLabel       String    @db.VarChar(120)
+  supplierSnapshot   Json
+  supplierCount      Int       @default(0)
+  pdfUrl             String?   @db.VarChar(1000)
+  pdfPublicId        String?   @db.VarChar(500)
+  fileBytes          Int?
+  status             String    @default("generated") @db.VarChar(40)
+  generatedByPidUser String?   @db.VarChar(191)
+  generatedAt        DateTime  @default(now())
+  approvedAt         DateTime?
+  publishedAt        DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @default(now())
+
+  @@unique([reportId, versionNumber])
+  @@index([reportId, status])
+}
+
+model intelligence_report_orders {
+  id                Int       @id @default(autoincrement())
+  pidOrder          String    @unique() @db.VarChar(80)
+  reportId          String    @db.VarChar(80)
+  versionId         String    @db.VarChar(80)
+  pidUser           String?   @db.VarChar(191)
+  email             String    @db.VarChar(255)
+  firstName         String?   @db.VarChar(120)
+  lastName          String?   @db.VarChar(120)
+  billingCountry    String?   @db.VarChar(120)
+  paymentProvider   String    @db.VarChar(40)
+  providerReference String?   @unique() @db.VarChar(160)
+  status            String    @default("pending") @db.VarChar(40)
+  amountMinor       Int
+  currency          String    @db.VarChar(10)
+  downloadToken     String    @unique() @db.VarChar(160)
+  downloadCount     Int       @default(0)
+  paidAt            DateTime?
+  fulfilledAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now())
+
+  @@index([reportId, status])
+  @@index([versionId])
+  @@index([pidUser, status])
+  @@index([email, status])
 }
 
 model special_sourcing {
@@ -1069,7 +1144,7 @@ model shippingplan {
   shippingPlanSlug String?
   shippingPlanName String?
   shippingPlanRate Float?
-  shippingPlanUnit String?    @default("KG")
+  shippingPlanUnit String?   @default("KG")
   ext1             String?
   ext2             String?
   status           String?

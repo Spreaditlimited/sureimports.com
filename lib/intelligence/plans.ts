@@ -30,7 +30,7 @@ export const intelligencePlans: Record<IntelligencePlanKey, IntelligencePlan> =
         'Browse all approved supplier categories and supplier leads',
         'Supplier leads checked across 10 data points',
         'Company profiles, contact details and Sure Imports notes',
-        'Buyer risks and Nigeria-specific notes for each category',
+        'Buyer risks and destination-market checks for each category',
       ],
     },
     pro: {

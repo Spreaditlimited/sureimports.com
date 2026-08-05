@@ -2,10 +2,9 @@ import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
-import {
-  grantIntelligenceCredits,
-} from '@/lib/intelligence/credits';
+import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
 import { getConfiguredIntelligencePlan } from '@/lib/intelligence/plans';
+import { fulfillReportOrder } from '@/lib/intelligence/reportOrders';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -52,14 +51,20 @@ function signatureIsValid(body: string, signature: string | null) {
 
   const expected = Buffer.from(hash);
   const received = Buffer.from(signature);
-  return expected.length === received.length && crypto.timingSafeEqual(expected, received);
+  return (
+    expected.length === received.length &&
+    crypto.timingSafeEqual(expected, received)
+  );
 }
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
 
   if (!signatureIsValid(rawBody, request.headers.get('x-paystack-signature'))) {
-    return NextResponse.json({ message: 'Invalid signature.' }, { status: 401 });
+    return NextResponse.json(
+      { message: 'Invalid signature.' },
+      { status: 401 },
+    );
   }
 
   const payload = JSON.parse(rawBody);
@@ -94,11 +99,32 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
 
-  if (payload?.event !== 'charge.success' || payload?.data?.status !== 'success') {
+  if (
+    payload?.event !== 'charge.success' ||
+    payload?.data?.status !== 'success'
+  ) {
     return NextResponse.json({ received: true });
   }
 
   const payment = payload.data;
+  if (payment?.metadata?.product === 'supplier_intelligence_report') {
+    const pidOrder = String(payment.metadata?.pidOrder || '').trim();
+    const order = pidOrder
+      ? await prisma.intelligence_report_orders.findUnique({
+          where: { pidOrder },
+        })
+      : null;
+    if (
+      order &&
+      order.paymentProvider === 'paystack' &&
+      order.providerReference === payment.reference &&
+      Number(payment.amount) === order.amountMinor &&
+      String(payment.currency || '').toUpperCase() === order.currency
+    ) {
+      await fulfillReportOrder(order.pidOrder);
+    }
+    return NextResponse.json({ received: true });
+  }
   const subscriptionCode = getPaymentSubscriptionCode(payment);
   const customerCode = payment.customer?.customer_code || null;
   const email = payment.customer?.email || payment.email || null;

@@ -119,6 +119,12 @@ export default async function DashboardIntelligencePage() {
                 Subscribe to unlock the approved supplier leads, contact routes
                 and buyer notes behind these categories.
               </p>
+              <Link
+                href="/supplier-intelligence/reports"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-black text-brand-orange-600 hover:text-brand-orange-700"
+              >
+                Prefer a one-time report? Browse reports
+              </Link>
 
               <div className="mt-5 grid grid-cols-3 gap-3">
                 {[
@@ -213,6 +219,15 @@ export default async function DashboardIntelligencePage() {
             </h2>
           </div>
 
+          <div className="relative mt-5 text-center">
+            <Link
+              href="/dashboard/intelligence/reports"
+              className="text-sm font-bold text-brand-orange-600 hover:text-brand-orange-700"
+            >
+              View My Reports
+            </Link>
+          </div>
+
           <div className="relative mt-10 grid gap-5 lg:grid-cols-2">
             <LockedPlanCard
               title={intelligencePlans.starter.name}
@@ -277,6 +292,12 @@ export default async function DashboardIntelligencePage() {
               <Crown className="h-4 w-4 text-amber-500" />
               Active {currentPlan?.name || subscription.plan} Plan
             </div>
+            <Link
+              href="/dashboard/intelligence/reports"
+              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
+            >
+              My Reports
+            </Link>
             <Link
               href="/dashboard/intelligence/manage"
               className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"

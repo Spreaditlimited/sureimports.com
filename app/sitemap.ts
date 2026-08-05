@@ -43,6 +43,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/supplier-intelligence/reports`,
+      lastModified: currentDate,
+      changeFrequency: 'weekly',
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/source-products-from-china`,
       lastModified: currentDate,
       changeFrequency: 'weekly',
@@ -165,7 +171,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: {
         blogPublished: true,
         xStaus: 'active',
-        AND: [{ OR: [{ createdAt: null }, { createdAt: { lte: new Date() } }] }],
+        AND: [
+          { OR: [{ createdAt: null }, { createdAt: { lte: new Date() } }] },
+        ],
       },
       select: {
         blogSlug: true,
@@ -190,5 +198,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error fetching blogs for sitemap:', error);
   }
 
-  return [...staticPages, ...blogPages];
+  let reportPages: MetadataRoute.Sitemap = [];
+  try {
+    const reports = await prisma.intelligence_report_products.findMany({
+      where: { status: 'published', currentVersionId: { not: null } },
+      select: { slug: true, publishedAt: true, updatedAt: true },
+    });
+    reportPages = reports.map((report) => ({
+      url: `${baseUrl}/supplier-intelligence/reports/${report.slug}`,
+      lastModified: (
+        report.updatedAt ||
+        report.publishedAt ||
+        new Date()
+      ).toISOString(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    }));
+  } catch (error) {
+    console.error(
+      'Error fetching Supplier Intelligence reports for sitemap:',
+      error,
+    );
+  }
+
+  return [...staticPages, ...blogPages, ...reportPages];
 }

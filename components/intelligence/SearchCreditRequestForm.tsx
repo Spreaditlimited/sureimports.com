@@ -322,7 +322,7 @@ export default function SearchCreditRequestForm({
             <input
               name="query"
               required
-              placeholder="Example: Gas generators for Nigerian importers"
+              placeholder="Example: Gas generators for small businesses in my target market"
               className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-orange-300 focus:ring-2 focus:ring-brand-orange-100"
             />
           </label>

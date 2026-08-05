@@ -45,7 +45,7 @@ export type NormalizedSupplierResearchCandidate = {
 };
 
 export const SUPPLIER_RESEARCH_RULE_VERSION =
-  'manufacturer-whatsapp-registry-v1';
+  'manufacturer-whatsapp-registry-global-v2';
 
 export const SUPPLIER_RESEARCH_RULES = [
   'Use web search to prioritize official company websites, official contact pages, manufacturer pages, and credible company information.',
@@ -55,6 +55,8 @@ export const SUPPLIER_RESEARCH_RULES = [
   'Do not invent phone numbers, WhatsApp numbers, addresses, emails, websites, certifications, factory locations, or contacts.',
   'If a direct contact detail is not clearly verified, leave that field empty. Do not return a supplier without a clearly public WhatsApp number.',
   'Use professional, confident, simple language. Do not say "footer says" or "I found on the website".',
+  'Write for importers in any country. Do not assume the buyer is Nigerian or located in any particular market.',
+  'When regulations, electrical standards, warranty coverage, shipping restrictions, taxes, certifications, product labeling, or market fit may vary, tell the buyer to confirm the requirements in their destination country or target market.',
   'Every supplier must have an officialWebsite and officialContactPage when possible.',
   'In verifiedFrom, include the evidence that the supplier is a manufacturer and where the public WhatsApp number was attributed from.',
 ];
@@ -63,7 +65,7 @@ export function supplierResearchJsonShape(nicheName: string) {
   return {
     ruleVersion: SUPPLIER_RESEARCH_RULE_VERSION,
     nicheName,
-    summary: 'Short practical summary for Nigerian importers.',
+    summary: 'Short practical summary for importers in any country.',
     suppliers: [
       {
         supplierName: 'Company name',
@@ -87,7 +89,7 @@ export function supplierResearchJsonShape(nicheName: string) {
         verifiedFrom:
           'Concise verification summary covering official website, manufacturer evidence, WhatsApp attribution, and registry check where possible.',
         buyerNotes:
-          'Practical buyer notes for Nigerian importers before payment.',
+          'Practical buyer notes for international importers before payment, including destination-market checks where relevant.',
         verificationStatus: 'official_site_contact_confirmed',
       },
     ],

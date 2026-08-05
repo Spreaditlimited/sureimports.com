@@ -140,7 +140,7 @@ export default async function DashboardIntelligenceNichePage({
                 <p className="mt-1 text-sm leading-relaxed text-amber-800/80">
                   Company profile, product fit, contact paths, category
                   relevance, location consistency, buyer risks, export clues,
-                  and Nigeria-use compatibility.
+                  and compatibility with your destination market.
                 </p>
               </div>
             </div>

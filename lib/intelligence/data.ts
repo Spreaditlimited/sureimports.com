@@ -11,6 +11,46 @@ export type SupplierResearchRecordWithProducts = SupplierResearchRecord & {
   whatsappUrl?: string | null;
 };
 
+function globalizeLegacyBuyerLanguage(value: string | null | undefined) {
+  return String(value || '')
+    .replace(/Nigerian importers/gi, 'importers')
+    .replace(/Nigerian buyers/gi, 'buyers')
+    .replace(/Nigerian businesses/gi, 'businesses')
+    .replace(/Nigerian market pricing/gi, 'target-market pricing')
+    .replace(/Nigerian retail price/gi, 'target-market retail price')
+    .replace(
+      /Nigerian market requirements/gi,
+      'destination-market requirements',
+    )
+    .replace(
+      /Nigerian electrical requirements/gi,
+      'destination-market electrical requirements',
+    )
+    .replace(
+      /Nigerian installation conditions/gi,
+      'local installation conditions',
+    )
+    .replace(/Nigerian hospitality use/gi, 'the intended hospitality market')
+    .replace(/Nigeria support/gi, 'destination-market support')
+    .replace(/For Nigeria,/gi, 'For the destination market,')
+    .replace(/Nigeria\/west Africa/gi, 'the destination market')
+    .replace(
+      /Nigeria product standards/gi,
+      'destination-market product standards',
+    )
+    .replace(/\bNigerian\b/gi, 'destination-market')
+    .replace(/\bNigeria\b/gi, 'the destination market');
+}
+
+function globalizeSupplierRecord<T extends SupplierResearchRecordWithProducts>(
+  supplier: T,
+) {
+  return {
+    ...supplier,
+    buyerNotes: globalizeLegacyBuyerLanguage(supplier.buyerNotes),
+  };
+}
+
 export function slugifyNiche(value: string) {
   return value
     .toLowerCase()
@@ -20,7 +60,9 @@ export function slugifyNiche(value: string) {
 }
 
 export function getResearchSuppliers() {
-  return supplierResearch as SupplierResearchRecord[];
+  return (supplierResearch as SupplierResearchRecord[]).map(
+    globalizeSupplierRecord,
+  );
 }
 
 async function getPublishedDatabaseSuppliers() {
@@ -81,13 +123,15 @@ export async function getResearchSuppliersWithDb() {
   const dbSuppliers = await getPublishedDatabaseSuppliers();
   const seen = new Set<string>();
 
-  return [...baseSuppliers, ...dbSuppliers].filter((supplier) => {
-    const key =
-      `${supplier.niche}|${supplier.supplierName}|${supplier.officialWebsite}`.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
+  return [...baseSuppliers, ...dbSuppliers]
+    .filter((supplier) => {
+      const key =
+        `${supplier.niche}|${supplier.supplierName}|${supplier.officialWebsite}`.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .map(globalizeSupplierRecord);
 }
 
 export function getPassingNiches(minimumVerifiedContacts = 3) {

@@ -31,22 +31,22 @@ const baseUrl = 'https://www.sureimports.com';
 const pageUrl = 'https://www.sureimports.com/supplier-intelligence';
 
 export const metadata: Metadata = {
-  title: 'China Supplier Intelligence for Nigerian Importers | Sure Imports',
+  title: 'China Supplier Intelligence for Global Importers | Sure Imports',
   description:
-    'Access researched China supplier leads for Nigerian importers. Starter gives you the supplier intelligence database plus one monthly supplier search credit. Pro adds supplier, quote and invoice review support before payment.',
+    'Access researched China supplier leads from anywhere in the world. Compare manufacturers, contact routes, product fit and buyer risks before payment.',
   keywords: [
-    'China supplier intelligence Nigeria',
-    'China suppliers for Nigerian importers',
-    'verified China supplier list Nigeria',
+    'China supplier intelligence',
+    'China suppliers for global importers',
+    'verified China supplier directory',
     'supplier review before payment',
-    'China supplier database Nigeria',
-    'import from China to Nigeria suppliers',
+    'China supplier database',
+    'international China sourcing',
     'China supplier quote review',
     'invoice review before paying China supplier',
   ],
   alternates: { canonical: pageUrl },
   openGraph: {
-    title: 'China Supplier Intelligence for Nigerian Importers',
+    title: 'China Supplier Intelligence for Global Importers',
     description:
       'Research-backed China supplier leads plus Pro review support for suppliers, quotes and invoices before payment.',
     url: pageUrl,
@@ -63,9 +63,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'China Supplier Intelligence for Nigerian Importers',
+    title: 'China Supplier Intelligence for Global Importers',
     description:
-      'Supplier intelligence database and pre-payment review support for Nigerian importers buying from China.',
+      'Research-backed supplier intelligence and pre-payment review support for importers buying from China.',
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
@@ -82,8 +82,8 @@ const valueProps = [
     icon: FileSearch,
   },
   {
-    title: 'Nigeria-focused buying notes',
-    text: 'We flag issues Nigerian importers often miss: MOQ, warranty route, shipping category, fake product risk and market fit.',
+    title: 'Destination-aware buying notes',
+    text: 'We flag issues importers often miss: MOQ, warranty coverage, shipping restrictions, product standards and target-market fit.',
     icon: Database,
   },
   {
@@ -98,7 +98,7 @@ const buyerProblems = [
   'You are seeing the same recycled supplier lists everywhere.',
   'You are not sure if the company name, contact person, invoice and payment details match.',
   'You have a quote but do not know what questions to ask before paying.',
-  'You want supplier leads for product categories that can work for the Nigerian market.',
+  'You want supplier leads for product categories that can work in your target market.',
   'You need more confidence before sending money to a supplier you have never met.',
 ];
 
@@ -163,7 +163,7 @@ const faqs = [
   {
     question: 'What is Sure Imports Supplier Intelligence?',
     answer:
-      'It is a paid supplier research service for Nigerian importers. Starter gives access to researched China supplier leads by product category plus one monthly supplier search credit. Pro adds review support for supplier details, quotes, invoices and payment details before you pay.',
+      'It is a supplier research service for importers worldwide. Starter gives access to researched China supplier leads by product category plus one monthly supplier search credit. Pro adds review support for supplier details, quotes, invoices and payment details before you pay.',
   },
   {
     question: 'Is this just a supplier list?',
@@ -186,29 +186,27 @@ const faqs = [
       'Yes. Pro members can submit priority category requests so Sure Imports can review whether that product area should be researched next.',
   },
   {
-    question: 'Can this help me import from China to Nigeria?',
+    question: 'Is Supplier Intelligence available worldwide?',
     answer:
-      'Yes. The service is built for Nigerian importers who need a better way to identify supplier options, compare risks and avoid paying blindly.',
+      'Yes. Supplier Intelligence is designed for buyers worldwide. The supplier research is global, while you remain responsible for confirming the rules, certifications, taxes and shipping requirements in your destination country.',
   },
 ];
 
 const serviceSchema = {
   '@context': 'https://schema.org',
   '@type': 'Service',
-  name: 'China Supplier Intelligence for Nigerian Importers',
+  name: 'China Supplier Intelligence for Global Importers',
   url: pageUrl,
   provider: {
     '@type': 'Organization',
     name: 'Sure Imports',
     url: baseUrl,
   },
-  areaServed: {
-    '@type': 'Country',
-    name: 'Nigeria',
-  },
-  serviceType: 'China supplier intelligence database and pre-payment review support',
+  areaServed: 'Worldwide',
+  serviceType:
+    'China supplier intelligence database and pre-payment review support',
   description:
-    'Supplier intelligence database for Nigerian importers, with Pro support for supplier, quote and invoice review before payment.',
+    'Supplier intelligence for importers worldwide, with Pro support for supplier, quote and invoice review before payment.',
 };
 
 const faqSchema = {
@@ -243,13 +241,11 @@ export default async function SupplierIntelligencePage() {
           <div className="mx-auto max-w-4xl">
             <div className="inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
               <LockKeyhole className="h-3.5 w-3.5" />
-              China supplier intelligence for Nigerians
+              China supplier intelligence for global buyers
             </div>
             <h1 className="mt-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
               Stop guessing where to find{' '}
-              <span className="text-white">
-                China suppliers
-              </span>
+              <span className="text-white">China suppliers</span>
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
               Access researched supplier leads by product category. If you
@@ -257,21 +253,21 @@ export default async function SupplierIntelligencePage() {
               invoices and payment information before you send money.
             </p>
 
-          <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-            <Link
-              href="#pricing"
-              className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
-            >
-              View Plans
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-            <Link
-              href="/dashboard/intelligence"
-              className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
-            >
-              Member Login
-            </Link>
-          </div>
+            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
+              <Link
+                href="/supplier-intelligence/reports"
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
+              >
+                Browse Supplier Reports
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="#pricing"
+                className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
+              >
+                Explore Membership
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -288,16 +284,76 @@ export default async function SupplierIntelligencePage() {
             </p>
           </div>
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-3xl font-black tracking-tight text-slate-900">10</p>
+            <p className="text-3xl font-black tracking-tight text-slate-900">
+              10
+            </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">
               data points reviewed per supplier
             </p>
           </div>
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-3xl font-black tracking-tight text-slate-900">Pro</p>
+            <p className="text-3xl font-black tracking-tight text-slate-900">
+              Pro
+            </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">
               supplier, quote and invoice review support
             </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+              Choose your access
+            </p>
+            <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
+              One category now, or ongoing intelligence
+            </h2>
+            <p className="mt-5 text-base leading-relaxed text-slate-600">
+              Both options use the same Supplier Intelligence research standard.
+              Choose the buying model that fits the decision in front of you.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            <article className="rounded-3xl border border-brand-orange-200 bg-brand-orange-50/50 p-7 sm:p-9">
+              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+                Pay once
+              </p>
+              <h3 className="mt-3 text-2xl font-black">
+                Buy a category report
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-slate-600">
+                Get a professionally produced supplier decision document for one
+                product category. Download the edition and keep it—no membership
+                required.
+              </p>
+              <Link
+                href="/supplier-intelligence/reports"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-5 py-3 text-sm font-black text-white"
+              >
+                Browse reports <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
+            <article className="rounded-3xl border border-slate-200 bg-slate-950 p-7 text-white sm:p-9">
+              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+                Ongoing access
+              </p>
+              <h3 className="mt-3 text-2xl font-black">
+                Use the intelligence platform
+              </h3>
+              <p className="mt-4 text-sm leading-relaxed text-slate-300">
+                Browse multiple categories, request fresh supplier research and
+                add pre-payment review support when you source regularly.
+              </p>
+              <Link
+                href="#pricing"
+                className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white"
+              >
+                Compare plans <ArrowRight className="h-4 w-4" />
+              </Link>
+            </article>
           </div>
         </div>
       </section>
@@ -313,7 +369,7 @@ export default async function SupplierIntelligencePage() {
               The wrong supplier decision is expensive.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-600">
-              Many Nigerian importers lose money before shipping even begins.
+              Importers everywhere can lose money before shipping even begins.
               The problem is usually not only shipping. It is weak supplier
               research, unclear quotes, mismatched invoice details and payment
               decisions made under pressure.
@@ -328,7 +384,7 @@ export default async function SupplierIntelligencePage() {
                 <h2 className="text-lg font-bold tracking-tight text-slate-900">
                   {item.title}
                 </h2>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600 text-balance">
+                <p className="mt-3 text-balance text-sm leading-relaxed text-slate-600">
                   {item.text}
                 </p>
               </div>
@@ -419,7 +475,8 @@ export default async function SupplierIntelligencePage() {
                 Pro support before payment
               </p>
               <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight md:text-5xl">
-                When money is about to leave your account, get another layer of review.
+                When money is about to leave your account, get another layer of
+                review.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-slate-300">
                 Pro is not just more database access. It is decision support
@@ -525,18 +582,19 @@ export default async function SupplierIntelligencePage() {
       {/* --- PRICING --- */}
       <section id="pricing" className="py-20 lg:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl text-center mx-auto md:text-left md:mx-0">
+          <div className="mx-auto max-w-2xl text-center md:mx-0 md:text-left">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
               Plans
             </p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl text-balance">
-              Start free, unlock the database, or add pre-payment review support.
+            <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+              Start free, unlock the database, or add pre-payment review
+              support.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-slate-600">
               Free gives you one supplier search credit. Starter gives you the
               supplier intelligence database plus one monthly supplier search
-              credit. Pro adds Sure Imports review support for suppliers,
-              quotes and invoices before you send money.
+              credit. Pro adds Sure Imports review support for suppliers, quotes
+              and invoices before you send money.
             </p>
           </div>
 
