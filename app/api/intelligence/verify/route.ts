@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
+import { checkAuth } from '@/lib/auth/checkAuth';
 import { generateToken } from '@/lib/jwt';
 import {
   disablePaystackSubscription,
@@ -9,9 +10,7 @@ import {
   getPaymentSubscriptionCode,
   verifyPaystackTransaction,
 } from '@/lib/intelligence/paystack';
-import {
-  grantIntelligenceCredits,
-} from '@/lib/intelligence/credits';
+import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
 import { getConfiguredIntelligencePlan } from '@/lib/intelligence/plans';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
@@ -205,7 +204,8 @@ export async function POST(request: Request) {
           customerCode:
             olderPayment?.customer?.customer_code ||
             olderSubscription.paystackCustomerCode,
-          customerEmail: olderPayment?.customer?.email || olderSubscription.email,
+          customerEmail:
+            olderPayment?.customer?.email || olderSubscription.email,
           planCode: olderPlanCode,
         });
         const olderSubscriptionCode =
@@ -215,8 +215,9 @@ export async function POST(request: Request) {
 
         if (!olderSubscriptionCode) return olderSubscription;
 
-        const paystackSubscription =
-          await fetchPaystackSubscription(olderSubscriptionCode);
+        const paystackSubscription = await fetchPaystackSubscription(
+          olderSubscriptionCode,
+        );
         const emailToken =
           olderSubscription.paystackEmailToken ||
           paystackSubscription?.email_token ||
@@ -276,6 +277,12 @@ export async function POST(request: Request) {
     },
   });
 
+  const authUser = await checkAuth();
+  const alreadyOwnsSession = authUser?.pidUser === user.pidUser;
+  const isNewAccountForThisSubscription =
+    user.loginKey ===
+    `supplier_intelligence_subscription:${subscription.pidSubscription}`;
+
   const token = generateToken({
     pidUser: user.pidUser,
     userEmail: user.userEmail,
@@ -286,14 +293,22 @@ export async function POST(request: Request) {
   const result = NextResponse.json({
     status: true,
     subscription,
+    canOpenDashboard: alreadyOwnsSession || isNewAccountForThisSubscription,
+    accountAccess: alreadyOwnsSession
+      ? 'signed_in'
+      : isNewAccountForThisSubscription
+        ? 'account_created'
+        : 'login_required',
   });
 
-  result.cookies.set('token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/',
-  });
+  if (alreadyOwnsSession || isNewAccountForThisSubscription) {
+    result.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
 
   return result;
 }

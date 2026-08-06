@@ -162,7 +162,7 @@ export default function GeneratorSizingTool() {
 
   return (
     <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
-      <div className="max-w-7xl mx-auto px-4 pt-48 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8">
         
         {/* Header */}
         <header className="mb-12">

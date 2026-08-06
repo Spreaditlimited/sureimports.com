@@ -11,6 +11,7 @@ import {
   Video,
   ReceiptText,
   Database,
+  FileText,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import { BsTiktok, BsYoutube } from 'react-icons/bs';
@@ -62,6 +63,12 @@ export const NavItems: NavItem[] = [
     title: 'Supplier Intelligence',
     icon: Database,
     href: '/dashboard/intelligence',
+    color: 'text-white',
+  },
+  {
+    title: 'My Supplier Reports',
+    icon: FileText,
+    href: '/dashboard/my-reports',
     color: 'text-white',
   },
   {
@@ -163,6 +170,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'Supplier Intelligence',
     icon: Database,
     href: '/dashboard/intelligence',
+    color: 'text-white',
+  },
+  {
+    title: 'My Supplier Reports',
+    icon: FileText,
+    href: '/dashboard/my-reports',
     color: 'text-white',
   },
   {

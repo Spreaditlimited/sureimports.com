@@ -1,0 +1,4 @@
+-- Intentionally empty.
+-- Social Studio belongs to admin.sureimports.com and was rolled back from the
+-- public Sure Imports application. This no-op preserves the migration history
+-- without recreating admin-only tables here.

@@ -11,6 +11,7 @@ interface Props {
   xBody2?: any;
   xButtonTitle?: any;
   xButtonLink?: any;
+  throwOnError?: boolean;
 }
 
 //EMAIL PROCESSOR
@@ -22,6 +23,7 @@ export default async function xMail({
   xBody2,
   xButtonTitle,
   xButtonLink,
+  throwOnError = false,
 }: Props) {
   let zTitle: string = xTitle;
   let zBodyTitle: any = xBodyTitle;
@@ -42,6 +44,6 @@ export default async function xMail({
   try {
     await sendEmail(xEmail, xTitle, mail);
   } catch (error) {
-    //console.error("myThrowingFunction failed", error);
+    if (throwOnError) throw error;
   }
 }

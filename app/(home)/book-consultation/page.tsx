@@ -116,7 +116,7 @@ export default async function BookConsultationPage({
       <div className="flex min-h-screen flex-col bg-[#fcfcfd] text-slate-600 antialiased selection:bg-brand-orange-500/30">
         <Navigation forceLightNavbar />
         <main className="flex-1">
-          <div className="mx-auto max-w-7xl px-4 pb-24 pt-48 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-48 sm:px-6 lg:px-8">
             <header className="mx-auto mb-12 max-w-3xl text-center">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600">
               <CalendarClock className="h-3.5 w-3.5" />

@@ -1,52 +1,50 @@
-import nodemailer from 'nodemailer';
+import sendEmail from '@/lib/email/config/sendEmail';
 import mailTemplate from '@/lib/email/temp/mailTemplate2';
+
+function escapeHtml(value: string) {
+  return value.replace(
+    /[&<>'"]/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        "'": '&#39;',
+        '"': '&quot;',
+      })[character] || character,
+  );
+}
 
 export async function sendMail({
   to,
   name,
   subject,
   body,
+  bodyTitle,
+  secondaryBody = '',
+  buttonTitle = '',
+  buttonLink = '',
 }: {
   to: string;
   name: string;
   subject: string;
   body: string;
+  bodyTitle?: string;
+  secondaryBody?: string;
+  buttonTitle?: string;
+  buttonLink?: string;
 }) {
-  const { SMTP_EMAIL, SMTP_PASSWORD } = process.env;
+  const greeting = name ? `<p>Hello ${escapeHtml(name)},</p>` : '';
+  const html = mailTemplate({
+    zTitle: subject,
+    zBodyTitle: bodyTitle || subject,
+    zBody1: `${greeting}${body}`,
+    zBody2: secondaryBody,
+    zButtonTitle: buttonTitle,
+    zButtonLink: buttonLink,
+  }) as string;
 
-  const transport = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: SMTP_EMAIL,
-      pass: SMTP_PASSWORD,
-    },
-  });
-  try {
-    const testResult = await transport.verify();
-    console.log(testResult);
-  } catch (error) {
-    console.error({ error });
-    return;
-  }
-
-  try {
-    const sendResult = await transport.sendMail({
-      from: SMTP_EMAIL,
-      to,
-      subject,
-      html: mailTemplate({
-        zTitle: subject,
-        zBodyTitle: subject,
-        zBody1: body,
-        zBody2: '',
-        zButtonTitle: '',
-        zButtonLink: '',
-      }) as string,
-    });
-    console.log(sendResult);
-  } catch (error) {
-    console.log(error);
-  }
+  return sendEmail(to, subject, html);
 }
 
 export function compileWelcomeTemplate(name: string, url: string) {

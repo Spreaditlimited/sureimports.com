@@ -76,7 +76,7 @@ export default function AboutUs() {
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
         
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+        <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 text-center">
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
             <Heart className="h-3.5 w-3.5" /> Our Story
           </div>
@@ -92,7 +92,7 @@ export default function AboutUs() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 space-y-24">
+      <div className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-8 space-y-24">
         
         {/* Stats Bento Grid */}
         <section>

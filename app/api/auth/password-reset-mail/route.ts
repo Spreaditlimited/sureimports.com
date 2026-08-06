@@ -8,6 +8,7 @@ import xMail from '@/lib/email/xMail';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
+import { randomBytes } from 'node:crypto';
 
 //PROCESS REGISTRATION FORM REQUEST
 export async function POST(request: Request) {
@@ -33,7 +34,8 @@ export async function POST(request: Request) {
   const sessioncode = randomGenerator(10);
 
   // Create a Reset Code
-  const resetCode = randomGenerator(6);
+  const resetCode = randomBytes(32).toString('base64url');
+  const resetExpiresAt = new Date(Date.now() + 60 * 60 * 1000);
 
   //CHECK IF USER PID AND CID EXISTS
   const user = await prisma.users.findUnique({
@@ -64,7 +66,11 @@ export async function POST(request: Request) {
     //UPDATE THE CID TO VALIDATE USER
     const updatex = await prisma.users.update({
       where: { userEmail: userEmail },
-      data: { cidStatus: resetCode },
+      data: {
+        cidStatus: resetCode,
+        loginKey: 'password_reset',
+        loginStamp: resetExpiresAt.toISOString(),
+      },
     });
 
     if (updatex) {
@@ -78,7 +84,7 @@ export async function POST(request: Request) {
       const xButtonTitle = `Password Reset Link`;
       const xButtonLink =
         process.env.ROOT_URL +
-        `/auth/password-reset-link?pidUser=${pidUser}&resetCode=${resetCode}`;
+        `/auth/password-reset-link?pidUser=${encodeURIComponent(String(pidUser))}&resetCode=${encodeURIComponent(resetCode)}`;
       await xMail({
         xEmail,
         xTitle,

@@ -221,10 +221,10 @@ export default async function DashboardIntelligencePage() {
 
           <div className="relative mt-5 text-center">
             <Link
-              href="/dashboard/intelligence/reports"
+              href="/dashboard/my-reports"
               className="text-sm font-bold text-brand-orange-600 hover:text-brand-orange-700"
             >
-              View My Reports
+              My Supplier Reports
             </Link>
           </div>
 
@@ -293,10 +293,10 @@ export default async function DashboardIntelligencePage() {
               Active {currentPlan?.name || subscription.plan} Plan
             </div>
             <Link
-              href="/dashboard/intelligence/reports"
+              href="/dashboard/my-reports"
               className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50"
             >
-              My Reports
+              My Supplier Reports
             </Link>
             <Link
               href="/dashboard/intelligence/manage"

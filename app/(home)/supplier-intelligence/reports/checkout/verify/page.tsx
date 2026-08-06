@@ -20,6 +20,7 @@ function VerifyContent() {
     'Confirming your payment and preparing your report…',
   );
   const [downloadUrl, setDownloadUrl] = useState('');
+  const [canOpenLibrary, setCanOpenLibrary] = useState(false);
 
   useEffect(() => {
     async function verify() {
@@ -33,9 +34,12 @@ function VerifyContent() {
         if (!response.ok || !data.success)
           throw new Error(data.message || 'Payment verification failed.');
         setDownloadUrl(data.downloadUrl);
+        setCanOpenLibrary(Boolean(data.canOpenLibrary));
         setState('success');
         setMessage(
-          'Payment confirmed. Your report is ready and a download link has been sent to your email.',
+          data.canOpenLibrary
+            ? 'Payment confirmed. Your report is ready and has been added to My Supplier Reports.'
+            : 'Payment confirmed. Your report is ready. We sent the download and secure account-access instructions to your email.',
         );
       } catch (caught) {
         setState('error');
@@ -81,10 +85,16 @@ function VerifyContent() {
               Download report
             </a>
             <Link
-              href="/dashboard/intelligence/reports"
+              href={
+                canOpenLibrary
+                  ? '/dashboard/my-reports'
+                  : `/auth/login?next=${encodeURIComponent('/dashboard/my-reports')}`
+              }
               className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-700"
             >
-              View My Reports
+              {canOpenLibrary
+                ? 'View My Supplier Reports'
+                : 'Sign in to My Supplier Reports'}
             </Link>
           </div>
         ) : null}

@@ -3,8 +3,11 @@ import { randomBytes } from 'node:crypto';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { checkAuth } from '@/lib/auth/checkAuth';
+import {
+  resolvePublicAccount,
+  sendPublicAccountSetupEmail,
+} from '@/lib/auth/resolvePublicAccount';
 import { createPayPalOrder } from '@/lib/paypal';
-import { getOrCreateReportBuyer } from '@/lib/intelligence/reportOrders';
 import { getPublishedReportBySlug } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 
@@ -47,24 +50,48 @@ export async function POST(request: Request) {
       { status: 404 },
     );
   const { report, version } = result;
+  const pidOrder = `SIRO${randomGenerator(18)}`;
   const provider =
     billingCountry.toLowerCase() === 'nigeria' ? 'paystack' : 'paypal';
   const authUser = await checkAuth();
-  const buyer = authUser
-    ? await prisma.users.findUnique({ where: { pidUser: authUser.pidUser } })
-    : await getOrCreateReportBuyer({
-        email,
-        firstName,
-        lastName,
-        country: billingCountry,
-      });
+  const account = await resolvePublicAccount({
+    authenticatedPidUser: authUser?.pidUser,
+    email,
+    firstName,
+    lastName,
+    country: billingCountry,
+    affiliateRef: 'supplier-intelligence-report',
+    accountSetupKey: `supplier_intelligence_report:${pidOrder}`,
+  });
+  if (account.status === 'login_required') {
+    return NextResponse.json(
+      {
+        statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
+        message:
+          'An account with this email already exists. Please sign in to complete your purchase.',
+        loginPath: `/auth/login?next=${encodeURIComponent(`/supplier-intelligence/reports/${report.slug}?resumeCheckout=1`)}`,
+      },
+      { status: 409 },
+    );
+  }
+  const buyer = account.user;
   if (!buyer)
     return NextResponse.json(
       { message: 'Unable to connect your Sure Imports account.' },
       { status: 500 },
     );
+  const buyerEmail = buyer.userEmail.trim().toLowerCase();
+  if (account.createdNewAccount) {
+    try {
+      await sendPublicAccountSetupEmail({
+        user: buyer,
+        context: 'your Supplier Intelligence report purchase',
+      });
+    } catch (error) {
+      console.error('report buyer account setup email failed:', error);
+    }
+  }
 
-  const pidOrder = `SIRO${randomGenerator(18)}`;
   const downloadToken = randomBytes(48).toString('base64url');
   const amountMinor =
     provider === 'paystack' ? report.priceNaira * 100 : report.priceUsdCents;
@@ -80,7 +107,7 @@ export async function POST(request: Request) {
       reportId: report.pidReport,
       versionId: version.pidVersion,
       pidUser: buyer.pidUser,
-      email,
+      email: buyerEmail,
       firstName,
       lastName: lastName || null,
       billingCountry,
@@ -108,7 +135,7 @@ export async function POST(request: Request) {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email,
+            email: buyerEmail,
             amount: amountMinor,
             currency,
             reference: paystackReference,

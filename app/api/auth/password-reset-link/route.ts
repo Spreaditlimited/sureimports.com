@@ -66,6 +66,28 @@ export async function POST(request: Request) {
     );
   }
 
+  if (
+    (String(user.loginKey || '') === 'password_reset' ||
+      String(user.loginKey || '') === 'report_account_setup' ||
+      String(user.loginKey || '').startsWith('supplier_intelligence_report:') ||
+      String(user.loginKey || '').startsWith(
+        'supplier_intelligence_subscription:',
+      )) &&
+    (!user.loginStamp ||
+      !Number.isFinite(new Date(user.loginStamp).getTime()) ||
+      new Date(user.loginStamp).getTime() <= Date.now())
+  ) {
+    const responsex = {
+      message:
+        'This secure link has expired. Please use Forgot password to request a new one.',
+      status: 'INVALID_RESET',
+    };
+    return NextResponse.json(
+      { responsex, successx: true, userx: null },
+      { status: 401 },
+    );
+  }
+
   // Hash the password & session
   const passwordHash = bcrypt.hashSync(password, 8);
   // Get user email
@@ -81,6 +103,9 @@ export async function POST(request: Request) {
         userPassword: passwordHash,
         loginStatus: 'RESET',
         userCid: 'VERIFIED',
+        cidStatus: null,
+        loginKey: null,
+        loginStamp: null,
       },
     });
 

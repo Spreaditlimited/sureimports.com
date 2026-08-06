@@ -13,6 +13,17 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MIN_DELIVERY_LEAD_DAYS = 60;
+const SUPPORTED_UPLOAD_EXTENSIONS = new Set([
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'webp',
+  'svg',
+  'pdf',
+]);
+
+class UploadValidationError extends Error {}
 
 const getString = (formData: FormData, keys: string[]) => {
   for (const key of keys) {
@@ -22,11 +33,68 @@ const getString = (formData: FormData, keys: string[]) => {
   return '';
 };
 
-const uploadToCloudinary = async (file: File, key: string) => {
+const getFileExtension = (filename: string) =>
+  filename.includes('.') ? filename.split('.').pop()?.toLowerCase() || '' : '';
+
+const hasExpectedFileSignature = (buffer: Buffer, extension: string) => {
+  if (extension === 'jpg' || extension === 'jpeg') {
+    return buffer.length >= 3 && buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
+  }
+
+  if (extension === 'png') {
+    return buffer.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  }
+
+  if (extension === 'gif') {
+    const signature = buffer.subarray(0, 6).toString('ascii');
+    return signature === 'GIF87a' || signature === 'GIF89a';
+  }
+
+  if (extension === 'webp') {
+    return (
+      buffer.subarray(0, 4).toString('ascii') === 'RIFF' &&
+      buffer.subarray(8, 12).toString('ascii') === 'WEBP'
+    );
+  }
+
+  if (extension === 'pdf') {
+    return buffer.subarray(0, 1024).toString('ascii').includes('%PDF-');
+  }
+
+  if (extension === 'svg') {
+    return /<svg(?:\s|>)/i.test(buffer.subarray(0, 4096).toString('utf8'));
+  }
+
+  return false;
+};
+
+const validateUpload = async (file: File, label: string) => {
+  if (file.size > MAX_FILE_SIZE) {
+    throw new UploadValidationError(`${label} exceeds the 10MB limit.`);
+  }
+
+  const extension = getFileExtension(file.name);
+  if (!SUPPORTED_UPLOAD_EXTENSIONS.has(extension)) {
+    throw new UploadValidationError(
+      `${label} must be a JPG, PNG, GIF, WebP, SVG, or PDF file.`,
+    );
+  }
+
   const buffer = Buffer.from(await file.arrayBuffer());
+  if (!hasExpectedFileSignature(buffer, extension)) {
+    throw new UploadValidationError(
+      `${label} does not contain valid ${extension.toUpperCase()} data. Renaming a file does not convert its format.`,
+    );
+  }
+
+  return buffer;
+};
+
+const uploadToCloudinary = async (buffer: Buffer, key: string) => {
   const uploaded = await uploadBufferToCloudinary(buffer, {
     folder: 'sureimports/corporate-gifts',
     publicId: key,
+    resourceType: 'image',
     useFilename: false,
     uniqueFilename: false,
     overwrite: true,
@@ -163,56 +231,21 @@ export async function POST(req: Request) {
       (formData.get('company_logo_upload') as File | null) ||
       (formData.get('company_logo') as File | null);
 
-    if (refImage && refImage.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'Reference image exceeds 10MB limit' },
-        { status: 400 },
-      );
-    }
-
-    if (companyLogo && companyLogo.size > MAX_FILE_SIZE) {
-      return NextResponse.json(
-        { error: 'Company logo exceeds 10MB limit' },
-        { status: 400 },
-      );
-    }
-
-    if (refImage && refImage.size > 0) {
-      const buffer = Buffer.from(await refImage.arrayBuffer());
-      attachments.push({
-        filename: refImage.name,
-        content: buffer,
-        contentType: refImage.type,
-      });
-    }
-
-    if (companyLogo && companyLogo.size > 0) {
-      const buffer = Buffer.from(await companyLogo.arrayBuffer());
-      attachments.push({
-        filename: companyLogo.name,
-        content: buffer,
-        contentType: companyLogo.type,
-      });
-    }
-
-    let referenceFileKey: string | null = null;
-    let logoFileKey: string | null = null;
     let referenceFileUrl: string | null = null;
     let logoFileUrl: string | null = null;
     if (refImage && refImage.size > 0) {
-      const ext = refImage.name.includes('.')
-        ? refImage.name.split('.').pop()
-        : 'bin';
-      referenceFileKey = `${pidRequest}-reference.${ext}`;
-      referenceFileUrl = await uploadToCloudinary(refImage, referenceFileKey);
+      const buffer = await validateUpload(refImage, 'Reference file');
+      attachments.push({ filename: refImage.name });
+      referenceFileUrl = await uploadToCloudinary(
+        buffer,
+        `${pidRequest}-reference`,
+      );
     }
 
     if (companyLogo && companyLogo.size > 0) {
-      const ext = companyLogo.name.includes('.')
-        ? companyLogo.name.split('.').pop()
-        : 'bin';
-      logoFileKey = `${pidRequest}-logo.${ext}`;
-      logoFileUrl = await uploadToCloudinary(companyLogo, logoFileKey);
+      const buffer = await validateUpload(companyLogo, 'Company logo');
+      attachments.push({ filename: companyLogo.name });
+      logoFileUrl = await uploadToCloudinary(buffer, `${pidRequest}-logo`);
     }
 
     // 4. Create account for corporate contact if missing
@@ -363,6 +396,7 @@ Page URL: ${data.pageUrl || 'N/A'}
         xBody2: `<pre>${emailText}</pre><p><strong>Attachments:</strong> ${attachmentNames}</p>`,
         xButtonTitle: 'Open Admin Dashboard',
         xButtonLink: 'https://admin.sureimports.com/dashboard/corporate-sourcing',
+        throwOnError: true,
       });
     } catch (emailError) {
       console.error('Corporate sourcing email notification failed:', emailError);
@@ -410,6 +444,10 @@ Page URL: ${data.pageUrl || 'N/A'}
       { status: 200 },
     );
   } catch (error) {
+    if (error instanceof UploadValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
     // Log server errors safely without exposing to client
     console.error('Submission processing error:', error);
     return NextResponse.json(

@@ -108,7 +108,7 @@ export default function WarrantyPolicy() {
       
       {/* Premium Page Header */}
       <div className="border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
               <Shield className="h-3.5 w-3.5" /> Hardware Protection
@@ -124,7 +124,7 @@ export default function WarrantyPolicy() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
           
           {/* LEFT: Sticky Table of Contents */}

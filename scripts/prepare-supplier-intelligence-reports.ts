@@ -14,8 +14,8 @@ function id(prefix: string) {
 
 async function main() {
   const slugs = Object.keys(REPORT_SEO);
-  if (slugs.length !== 23) {
-    throw new Error(`Expected 23 SEO profiles; found ${slugs.length}.`);
+  if (slugs.length !== 25) {
+    throw new Error(`Expected 25 SEO profiles; found ${slugs.length}.`);
   }
 
   const niches = await prisma.$queryRawUnsafe<
@@ -27,7 +27,7 @@ async function main() {
        AND status = 'published'`,
     ...slugs,
   );
-  if (niches.length !== 23) {
+  if (niches.length !== 25) {
     const found = new Set(niches.map((niche) => niche.slug));
     throw new Error(
       `Missing report categories: ${slugs.filter((slug) => !found.has(slug)).join(', ')}`,

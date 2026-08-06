@@ -1,13 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import {
-  Check,
-  ChevronDown,
-  Globe2,
-  Loader2,
-  LockKeyhole,
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, ChevronDown, Globe2, Loader2, LockKeyhole } from 'lucide-react';
 
 import { cn } from '@/_lib/utils';
 import { Button } from '@/components/ui/button';
@@ -35,29 +29,39 @@ export default function ReportCheckoutForm({
   const [countryOpen, setCountryOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const pendingCheckoutKey = `sureimports:pendingReportCheckout:${reportSlug}`;
   const provider =
     country.trim().toLowerCase() === 'nigeria' ? 'Paystack' : 'PayPal';
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function startCheckout(payload: {
+    reportSlug: string;
+    firstName: FormDataEntryValue | string | null;
+    lastName: FormDataEntryValue | string | null;
+    email: FormDataEntryValue | string | null;
+    billingCountry: string;
+  }) {
     setLoading(true);
     setError('');
-    const form = new FormData(event.currentTarget);
     try {
       const response = await fetch('/api/intelligence/reports/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reportSlug,
-          firstName: form.get('firstName'),
-          lastName: form.get('lastName'),
-          email: form.get('email'),
-          billingCountry: country,
-        }),
+        body: JSON.stringify(payload),
       });
       const data = await response.json();
+      if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
+        window.localStorage.setItem(
+          pendingCheckoutKey,
+          JSON.stringify(payload),
+        );
+        window.location.href =
+          data.loginPath ||
+          `/auth/login?next=${encodeURIComponent(`/supplier-intelligence/reports/${reportSlug}?resumeCheckout=1`)}`;
+        return;
+      }
       if (!response.ok || !data.authorizationUrl)
         throw new Error(data.message || 'Unable to start checkout.');
+      window.localStorage.removeItem(pendingCheckoutKey);
       window.location.href = data.authorizationUrl;
     } catch (caught) {
       setError(
@@ -65,6 +69,34 @@ export default function ReportCheckoutForm({
       );
       setLoading(false);
     }
+  }
+
+  useEffect(() => {
+    const shouldResume =
+      new URLSearchParams(window.location.search).get('resumeCheckout') === '1';
+    if (!shouldResume) return;
+    const pending = window.localStorage.getItem(pendingCheckoutKey);
+    if (!pending) return;
+    try {
+      const payload = JSON.parse(pending);
+      if (payload?.reportSlug === reportSlug) void startCheckout(payload);
+    } catch {
+      window.localStorage.removeItem(pendingCheckoutKey);
+    }
+    // This should run once when returning from the login page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingCheckoutKey, reportSlug]);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    await startCheckout({
+      reportSlug,
+      firstName: form.get('firstName'),
+      lastName: form.get('lastName'),
+      email: form.get('email'),
+      billingCountry: country,
+    });
   }
 
   const field =
@@ -168,8 +200,8 @@ export default function ReportCheckoutForm({
         {!country
           ? 'Select country to continue'
           : loading
-          ? 'Preparing secure checkout…'
-          : `Buy securely with ${provider}`}
+            ? 'Preparing secure checkout…'
+            : `Buy securely with ${provider}`}
       </button>
       <p className="text-center text-xs leading-relaxed text-slate-500">
         Your purchased edition will be emailed to you and added to your Sure

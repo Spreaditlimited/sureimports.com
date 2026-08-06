@@ -274,7 +274,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- STATUS BAR --- */}
       <section className="border-b border-slate-200 bg-white py-8">
-        <div className="mx-auto grid max-w-7xl gap-6 px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-6 px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
             <p className="text-3xl font-black tracking-tight text-slate-900">
               {passingNiches.length}
@@ -303,7 +303,7 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       <section className="border-b border-slate-200 bg-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
               Choose your access
@@ -360,7 +360,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- VALUE PROPS --- */}
       <section className="py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mb-14 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
               Why this matters
@@ -395,7 +395,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- PAIN POINTS --- */}
       <section className="border-y border-slate-100 bg-white py-20 md:py-28">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
               Common importer problem
@@ -428,7 +428,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- WORKFLOW --- */}
       <section className="py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-14 max-w-3xl text-center">
             <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
               How it works
@@ -468,7 +468,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- PRO REVIEWS --- */}
       <section className="bg-slate-950 py-20 text-white md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
@@ -514,7 +514,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- NICHE EXAMPLES --- */}
       <section className="border-y border-slate-100 bg-slate-50/50 py-20 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
@@ -551,7 +551,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- WHO IT IS FOR --- */}
       <section className="bg-white py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mb-14 max-w-3xl">
             <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
               Who should use it
@@ -581,7 +581,7 @@ export default async function SupplierIntelligencePage() {
 
       {/* --- PRICING --- */}
       <section id="pricing" className="py-20 lg:py-32">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center md:mx-0 md:text-left">
             <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
               Plans

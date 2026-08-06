@@ -101,6 +101,7 @@ After your first login, this temporary password expires and you will be prompted
       xBody2: `${emailBody}${onboardingBlock}<br /><br />Thank you for choosing Sure Imports.`,
       xButtonTitle: 'Open Corporate Sourcing Dashboard',
       xButtonLink: dashboardLink,
+      throwOnError: true,
     }),
     sendWhatsAppTemplate(input),
   ]);

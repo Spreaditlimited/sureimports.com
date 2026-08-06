@@ -41,9 +41,7 @@ export async function generateMetadata({
       result.report.description ||
       result.report.subtitle ||
       undefined,
-    keywords: seo
-      ? [seo.primaryKeyword, ...seo.secondaryKeywords]
-      : undefined,
+    keywords: seo ? [seo.primaryKeyword, ...seo.secondaryKeywords] : undefined,
     alternates: { canonical },
     openGraph: {
       type: 'website',
@@ -148,7 +146,7 @@ export default async function SupplierReportPage({
       ) : null}
       <Navigation />
       <section className="pb-20 pt-32 md:pt-40">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <Link
             href="/supplier-intelligence/reports"
             className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900"
@@ -220,19 +218,16 @@ export default async function SupplierReportPage({
 
       {seo ? (
         <section className="border-y border-slate-200 bg-white py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
-                  China manufacturer sourcing
+                  Before you contact a factory
                 </p>
                 <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
                   {seo.heading}
                 </h2>
                 <p className="mt-5 text-base leading-8 text-slate-600">
-                  {seo.introduction}
-                </p>
-                <p className="mt-4 text-base leading-8 text-slate-600">
                   {seo.buyerValue}
                 </p>
               </div>
@@ -242,7 +237,10 @@ export default async function SupplierReportPage({
                 </p>
                 <ul className="mt-5 space-y-4">
                   {seo.products.map((product) => (
-                    <li key={product} className="flex items-start gap-3 text-sm leading-6 text-slate-200">
+                    <li
+                      key={product}
+                      className="flex items-start gap-3 text-sm leading-6 text-slate-200"
+                    >
                       <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange-400" />
                       {product}
                     </li>
@@ -255,7 +253,7 @@ export default async function SupplierReportPage({
       ) : null}
 
       <section className="border-b border-slate-200 bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
@@ -265,7 +263,10 @@ export default async function SupplierReportPage({
                 More than a contact list
               </h2>
               <p className="mt-4 text-base leading-relaxed text-slate-600">
-                {seo?.buyerValue || report.description}
+                Each profile brings the useful working details into one place:
+                what the company manufactures, how to reach it through official
+                channels and what deserves a closer look before you request a
+                sample, accept a quotation or make payment.
               </p>
             </div>
             <ul className="grid gap-4">
@@ -291,16 +292,21 @@ export default async function SupplierReportPage({
       </section>
       {seo ? (
         <section className="bg-white py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid gap-8 lg:grid-cols-2">
               <div className="rounded-3xl border border-slate-200 p-7 sm:p-8">
                 <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
                   Important buying checks
                 </p>
-                <h2 className="mt-3 text-2xl font-black">Questions worth resolving before production</h2>
+                <h2 className="mt-3 text-2xl font-black">
+                  Questions worth resolving before production
+                </h2>
                 <ul className="mt-6 space-y-4">
                   {seo.checks.map((check) => (
-                    <li key={check} className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+                    <li
+                      key={check}
+                      className="flex items-start gap-3 text-sm leading-6 text-slate-600"
+                    >
                       <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" />
                       {check}
                     </li>
@@ -311,10 +317,15 @@ export default async function SupplierReportPage({
                 <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
                   Who this report is for
                 </p>
-                <h2 className="mt-3 text-2xl font-black">Built for commercial buyers</h2>
+                <h2 className="mt-3 text-2xl font-black">
+                  Built for commercial buyers
+                </h2>
                 <ul className="mt-6 grid gap-4 sm:grid-cols-2">
                   {seo.audiences.map((audience) => (
-                    <li key={audience} className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700">
+                    <li
+                      key={audience}
+                      className="rounded-2xl bg-slate-50 p-4 text-sm font-bold text-slate-700"
+                    >
                       {audience}
                     </li>
                   ))}
@@ -325,7 +336,7 @@ export default async function SupplierReportPage({
         </section>
       ) : null}
       <section className="bg-[#071426] py-20 text-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-3 lg:px-8">
           {[
             [
               ShieldCheck,
@@ -362,12 +373,19 @@ export default async function SupplierReportPage({
             <p className="text-center text-xs font-black uppercase tracking-widest text-brand-orange-600">
               Frequently asked questions
             </p>
-            <h2 className="mt-3 text-center text-3xl font-black">Before you buy the report</h2>
+            <h2 className="mt-3 text-center text-3xl font-black">
+              Before you buy the report
+            </h2>
             <div className="mt-10 space-y-4">
               {seo.faqs.map((faq) => (
-                <article key={faq.question} className="rounded-2xl border border-slate-200 bg-white p-6">
+                <article
+                  key={faq.question}
+                  className="rounded-2xl border border-slate-200 bg-white p-6"
+                >
                   <h3 className="text-lg font-black">{faq.question}</h3>
-                  <p className="mt-3 text-sm leading-7 text-slate-600">{faq.answer}</p>
+                  <p className="mt-3 text-sm leading-7 text-slate-600">
+                    {faq.answer}
+                  </p>
                 </article>
               ))}
             </div>

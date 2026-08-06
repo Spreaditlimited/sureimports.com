@@ -56,6 +56,7 @@ export default function CorporateGiftsClient() {
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<Status>('idle');
+  const [submissionError, setSubmissionError] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
 
   const minDeliveryDate = useMemo(() => {
@@ -134,6 +135,7 @@ export default function CorporateGiftsClient() {
     e.preventDefault();
     if (!validate()) return;
     setStatus('submitting');
+    setSubmissionError('');
 
     try {
       const formData = new FormData();
@@ -143,7 +145,10 @@ export default function CorporateGiftsClient() {
 
       // Add analytics params...
       const response = await fetch('/api/corporate-gifts', { method: 'POST', body: formData });
-      if (!response.ok) throw new Error('Submission failed');
+      const responseBody = await response.json().catch(() => null);
+      if (!response.ok) {
+        throw new Error(responseBody?.error || 'Submission failed');
+      }
       
       setStatus('success');
       setValues(initialValues);
@@ -151,6 +156,9 @@ export default function CorporateGiftsClient() {
       setLogoFile(null);
       setCurrentStep(0);
     } catch (error) {
+      setSubmissionError(
+        error instanceof Error ? error.message : 'Submission failed',
+      );
       setStatus('error');
     }
   };
@@ -188,7 +196,7 @@ export default function CorporateGiftsClient() {
 
       {status === 'error' && (
         <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-600 dark:border-rose-900/30 dark:bg-rose-900/10 dark:text-rose-400">
-          We could not submit your request. Please check your connection and try again.
+          {submissionError || 'We could not submit your request. Please check your connection and try again.'}
         </div>
       )}
 
@@ -225,8 +233,8 @@ export default function CorporateGiftsClient() {
             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Customization and Supporting Files</h3>
             <PremiumSelect label="Do you need branding or product customization?" required value={values.branding_customization_required} onValueChange={(v) => onChange('branding_customization_required', v)} options={brandingOptions} placeholder="Select an option..." error={errors.branding_customization_required} />
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <FileField label="Reference Image or Specification Sheet (Optional)" accept="image/*,.pdf" onChange={setReferenceFile} error={errors.reference_image_upload} />
-              <FileField label="Company Logo for Branded Orders (Optional)" accept=".png,.jpg,.svg,.pdf" onChange={setLogoFile} error={errors.company_logo_upload} />
+              <FileField label="Reference Image or Specification Sheet (Optional)" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf" onChange={setReferenceFile} error={errors.reference_image_upload} />
+              <FileField label="Company Logo for Branded Orders (Optional)" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf" onChange={setLogoFile} error={errors.company_logo_upload} />
             </div>
             <p className="text-xs font-semibold text-slate-500">Accepted: Images & PDFs. Max size: 10MB per file.</p>
           </div>

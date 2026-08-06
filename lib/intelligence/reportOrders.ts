@@ -1,62 +1,5 @@
-import bcrypt from 'bcryptjs';
-import { Prisma } from '@prisma/client';
-
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { sendMail } from '@/lib/mail';
 import { prisma } from '@/lib/prisma';
-
-export async function getOrCreateReportBuyer(input: {
-  email: string;
-  firstName: string;
-  lastName: string;
-  country: string;
-}) {
-  const existing = await prisma.users.findUnique({
-    where: { userEmail: input.email },
-  });
-  if (existing) return existing;
-
-  const data = {
-    pidUser: `CUS${randomGenerator(10)}`,
-    userFirstname: input.firstName || 'Customer',
-    userLastname: input.lastName || '',
-    userEmail: input.email,
-    email: input.email,
-    userPassword: bcrypt.hashSync(randomGenerator(28), 8),
-    userSession: bcrypt.hashSync(randomGenerator(12), 8),
-    country: input.country,
-    userCountry: input.country,
-    userCid: 'VERIFIED',
-    loginStatus: 'RESET',
-    userStatus: 'AL1',
-    userAffiliateCode: randomGenerator(6),
-    userAffiliateRef: 'supplier-intelligence-report',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      return await prisma.users.create({
-        data: {
-          ...data,
-          pidUser: attempt ? `CUS${randomGenerator(10)}` : data.pidUser,
-        },
-      });
-    } catch (error) {
-      const user = await prisma.users.findUnique({
-        where: { userEmail: input.email },
-      });
-      if (user) return user;
-      if (
-        !(error instanceof Prisma.PrismaClientKnownRequestError) ||
-        error.code !== 'P2002'
-      )
-        throw error;
-    }
-  }
-  throw new Error('Unable to create a Sure Imports account.');
-}
 
 function siteUrl(path: string) {
   const base =
@@ -96,15 +39,39 @@ export async function fulfillReportOrder(pidOrder: string) {
   });
 
   if (fulfilmentClaim.count === 1) {
+    const buyer = order.pidUser
+      ? await prisma.users.findUnique({ where: { pidUser: order.pidUser } })
+      : null;
     const downloadUrl = siteUrl(
       `/api/intelligence/reports/download?token=${encodeURIComponent(order.downloadToken)}`,
     );
-    await sendMail({
-      to: order.email,
-      name: order.firstName || 'Customer',
-      subject: `Your Supplier Intelligence report is ready: ${report.title}`,
-      body: `<p>Thank you for your purchase. Your <strong>${report.editionLabel}</strong> edition is ready.</p><p><a href="${downloadUrl}">Download your Supplier Intelligence report</a></p><p>You can also find purchased reports under <a href="${siteUrl('/dashboard/intelligence/reports')}">My Reports</a>. If this is your first Sure Imports purchase, use the password reset option with this email address to access your account.</p>`,
-    });
+    const accountSetupIsActive =
+      buyer?.loginKey === `supplier_intelligence_report:${pidOrder}` &&
+      Boolean(buyer.cidStatus) &&
+      Boolean(buyer.loginStamp) &&
+      new Date(String(buyer.loginStamp)).getTime() > Date.now();
+    const accountAccess = accountSetupIsActive
+      ? `<p>We created a Sure Imports account for this email so your purchase remains available in <strong>My Supplier Reports</strong>.</p><p><a href="${siteUrl(`/auth/password-reset-link?pidUser=${encodeURIComponent(buyer!.pidUser)}&resetCode=${encodeURIComponent(String(buyer!.cidStatus))}`)}">Set your Sure Imports password</a>. This secure link expires after 48 hours.</p>`
+      : `<p>You can also find this purchase under <a href="${siteUrl('/dashboard/my-reports')}">My Supplier Reports</a>. Sign in with this email address. If you do not know the password, use the secure password-reset option.</p>`;
+    try {
+      await sendMail({
+        to: order.email,
+        name: order.firstName || 'Customer',
+        subject: `Your Supplier Intelligence report is ready: ${report.title}`,
+        bodyTitle: 'Your Supplier Intelligence report is ready',
+        body: `<p>Thank you for your purchase. Your <strong>${report.editionLabel}</strong> edition of <strong>${report.title}</strong> is ready to download.</p>${accountAccess}`,
+        secondaryBody:
+          '<p>Keep this email for convenient access to this exact purchased edition.</p>',
+        buttonTitle: 'Download my report',
+        buttonLink: downloadUrl,
+      });
+    } catch (error) {
+      await prisma.intelligence_report_orders.updateMany({
+        where: { pidOrder, fulfilledAt: now },
+        data: { fulfilledAt: null, updatedAt: new Date() },
+      });
+      throw error;
+    }
   }
 
   return { order: paidOrder, report, version };

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
+import { checkAuth } from '@/lib/auth/checkAuth';
 import { generateToken } from '@/lib/jwt';
 import { fulfillReportOrder } from '@/lib/intelligence/reportOrders';
 import { prisma } from '@/lib/prisma';
@@ -97,30 +98,43 @@ export async function POST(request: Request) {
   }
 
   const fulfilled = await fulfillReportOrder(pidOrder);
-  const user = order.pidUser
+  const authUser = await checkAuth();
+  const alreadyOwnsSession = Boolean(
+    authUser?.pidUser && authUser.pidUser === order.pidUser,
+  );
+  const buyer = order.pidUser
     ? await prisma.users.findUnique({ where: { pidUser: order.pidUser } })
     : null;
-  const response = NextResponse.json({
+  const isNewAccountForThisOrder = Boolean(
+    buyer?.loginKey === `supplier_intelligence_report:${pidOrder}`,
+  );
+  const canOpenLibrary = alreadyOwnsSession || isNewAccountForThisOrder;
+  const result = NextResponse.json({
     success: true,
     reportSlug: fulfilled.report.slug,
     downloadUrl: `/api/intelligence/reports/download?token=${encodeURIComponent(order.downloadToken)}`,
+    canOpenLibrary,
+    accountAccess: alreadyOwnsSession
+      ? 'signed_in'
+      : isNewAccountForThisOrder
+        ? 'account_created'
+        : 'email_required',
   });
-  if (user) {
-    response.cookies.set(
-      'token',
-      generateToken({
-        pidUser: user.pidUser,
-        userEmail: user.userEmail,
-        userFirstname: user.userFirstname,
-        userImage: user.userImage,
-      }),
-      {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-      },
-    );
+
+  if (isNewAccountForThisOrder && buyer) {
+    const token = generateToken({
+      pidUser: buyer.pidUser,
+      userEmail: buyer.userEmail,
+      userFirstname: buyer.userFirstname,
+      userImage: buyer.userImage,
+    });
+    result.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
   }
-  return response;
+
+  return result;
 }

@@ -8,7 +8,10 @@ export default function PublicHeroBackground({
   priority = true,
 }: PublicHeroBackgroundProps) {
   return (
-    <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+    <div
+      className="pointer-events-none absolute inset-0 z-0"
+      aria-hidden="true"
+    >
       <Image
         src="/images/hero-background-1.png"
         alt=""

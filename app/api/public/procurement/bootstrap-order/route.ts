@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken, verifyToken } from '@/lib/jwt';
+import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 
 type ProductInput = {
@@ -117,85 +117,46 @@ export async function POST(request: NextRequest) {
     }
 
     const token = request.cookies.get('token')?.value;
-    let activeUser = null as Awaited<ReturnType<typeof prisma.users.findUnique>>;
+    let authenticatedPidUser: string | null = null;
 
     if (token) {
       const payload = verifyToken(token);
       if (payload && typeof payload === 'object' && 'pidUser' in payload) {
-        activeUser = await prisma.users.findUnique({
-          where: { pidUser: String(payload.pidUser) },
-        });
+        authenticatedPidUser = String(payload.pidUser);
       }
     }
 
-    let user = activeUser;
-    let createdNewAccount = false;
-
-    if (!user) {
-      const firstName = normalize(body?.account?.firstName);
-      const lastName = normalize(body?.account?.lastName);
-      const email = normalize(body?.account?.email).toLowerCase();
-      const phone = normalize(body?.account?.phone);
-
-      if (!email) {
-        return NextResponse.json(
-          {
-            statusx: 'FAILED_VALIDATION',
-            message: 'Email is required to continue to payment.',
-          },
-          { status: 400 },
-        );
-      }
-
-      const existingUser = await prisma.users.findFirst({
-        where: { userEmail: email },
-      });
-
-      if (existingUser) {
-        return NextResponse.json(
-          {
-            statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
-            message:
-              'An account with this email already exists. Please sign in to continue.',
-            loginPath: `/auth/login?next=${encodeURIComponent('/dashboard/procurement/create-order')}`,
-          },
-          { status: 409 },
-        );
-      }
-
-      const tempPassword = randomGenerator(12);
-      const passwordHash = bcrypt.hashSync(tempPassword, 8);
-      const sessionHash = bcrypt.hashSync(randomGenerator(10), 8);
-      const pidUser = `CUS${randomGenerator(10)}`;
-
-      user = await prisma.users.create({
-        data: {
-          pidUser,
-          userFirstname: firstName || 'Customer',
-          userLastname: lastName || '',
-          userEmail: email,
-          userPassword: passwordHash,
-          userSession: sessionHash,
-          userPhone: phone || '',
-          userCid: 'VERIFIED',
-          loginStatus: 'ACTIVE',
-          userStatus: 'AL1',
-          userAffiliateCode: randomGenerator(6),
-          userAffiliateRef: 'NO_REF',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
-
-      createdNewAccount = true;
-    }
-
-    if (!user) {
+    const email = normalize(body?.account?.email).toLowerCase();
+    if (!authenticatedPidUser && !email) {
       return NextResponse.json(
-        { statusx: 'FAILED', message: 'Unable to initialize account.' },
-        { status: 500 },
+        {
+          statusx: 'FAILED_VALIDATION',
+          message: 'Email is required to continue to payment.',
+        },
+        { status: 400 },
       );
     }
+
+    const account = await resolvePublicAccount({
+      authenticatedPidUser,
+      email,
+      firstName: normalize(body?.account?.firstName),
+      lastName: normalize(body?.account?.lastName),
+      phone: normalize(body?.account?.phone),
+      affiliateRef: 'NO_REF',
+    });
+    if (account.status === 'login_required') {
+      return NextResponse.json(
+        {
+          statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
+          message:
+            'An account with this email already exists. Please sign in to continue.',
+          loginPath: `/auth/login?next=${encodeURIComponent('/buy-from-chinese-websites?resumeCheckout=1')}`,
+        },
+        { status: 409 },
+      );
+    }
+    const { user, createdNewAccount } = account;
 
     await prisma.orders.create({
       data: {

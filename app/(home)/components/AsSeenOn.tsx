@@ -31,7 +31,7 @@ export default function AsSeenOn() {
 
   return (
     <section className="border-b border-slate-800/50 bg-gradient-to-b from-slate-900 to-slate-800 py-12">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         <div className="mb-8 text-center">
           <p className="mb-4 text-sm font-medium uppercase tracking-wide text-gray-400">
             As Featured In

@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { Prisma } from '@prisma/client';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { checkAuth } from '@/lib/auth/checkAuth';
+import {
+  resolvePublicAccount,
+  sendPublicAccountSetupEmail,
+} from '@/lib/auth/resolvePublicAccount';
 import { prisma } from '@/lib/prisma';
 import {
   getPaystackPlanCode,
@@ -19,62 +21,6 @@ function absoluteUrl(path: string) {
     process.env.NEXT_PUBLIC_BASE_URL ||
     'https://www.sureimports.com';
   return `${baseUrl.replace(/\/$/, '')}${path}`;
-}
-
-async function createIntelligenceUser(input: {
-  email: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-}) {
-  const tempPassword = randomGenerator(24);
-  const sessionCode = randomGenerator(10);
-  const baseData = {
-    pidUser: `CUS${randomGenerator(10)}`,
-    userFirstname: input.firstName || 'Subscriber',
-    userLastname: input.lastName || '',
-    userEmail: input.email,
-    email: input.email,
-    userPassword: bcrypt.hashSync(tempPassword, 8),
-    userSession: bcrypt.hashSync(sessionCode, 8),
-    userPhone: input.phone || null,
-    phone: input.phone || null,
-    userCid: 'PENDING_PAYMENT',
-    loginStatus: 'RESET',
-    userStatus: 'AL1',
-    userAffiliateCode: randomGenerator(6),
-    userAffiliateRef: 'supplier-intelligence',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      return await prisma.users.create({
-        data: {
-          ...baseData,
-          pidUser: attempt === 0 ? baseData.pidUser : `CUS${randomGenerator(10)}`,
-          userAffiliateCode: randomGenerator(6),
-        },
-      });
-    } catch (error) {
-      const existingUser = await prisma.users.findUnique({
-        where: { userEmail: input.email },
-      });
-      if (existingUser) return existingUser;
-
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        continue;
-      }
-
-      throw error;
-    }
-  }
-
-  throw new Error('Unable to create a unique Sure Imports account.');
 }
 
 export async function POST(request: Request) {
@@ -96,6 +42,8 @@ export async function POST(request: Request) {
   const firstName = String(body.firstName || '').trim();
   const lastName = String(body.lastName || '').trim();
   const phone = String(body.phone || '').trim();
+  const reference = `SI_INTEL_${plan.key.toUpperCase()}_${Date.now()}_${randomGenerator(6)}`;
+  const pidSubscription = `INTSUB${randomGenerator(12)}`;
 
   if (!email || !email.includes('@')) {
     return NextResponse.json(
@@ -104,18 +52,40 @@ export async function POST(request: Request) {
     );
   }
 
-  let user = authUser
-    ? await prisma.users.findUnique({ where: { pidUser: authUser.pidUser } })
-    : await prisma.users.findUnique({ where: { userEmail: email } });
+  const account = await resolvePublicAccount({
+    authenticatedPidUser: authUser?.pidUser,
+    email,
+    firstName,
+    lastName,
+    phone,
+    affiliateRef: 'supplier-intelligence',
+    defaultFirstName: 'Subscriber',
+    accountSetupKey: `supplier_intelligence_subscription:${pidSubscription}`,
+  });
+  if (account.status === 'login_required') {
+    return NextResponse.json(
+      {
+        statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
+        message:
+          'An account with this email already exists. Please sign in to subscribe.',
+        loginPath: `/auth/login?next=${encodeURIComponent(`/supplier-intelligence?resumeSubscription=${plan.key}`)}`,
+      },
+      { status: 409 },
+    );
+  }
 
-  if (!user) {
-    user = await createIntelligenceUser({
-      email,
-      firstName,
-      lastName,
-      phone,
-    });
-  } else if (phone && !user.phone && !user.userPhone) {
+  let user = account.user;
+  if (account.createdNewAccount) {
+    try {
+      await sendPublicAccountSetupEmail({
+        user,
+        context: 'your Supplier Intelligence subscription',
+      });
+    } catch (error) {
+      console.error('subscription account setup email failed:', error);
+    }
+  }
+  if (phone && !user.phone && !user.userPhone) {
     user = await prisma.users.update({
       where: { pidUser: user.pidUser },
       data: {
@@ -136,9 +106,6 @@ export async function POST(request: Request) {
   }
 
   const amountKobo = plan.priceNaira * 100;
-  const reference = `SI_INTEL_${plan.key.toUpperCase()}_${Date.now()}_${randomGenerator(6)}`;
-  const pidSubscription = `INTSUB${randomGenerator(12)}`;
-
   await prisma.intelligence_subscriptions.create({
     data: {
       pidSubscription,
@@ -154,27 +121,30 @@ export async function POST(request: Request) {
     },
   });
 
-  const response = await fetch('https://api.paystack.co/transaction/initialize', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: user.userEmail,
-      amount: amountKobo,
-      currency: 'NGN',
-      reference,
-      plan: paystackPlanCode,
-      callback_url: absoluteUrl('/intelligence/checkout/verify'),
-      metadata: {
-        product: 'supplier_intelligence',
-        plan: plan.key,
-        pidUser: user.pidUser,
-        pidSubscription,
+  const response = await fetch(
+    'https://api.paystack.co/transaction/initialize',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${PAYSTACK_SECRET_KEY}`,
+        'Content-Type': 'application/json',
       },
-    }),
-  });
+      body: JSON.stringify({
+        email: user.userEmail,
+        amount: amountKobo,
+        currency: 'NGN',
+        reference,
+        plan: paystackPlanCode,
+        callback_url: absoluteUrl('/intelligence/checkout/verify'),
+        metadata: {
+          product: 'supplier_intelligence',
+          plan: plan.key,
+          pidUser: user.pidUser,
+          pidSubscription,
+        },
+      }),
+    },
+  );
 
   const data = await response.json();
 

@@ -557,11 +557,11 @@ export default function CorporateGiftsDashboardPage() {
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center dark:border-slate-700 dark:bg-[#0f1020]">
                       <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Reference Image or Specification Sheet</p>
-                      <input type="file" accept="image/*,.pdf" onChange={(e) => setReferenceImage(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
+                      <input type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf" onChange={(e) => setReferenceImage(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
                     </div>
                     <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center dark:border-slate-700 dark:bg-[#0f1020]">
                       <p className="mb-2 text-xs font-medium text-slate-500 dark:text-slate-300">Company Logo for Branded Orders</p>
-                      <input type="file" accept=".png,.jpg,.jpeg,.svg,.pdf" onChange={(e) => setCompanyLogo(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
+                      <input type="file" accept=".jpg,.jpeg,.png,.gif,.webp,.svg,.pdf" onChange={(e) => setCompanyLogo(e.target.files?.[0] || null)} className="block w-full rounded-lg border border-slate-200 bg-slate-50 p-2 text-xs text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-blue-500 dark:border-slate-700 dark:bg-[#161629] dark:text-slate-200" />
                     </div>
                   </div>
                 </div>

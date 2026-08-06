@@ -169,7 +169,7 @@ export default async function ShippingRatePage() {
         <section className="relative overflow-hidden bg-slate-950 px-4 pb-16 pt-48 text-white sm:px-6 lg:px-8">
           <PublicHeroBackground />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%)]" />
-          <div className="relative mx-auto max-w-7xl">
+          <div className="relative mx-auto max-w-[1440px]">
             <div className="max-w-3xl">
               <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-400/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-orange-300">
                 <Ship className="h-3.5 w-3.5" />
@@ -224,7 +224,7 @@ export default async function ShippingRatePage() {
         </section>
 
         <section className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto max-w-[1440px]">
             <div className="mb-8 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
               <div className="rounded-xl border border-orange-200 bg-orange-50 p-5 text-orange-950 dark:border-orange-900/40 dark:bg-orange-950/30 dark:text-orange-100">
                 <div className="flex gap-3">

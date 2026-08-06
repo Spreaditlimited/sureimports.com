@@ -13,6 +13,7 @@ function IntelligenceCheckoutVerifyContent() {
     'loading',
   );
   const [message, setMessage] = useState('Verifying your subscription...');
+  const [canOpenDashboard, setCanOpenDashboard] = useState(false);
 
   useEffect(() => {
     async function verify() {
@@ -35,7 +36,12 @@ function IntelligenceCheckoutVerifyContent() {
         }
 
         setStatus('success');
-        setMessage('Your Supplier Intelligence access is active.');
+        setCanOpenDashboard(Boolean(data.canOpenDashboard));
+        setMessage(
+          data.canOpenDashboard
+            ? 'Your Supplier Intelligence access is active and available in your account.'
+            : 'Your Supplier Intelligence access is active. Sign in with the purchasing account to continue.',
+        );
       } catch (error) {
         setStatus('error');
         setMessage(
@@ -71,13 +77,19 @@ function IntelligenceCheckoutVerifyContent() {
         <p className="mt-3 text-sm leading-6 text-slate-600">{message}</p>
         <Link
           href={
-            status === 'success'
+            status === 'success' && canOpenDashboard
               ? '/dashboard/intelligence'
-              : '/supplier-intelligence'
+              : status === 'success'
+                ? `/auth/login?next=${encodeURIComponent('/dashboard/intelligence')}`
+                : '/supplier-intelligence'
           }
           className="mt-7 inline-flex w-full items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800"
         >
-          {status === 'success' ? 'Go to dashboard' : 'Return to plans'}
+          {status === 'success'
+            ? canOpenDashboard
+              ? 'Go to dashboard'
+              : 'Sign in to continue'
+            : 'Return to plans'}
         </Link>
       </div>
     </main>

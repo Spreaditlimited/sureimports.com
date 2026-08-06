@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
@@ -21,6 +21,65 @@ export default function IntelligenceSignupForm({
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const isFreePlan = plan === 'free';
+  const pendingSubscriptionKey = `sureimports:pendingIntelligenceSubscription:${plan}`;
+
+  async function startSubscription(payload: {
+    plan: IntelligencePlanKey;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+  }) {
+    const response = await fetch('/api/intelligence/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await response.json();
+
+    if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
+      window.localStorage.setItem(
+        pendingSubscriptionKey,
+        JSON.stringify(payload),
+      );
+      window.location.href =
+        data.loginPath ||
+        `/auth/login?next=${encodeURIComponent(`/supplier-intelligence?resumeSubscription=${plan}`)}`;
+      return;
+    }
+
+    if (!response.ok || !data.authorizationUrl) {
+      throw new Error(data.message || 'Unable to start checkout.');
+    }
+
+    window.localStorage.removeItem(pendingSubscriptionKey);
+    window.location.href = data.authorizationUrl;
+  }
+
+  useEffect(() => {
+    if (isFreePlan) return;
+    const resumePlan = new URLSearchParams(window.location.search).get(
+      'resumeSubscription',
+    );
+    if (resumePlan !== plan) return;
+    const pending = window.localStorage.getItem(pendingSubscriptionKey);
+    if (!pending) return;
+    setIsLoading(true);
+    try {
+      const payload = JSON.parse(pending);
+      void startSubscription(payload).catch((error) => {
+        setError(
+          error instanceof Error ? error.message : 'Unable to start checkout.',
+        );
+        setIsLoading(false);
+      });
+    } catch {
+      window.localStorage.removeItem(pendingSubscriptionKey);
+      setIsLoading(false);
+    }
+    // This runs only for the matching plan after returning from login.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFreePlan, pendingSubscriptionKey, plan]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -41,24 +100,7 @@ export default function IntelligenceSignupForm({
         return;
       }
 
-      const response = await fetch('/api/intelligence/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          plan,
-          firstName,
-          lastName,
-          email,
-          phone,
-        }),
-      });
-      const data = await response.json();
-
-      if (!response.ok || !data.authorizationUrl) {
-        throw new Error(data.message || 'Unable to start checkout.');
-      }
-
-      window.location.href = data.authorizationUrl;
+      await startSubscription({ plan, firstName, lastName, email, phone });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Unable to start checkout.',
