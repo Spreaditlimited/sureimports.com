@@ -4,9 +4,9 @@ import Footer from '@/app/(home)/components/Footer';
 import Navigation from '@/app/(home)/components/Navigation';
 import ReportSearchExperience from '@/components/intelligence/ReportSearchExperience';
 import { getReportSeo } from '@/lib/intelligence/reportSeo';
-import { getPublishedReports } from '@/lib/intelligence/reports';
+import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: 'Search China Supplier Reports | Sure Imports',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 };
 
 export default async function SupplierIntelligenceReportsPage() {
-  const reports = await getPublishedReports();
+  const { reports } = await getPublicPublishedReports();
   const searchReports = reports.map((report) => {
     const seo = getReportSeo(report.slug);
     return {

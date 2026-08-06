@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 
 interface BlogForSitemap {
@@ -200,17 +201,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let reportPages: MetadataRoute.Sitemap = [];
   try {
-    const reports = await prisma.intelligence_report_products.findMany({
-      where: { status: 'published', currentVersionId: { not: null } },
-      select: { slug: true, publishedAt: true, updatedAt: true },
-    });
+    const { reports } = await getPublicPublishedReports();
     reportPages = reports.map((report) => ({
       url: `${baseUrl}/supplier-intelligence/reports/${report.slug}`,
-      lastModified: (
-        report.updatedAt ||
-        report.publishedAt ||
-        new Date()
-      ).toISOString(),
+      lastModified: report.updatedAt || report.publishedAt || currentDate,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     }));

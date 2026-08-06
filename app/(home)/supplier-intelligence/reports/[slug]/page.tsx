@@ -15,11 +15,18 @@ import ReportCover from '@/components/intelligence/ReportCover';
 import ReportCheckoutForm from '@/components/intelligence/ReportCheckoutForm';
 import {
   formatReportPrice,
-  getPublishedReportBySlug,
+  getPublicPublishedReports,
+  getPublicPublishedReportBySlug,
 } from '@/lib/intelligence/reports';
 import { getReportSeo } from '@/lib/intelligence/reportSeo';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const { reports } = await getPublicPublishedReports();
+
+  return reports.map((report) => ({ slug: report.slug }));
+}
 
 export async function generateMetadata({
   params,
@@ -27,33 +34,33 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const result = await getPublishedReportBySlug(slug);
-  if (!result) return { title: 'Supplier report not found | Sure Imports' };
+  const { report } = await getPublicPublishedReportBySlug(slug);
+  if (!report) return { title: 'Supplier report not found | Sure Imports' };
   const seo = getReportSeo(slug);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
-  const image = result.report.coverImageUrl
-    ? `https://www.sureimports.com${result.report.coverImageUrl}`
+  const image = report.coverImageUrl
+    ? `https://www.sureimports.com${report.coverImageUrl}`
     : 'https://www.sureimports.com/assets/img/logo.svg';
   return {
-    title: seo?.metaTitle || `${result.report.title} | Sure Imports`,
+    title: seo?.metaTitle || `${report.title} | Sure Imports`,
     description:
       seo?.metaDescription ||
-      result.report.description ||
-      result.report.subtitle ||
+      report.description ||
+      report.subtitle ||
       undefined,
     keywords: seo ? [seo.primaryKeyword, ...seo.secondaryKeywords] : undefined,
     alternates: { canonical },
     openGraph: {
       type: 'website',
       url: canonical,
-      title: seo?.metaTitle || result.report.title,
-      description: seo?.metaDescription || result.report.subtitle || '',
-      images: [{ url: image, alt: result.report.title }],
+      title: seo?.metaTitle || report.title,
+      description: seo?.metaDescription || report.subtitle || '',
+      images: [{ url: image, alt: report.title }],
     },
     twitter: {
       card: 'summary_large_image',
-      title: seo?.metaTitle || result.report.title,
-      description: seo?.metaDescription || result.report.subtitle || '',
+      title: seo?.metaTitle || report.title,
+      description: seo?.metaDescription || report.subtitle || '',
       images: [image],
     },
   };
@@ -65,9 +72,8 @@ export default async function SupplierReportPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const result = await getPublishedReportBySlug(slug);
-  if (!result) notFound();
-  const { report } = result;
+  const { report } = await getPublicPublishedReportBySlug(slug);
+  if (!report) notFound();
   const seo = getReportSeo(slug);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
   const schema = seo

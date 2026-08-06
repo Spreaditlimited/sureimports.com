@@ -43,7 +43,19 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = await getPublishedReportBySlug(reportSlug);
+  let result;
+  try {
+    result = await getPublishedReportBySlug(reportSlug);
+  } catch (error) {
+    console.error('Report checkout database unavailable:', error);
+    return NextResponse.json(
+      {
+        message:
+          'Report checkout is temporarily unavailable. Please try again shortly.',
+      },
+      { status: 503 },
+    );
+  }
   if (!result)
     return NextResponse.json(
       { message: 'This report is not available for purchase.' },
