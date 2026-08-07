@@ -157,14 +157,19 @@ export default async function BookConsultationPage({
         <PublicHeroBackground />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand-orange-500/15 blur-[100px] sm:h-[600px] sm:w-[800px]" />
         
-        <div className="relative mx-auto max-w-4xl">
+        <div className="relative mx-auto max-w-5xl">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md sm:mb-6 sm:px-4 sm:py-1.5 sm:text-xs">
             <PhoneCall className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             1-on-1 Strategy Call
           </div>
           
-          <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-            Get clear direction before you <br className="hidden md:block" /> send money to China
+          <h1 className="text-[clamp(2.25rem,6.4vw,4.5rem)] font-black leading-[1.08] tracking-tight">
+            <span className="md:block md:whitespace-nowrap">
+              Get clear direction before you
+            </span>{" "}
+            <span className="md:block md:whitespace-nowrap">
+              send money to China
+            </span>
           </h1>
           
           <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg">
@@ -231,42 +236,41 @@ export default async function BookConsultationPage({
 
       {/* --- FOCUSED BOOKING SECTION --- */}
       <section id="booking" className="py-16 sm:py-24 lg:py-32">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-200/50 sm:rounded-[2rem]">
-            {/* Header Area */}
-            <div className="border-b border-slate-100 bg-slate-50/50 px-5 py-6 sm:px-10 sm:py-8">
-              <h3 className="text-xl font-bold text-slate-900 sm:text-2xl">Secure Your Session</h3>
-              <p className="mt-1.5 text-sm text-slate-500 sm:mt-2">
-                Select your preferred time slot and complete the payment to confirm.
-              </p>
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <header className="mx-auto mb-10 max-w-2xl text-center sm:mb-14">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-brand-orange-200 bg-brand-orange-50 text-brand-orange-600">
+              <ShieldCheck className="h-5 w-5" />
             </div>
-            
-            {/* Form Area */}
-            <div className="p-5 sm:p-10">
-              {amountKobo > 0 ? (
-                <ConsultationBookingForm amountKobo={amountKobo} />
-              ) : (
-                <div className="flex flex-col items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 px-4 py-10 text-center sm:p-12">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
-                    <CalendarClock className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-lg font-bold text-amber-900">Booking Offline</h3>
-                  <p className="mt-2 max-w-md text-sm leading-relaxed text-amber-800">
-                    Consultation booking is currently offline while we update our schedule. Please check back later.
-                  </p>
-                </div>
-              )}
-            </div>
-            
-            {/* Security Footer */}
-            <div className="border-t border-slate-100 bg-slate-50/80 p-4 sm:p-6 text-center">
-              <p className="flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 sm:text-xs">
-                <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Guaranteed Secure Payment
-              </p>
-            </div>
-          </div>
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.2em] text-brand-orange-600">
+              Private 1-on-1 advisory
+            </p>
+            <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              Secure your session
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-slate-600">
+              Choose a time that works for you, share what you need help with,
+              and reserve your consultation securely.
+            </p>
+          </header>
 
+          {amountKobo > 0 ? (
+            <ConsultationBookingForm amountKobo={amountKobo} />
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-3xl border border-amber-200 bg-white px-4 py-10 text-center shadow-xl shadow-slate-200/50 sm:p-12">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                <CalendarClock className="h-7 w-7" />
+              </div>
+              <h3 className="text-lg font-bold text-amber-900">Booking Offline</h3>
+              <p className="mt-2 max-w-md text-sm leading-relaxed text-amber-800">
+                Consultation booking is currently offline while we update our schedule. Please check back later.
+              </p>
+            </div>
+          )}
+
+          <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs font-medium text-slate-500">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+            Encrypted payment processed securely by Paystack
+          </p>
         </div>
       </section>
 

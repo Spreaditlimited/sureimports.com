@@ -108,60 +108,85 @@ export default function ConsultationBookingForm({
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:sticky lg:top-28">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-600">
-            <CalendarClock className="h-5 w-5" />
+    <div className="grid overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_28px_80px_-35px_rgba(15,23,42,0.28)] lg:grid-cols-[0.72fr_1.28fr] sm:rounded-[2rem]">
+      <aside className="relative overflow-hidden bg-slate-950 p-6 text-white sm:p-8 lg:p-10">
+        <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-orange-500/10 blur-3xl" />
+        <div className="absolute inset-y-0 left-0 w-1 bg-brand-orange-500" />
+
+        <div className="relative">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-brand-orange-400">
+            <CalendarClock className="h-4 w-4" />
           </div>
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Paid consultation
-            </p>
-            <p className="text-2xl font-black tracking-tight text-slate-950">
-              {formatAmount(amountKobo)}
-            </p>
-          </div>
+          <span className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
+            30 minutes
+          </span>
         </div>
 
-        <div className="mt-6 space-y-4 text-sm leading-6 text-slate-600">
-          <p>
+        <div className="mt-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-400">
+            Your consultation
+          </p>
+          <h3 className="mt-3 text-2xl font-black leading-tight tracking-tight">
+            Clear answers for your next import decision.
+          </h3>
+          <p className="mt-4 text-sm leading-6 text-slate-300">
             This is a focused 30-minute call for importers who need clear
             direction before paying a supplier, choosing a buying route, or
             committing money.
           </p>
-          <div className="space-y-3">
+        </div>
+
+        <div className="my-7 h-px bg-white/10" />
+
+        <div>
+          <p className="text-xs font-semibold text-slate-400">Session fee</p>
+          <p className="mt-1 text-4xl font-black tracking-tight text-white">
+            {formatAmount(amountKobo)}
+          </p>
+          <p className="mt-1 text-xs text-slate-400">One-time secure payment</p>
+        </div>
+
+        <div className="mt-8 space-y-3 text-sm leading-6 text-slate-300">
             {[
-              'We review your import situation before the call.',
-              'You receive a Zoom link after successful payment.',
-              'Your slot is held only after Paystack confirms payment.',
+              'Your situation reviewed before the call',
+              'Private Zoom meeting link by email',
+              'Confirmed slot after secure payment',
             ].map((item) => (
               <div key={item} className="flex items-start gap-3">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-400" />
                 <span>{item}</span>
               </div>
             ))}
-          </div>
         </div>
 
         {selectedSlotLabel ? (
-          <div className="mt-6 rounded-xl border border-brand-orange-100 bg-brand-orange-50 p-4 text-sm font-semibold text-slate-900">
-            Selected: {selectedSlotLabel}
+          <div className="mt-8 border-t border-white/10 pt-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Selected session
+            </p>
+            <p className="mt-1.5 text-sm font-semibold leading-relaxed text-white">
+              {selectedSlotLabel}
+            </p>
           </div>
         ) : null}
-      </div>
+        </div>
+      </aside>
 
       <form
         onSubmit={handleSubmit}
-        className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-8"
+        className="p-5 sm:p-8 lg:p-10"
       >
         <div>
-          <p className="text-sm font-bold uppercase tracking-widest text-brand-orange-500">
-            Choose a time
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-600">
+            01 / Select a time
           </p>
-          <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-950">
-            Book your consultation
-          </h2>
+          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+            When would you like to talk?
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            All times are shown in West Africa Time (WAT).
+          </p>
         </div>
 
         <div className="mt-6">
@@ -179,10 +204,11 @@ export default function ConsultationBookingForm({
                     key={slot.startIso}
                     type="button"
                     onClick={() => setSelectedSlot(slot.startIso)}
-                    className={`rounded-xl border p-4 text-left text-sm font-semibold leading-5 transition ${
+                    aria-pressed={active}
+                    className={`rounded-xl border p-4 text-left text-sm font-semibold leading-5 transition-all ${
                       active
-                        ? 'border-brand-orange-500 bg-brand-orange-50 text-slate-950 shadow-sm'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-brand-orange-200'
+                        ? 'border-brand-orange-500 bg-brand-orange-50 text-slate-950 shadow-sm ring-2 ring-brand-orange-500/10'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   >
                     {slot.label}
@@ -198,48 +224,75 @@ export default function ConsultationBookingForm({
           )}
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <input
-            value={form.fullName}
-            onChange={(event) => updateField('fullName', event.target.value)}
-            className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
-            placeholder="Full name"
-            required
-          />
-          <input
-            value={form.email}
-            onChange={(event) => updateField('email', event.target.value)}
-            className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
-            placeholder="Email address"
-            type="email"
-            required
-          />
-          <input
-            value={form.phone}
-            onChange={(event) => updateField('phone', event.target.value)}
-            className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
-            placeholder="Phone / WhatsApp"
-            required
-          />
-          <input
-            value={form.businessName}
-            onChange={(event) =>
-              updateField('businessName', event.target.value)
-            }
-            className="h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
-            placeholder="Business name, optional"
-          />
+        <div className="mt-9 border-t border-slate-100 pt-8">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-600">
+            02 / Your details
+          </p>
+          <h3 className="mt-2 text-2xl font-black tracking-tight text-slate-950">
+            Help us prepare for your call
+          </h3>
+          <p className="mt-2 text-sm leading-relaxed text-slate-500">
+            We’ll use these details for your confirmation and meeting invite.
+          </p>
         </div>
 
-        <textarea
-          value={form.consultationGoal}
-          onChange={(event) =>
-            updateField('consultationGoal', event.target.value)
-          }
-          className="mt-4 min-h-32 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none transition focus:border-brand-orange-500 focus:ring-2 focus:ring-brand-orange-500/20"
-          placeholder="What do you need help with? Include product, supplier, budget, shipping concern, or decision you want to make."
-          required
-        />
+        <div className="mt-5 grid gap-4 sm:grid-cols-2">
+          <label className="space-y-2 text-xs font-bold text-slate-700">
+            Full name
+            <input
+              value={form.fullName}
+              onChange={(event) => updateField('fullName', event.target.value)}
+              className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-normal text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-orange-500 focus:bg-white focus:ring-2 focus:ring-brand-orange-500/20"
+              placeholder="Your full name"
+              required
+            />
+          </label>
+          <label className="space-y-2 text-xs font-bold text-slate-700">
+            Email address
+            <input
+              value={form.email}
+              onChange={(event) => updateField('email', event.target.value)}
+              className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-normal text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-orange-500 focus:bg-white focus:ring-2 focus:ring-brand-orange-500/20"
+              placeholder="you@example.com"
+              type="email"
+              required
+            />
+          </label>
+          <label className="space-y-2 text-xs font-bold text-slate-700">
+            Phone / WhatsApp
+            <input
+              value={form.phone}
+              onChange={(event) => updateField('phone', event.target.value)}
+              className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-normal text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-orange-500 focus:bg-white focus:ring-2 focus:ring-brand-orange-500/20"
+              placeholder="Your phone number"
+              required
+            />
+          </label>
+          <label className="space-y-2 text-xs font-bold text-slate-700">
+            Business name <span className="font-normal text-slate-400">(optional)</span>
+            <input
+              value={form.businessName}
+              onChange={(event) =>
+                updateField('businessName', event.target.value)
+              }
+              className="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-normal text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-orange-500 focus:bg-white focus:ring-2 focus:ring-brand-orange-500/20"
+              placeholder="Your business name"
+            />
+          </label>
+        </div>
+
+        <label className="mt-4 block space-y-2 text-xs font-bold text-slate-700">
+          What do you need help with?
+          <textarea
+            value={form.consultationGoal}
+            onChange={(event) =>
+              updateField('consultationGoal', event.target.value)
+            }
+            className="block min-h-32 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm font-normal text-slate-950 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-brand-orange-500 focus:bg-white focus:ring-2 focus:ring-brand-orange-500/20"
+            placeholder="Tell us about the product, supplier, budget, or decision you want to make."
+            required
+          />
+        </label>
 
         {error ? (
           <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -252,7 +305,7 @@ export default function ConsultationBookingForm({
           disabled={
             isSubmitting || isLoadingSlots || !slots.length || !selectedSlot
           }
-          className="mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-6 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition hover:bg-brand-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-6 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/25 transition-all hover:-translate-y-0.5 hover:bg-brand-orange-600 hover:shadow-xl hover:shadow-brand-orange-500/25 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
           {isSubmitting
