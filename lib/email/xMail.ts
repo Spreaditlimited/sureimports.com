@@ -1,5 +1,6 @@
 'use server';
 import sendEmail from '@/lib/email/config/sendEmail';
+import type { EmailAttachment } from '@/lib/email/config/sendEmail';
 import mailTemplate from '@/lib/email/temp/mailTemplate2';
 import { cleanLegacyEmailBody } from '@/lib/email/cleanBody';
 
@@ -11,6 +12,7 @@ interface Props {
   xBody2?: any;
   xButtonTitle?: any;
   xButtonLink?: any;
+  attachments?: EmailAttachment[];
 }
 
 //EMAIL PROCESSOR
@@ -22,6 +24,7 @@ export default async function xMail({
   xBody2,
   xButtonTitle,
   xButtonLink,
+  attachments,
 }: Props) {
   let zTitle: string = xTitle;
   let zBodyTitle: any = xBodyTitle;
@@ -40,7 +43,7 @@ export default async function xMail({
   }) as any;
 
   try {
-    await sendEmail(xEmail, xTitle, mail);
+    await sendEmail(xEmail, xTitle, mail, attachments);
     return { success: true };
   } catch (error) {
     console.error('xMail failed to send email:', error);

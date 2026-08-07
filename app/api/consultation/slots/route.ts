@@ -9,7 +9,7 @@ export async function GET() {
     SELECT slotStartUtc
     FROM consultation_bookings
     WHERE (
-        status IN ('paid', 'booked', 'rescheduled')
+        status IN ('cancelling', 'fulfilling', 'paid', 'booked', 'rescheduled')
         OR (status = 'pending_payment' AND createdAt > DATE_SUB(NOW(), INTERVAL 30 MINUTE))
       )
       AND slotStartUtc IS NOT NULL

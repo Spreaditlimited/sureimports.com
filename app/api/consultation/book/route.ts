@@ -56,61 +56,64 @@ export async function POST(request: Request) {
   const reference = `SI_CONSULT_${Date.now()}_${pidBooking.slice(-6)}`;
 
   try {
-    const existingActiveSlot = await prisma.$queryRaw<Array<{ pidBooking: string }>>`
-      SELECT pidBooking
-      FROM consultation_bookings
-      WHERE slotStartUtc = ${slotStartDate}
-        AND (
-          status IN ('paid', 'booked', 'rescheduled')
-          OR (status = 'pending_payment' AND createdAt > DATE_SUB(NOW(), INTERVAL 30 MINUTE))
+    await prisma.$transaction(async (transaction) => {
+      const existingActiveSlot = await transaction.$queryRaw<
+        Array<{ pidBooking: string }>
+      >`
+        SELECT pidBooking
+        FROM consultation_bookings
+        WHERE slotStartUtc = ${slotStartDate}
+          AND (
+            status IN ('cancelling', 'fulfilling', 'paid', 'booked', 'rescheduled')
+            OR (status = 'pending_payment' AND createdAt > DATE_SUB(NOW(), INTERVAL 30 MINUTE))
+          )
+        LIMIT 1
+        FOR UPDATE
+      `;
+
+      if (existingActiveSlot.length > 0) {
+        throw new Error('CONSULTATION_SLOT_TAKEN');
+      }
+
+      await transaction.$executeRaw`
+        INSERT INTO consultation_bookings (
+          pidBooking,
+          manageToken,
+          fullName,
+          email,
+          phone,
+          businessName,
+          consultationGoal,
+          slotStartUtc,
+          slotEndUtc,
+          status,
+          amountKobo,
+          currency,
+          paystackReference,
+          createdAt,
+          updatedAt
+        ) VALUES (
+          ${pidBooking},
+          ${manageToken},
+          ${fullName},
+          ${email},
+          ${phone},
+          ${businessName || null},
+          ${consultationGoal},
+          ${slotStartDate},
+          ${slotEndDate},
+          'pending_payment',
+          ${amountKobo},
+          'NGN',
+          ${reference},
+          ${new Date()},
+          ${new Date()}
         )
-      LIMIT 1
-    `;
-
-    if (existingActiveSlot.length > 0) {
-      return NextResponse.json(
-        { message: 'That slot has just been taken. Please choose another.' },
-        { status: 409 },
-      );
-    }
-
-    await prisma.$executeRaw`
-      INSERT INTO consultation_bookings (
-        pidBooking,
-        manageToken,
-        fullName,
-        email,
-        phone,
-        businessName,
-        consultationGoal,
-        slotStartUtc,
-        slotEndUtc,
-        status,
-        amountKobo,
-        currency,
-        paystackReference,
-        createdAt,
-        updatedAt
-      ) VALUES (
-        ${pidBooking},
-        ${manageToken},
-        ${fullName},
-        ${email},
-        ${phone},
-        ${businessName || null},
-        ${consultationGoal},
-        ${slotStartDate},
-        ${slotEndDate},
-        'pending_payment',
-        ${amountKobo},
-        'NGN',
-        ${reference},
-        ${new Date()},
-        ${new Date()}
-      )
-    `;
+      `;
+    });
   } catch (error: any) {
-    if (String(error?.code || error?.message || '').includes('Duplicate')) {
+    const reason = String(error?.code || error?.message || '');
+    if (reason.includes('Duplicate') || reason.includes('CONSULTATION_SLOT_TAKEN')) {
       return NextResponse.json(
         { message: 'That slot has just been taken. Please choose another.' },
         { status: 409 },

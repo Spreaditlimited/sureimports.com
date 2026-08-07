@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 
-type Status = 'loading' | 'success' | 'error';
+type Status = 'loading' | 'success' | 'review' | 'error';
 
 export default function ConsultationVerifyClient({
   reference,
@@ -33,13 +33,28 @@ export default function ConsultationVerifyClient({
           body: JSON.stringify({ reference }),
         });
         const data = await response.json();
+        if (data?.paymentReceived) {
+          if (!mounted) return;
+          setStatus('review');
+          setMessage(data.message);
+          return;
+        }
         if (!response.ok || !data?.ok) {
           throw new Error(data?.message || 'Payment could not be verified.');
         }
         if (!mounted) return;
+        if (data?.processing) {
+          setStatus('success');
+          setMessage(
+            'Your payment is confirmed and your booking is being finalized. Your Zoom details will arrive by email shortly.',
+          );
+          return;
+        }
         setStatus('success');
         setMessage(
-          'Your consultation is booked. We have sent the Zoom details to your email.',
+          data?.customerEmailSent
+            ? 'Your consultation is booked. We have sent the Zoom details and calendar invitation to your email.'
+            : 'Your consultation is booked, but the confirmation email is delayed. Our team has been notified and your booking remains secure.',
         );
       } catch (error) {
         if (!mounted) return;
@@ -64,24 +79,29 @@ export default function ConsultationVerifyClient({
         className={`flex h-16 w-16 items-center justify-center rounded-full ${
           status === 'success'
             ? 'bg-emerald-50 text-emerald-600'
-            : status === 'error'
-              ? 'bg-red-50 text-red-600'
-              : 'bg-brand-orange-50 text-brand-orange-600'
+            : status === 'review'
+              ? 'bg-amber-50 text-amber-600'
+              : status === 'error'
+                ? 'bg-red-50 text-red-600'
+                : 'bg-brand-orange-50 text-brand-orange-600'
         }`}
       >
         {status === 'loading' ? (
           <Loader2 className="h-8 w-8 animate-spin" />
         ) : null}
         {status === 'success' ? <CheckCircle2 className="h-8 w-8" /> : null}
+        {status === 'review' ? <AlertCircle className="h-8 w-8" /> : null}
         {status === 'error' ? <XCircle className="h-8 w-8" /> : null}
       </div>
 
       <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-950">
         {status === 'success'
           ? 'Consultation booked'
-          : status === 'error'
-            ? 'Could not finish booking'
-            : 'Confirming booking'}
+          : status === 'review'
+            ? 'Payment received — review needed'
+            : status === 'error'
+              ? 'Could not finish booking'
+              : 'Confirming booking'}
       </h1>
       <p className="mt-3 text-sm leading-6 text-slate-600">{message}</p>
 

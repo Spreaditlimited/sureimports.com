@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma';
 import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
 import { getConfiguredIntelligencePlan } from '@/lib/intelligence/plans';
 import { fulfillReportOrder } from '@/lib/intelligence/reportOrders';
+import { fulfillConsultationPayment } from '@/lib/consultationFulfillment';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -69,6 +70,23 @@ export async function POST(request: Request) {
 
   const payload = JSON.parse(rawBody);
   const event = String(payload?.event || '').trim();
+
+  if (
+    event === 'charge.success' &&
+    payload?.data?.status === 'success' &&
+    payload?.data?.metadata?.product === 'sureimports_consultation'
+  ) {
+    try {
+      const result = await fulfillConsultationPayment(payload.data);
+      return NextResponse.json({ received: true, status: result.status });
+    } catch (error) {
+      console.error('Consultation webhook fulfillment failed:', error);
+      return NextResponse.json(
+        { message: 'Consultation fulfillment failed.' },
+        { status: 500 },
+      );
+    }
+  }
 
   if (event.startsWith('subscription.')) {
     const subscriptionCode = getSubscriptionCodeFromEvent(payload.data);

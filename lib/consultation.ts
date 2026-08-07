@@ -237,6 +237,28 @@ export async function updateZoomMeeting(input: {
   }
 }
 
+export async function getZoomMeeting(meetingId: string) {
+  const cleanMeetingId = clean(meetingId, 120);
+  if (!cleanMeetingId) throw new Error('Zoom meeting ID is required.');
+
+  const token = await zoomAccessToken();
+  const response = await fetch(
+    `https://api.zoom.us/v2/meetings/${encodeURIComponent(cleanMeetingId)}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json',
+      },
+      cache: 'no-store',
+    },
+  );
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.id) {
+    throw new Error(data?.message || data?.reason || 'Could not retrieve Zoom meeting.');
+  }
+  return data as { id: string | number; join_url?: string; start_url?: string };
+}
+
 export async function cancelZoomMeeting(meetingId: string) {
   const cleanMeetingId = clean(meetingId, 120);
   if (!cleanMeetingId) return;
@@ -264,4 +286,58 @@ export function bookingTokens() {
     pidBooking: `CONSULT${crypto.randomBytes(6).toString('hex').toUpperCase()}`,
     manageToken: `${crypto.randomUUID()}${crypto.randomUUID().replace(/-/g, '')}`,
   };
+}
+
+function escapeCalendarText(value: string) {
+  return value
+    .replace(/\\/g, '\\\\')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;');
+}
+
+function calendarDate(date: Date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+export function consultationCalendarInvite(input: {
+  pidBooking: string;
+  fullName: string;
+  email: string;
+  startDate: Date;
+  endDate: Date;
+  zoomJoinUrl?: string | null;
+  method?: 'REQUEST' | 'CANCEL';
+  sequence?: number;
+}) {
+  const method = input.method || 'REQUEST';
+  const organizerEmail =
+    clean(process.env.SUREIMPORTS_ADMIN_EMAIL, 255) || 'support@sureimports.com';
+  const location = input.zoomJoinUrl || 'Zoom';
+  const description = input.zoomJoinUrl
+    ? `Join the consultation on Zoom: ${input.zoomJoinUrl}`
+    : 'Sure Imports private consultation';
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Sure Imports//Consultation Booking//EN',
+    'CALSCALE:GREGORIAN',
+    `METHOD:${method}`,
+    'BEGIN:VEVENT',
+    `UID:${escapeCalendarText(input.pidBooking)}@sureimports.com`,
+    `DTSTAMP:${calendarDate(new Date())}`,
+    `DTSTART:${calendarDate(input.startDate)}`,
+    `DTEND:${calendarDate(input.endDate)}`,
+    `SEQUENCE:${Math.max(0, input.sequence || 0)}`,
+    `STATUS:${method === 'CANCEL' ? 'CANCELLED' : 'CONFIRMED'}`,
+    'SUMMARY:Sure Imports Consultation',
+    `DESCRIPTION:${escapeCalendarText(description)}`,
+    `LOCATION:${escapeCalendarText(location)}`,
+    `ORGANIZER;CN=Sure Imports:mailto:${organizerEmail}`,
+    `ATTENDEE;CN=${escapeCalendarText(input.fullName)};RSVP=TRUE:mailto:${input.email}`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+    '',
+  ].join('\r\n');
 }

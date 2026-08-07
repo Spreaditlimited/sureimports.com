@@ -5,6 +5,13 @@ import mailTemplate from '@/lib/email/temp/mailTemplate2';
 const { SMTP_EMAIL } = process.env;
 const STANDARD_EMAIL_TEMPLATE_MARKER = 'sureimports-standard-email-template';
 
+export type EmailAttachment = {
+  filename: string;
+  content: Buffer | string;
+  contentType?: string;
+  contentDisposition?: 'attachment' | 'inline';
+};
+
 function ensureStandardTemplate(subject: string, html: string) {
   if (html?.includes(STANDARD_EMAIL_TEMPLATE_MARKER)) {
     return html;
@@ -24,6 +31,7 @@ const sendEmail = async (
   to: string,
   subject: string,
   html: string,
+  attachments: EmailAttachment[] = [],
   retries = 3,
 ) => {
   let lastError;
@@ -37,6 +45,7 @@ const sendEmail = async (
         to,
         subject,
         html: ensureStandardTemplate(subject, html),
+        attachments,
       });
 
       console.log('Email sent successfully:', info.messageId);

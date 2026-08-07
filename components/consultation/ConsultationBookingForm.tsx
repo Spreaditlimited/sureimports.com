@@ -108,46 +108,48 @@ export default function ConsultationBookingForm({
   }
 
   return (
-    <div className="grid overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_28px_80px_-35px_rgba(15,23,42,0.28)] lg:grid-cols-[0.72fr_1.28fr] sm:rounded-[2rem]">
+    <div className="grid overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_28px_80px_-35px_rgba(15,23,42,0.28)] sm:rounded-[2rem] lg:grid-cols-[0.72fr_1.28fr]">
       <aside className="relative overflow-hidden bg-slate-950 p-6 text-white sm:p-8 lg:p-10">
         <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-orange-500/10 blur-3xl" />
         <div className="absolute inset-y-0 left-0 w-1 bg-brand-orange-500" />
 
         <div className="relative">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-brand-orange-400">
-            <CalendarClock className="h-4 w-4" />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-brand-orange-400">
+              <CalendarClock className="h-4 w-4" />
+            </div>
+            <span className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
+              30 minutes
+            </span>
           </div>
-          <span className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-300">
-            30 minutes
-          </span>
-        </div>
 
-        <div className="mt-8">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-400">
-            Your consultation
-          </p>
-          <h3 className="mt-3 text-2xl font-black leading-tight tracking-tight">
-            Clear answers for your next import decision.
-          </h3>
-          <p className="mt-4 text-sm leading-6 text-slate-300">
-            This is a focused 30-minute call for importers who need clear
-            direction before paying a supplier, choosing a buying route, or
-            committing money.
-          </p>
-        </div>
+          <div className="mt-8">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-400">
+              Your consultation
+            </p>
+            <h3 className="mt-3 text-2xl font-black leading-tight tracking-tight">
+              Clear answers for your next import decision.
+            </h3>
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              This is a focused 30-minute call for importers who need clear
+              direction before paying a supplier, choosing a buying route, or
+              committing money.
+            </p>
+          </div>
 
-        <div className="my-7 h-px bg-white/10" />
+          <div className="my-7 h-px bg-white/10" />
 
-        <div>
-          <p className="text-xs font-semibold text-slate-400">Session fee</p>
-          <p className="mt-1 text-4xl font-black tracking-tight text-white">
-            {formatAmount(amountKobo)}
-          </p>
-          <p className="mt-1 text-xs text-slate-400">One-time secure payment</p>
-        </div>
+          <div>
+            <p className="text-xs font-semibold text-slate-400">Session fee</p>
+            <p className="mt-1 text-4xl font-black tracking-tight text-white">
+              {formatAmount(amountKobo)}
+            </p>
+            <p className="mt-1 text-xs text-slate-400">
+              One-time secure payment
+            </p>
+          </div>
 
-        <div className="mt-8 space-y-3 text-sm leading-6 text-slate-300">
+          <div className="mt-8 space-y-3 text-sm leading-6 text-slate-300">
             {[
               'Your situation reviewed before the call',
               'Private Zoom meeting link by email',
@@ -158,25 +160,22 @@ export default function ConsultationBookingForm({
                 <span>{item}</span>
               </div>
             ))}
-        </div>
-
-        {selectedSlotLabel ? (
-          <div className="mt-8 border-t border-white/10 pt-6">
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
-              Selected session
-            </p>
-            <p className="mt-1.5 text-sm font-semibold leading-relaxed text-white">
-              {selectedSlotLabel}
-            </p>
           </div>
-        ) : null}
+
+          {selectedSlotLabel ? (
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                Selected session
+              </p>
+              <p className="mt-1.5 text-sm font-semibold leading-relaxed text-white">
+                {selectedSlotLabel}
+              </p>
+            </div>
+          ) : null}
         </div>
       </aside>
 
-      <form
-        onSubmit={handleSubmit}
-        className="p-5 sm:p-8 lg:p-10"
-      >
+      <form onSubmit={handleSubmit} className="p-5 sm:p-8 lg:p-10">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand-orange-600">
             01 / Select a time
@@ -269,7 +268,8 @@ export default function ConsultationBookingForm({
             />
           </label>
           <label className="space-y-2 text-xs font-bold text-slate-700">
-            Business name <span className="font-normal text-slate-400">(optional)</span>
+            Business name{' '}
+            <span className="font-normal text-slate-400">(optional)</span>
             <input
               value={form.businessName}
               onChange={(event) =>
