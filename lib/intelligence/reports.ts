@@ -1,5 +1,3 @@
-import { unstable_cache } from 'next/cache';
-
 import { prisma } from '@/lib/prisma';
 import publishedReportsSnapshot from '@/lib/intelligence/publishedReportsSnapshot.json';
 
@@ -100,15 +98,9 @@ export async function getPublishedReports() {
   );
 }
 
-const getCachedPublicPublishedReports = unstable_cache(
-  async () => (await getPublishedReports()).map(serializePublishedReport),
-  ['supplier-intelligence-published-reports-v1'],
-  { revalidate: 300, tags: ['supplier-intelligence-reports'] },
-);
-
 export async function getPublicPublishedReports() {
   try {
-    const reports = await getCachedPublicPublishedReports();
+    const reports = (await getPublishedReports()).map(serializePublishedReport);
     return {
       reports,
       source: 'database' as const,

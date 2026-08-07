@@ -913,9 +913,9 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
       'Meet 10 reviewed makeup manufacturers in China for lipstick, foundation, mascara, eyeshadow and private-label colour cosmetics.',
     heading: 'Find makeup manufacturers in China for your beauty brand',
     introduction:
-      "Launching makeup is about much more than choosing attractive shades. The formula has to perform, the colour has to stay consistent, the packaging must work with the product and the documents must suit your destination market. This report introduces 10 reviewed makeup manufacturers in China producing private-label lip, face and eye cosmetics.",
+      'Launching makeup is about much more than choosing attractive shades. The formula has to perform, the colour has to stay consistent, the packaging must work with the product and the documents must suit your destination market. This report introduces 10 reviewed makeup manufacturers in China producing private-label lip, face and eye cosmetics.',
     buyerValue:
-      "You can compare the formats each factory actually manufactures and approach the right companies for a single hero product or a coordinated makeup line. The report helps you discuss formula ownership, shade matching, samples, testing, packaging compatibility, production standards and regulatory documents before committing to bulk production.",
+      'You can compare the formats each factory actually manufactures and approach the right companies for a single hero product or a coordinated makeup line. The report helps you discuss formula ownership, shade matching, samples, testing, packaging compatibility, production standards and regulatory documents before committing to bulk production.',
     products: [
       'Lipstick, liquid lipstick, lip gloss, tint and liner',
       'Foundation, concealer, primer, contour and powder',

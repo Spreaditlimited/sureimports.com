@@ -6,7 +6,7 @@ import ReportSearchExperience from '@/components/intelligence/ReportSearchExperi
 import { getReportSeo } from '@/lib/intelligence/reportSeo';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Search China Supplier Reports | Sure Imports',

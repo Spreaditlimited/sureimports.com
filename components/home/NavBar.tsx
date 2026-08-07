@@ -219,8 +219,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
   const isToolsPage = Boolean(pathname?.startsWith('/tools'));
   const isBlogPage = Boolean(pathname?.startsWith('/blog'));
   const isSupplierReportProductPage = Boolean(
-    pathname &&
-      /^\/supplier-intelligence\/reports\/[^/]+\/?$/.test(pathname),
+    pathname && /^\/supplier-intelligence\/reports\/[^/]+\/?$/.test(pathname),
   );
   const useLightNavbar =
     forceLightNavbar ||

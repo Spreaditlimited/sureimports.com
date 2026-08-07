@@ -15,18 +15,11 @@ import ReportCover from '@/components/intelligence/ReportCover';
 import ReportCheckoutForm from '@/components/intelligence/ReportCheckoutForm';
 import {
   formatReportPrice,
-  getPublicPublishedReports,
   getPublicPublishedReportBySlug,
 } from '@/lib/intelligence/reports';
 import { getReportSeo } from '@/lib/intelligence/reportSeo';
 
-export const revalidate = 300;
-
-export async function generateStaticParams() {
-  const { reports } = await getPublicPublishedReports();
-
-  return reports.map((report) => ({ slug: report.slug }));
-}
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,

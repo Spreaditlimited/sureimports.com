@@ -24,7 +24,9 @@ export function reportDemandWeekKey(value = new Date()) {
 }
 
 export function previousReportDemandWeekKey(value = new Date()) {
-  return reportDemandWeekKey(new Date(value.getTime() - 7 * 24 * 60 * 60 * 1000));
+  return reportDemandWeekKey(
+    new Date(value.getTime() - 7 * 24 * 60 * 60 * 1000),
+  );
 }
 
 export function daysUntilDemandSelection(value = new Date()) {
@@ -41,8 +43,14 @@ export function normalizeReportDemandQuery(value: string) {
     .replace(/two[\s-]?piece/g, 'two piece')
     .replace(/&/g, ' and ')
     .replace(/[’']/g, '')
-    .replace(/\b(i need|i want|looking for|searching for|find me|please|reliable|best|good)\b/g, ' ')
-    .replace(/\b(vendors?|suppliers?|manufacturers?|factories|factory|wholesale|china|chinese)\b/g, ' ')
+    .replace(
+      /\b(i need|i want|looking for|searching for|find me|please|reliable|best|good)\b/g,
+      ' ',
+    )
+    .replace(
+      /\b(vendors?|suppliers?|manufacturers?|factories|factory|wholesale|china|chinese)\b/g,
+      ' ',
+    )
     .replace(/[^a-z0-9]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();

@@ -2,7 +2,7 @@ import { prisma } from '../lib/prisma';
 import { REPORT_SEO } from '../lib/intelligence/reportSeo';
 
 const EDITION = 'August 2026';
-const PRICE_NAIRA = 25_000;
+const PRICE_NAIRA = 50_000;
 const PRICE_USD_CENTS = 5_000;
 
 function id(prefix: string) {

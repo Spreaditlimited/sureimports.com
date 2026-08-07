@@ -43,7 +43,10 @@ type DemandItem = {
 };
 
 function normalize(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 function statusLabel(status: string) {
@@ -415,14 +418,19 @@ export default function ReportSearchExperience({
                 onClick={() => setShowAll((current) => !current)}
                 className="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-black text-slate-800 transition hover:border-slate-950"
               >
-                {showAll ? 'Show fewer reports' : `See all ${reports.length} reports`}
+                {showAll
+                  ? 'Show fewer reports'
+                  : `See all ${reports.length} reports`}
               </button>
             </div>
           ) : null}
         </div>
       </section>
 
-      <section id="research-radar" className="scroll-mt-24 bg-white py-16 md:py-24">
+      <section
+        id="research-radar"
+        className="scroll-mt-24 bg-white py-16 md:py-24"
+      >
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
             <div className="lg:sticky lg:top-28">
@@ -438,7 +446,10 @@ export default function ReportSearchExperience({
                 highest-ranked requests enter the Sure Imports research queue.
               </p>
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <label htmlFor="radar-voting-email" className="text-xs font-black uppercase tracking-widest text-slate-500">
+                <label
+                  htmlFor="radar-voting-email"
+                  className="text-xs font-black uppercase tracking-widest text-slate-500"
+                >
                   Your voting email
                 </label>
                 <input
@@ -487,7 +498,8 @@ export default function ReportSearchExperience({
 
               {loadingDemand ? (
                 <div className="flex min-h-48 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-500">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading the radar…
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading the
+                  radar…
                 </div>
               ) : demand.length ? (
                 <div className="space-y-3">
@@ -519,12 +531,15 @@ export default function ReportSearchExperience({
                                 href={`/supplier-intelligence/reports/${item.publishedReportSlug}`}
                                 className="inline-flex shrink-0 items-center gap-1 text-sm font-black text-emerald-700"
                               >
-                                Open report <ArrowRight className="h-3.5 w-3.5" />
+                                Open report{' '}
+                                <ArrowRight className="h-3.5 w-3.5" />
                               </Link>
                             ) : (
                               <button
                                 type="button"
-                                onClick={() => vote({ pidRequest: item.pidRequest })}
+                                onClick={() =>
+                                  vote({ pidRequest: item.pidRequest })
+                                }
                                 disabled={submittingKey === item.pidRequest}
                                 className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white transition hover:bg-brand-orange-600 disabled:opacity-60"
                               >
@@ -547,7 +562,8 @@ export default function ReportSearchExperience({
                           </div>
                           <div className="mt-2 flex items-center justify-between text-xs font-semibold text-slate-500">
                             <span>
-                              {item.weeklyVotes} vote{item.weeklyVotes === 1 ? '' : 's'} this week
+                              {item.weeklyVotes} vote
+                              {item.weeklyVotes === 1 ? '' : 's'} this week
                             </span>
                             <span>{item.totalVotes} total</span>
                           </div>
@@ -576,16 +592,33 @@ export default function ReportSearchExperience({
       <section className="border-y border-slate-200 bg-slate-50 py-8">
         <div className="mx-auto grid max-w-[1440px] gap-4 px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
           {[
-            [FileSearch, 'Search before you buy', 'Find the exact category and see what every edition covers.'],
-            [ThumbsUp, 'Vote with the market', 'Missing categories rise according to real buyer demand.'],
-            [BarChart3, 'Research follows demand', 'The weekly leaders move into our existing specialist workflow.'],
+            [
+              FileSearch,
+              'Search before you buy',
+              'Find the exact category and see what every edition covers.',
+            ],
+            [
+              ThumbsUp,
+              'Vote with the market',
+              'Missing categories rise according to real buyer demand.',
+            ],
+            [
+              BarChart3,
+              'Research follows demand',
+              'The weekly leaders move into our existing specialist workflow.',
+            ],
           ].map(([Icon, title, text]) => {
             const FeatureIcon = Icon as typeof FileSearch;
             return (
-              <div key={String(title)} className="flex gap-4 rounded-2xl bg-white p-5">
+              <div
+                key={String(title)}
+                className="flex gap-4 rounded-2xl bg-white p-5"
+              >
                 <FeatureIcon className="h-5 w-5 shrink-0 text-brand-orange-500" />
                 <div>
-                  <h2 className="text-sm font-black text-slate-950">{String(title)}</h2>
+                  <h2 className="text-sm font-black text-slate-950">
+                    {String(title)}
+                  </h2>
                   <p className="mt-1 text-sm text-slate-600">{String(text)}</p>
                 </div>
               </div>
