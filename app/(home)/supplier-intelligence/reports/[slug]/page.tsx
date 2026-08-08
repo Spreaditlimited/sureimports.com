@@ -21,6 +21,12 @@ import { getReportSeo } from '@/lib/intelligence/reportSeo';
 
 export const dynamic = 'force-dynamic';
 
+function absoluteImageUrl(value?: string | null) {
+  if (!value) return 'https://www.sureimports.com/assets/img/logo.svg';
+  if (/^https:\/\//i.test(value)) return value;
+  return `https://www.sureimports.com${value.startsWith('/') ? value : `/${value}`}`;
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -29,11 +35,9 @@ export async function generateMetadata({
   const { slug } = await params;
   const { report } = await getPublicPublishedReportBySlug(slug);
   if (!report) return { title: 'Supplier report not found | Sure Imports' };
-  const seo = getReportSeo(slug, report.supplierCount);
+  const seo = getReportSeo(slug, report.supplierCount, report.seoProfile);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
-  const image = report.coverImageUrl
-    ? `https://www.sureimports.com${report.coverImageUrl}`
-    : 'https://www.sureimports.com/assets/img/logo.svg';
+  const image = absoluteImageUrl(report.coverImageUrl);
   return {
     title: seo?.metaTitle || `${report.title} | Sure Imports`,
     description:
@@ -67,7 +71,7 @@ export default async function SupplierReportPage({
   const { slug } = await params;
   const { report } = await getPublicPublishedReportBySlug(slug);
   if (!report) notFound();
-  const seo = getReportSeo(slug, report.supplierCount);
+  const seo = getReportSeo(slug, report.supplierCount, report.seoProfile);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
   const schema = seo
     ? {
@@ -78,7 +82,7 @@ export default async function SupplierReportPage({
             name: report.title,
             description: seo.metaDescription,
             image: report.coverImageUrl
-              ? `https://www.sureimports.com${report.coverImageUrl}`
+              ? absoluteImageUrl(report.coverImageUrl)
               : undefined,
             sku: report.pidReport,
             brand: { '@type': 'Brand', name: 'Sure Imports' },

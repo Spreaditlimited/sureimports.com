@@ -27,7 +27,11 @@ export const metadata: Metadata = {
 export default async function SupplierIntelligenceReportsPage() {
   const { reports } = await getPublicPublishedReports();
   const searchReports = reports.map((report) => {
-    const seo = getReportSeo(report.slug, report.supplierCount);
+    const seo = getReportSeo(
+      report.slug,
+      report.supplierCount,
+      report.seoProfile,
+    );
     return {
       pidReport: report.pidReport,
       slug: report.slug,

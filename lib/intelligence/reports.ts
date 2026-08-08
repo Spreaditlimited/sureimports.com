@@ -10,6 +10,7 @@ export type PublicPublishedReport = {
   description: string | null;
   editionLabel: string;
   coverImageUrl: string | null;
+  seoProfile?: unknown;
   priceNaira: number;
   priceUsdCents: number;
   status: string;
@@ -59,6 +60,7 @@ function serializePublishedReport(report: {
   description: string | null;
   editionLabel: string;
   coverImageUrl: string | null;
+  seoProfile: unknown;
   priceNaira: number;
   priceUsdCents: number;
   status: string;

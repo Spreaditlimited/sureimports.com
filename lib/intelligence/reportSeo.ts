@@ -12,6 +12,24 @@ export type ReportSeoProfile = {
   faqs: Array<{ question: string; answer: string }>;
 };
 
+function isReportSeoProfile(value: unknown): value is ReportSeoProfile {
+  if (!value || typeof value !== 'object') return false;
+  const profile = value as Partial<ReportSeoProfile>;
+  return Boolean(
+    profile.primaryKeyword &&
+      Array.isArray(profile.secondaryKeywords) &&
+      profile.metaTitle &&
+      profile.metaDescription &&
+      profile.heading &&
+      profile.introduction &&
+      profile.buyerValue &&
+      Array.isArray(profile.products) &&
+      Array.isArray(profile.checks) &&
+      Array.isArray(profile.audiences) &&
+      Array.isArray(profile.faqs),
+  );
+}
+
 const sharedFaq = (category: string) => [
   {
     question: `Does this ${category} supplier report include direct manufacturers?`,
@@ -942,8 +960,14 @@ function resolveSupplierCount(value: string, supplierCount: number) {
   return value.replaceAll('{supplierCount}', String(supplierCount));
 }
 
-export function getReportSeo(slug: string, supplierCount: number) {
-  const profile = REPORT_SEO[slug];
+export function getReportSeo(
+  slug: string,
+  supplierCount: number,
+  storedProfile?: unknown,
+) {
+  const profile = isReportSeoProfile(storedProfile)
+    ? storedProfile
+    : REPORT_SEO[slug];
   if (!profile) return null;
   const count = Math.max(0, Math.round(supplierCount));
   const resolve = (value: string) => resolveSupplierCount(value, count);

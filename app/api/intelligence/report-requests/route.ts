@@ -56,7 +56,11 @@ async function findMatchingPublishedReport(query: string) {
 
   const matches = reports
     .map((report) => {
-      const seo = getReportSeo(report.slug, report.supplierCount);
+      const seo = getReportSeo(
+        report.slug,
+        report.supplierCount,
+        report.seoProfile,
+      );
       const text = normalizeReportDemandQuery(
         [
           report.slug,
