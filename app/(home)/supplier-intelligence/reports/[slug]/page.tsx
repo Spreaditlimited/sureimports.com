@@ -29,7 +29,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const { report } = await getPublicPublishedReportBySlug(slug);
   if (!report) return { title: 'Supplier report not found | Sure Imports' };
-  const seo = getReportSeo(slug);
+  const seo = getReportSeo(slug, report.supplierCount);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
   const image = report.coverImageUrl
     ? `https://www.sureimports.com${report.coverImageUrl}`
@@ -67,7 +67,7 @@ export default async function SupplierReportPage({
   const { slug } = await params;
   const { report } = await getPublicPublishedReportBySlug(slug);
   if (!report) notFound();
-  const seo = getReportSeo(slug);
+  const seo = getReportSeo(slug, report.supplierCount);
   const canonical = `https://www.sureimports.com/supplier-intelligence/reports/${slug}`;
   const schema = seo
     ? {

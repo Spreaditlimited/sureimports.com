@@ -43,10 +43,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Auto Parts Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Looking for auto parts manufacturers in China? Meet 10 reviewed factories, see what they make and contact them through official channels.',
+      'Looking for auto parts manufacturers in China? Meet {supplierCount} reviewed factories, see what they make and contact them through official channels.',
     heading: 'Find established auto parts manufacturers in China',
     introduction:
-      'Finding an auto-parts factory is easy. Finding one that actually makes the right part for the right vehicle is where the work begins. This report introduces 10 reviewed auto parts manufacturers in China across replacement parts, vehicle systems and aftermarket accessories.',
+      'Finding an auto-parts factory is easy. Finding one that actually makes the right part for the right vehicle is where the work begins. This report introduces {supplierCount} reviewed auto parts manufacturers in China across replacement parts, vehicle systems and aftermarket accessories.',
     buyerValue:
       'You can see what each manufacturer is set up to produce, compare official contact routes and narrow the list before requesting samples or quotations. It also shows you what to confirm about vehicle compatibility, reference numbers, materials and repeat-order quality.',
     products: [
@@ -79,10 +79,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Backpack Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed backpack manufacturers in China for custom bags, wholesale orders, OEM production and private-label collections.',
+      'Meet {supplierCount} reviewed backpack manufacturers in China for custom bags, wholesale orders, OEM production and private-label collections.',
     heading: 'Compare backpack and bag manufacturers in China',
     introduction:
-      'A good bag can look simple until you have to specify the fabric, lining, zips, reinforcement, compartments and logo finish. This report gives you 10 reviewed backpack manufacturers in China covering school, travel, promotional, business and specialist bags.',
+      'A good bag can look simple until you have to specify the fabric, lining, zips, reinforcement, compartments and logo finish. This report gives you {supplierCount} reviewed backpack manufacturers in China covering school, travel, promotional, business and specialist bags.',
     buyerValue:
       'Use it to find factories that suit the kind of bag you want to make, then approach them with a much clearer brief. You will know which production details to discuss and what to inspect when the first samples arrive.',
     products: [
@@ -115,10 +115,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Cosmetic Packaging Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed cosmetic packaging manufacturers in China for bottles, jars, pumps, tubes and custom beauty packaging projects.',
+      'Find {supplierCount} reviewed cosmetic packaging manufacturers in China for bottles, jars, pumps, tubes and custom beauty packaging projects.',
     heading: 'Source cosmetic packaging manufacturers in China',
     introduction:
-      'Packaging is often the first thing a customer notices, but appearance is only half the job. This report brings together 10 reviewed cosmetic packaging manufacturers in China for skincare, fragrance, haircare and makeup projects.',
+      'Packaging is often the first thing a customer notices, but appearance is only half the job. This report brings together {supplierCount} reviewed cosmetic packaging manufacturers in China for skincare, fragrance, haircare and makeup projects.',
     buyerValue:
       'You can compare factories by the bottles, jars, pumps, tubes and decorative finishes they produce. Just as importantly, the buying notes help you discuss leakage, formula compatibility, colour matching and mould ownership before approving production.',
     products: [
@@ -151,10 +151,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Body Camera Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed body camera manufacturers in China and compare their devices, official contact routes and essential buying checks.',
+      'Meet {supplierCount} reviewed body camera manufacturers in China and compare their devices, official contact routes and essential buying checks.',
     heading: 'Identify capable body camera manufacturers in China',
     introduction:
-      'If you are buying body cameras for a security team, transport operation or public institution, resolution alone will not tell you whether the system is fit for use. This report profiles 10 reviewed body camera manufacturers in China and the equipment they produce.',
+      'If you are buying body cameras for a security team, transport operation or public institution, resolution alone will not tell you whether the system is fit for use. This report profiles {supplierCount} reviewed body camera manufacturers in China and the equipment they produce.',
     buyerValue:
       'It gives you a practical shortlist and helps you compare battery life, low-light recording, docking, storage and evidence handling. You can then speak to manufacturers about the complete working system instead of buying on a headline camera specification.',
     products: [
@@ -187,10 +187,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'CCTV Camera Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed CCTV camera manufacturers in China for cameras, recorders, access control, security systems and OEM projects.',
+      'Find {supplierCount} reviewed CCTV camera manufacturers in China for cameras, recorders, access control, security systems and OEM projects.',
     heading: 'Compare CCTV camera manufacturers in China',
     introduction:
-      'Two CCTV cameras can carry similar specifications and still perform very differently once they are installed. This report introduces 10 reviewed CCTV camera manufacturers in China across cameras, recorders, access control and connected security equipment.',
+      'Two CCTV cameras can carry similar specifications and still perform very differently once they are installed. This report introduces {supplierCount} reviewed CCTV camera manufacturers in China across cameras, recorders, access control and connected security equipment.',
     buyerValue:
       'You will be able to compare product focus and contact the manufacturers through their official channels. The report also points you towards the questions that matter in practice: recorder compatibility, firmware support, cybersecurity, storage, weather protection and warranty handling.',
     products: [
@@ -223,10 +223,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'School Supplies Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed school supplies manufacturers in China for stationery, school bags, lunchware and customised education products.',
+      'Meet {supplierCount} reviewed school supplies manufacturers in China for stationery, school bags, lunchware and customised education products.',
     heading: 'Find school supplies manufacturers in China',
     introduction:
-      'Planning a school-supplies range usually means coordinating several products, age groups and packaging requirements at once. This report brings together 10 reviewed school supplies manufacturers in China for wholesale, retail and institutional orders.',
+      'Planning a school-supplies range usually means coordinating several products, age groups and packaging requirements at once. This report brings together {supplierCount} reviewed school supplies manufacturers in China for wholesale, retail and institutional orders.',
     buyerValue:
       'It helps you see which factories are relevant to stationery, bags, lunchware and classroom products before you start sending enquiries. You will also know what to ask about durability, material safety, artwork rights and assortment packing.',
     products: [
@@ -259,10 +259,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Cleaning Equipment Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed cleaning equipment manufacturers in China for floor scrubbers, industrial vacuums and janitorial systems.',
+      'Find {supplierCount} reviewed cleaning equipment manufacturers in China for floor scrubbers, industrial vacuums and janitorial systems.',
     heading: 'Source commercial cleaning equipment from China',
     introduction:
-      'The purchase price of a cleaning machine matters, but downtime, unavailable brushes or a failed battery can cost far more. This report profiles 10 reviewed cleaning equipment manufacturers in China serving distributors, facilities teams and contract cleaners.',
+      'The purchase price of a cleaning machine matters, but downtime, unavailable brushes or a failed battery can cost far more. This report profiles {supplierCount} reviewed cleaning equipment manufacturers in China serving distributors, facilities teams and contract cleaners.',
     buyerValue:
       'You can compare the machines each company makes and go into discussions already thinking about consumables, replacement parts, duty cycle and technical support. That makes it easier to judge the equipment as an operating investment, not just a quotation.',
     products: [
@@ -295,10 +295,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Corporate Gift Suppliers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed corporate gift suppliers in China for branded merchandise, customised products and time-sensitive bulk campaigns.',
+      'Meet {supplierCount} reviewed corporate gift suppliers in China for branded merchandise, customised products and time-sensitive bulk campaigns.',
     heading: 'Find corporate gift suppliers in China',
     introduction:
-      'Corporate gifts are rarely just about choosing an item. The logo has to look right, the packaging has to feel considered and every piece has to arrive before the campaign or event date. This report introduces 10 reviewed corporate gift suppliers in China across popular merchandise categories.',
+      'Corporate gifts are rarely just about choosing an item. The logo has to look right, the packaging has to feel considered and every piece has to arrive before the campaign or event date. This report introduces {supplierCount} reviewed corporate gift suppliers in China across popular merchandise categories.',
     buyerValue:
       'Use the shortlist to find the right production route for executive gifts, drinkware, bags, textiles and technology items. The buying checks will help you manage samples, artwork, presentation, consolidation and deadlines with fewer surprises.',
     products: [
@@ -331,10 +331,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Food Dehydrator Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed food dehydrator manufacturers in China for fruit, vegetables, meat, herbs and commercial drying projects.',
+      'Find {supplierCount} reviewed food dehydrator manufacturers in China for fruit, vegetables, meat, herbs and commercial drying projects.',
     heading: 'Compare food dehydrator manufacturers in China',
     introduction:
-      'A dehydrator that works well for herbs may be completely wrong for sliced fruit, meat or a high-volume processing line. This report introduces 10 reviewed food dehydrator manufacturers in China across cabinet, heat-pump and larger drying systems.',
+      'A dehydrator that works well for herbs may be completely wrong for sliced fruit, meat or a high-volume processing line. This report introduces {supplierCount} reviewed food dehydrator manufacturers in China across cabinet, heat-pump and larger drying systems.',
     buyerValue:
       'You can start with factories whose equipment is closer to your actual process, then discuss the product, starting moisture, tray load and target output in practical terms. That gives you a better basis for comparing capacity claims and quotations.',
     products: [
@@ -367,10 +367,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Diaper Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed diaper manufacturers in China for baby diapers, adult products, pull-ups, OEM and private-label supply.',
+      'Meet {supplierCount} reviewed diaper manufacturers in China for baby diapers, adult products, pull-ups, OEM and private-label supply.',
     heading: 'Find diaper manufacturers in China for private-label supply',
     introduction:
-      'If you are building a diaper brand, a low unit price means very little when absorbency, fit or production hygiene is inconsistent. This report gives you 10 reviewed diaper manufacturers in China covering baby, adult and incontinence products.',
+      'If you are building a diaper brand, a low unit price means very little when absorbency, fit or production hygiene is inconsistent. This report gives you {supplierCount} reviewed diaper manufacturers in China covering baby, adult and incontinence products.',
     buyerValue:
       'The shortlist helps you find factories suited to OEM and private-label supply, while the buying notes show what to test in samples. You can discuss the absorbent core, rewet, leakage, sizing, raw materials and packaging before committing to a production run.',
     products: [
@@ -403,10 +403,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Diesel Generator Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed diesel generator manufacturers in China for open, silent, industrial and containerised generator sets.',
+      'Find {supplierCount} reviewed diesel generator manufacturers in China for open, silent, industrial and containerised generator sets.',
     heading: 'Compare diesel generator manufacturers in China',
     introduction:
-      'Choosing a diesel generator is not simply a matter of asking for a certain kVA. The real load, operating hours, climate, engine, alternator and controller all affect whether the set will perform reliably. This report profiles 10 reviewed diesel generator manufacturers in China.',
+      'Choosing a diesel generator is not simply a matter of asking for a certain kVA. The real load, operating hours, climate, engine, alternator and controller all affect whether the set will perform reliably. This report profiles {supplierCount} reviewed diesel generator manufacturers in China.',
     buyerValue:
       'You can compare factories producing open, silent, industrial and containerised sets, then contact them through their official channels. The report also helps you prepare a more complete request covering ratings, component brands, test records, spare parts and commissioning support.',
     products: [
@@ -439,10 +439,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Electric Motorcycle Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed electric motorcycle manufacturers in China for commuter, delivery, OEM, CKD and distributor programmes.',
+      'Meet {supplierCount} reviewed electric motorcycle manufacturers in China for commuter, delivery, OEM, CKD and distributor programmes.',
     heading: 'Find electric motorcycle manufacturers in China',
     introduction:
-      'Advertised range is only one part of an electric motorcycle. Battery cells, the BMS, motor, controller, charger and parts support determine what the vehicle will be like to own and operate. This report profiles 10 reviewed electric motorcycle manufacturers in China.',
+      'Advertised range is only one part of an electric motorcycle. Battery cells, the BMS, motor, controller, charger and parts support determine what the vehicle will be like to own and operate. This report profiles {supplierCount} reviewed electric motorcycle manufacturers in China.',
     buyerValue:
       'Use it to compare commuter, delivery and OEM programmes before requesting detailed quotations. You will have a clearer list of questions about real-world range, gradients, charging, homologation, diagnostics and the spare-parts package behind each model.',
     products: [
@@ -475,10 +475,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Electric Tricycle Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed electric tricycle manufacturers in China for cargo, passenger, delivery, sanitation and utility vehicles.',
+      'Find {supplierCount} reviewed electric tricycle manufacturers in China for cargo, passenger, delivery, sanitation and utility vehicles.',
     heading: 'Compare electric tricycle manufacturers in China',
     introduction:
-      'The right electric tricycle depends on the work it must do every day. A passenger route, last-mile delivery service and sanitation contract will each need a different chassis, payload and battery setup. This report introduces 10 reviewed electric tricycle manufacturers in China.',
+      'The right electric tricycle depends on the work it must do every day. A passenger route, last-mile delivery service and sanitation contract will each need a different chassis, payload and battery setup. This report introduces {supplierCount} reviewed electric tricycle manufacturers in China.',
     buyerValue:
       'You can compare manufacturers across cargo, passenger and utility models, then approach the most relevant ones with your route and operating conditions. The included checks cover payload, braking, range, road approval, knock-down options and after-sales parts.',
     products: [
@@ -511,10 +511,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Electric Vehicle Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed electric vehicle manufacturers in China for passenger cars, commercial vehicles, export and fleet sourcing.',
+      'Meet {supplierCount} reviewed electric vehicle manufacturers in China for passenger cars, commercial vehicles, export and fleet sourcing.',
     heading: 'Identify electric vehicle manufacturers in China',
     introduction:
-      'China offers an enormous range of electric vehicles, but not every manufacturer or model is ready for your market. This report gives you 10 reviewed electric vehicle manufacturers in China to consider for passenger, commercial and fleet requirements.',
+      'China offers an enormous range of electric vehicles, but not every manufacturer or model is ready for your market. This report gives you {supplierCount} reviewed electric vehicle manufacturers in China to consider for passenger, commercial and fleet requirements.',
     buyerValue:
       'It helps you look beyond the vehicle photograph and headline range. Before treating any quotation as a complete offer, you can ask about export authority, homologation, battery warranty, charging standards, diagnostics, software and long-term parts support.',
     products: [
@@ -547,10 +547,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Conference & Event Supplies Manufacturers in China',
     metaDescription:
-      'Find 10 reviewed conference supplies manufacturers in China for lanyards, badges, delegate bags, displays and branded merchandise.',
+      'Find {supplierCount} reviewed conference supplies manufacturers in China for lanyards, badges, delegate bags, displays and branded merchandise.',
     heading: 'Source conference and event materials from China',
     introduction:
-      'When an event date cannot move, one late badge, bag or branded item can hold up the entire delegate pack. This report brings together 10 reviewed conference supplies manufacturers in China for registration materials, displays, merchandise and welcome packs.',
+      'When an event date cannot move, one late badge, bag or branded item can hold up the entire delegate pack. This report brings together {supplierCount} reviewed conference supplies manufacturers in China for registration materials, displays, merchandise and welcome packs.',
     buyerValue:
       'You can quickly see which suppliers fit the products on your list and contact them through official channels. The planning checks help you work backwards from the event date and control artwork approval, personalisation, kitting, carton labels and consolidation.',
     products: [
@@ -583,10 +583,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Fashion Accessories Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed fashion accessories manufacturers in China for bags, belts, jewellery, eyewear and private-label collections.',
+      'Meet {supplierCount} reviewed fashion accessories manufacturers in China for bags, belts, jewellery, eyewear and private-label collections.',
     heading: 'Find fashion accessories manufacturers in China',
     introduction:
-      'Fashion accessories live in the details. The wrong plating tone, weak clasp, uneven stitching or generic packaging can make an otherwise good collection feel cheap. This report introduces 10 reviewed fashion accessories manufacturers in China.',
+      'Fashion accessories live in the details. The wrong plating tone, weak clasp, uneven stitching or generic packaging can make an otherwise good collection feel cheap. This report introduces {supplierCount} reviewed fashion accessories manufacturers in China.',
     buyerValue:
       'Use it to narrow your search across bags, belts, jewellery, eyewear and coordinated private-label collections. It also gives you a stronger starting point for sample briefs covering materials, finishes, colour, wear testing, packaging and collection MOQs.',
     products: [
@@ -619,10 +619,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Fitness Equipment Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed fitness equipment manufacturers in China for gym products, training accessories, yoga and recovery ranges.',
+      'Find {supplierCount} reviewed fitness equipment manufacturers in China for gym products, training accessories, yoga and recovery ranges.',
     heading: 'Compare fitness equipment manufacturers in China',
     introduction:
-      'Fitness products are expected to take weight, movement and repeated use without becoming a safety problem. This report introduces 10 reviewed fitness equipment manufacturers in China across strength training, gym accessories, yoga and recovery products.',
+      'Fitness products are expected to take weight, movement and repeated use without becoming a safety problem. This report introduces {supplierCount} reviewed fitness equipment manufacturers in China across strength training, gym accessories, yoga and recovery products.',
     buyerValue:
       'You can find factories that match the part of the market you want to serve and compare their official product focus. The buying checks help you define load tests, materials, assembly, replacement components and packaging before you approve a sample.',
     products: [
@@ -655,10 +655,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Freeze Dryer Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed freeze dryer manufacturers in China for food processing, laboratories, pharmaceuticals and industrial projects.',
+      'Meet {supplierCount} reviewed freeze dryer manufacturers in China for food processing, laboratories, pharmaceuticals and industrial projects.',
     heading: 'Find freeze dryer manufacturers in China',
     introduction:
-      'Freeze dryers that look similar on paper can have very different usable capacity once you account for shelf area, ice load, condenser performance and cycle time. This report profiles 10 reviewed freeze dryer manufacturers in China.',
+      'Freeze dryers that look similar on paper can have very different usable capacity once you account for shelf area, ice load, condenser performance and cycle time. This report profiles {supplierCount} reviewed freeze dryer manufacturers in China.',
     buyerValue:
       'The shortlist covers food, laboratory, pharmaceutical and industrial applications, from pilot units to production systems. It will help you describe your product and process properly, compare technical offers and ask about utilities, installation and service before ordering.',
     products: [
@@ -691,10 +691,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Golf Cart Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Find 10 reviewed golf cart manufacturers in China for passenger, resort, utility, patrol and lithium-powered cart fleets.',
+      'Find {supplierCount} reviewed golf cart manufacturers in China for passenger, resort, utility, patrol and lithium-powered cart fleets.',
     heading: 'Compare golf cart manufacturers in China',
     introduction:
-      'A golf cart used on a flat course has a very different job from one carrying guests around a hilly resort or tools across an estate. This report introduces 10 reviewed golf cart manufacturers in China across passenger, resort, patrol and utility models.',
+      'A golf cart used on a flat course has a very different job from one carrying guests around a hilly resort or tools across an estate. This report introduces {supplierCount} reviewed golf cart manufacturers in China across passenger, resort, patrol and utility models.',
     buyerValue:
       'You can compare likely manufacturing partners before asking for fleet quotations. The report helps you explain the terrain, passenger load and daily duty, then check the motor, brakes, battery, weather protection, warranty and parts support behind the price.',
     products: [
@@ -727,10 +727,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Hammer Mill Manufacturers in China: Supplier Report',
     metaDescription:
-      'Meet 10 reviewed hammer mill manufacturers in China for feed, grain, food, biomass and industrial grinding applications.',
+      'Meet {supplierCount} reviewed hammer mill manufacturers in China for feed, grain, food, biomass and industrial grinding applications.',
     heading: 'Find hammer mill manufacturers in China',
     introduction:
-      'A hammer mill cannot be sized properly until the supplier knows what you are grinding, its moisture level and the particle size you need. This report gives you 10 reviewed hammer mill manufacturers in China for feed, grain, food, biomass and industrial applications.',
+      'A hammer mill cannot be sized properly until the supplier knows what you are grinding, its moisture level and the particle size you need. This report gives you {supplierCount} reviewed hammer mill manufacturers in China for feed, grain, food, biomass and industrial applications.',
     buyerValue:
       'Use the shortlist to start with factories whose machines fit your material and intended output. The checks help you challenge throughput claims, specify the motor correctly and plan for screens, hammers, dust control, guarding and other parts of the complete system.',
     products: [
@@ -763,10 +763,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Home Storage Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 10 reviewed home storage manufacturers in China for organisers, bins, shelving, baskets and private-label ranges.',
+      'Find {supplierCount} reviewed home storage manufacturers in China for organisers, bins, shelving, baskets and private-label ranges.',
     heading: 'Source home storage and organisation products from China',
     introduction:
-      'Home-storage products often look straightforward until carton volume, weak plastic, poor nesting or awkward dimensions begin to affect the landed cost. This report profiles 10 reviewed home storage manufacturers in China for retail, wholesale and private-label ranges.',
+      'Home-storage products often look straightforward until carton volume, weak plastic, poor nesting or awkward dimensions begin to affect the landed cost. This report profiles {supplierCount} reviewed home storage manufacturers in China for retail, wholesale and private-label ranges.',
     buyerValue:
       'You can compare factories producing bins, organisers, shelving, racks and household storage for different rooms. The buying notes keep both the customer experience and the shipping economics in view, from load rating and finish to nesting and carton utilisation.',
     products: [
@@ -799,10 +799,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Human Hair Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed human hair manufacturers in China for bundles, wigs, lace closures, frontals and private-label wholesale supply.',
+      'Meet {supplierCount} reviewed human hair manufacturers in China for bundles, wigs, lace closures, frontals and private-label wholesale supply.',
     heading: 'Find human hair manufacturers in China',
     introduction:
-      'Human hair can look beautiful in a supplier photograph and still disappoint after the first wash. This report gives serious wholesale buyers 10 reviewed human hair manufacturers in China producing bundles, wigs, lace closures and lace frontals.',
+      'Human hair can look beautiful in a supplier photograph and still disappoint after the first wash. This report gives serious wholesale buyers {supplierCount} reviewed human hair manufacturers in China producing bundles, wigs, lace closures and lace frontals.',
     buyerValue:
       'You can see the actual product categories associated with each manufacturer and use their official contact routes to begin discussions. The report also gives you a practical framework for checking length, weight, density, lace construction, shedding, wash performance and repeat-order consistency.',
     products: [
@@ -835,10 +835,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Phone Accessories Manufacturers in China: Supplier Report',
     metaDescription:
-      'Find 14 reviewed phone accessories manufacturers in China for cases, chargers, cables, power banks, audio and OEM programmes.',
+      'Find {supplierCount} reviewed phone accessories manufacturers in China for cases, chargers, cables, power banks, audio and OEM programmes.',
     heading: 'Compare phone accessories manufacturers in China',
     introduction:
-      'Phone accessories are easy to find online, but product photographs rarely tell you whether a charger delivers its stated output or a power bank uses dependable cells. This report introduces 14 reviewed phone accessories manufacturers in China.',
+      'Phone accessories are easy to find online, but product photographs rarely tell you whether a charger delivers its stated output or a power bank uses dependable cells. This report introduces {supplierCount} reviewed phone accessories manufacturers in China.',
     buyerValue:
       'Instead of sorting through thousands of mixed listings, you can start with manufacturers covering chargers, cables, power banks, cases and audio products. The buying checks help you discuss protocols, safety testing, battery transport documents, compatibility, materials and warranty with more confidence.',
     products: [
@@ -872,11 +872,11 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: "Women's Clothing Manufacturers in China: Supplier Report",
     metaDescription:
-      "Meet 10 reviewed women's clothing manufacturers in China for two-piece sets, private-label shapewear, activewear and OEM collections.",
+      "Meet {supplierCount} reviewed women's clothing manufacturers in China for two-piece sets, private-label shapewear, activewear and OEM collections.",
     heading:
       "Find women's clothing manufacturers for two-piece sets, shapewear and activewear",
     introduction:
-      "A matching set can look effortless on the rack, but producing one well means getting two garments, one fabric story and a complete size range to work together. Add shapewear or performance activewear, and fit, stretch, recovery and construction become even more important. This report introduces 10 reviewed women's clothing manufacturers in China across coordinated sets, sculpting garments and activewear.",
+      "A matching set can look effortless on the rack, but producing one well means getting two garments, one fabric story and a complete size range to work together. Add shapewear or performance activewear, and fit, stretch, recovery and construction become even more important. This report introduces {supplierCount} reviewed women's clothing manufacturers in China across coordinated sets, sculpting garments and activewear.",
     buyerValue:
       "You can quickly see which factories suit fashion-led co-ords, engineered shapewear or performance sets before sending your brief. The report also helps you ask sharper questions about original product development, samples, fabrics, compression, sizing, private labels and repeat-order consistency—without relying on a marketplace search or requesting copies of another brand's protected designs.",
     products: [
@@ -910,10 +910,10 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
     ],
     metaTitle: 'Makeup Manufacturers in China: Verified Supplier Report',
     metaDescription:
-      'Meet 10 reviewed makeup manufacturers in China for lipstick, foundation, mascara, eyeshadow and private-label colour cosmetics.',
+      'Meet {supplierCount} reviewed makeup manufacturers in China for lipstick, foundation, mascara, eyeshadow and private-label colour cosmetics.',
     heading: 'Find makeup manufacturers in China for your beauty brand',
     introduction:
-      'Launching makeup is about much more than choosing attractive shades. The formula has to perform, the colour has to stay consistent, the packaging must work with the product and the documents must suit your destination market. This report introduces 10 reviewed makeup manufacturers in China producing private-label lip, face and eye cosmetics.',
+      'Launching makeup is about much more than choosing attractive shades. The formula has to perform, the colour has to stay consistent, the packaging must work with the product and the documents must suit your destination market. This report introduces {supplierCount} reviewed makeup manufacturers in China producing private-label lip, face and eye cosmetics.',
     buyerValue:
       'You can compare the formats each factory actually manufactures and approach the right companies for a single hero product or a coordinated makeup line. The report helps you discuss formula ownership, shade matching, samples, testing, packaging compatibility, production standards and regulatory documents before committing to bulk production.',
     products: [
@@ -938,6 +938,31 @@ export const REPORT_SEO: Record<string, ReportSeoProfile> = {
   },
 };
 
-export function getReportSeo(slug: string) {
-  return REPORT_SEO[slug] || null;
+function resolveSupplierCount(value: string, supplierCount: number) {
+  return value.replaceAll('{supplierCount}', String(supplierCount));
+}
+
+export function getReportSeo(slug: string, supplierCount: number) {
+  const profile = REPORT_SEO[slug];
+  if (!profile) return null;
+  const count = Math.max(0, Math.round(supplierCount));
+  const resolve = (value: string) => resolveSupplierCount(value, count);
+
+  return {
+    ...profile,
+    primaryKeyword: resolve(profile.primaryKeyword),
+    secondaryKeywords: profile.secondaryKeywords.map(resolve),
+    metaTitle: resolve(profile.metaTitle),
+    metaDescription: resolve(profile.metaDescription),
+    heading: resolve(profile.heading),
+    introduction: resolve(profile.introduction),
+    buyerValue: resolve(profile.buyerValue),
+    products: profile.products.map(resolve),
+    checks: profile.checks.map(resolve),
+    audiences: profile.audiences.map(resolve),
+    faqs: profile.faqs.map((faq) => ({
+      question: resolve(faq.question),
+      answer: resolve(faq.answer),
+    })),
+  };
 }

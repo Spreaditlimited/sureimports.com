@@ -18,7 +18,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 function clean(value: unknown, max = 180) {
-  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, max);
+  return String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .slice(0, max);
 }
 
 function validEmail(value: string) {
@@ -53,7 +56,7 @@ async function findMatchingPublishedReport(query: string) {
 
   const matches = reports
     .map((report) => {
-      const seo = getReportSeo(report.slug);
+      const seo = getReportSeo(report.slug, report.supplierCount);
       const text = normalizeReportDemandQuery(
         [
           report.slug,
@@ -127,7 +130,11 @@ export async function POST(request: Request) {
     let normalizedQuery = normalizeReportDemandQuery(query);
     if (pidRequest) {
       const rows = await prisma.$queryRaw<
-        Array<{ query: string; normalizedQuery: string; publishedReportSlug: string | null }>
+        Array<{
+          query: string;
+          normalizedQuery: string;
+          publishedReportSlug: string | null;
+        }>
       >`
         SELECT query, normalizedQuery, publishedReportSlug
         FROM intelligence_report_requests
@@ -144,7 +151,10 @@ export async function POST(request: Request) {
       if (existing.publishedReportSlug) {
         return NextResponse.json({
           success: true,
-          availableReport: { slug: existing.publishedReportSlug, title: existing.query },
+          availableReport: {
+            slug: existing.publishedReportSlug,
+            title: existing.query,
+          },
         });
       }
       query = existing.query;
@@ -176,7 +186,8 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: 'You have reached the weekly voting limit. New voting opens on Monday.',
+          error:
+            'You have reached the weekly voting limit. New voting opens on Monday.',
         },
         { status: 429 },
       );
