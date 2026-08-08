@@ -10,20 +10,31 @@ import {
   createExistingNicheSearchLog,
   createExistingNicheSearchResultWithConsumedCredit,
   createSearchRequestWithReservedCredit,
+  findReusableUserSearchRequest,
   type ExistingNicheSearchMatch,
 } from '@/lib/intelligence/credits';
 import { findPublishedNicheMatches } from '@/lib/intelligence/data';
-import { startUserSupplierResearch } from '@/lib/intelligence/researchRunner';
+import { assessSupplierSearchQuery } from '@/lib/intelligence/searchQueryPolicy';
 
 export type SearchCreditRequestState = {
   success: boolean;
   message: string;
   pidSearch?: string;
   existingMatches?: ExistingNicheSearchMatch[];
+  confirmation?: {
+    originalQuery: string;
+    canonicalQuery: string;
+    notes: string;
+    targetSupplierCount: number;
+    existingCategory: boolean;
+  };
+  suggestions?: string[];
 };
 
 function clean(value: FormDataEntryValue | null, max = 4000) {
-  return String(value || '').trim().slice(0, max);
+  return String(value || '')
+    .trim()
+    .slice(0, max);
 }
 
 function notifyAdminOfSearch(input: {
@@ -61,7 +72,8 @@ function notifyAdminOfSearch(input: {
         .join('<br />'),
       xBody2: input.notes ? `Notes: ${input.notes}` : '',
       xButtonTitle: 'Open admin dashboard',
-      xButtonLink: 'https://admin.sureimports.com/dashboard/intelligence/research',
+      xButtonLink:
+        'https://admin.sureimports.com/dashboard/intelligence/research',
     });
   });
 }
@@ -79,22 +91,70 @@ export async function createIntelligenceSearchRequest(
     };
   }
 
-  const query = clean(formData.get('query'), 220);
+  const originalQuery = clean(formData.get('query'), 220);
+  const confirmedQuery = clean(formData.get('confirmedQuery'), 220);
   const notes = clean(formData.get('notes'), 4000);
   const targetSupplierCount = Math.min(
     10,
     Math.max(3, Math.round(Number(formData.get('targetSupplierCount') || 3))),
   );
 
-  if (!query) {
+  if (!originalQuery) {
     return {
       success: false,
-      message: 'Enter the product or category you want Sure Imports to research.',
+      message:
+        'Enter the product or category you want Sure Imports to research.',
     };
   }
 
   try {
-    const existingMatches = await findPublishedNicheMatches(query);
+    const assessment = assessSupplierSearchQuery(originalQuery);
+    if (assessment.status !== 'valid' || !assessment.canonicalQuery) {
+      return {
+        success: false,
+        message: assessment.message,
+        suggestions: assessment.suggestions,
+      };
+    }
+
+    const existingMatches = await findPublishedNicheMatches(
+      assessment.canonicalQuery,
+    );
+    const query = existingMatches[0]?.name || assessment.canonicalQuery;
+
+    if (confirmedQuery !== query) {
+      return {
+        success: false,
+        message: assessment.message,
+        confirmation: {
+          originalQuery,
+          canonicalQuery: query,
+          notes,
+          targetSupplierCount,
+          existingCategory: existingMatches.length > 0,
+        },
+      };
+    }
+
+    const reusableRequest = await findReusableUserSearchRequest({
+      pidUser: user.pidUser,
+      query,
+    });
+    if (reusableRequest) {
+      revalidatePath('/dashboard/intelligence');
+      const resultReady = ['approved', 'fulfilled_existing'].includes(
+        reusableRequest.status,
+      );
+      return {
+        success: true,
+        message: resultReady
+          ? 'You already have access to this supplier intelligence result. No additional credit was used.'
+          : 'This product request is already in progress. No additional credit was used.',
+        pidSearch: resultReady ? undefined : reusableRequest.pidSearch,
+        existingMatches: resultReady ? existingMatches : [],
+      };
+    }
+
     const subscription = await getActiveIntelligenceSubscription(user.pidUser);
 
     if (existingMatches.length > 0) {
@@ -103,6 +163,7 @@ export async function createIntelligenceSearchRequest(
           pidUser: user.pidUser,
           email: user.userEmail,
           query,
+          originalQuery,
           targetSupplierCount,
           notes,
           matches: existingMatches,
@@ -128,14 +189,17 @@ export async function createIntelligenceSearchRequest(
         };
       }
 
-      const pidSearch = await createExistingNicheSearchResultWithConsumedCredit({
-        pidUser: user.pidUser,
-        email: user.userEmail,
-        query,
-        targetSupplierCount,
-        notes,
-        matches: existingMatches,
-      });
+      const pidSearch = await createExistingNicheSearchResultWithConsumedCredit(
+        {
+          pidUser: user.pidUser,
+          email: user.userEmail,
+          query,
+          originalQuery,
+          targetSupplierCount,
+          notes,
+          matches: existingMatches,
+        },
+      );
       notifyAdminOfSearch({
         pidSearch,
         userEmail: user.userEmail,
@@ -161,6 +225,7 @@ export async function createIntelligenceSearchRequest(
       pidUser: user.pidUser,
       email: user.userEmail,
       query,
+      originalQuery,
       targetSupplierCount,
       notes,
     });
@@ -176,22 +241,10 @@ export async function createIntelligenceSearchRequest(
 
     revalidatePath('/dashboard/intelligence');
 
-    after(async () => {
-      try {
-        await startUserSupplierResearch({
-          pidSearch,
-          pidUser: user.pidUser,
-        });
-      } catch {
-        // The user dashboard also attempts to start/poll the search. Failures are
-        // written to the request record by the research runner where possible.
-      }
-    });
-
     return {
       success: true,
       message:
-        'Search started. You can follow the research progress below while Sure Imports prepares the first result for specialist review.',
+        'Request received. Your credit is reserved, and research will begin only after Sure Imports confirms that the product is in scope.',
       pidSearch,
     };
   } catch (error: any) {

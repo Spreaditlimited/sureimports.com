@@ -4,6 +4,7 @@ import {
   canonicalCategoryKey,
   categoriesAreCloselyRelated,
 } from '@/lib/intelligence/categoryNormalization';
+import { supplierCategoryMatchScore } from '@/lib/intelligence/searchQueryPolicy';
 
 export type SupplierResearchRecord = (typeof supplierResearch)[number];
 export type SupplierResearchRecordWithProducts = SupplierResearchRecord & {
@@ -197,23 +198,18 @@ export async function findPublishedNicheMatches(query: string, limit = 5) {
   if (!cleanQuery) return [];
 
   const niches = await getPassingNichesWithDb();
-  const querySlug = slugifyNiche(cleanQuery);
-  const queryCanonical = canonicalCategoryKey(cleanQuery);
-  const queryLower = cleanQuery.toLowerCase();
 
   return niches
-    .filter((niche) => {
-      const nameLower = niche.name.toLowerCase();
-      return (
-        niche.slug === querySlug ||
-        canonicalCategoryKey(niche.name) === queryCanonical ||
-        categoriesAreCloselyRelated(niche.name, cleanQuery) ||
-        nameLower.includes(queryLower) ||
-        queryLower.includes(nameLower)
-      );
-    })
-    .slice(0, limit)
     .map((niche) => ({
+      niche,
+      score: supplierCategoryMatchScore(cleanQuery, niche.name),
+    }))
+    .filter(({ score }) => score > 0)
+    .sort(
+      (a, b) => b.score - a.score || a.niche.name.localeCompare(b.niche.name),
+    )
+    .slice(0, limit)
+    .map(({ niche }) => ({
       name: niche.name,
       slug: niche.slug,
       supplierCount: niche.suppliers.length,

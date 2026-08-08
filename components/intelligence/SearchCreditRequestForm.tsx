@@ -9,6 +9,7 @@ import {
   CreditCard,
   Database,
   Loader2,
+  PackageCheck,
   Search,
   ShieldCheck,
 } from 'lucide-react';
@@ -21,6 +22,15 @@ import type {
   IntelligenceCreditAccount,
   IntelligenceSearchRequest,
 } from '@/lib/intelligence/credits';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 const initialState: SearchCreditRequestState = {
   success: false,
@@ -72,7 +82,7 @@ function statusClass(status: string) {
   if (status === 'approved' || status === 'fulfilled_existing') {
     return 'border-emerald-200 bg-emerald-50 text-emerald-700';
   }
-  if (status === 'rejected' || status === 'failed')
+  if (status === 'rejected' || status === 'failed' || status === 'invalid')
     return 'border-red-200 bg-red-50 text-red-700';
   if (status === 'running' || status === 'awaiting_approval') {
     return 'border-blue-200 bg-blue-50 text-blue-700';
@@ -95,6 +105,25 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
         <Search className="h-4 w-4" />
       )}
       {pending ? 'Searching...' : 'Search suppliers'}
+    </button>
+  );
+}
+
+function ConfirmSearchButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition hover:bg-brand-orange-600 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+    >
+      {pending ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <PackageCheck className="h-4 w-4" />
+      )}
+      {pending ? 'Confirming...' : 'Confirm and continue'}
     </button>
   );
 }
@@ -223,6 +252,7 @@ export default function SearchCreditRequestForm({
   );
   const [activeSearchId, setActiveSearchId] = useState<string | null>(null);
   const [progress, setProgress] = useState<ResearchProgress | null>(null);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
   const balance = account?.balance || 0;
 
   useEffect(() => {
@@ -236,6 +266,10 @@ export default function SearchCreditRequestForm({
     setActiveSearchId(state.pidSearch);
     setProgress(null);
   }, [state.success, state.pidSearch]);
+
+  useEffect(() => {
+    setConfirmationOpen(Boolean(state.confirmation));
+  }, [state.confirmation]);
 
   useEffect(() => {
     if (!activeSearchId) return;
@@ -288,12 +322,12 @@ export default function SearchCreditRequestForm({
             Search credits
           </div>
           <h2 className="mt-4 text-xl font-extrabold text-slate-900">
-            Ask Sure Imports to research a new product category
+            Find manufacturers for a specific product
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
             {canOpenCategories
-              ? 'Search for a supplier category. If the category already exists, we link you to it without using a credit. If it needs fresh research, one credit is reserved while admin reviews the request.'
-              : 'Search for a supplier category. If a result is ready, you will see it immediately. If it needs fresh research, our team reviews the request before results are delivered. Each search uses one credit.'}{' '}
+              ? 'Enter the physical product you want manufacturers for. Existing categories open without using a credit; fresh research uses one credit only after you confirm the interpreted product.'
+              : 'Enter the physical product you want manufacturers for. We show exactly what will be searched before a credit can be used. Fresh research starts only after Sure Imports confirms that the request is in scope.'}{' '}
             Starter includes {starterMonthlyCredits} monthly supplier search{' '}
             {starterMonthlyCredits === 1 ? 'credit' : 'credits'}; Pro includes{' '}
             {proMonthlyCredits} monthly supplier search{' '}
@@ -317,12 +351,12 @@ export default function SearchCreditRequestForm({
         <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
           <label className="block">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-              Product or category
+              What product do you want manufacturers for?
             </span>
             <input
               name="query"
               required
-              placeholder="Example: Gas generators for small businesses in my target market"
+              placeholder="Example: Commercial supermarket shelves, steel, adjustable"
               className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 outline-none transition focus:border-brand-orange-300 focus:ring-2 focus:ring-brand-orange-100"
             />
           </label>
@@ -361,7 +395,12 @@ export default function SearchCreditRequestForm({
           />
         </label>
 
-        {state.message ? (
+        <p className="-mt-2 text-xs font-medium leading-relaxed text-slate-500">
+          Enter a physical product—not customers, target markets, business
+          ideas, locations, or where to sell.
+        </p>
+
+        {state.message && !state.confirmation ? (
           <p
             className={`rounded-xl px-4 py-3 text-sm font-semibold ${
               state.success
@@ -371,6 +410,19 @@ export default function SearchCreditRequestForm({
           >
             {state.message}
           </p>
+        ) : null}
+
+        {state.suggestions && state.suggestions.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {state.suggestions.map((suggestion) => (
+              <span
+                key={suggestion}
+                className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-600"
+              >
+                {suggestion}
+              </span>
+            ))}
+          </div>
         ) : null}
 
         {progress ? <ResearchProgressPanel progress={progress} /> : null}
@@ -513,6 +565,82 @@ export default function SearchCreditRequestForm({
           </div>
         </div>
       ) : null}
+
+      <Dialog open={confirmationOpen} onOpenChange={setConfirmationOpen}>
+        <DialogContent className="w-[calc(100vw-2rem)] overflow-hidden rounded-[32px] border-0 bg-white p-0 shadow-2xl sm:max-w-md">
+          {state.confirmation ? (
+            <>
+              <div className="bg-slate-950 p-6 text-white sm:p-7">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-500 shadow-lg shadow-brand-orange-500/25">
+                  <PackageCheck className="h-6 w-6" />
+                </div>
+                <DialogHeader className="mt-5 text-left">
+                  <DialogTitle className="text-xl font-extrabold text-white">
+                    Confirm the product search
+                  </DialogTitle>
+                  <DialogDescription className="pt-2 leading-relaxed text-slate-300">
+                    Check our interpretation before any search credit can be
+                    used.
+                  </DialogDescription>
+                </DialogHeader>
+              </div>
+
+              <div className="p-6 sm:p-7">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                  We will search for manufacturers of
+                </p>
+                <div className="mt-3 rounded-2xl border border-brand-orange-200 bg-brand-orange-50 p-4">
+                  <p className="text-base font-extrabold text-slate-950">
+                    {state.confirmation.canonicalQuery}
+                  </p>
+                </div>
+                <p className="mt-4 flex items-start gap-2 text-xs font-semibold leading-relaxed text-slate-600">
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-500" />
+                  {state.confirmation.existingCategory
+                    ? canOpenCategories
+                      ? 'This category already exists and no credit will be used.'
+                      : 'This category already exists. One credit will unlock the available supplier intelligence.'
+                    : 'One credit will be reserved. External research will begin only after Sure Imports approves the product request.'}
+                </p>
+
+                <form action={formAction} className="mt-6">
+                  <input
+                    type="hidden"
+                    name="query"
+                    value={state.confirmation.originalQuery}
+                  />
+                  <input
+                    type="hidden"
+                    name="confirmedQuery"
+                    value={state.confirmation.canonicalQuery}
+                  />
+                  <input
+                    type="hidden"
+                    name="notes"
+                    value={state.confirmation.notes}
+                  />
+                  <input
+                    type="hidden"
+                    name="targetSupplierCount"
+                    value={state.confirmation.targetSupplierCount}
+                  />
+                  <DialogFooter className="gap-3 sm:space-x-0">
+                    <DialogClose asChild>
+                      <button
+                        type="button"
+                        className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 sm:w-auto"
+                      >
+                        Edit request
+                      </button>
+                    </DialogClose>
+                    <ConfirmSearchButton />
+                  </DialogFooter>
+                </form>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
@@ -524,11 +652,14 @@ function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
   );
   const isComplete = progress.status === 'awaiting_approval';
   const isFailed = progress.status === 'failed';
+  const isPendingApproval = progress.status === 'awaiting_admin';
   const currentStage =
     progress.progressStage ||
-    (isComplete
-      ? 'Research complete. Now being manually checked by Sure Imports specialists.'
-      : 'Research in progress');
+    (isPendingApproval
+      ? 'Waiting for Sure Imports to confirm that this is a valid physical-product request.'
+      : isComplete
+        ? 'Research complete. Now being manually checked by Sure Imports specialists.'
+        : 'Research in progress');
 
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-950 text-white shadow-xl">
@@ -536,7 +667,9 @@ function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-brand-orange-300">
-              Live supplier search
+              {isPendingApproval
+                ? 'Product request review'
+                : 'Live supplier search'}
             </p>
             <h3 className="mt-2 text-lg font-extrabold">{progress.query}</h3>
             <p className="mt-2 text-sm leading-relaxed text-slate-300">
@@ -558,37 +691,45 @@ function ResearchProgressPanel({ progress }: { progress: ResearchProgress }) {
           />
         </div>
 
-        <div className="mt-5 grid gap-2">
-          {progressSteps.map((step) => {
-            const done = percent >= step.percent;
-            const active =
-              percent < step.percent &&
-              progressSteps.find((item) => percent < item.percent)?.percent ===
-                step.percent;
+        {isPendingApproval ? (
+          <div className="mt-5 flex items-start gap-3 rounded-xl border border-brand-orange-400/20 bg-brand-orange-400/10 p-4 text-sm leading-relaxed text-brand-orange-100">
+            <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
+            No external supplier research has started. If Sure Imports declines
+            the request, the reserved credit is returned automatically.
+          </div>
+        ) : (
+          <div className="mt-5 grid gap-2">
+            {progressSteps.map((step) => {
+              const done = percent >= step.percent;
+              const active =
+                percent < step.percent &&
+                progressSteps.find((item) => percent < item.percent)
+                  ?.percent === step.percent;
 
-            return (
-              <div
-                key={step.label}
-                className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-xs font-semibold ${
-                  done
-                    ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'
-                    : active
-                      ? 'border-brand-orange-400/30 bg-brand-orange-400/10 text-brand-orange-100'
-                      : 'border-white/10 bg-white/[0.03] text-slate-400'
-                }`}
-              >
-                {done ? (
-                  <ShieldCheck className="h-4 w-4 shrink-0" />
-                ) : active ? (
-                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                ) : (
-                  <Clock3 className="h-4 w-4 shrink-0" />
-                )}
-                {step.label}
-              </div>
-            );
-          })}
-        </div>
+              return (
+                <div
+                  key={step.label}
+                  className={`flex items-center gap-3 rounded-xl border px-3 py-2 text-xs font-semibold ${
+                    done
+                      ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-200'
+                      : active
+                        ? 'border-brand-orange-400/30 bg-brand-orange-400/10 text-brand-orange-100'
+                        : 'border-white/10 bg-white/[0.03] text-slate-400'
+                  }`}
+                >
+                  {done ? (
+                    <ShieldCheck className="h-4 w-4 shrink-0" />
+                  ) : active ? (
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                  ) : (
+                    <Clock3 className="h-4 w-4 shrink-0" />
+                  )}
+                  {step.label}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {isComplete && progress.draft ? (

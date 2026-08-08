@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { refundReservedSearchCredit } from '@/lib/intelligence/credits';
 import {
   normalizeSupplierResearchCandidate,
   supplierPassesResearchRules,
@@ -261,6 +262,12 @@ export async function startUserSupplierResearch(input: {
   const search = rows[0];
   if (!search) throw new Error('Search request was not found.');
 
+  if (search.status !== 'approved_to_run') {
+    throw new Error(
+      'This supplier search is waiting for Sure Imports approval before research can begin.',
+    );
+  }
+
   if (
     search.relatedPidJob &&
     ['running', 'awaiting_approval', 'approved'].includes(search.status)
@@ -357,6 +364,10 @@ export async function startUserSupplierResearch(input: {
       'Research could not be completed',
       100,
       message,
+    );
+    await refundReservedSearchCredit(
+      search.pidSearch,
+      'Research failed before a usable result was produced. Your search credit has been returned.',
     );
     throw error;
   }

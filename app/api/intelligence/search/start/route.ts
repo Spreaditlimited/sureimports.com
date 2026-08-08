@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { checkAuth } from '@/lib/auth/checkAuth';
-import { startUserSupplierResearch } from '@/lib/intelligence/researchRunner';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,17 +19,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  try {
-    const result = await startUserSupplierResearch({
+  return NextResponse.json(
+    {
+      message:
+        'This supplier search must be approved by Sure Imports before external research can begin.',
       pidSearch,
-      pidUser: user.pidUser,
-    });
-
-    return NextResponse.json({ ok: true, ...result });
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error?.message || 'Could not start supplier research.' },
-      { status: 500 },
-    );
-  }
+    },
+    { status: 409 },
+  );
 }

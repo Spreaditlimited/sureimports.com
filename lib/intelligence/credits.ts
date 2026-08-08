@@ -6,6 +6,8 @@ export type IntelligenceSearchRequest = {
   pidUser: string;
   email: string;
   query: string;
+  originalQuery: string | null;
+  confirmedAt: Date | null;
   targetSupplierCount: number;
   notes: string | null;
   status: string;
@@ -87,6 +89,8 @@ async function ensureCreditTables() {
       pidUser VARCHAR(80) NOT NULL,
       email VARCHAR(255) NOT NULL,
       query VARCHAR(220) NOT NULL,
+      originalQuery VARCHAR(220) NULL,
+      confirmedAt DATETIME(3) NULL,
       targetSupplierCount INT NOT NULL DEFAULT 3,
       notes LONGTEXT NULL,
       status VARCHAR(40) NOT NULL DEFAULT 'awaiting_admin',
@@ -113,6 +117,8 @@ async function ensureCreditTables() {
     'ALTER TABLE intelligence_search_requests ADD COLUMN progressPercent INT NOT NULL DEFAULT 0',
     'ALTER TABLE intelligence_search_requests ADD COLUMN resultSlug VARCHAR(180) NULL',
     'ALTER TABLE intelligence_search_requests ADD COLUMN creditSource VARCHAR(40) NULL',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN originalQuery VARCHAR(220) NULL',
+    'ALTER TABLE intelligence_search_requests ADD COLUMN confirmedAt DATETIME(3) NULL',
   ]) {
     try {
       await prisma.$executeRawUnsafe(statement);
@@ -143,6 +149,7 @@ async function getNextCreditSource(pidUser: string) {
         WHERE r.pidUser = ${pidUser}
           AND r.creditCost > 0
           AND r.creditSource = 'free'
+          AND r.status NOT IN ('rejected', 'failed', 'cancelled', 'invalid')
       ) AS freeUsed,
       (
         SELECT COUNT(*)
@@ -150,6 +157,7 @@ async function getNextCreditSource(pidUser: string) {
         WHERE r.pidUser = ${pidUser}
           AND r.creditCost > 0
           AND r.creditSource = 'paid'
+          AND r.status NOT IN ('rejected', 'failed', 'cancelled', 'invalid')
       ) AS paidUsed,
       (
         SELECT COUNT(*)
@@ -157,6 +165,7 @@ async function getNextCreditSource(pidUser: string) {
         WHERE r.pidUser = ${pidUser}
           AND r.creditCost > 0
           AND r.creditSource = 'subscription'
+          AND r.status NOT IN ('rejected', 'failed', 'cancelled', 'invalid')
       ) AS subscriptionUsed
     FROM intelligence_credit_transactions t
     WHERE t.pidUser = ${pidUser}
@@ -290,6 +299,7 @@ export async function createSearchRequestWithReservedCredit(input: {
   pidUser: string;
   email: string;
   query: string;
+  originalQuery: string;
   targetSupplierCount: number;
   notes?: string | null;
 }) {
@@ -309,6 +319,7 @@ export async function createSearchRequestWithReservedCredit(input: {
       FROM intelligence_credit_accounts
       WHERE pidUser = ${input.pidUser}
       LIMIT 1
+      FOR UPDATE
     `;
     const latestAccount = accounts[0];
     if (!latestAccount || latestAccount.balance < SEARCH_CREDIT_COST) {
@@ -350,6 +361,8 @@ export async function createSearchRequestWithReservedCredit(input: {
         pidUser,
         email,
         query,
+        originalQuery,
+        confirmedAt,
         targetSupplierCount,
         notes,
         status,
@@ -366,6 +379,8 @@ export async function createSearchRequestWithReservedCredit(input: {
         ${input.pidUser},
         ${clean(input.email, 255)},
         ${clean(input.query, 220)},
+        ${clean(input.originalQuery, 220)},
+        ${new Date()},
         ${Math.min(10, Math.max(3, Math.round(input.targetSupplierCount || 3)))},
         ${clean(input.notes) || null},
         'awaiting_admin',
@@ -388,6 +403,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
   pidUser: string;
   email: string;
   query: string;
+  originalQuery: string;
   targetSupplierCount: number;
   notes?: string | null;
   matches: ExistingNicheSearchMatch[];
@@ -411,6 +427,7 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
       FROM intelligence_credit_accounts
       WHERE pidUser = ${input.pidUser}
       LIMIT 1
+      FOR UPDATE
     `;
     const latestAccount = accounts[0];
     if (!latestAccount || latestAccount.balance < SEARCH_CREDIT_COST) {
@@ -452,6 +469,8 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         pidUser,
         email,
         query,
+        originalQuery,
+        confirmedAt,
         targetSupplierCount,
         notes,
         status,
@@ -469,6 +488,8 @@ export async function createExistingNicheSearchResultWithConsumedCredit(input: {
         ${input.pidUser},
         ${clean(input.email, 255)},
         ${clean(input.query, 220)},
+        ${clean(input.originalQuery, 220)},
+        ${new Date()},
         ${Math.min(10, Math.max(3, Math.round(input.targetSupplierCount || 3)))},
         ${clean(input.notes) || null},
         'fulfilled_existing',
@@ -492,6 +513,7 @@ export async function createExistingNicheSearchLog(input: {
   pidUser: string;
   email: string;
   query: string;
+  originalQuery: string;
   targetSupplierCount: number;
   notes?: string | null;
   matches: ExistingNicheSearchMatch[];
@@ -509,6 +531,8 @@ export async function createExistingNicheSearchLog(input: {
       pidUser,
       email,
       query,
+      originalQuery,
+      confirmedAt,
       targetSupplierCount,
       notes,
       status,
@@ -526,6 +550,8 @@ export async function createExistingNicheSearchLog(input: {
       ${input.pidUser},
       ${clean(input.email, 255)},
       ${clean(input.query, 220)},
+      ${clean(input.originalQuery, 220)},
+      ${new Date()},
       ${Math.min(10, Math.max(3, Math.round(input.targetSupplierCount || 3)))},
       ${clean(input.notes) || null},
       'fulfilled_existing',
@@ -544,6 +570,132 @@ export async function createExistingNicheSearchLog(input: {
   return pidSearch;
 }
 
+export async function refundReservedSearchCredit(
+  pidSearch: string,
+  reason: string,
+) {
+  await ensureCreditTables();
+
+  return prisma.$transaction(async (tx) => {
+    const requests = await tx.$queryRaw<IntelligenceSearchRequest[]>`
+      SELECT
+        pidSearch,
+        pidUser,
+        email,
+        query,
+        originalQuery,
+        confirmedAt,
+        targetSupplierCount,
+        notes,
+        status,
+        creditCost,
+        creditReserved,
+        relatedPidJob,
+        adminNotes,
+        progressStage,
+        progressPercent,
+        resultSlug,
+        creditSource,
+        createdAt,
+        updatedAt
+      FROM intelligence_search_requests
+      WHERE pidSearch = ${pidSearch}
+      LIMIT 1
+      FOR UPDATE
+    `;
+    const request = requests[0];
+    if (!request || !request.creditReserved || request.creditCost <= 0) {
+      return false;
+    }
+
+    const released = await tx.$executeRaw`
+      UPDATE intelligence_search_requests
+      SET
+        creditReserved = 0,
+        adminNotes = ${clean(reason, 4000)},
+        updatedAt = ${new Date()}
+      WHERE pidSearch = ${request.pidSearch}
+        AND creditReserved = 1
+    `;
+    if (released === 0) return false;
+
+    await tx.$executeRaw`
+      UPDATE intelligence_credit_accounts
+      SET
+        balance = balance + ${request.creditCost},
+        lifetimeUsed = GREATEST(0, lifetimeUsed - ${request.creditCost}),
+        updatedAt = ${new Date()}
+      WHERE pidUser = ${request.pidUser}
+    `;
+
+    await tx.$executeRaw`
+      INSERT INTO intelligence_credit_transactions (
+        pidTransaction,
+        pidUser,
+        amount,
+        reason,
+        reference,
+        createdAt
+      ) VALUES (
+        ${`INTCTX${randomGenerator(12)}`},
+        ${request.pidUser},
+        ${request.creditCost},
+        'search_request_refunded',
+        ${request.pidSearch},
+        ${new Date()}
+      )
+    `;
+
+    return true;
+  });
+}
+
+export async function findReusableUserSearchRequest(input: {
+  pidUser: string;
+  query: string;
+}) {
+  await ensureCreditTables();
+
+  const rows = await prisma.$queryRaw<IntelligenceSearchRequest[]>`
+    SELECT
+      pidSearch,
+      pidUser,
+      email,
+      query,
+      originalQuery,
+      confirmedAt,
+      targetSupplierCount,
+      notes,
+      status,
+      creditCost,
+      creditReserved,
+      relatedPidJob,
+      adminNotes,
+      progressStage,
+      progressPercent,
+      resultSlug,
+      creditSource,
+      createdAt,
+      updatedAt
+    FROM intelligence_search_requests
+    WHERE pidUser = ${input.pidUser}
+      AND LOWER(TRIM(query)) = LOWER(TRIM(${clean(input.query, 220)}))
+      AND status IN (
+        'awaiting_admin',
+        'approved_to_run',
+        'queued',
+        'running',
+        'awaiting_approval',
+        'approved',
+        'fulfilled_existing'
+      )
+    ORDER BY createdAt DESC
+    LIMIT 1
+  `;
+
+  return rows[0] || null;
+}
+
 export async function getUserIntelligenceSearchRequests(
   pidUser?: string | null,
 ) {
@@ -556,6 +708,8 @@ export async function getUserIntelligenceSearchRequests(
       pidUser,
       email,
       query,
+      originalQuery,
+      confirmedAt,
       targetSupplierCount,
       notes,
       status,
