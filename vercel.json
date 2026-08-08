@@ -1,31 +1,32 @@
 {
-    "buildCommand": "npm run vercel-build",
-    
-    "git": {
-      "deploymentEnabled": {
-        "main": true
-      }
+  "buildCommand": "npm run vercel-build",
+
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  },
+
+  "crons": [
+    {
+      "path": "/api/cron/special-sourcing",
+      "schedule": "0 0 1,8,15,22,29 * *"
     },
-
-    "crons": [
-      {
-        "path": "/api/cron/special-sourcing",
-        "schedule": "0 0 1,8,15,22,29 * *"
-      },
-      {
-        "path": "/api/cron/delete-orders",
-        "schedule": "0 0 * * *"
-      },
-      {
-        "path": "/api/cron/intelligence-report-demand",
-        "schedule": "0 7 * * 1"
-      },
-      {
-        "path": "/api/cron/consultation-reconcile",
-        "schedule": "*/15 * * * *"
-      }
+    {
+      "path": "/api/cron/delete-orders",
+      "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/intelligence-report-demand",
+      "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/consultation-reconcile",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/intelligence-report-orders",
+      "schedule": "*/15 * * * *"
+    }
   ]
-  }
-
-
-  
+}

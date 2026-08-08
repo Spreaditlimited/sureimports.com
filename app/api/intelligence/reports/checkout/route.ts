@@ -3,11 +3,12 @@ import { randomBytes } from 'node:crypto';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { checkAuth } from '@/lib/auth/checkAuth';
-import {
-  resolvePublicAccount,
-  sendPublicAccountSetupEmail,
-} from '@/lib/auth/resolvePublicAccount';
 import { createPayPalOrder } from '@/lib/paypal';
+import {
+  checkoutOriginIsAllowed,
+  enforceReportCheckoutRateLimit,
+  REPORT_EMAIL_PATTERN,
+} from '@/lib/intelligence/reportCheckoutSecurity';
 import { getPublishedReportBySlug } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 
@@ -29,17 +30,41 @@ function absoluteUrl(path: string) {
 }
 
 export async function POST(request: Request) {
+  if (!checkoutOriginIsAllowed(request)) {
+    return NextResponse.json(
+      { message: 'This checkout request is not allowed.' },
+      { status: 403 },
+    );
+  }
   const body = await request.json().catch(() => ({}));
   const email = clean(body.email).toLowerCase();
   const firstName = clean(body.firstName, 120);
   const lastName = clean(body.lastName, 120);
   const billingCountry = clean(body.billingCountry, 120);
   const reportSlug = clean(body.reportSlug, 180);
+  const honeypot = clean(body.companyWebsite, 180);
 
-  if (!email.includes('@') || !firstName || !billingCountry || !reportSlug) {
+  if (
+    !REPORT_EMAIL_PATTERN.test(email) ||
+    !firstName ||
+    !billingCountry ||
+    !reportSlug ||
+    honeypot
+  ) {
     return NextResponse.json(
       { message: 'Name, email, billing country and report are required.' },
       { status: 400 },
+    );
+  }
+
+  const rateLimit = await enforceReportCheckoutRateLimit({ request, email });
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { message: 'Too many checkout attempts. Please try again shortly.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) },
+      },
     );
   }
 
@@ -66,16 +91,13 @@ export async function POST(request: Request) {
   const provider =
     billingCountry.toLowerCase() === 'nigeria' ? 'paystack' : 'paypal';
   const authUser = await checkAuth();
-  const account = await resolvePublicAccount({
-    authenticatedPidUser: authUser?.pidUser,
-    email,
-    firstName,
-    lastName,
-    country: billingCountry,
-    affiliateRef: 'supplier-intelligence-report',
-    accountSetupKey: `supplier_intelligence_report:${pidOrder}`,
-  });
-  if (account.status === 'login_required') {
+  const authenticatedBuyer = authUser?.pidUser
+    ? await prisma.users.findUnique({ where: { pidUser: authUser.pidUser } })
+    : null;
+  const existingBuyer = !authenticatedBuyer
+    ? await prisma.users.findUnique({ where: { userEmail: email } })
+    : null;
+  if (existingBuyer) {
     return NextResponse.json(
       {
         statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
@@ -86,23 +108,8 @@ export async function POST(request: Request) {
       { status: 409 },
     );
   }
-  const buyer = account.user;
-  if (!buyer)
-    return NextResponse.json(
-      { message: 'Unable to connect your Sure Imports account.' },
-      { status: 500 },
-    );
-  const buyerEmail = buyer.userEmail.trim().toLowerCase();
-  if (account.createdNewAccount) {
-    try {
-      await sendPublicAccountSetupEmail({
-        user: buyer,
-        context: 'your Supplier Intelligence report purchase',
-      });
-    } catch (error) {
-      console.error('report buyer account setup email failed:', error);
-    }
-  }
+  const buyerEmail =
+    authenticatedBuyer?.userEmail.trim().toLowerCase() || email;
 
   const downloadToken = randomBytes(48).toString('base64url');
   const amountMinor =
@@ -118,7 +125,7 @@ export async function POST(request: Request) {
       pidOrder,
       reportId: report.pidReport,
       versionId: version.pidVersion,
-      pidUser: buyer.pidUser,
+      pidUser: authenticatedBuyer?.pidUser || null,
       email: buyerEmail,
       firstName,
       lastName: lastName || null,
@@ -129,6 +136,7 @@ export async function POST(request: Request) {
       amountMinor,
       currency,
       downloadToken,
+      downloadTokenExpiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       createdAt: new Date(),
       updatedAt: new Date(),
     },

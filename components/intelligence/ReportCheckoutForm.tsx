@@ -39,6 +39,7 @@ export default function ReportCheckoutForm({
     lastName: FormDataEntryValue | string | null;
     email: FormDataEntryValue | string | null;
     billingCountry: string;
+    companyWebsite?: string;
   }) {
     setLoading(true);
     setError('');
@@ -96,6 +97,7 @@ export default function ReportCheckoutForm({
       lastName: form.get('lastName'),
       email: form.get('email'),
       billingCountry: country,
+      companyWebsite: String(form.get('companyWebsite') || ''),
     });
   }
 
@@ -121,6 +123,14 @@ export default function ReportCheckoutForm({
         className={field}
         placeholder="Email address"
         required
+      />
+      <input
+        name="companyWebsite"
+        type="text"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        className="sr-only"
       />
       <Popover open={countryOpen} onOpenChange={setCountryOpen}>
         <PopoverTrigger asChild>

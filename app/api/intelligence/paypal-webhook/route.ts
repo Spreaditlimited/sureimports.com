@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 
-import { fulfillReportOrder } from '@/lib/intelligence/reportOrders';
+import {
+  confirmReportOrderPayment,
+  transitionReportOrderAccess,
+} from '@/lib/intelligence/reportOrders';
 import { getPayPalOrder, verifyPayPalWebhookSignature } from '@/lib/paypal';
 import { prisma } from '@/lib/prisma';
+import { resolvePayPalAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -35,40 +39,63 @@ export async function POST(request: Request) {
     ![
       'PAYMENT.CAPTURE.COMPLETED',
       'PAYMENT.CAPTURE.DENIED',
+      'PAYMENT.CAPTURE.DECLINED',
       'PAYMENT.CAPTURE.REFUNDED',
+      'PAYMENT.CAPTURE.REVERSED',
       'CHECKOUT.ORDER.APPROVED',
+      'CUSTOMER.DISPUTE.CREATED',
+      'CUSTOMER.DISPUTE.UPDATED',
+      'CUSTOMER.DISPUTE.RESOLVED',
     ].includes(event)
   ) {
     return NextResponse.json({ received: true });
   }
   const resource = body?.resource || {};
+  const captureReference = String(
+    resource?.disputed_transactions?.[0]?.seller_transaction_id ||
+      (event.startsWith('PAYMENT.CAPTURE.') ? resource?.id : '') ||
+      '',
+  ).trim();
   const orderId = String(
     resource?.supplementary_data?.related_ids?.order_id ||
       (event === 'CHECKOUT.ORDER.APPROVED' ? resource?.id : '') ||
       '',
   ).trim();
-  if (!orderId) return NextResponse.json({ received: true });
+  if (!orderId && !captureReference)
+    return NextResponse.json({ received: true });
   const reportOrder = await prisma.intelligence_report_orders.findFirst({
-    where: { providerReference: orderId, paymentProvider: 'paypal' },
+    where: {
+      paymentProvider: 'paypal',
+      OR: [
+        ...(orderId ? [{ providerReference: orderId }] : []),
+        ...(captureReference
+          ? [{ providerCaptureReference: captureReference }]
+          : []),
+      ],
+    },
   });
   if (!reportOrder) return NextResponse.json({ received: true });
   if (
     event === 'PAYMENT.CAPTURE.REFUNDED' ||
-    event === 'PAYMENT.CAPTURE.DENIED'
+    event === 'PAYMENT.CAPTURE.REVERSED' ||
+    event === 'PAYMENT.CAPTURE.DENIED' ||
+    event === 'PAYMENT.CAPTURE.DECLINED' ||
+    event.startsWith('CUSTOMER.DISPUTE.')
   ) {
-    await prisma.intelligence_report_orders.update({
-      where: { pidOrder: reportOrder.pidOrder },
-      data: {
-        status: event === 'PAYMENT.CAPTURE.REFUNDED' ? 'refunded' : 'failed',
-        updatedAt: new Date(),
-      },
+    const status = resolvePayPalAccessStatus(event) || 'revoked';
+    await transitionReportOrderAccess({
+      pidOrder: reportOrder.pidOrder,
+      status,
+      source: 'paypal',
+      eventType: event.toLowerCase(),
+      providerEventId: String(body?.id || '') || null,
+      reason: `PayPal reported ${event}.`,
     });
     return NextResponse.json({ received: true });
   }
-  if (reportOrder.status === 'paid')
-    return NextResponse.json({ received: true });
-
-  const paypalOrder = await getPayPalOrder(orderId);
+  const paypalOrder = await getPayPalOrder(
+    orderId || reportOrder.providerReference || '',
+  );
   const unit = paypalOrder?.purchase_units?.[0];
   const capture = unit?.payments?.captures?.[0];
   if (
@@ -80,7 +107,13 @@ export async function POST(request: Request) {
     String(capture?.amount?.currency_code || '').toUpperCase() ===
       reportOrder.currency
   ) {
-    await fulfillReportOrder(reportOrder.pidOrder);
+    await confirmReportOrderPayment({
+      pidOrder: reportOrder.pidOrder,
+      source: 'paypal',
+      paidAt: capture?.create_time ? new Date(capture.create_time) : null,
+      providerEventId: String(body?.id || '') || null,
+      providerCaptureReference: String(capture?.id || '').trim() || null,
+    });
   }
   return NextResponse.json({ received: true });
 }

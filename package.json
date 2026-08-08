@@ -14,6 +14,7 @@
     "blog:images:dry": "node scripts/blog/generate-blog-feature-images.js --dry-run",
     "lint:fix": "next lint --fix",
     "lint:strict": "next lint '*/**/*.{js,jsx,ts,tsx}'",
+    "test:report-orders": "node --test --experimental-strip-types tests/report-order-policy.test.mjs",
     "prettier": "prettier --no-error-on-unmatched-pattern --write */**/*.{js,jsx,json,ts,tsx,scss,css,md}",
     "prepare": "husky install"
   },

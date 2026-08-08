@@ -4,8 +4,12 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
 import { getConfiguredIntelligencePlan } from '@/lib/intelligence/plans';
-import { fulfillReportOrder } from '@/lib/intelligence/reportOrders';
+import {
+  confirmReportOrderPayment,
+  transitionReportOrderAccess,
+} from '@/lib/intelligence/reportOrders';
 import { fulfillConsultationPayment } from '@/lib/consultationFulfillment';
+import { resolvePaystackAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -70,6 +74,76 @@ export async function POST(request: Request) {
 
   const payload = JSON.parse(rawBody);
   const event = String(payload?.event || '').trim();
+
+  if (event.startsWith('refund.') || event.startsWith('charge.dispute.')) {
+    const data = payload?.data || {};
+    const reference = String(
+      data.transaction_reference ||
+        data.transaction?.reference ||
+        data.reference ||
+        '',
+    ).trim();
+    const order = reference
+      ? await prisma.intelligence_report_orders.findFirst({
+          where: { providerReference: reference, paymentProvider: 'paystack' },
+        })
+      : null;
+    if (!order) return NextResponse.json({ received: true });
+
+    const providerEventId = `paystack:${event}:${String(
+      data.refund_reference || data.id || reference,
+    )}`;
+    if (event === 'refund.processed') {
+      const refundedAmount = Number(data.amount || 0);
+      const accessStatus = resolvePaystackAccessStatus(
+        event,
+        refundedAmount,
+        order.amountMinor,
+      );
+      await transitionReportOrderAccess({
+        pidOrder: order.pidOrder,
+        status: accessStatus || 'disputed',
+        source: 'paystack',
+        eventType:
+          accessStatus === 'refunded'
+            ? 'refund_processed'
+            : 'partial_refund_review',
+        providerEventId,
+        reason:
+          accessStatus === 'refunded'
+            ? 'Paystack confirmed a full refund.'
+            : 'Paystack confirmed a partial refund; manual review required.',
+      });
+    } else if (
+      event === 'charge.dispute.create' ||
+      event === 'charge.dispute.remind'
+    ) {
+      await transitionReportOrderAccess({
+        pidOrder: order.pidOrder,
+        status: 'disputed',
+        source: 'paystack',
+        eventType: event,
+        providerEventId,
+        reason: 'Paystack reported an open payment dispute.',
+      });
+    } else if (event === 'charge.dispute.resolve') {
+      const accessStatus = resolvePaystackAccessStatus(
+        event,
+        Number(data.refund_amount || 0),
+        order.amountMinor,
+      );
+      await transitionReportOrderAccess({
+        pidOrder: order.pidOrder,
+        status: accessStatus || 'disputed',
+        source: 'paystack',
+        eventType: event,
+        providerEventId,
+        reason:
+          'Paystack reported a resolved dispute; access remains blocked pending review.',
+      });
+    }
+    return NextResponse.json({ received: true });
+  }
 
   if (
     event === 'charge.success' &&
@@ -137,9 +211,16 @@ export async function POST(request: Request) {
       order.paymentProvider === 'paystack' &&
       order.providerReference === payment.reference &&
       Number(payment.amount) === order.amountMinor &&
-      String(payment.currency || '').toUpperCase() === order.currency
+      String(payment.currency || '').toUpperCase() === order.currency &&
+      String(payment.metadata?.pidReport || '') === order.reportId &&
+      String(payment.metadata?.pidVersion || '') === order.versionId
     ) {
-      await fulfillReportOrder(order.pidOrder);
+      await confirmReportOrderPayment({
+        pidOrder: order.pidOrder,
+        source: 'paystack',
+        paidAt: payment.paid_at ? new Date(payment.paid_at) : null,
+        providerEventId: `paystack:charge.success:${String(payment.id || payment.reference)}`,
+      });
     }
     return NextResponse.json({ received: true });
   }

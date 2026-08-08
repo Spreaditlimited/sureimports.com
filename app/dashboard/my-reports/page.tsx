@@ -98,7 +98,7 @@ export default async function MySupplierReportsPage() {
                     </div>
                   </div>
                   <a
-                    href={`/api/intelligence/reports/download?token=${encodeURIComponent(order.downloadToken)}`}
+                    href={`/api/intelligence/reports/download?order=${encodeURIComponent(order.pidOrder)}`}
                     className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-black text-white"
                   >
                     <Download className="h-4 w-4" />

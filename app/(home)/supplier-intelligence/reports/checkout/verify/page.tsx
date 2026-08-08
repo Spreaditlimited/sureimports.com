@@ -37,9 +37,11 @@ function VerifyContent() {
         setCanOpenLibrary(Boolean(data.canOpenLibrary));
         setState('success');
         setMessage(
-          data.canOpenLibrary
-            ? 'Payment confirmed. Your report is ready and has been added to My Supplier Reports.'
-            : 'Payment confirmed. Your report is ready. We sent the download and secure account-access instructions to your email.',
+          data.deliveryPending
+            ? 'Payment confirmed. Your report is ready here now. Email and library delivery are being retried automatically.'
+            : data.canOpenLibrary
+              ? 'Payment confirmed. Your report is ready and has been added to My Supplier Reports.'
+              : 'Payment confirmed. Your report is ready. We sent the download and secure account-access instructions to your email.',
         );
       } catch (caught) {
         setState('error');
