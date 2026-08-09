@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { 
   Globe, 
@@ -9,7 +9,6 @@ import {
   Ship, 
   User, 
   FileText, 
-  CheckCircle2, 
   Weight, 
   Hash, 
   MessageSquare,
@@ -25,6 +24,11 @@ import {
   buildFacebookLeadMeta,
   trackBrowserLeadEvent,
 } from '@/lib/marketing/facebookLeadMeta';
+import {
+  PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+  POST_AUTH_REDIRECT_KEY,
+  SHIPPING_ONLY_RESUME_PATH,
+} from '@/lib/auth/loginRedirect';
 
 type ShippingPlan = {
   pidShippingPlan: string;
@@ -39,14 +43,10 @@ type Country = {
 
 export default function PublicShippingOnlyFlow() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const shouldResumeCheckout = searchParams.get('resumeCheckout') === '1';
-  const PENDING_KEY = 'sureimports:pendingShippingOnlyCheckout';
 
   const [countries, setCountries] = useState<Country[]>([]);
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [resuming, setResuming] = useState(false);
 
   const [account, setAccount] = useState({
     firstName: '',
@@ -91,41 +91,6 @@ export default function PublicShippingOnlyFlow() {
     [countries, request.shippingTo],
   );
 
-  // Resume Checkout Logic
-  useEffect(() => {
-    if (!shouldResumeCheckout || resuming) return;
-    const pendingRaw = window.localStorage.getItem(PENDING_KEY);
-    if (!pendingRaw) return;
-
-    setResuming(true);
-    const resumeCheckout = async () => {
-      try {
-        const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
-        if (!authResponse.ok) { setResuming(false); return; }
-
-        const pendingPayload = JSON.parse(pendingRaw);
-        const response = await fetch('/api/public/shipping-only/bootstrap-request', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pendingPayload),
-        });
-        const data = await response.json();
-
-        if (data?.statusx === 'SUCCESS') {
-          window.localStorage.removeItem(PENDING_KEY);
-          toast.success('Resuming your request...');
-          router.push(data.redirectTo);
-          return;
-        }
-      } catch (e) {
-        toast.error('Unable to resume draft.');
-      } finally {
-        setResuming(false);
-      }
-    };
-    resumeCheckout();
-  }, [shouldResumeCheckout, resuming, router]);
-
   const submitRequest = async () => {
     if (!request.shippingName.trim() || !request.shippingTo || !request.shippingPlan || !request.grossWeight.trim() || !request.expectedShipments.trim()) {
       toast.error('Please complete all required shipment fields.');
@@ -140,6 +105,23 @@ export default function PublicShippingOnlyFlow() {
     const payload = { account, request, ...leadMeta };
     setSubmitting(true);
     try {
+      const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (!authResponse.ok) {
+        window.localStorage.setItem(
+          PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+          JSON.stringify(payload),
+        );
+        window.localStorage.setItem(
+          POST_AUTH_REDIRECT_KEY,
+          SHIPPING_ONLY_RESUME_PATH,
+        );
+        toast.info('Please sign in or create an account to continue.');
+        router.push(
+          `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
+        );
+        return;
+      }
+
       const response = await fetch('/api/public/shipping-only/bootstrap-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -156,16 +138,29 @@ export default function PublicShippingOnlyFlow() {
           value: 1,
           currency: 'NGN',
         });
-        window.localStorage.removeItem(PENDING_KEY);
+        window.localStorage.removeItem(PENDING_SHIPPING_ONLY_CHECKOUT_KEY);
+        window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
         toast.success('Shipment created successfully!');
-        router.push(data.redirectTo);
+        router.replace(data.redirectTo);
         return;
       }
 
-      if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
-        window.localStorage.setItem(PENDING_KEY, JSON.stringify(payload));
-        toast.info('Account found. Please sign in to finalize.');
-        router.push(`/auth/login?next=${encodeURIComponent('/ship-with-us?resumeCheckout=1')}`);
+      if (
+        data?.statusx === 'AUTH_REQUIRED' ||
+        data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED'
+      ) {
+        window.localStorage.setItem(
+          PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+          JSON.stringify(payload),
+        );
+        window.localStorage.setItem(
+          POST_AUTH_REDIRECT_KEY,
+          SHIPPING_ONLY_RESUME_PATH,
+        );
+        toast.info('Please sign in or create an account to continue.');
+        router.push(
+          `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
+        );
         return;
       }
 
@@ -176,15 +171,6 @@ export default function PublicShippingOnlyFlow() {
       setSubmitting(false);
     }
   };
-
-  if (resuming) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#fcfcfd] dark:bg-slate-950">
-        <Loader2 className="h-10 w-10 animate-spin text-indigo-600" />
-        <p className="mt-4 text-sm font-bold text-slate-600 dark:text-slate-400">Restoring your session...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-transparent">
@@ -361,7 +347,7 @@ export default function PublicShippingOnlyFlow() {
               <div className="mt-8 space-y-4">
                 <Button
                   onClick={submitRequest}
-                  disabled={submitting || resuming}
+                  disabled={submitting}
                   className="h-14 w-full rounded-2xl bg-indigo-600 text-base font-black text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500 active:scale-[0.98] border-0"
                 >
                   {submitting ? (

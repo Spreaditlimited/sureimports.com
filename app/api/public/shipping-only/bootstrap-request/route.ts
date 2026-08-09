@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
-import { generateToken, verifyToken } from '@/lib/jwt';
-import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
+import { verifyToken } from '@/lib/jwt';
 import { notifyNewShippingOnlyRequest } from '@/lib/notifications/shippingOnly';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
+import { SHIPPING_ONLY_RESUME_PATH } from '@/lib/auth/loginRedirect';
 
 type Payload = {
   account?: {
@@ -81,43 +81,40 @@ export async function POST(request: NextRequest) {
     let authenticatedPidUser: string | null = null;
 
     if (token) {
-      const payload = verifyToken(token);
-      if (payload && typeof payload === 'object' && 'pidUser' in payload) {
-        authenticatedPidUser = String(payload.pidUser);
+      try {
+        const payload = verifyToken(token);
+        if (payload && typeof payload === 'object' && 'pidUser' in payload) {
+          authenticatedPidUser = String(payload.pidUser);
+        }
+      } catch {
+        authenticatedPidUser = null;
       }
     }
 
-    const email = normalize(body?.account?.email).toLowerCase();
-    if (!authenticatedPidUser && !email) {
+    if (!authenticatedPidUser) {
       return NextResponse.json(
         {
-          statusx: 'FAILED_VALIDATION',
-          message: 'Email is required to continue.',
+          statusx: 'AUTH_REQUIRED',
+          message: 'Please sign in or create an account to submit your request.',
+          loginPath: `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
         },
-        { status: 400 },
+        { status: 401 },
       );
     }
 
-    const account = await resolvePublicAccount({
-      authenticatedPidUser,
-      email,
-      firstName: normalize(body?.account?.firstName),
-      lastName: normalize(body?.account?.lastName),
-      phone: normalize(body?.account?.phone),
-      affiliateRef: 'NO_REF',
+    const user = await prisma.users.findUnique({
+      where: { pidUser: authenticatedPidUser },
     });
-    if (account.status === 'login_required') {
+    if (!user) {
       return NextResponse.json(
         {
-          statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
-          message:
-            'An account with this email already exists. Please sign in to continue.',
-          loginPath: `/auth/login?next=${encodeURIComponent('/ship-with-us?resumeCheckout=1')}`,
+          statusx: 'AUTH_REQUIRED',
+          message: 'Your session is no longer valid.',
+          loginPath: `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
         },
-        { status: 409 },
+        { status: 401 },
       );
     }
-    const { user, createdNewAccount } = account;
 
     const pidShippingOnly = `SL${Date.now()}${randomGenerator(4)}`;
 
@@ -198,31 +195,14 @@ export async function POST(request: NextRequest) {
       console.error('shipping-only bootstrap Facebook CAPI failed:', capiError);
     }
 
-    const authToken = generateToken({
-      pidUser: user.pidUser,
-      userEmail: user.userEmail,
-      userFirstname: user.userFirstname,
-      userImage: user.userImage,
-    });
-
-    const response = NextResponse.json(
+    return NextResponse.json(
       {
         statusx: 'SUCCESS',
         message: 'Shipping request created successfully.',
-        redirectTo: '/dashboard/shipping-only',
-        createdNewAccount,
+        redirectTo: `/dashboard/shipping-only/request-received?request=${encodeURIComponent(pidShippingOnly)}`,
       },
       { status: 200 },
     );
-
-    response.cookies.set('token', authToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-    });
-
-    return response;
   } catch (error) {
     console.error('shipping-only bootstrap error:', error);
     return NextResponse.json(

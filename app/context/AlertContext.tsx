@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 
 interface AlertContextType {
   showSuccess: (message: string) => void;
@@ -21,14 +21,6 @@ export const AlertProvider: React.FC<{ children: ReactNode }> = ({
   return (
     <AlertContext.Provider value={{ showSuccess, showError, showInfo }}>
       {children}
-      <Toaster
-        position="top-right"
-        expand={true}
-        richColors
-        toastOptions={{
-          duration: 3000,
-        }}
-      />
     </AlertContext.Provider>
   );
 };

@@ -1,14 +1,14 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
 import xMail from '@/lib/email/xMail2';
-import bcrypt from 'bcryptjs';
 import {
   notifyCustomerCorporateGiftStatus,
   type CorporateGiftStatus,
 } from '@/lib/notifications/corporateGifts';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
-import randomGenerator from '@/lib/helpers/randomGenerator';
+import { verifyToken } from '@/lib/jwt';
+import { CORPORATE_SOURCING_RESUME_PATH } from '@/lib/auth/loginRedirect';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -115,8 +115,43 @@ const getIpAddress = (req: Request) => {
   return null;
 };
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    const token = req.cookies.get('token')?.value;
+    let authenticatedPidUser: string | null = null;
+    if (token) {
+      try {
+        const payload = verifyToken(token);
+        if (payload && typeof payload === 'object' && 'pidUser' in payload) {
+          authenticatedPidUser = String(payload.pidUser);
+        }
+      } catch {
+        authenticatedPidUser = null;
+      }
+    }
+
+    if (!authenticatedPidUser) {
+      return NextResponse.json(
+        {
+          statusx: 'AUTH_REQUIRED',
+          error: 'Please sign in or create an account to submit your request.',
+          loginPath: `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
+        },
+        { status: 401 },
+      );
+    }
+
+    const authenticatedUser = await prisma.users.findUnique({
+      where: { pidUser: authenticatedPidUser },
+      select: { pidUser: true },
+    });
+    if (!authenticatedUser) {
+      return NextResponse.json(
+        { statusx: 'AUTH_REQUIRED', error: 'Your session is no longer valid.' },
+        { status: 401 },
+      );
+    }
+
     const formData = await req.formData();
 
     // 1. Extract text fields (supports current and legacy keys)
@@ -248,53 +283,11 @@ export async function POST(req: Request) {
       logoFileUrl = await uploadToCloudinary(buffer, `${pidRequest}-logo`);
     }
 
-    // 4. Create account for corporate contact if missing
-    let createdDashboardAccount = false;
-    let temporaryPassword: string | null = null;
-
-    const existingUser = await prisma.users.findFirst({
-      where: {
-        OR: [{ userEmail: data.contactEmail }, { email: data.contactEmail }],
-      },
-      select: { pidUser: true },
-    });
-    let requestPidUser: string | null = existingUser?.pidUser || null;
-
-    if (!existingUser) {
-      temporaryPassword = randomGenerator(12);
-      const passwordHash = bcrypt.hashSync(temporaryPassword, 8);
-      const sessionHash = bcrypt.hashSync(randomGenerator(10), 8);
-      const contactNames = data.contactPersonFullName.split(' ').filter(Boolean);
-      const firstName = contactNames[0] || data.businessName;
-      const lastName = contactNames.slice(1).join(' ') || 'Corporate';
-
-      const createdUser = await prisma.users.create({
-        data: {
-          pidUser: `CUS${randomGenerator(10)}`,
-          userFirstname: firstName,
-          userLastname: lastName,
-          userEmail: data.contactEmail,
-          email: data.contactEmail,
-          userPassword: passwordHash,
-          userSession: sessionHash,
-          userPhone: data.whatsappNumber,
-          phone: data.whatsappNumber,
-          userCid: 'VERIFIED',
-          // Mark verified to allow immediate access with temporary password.
-          userStatus: 'AL1',
-          loginStatus: 'TEMP_PASSWORD_UNUSED',
-          userAffiliateCode: randomGenerator(6),
-        },
-      });
-      requestPidUser = createdUser.pidUser;
-      createdDashboardAccount = true;
-    }
-
-    // 5. Persist submission in DB
+    // 4. Persist submission against the authenticated account
     await prisma.corporate_gift_request.create({
       data: {
         pidRequest,
-        pidUser: requestPidUser,
+        pidUser: authenticatedUser.pidUser,
         businessName: data.businessName,
         contactPersonFullName: data.contactPersonFullName,
         productOrItemNeeded: data.productOrItemNeeded,
@@ -332,8 +325,7 @@ export async function POST(req: Request) {
       whatsappNumber: data.whatsappNumber,
       status: 'Pending' as CorporateGiftStatus,
       onboarding: {
-        accountCreated: createdDashboardAccount,
-        temporaryPassword: temporaryPassword || undefined,
+        accountCreated: false,
         dashboardLink: 'https://sureimports.com/dashboard/corporate-sourcing',
       },
     });
@@ -439,6 +431,7 @@ Page URL: ${data.pageUrl || 'N/A'}
         success: true,
         message: 'Request submitted successfully',
         pidRequest,
+        redirectTo: `/dashboard/corporate-sourcing?request=${encodeURIComponent(pidRequest)}`,
         notifications: notificationResult,
       },
       { status: 200 },

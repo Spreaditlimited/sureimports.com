@@ -3,14 +3,11 @@
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Mail, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react';
-
-interface AccountNotActivatedPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
+import { getSafeLoginRedirect } from '@/lib/auth/loginRedirect';
 
 interface ApiResponse {
   responsex: {
@@ -21,11 +18,19 @@ interface ApiResponse {
   userx?: any;
 }
 
-export default function AccountNotActivatedPage({ searchParams }: AccountNotActivatedPageProps) {
+export default function AccountNotActivatedPage() {
   const router = useRouter();
-  
-  // Extract email from searchParams
-  const email = typeof searchParams?.email === 'string' ? searchParams.email : undefined;
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email') || '';
+  const requestedNext = searchParams.get('next');
+  const loginParams = new URLSearchParams();
+  if (email) loginParams.set('email', email);
+  if (requestedNext) {
+    loginParams.set('next', getSafeLoginRedirect(requestedNext));
+  }
+  const loginHref = loginParams.size
+    ? `/auth/login?${loginParams.toString()}`
+    : '/auth/login';
   
   const [isLoading, setIsLoading] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -49,7 +54,7 @@ export default function AccountNotActivatedPage({ searchParams }: AccountNotActi
 
       if (data.responsex?.status === 'ALREADY_VERIFIED') {
         toast.info(data.responsex.message || 'Your account is already verified!');
-        router.push('/auth/login');
+        router.push(loginHref);
       } else if (data.responsex?.status === 'VERIFICATION_EMAIL_SENT') {
         setIsSuccess(true);
         toast.success('A new activation email has been sent.');
@@ -127,7 +132,7 @@ export default function AccountNotActivatedPage({ searchParams }: AccountNotActi
                     We've sent a fresh activation link to <strong>{email || 'your email address'}</strong>. Please check your inbox and spam folders.
                   </div>
                   <Button
-                    onClick={() => router.push('/auth/login')}
+                    onClick={() => router.push(loginHref)}
                     className="h-14 w-full rounded-xl bg-indigo-800 text-base font-bold text-white shadow-xl shadow-indigo-900/20 transition-all hover:bg-indigo-900 active:scale-[0.98] dark:bg-indigo-600 dark:hover:bg-indigo-700 border-0"
                   >
                     Return to Login
@@ -168,7 +173,7 @@ export default function AccountNotActivatedPage({ searchParams }: AccountNotActi
                     
                     <Button
                       variant="outline"
-                      onClick={() => router.push('/auth/login')}
+                      onClick={() => router.push(loginHref)}
                       disabled={isLoading}
                       className="h-14 w-full rounded-xl border-slate-200 bg-white text-base font-bold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-transparent dark:text-slate-300 dark:hover:bg-slate-900"
                     >

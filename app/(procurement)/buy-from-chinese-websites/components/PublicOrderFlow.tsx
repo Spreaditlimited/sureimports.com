@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   ArrowRight,
@@ -23,6 +23,11 @@ import {
   buildFacebookLeadMeta,
   trackBrowserLeadEvent,
 } from '@/lib/marketing/facebookLeadMeta';
+import {
+  PENDING_PROCUREMENT_CHECKOUT_KEY,
+  POST_AUTH_REDIRECT_KEY,
+  PROCUREMENT_RESUME_CHECKOUT_PATH,
+} from '@/lib/auth/loginRedirect';
 
 type ShippingPlan = {
   pidShippingPlan: string;
@@ -57,9 +62,6 @@ const initialProduct: ProductDraft = {
 
 export default function PublicOrderFlow() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const shouldResumeCheckout = searchParams.get('resumeCheckout') === '1';
-  const PENDING_CHECKOUT_KEY = 'sureimports:pendingProcurementCheckout';
   const [countries, setCountries] = useState<Country[]>([]);
   const [countriesLoading, setCountriesLoading] = useState(true);
 
@@ -80,7 +82,6 @@ export default function PublicOrderFlow() {
   const [productDraft, setProductDraft] = useState<ProductDraft>(initialProduct);
   const [products, setProducts] = useState<ProductDraft[]>([]);
   const [submitting, setSubmitting] = useState(false);
-  const [resuming, setResuming] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,56 +121,6 @@ export default function PublicOrderFlow() {
 
   const formatPlanUnit = (unit?: string | null) =>
     unit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
-
-  useEffect(() => {
-    if (!shouldResumeCheckout || resuming) return;
-    if (typeof window === 'undefined') return;
-
-    const pendingRaw = window.localStorage.getItem(PENDING_CHECKOUT_KEY);
-    if (!pendingRaw) return;
-
-    setResuming(true);
-
-    const resumeCheckout = async () => {
-      try {
-        const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
-        if (!authResponse.ok) {
-          setResuming(false);
-          return;
-        }
-
-        let pendingPayload: unknown = null;
-        try {
-          pendingPayload = JSON.parse(pendingRaw);
-        } catch {
-          window.localStorage.removeItem(PENDING_CHECKOUT_KEY);
-          toast.error('Saved checkout draft was invalid. Please recreate your order.');
-          return;
-        }
-        const response = await fetch('/api/public/procurement/bootstrap-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pendingPayload),
-        });
-        const data = await response.json();
-
-        if (data?.statusx === 'SUCCESS') {
-          window.localStorage.removeItem(PENDING_CHECKOUT_KEY);
-          toast.success('Welcome back. Opening your saved order...');
-          router.push(data.redirectTo);
-          return;
-        }
-
-        toast.error(data?.message || 'Unable to resume your order.');
-      } catch {
-        toast.error('Unable to resume your order right now.');
-      } finally {
-        setResuming(false);
-      }
-    };
-
-    resumeCheckout();
-  }, [shouldResumeCheckout, resuming, router]);
 
   const totalEstimatedValue = useMemo(() => {
     return products.reduce((total, p) => total + (Number(p.productPrice) * Number(p.productQuantity)), 0);
@@ -242,6 +193,25 @@ export default function PublicOrderFlow() {
 
     setSubmitting(true);
     try {
+      const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (!authResponse.ok) {
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(
+            PENDING_PROCUREMENT_CHECKOUT_KEY,
+            JSON.stringify(payload),
+          );
+          window.localStorage.setItem(
+            POST_AUTH_REDIRECT_KEY,
+            PROCUREMENT_RESUME_CHECKOUT_PATH,
+          );
+        }
+        toast.info('Please sign in or create an account to save your order.');
+        router.push(
+          `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
+        );
+        return;
+      }
+
       const response = await fetch('/api/public/procurement/bootstrap-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -260,23 +230,31 @@ export default function PublicOrderFlow() {
           currency: order.currencyType || 'USD',
         });
         if (typeof window !== 'undefined') {
-          window.localStorage.removeItem(PENDING_CHECKOUT_KEY);
+          window.localStorage.removeItem(PENDING_PROCUREMENT_CHECKOUT_KEY);
+          window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
         }
         toast.success('Order created. Redirecting to your dashboard...');
         router.push(data.redirectTo);
         return;
       }
 
-      if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
+      if (
+        data?.statusx === 'AUTH_REQUIRED' ||
+        data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED'
+      ) {
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(
-            PENDING_CHECKOUT_KEY,
+            PENDING_PROCUREMENT_CHECKOUT_KEY,
             JSON.stringify(payload),
           );
+          window.localStorage.setItem(
+            POST_AUTH_REDIRECT_KEY,
+            PROCUREMENT_RESUME_CHECKOUT_PATH,
+          );
         }
-        toast.info('Existing account found. Please sign in to continue.');
+        toast.info('Please sign in or create an account to continue.');
         router.push(
-          `/auth/login?next=${encodeURIComponent('/buy-from-chinese-websites?resumeCheckout=1')}`,
+          `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
         );
         return;
       }
@@ -537,12 +515,12 @@ export default function PublicOrderFlow() {
                   type="button"
                   className="h-14 w-full rounded-xl bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-70 border-0"
                   onClick={proceedToPayment}
-                  disabled={submitting || resuming}
+                  disabled={submitting}
                 >
-                  {submitting || resuming ? (
+                  {submitting ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      {resuming ? 'Resuming...' : 'Processing...'}
+                      Processing...
                     </>
                   ) : (
                     <>Proceed to Checkout <ArrowRight className="ml-2 h-5 w-5" /></>

@@ -4,6 +4,7 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken, verifyToken } from '@/lib/jwt';
 import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
+import { PROCUREMENT_RESUME_CHECKOUT_PATH } from '@/lib/auth/loginRedirect';
 
 type ProductInput = {
   productName: string;
@@ -126,16 +127,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const email = normalize(body?.account?.email).toLowerCase();
-    if (!authenticatedPidUser && !email) {
+    if (!authenticatedPidUser) {
       return NextResponse.json(
         {
-          statusx: 'FAILED_VALIDATION',
-          message: 'Email is required to continue to payment.',
+          statusx: 'AUTH_REQUIRED',
+          message: 'Please sign in or create an account to save your order.',
+          loginPath: `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
         },
-        { status: 400 },
+        { status: 401 },
       );
     }
+
+    const email = normalize(body?.account?.email).toLowerCase();
 
     const account = await resolvePublicAccount({
       authenticatedPidUser,
@@ -151,7 +154,7 @@ export async function POST(request: NextRequest) {
           statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
           message:
             'An account with this email already exists. Please sign in to continue.',
-          loginPath: `/auth/login?next=${encodeURIComponent('/buy-from-chinese-websites?resumeCheckout=1')}`,
+          loginPath: `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
         },
         { status: 409 },
       );

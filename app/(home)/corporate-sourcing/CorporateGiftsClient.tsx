@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,13 +13,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CheckCircle2, Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
+import {
+  CORPORATE_SOURCING_RESUME_PATH,
+  POST_AUTH_REDIRECT_KEY,
+} from '@/lib/auth/loginRedirect';
+import {
+  corporateSourcingDraftToFormData,
+  deleteCorporateSourcingDraft,
+  saveCorporateSourcingDraft,
+  type CorporateSourcingDraft,
+} from '@/lib/corporateSourcing/pendingDraft';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MIN_DELIVERY_LEAD_DAYS = 60;
 
 type FormErrors = Record<string, string>;
-type Status = 'idle' | 'submitting' | 'success' | 'error';
+type Status = 'idle' | 'submitting' | 'error';
 
 type FormValues = {
   business_name: string;
@@ -51,6 +62,7 @@ const proceedOptions = ['Immediately', 'Within 1 week', 'Within 2 - 4 weeks', 'S
 const sourceOptions = ['Facebook', 'Instagram', 'Google', 'Referral', 'Existing customer', 'WhatsApp', 'Other'];
 
 export default function CorporateGiftsClient() {
+  const router = useRouter();
   const [values, setValues] = useState<FormValues>(initialValues);
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -138,23 +150,48 @@ export default function CorporateGiftsClient() {
     setSubmissionError('');
 
     try {
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => formData.append(key, value));
-      if (referenceFile) formData.append('reference_image_upload', referenceFile);
-      if (logoFile) formData.append('company_logo_upload', logoFile);
+      const draft: CorporateSourcingDraft = {
+        values,
+        referenceFile,
+        logoFile,
+      };
 
-      // Add analytics params...
+      const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (!authResponse.ok) {
+        await saveCorporateSourcingDraft(draft);
+        window.localStorage.setItem(
+          POST_AUTH_REDIRECT_KEY,
+          CORPORATE_SOURCING_RESUME_PATH,
+        );
+        router.push(
+          `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
+        );
+        return;
+      }
+
+      const formData = corporateSourcingDraftToFormData(draft);
       const response = await fetch('/api/corporate-gifts', { method: 'POST', body: formData });
       const responseBody = await response.json().catch(() => null);
+      if (response.status === 401) {
+        await saveCorporateSourcingDraft(draft);
+        window.localStorage.setItem(
+          POST_AUTH_REDIRECT_KEY,
+          CORPORATE_SOURCING_RESUME_PATH,
+        );
+        router.push(
+          `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
+        );
+        return;
+      }
       if (!response.ok) {
         throw new Error(responseBody?.error || 'Submission failed');
       }
-      
-      setStatus('success');
-      setValues(initialValues);
-      setReferenceFile(null);
-      setLogoFile(null);
-      setCurrentStep(0);
+
+      await deleteCorporateSourcingDraft();
+      window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
+      router.replace(
+        responseBody?.redirectTo || '/dashboard/corporate-sourcing',
+      );
     } catch (error) {
       setSubmissionError(
         error instanceof Error ? error.message : 'Submission failed',
@@ -162,21 +199,6 @@ export default function CorporateGiftsClient() {
       setStatus('error');
     }
   };
-
-  if (status === 'success') {
-    return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
-          <CheckCircle2 className="h-10 w-10" />
-        </div>
-        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Request Received!</h3>
-        <p className="mt-2 text-slate-500 dark:text-slate-400 max-w-md">
-          Thank you for trusting Sure Imports. Our corporate sourcing team is reviewing your requirements and will reach out to you via WhatsApp shortly.
-        </p>
-        <Button onClick={() => setStatus('idle')} variant="outline" className="mt-8 rounded-xl h-12 px-8">Submit Another Request</Button>
-      </div>
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>

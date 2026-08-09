@@ -22,6 +22,7 @@ const excludedPathPrefixes = [
   '/auth',
   '/dashboard',
   '/login',
+  '/checkout',
   '/shop/checkout',
   '/shop/order-success',
   '/receipt',

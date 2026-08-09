@@ -23,6 +23,18 @@ import { User, Mail, Phone, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useAuth } from '@/app/context/AuthContext';
 import { getAffiliateReference } from '@/utils/affiliateUtils';
 import { useRecaptchaV3 } from '@/lib/security/useRecaptchaV3';
+import {
+  CORPORATE_SOURCING_RESUME_PATH,
+  PENDING_PROCUREMENT_CHECKOUT_KEY,
+  PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+  POST_AUTH_REDIRECT_KEY,
+  PROCUREMENT_RESUME_CHECKOUT_PATH,
+  SHIPPING_ONLY_RESUME_PATH,
+} from '@/lib/auth/loginRedirect';
+import {
+  getCorporateSourcingDraft,
+  updateCorporateSourcingDraftEmail,
+} from '@/lib/corporateSourcing/pendingDraft';
 
 ////////////////////// ZOD FORM SCHEMA //////////////////////
 const formSchema = z
@@ -49,6 +61,28 @@ interface ApiResponse {
   statusx?: string | null;
   successx?: boolean;
   userx?: unknown;
+}
+
+function updatePendingAccountEmail(storageKey: string, email: string) {
+  const pendingRaw = window.localStorage.getItem(storageKey);
+  if (!pendingRaw) return;
+
+  const pending = JSON.parse(pendingRaw) as {
+    account?: Record<string, unknown>;
+    [key: string]: unknown;
+  };
+  if (!pending.account || typeof pending.account !== 'object') return;
+
+  window.localStorage.setItem(
+    storageKey,
+    JSON.stringify({
+      ...pending,
+      account: {
+        ...pending.account,
+        email: email.trim().toLowerCase(),
+      },
+    }),
+  );
 }
 
 export default function SignUpFormContainer() {
@@ -125,6 +159,133 @@ export default function SignUpFormContainer() {
     }
   }, [searchParams, form, getAffiliateRef]);
 
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (
+      window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) !==
+      PROCUREMENT_RESUME_CHECKOUT_PATH
+    ) {
+      return;
+    }
+
+    const pendingRaw = window.localStorage.getItem(
+      PENDING_PROCUREMENT_CHECKOUT_KEY,
+    );
+    if (!pendingRaw) return;
+
+    try {
+      const pending = JSON.parse(pendingRaw) as {
+        account?: {
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+          phone?: string;
+        };
+      };
+      const account = pending.account;
+      if (!account) return;
+
+      if (!form.getValues('userFirstname') && account.firstName) {
+        form.setValue('userFirstname', account.firstName);
+      }
+      if (!form.getValues('userLastname') && account.lastName) {
+        form.setValue('userLastname', account.lastName);
+      }
+      if (!form.getValues('email') && account.email) {
+        form.setValue('email', account.email);
+      }
+      if (!form.getValues('phone') && account.phone) {
+        form.setValue('phone', account.phone);
+      }
+    } catch {
+      // The public checkout page owns invalid-draft feedback and cleanup.
+    }
+  }, [form]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+
+    const prefillCorporateContact = async () => {
+      try {
+        if (
+          window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) !==
+          CORPORATE_SOURCING_RESUME_PATH
+        ) {
+          return;
+        }
+        const draft = await getCorporateSourcingDraft();
+        if (cancelled || !draft) return;
+
+        const fullName = draft.values.contact_person_full_name || '';
+        const [firstName = '', ...lastNameParts] = fullName.trim().split(/\s+/);
+        const lastName = lastNameParts.join(' ');
+
+        if (!form.getValues('userFirstname') && firstName) {
+          form.setValue('userFirstname', firstName);
+        }
+        if (!form.getValues('userLastname') && lastName) {
+          form.setValue('userLastname', lastName);
+        }
+        if (!form.getValues('email') && draft.values.contact_email) {
+          form.setValue('email', draft.values.contact_email);
+        }
+        if (!form.getValues('phone') && draft.values.whatsapp_number) {
+          form.setValue('phone', draft.values.whatsapp_number);
+        }
+      } catch {
+        // Account creation still works if browser draft storage is unavailable.
+      }
+    };
+
+    void prefillCorporateContact();
+    return () => {
+      cancelled = true;
+    };
+  }, [form]);
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (
+      window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) !==
+      SHIPPING_ONLY_RESUME_PATH
+    ) {
+      return;
+    }
+
+    const pendingRaw = window.localStorage.getItem(
+      PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+    );
+    if (!pendingRaw) return;
+
+    try {
+      const pending = JSON.parse(pendingRaw) as {
+        account?: {
+          firstName?: string;
+          lastName?: string;
+          email?: string;
+          phone?: string;
+        };
+      };
+      const account = pending.account;
+      if (!account) return;
+
+      if (!form.getValues('userFirstname') && account.firstName) {
+        form.setValue('userFirstname', account.firstName);
+      }
+      if (!form.getValues('userLastname') && account.lastName) {
+        form.setValue('userLastname', account.lastName);
+      }
+      if (!form.getValues('email') && account.email) {
+        form.setValue('email', account.email);
+      }
+      if (!form.getValues('phone') && account.phone) {
+        form.setValue('phone', account.phone);
+      }
+    } catch {
+      // The resume page owns invalid-draft feedback and cleanup.
+    }
+  }, [form]);
+
   const onSubmit = async (data: FormValues) => {
     setSubmitError('');
     setIsLoading(true);
@@ -149,12 +310,37 @@ export default function SignUpFormContainer() {
       const responseData = (await res.json()) as ApiResponse;
 
       if (res.ok && responseData.successx) {
-        toast.success('Account created successfully!');
-        if (nextParam && nextParam.startsWith('/')) {
-          router.push(loginHref);
-        } else {
-          router.push('/auth/account-creation-success');
+        try {
+          const pendingRedirect = window.localStorage.getItem(
+            POST_AUTH_REDIRECT_KEY,
+          );
+          if (pendingRedirect === PROCUREMENT_RESUME_CHECKOUT_PATH) {
+            updatePendingAccountEmail(
+              PENDING_PROCUREMENT_CHECKOUT_KEY,
+              data.email,
+            );
+          } else if (pendingRedirect === SHIPPING_ONLY_RESUME_PATH) {
+            updatePendingAccountEmail(
+              PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+              data.email,
+            );
+          } else if (pendingRedirect === CORPORATE_SOURCING_RESUME_PATH) {
+            await updateCorporateSourcingDraftEmail(data.email);
+          }
+        } catch (draftError) {
+          console.error('Unable to update pending checkout email:', draftError);
         }
+
+        toast.success('Account created successfully!');
+        const activationParams = new URLSearchParams({
+          email: data.email.trim().toLowerCase(),
+        });
+        if (nextParam && nextParam.startsWith('/')) {
+          activationParams.set('next', nextParam);
+        }
+        router.push(
+          `/auth/account-creation-success?${activationParams.toString()}`,
+        );
       } else {
         const message =
           responseData.messagex?.message1 || 'Failed to create account.';

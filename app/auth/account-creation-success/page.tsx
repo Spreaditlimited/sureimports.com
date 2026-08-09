@@ -3,12 +3,24 @@
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, MailCheck } from 'lucide-react';
+import { getSafeLoginRedirect } from '@/lib/auth/loginRedirect';
 
 export default function AccountCreationSuccessPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email') || '';
+  const requestedNext = searchParams.get('next');
+  const loginParams = new URLSearchParams();
+  if (email) loginParams.set('email', email);
+  if (requestedNext) {
+    loginParams.set('next', getSafeLoginRedirect(requestedNext));
+  }
+  const loginHref = loginParams.size
+    ? `/auth/login?${loginParams.toString()}`
+    : '/auth/login';
 
   return (
     <div className="flex min-h-screen w-full">
@@ -83,13 +95,15 @@ export default function AccountCreationSuccessPage() {
               
               <div className="mb-8 rounded-2xl bg-slate-50 p-6 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 <MailCheck className="mx-auto mb-3 h-6 w-6 text-indigo-400" />
-                We've sent an activation link to your email address. Please click the link to verify your account. 
+                We've sent an activation link to{' '}
+                <strong>{email || 'your email address'}</strong>. Please click
+                the link to verify your account.
                 <br /><br />
                 <span className="font-semibold text-slate-500">Note: Check your spam folder if it doesn't arrive within a few minutes.</span>
               </div>
 
               <Button
-                onClick={() => router.push('/auth/login')}
+                onClick={() => router.push(loginHref)}
                 className="h-14 w-full rounded-xl bg-indigo-800 text-base font-bold text-white shadow-xl shadow-indigo-900/20 transition-all hover:bg-indigo-900 active:scale-[0.98] dark:bg-indigo-600 dark:hover:bg-indigo-700 border-0"
               >
                 Return to Login

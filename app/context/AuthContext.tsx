@@ -3,6 +3,11 @@
 import type React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import {
+  getSafeLoginRedirect,
+  POST_AUTH_REDIRECT_KEY,
+  POST_LOGOUT_REDIRECT_KEY,
+} from '@/lib/auth/loginRedirect';
 
 interface User {
   pidUser: string;
@@ -50,45 +55,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const DEFAULT_LOGIN_REDIRECT = '/dashboard/procurement';
-
-function getSafeLoginRedirect(redirectCandidate: string): string {
-  if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
-  if (
-    !redirectCandidate.startsWith('/') ||
-    redirectCandidate.startsWith('//') ||
-    redirectCandidate.startsWith('/auth/')
-  ) {
-    return DEFAULT_LOGIN_REDIRECT;
-  }
-
-  try {
-    const [pathWithQuery, hash = ''] = redirectCandidate.split('#');
-    const [pathname, search = ''] = pathWithQuery.split('?');
-    const searchParams = new URLSearchParams(search);
-    const isDashboardPath = pathname.startsWith('/dashboard');
-    const isShopCheckoutResume =
-      pathname === '/shop/checkout' &&
-      searchParams.get('resumeCheckout') === '1';
-
-    const isIntelligencePath = pathname.startsWith('/intelligence');
-
-    if (isDashboardPath || isShopCheckoutResume || isIntelligencePath) {
-      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
-    }
-  } catch {
-    return DEFAULT_LOGIN_REDIRECT;
-  }
-
-  return DEFAULT_LOGIN_REDIRECT;
-}
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-  const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
-
   //////////////////////////////////// CHECK AUTH
   const checkAuth = async () => {
     try {
@@ -146,7 +116,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextParam = searchParams?.get('next') || '';
     const storedNextPath =
       typeof window !== 'undefined'
-        ? window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) || ''
+        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
+          window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) ||
+          ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
     const safeNextPath = getSafeLoginRedirect(redirectCandidate);
@@ -163,14 +135,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.statusx === 'MIGRATION_REQUIRED' || data.statusx === 'RESET') {
         router.push('/auth/welcome-reset-password?email=' + userEmail);
       } else if (data.statusx === 'NOT_VERIFIED') {
-        router.push('/auth/account-not-activated/?email=' + userEmail);
+        const activationParams = new URLSearchParams({
+          email: userEmail,
+          next: safeNextPath,
+        });
+        router.push(`/auth/account-not-activated?${activationParams.toString()}`);
       } else if (data.statusx == 'USER_DOES_NOT_EXIST') {
         throw new Error(data.message);
       } else if (data.statusx == 'SUCCESS') {
         if (typeof window !== 'undefined') {
           window.localStorage.removeItem(POST_LOGOUT_REDIRECT_KEY);
+          window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
         }
-        router.push(safeNextPath);
+        router.replace(safeNextPath);
       } else {
         throw new Error(data.message);
       }
@@ -187,7 +164,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextParam = searchParams?.get('next') || '';
     const storedNextPath =
       typeof window !== 'undefined'
-        ? window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) || ''
+        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
+          window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) ||
+          ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
     const safeNextPath = getSafeLoginRedirect(redirectCandidate);
@@ -206,8 +185,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data.user);
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(POST_LOGOUT_REDIRECT_KEY);
+      window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
     }
-    router.push(safeNextPath);
+    router.replace(safeNextPath);
   };
 
   /////////////////////////////////// LOGOUT
