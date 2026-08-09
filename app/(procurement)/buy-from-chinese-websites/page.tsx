@@ -22,9 +22,16 @@ import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import CloudflareExplainerVideo from './components/CloudflareExplainerVideo';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/buy-from-chinese-websites`;
+const explainerVideoUrl =
+  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/manifest/video.m3u8';
+const explainerPosterUrl =
+  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/thumbnails/thumbnail.jpg';
+const explainerEmbedUrl =
+  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/iframe';
 
 const platforms = [
   '1688',
@@ -148,6 +155,19 @@ const faqSchema = {
   })),
 };
 
+const videoSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'VideoObject',
+  name: 'How Buy From Chinese Websites Works at Sure Imports',
+  description:
+    'A guided walkthrough showing how to submit Chinese product links, create or access a Sure Imports account, and continue the saved order through the customer dashboard.',
+  thumbnailUrl: [explainerPosterUrl],
+  uploadDate: '2026-08-09',
+  duration: 'PT18M53S',
+  contentUrl: explainerVideoUrl,
+  embedUrl: explainerEmbedUrl,
+};
+
 const paySupplierHref = '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate';
 const inlineServiceLinkClass =
   'font-bold text-brand-orange-600 underline decoration-brand-orange-300 underline-offset-4 transition hover:text-brand-orange-700 dark:text-brand-orange-400 dark:decoration-brand-orange-500/60 dark:hover:text-brand-orange-300';
@@ -215,7 +235,7 @@ function renderFaqAnswer(question: string, answer: string) {
 export default function BuyFromChineseWebsitesPage() {
   return (
     <>
-      <JsonLdScript data={[serviceSchema, faqSchema]} />
+      <JsonLdScript data={[serviceSchema, faqSchema, videoSchema]} />
       <Header />
       <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
         
@@ -251,19 +271,19 @@ export default function BuyFromChineseWebsitesPage() {
                     Start Your Order <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </a>
-                <Link
-                  href="/blog/1688-vs-taobao-vs-alibaba-vs-aliexpress-best-china-website-for-nigerians"
+                <a
+                  href="#how-it-works"
                   className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
                 >
-                  Compare China Websites
-                </Link>
+                  Learn How it Works
+                </a>
               </div>
             </div>
           </div>
         </section>
 
         {/* --- SUPPORTED PLATFORMS BAR --- */}
-        <section className="border-b border-slate-200 bg-white py-8 dark:border-slate-800/50 dark:bg-slate-900/50 overflow-hidden">
+        <section className="bg-white py-8 dark:bg-slate-900/50 overflow-hidden">
           <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
             <p className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
               Supported Websites:
@@ -277,6 +297,23 @@ export default function BuyFromChineseWebsitesPage() {
                   {platform}
                 </span>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* --- VIDEO WALKTHROUGH --- */}
+        <section
+          id="how-it-works"
+          className="scroll-mt-24 overflow-hidden bg-white py-14 dark:bg-slate-950 md:py-20"
+        >
+          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl">
+              <h2 className="mb-6 text-center text-xs font-black uppercase tracking-[0.2em] text-brand-orange-400 sm:text-sm">
+                Step by Step Video Guide
+              </h2>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900">
+                <CloudflareExplainerVideo />
+              </div>
             </div>
           </div>
         </section>
