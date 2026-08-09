@@ -44,12 +44,12 @@ async function runDraftTransaction<T>(
 export function saveCorporateSourcingDraft(
   draft: CorporateSourcingDraft,
 ): Promise<IDBValidKey> {
-  return runDraftTransaction('readwrite', (store) => store.put(draft, DRAFT_KEY));
+  return runDraftTransaction('readwrite', (store) =>
+    store.put(draft, DRAFT_KEY),
+  );
 }
 
-export async function getCorporateSourcingDraft(): Promise<
-  CorporateSourcingDraft | null
-> {
+export async function getCorporateSourcingDraft(): Promise<CorporateSourcingDraft | null> {
   const draft = await runDraftTransaction<CorporateSourcingDraft | undefined>(
     'readonly',
     (store) => store.get(DRAFT_KEY),

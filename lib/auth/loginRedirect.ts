@@ -3,17 +3,14 @@ export const POST_AUTH_REDIRECT_KEY = 'sureimports:postAuthRedirect';
 export const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
 export const PENDING_PROCUREMENT_CHECKOUT_KEY =
   'sureimports:pendingProcurementCheckout';
-export const PROCUREMENT_RESUME_CHECKOUT_PATH =
-  '/checkout/resume-procurement';
+export const PROCUREMENT_RESUME_CHECKOUT_PATH = '/checkout/resume-procurement';
 export const CORPORATE_SOURCING_RESUME_PATH =
   '/checkout/resume-corporate-sourcing';
 export const PENDING_SHIPPING_ONLY_CHECKOUT_KEY =
   'sureimports:pendingShippingOnlyCheckout';
 export const SHIPPING_ONLY_RESUME_PATH = '/checkout/resume-shipping-only';
 
-export function getSafeLoginRedirect(
-  redirectCandidate: string | null,
-): string {
+export function getSafeLoginRedirect(redirectCandidate: string | null): string {
   if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
   if (
     !redirectCandidate.startsWith('/') ||
@@ -33,8 +30,7 @@ export function getSafeLoginRedirect(
       url.pathname === PROCUREMENT_RESUME_CHECKOUT_PATH;
     const isCorporateSourcingResume =
       url.pathname === CORPORATE_SOURCING_RESUME_PATH;
-    const isShippingCheckoutResume =
-      url.pathname === SHIPPING_ONLY_RESUME_PATH;
+    const isShippingCheckoutResume = url.pathname === SHIPPING_ONLY_RESUME_PATH;
     const isIntelligencePath = url.pathname.startsWith('/intelligence');
 
     if (
