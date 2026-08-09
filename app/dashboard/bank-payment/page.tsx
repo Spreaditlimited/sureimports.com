@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import BankPaymentForm from '@/app/dashboard/bank-payment/components/bank-payment-form';
+import { prisma } from '@/lib/prisma';
 import { 
   ArrowLeft, 
   Building2, 
@@ -28,32 +29,25 @@ type BankOption = {
 };
 
 async function getPaymentChannels(): Promise<AdminBankAccount[]> {
-  const adminBaseUrl =
-    process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com';
-  const endpoint = `${adminBaseUrl.replace(/\/$/, '')}/api/invoicing/bank-accounts`;
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 12000);
-
   try {
-    const response = await fetch(endpoint, {
-      cache: 'no-store',
-      signal: controller.signal,
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-
-    if (!response.ok) return [];
-    const json = await response.json();
-    const records = Array.isArray(json?.data)
-      ? json.data
-      : Array.isArray(json)
-        ? json
-        : [];
+    const records = await prisma.$queryRaw<AdminBankAccount[]>`
+      SELECT
+        pidBankAccount,
+        accountName,
+        accountNumber,
+        bankName,
+        sortCode,
+        currency,
+        country,
+        notes,
+        status
+      FROM invoice_bank_accounts
+      WHERE status = 'ACTIVE'
+      ORDER BY displayOrder ASC, createdAt ASC
+    `;
 
     return records
-      .filter((row: any) => row?.status !== 'INACTIVE')
-      .map((row: any) => ({
+      .map((row) => ({
         pidBankAccount: row?.pidBankAccount || undefined,
         accountName: row?.accountName || undefined,
         accountNumber: row?.accountNumber || undefined,
@@ -65,10 +59,8 @@ async function getPaymentChannels(): Promise<AdminBankAccount[]> {
         status: row?.status || undefined,
       }));
   } catch (error) {
-    console.error('Bank channels fetch error:', error);
+    console.warn('Bank channels query failed:', error);
     return [];
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
