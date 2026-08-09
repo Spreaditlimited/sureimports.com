@@ -107,14 +107,16 @@ export default function PublicShippingOnlyFlow() {
     try {
       const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
       if (!authResponse.ok) {
-        window.localStorage.setItem(
-          PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
-          JSON.stringify(payload),
-        );
-        window.localStorage.setItem(
-          POST_AUTH_REDIRECT_KEY,
-          SHIPPING_ONLY_RESUME_PATH,
-        );
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(
+            PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+            JSON.stringify(payload),
+          );
+          window.localStorage.setItem(
+            POST_AUTH_REDIRECT_KEY,
+            SHIPPING_ONLY_RESUME_PATH,
+          );
+        }
         toast.info('Please sign in or create an account to continue.');
         router.push(
           `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
@@ -149,14 +151,16 @@ export default function PublicShippingOnlyFlow() {
         data?.statusx === 'AUTH_REQUIRED' ||
         data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED'
       ) {
-        window.localStorage.setItem(
-          PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
-          JSON.stringify(payload),
-        );
-        window.localStorage.setItem(
-          POST_AUTH_REDIRECT_KEY,
-          SHIPPING_ONLY_RESUME_PATH,
-        );
+        if (typeof window !== 'undefined') {
+          window.localStorage.setItem(
+            PENDING_SHIPPING_ONLY_CHECKOUT_KEY,
+            JSON.stringify(payload),
+          );
+          window.localStorage.setItem(
+            POST_AUTH_REDIRECT_KEY,
+            SHIPPING_ONLY_RESUME_PATH,
+          );
+        }
         toast.info('Please sign in or create an account to continue.');
         router.push(
           `/auth/login?next=${encodeURIComponent(SHIPPING_ONLY_RESUME_PATH)}`,
@@ -346,6 +350,7 @@ export default function PublicShippingOnlyFlow() {
 
               <div className="mt-8 space-y-4">
                 <Button
+                  type="button"
                   onClick={submitRequest}
                   disabled={submitting}
                   className="h-14 w-full rounded-2xl bg-indigo-600 text-base font-black text-white shadow-lg shadow-indigo-500/20 transition-all hover:bg-indigo-500 active:scale-[0.98] border-0"
