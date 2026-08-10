@@ -19,6 +19,10 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import countries from '@/lib/data/countries';
+import {
+  getSupplierReportResumePath,
+  POST_AUTH_REDIRECT_KEY,
+} from '@/lib/auth/loginRedirect';
 
 export default function ReportCheckoutForm({
   reportSlug,
@@ -51,13 +55,15 @@ export default function ReportCheckoutForm({
       });
       const data = await response.json();
       if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
+        const resumePath = getSupplierReportResumePath(reportSlug);
         window.localStorage.setItem(
           pendingCheckoutKey,
           JSON.stringify(payload),
         );
+        window.localStorage.setItem(POST_AUTH_REDIRECT_KEY, resumePath);
         window.location.href =
           data.loginPath ||
-          `/auth/login?next=${encodeURIComponent(`/supplier-intelligence/reports/${reportSlug}?resumeCheckout=1`)}`;
+          `/auth/login?next=${encodeURIComponent(resumePath)}`;
         return;
       }
       if (!response.ok || !data.authorizationUrl)

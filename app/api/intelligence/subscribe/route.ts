@@ -12,6 +12,7 @@ import {
   getConfiguredIntelligencePlan,
   type IntelligencePlanKey,
 } from '@/lib/intelligence/plans';
+import { getIntelligenceSubscriptionResumePath } from '@/lib/auth/loginRedirect';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
         statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
         message:
           'An account with this email already exists. Please sign in to subscribe.',
-        loginPath: `/auth/login?next=${encodeURIComponent(`/supplier-intelligence?resumeSubscription=${plan.key}`)}`,
+        loginPath: `/auth/login?next=${encodeURIComponent(getIntelligenceSubscriptionResumePath(plan.key))}`,
       },
       { status: 409 },
     );

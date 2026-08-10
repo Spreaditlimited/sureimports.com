@@ -254,45 +254,58 @@ export async function grantIntelligenceCredits(input: {
   await ensureCreditTables();
   await getOrCreateIntelligenceCreditAccount(input.pidUser);
 
-  if (input.reference) {
-    const existing = await prisma.$queryRaw<Array<{ total: bigint }>>`
-      SELECT COUNT(*) AS total
-      FROM intelligence_credit_transactions
+  return prisma.$transaction(async (tx) => {
+    // Serialise grants for this credit account so the Paystack callback and
+    // webhook cannot both grant the same payment reference concurrently.
+    const accounts = await tx.$queryRaw<Array<{ pidAccount: string }>>`
+      SELECT pidAccount
+      FROM intelligence_credit_accounts
       WHERE pidUser = ${input.pidUser}
-        AND reference = ${input.reference}
-        AND reason = ${input.reason}
+      LIMIT 1
+      FOR UPDATE
     `;
-    if (Number(existing[0]?.total || 0) > 0) return false;
-  }
+    if (!accounts[0]) return false;
 
-  await prisma.$executeRaw`
-    UPDATE intelligence_credit_accounts
-    SET
-      balance = balance + ${input.amount},
-      lifetimeGranted = lifetimeGranted + ${input.amount},
-      updatedAt = ${new Date()}
-    WHERE pidUser = ${input.pidUser}
-  `;
+    if (input.reference) {
+      const existing = await tx.$queryRaw<Array<{ total: bigint }>>`
+        SELECT COUNT(*) AS total
+        FROM intelligence_credit_transactions
+        WHERE pidUser = ${input.pidUser}
+          AND reference = ${input.reference}
+          AND reason = ${input.reason}
+      `;
+      if (Number(existing[0]?.total || 0) > 0) return false;
+    }
 
-  await prisma.$executeRaw`
-    INSERT INTO intelligence_credit_transactions (
-      pidTransaction,
-      pidUser,
-      amount,
-      reason,
-      reference,
-      createdAt
-    ) VALUES (
-      ${`INTCTX${randomGenerator(12)}`},
-      ${input.pidUser},
-      ${input.amount},
-      ${clean(input.reason, 120)},
-      ${clean(input.reference, 160) || null},
-      ${new Date()}
-    )
-  `;
+    await tx.$executeRaw`
+      UPDATE intelligence_credit_accounts
+      SET
+        balance = balance + ${input.amount},
+        lifetimeGranted = lifetimeGranted + ${input.amount},
+        updatedAt = ${new Date()}
+      WHERE pidUser = ${input.pidUser}
+    `;
 
-  return true;
+    await tx.$executeRaw`
+      INSERT INTO intelligence_credit_transactions (
+        pidTransaction,
+        pidUser,
+        amount,
+        reason,
+        reference,
+        createdAt
+      ) VALUES (
+        ${`INTCTX${randomGenerator(12)}`},
+        ${input.pidUser},
+        ${input.amount},
+        ${clean(input.reason, 120)},
+        ${clean(input.reference, 160) || null},
+        ${new Date()}
+      )
+    `;
+
+    return true;
+  });
 }
 
 export async function createSearchRequestWithReservedCredit(input: {

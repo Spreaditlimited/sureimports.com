@@ -9,6 +9,16 @@ export const CORPORATE_SOURCING_RESUME_PATH =
 export const PENDING_SHIPPING_ONLY_CHECKOUT_KEY =
   'sureimports:pendingShippingOnlyCheckout';
 export const SHIPPING_ONLY_RESUME_PATH = '/checkout/resume-shipping-only';
+export const SUPPLIER_INTELLIGENCE_PATH = '/supplier-intelligence';
+
+export function getSupplierReportResumePath(reportSlug: string) {
+  return `${SUPPLIER_INTELLIGENCE_PATH}/reports/${encodeURIComponent(reportSlug)}?resumeCheckout=1`;
+}
+
+export function getIntelligenceSubscriptionResumePath(plan: string) {
+  const safePlan = plan === 'pro' ? 'pro' : 'starter';
+  return `${SUPPLIER_INTELLIGENCE_PATH}?resumeSubscription=${safePlan}`;
+}
 
 export function getSafeLoginRedirect(redirectCandidate: string | null): string {
   if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
@@ -32,6 +42,14 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
       url.pathname === CORPORATE_SOURCING_RESUME_PATH;
     const isShippingCheckoutResume = url.pathname === SHIPPING_ONLY_RESUME_PATH;
     const isIntelligencePath = url.pathname.startsWith('/intelligence');
+    const isSupplierReportCheckoutResume =
+      /^\/supplier-intelligence\/reports\/[^/]+$/.test(url.pathname) &&
+      url.searchParams.get('resumeCheckout') === '1';
+    const isSupplierSubscriptionResume =
+      url.pathname === SUPPLIER_INTELLIGENCE_PATH &&
+      ['starter', 'pro'].includes(
+        url.searchParams.get('resumeSubscription') || '',
+      );
 
     if (
       isDashboardPath ||
@@ -39,7 +57,9 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
       isProcurementCheckoutResume ||
       isCorporateSourcingResume ||
       isShippingCheckoutResume ||
-      isIntelligencePath
+      isIntelligencePath ||
+      isSupplierReportCheckoutResume ||
+      isSupplierSubscriptionResume
     ) {
       return `${url.pathname}${url.search}${url.hash}`;
     }

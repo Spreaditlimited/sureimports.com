@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
+import {
+  getIntelligenceSubscriptionResumePath,
+  POST_AUTH_REDIRECT_KEY,
+} from '@/lib/auth/loginRedirect';
 
 type IntelligenceSignupFormProps = {
   plan: IntelligencePlanKey | 'free';
@@ -38,13 +42,15 @@ export default function IntelligenceSignupForm({
     const data = await response.json();
 
     if (data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED') {
+      const resumePath = getIntelligenceSubscriptionResumePath(plan);
       window.localStorage.setItem(
         pendingSubscriptionKey,
         JSON.stringify(payload),
       );
+      window.localStorage.setItem(POST_AUTH_REDIRECT_KEY, resumePath);
       window.location.href =
         data.loginPath ||
-        `/auth/login?next=${encodeURIComponent(`/supplier-intelligence?resumeSubscription=${plan}`)}`;
+        `/auth/login?next=${encodeURIComponent(resumePath)}`;
       return;
     }
 

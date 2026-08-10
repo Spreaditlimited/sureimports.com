@@ -10,6 +10,11 @@ import {
 } from '@/lib/intelligence/reportOrders';
 import { fulfillConsultationPayment } from '@/lib/consultationFulfillment';
 import { resolvePaystackAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
+import {
+  activateIntelligenceSubscriptionPayment,
+  IntelligenceSubscriptionNotFoundError,
+  IntelligenceSubscriptionPaymentError,
+} from '@/lib/intelligence/subscriptionActivation';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -223,6 +228,32 @@ export async function POST(request: Request) {
       });
     }
     return NextResponse.json({ received: true });
+  }
+  if (payment?.metadata?.product === 'supplier_intelligence') {
+    try {
+      const { subscription } =
+        await activateIntelligenceSubscriptionPayment(payment);
+      return NextResponse.json({
+        received: true,
+        status: subscription.status,
+      });
+    } catch (error) {
+      // Paystack can retain the original metadata on recurring charges. A new
+      // renewal reference will not match the initial checkout record, so let
+      // that event continue into the recurring-subscription handler below.
+      if (error instanceof IntelligenceSubscriptionNotFoundError) {
+        // Continue below.
+      } else if (error instanceof IntelligenceSubscriptionPaymentError) {
+        console.error('Subscription webhook payment rejected:', error.message);
+        return NextResponse.json({ received: true, status: 'ignored' });
+      } else {
+        console.error('Subscription webhook activation failed:', error);
+        return NextResponse.json(
+          { message: 'Subscription activation failed.' },
+          { status: 500 },
+        );
+      }
+    }
   }
   const subscriptionCode = getPaymentSubscriptionCode(payment);
   const customerCode = payment.customer?.customer_code || null;

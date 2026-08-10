@@ -11,6 +11,7 @@ import {
 } from '@/lib/intelligence/reportCheckoutSecurity';
 import { getPublishedReportBySlug } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
+import { getSupplierReportResumePath } from '@/lib/auth/loginRedirect';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
         statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED',
         message:
           'An account with this email already exists. Please sign in to complete your purchase.',
-        loginPath: `/auth/login?next=${encodeURIComponent(`/supplier-intelligence/reports/${report.slug}?resumeCheckout=1`)}`,
+        loginPath: `/auth/login?next=${encodeURIComponent(getSupplierReportResumePath(report.slug))}`,
       },
       { status: 409 },
     );
