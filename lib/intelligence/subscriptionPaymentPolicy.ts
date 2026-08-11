@@ -19,9 +19,7 @@ function normalizedEmail(value: unknown) {
 
 export function getPaystackPaymentPlanCode(payment: any) {
   return normalized(
-    typeof payment?.plan === 'string'
-      ? payment.plan
-      : payment?.plan?.plan_code,
+    typeof payment?.plan === 'string' ? payment.plan : payment?.plan?.plan_code,
   );
 }
 

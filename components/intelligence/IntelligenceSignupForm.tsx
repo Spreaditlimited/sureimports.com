@@ -49,8 +49,7 @@ export default function IntelligenceSignupForm({
       );
       window.localStorage.setItem(POST_AUTH_REDIRECT_KEY, resumePath);
       window.location.href =
-        data.loginPath ||
-        `/auth/login?next=${encodeURIComponent(resumePath)}`;
+        data.loginPath || `/auth/login?next=${encodeURIComponent(resumePath)}`;
       return;
     }
 

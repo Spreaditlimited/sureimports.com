@@ -67,7 +67,14 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const { tag, page, q } = await searchParams;
   const currentPage = Number.parseInt(page || '1', 10);
   const searchQuery = typeof q === 'string' ? q.trim() : '';
-  const { posts, featuredPosts, totalPages, totalPosts, page: resolvedPage } =
+  const {
+    posts,
+    featuredPosts,
+    totalPages,
+    totalPosts,
+    totalReadTime,
+    page: resolvedPage,
+  } =
     await fetchPublishedBlogsLite(
       Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1,
       9,
@@ -87,6 +94,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
           currentPage={resolvedPage}
           totalPages={totalPages}
           totalPosts={totalPosts}
+          totalReadTime={totalReadTime}
         />
       </main>
       <Footer />

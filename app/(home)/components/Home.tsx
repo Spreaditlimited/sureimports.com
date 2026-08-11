@@ -291,6 +291,7 @@ export default function Home() {
           currentPage={1}
           totalPages={1}
           totalPosts={0}
+          totalReadTime={0}
         />
         <Footer />
         <CookieConsent

@@ -11,15 +11,33 @@ Rules for Flodesk setup:
 - Do not promise fixed customs duty, exchange rates, shipping prices, delivery timelines or profit margins.
 - Do not say a supplier is safe just because it appears online.
 - Keep every email educational first, commercial second.
+- Every email must stand on its own and give the reader a practical test, question, framework or action they can use without buying anything.
+- Keep the resource link to a short, natural final step. Do not interrupt the lesson with repeated sales language or imply that a paid service is required.
 - Use the CTA that matches the lesson.
-- Primary paid offer: Supplier Intelligence, especially Pro review support.
+- Keep the offers distinct: ready-made Supplier Reports are one-time purchases for a specific product; Supplier Intelligence is the subscription database and research service; Pro review is for supplier, quote, invoice and payment checks before payment.
+- Use direct report links only when the report closely matches the lesson. Use the reports catalogue for general product discovery and category research.
+- Send general leads to public landing pages. Use gated dashboard links only when the email explicitly addresses existing subscribers or a task that requires an account.
 - Service CTAs:
+  - Supplier Reports catalogue: `https://www.sureimports.com/supplier-intelligence/reports`
   - Supplier Intelligence: `https://www.sureimports.com/supplier-intelligence`
   - Dashboard reviews after subscription: `https://www.sureimports.com/dashboard/intelligence/reviews`
   - Buy From Chinese Websites: `https://www.sureimports.com/buy-from-chinese-websites`
   - Ship With Us: `https://www.sureimports.com/ship-with-us`
-  - Corporate Sourcing: `https://www.sureimports.com/corporate-gifts`
+  - Shipping Rates: `https://www.sureimports.com/shipping-rate`
+  - Corporate Sourcing: `https://www.sureimports.com/corporate-sourcing`
+  - Laptops for Business: `https://www.sureimports.com/laptops-for-business`
+  - Buy Phones from China: `https://www.sureimports.com/buy-phones-from-china`
+  - Sure Imports Shop: `https://www.sureimports.com/shop`
+  - Pay Supplier: `https://www.sureimports.com/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate`
+  - Book Consultation: `https://www.sureimports.com/book-consultation`
+  - Import from China hub: `https://www.sureimports.com/import-from-china-to-nigeria`
   - LineScout: `https://linescout.sureimports.com/`
+  - Landed Cost Estimator: `https://www.sureimports.com/tools/landed-cost-estimator`
+  - Retail Price Builder: `https://www.sureimports.com/tools/retail-price-builder`
+  - Air vs Sea Calculator: `https://www.sureimports.com/tools/air-vs-sea-calculator`
+  - CBM & Volumetric Calculator: `https://www.sureimports.com/tools/cbm-volumetric-weight-calculator`
+  - Carton Optimization: `https://www.sureimports.com/tools/carton-optimization`
+  - Generator Sizing: `https://www.sureimports.com/tools/generator-sizing`
 
 ## Welcome Email
 
@@ -38,9 +56,9 @@ Over the next 52 weeks, I’ll send you one practical import lesson every week. 
 
 Start with the guide today. When you are ready to investigate suppliers more seriously, use Supplier Intelligence.
 
-CTA: Download your guide / Explore Supplier Intelligence
+CTA: Keep learning in the Sure Imports China import resource hub
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/import-from-china-to-nigeria`
 
 ---
 
@@ -57,9 +75,9 @@ Many beginners fail because they treat importing as “send money and wait.” T
 
 Good importers do not rush the chain. They control it.
 
-CTA: See researched supplier categories in Supplier Intelligence.
+CTA: See the complete Sure Imports import process and choose your next step.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/import-from-china-to-nigeria`
 
 ---
 
@@ -76,11 +94,11 @@ A cheap product can still fail if nobody wants it, if quality is poor, if shippi
 
 Before buying, ask: Who will buy this? Why will they choose mine? What quality level is acceptable? What is the total cost after shipping and local expenses? Can I sell fast enough to recover cash?
 
-The product decision is more important than the supplier search.
+The product decision is more important than the supplier search. Before you contact any supplier, speak to at least five likely buyers or test the offer with a small audience. Questions, deposits and genuine price enquiries are stronger evidence than likes.
 
-CTA: Use Supplier Intelligence when you need safer starting points.
+CTA: Review the beginner resources before choosing what to import.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/import-from-china-to-nigeria`
 
 ---
 
@@ -99,9 +117,11 @@ Also check pain. Products that solve a clear problem usually sell better than pr
 
 If you cannot explain who will buy and why, pause before importing.
 
-CTA: Need help choosing a category? Pro users can request research.
+If the product is not available yet, you can search for it on the reports page and add your vote to the Research Radar. Treat that as another signal of buyer interest—not a replacement for checking demand in your own market.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA: Check whether the product already has a supplier report.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -118,11 +138,11 @@ Score each one on demand, competition, shipping weight, damage risk, warranty ri
 
 A product with lower profit per unit but faster turnover may beat a “high margin” product that sits unsold. A light product may beat a bulky one if shipping cost is the difference between profit and loss.
 
-Good importers compare options before they commit cash.
+Good importers compare options before they commit cash. Give every idea a score from 1 to 5 for demand, competition, shipping, defect risk, cash required and expected selling speed. The numbers do not make the decision for you, but they expose weak assumptions.
 
-CTA: Use Supplier Intelligence to study categories before buying.
+CTA: Compare the product categories with ready-made supplier reports.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -139,9 +159,11 @@ Beginners often see MOQ and give up. But MOQ can sometimes be negotiated, especi
 
 Do not ask “Can you reduce MOQ?” only. Ask: “What is the smallest paid trial order you can support without customization?” That question sounds more serious.
 
-CTA: Ask Sure Imports to review supplier terms before payment.
+When reviewing a ready-made supplier report, use its product-fit and buyer-note sections to prepare MOQ questions; do not assume every supplier in a category will accept the same trial quantity.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how product-specific supplier research is organised.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -181,9 +203,11 @@ Ask direct questions: Do you manufacture this product yourself? Where is the fac
 
 The goal is not labels. The goal is clarity.
 
-CTA: Submit supplier details for Pro review before paying.
+If you want an example of how manufacturer evidence, product fit and contact attribution can be recorded, compare the structure of a product-specific supplier report with the claims made in a marketplace listing.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See available product-specific manufacturer reports.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -202,9 +226,11 @@ Also check whether the supplier can answer product-specific questions. A real su
 
 Never rely on one signal. Use several checks together.
 
-CTA: Pro users can submit supplier details for review.
+Use a three-part check: identity, capability and transaction. Identity asks whether the legal company, address and payment beneficiary match. Capability asks whether the supplier can actually make the exact product. Transaction asks whether the quotation, invoice, specifications and payment instructions describe the same deal.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how pre-payment supplier review works.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -221,9 +247,9 @@ Some products may also need test reports, certifications, manuals, labels, or co
 
 Documents are not decoration. They help you check what you are buying.
 
-CTA: Use Pro review for invoice and supplier document checks.
+CTA: See how invoice and supplier-document review works.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -242,9 +268,9 @@ Weak suppliers answer vaguely. Stronger suppliers give clear details or explain 
 
 Your questions should make risk visible before payment.
 
-CTA: Need help reviewing supplier answers? Use Pro review.
+CTA: Learn how Pro review can support this check.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -265,7 +291,7 @@ A sample is useful only when you inspect it with purpose.
 
 CTA: For custom/bulk items, use Corporate Sourcing.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -286,7 +312,7 @@ The larger the order, the more control you need.
 
 CTA: Use Corporate Sourcing for custom or bulk sourcing support.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -305,9 +331,11 @@ If you price your product using only the supplier’s unit price, you may sell a
 
 Always build a simple landed cost sheet before you buy.
 
-CTA: Submit a quote for Pro review before you commit.
+Use separate rows for unit price, quantity, China delivery, packaging, inspection, international freight, clearing, local delivery, payment charges and a contingency buffer. Leaving an unknown row blank is safer than pretending it is zero.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Estimate the wider cost before you commit.
+
+CTA URL: `https://www.sureimports.com/tools/landed-cost-estimator`
 
 ---
 
@@ -326,9 +354,9 @@ Do not wait until goods arrive before calculating. If landed cost is too high, y
 
 Landed cost is where many import mistakes become visible.
 
-CTA: Use Supplier Intelligence and Pro quote review before ordering.
+CTA: Build a landed-cost estimate before ordering.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/tools/landed-cost-estimator`
 
 ---
 
@@ -347,9 +375,9 @@ Before choosing shipping, consider weight, volume, urgency, product value, cash 
 
 The best shipping method is not the fastest. It is the one that protects the business case.
 
-CTA: If goods are ready in China, use Ship With Us.
+CTA: Compare air and sea shipping for your order.
 
-CTA URL: `https://www.sureimports.com/ship-with-us`
+CTA URL: `https://www.sureimports.com/tools/air-vs-sea-calculator`
 
 ---
 
@@ -368,9 +396,11 @@ If shipping cost makes the product too expensive to sell, the problem may be pro
 
 Shipping is part of product strategy.
 
-CTA: Let Sure Imports handle shipping-only logistics when sourcing is done.
+Check the current shipping-rate guide before deciding, then submit a Ship With Us request when your goods are ready.
 
-CTA URL: `https://www.sureimports.com/ship-with-us`
+CTA: Review current China-to-Nigeria shipping rates.
+
+CTA URL: `https://www.sureimports.com/shipping-rate`
 
 ---
 
@@ -388,6 +418,8 @@ Does it include pickup? China warehouse handling? Customs process? Delivery loca
 The cheapest quote can become expensive if communication is poor, documentation is weak, or hidden charges appear later.
 
 Choose shipping based on clarity, not price alone.
+
+Compare quotations on the same basis: chargeable weight or CBM, route, included handling, customs assumptions, delivery point, transit range and exclusions. Two prices are not comparable when one ends at the port and the other includes local delivery.
 
 CTA: Use Ship With Us when your supplier already has goods ready.
 
@@ -410,9 +442,13 @@ Poor packaging can increase shipping cost or cause damage. Over-packaging can al
 
 Do not treat packaging as an afterthought. It is part of the import plan.
 
-CTA: For custom packaging or branded items, use Corporate Sourcing.
+Use the CBM calculator to compare the effect of carton size and weight before approving a packaging change: https://www.sureimports.com/tools/cbm-volumetric-weight-calculator
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+If packaging itself is the product you plan to source, the Beauty and Cosmetic Packaging report is a relevant research example: https://www.sureimports.com/supplier-intelligence/reports/beauty-and-cosmetic-packaging
+
+CTA: Test carton dimensions before approving packaging.
+
+CTA URL: `https://www.sureimports.com/tools/carton-optimization`
 
 ---
 
@@ -431,9 +467,9 @@ If a product’s profit only works when every cost is perfect, it may be too fra
 
 Plan with margin for uncertainty.
 
-CTA: Use Pro review to check cost assumptions before paying suppliers.
+CTA: Learn how quote review works before supplier payment.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -452,9 +488,11 @@ If you sell too cheaply, you may move stock but still weaken your business. Prof
 
 The goal is not just to sell out. The goal is to sell and have enough cash to buy again.
 
-CTA: Use quote review before committing to a landed cost.
+Subtract every expected cost from the proposed selling price—not only product and freight. Then ask whether the amount left can absorb discounts, a few defects and the next restock. If one small problem removes the entire profit, the price is too fragile.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Turn your estimated landed cost into a sensible selling price.
+
+CTA URL: `https://www.sureimports.com/tools/retail-price-builder`
 
 ---
 
@@ -473,9 +511,9 @@ Do not set margin by copying other sellers. Understand your cost, your customers
 
 Profit is not just the difference between buying and selling. It is what remains after the full business reality.
 
-CTA: Supplier Intelligence helps you choose better product categories.
+CTA: Build a retail price from your real costs and target margin.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/tools/retail-price-builder`
 
 ---
 
@@ -494,9 +532,9 @@ Do not import just because the product is unique. Unique products still need buy
 
 Fast turnover gives you room to learn and restock.
 
-CTA: Study supplier categories before choosing what to buy.
+CTA: Continue with the practical product-selection guides.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA URL: `https://www.sureimports.com/import-from-china-to-nigeria`
 
 ---
 
@@ -515,9 +553,11 @@ If you are new, choose products that are easier to explain, easier to ship local
 
 Your first goal is not to impress people. It is to learn without losing too much money.
 
-CTA: Request category research as a Pro user.
+If you cannot find the product you are considering, search for it on the reports page and vote for it on the Research Radar instead of guessing.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Search reports and vote for missing categories.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -536,9 +576,13 @@ Plan backward: selling season, arrival deadline, shipping time, production time,
 
 Seasonal importing rewards planning and punishes delay.
 
-CTA: For business/event orders, use Corporate Sourcing early.
+If you are actively considering either category, these are relevant research examples—not proof of demand in your own market:
+- https://www.sureimports.com/supplier-intelligence/reports/children-and-school-supplies
+- https://www.sureimports.com/supplier-intelligence/reports/event-and-conference-materials
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA: Review available category research after checking the selling season.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -578,9 +622,11 @@ Scaling should be based on evidence, not excitement.
 
 The goal is repeatable supply, not one lucky shipment.
 
-CTA: Pro users can submit supplier or quote details before scaling.
+Before increasing quantity, record four numbers from the test: units sold, average days to sell, defect or return rate, and cash left after every cost. Scale the proven sizes, colours or models first instead of multiplying every option equally.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Review the available supplier and quotation checks before scaling.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -599,9 +645,11 @@ If the supplier sends vague answers, keep asking before payment.
 
 Written specs give you something to compare when goods arrive.
 
-CTA: Use Pro review if you are unsure about supplier specs.
+Your specification sheet should cover dimensions, material grade, colour reference, components, logo position, packaging, accessories, voltage or plug where relevant, acceptable tolerances and the approved sample. Date every version so an old file cannot quietly become the production instruction.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Use Corporate Sourcing when specifications require hands-on sourcing support.
+
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -620,9 +668,11 @@ If your request is vague, suppliers will quote different things and comparison b
 
 A good brief saves time, improves quotes and reduces mistakes.
 
+Use this order: product and intended use; required specifications; quantity and acceptable MOQ; quality level; branding and packaging; destination; deadline; required documents; inspection expectation; and questions the supplier must answer. Mark each requirement as “must have” or “preferred.”
+
 CTA: For bulk/custom sourcing, use Corporate Sourcing.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -641,9 +691,11 @@ Create a simple comparison table. If information is missing, ask before deciding
 
 The best quote is the clearest quote that fits your market and risk level.
 
-CTA: Submit supplier quotes for Pro review.
+Put every quotation into one table. Use the same columns for specification, quantity, unit price, tooling, samples, packaging, China delivery, lead time, payment terms, warranty and exclusions. Highlight blank cells: missing information is a comparison risk, not an automatic saving.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how quotation review works before payment.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -662,9 +714,11 @@ Do not let pressure force payment before clarity.
 
 Money should leave your account only after the basics are checked.
 
-CTA: Use invoice/payment detail check before sending money.
+If you already have a confirmed supplier and need Sure Imports to process the payment, use Pay Supplier. If the invoice or beneficiary details are unclear, use Pro review first.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Start a Pay Supplier request.
+
+CTA URL: `https://www.sureimports.com/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate`
 
 ---
 
@@ -683,9 +737,9 @@ Also be careful with last-minute account changes. That is a common risk point in
 
 Slow down at the payment stage. It is better to delay than to pay blindly.
 
-CTA: Submit invoice details for Pro review.
+CTA: See how invoice and beneficiary review works before payment.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -704,9 +758,11 @@ Inspection is not needed for every small order, but it becomes more important as
 
 Problems are easier to handle before goods ship.
 
+Define the inspection before production ends: what quantity will be checked, which measurements matter, what counts as a major or minor defect, which functional tests apply, and what evidence the inspector must provide. “Check quality” is not an inspection standard.
+
 CTA: For bulk/custom orders, use Corporate Sourcing.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -722,6 +778,14 @@ Factory inspection may be worth it when the order is large, custom, technical, b
 It can help confirm whether the supplier has the environment, process and capacity to support the order. It can also reveal whether you are dealing with a factory, a trading office or something else.
 
 Do not use factory inspection for ego. Use it when the risk justifies the cost.
+
+For machinery, use a written specification before comparing factories: output per hour, raw material, power source, voltage, included accessories, installation, spare parts and warranty. The following reports are useful examples only when they match the machine you need:
+- https://www.sureimports.com/supplier-intelligence/reports/hammer-mills
+- https://www.sureimports.com/supplier-intelligence/reports/freeze-dryers
+- https://www.sureimports.com/supplier-intelligence/reports/dehydrators
+- https://www.sureimports.com/supplier-intelligence/reports/diesel-generators
+
+If your immediate question is generator capacity rather than supplier choice, use the Generator Sizing tool first: https://www.sureimports.com/tools/generator-sizing
 
 CTA: For machinery and technical equipment, use LineScout.
 
@@ -744,9 +808,11 @@ Also keep your own buffer. If you sell every unit assuming zero defects, one bad
 
 Defect policy should be discussed before payment, not after anger.
 
-CTA: Use Pro review to check supplier terms before ordering.
+Put the remedy in writing. Define how defects will be counted, the evidence deadline, whether the solution is replacement, spare parts or credit, and when it will be delivered. Keep samples, inspection records and batch photographs so the discussion is based on evidence.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how supplier and quotation review works before ordering.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -765,7 +831,9 @@ A supplier who sees repeat potential may cooperate better on price, packaging, M
 
 Importing becomes easier when you build reliable supply relationships.
 
-CTA: Supplier Intelligence helps you start from better supplier leads.
+Keep a supplier scorecard after every order: response time, specification accuracy, sample quality, production punctuality, inspection result, document accuracy and how problems were resolved. Relationships may improve cooperation, but records should still guide your decisions.
+
+CTA: Explore researched supplier categories when you need a new starting point.
 
 CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
@@ -786,9 +854,11 @@ You can negotiate better when you know what can move: price, MOQ, packaging, acc
 
 Good negotiation is not begging. It is finding a workable order structure.
 
-CTA: Submit a quote for Pro review before negotiating further.
+Negotiate in sequence. Confirm the specification first, then ask for quantity-price breaks, and only then explore packaging, stock materials, payment structure and timing. Changing five variables at once makes it difficult to know what concession produced the lower price—or what quality was removed.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how quotation review can prepare you for negotiation.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -807,9 +877,13 @@ If you are still testing demand, be careful with heavy customization. If you alr
 
 Choose the level of branding that matches your stage.
 
-CTA: For branded or custom products, use Corporate Sourcing.
+If fashion accessories or bags are already among your tested ideas, these reports provide relevant manufacturer-research examples:
+- https://www.sureimports.com/supplier-intelligence/reports/fashion-accessories
+- https://www.sureimports.com/supplier-intelligence/reports/bags-and-backpacks
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA: Review the available research after deciding how much branding you need.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -828,9 +902,11 @@ Before white labeling, confirm product quality, packaging, warranty route, MOQ, 
 
 White label can be powerful, but only when execution is controlled.
 
-CTA: Use Corporate Sourcing for white label planning.
+If sneakers are the category you have already chosen, the High Quality Sneakers with OEM Capability report is a relevant example of supplier research for an own-brand programme.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA: Review the OEM-capable sneakers research.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports/high-quality-sneakers-with-oem-capability`
 
 ---
 
@@ -849,9 +925,13 @@ If every batch is different, customers will not trust the brand.
 
 A brand is not just logo. It is the experience customers can expect again.
 
-CTA: For repeat branded sourcing, use Corporate Sourcing.
+If you are building a cosmetics business, separate the product supplier decision from the packaging decision. These two reports cover those distinct parts of the supply chain:
+- https://www.sureimports.com/supplier-intelligence/reports/makeup-and-colour-cosmetics
+- https://www.sureimports.com/supplier-intelligence/reports/beauty-and-cosmetic-packaging
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA: Use Corporate Sourcing when you are ready to develop the branded order.
+
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -870,9 +950,11 @@ But do not overstock blindly. Use sales data to decide reorder quantity.
 
 Retail importing works better when stock movement guides buying.
 
-CTA: Use Supplier Intelligence to plan reliable product categories.
+When evaluating a repeat-inventory category, check whether the product has stable specifications, several viable suppliers and a reorder lead time your cash flow can support. Ready-made reports currently cover examples such as Human Hair, Diapers, Home Storage and Fitness Products.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA: Check the available research for the category you already sell or have tested.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -891,9 +973,11 @@ Ask suppliers for clean photos, product videos, manuals, packaging images and sp
 
 Online customers buy what they understand and trust.
 
-CTA: Submit product/supplier details for Pro review.
+Calculate the order at SKU level. Include advertising, platform or payment fees, failed local deliveries, returns, replacement units and the time stock may sit before selling. A product can look profitable at gross-margin level and lose money after fulfilment.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: Check available reports for the product category you plan to sell.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -912,9 +996,13 @@ If the product is for clients, staff, events or resale, quality consistency matt
 
 Corporate orders need structure before payment.
 
+When the brief involves gifts, promotional items or event materials, these reports can support the supplier-comparison stage:
+- https://www.sureimports.com/supplier-intelligence/reports/corporate-gifts-and-promotional-merchandise
+- https://www.sureimports.com/supplier-intelligence/reports/event-and-conference-materials
+
 CTA: Use Corporate Sourcing for business and bulk orders.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -933,9 +1021,16 @@ Do not buy electronics only because the margin looks attractive. Warranty and de
 
 With electronics, verification and after-sales planning matter.
 
-CTA: For complex product checks, use Pro review or Corporate Sourcing.
+If you want tested ready-to-buy devices rather than a supplier shortlist, the Sure Imports shop is the more relevant route: https://www.sureimports.com/shop
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+For accessories and security electronics, use the report that matches the exact product rather than treating all electronics as one category:
+- https://www.sureimports.com/supplier-intelligence/reports/phone-accessories
+- https://www.sureimports.com/supplier-intelligence/reports/cctv-and-security-gadgets
+- https://www.sureimports.com/supplier-intelligence/reports/body-cameras
+
+CTA: Review the Phone Accessories supplier report.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports/phone-accessories`
 
 ---
 
@@ -954,9 +1049,11 @@ For bulk laptop procurement, inconsistent specs can create serious complaints.
 
 Plan the device standard before sourcing.
 
-CTA: For business laptop sourcing, use Sure Imports business sourcing routes.
+Create a minimum configuration for each user group. Office users may prioritise battery, keyboard and reliability; designers may need stronger graphics and displays; resellers need consistent grade and easy-to-explain specifications. For used or refurbished units, define acceptable cosmetic grade, battery-health threshold and testing evidence.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA: Use the dedicated Laptops for Business sourcing route.
+
+CTA URL: `https://www.sureimports.com/laptops-for-business`
 
 ---
 
@@ -975,9 +1072,11 @@ Ask for real photos, videos, model numbers, test evidence and packaging details.
 
 If the claim sounds too good for the price, investigate before paying.
 
-CTA: Submit suspicious supplier claims for Pro review.
+Cross-check important claims in three places: the manufacturer model number, the quotation or invoice, and independent test evidence or a physical sample. For electronics, compare the operating-system screen with diagnostic results. For machinery, ask for a continuous production test.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how pre-payment supplier review works.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -996,9 +1095,11 @@ Evidence helps, but it must match the product you plan to buy.
 
 Do not accept “trust me” when a simple video can answer the question.
 
-CTA: Use Pro review to check supplier evidence before payment.
+Ask for one continuous, timestamped video rather than several edited clips. Request a handwritten card showing your name and date, then have the supplier show the product label, quantity, key measurement and functional test in the same recording. This makes recycled evidence harder to use.
 
-CTA URL: `https://www.sureimports.com/dashboard/intelligence/reviews`
+CTA: See how supplier evidence can be reviewed before payment.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
 ---
 
@@ -1017,9 +1118,11 @@ Ask for realistic production time, confirm before payment, and build a communica
 
 Professional importers expect uncertainty and plan around it.
 
+Plan three dates instead of one: supplier-ready date, latest acceptable shipping date and must-arrive date. Add decision points for sample approval, production update and inspection. If one milestone slips, decide immediately whether to change route, reduce scope or inform customers.
+
 CTA: For time-sensitive business orders, use Corporate Sourcing early.
 
-CTA URL: `https://www.sureimports.com/corporate-gifts`
+CTA URL: `https://www.sureimports.com/corporate-sourcing`
 
 ---
 
@@ -1038,7 +1141,9 @@ If something goes wrong, records give you evidence. If something goes right, rec
 
 Importing without records is guessing with money.
 
-CTA: Supplier Intelligence Pro helps you review supplier details before payment.
+Create one folder per order containing the licence, contacts, approved specification, quotation, invoice, payment proof, production updates, inspection evidence, packing list, shipping documents and complaint history. Use dates and version numbers instead of filenames such as “final latest.”
+
+CTA: Use Supplier Intelligence Pro when records reveal a supplier, quote or payment mismatch.
 
 CTA URL: `https://www.sureimports.com/supplier-intelligence`
 
@@ -1059,9 +1164,11 @@ Use help when it reduces risk, saves time or gives access to better process.
 
 The right support can prevent expensive mistakes.
 
-CTA: Use Sure Imports for sourcing, review, buying or shipping support.
+If the right route is still unclear—or the decision involves a large budget, machinery, several suppliers or complex shipping—book a private consultation before committing.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA: Book a Sure Imports consultation.
+
+CTA URL: `https://www.sureimports.com/book-consultation`
 
 ---
 
@@ -1080,7 +1187,11 @@ If you need supplier search, comparison, branding or bulk sourcing, Corporate So
 
 If you need machinery or technical sourcing, LineScout is the right route.
 
-If you want supplier intelligence and review support before paying, use Supplier Intelligence.
+If you need a ready-made shortlist for one specific product, search Supplier Reports. If you need continuing database access, fresh supplier searches and pre-payment review support, use Supplier Intelligence.
+
+If you already have a confirmed supplier and only need payment handling, use Pay Supplier. For laptops needed by a company, school or reseller, use Laptops for Business.
+
+If the order is high-value or you are still unsure which route fits, book a consultation before committing money. Choose the narrowest service that solves the actual problem; you do not need every service for every import.
 
 CTA: Choose the right Sure Imports route.
 
@@ -1103,9 +1214,11 @@ Do not jump from product to product because someone posted profit online. Build 
 
 Importing becomes easier when your decisions become repeatable.
 
-CTA: Use Supplier Intelligence as your research base.
+Plan in quarters. Give each quarter a test budget, restock budget and risk limit. Review products using selling speed, actual margin, defect rate and supplier performance. Stop weak categories early and give more cash only to products that have earned it through evidence.
 
-CTA URL: `https://www.sureimports.com/supplier-intelligence`
+CTA: Use ready-made supplier reports as your category research base.
+
+CTA URL: `https://www.sureimports.com/supplier-intelligence/reports`
 
 ---
 
@@ -1124,6 +1237,8 @@ If any answer is weak, pause and fix it.
 
 Good importing is not luck. It is process.
 
-CTA: Use Supplier Intelligence Pro before your next payment.
+If you need a product-specific shortlist, start with a report. If you already have a supplier or invoice, use Supplier Intelligence Pro before payment.
+
+CTA: Choose the right research or review route.
 
 CTA URL: `https://www.sureimports.com/supplier-intelligence`

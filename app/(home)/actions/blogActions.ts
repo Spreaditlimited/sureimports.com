@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
+import { getBlogReadingTime } from '@/lib/blogReadingTime';
 
 // Media base URL for serving filename-based images during migration
 const MEDIA_PUBLIC_URL =
@@ -158,6 +159,7 @@ export interface BlogListPageResult {
   pageSize: number;
   totalPosts: number;
   totalPages: number;
+  totalReadTime: number;
 }
 
 function toLitePost(dbBlog: DbBlog): BlogListPost {
@@ -375,11 +377,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
       ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
       : 'No excerpt available');
 
-  // Calculate read time (assuming 200 words per minute)
-  const wordCount = dbBlog.blogContent
-    ? dbBlog.blogContent.replace(/<[^>]*>/g, '').split(/\s+/).length
-    : 0;
-  const readTime = Math.ceil(wordCount / 200);
+  const readTime = getBlogReadingTime(dbBlog.blogContent);
 
   // Get image URL
   const imageUrl = resolveBlogImageUrl(dbBlog.blogImage);
@@ -446,7 +444,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
     publishDate: dbBlog.createdAt
       ? dbBlog.createdAt.toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0],
-    readTime: readTime > 0 ? readTime : 5,
+    readTime,
     featured: dbBlog.blogFeatured === true || seo.featured === true,
     image: imageUrl,
     slug: dbBlog.blogSlug || dbBlog.pidBlog,
@@ -487,7 +485,17 @@ export async function fetchPublishedBlogsLite(
         : 9;
     const where = buildPublishedBlogWhere(searchQuery);
 
-    const totalPosts = await prisma.blog.count({ where });
+    const [totalPosts, readingTimeRows] = await Promise.all([
+      prisma.blog.count({ where }),
+      prisma.blog.findMany({
+        where,
+        select: { blogContent: true },
+      }),
+    ]);
+    const totalReadTime = readingTimeRows.reduce(
+      (total, blog) => total + getBlogReadingTime(blog.blogContent),
+      0,
+    );
 
     const totalPages = Math.max(1, Math.ceil(totalPosts / safePageSize));
     const resolvedPage = Math.min(safePage, totalPages);
@@ -495,6 +503,7 @@ export async function fetchPublishedBlogsLite(
       id: true,
       pidBlog: true,
       blogTitle: true,
+      blogContent: true,
       blogSlug: true,
       blogPublished: true,
       blogFeatured: true,
@@ -561,6 +570,7 @@ export async function fetchPublishedBlogsLite(
       pageSize: safePageSize,
       totalPosts,
       totalPages,
+      totalReadTime,
     };
   } catch (error) {
     console.error('Error fetching lite blogs:', error);
@@ -571,6 +581,7 @@ export async function fetchPublishedBlogsLite(
       pageSize: 9,
       totalPosts: 0,
       totalPages: 1,
+      totalReadTime: 0,
     };
   }
 }

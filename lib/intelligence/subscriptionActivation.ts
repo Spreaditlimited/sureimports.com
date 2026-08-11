@@ -51,8 +51,7 @@ async function retireOlderSubscriptions(pidUser: string, currentId: string) {
         customerCode:
           olderPayment?.customer?.customer_code ||
           olderSubscription.paystackCustomerCode,
-        customerEmail:
-          olderPayment?.customer?.email || olderSubscription.email,
+        customerEmail: olderPayment?.customer?.email || olderSubscription.email,
         planCode: getPaystackPaymentPlanCode(olderPayment),
       });
       const subscriptionCode =

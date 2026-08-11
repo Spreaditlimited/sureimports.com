@@ -11,6 +11,11 @@ import {
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import {
+  blogPlainText,
+  getBlogReadingTime,
+  getBlogWordCount,
+} from '@/lib/blogReadingTime';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -82,11 +87,7 @@ export async function generateMetadata({
     },
   };
 
-  // Calculate reading time for description enhancement
-  const wordCount = post.content
-    ? post.content.replace(/<[^>]*>/g, '').split(/\s+/).length
-    : 0;
-  const readingTime = Math.ceil(wordCount / 200);
+  const readingTime = getBlogReadingTime(post.content);
 
   return {
     title: `${title} | Sure Imports`,
@@ -163,11 +164,9 @@ export default async function BlogDetailsPage({ params }: PageProps) {
   const ogImage = seo.ogImage || post.image || `${SITE_URL}/images/og-blog.png`;
 
   // Calculate content metrics
-  const plainTextContent = post.content
-    ? post.content.replace(/<[^>]*>/g, '')
-    : '';
-  const wordCount = plainTextContent.split(/\s+/).filter(Boolean).length;
-  const readingTime = Math.ceil(wordCount / 200);
+  const plainTextContent = blogPlainText(post.content);
+  const wordCount = getBlogWordCount(post.content);
+  const readingTime = getBlogReadingTime(post.content);
 
   // Enhanced JSON-LD structured data for Article (BlogPosting for better SEO)
   const articleJsonLd = {

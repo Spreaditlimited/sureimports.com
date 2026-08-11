@@ -137,6 +137,7 @@ interface BlogListProps {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
+  totalReadTime: number;
 }
 
 export default function BlogList({
@@ -147,6 +148,7 @@ export default function BlogList({
   currentPage,
   totalPages,
   totalPosts,
+  totalReadTime,
 }: BlogListProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -249,7 +251,6 @@ export default function BlogList({
     });
   };
 
-  const totalReadTime = blogPosts.reduce((acc, post) => acc + post.readTime, 0);
   const categoriesCount = blogCategories.length - 1; 
   
   const buildPageHref = (targetPage: number) => {
@@ -297,7 +298,7 @@ export default function BlogList({
             <div className="mx-auto mb-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
               {[
                 { icon: BookOpen, val: `${totalPosts}+`, label: 'Articles Published', color: 'text-indigo-600 dark:text-indigo-400' },
-                { icon: Clock, val: `${totalReadTime}+`, label: 'Minutes of Reading', color: 'text-brand-orange-500 dark:text-brand-orange-400' },
+                { icon: Clock, val: totalReadTime.toLocaleString(), label: 'Minutes of Reading', color: 'text-brand-orange-500 dark:text-brand-orange-400' },
                 { icon: Tag, val: categoriesCount, label: 'Topics Covered', color: 'text-emerald-600 dark:text-emerald-400' }
               ].map((stat, i) => (
                 <div key={i} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
