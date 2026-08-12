@@ -1,7 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,17 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Loader2, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Loader2, ArrowRight, ArrowLeft, LockKeyhole, ShieldCheck } from 'lucide-react';
 import {
-  CORPORATE_SOURCING_RESUME_PATH,
-  POST_AUTH_REDIRECT_KEY,
-} from '@/lib/auth/loginRedirect';
-import {
-  corporateSourcingDraftToFormData,
-  deleteCorporateSourcingDraft,
+  getCorporateSourcingDraft,
   saveCorporateSourcingDraft,
   type CorporateSourcingDraft,
 } from '@/lib/corporateSourcing/pendingDraft';
+import countries from '@/lib/data/countries';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const MIN_DELIVERY_LEAD_DAYS = 60;
@@ -61,8 +56,12 @@ const brandingOptions = ['Yes, with our logo', 'Yes, product or machine customiz
 const proceedOptions = ['Immediately', 'Within 1 week', 'Within 2 - 4 weeks', 'Still comparing options'];
 const sourceOptions = ['Facebook', 'Instagram', 'Google', 'Referral', 'Existing customer', 'WhatsApp', 'Other'];
 
-export default function CorporateGiftsClient() {
-  const router = useRouter();
+export default function CorporateGiftsClient({
+  researchFee,
+}: {
+  researchFee: { priceNaira: number; priceUsdCents: number };
+}) {
+  const [liveResearchFee, setLiveResearchFee] = useState(researchFee);
   const [values, setValues] = useState<FormValues>(initialValues);
   const [referenceFile, setReferenceFile] = useState<File | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -70,6 +69,8 @@ export default function CorporateGiftsClient() {
   const [status, setStatus] = useState<Status>('idle');
   const [submissionError, setSubmissionError] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
+  const [checkoutReady, setCheckoutReady] = useState(false);
+  const [billingCountry, setBillingCountry] = useState('');
 
   const minDeliveryDate = useMemo(() => {
     const date = new Date();
@@ -79,6 +80,24 @@ export default function CorporateGiftsClient() {
 
   const steps = ['Business Details', 'Product or Machine', 'Customization & Files', 'Delivery Info'];
   const isLastStep = currentStep === steps.length - 1;
+
+  useEffect(() => {
+    fetch('/api/corporate-sourcing/checkout', { cache: 'no-store' })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data?.success && data?.data) setLiveResearchFee(data.data);
+      })
+      .catch(() => undefined);
+    getCorporateSourcingDraft()
+      .then((draft) => {
+        if (!draft) return;
+        setValues((current) => ({ ...current, ...draft.values } as FormValues));
+        setReferenceFile(draft.referenceFile || null);
+        setLogoFile(draft.logoFile || null);
+        setCurrentStep(steps.length - 1);
+      })
+      .catch(() => undefined);
+  }, []);
 
   const onChange = (name: keyof FormValues, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -156,42 +175,9 @@ export default function CorporateGiftsClient() {
         logoFile,
       };
 
-      const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
-      if (!authResponse.ok) {
-        await saveCorporateSourcingDraft(draft);
-        window.localStorage.setItem(
-          POST_AUTH_REDIRECT_KEY,
-          CORPORATE_SOURCING_RESUME_PATH,
-        );
-        router.push(
-          `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
-        );
-        return;
-      }
-
-      const formData = corporateSourcingDraftToFormData(draft);
-      const response = await fetch('/api/corporate-gifts', { method: 'POST', body: formData });
-      const responseBody = await response.json().catch(() => null);
-      if (response.status === 401) {
-        await saveCorporateSourcingDraft(draft);
-        window.localStorage.setItem(
-          POST_AUTH_REDIRECT_KEY,
-          CORPORATE_SOURCING_RESUME_PATH,
-        );
-        router.push(
-          `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
-        );
-        return;
-      }
-      if (!response.ok) {
-        throw new Error(responseBody?.error || 'Submission failed');
-      }
-
-      await deleteCorporateSourcingDraft();
-      window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
-      router.replace(
-        responseBody?.redirectTo || '/dashboard/corporate-sourcing',
-      );
+      await saveCorporateSourcingDraft(draft);
+      setCheckoutReady(true);
+      setStatus('idle');
     } catch (error) {
       setSubmissionError(
         error instanceof Error ? error.message : 'Submission failed',
@@ -199,6 +185,95 @@ export default function CorporateGiftsClient() {
       setStatus('error');
     }
   };
+
+  const startCheckout = async () => {
+    if (!billingCountry) {
+      setSubmissionError('Select your billing country to continue.');
+      return;
+    }
+    setStatus('submitting');
+    setSubmissionError('');
+    try {
+      const names = values.contact_person_full_name.trim().split(/\s+/);
+      const response = await fetch('/api/corporate-sourcing/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: values.contact_email,
+          firstName: names[0],
+          lastName: names.slice(1).join(' '),
+          billingCountry,
+          companyWebsite: '',
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data?.authorizationUrl) {
+        throw new Error(data?.message || 'Unable to start secure checkout.');
+      }
+      window.localStorage.setItem(
+        'sureimports:corporateSourcingCheckout',
+        JSON.stringify({
+          pidPayment: data.pidPayment,
+          submissionToken: data.submissionToken,
+        }),
+      );
+      window.location.href = data.authorizationUrl;
+    } catch (error) {
+      setSubmissionError(error instanceof Error ? error.message : 'Unable to start checkout.');
+      setStatus('error');
+    }
+  };
+
+  if (checkoutReady) {
+    const isNigeria = billingCountry.toLowerCase() === 'nigeria';
+    const amount = isNigeria
+      ? `₦${liveResearchFee.priceNaira.toLocaleString()}`
+      : `$${(liveResearchFee.priceUsdCents / 100).toFixed(0)}`;
+    return (
+      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-950">
+        <div className="border-b border-slate-200 bg-slate-950 p-7 text-white dark:border-slate-800 sm:p-9">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-500">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
+          <p className="mt-6 text-xs font-black uppercase tracking-[0.22em] text-brand-orange-400">Research fee</p>
+          <h3 className="mt-3 text-3xl font-black tracking-tight">Your sourcing brief is saved.</h3>
+          <p className="mt-3 max-w-2xl leading-relaxed text-slate-300">
+            The research fee covers the specialist work required to review your brief, identify suitable manufacturers and prepare the sourcing process. Your request reaches our team only after payment is confirmed.
+          </p>
+        </div>
+        <div className="space-y-5 p-7 sm:p-9">
+          <PremiumSelect
+            label="Billing country"
+            required
+            value={billingCountry}
+            onValueChange={setBillingCountry}
+            options={countries.filter((item) => item.optionValue).map((item) => item.optionName)}
+            placeholder="Select billing country..."
+          />
+          {billingCountry ? (
+            <div className="flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-900">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Corporate Sourcing research fee</p>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Secure payment with {isNigeria ? 'Paystack' : 'PayPal'}</p>
+              </div>
+              <span className="text-2xl font-black text-slate-950 dark:text-white">{amount}</span>
+            </div>
+          ) : null}
+          {submissionError ? <p className="text-sm font-semibold text-red-600">{submissionError}</p> : null}
+          <div className="grid gap-3 sm:grid-cols-[auto_1fr]">
+            <Button type="button" variant="outline" onClick={() => setCheckoutReady(false)} className="h-12 rounded-xl px-5 font-bold">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Review brief
+            </Button>
+            <Button type="button" onClick={startCheckout} disabled={!billingCountry || status === 'submitting'} className="h-12 rounded-xl bg-brand-orange-500 font-bold text-white hover:bg-brand-orange-600">
+              {status === 'submitting' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LockKeyhole className="mr-2 h-4 w-4" />}
+              {status === 'submitting' ? 'Preparing secure checkout...' : `Pay ${billingCountry ? amount : 'research fee'}`}
+            </Button>
+          </div>
+          <p className="text-center text-xs leading-relaxed text-slate-500">Payment is verified securely before your sourcing request is submitted.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>
@@ -296,7 +371,7 @@ export default function CorporateGiftsClient() {
         
         {isLastStep ? (
           <Button type="submit" disabled={status === 'submitting'} className="h-12 flex-1 rounded-xl bg-brand-orange-500 text-white font-bold hover:bg-brand-orange-600 border-0 shadow-lg shadow-brand-orange-500/20 active:scale-95 transition-all">
-            {status === 'submitting' ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Submitting...</> : 'Submit Request'}
+            {status === 'submitting' ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Saving...</> : 'Continue to payment'}
           </Button>
         ) : (
           <Button type="button" onClick={handleNextStep} className="h-12 flex-1 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 border-0 shadow-lg shadow-indigo-600/20 active:scale-95 transition-all">

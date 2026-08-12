@@ -7,6 +7,10 @@ import {
 import { getPayPalOrder, verifyPayPalWebhookSignature } from '@/lib/paypal';
 import { prisma } from '@/lib/prisma';
 import { resolvePayPalAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
+import {
+  confirmCorporateSourcingPayment,
+  ensureCorporateSourcingPayments,
+} from '@/lib/corporateSourcing/payments';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -63,6 +67,55 @@ export async function POST(request: Request) {
   ).trim();
   if (!orderId && !captureReference)
     return NextResponse.json({ received: true });
+  await ensureCorporateSourcingPayments();
+  const corporateRows = await prisma.$queryRaw<Array<{
+    pidPayment: string;
+    providerReference: string | null;
+    providerCaptureReference: string | null;
+    amountMinor: number;
+    currency: string;
+  }>>`
+    SELECT pidPayment, providerReference, providerCaptureReference, amountMinor, currency
+    FROM corporate_sourcing_research_payments
+    WHERE paymentProvider = 'paypal'
+      AND (providerReference = ${orderId || '__none__'} OR providerCaptureReference = ${captureReference || '__none__'})
+    LIMIT 1
+  `;
+  const corporatePayment = corporateRows[0];
+  if (corporatePayment) {
+    if (
+      event === 'PAYMENT.CAPTURE.REFUNDED' ||
+      event === 'PAYMENT.CAPTURE.REVERSED' ||
+      event === 'PAYMENT.CAPTURE.DENIED' ||
+      event === 'PAYMENT.CAPTURE.DECLINED' ||
+      event.startsWith('CUSTOMER.DISPUTE.')
+    ) {
+      const status = resolvePayPalAccessStatus(event) || 'reversed';
+      await prisma.$executeRaw`
+        UPDATE corporate_sourcing_research_payments
+        SET status = ${status}, updatedAt = ${new Date()}
+        WHERE pidPayment = ${corporatePayment.pidPayment}
+      `;
+      return NextResponse.json({ received: true });
+    }
+    const paypalOrder = await getPayPalOrder(orderId || corporatePayment.providerReference || '');
+    const unit = paypalOrder?.purchase_units?.[0];
+    const capture = unit?.payments?.captures?.[0];
+    if (
+      String(paypalOrder?.status || '').toUpperCase() === 'COMPLETED' &&
+      String(capture?.status || '').toUpperCase() === 'COMPLETED' &&
+      String(unit?.custom_id || '') === corporatePayment.pidPayment &&
+      Math.round(Number(capture?.amount?.value || 0) * 100) === corporatePayment.amountMinor &&
+      String(capture?.amount?.currency_code || '').toUpperCase() === corporatePayment.currency
+    ) {
+      await confirmCorporateSourcingPayment({
+        pidPayment: corporatePayment.pidPayment,
+        paidAt: capture?.create_time ? new Date(capture.create_time) : null,
+        providerCaptureReference: String(capture?.id || '').trim() || null,
+      });
+    }
+    return NextResponse.json({ received: true });
+  }
   const reportOrder = await prisma.intelligence_report_orders.findFirst({
     where: {
       paymentProvider: 'paypal',

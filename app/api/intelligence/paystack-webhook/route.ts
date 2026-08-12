@@ -11,6 +11,10 @@ import {
 import { fulfillConsultationPayment } from '@/lib/consultationFulfillment';
 import { resolvePaystackAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
 import {
+  confirmCorporateSourcingPayment,
+  getCorporateSourcingPayment,
+} from '@/lib/corporateSourcing/payments';
+import {
   activateIntelligenceSubscriptionPayment,
   IntelligenceSubscriptionNotFoundError,
   IntelligenceSubscriptionPaymentError,
@@ -93,6 +97,32 @@ export async function POST(request: Request) {
           where: { providerReference: reference, paymentProvider: 'paystack' },
         })
       : null;
+    if (!order && reference) {
+      const corporateRows = await prisma.$queryRaw<Array<{
+        pidPayment: string;
+        amountMinor: number;
+      }>>`
+        SELECT pidPayment, amountMinor
+        FROM corporate_sourcing_research_payments
+        WHERE providerReference = ${reference}
+          AND paymentProvider = 'paystack'
+        LIMIT 1
+      `.catch(() => []);
+      const corporatePayment = corporateRows[0];
+      if (corporatePayment) {
+        const status = event === 'refund.processed'
+          ? Number(data.amount || 0) >= corporatePayment.amountMinor
+            ? 'refunded'
+            : 'disputed'
+          : 'disputed';
+        await prisma.$executeRaw`
+          UPDATE corporate_sourcing_research_payments
+          SET status = ${status}, updatedAt = ${new Date()}
+          WHERE pidPayment = ${corporatePayment.pidPayment}
+        `;
+        return NextResponse.json({ received: true });
+      }
+    }
     if (!order) return NextResponse.json({ received: true });
 
     const providerEventId = `paystack:${event}:${String(
@@ -204,6 +234,25 @@ export async function POST(request: Request) {
   }
 
   const payment = payload.data;
+  if (payment?.metadata?.product === 'corporate_sourcing_research_fee') {
+    const pidPayment = String(payment.metadata?.pidPayment || '').trim();
+    const corporatePayment = pidPayment
+      ? await getCorporateSourcingPayment(pidPayment)
+      : null;
+    if (
+      corporatePayment &&
+      corporatePayment.paymentProvider === 'paystack' &&
+      corporatePayment.providerReference === payment.reference &&
+      Number(payment.amount) === corporatePayment.amountMinor &&
+      String(payment.currency || '').toUpperCase() === corporatePayment.currency
+    ) {
+      await confirmCorporateSourcingPayment({
+        pidPayment,
+        paidAt: payment.paid_at ? new Date(payment.paid_at) : null,
+      });
+    }
+    return NextResponse.json({ received: true });
+  }
   if (payment?.metadata?.product === 'supplier_intelligence_report') {
     const pidOrder = String(payment.metadata?.pidOrder || '').trim();
     const order = pidOrder

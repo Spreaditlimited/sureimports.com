@@ -29,6 +29,10 @@ import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import CorporateGiftsClient from './CorporateGiftsClient';
+import {
+  DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
+  DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
+} from '@/lib/corporateSourcing/pricing';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 const baseUrl = 'https://www.sureimports.com';
@@ -429,14 +433,28 @@ export default function CorporateGiftsPage() {
                  Request a quote
                </span>
                <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                 Submit your sourcing brief.
+                 Pay and Submit your sourcing brief.
                </h2>
                <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-                 Share the product or machine, specifications, quantity, deadline and any customization needs. Our team will review the details and contact you.
+                 Share the product or machine details, specifications, quantity,
+                 delivery timeline, and any customization requirements. Our team
+                 will review your request and get in touch. Please note that a{' '}
+                 <strong className="font-bold text-slate-900 dark:text-white">
+                   ₦50,000 or $50 research fee
+                 </strong>{' '}
+                 is required before we begin identifying the most suitable
+                 manufacturer. This fee is{' '}
+                 <strong className="font-bold text-slate-900 dark:text-white">
+                   fully credited toward your procurement
+                 </strong>{' '}
+                 if you proceed with your order.
                </p>
              </div>
              <div className="mx-auto max-w-4xl">
-               <CorporateGiftsClient />
+               <CorporateGiftsClient researchFee={{
+                 priceNaira: DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
+                 priceUsdCents: DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
+               }} />
              </div>
           </div>
         </section>

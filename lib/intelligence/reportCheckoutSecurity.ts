@@ -55,6 +55,16 @@ export function checkoutOriginIsAllowed(request: Request) {
   }
 }
 
+export function checkoutReturnUrl(request: Request, path: string) {
+  const base =
+    process.env.NODE_ENV === 'production'
+      ? process.env.NEXT_PUBLIC_SITE_URL ||
+        process.env.NEXT_PUBLIC_BASE_URL ||
+        'https://www.sureimports.com'
+      : new URL(request.url).origin;
+  return `${base.replace(/\/$/, '')}${path}`;
+}
+
 export async function enforceReportCheckoutRateLimit(input: {
   request: Request;
   email: string;

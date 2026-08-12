@@ -6,6 +6,7 @@ import { checkAuth } from '@/lib/auth/checkAuth';
 import { createPayPalOrder } from '@/lib/paypal';
 import {
   checkoutOriginIsAllowed,
+  checkoutReturnUrl,
   enforceReportCheckoutRateLimit,
   REPORT_EMAIL_PATTERN,
 } from '@/lib/intelligence/reportCheckoutSecurity';
@@ -20,14 +21,6 @@ function clean(value: unknown, max = 255) {
   return String(value || '')
     .trim()
     .slice(0, max);
-}
-
-function absoluteUrl(path: string) {
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    'https://www.sureimports.com';
-  return `${base.replace(/\/$/, '')}${path}`;
 }
 
 export async function POST(request: Request) {
@@ -160,7 +153,8 @@ export async function POST(request: Request) {
             amount: amountMinor,
             currency,
             reference: paystackReference,
-            callback_url: absoluteUrl(
+            callback_url: checkoutReturnUrl(
+              request,
               `/supplier-intelligence/reports/checkout/verify?provider=paystack&pidOrder=${pidOrder}`,
             ),
             metadata: {
@@ -186,10 +180,12 @@ export async function POST(request: Request) {
     const order = await createPayPalOrder({
       amount: (amountMinor / 100).toFixed(2),
       currency,
-      returnUrl: absoluteUrl(
+      returnUrl: checkoutReturnUrl(
+        request,
         `/supplier-intelligence/reports/checkout/verify?provider=paypal&pidOrder=${pidOrder}`,
       ),
-      cancelUrl: absoluteUrl(
+      cancelUrl: checkoutReturnUrl(
+        request,
         `/supplier-intelligence/reports/${report.slug}?payment=cancelled`,
       ),
       customId: pidOrder,

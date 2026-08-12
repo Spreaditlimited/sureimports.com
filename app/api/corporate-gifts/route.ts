@@ -7,8 +7,11 @@ import {
   type CorporateGiftStatus,
 } from '@/lib/notifications/corporateGifts';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
-import { verifyToken } from '@/lib/jwt';
-import { CORPORATE_SOURCING_RESUME_PATH } from '@/lib/auth/loginRedirect';
+import {
+  getCorporateSourcingPayment,
+  hashCorporateSubmissionToken,
+} from '@/lib/corporateSourcing/payments';
+import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -117,41 +120,6 @@ const getIpAddress = (req: Request) => {
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value;
-    let authenticatedPidUser: string | null = null;
-    if (token) {
-      try {
-        const payload = verifyToken(token);
-        if (payload && typeof payload === 'object' && 'pidUser' in payload) {
-          authenticatedPidUser = String(payload.pidUser);
-        }
-      } catch {
-        authenticatedPidUser = null;
-      }
-    }
-
-    if (!authenticatedPidUser) {
-      return NextResponse.json(
-        {
-          statusx: 'AUTH_REQUIRED',
-          error: 'Please sign in or create an account to submit your request.',
-          loginPath: `/auth/login?next=${encodeURIComponent(CORPORATE_SOURCING_RESUME_PATH)}`,
-        },
-        { status: 401 },
-      );
-    }
-
-    const authenticatedUser = await prisma.users.findUnique({
-      where: { pidUser: authenticatedPidUser },
-      select: { pidUser: true },
-    });
-    if (!authenticatedUser) {
-      return NextResponse.json(
-        { statusx: 'AUTH_REQUIRED', error: 'Your session is no longer valid.' },
-        { status: 401 },
-      );
-    }
-
     const formData = await req.formData();
 
     // 1. Extract text fields (supports current and legacy keys)
@@ -208,6 +176,8 @@ export async function POST(req: NextRequest) {
     };
 
     const quantityNeeded = Number(data.quantityNeededRaw);
+    const pidPayment = getString(formData, ['pid_payment']);
+    const submissionToken = getString(formData, ['submission_token']);
 
     // 2. Server-side validation
     if (
@@ -234,6 +204,50 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid contact email' },
         { status: 400 },
+      );
+    }
+
+    const payment = await getCorporateSourcingPayment(pidPayment);
+    if (
+      !payment ||
+      payment.status !== 'paid' ||
+      payment.consumedAt ||
+      payment.requestId ||
+      payment.email.toLowerCase() !== data.contactEmail.toLowerCase() ||
+      !submissionToken ||
+      hashCorporateSubmissionToken(submissionToken) !== payment.submissionTokenHash
+    ) {
+      return NextResponse.json(
+        { error: 'A verified, unused Corporate Sourcing research payment is required.' },
+        { status: 402 },
+      );
+    }
+
+    let pidUser = payment.pidUser;
+    if (!pidUser) {
+      const existing = await prisma.users.findUnique({
+        where: { userEmail: data.contactEmail.toLowerCase() },
+      });
+      if (existing) {
+        pidUser = existing.pidUser;
+      } else {
+        const names = data.contactPersonFullName.split(/\s+/);
+        const account = await resolvePublicAccount({
+          email: data.contactEmail,
+          firstName: names[0],
+          lastName: names.slice(1).join(' '),
+          phone: data.whatsappNumber,
+          country: payment.billingCountry || undefined,
+          affiliateRef: 'corporate-sourcing',
+          accountSetupKey: `corporate_sourcing:${pidPayment}`,
+        });
+        if (account.status === 'ready') pidUser = account.user.pidUser;
+      }
+    }
+    if (!pidUser) {
+      return NextResponse.json(
+        { error: 'We could not connect this payment to a Sure Imports account.' },
+        { status: 409 },
       );
     }
 
@@ -283,11 +297,22 @@ export async function POST(req: NextRequest) {
       logoFileUrl = await uploadToCloudinary(buffer, `${pidRequest}-logo`);
     }
 
-    // 4. Persist submission against the authenticated account
-    await prisma.corporate_gift_request.create({
-      data: {
+    // 4. Consume the verified payment and persist one request atomically.
+    await prisma.$transaction(async (tx) => {
+      const claimed = await tx.$executeRaw`
+        UPDATE corporate_sourcing_research_payments
+        SET consumedAt = ${new Date()}, requestId = ${pidRequest},
+            pidUser = ${pidUser}, updatedAt = ${new Date()}
+        WHERE pidPayment = ${pidPayment}
+          AND status = 'paid'
+          AND consumedAt IS NULL
+          AND requestId IS NULL
+      `;
+      if (claimed === 0) throw new Error('This research payment has already been used.');
+      await tx.corporate_gift_request.create({
+        data: {
         pidRequest,
-        pidUser: authenticatedUser.pidUser,
+        pidUser,
         businessName: data.businessName,
         contactPersonFullName: data.contactPersonFullName,
         productOrItemNeeded: data.productOrItemNeeded,
@@ -314,7 +339,8 @@ export async function POST(req: NextRequest) {
         utmContent: data.utmContent,
         utmTerm: data.utmTerm,
         submittedAt: data.submittedAt,
-      },
+        },
+      });
     });
 
     const notificationResult = await notifyCustomerCorporateGiftStatus({
