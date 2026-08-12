@@ -63,7 +63,7 @@ export const metadata: Metadata = {
       'Import quality products from China with confidence. We guarantee quality, authenticity, and reliable shipping.',
     images: [
       {
-        url: '/images/og-image.png',
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports - Import from China',
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
     title: 'Sure Imports - Import from China with Confidence',
     description:
       'Import quality products from China. Quality guaranteed, reliable shipping.',
-    images: ['/images/og-image.png'],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
     creator: '@sureimports',
   },
   robots: {

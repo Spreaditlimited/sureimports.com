@@ -67,7 +67,10 @@ export async function generateMetadata({
   // Open Graph values
   const ogTitle = seo.ogTitle || `${title} | Sure Imports Blog`;
   const ogDescription = seo.ogDescription || description;
-  const ogImage = seo.ogImage || post.image || `${SITE_URL}/images/og-blog.png`;
+  const ogImage =
+    seo.ogImage ||
+    post.image ||
+    `${SITE_URL}/images/sure-imports-social-card.png`;
 
   // Twitter values
   const twitterTitle = seo.twitterTitle || ogTitle;
@@ -161,7 +164,10 @@ export default async function BlogDetailsPage({ params }: PageProps) {
 
   const seo = post.seo || {};
   const canonicalUrl = seo.canonicalUrl || `${SITE_URL}/blog/${slug}`;
-  const ogImage = seo.ogImage || post.image || `${SITE_URL}/images/og-blog.png`;
+  const ogImage =
+    seo.ogImage ||
+    post.image ||
+    `${SITE_URL}/images/sure-imports-social-card.png`;
 
   // Calculate content metrics
   const plainTextContent = blogPlainText(post.content);

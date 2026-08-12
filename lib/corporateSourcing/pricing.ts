@@ -37,8 +37,10 @@ export async function getCorporateSourcingPricing(): Promise<CorporateSourcingPr
     WHERE settingKey = ${CORPORATE_SOURCING_PRICING_KEY}
     LIMIT 1
   `;
-  return rows[0] || {
-    priceNaira: DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
-    priceUsdCents: DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
-  };
+  return (
+    rows[0] || {
+      priceNaira: DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
+      priceUsdCents: DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
+    }
+  );
 }

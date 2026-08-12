@@ -55,7 +55,7 @@ export const defaultSEO: Metadata = {
       'Import quality products from China with confidence. Sure Imports guarantees quality, authenticity, and reliable shipping for all your import needs.',
     images: [
       {
-        url: `${baseUrl}/images/og-image.png`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports - Import from China',
@@ -74,7 +74,7 @@ export const defaultSEO: Metadata = {
     title: 'Sure Imports | Import from China with Confidence',
     description:
       'Import quality products from China with confidence. Quality guaranteed.',
-    images: [`${baseUrl}/images/og-image.png`],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
     creator: '@sureimports',
     site: '@sureimports',
   },

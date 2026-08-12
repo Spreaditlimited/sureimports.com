@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/images/og-image.png',
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports - Import from China',
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Sure Imports - Import from China with Confidence',
     description: 'Import quality products from China. Quality guaranteed.',
-    images: ['/images/og-image.png'],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
   },
   alternates: {
     canonical: baseUrl,

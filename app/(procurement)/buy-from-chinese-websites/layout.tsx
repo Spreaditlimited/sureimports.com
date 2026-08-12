@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: 'Sure Imports',
     images: [
       {
-        url: 'https://www.sureimports.com/images/og-image.png',
+        url: 'https://www.sureimports.com/images/sure-imports-social-card.png',
         width: 1200,
         height: 630,
         alt: 'Buy from Chinese websites with Sure Imports',
@@ -41,7 +41,9 @@ export const metadata: Metadata = {
     title: 'Buy From Chinese Websites in Nigeria | Sure Imports',
     description:
       'Buy from 1688, Alibaba, Taobao, Pinduoduo and other Chinese websites from Nigeria with Sure Imports.',
-    images: ['https://www.sureimports.com/images/og-image.png'],
+    images: [
+      'https://www.sureimports.com/images/sure-imports-social-card.png',
+    ],
   },
 };
 

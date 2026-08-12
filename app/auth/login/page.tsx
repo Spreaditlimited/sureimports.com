@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Access your Sure Imports dashboard. We guarantee the quality and accuracy of every product we source for you from China.',
     images: [
       {
-        url: '/images/og-image.png',
+        url: 'https://www.sureimports.com/images/sure-imports-social-card.png',
         width: 1200,
         height: 630,
         alt: 'Sure Imports',

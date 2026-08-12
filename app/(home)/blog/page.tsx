@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     url: `${baseUrl}/blog`,
     images: [
       {
-        url: '/images/og-blog.png',
+        url: 'https://www.sureimports.com/images/sure-imports-social-card.png',
         width: 1200,
         height: 630,
         alt: 'Sure Imports Blog',
@@ -46,7 +46,9 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Import Insights Blog | Sure Imports',
     description: 'Expert insights and guides for import professionals.',
-    images: ['/images/og-blog.png'],
+    images: [
+      'https://www.sureimports.com/images/sure-imports-social-card.png',
+    ],
   },
   alternates: {
     canonical: `${baseUrl}/blog`,
