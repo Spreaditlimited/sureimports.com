@@ -113,8 +113,7 @@ export function generateArticleSchema(article: {
     '@type': 'Article',
     headline: article.title,
     description: article.description,
-    image:
-      article.image || `${baseUrl}/images/sure-imports-social-card.png`,
+    image: article.image || `${baseUrl}/images/sure-imports-social-card.png`,
     author: {
       '@type': 'Person',
       name: article.author || 'Sure Imports Team',

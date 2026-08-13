@@ -92,6 +92,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: baseUrl,
+    types: {
+      'application/rss+xml': [
+        { url: `${baseUrl}/blog/rss`, title: 'Sure Imports Blog RSS Feed' },
+      ],
+    },
   },
   verification: {
     // Add your verification codes here

@@ -52,6 +52,14 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: `${baseUrl}/blog`,
+    types: {
+      'application/rss+xml': [
+        {
+          url: 'https://www.sureimports.com/blog/rss',
+          title: 'Sure Imports Blog RSS Feed',
+        },
+      ],
+    },
   },
 };
 
