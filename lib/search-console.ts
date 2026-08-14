@@ -45,6 +45,21 @@ type ImportOptions = {
   rowLimit?: number;
 };
 
+export type SearchConsoleImportReservation = {
+  pidRun: string;
+  siteUrl: string;
+  startDate: string;
+  endDate: string;
+  rowLimit: number;
+};
+
+export type SearchConsoleImportStartResult =
+  | { started: true; run: SearchConsoleImportReservation }
+  | {
+      started: false;
+      run: SearchConsoleImportReservation & { startedAt: Date | null };
+    };
+
 type OpportunityCandidate = {
   pageUrl: string;
   blogSlug: string | null;
@@ -646,7 +661,9 @@ export async function generateSearchConsoleOpportunities(input: {
   };
 }
 
-export async function importSearchConsolePerformance(options: ImportOptions = {}) {
+export async function startSearchConsolePerformanceImport(
+  options: ImportOptions = {},
+): Promise<SearchConsoleImportStartResult> {
   await ensureSearchConsoleTables();
 
   const siteUrl =
@@ -660,17 +677,75 @@ export async function importSearchConsolePerformance(options: ImportOptions = {}
   );
   const pidRun = randomPid('GSCRUN');
   const dimensions = 'date,page,query,country,device';
+  const staleBefore = new Date(Date.now() - 60 * 60 * 1000);
 
-  await prisma.$executeRaw(
-    Prisma.sql`
-      INSERT INTO search_console_import_runs (
-        pidRun, siteUrl, startDate, endDate, dimensions, rowCount, status, startedAt, createdAt, updatedAt
-      ) VALUES (
-        ${pidRun}, ${siteUrl}, ${sqlDate(startDate)}, ${sqlDate(endDate)}, ${dimensions}, 0, 'started',
-        ${new Date()}, ${new Date()}, ${new Date()}
-      )
-    `,
-  );
+  return prisma.$transaction(async (transaction) => {
+    await transaction.$executeRaw(
+      Prisma.sql`
+        UPDATE search_console_import_runs
+        SET status = 'failed',
+            errorMessage = 'The import stopped before it could complete.',
+            completedAt = ${new Date()},
+            updatedAt = ${new Date()}
+        WHERE status = 'started'
+          AND startedAt < ${staleBefore}
+      `,
+    );
+
+    const activeRuns = await transaction.$queryRaw<Array<{
+      pidRun: string;
+      siteUrl: string;
+      startDate: Date;
+      endDate: Date;
+      startedAt: Date | null;
+    }>>(
+      Prisma.sql`
+        SELECT pidRun, siteUrl, startDate, endDate, startedAt
+        FROM search_console_import_runs
+        WHERE status = 'started'
+        ORDER BY startedAt DESC
+        LIMIT 1
+        FOR UPDATE
+      `,
+    );
+    const active = activeRuns[0];
+    if (active) {
+      return {
+        started: false as const,
+        run: {
+          pidRun: active.pidRun,
+          siteUrl: active.siteUrl,
+          startDate: dateOnly(active.startDate),
+          endDate: dateOnly(active.endDate),
+          rowLimit,
+          startedAt: active.startedAt,
+        },
+      };
+    }
+
+    const now = new Date();
+    await transaction.$executeRaw(
+      Prisma.sql`
+        INSERT INTO search_console_import_runs (
+          pidRun, siteUrl, startDate, endDate, dimensions, rowCount, status, startedAt, createdAt, updatedAt
+        ) VALUES (
+          ${pidRun}, ${siteUrl}, ${sqlDate(startDate)}, ${sqlDate(endDate)}, ${dimensions}, 0, 'started',
+          ${now}, ${now}, ${now}
+        )
+      `,
+    );
+
+    return {
+      started: true as const,
+      run: { pidRun, siteUrl, startDate, endDate, rowLimit },
+    };
+  });
+}
+
+export async function executeSearchConsolePerformanceImport(
+  run: SearchConsoleImportReservation,
+) {
+  const { pidRun, siteUrl, startDate, endDate, rowLimit } = run;
 
   try {
     const accessToken = await getSearchConsoleAccessToken();
@@ -709,6 +784,16 @@ export async function importSearchConsolePerformance(options: ImportOptions = {}
 
       await saveSearchConsoleStatRecords(records, { siteUrl, runId: pidRun });
       totalRows += records.length;
+
+      await prisma.$executeRaw(
+        Prisma.sql`
+          UPDATE search_console_import_runs
+          SET rowCount = ${totalRows},
+              updatedAt = ${new Date()}
+          WHERE pidRun = ${pidRun}
+            AND status = 'started'
+        `,
+      );
 
       if (rows.length < rowLimit) break;
       startRow += rowLimit;
@@ -754,4 +839,12 @@ export async function importSearchConsolePerformance(options: ImportOptions = {}
     );
     throw error;
   }
+}
+
+export async function importSearchConsolePerformance(options: ImportOptions = {}) {
+  const reservation = await startSearchConsolePerformanceImport(options);
+  if (!reservation.started) {
+    throw new Error(`Search Console import ${reservation.run.pidRun} is already running.`);
+  }
+  return executeSearchConsolePerformanceImport(reservation.run);
 }
