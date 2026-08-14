@@ -26,6 +26,14 @@ test('manual imports save a job before background execution', () => {
   assert.match(manualRouteSource, /pidRun: reservation\.run\.pidRun/);
 });
 
+test('cross-service authorization uses an expiring one-time database token', () => {
+  assert.match(manualRouteSource, /seo_manual_gsc_dispatch_tokens/);
+  assert.match(manualRouteSource, /t\.status = 'pending'/);
+  assert.match(manualRouteSource, /t\.expiresAt >/);
+  assert.match(manualRouteSource, /SET status = 'consumed'/);
+  assert.doesNotMatch(manualRouteSource, /JWT_SECRET|jsonwebtoken/);
+});
+
 test('the importer rejects overlapping active jobs and saves row progress', () => {
   assert.match(importerSource, /WHERE status = 'started'/);
   assert.match(importerSource, /FOR UPDATE/);

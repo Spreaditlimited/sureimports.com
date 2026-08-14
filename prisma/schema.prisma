@@ -353,6 +353,23 @@ model search_console_import_runs {
   @@index([startDate, endDate])
 }
 
+model seo_manual_gsc_dispatch_tokens {
+  id         Int       @id @default(autoincrement())
+  pidToken   String    @unique @db.VarChar(80)
+  tokenHash  String    @unique @db.Char(64)
+  pidUser    String    @db.VarChar(80)
+  startDate  DateTime  @db.Date
+  endDate    DateTime  @db.Date
+  status     String    @default("pending") @db.VarChar(40)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime?
+
+  @@index([status, expiresAt])
+  @@index([pidUser])
+}
+
 model search_console_query_stats {
   id          Int       @id @default(autoincrement())
   pidStat     String    @unique() @db.VarChar(80)

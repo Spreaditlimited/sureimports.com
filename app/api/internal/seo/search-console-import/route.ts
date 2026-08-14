@@ -1,6 +1,8 @@
-import jwt from 'jsonwebtoken';
+import { createHash } from 'crypto';
+import { Prisma } from '@prisma/client';
 import { after, NextRequest, NextResponse } from 'next/server';
 
+import { prisma } from '@/lib/prisma';
 import {
   executeSearchConsolePerformanceImport,
   startSearchConsolePerformanceImport,
@@ -10,24 +12,54 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 300;
 
-const TOKEN_ISSUER = 'admin.sureimports.com';
-const TOKEN_AUDIENCE = 'sureimports-gsc-manual-import';
+type DispatchTokenRow = {
+  id: number;
+  pidUser: string;
+  startDate: Date;
+  endDate: Date;
+  userStatus: string | null;
+};
 
-function isAuthorized(request: NextRequest) {
-  const secret = process.env.JWT_SECRET;
+async function consumeAuthorizedDispatchToken(
+  request: NextRequest,
+  startDate: string,
+  endDate: string,
+) {
   const authorization = request.headers.get('authorization') || '';
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-  if (!secret || !token) return false;
+  if (!token) return false;
+  const tokenHash = createHash('sha256').update(token).digest('hex');
 
-  try {
-    const payload = jwt.verify(token, secret, {
-      issuer: TOKEN_ISSUER,
-      audience: TOKEN_AUDIENCE,
-    }) as jwt.JwtPayload;
-    return payload.purpose === 'manual-gsc-import' && Boolean(payload.pidUser);
-  } catch {
-    return false;
-  }
+  return prisma.$transaction(async (transaction) => {
+    const rows = await transaction.$queryRaw<DispatchTokenRow[]>(
+      Prisma.sql`
+        SELECT t.id, t.pidUser, t.startDate, t.endDate, a.userStatus
+        FROM seo_manual_gsc_dispatch_tokens t
+        INNER JOIN admin a ON a.pidUser = t.pidUser
+        WHERE t.tokenHash = ${tokenHash}
+          AND t.status = 'pending'
+          AND t.expiresAt > ${new Date()}
+        LIMIT 1
+        FOR UPDATE
+      `,
+    );
+    const dispatch = rows[0];
+    const authorizedStatus = dispatch?.userStatus === 'superadmin' || dispatch?.userStatus === 'L1';
+    const matchingRange =
+      dispatch?.startDate.toISOString().slice(0, 10) === startDate &&
+      dispatch?.endDate.toISOString().slice(0, 10) === endDate;
+    if (!dispatch || !authorizedStatus || !matchingRange) return false;
+
+    await transaction.$executeRaw(
+      Prisma.sql`
+        UPDATE seo_manual_gsc_dispatch_tokens
+        SET status = 'consumed', consumedAt = ${new Date()}, updatedAt = ${new Date()}
+        WHERE id = ${dispatch.id}
+          AND status = 'pending'
+      `,
+    );
+    return true;
+  });
 }
 
 function validDate(value: unknown) {
@@ -40,10 +72,6 @@ function validDate(value: unknown) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
-  }
-
   const body = await request.json().catch(() => null);
   const startDate = validDate(body?.startDate);
   const endDate = validDate(body?.endDate);
@@ -61,6 +89,10 @@ export async function POST(request: NextRequest) {
       { ok: false, error: 'Search Console data is imported only through two days ago.' },
       { status: 400 },
     );
+  }
+
+  if (!(await consumeAuthorizedDispatchToken(request, startDate, endDate))) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
