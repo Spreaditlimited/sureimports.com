@@ -77,7 +77,10 @@ export async function verifyEmailAccount(
           context: { pidUser: user.pidUser, channelOwner: 'SES' },
         });
       } catch (error) {
-        console.error('Unable to add verified user to the SES marketing ledger:', error);
+        console.error(
+          'Unable to add verified user to the SES marketing ledger:',
+          error,
+        );
       }
       return;
     }

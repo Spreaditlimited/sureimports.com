@@ -50,8 +50,8 @@ function getBlogPostsByCategory(
 }
 
 function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
-  const terms = normalizeSearchQuery(query);
-  if (!terms.length) return posts;
+  const searchPhrase = normalizeSearchText(query);
+  if (!searchPhrase) return posts;
 
   return posts.filter((post) => {
     const searchableContent = normalizeSearchText(
@@ -66,7 +66,7 @@ function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
       ].join(' '),
     );
 
-    return terms.every((term) => searchableContent.includes(term));
+    return searchableContent.includes(searchPhrase);
   });
 }
 
@@ -79,13 +79,6 @@ function normalizeSearchText(value: string): string {
     .replace(/[^a-z0-9\s]+/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
-}
-
-function normalizeSearchQuery(query: string): string[] {
-  return normalizeSearchText(query)
-    .split(/\s+/)
-    .map((term) => term.trim())
-    .filter((term) => term.length >= 2);
 }
 
 // Lightweight image component that supports StaticImageData and provides a simple fallback
@@ -214,7 +207,7 @@ export default function BlogList({
           (tag) => tag.toLowerCase() === selectedTag.toLowerCase(),
         ),
       );
-    } else if (searchQuery) {
+    } else if (searchQuery && searchQuery !== initialSearchQuery) {
       posts = searchBlogPosts(posts, searchQuery);
     } else {
       posts = getBlogPostsByCategory(posts, selectedCategory);
@@ -241,7 +234,7 @@ export default function BlogList({
     }
 
     return posts;
-  }, [searchQuery, selectedCategory, selectedTag, sortBy, blogPosts]);
+  }, [searchQuery, initialSearchQuery, selectedCategory, selectedTag, sortBy, blogPosts]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {

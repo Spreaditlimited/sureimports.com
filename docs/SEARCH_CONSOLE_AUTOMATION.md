@@ -59,6 +59,16 @@ date, page, query, country, device
 
 It stores rows in `search_console_query_stats`, logs runs in `search_console_import_runs`, and creates first-pass SEO opportunities in `seo_opportunities`.
 
+## Editorial Rewrite Checkpoints
+
+The admin review workflow uses two additional tables:
+
+- `seo_linkable_pages` is the shared source of truth for URLs that AI-generated drafts and rewrites may introduce.
+- `seo_change_rewrite_artifacts` stores generated HTML, the source-content checksum, link-review decisions, attempt counts and errors before publication.
+- `seo_change_pipeline_attempts` keeps the audit history for rewrite and final-apply attempts, including structured failures.
+
+Rewrite generation and publication are separate administrator actions. The review page saves the generated HTML, shows it beside the original article, and requires an explicit final Apply action. Newly introduced internal links that are not active in `seo_linkable_pages` move the change to `awaiting_link_review`; an administrator can approve each link for that change or add it to the global registry. Link approval makes the saved rewrite ready but does not publish it. If the blog changes while approval is pending, the stale artifact is not reused.
+
 ## Internal Admin API
 
 ```txt

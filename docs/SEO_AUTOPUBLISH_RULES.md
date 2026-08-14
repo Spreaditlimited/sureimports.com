@@ -43,6 +43,8 @@ These changes require a draft first unless a future admin setting explicitly all
 - The system must prefer useful importer language over generic SEO language.
 - The article must keep its existing canonical URL unless an admin approves a slug change.
 - Internal links must point only to existing live SureImports routes.
+- Newly introduced internal links must exist in the active linkable-page registry or receive an explicit one-change administrator approval.
+- Link validation must compare the source and rewritten documents so preserved legacy links are not misreported as AI-inferred links.
 - New FAQ answers must be concise and directly answer the query.
 
 ## Offer Rules
@@ -71,5 +73,16 @@ These changes require a draft first unless a future admin setting explicitly all
 ## Rollback
 
 - Every auto-published update must be reversible from the stored before snapshot.
+- A generated rewrite must be saved before link review or final database application so a failed later stage can resume without regenerating content.
 - The system must store the automated job id, changed fields, trigger reason, and validation result.
 - If an update causes indexing, rendering, or build errors, auto-publish must disable itself until an admin re-enables it.
+
+## Rewrite Research and Citation Policy
+
+- Nigeria remains the primary audience and market context, but every rewrite must explain local context and deliver transferable value to readers outside Nigeria.
+- Existing useful external links are editorial assets. Rewrites must retain them or replace them only with a researched, more authoritative and relevant source.
+- Replacements must be explicitly recorded, and the replacement URL must appear in the rewritten article.
+- New official or primary external sources should be linked when they materially help readers verify claims, use an official service, or continue their research.
+- External-link continuity is enforced during generation and again before application. An older rewrite artifact cannot be applied unless it was generated under the current quality policy.
+- Article rewrites use `gpt-5.6-sol` with high reasoning, bounded web search and output limits unless `SEO_CONTENT_REWRITE_MODEL` explicitly selects a different model.
+- Long-running rewrite requests run in OpenAI background mode. The response ID is saved immediately, and later status checks retrieve that same response instead of creating another billable generation.

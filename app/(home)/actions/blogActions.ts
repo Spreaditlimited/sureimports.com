@@ -41,39 +41,55 @@ function getPublishedBlogWhere() {
   };
 }
 
-function normalizeSearchQuery(query: string | undefined): string[] {
+function normalizeSearchPhrase(query: string | undefined): string {
   return String(query || '')
     .toLowerCase()
     .replace(/^https?:\/\/[^/]+\/blog\//, '')
     .replace(/^\/?blog\//, '')
     .replace(/[-_]+/g, ' ')
     .replace(/[^a-z0-9\s]+/g, ' ')
-    .split(/\s+/)
-    .map((term) => term.trim())
-    .filter((term) => term.length >= 2);
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function buildPublishedBlogPriorityWhere(searchQuery?: string) {
+  const titlePhrase = normalizeSearchPhrase(searchQuery);
+  if (!titlePhrase) return null;
+
+  const slugPhrase = titlePhrase.replace(/\s+/g, '-');
+
+  return {
+    ...getPublishedBlogWhere(),
+    OR: [
+      { blogTitle: { contains: titlePhrase } },
+      { blogSlug: { contains: slugPhrase } },
+    ],
+  };
 }
 
 function buildPublishedBlogWhere(searchQuery?: string) {
   const baseWhere = getPublishedBlogWhere();
-  const searchTerms = normalizeSearchQuery(searchQuery);
+  const searchPhrase = normalizeSearchPhrase(searchQuery);
 
-  if (!searchTerms.length) return baseWhere;
+  if (!searchPhrase) return baseWhere;
+
+  const slugPhrase = searchPhrase.replace(/\s+/g, '-');
 
   return {
     ...baseWhere,
     AND: [
       ...baseWhere.AND,
-      ...searchTerms.map((term) => ({
+      {
         OR: [
-          { blogTitle: { contains: term } },
-          { blogSlug: { contains: term } },
-          { blogContent: { contains: term } },
-          { blogExt2: { contains: term } },
-          { blogBy: { contains: term } },
-          { category: { is: { categoryName: { contains: term } } } },
-          { publisher: { is: { publisherName: { contains: term } } } },
+          { blogTitle: { contains: searchPhrase } },
+          { blogSlug: { contains: slugPhrase } },
+          { blogContent: { contains: searchPhrase } },
+          { blogExt2: { contains: searchPhrase } },
+          { blogBy: { contains: searchPhrase } },
+          { category: { is: { categoryName: { contains: searchPhrase } } } },
+          { publisher: { is: { publisherName: { contains: searchPhrase } } } },
         ],
-      })),
+      },
     ],
   };
 }
@@ -484,6 +500,16 @@ export async function fetchPublishedBlogsLite(
         ? Math.min(9, Math.floor(pageSize))
         : 9;
     const where = buildPublishedBlogWhere(searchQuery);
+    const priorityWhere = buildPublishedBlogPriorityWhere(searchQuery);
+
+    const priorityRows = priorityWhere
+      ? await prisma.blog.findMany({
+          where: priorityWhere,
+          select: { pidBlog: true },
+          orderBy: { createdAt: 'desc' },
+        })
+      : [];
+    const priorityIds = priorityRows.map((blog) => blog.pidBlog);
 
     const [totalPosts, readingTimeRows] = await Promise.all([
       prisma.blog.count({ where }),
@@ -538,15 +564,41 @@ export async function fetchPublishedBlogsLite(
       },
     } as const;
 
-    const blogs = await prisma.blog.findMany({
-      where,
-      select: postSelect,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: safePageSize,
-      skip: (resolvedPage - 1) * safePageSize,
-    });
+    const pageOffset = (resolvedPage - 1) * safePageSize;
+    const priorityPageIds = priorityIds.slice(
+      pageOffset,
+      pageOffset + safePageSize,
+    );
+    const priorityPageRows = priorityPageIds.length
+      ? await prisma.blog.findMany({
+          where: { ...where, pidBlog: { in: priorityPageIds } },
+          select: postSelect,
+        })
+      : [];
+    const priorityOrder = new Map(
+      priorityPageIds.map((pidBlog, index) => [pidBlog, index]),
+    );
+    priorityPageRows.sort(
+      (left, right) =>
+        (priorityOrder.get(left.pidBlog) ?? 0) -
+        (priorityOrder.get(right.pidBlog) ?? 0),
+    );
+
+    const remainingSlots = safePageSize - priorityPageRows.length;
+    const remainderSkip = Math.max(0, pageOffset - priorityIds.length);
+    const remainderWhere = priorityIds.length
+      ? { ...where, pidBlog: { notIn: priorityIds } }
+      : where;
+    const remainderRows = remainingSlots
+      ? await prisma.blog.findMany({
+          where: remainderWhere,
+          select: postSelect,
+          orderBy: { createdAt: 'desc' },
+          take: remainingSlots,
+          skip: remainderSkip,
+        })
+      : [];
+    const blogs = [...priorityPageRows, ...remainderRows];
 
     const featuredBlogs = await prisma.blog.findMany({
       where: {
