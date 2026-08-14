@@ -4,6 +4,8 @@ import { Prisma } from '@prisma/client';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
+import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 const DEFAULT_SEGMENT_ID = '67699403ee348d7f8cb68f3a';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,7 +109,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!process.env.FLODESK_API_KEY) {
+    const sesOwned = belongsToSesMarketing(new Date());
+
+    if (!sesOwned && !process.env.FLODESK_API_KEY) {
       return NextResponse.json(
         { success: false, error: 'Newsletter service is not configured.' },
         { status: 500 },
@@ -124,31 +128,46 @@ export async function POST(request: Request) {
       await ensureLeadMagnetLeadColumns();
     }
 
-    const response = await fetch('https://api.flodesk.com/v1/subscribers', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
-        'User-Agent': 'Sure Imports (www.sureimports.com)',
-      },
-      body: JSON.stringify({
+    let alreadySubscribed = false;
+    if (!sesOwned) {
+      const response = await fetch('https://api.flodesk.com/v1/subscribers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
+          'User-Agent': 'Sure Imports (www.sureimports.com)',
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          first_name: firstName,
+          last_name,
+          segment_ids: cleanedSegmentIds,
+        }),
+      });
+
+      const responseBody = await response.text();
+      alreadySubscribed = isAlreadySubscribedResponse(response.status, responseBody);
+      if (!response.ok && !alreadySubscribed) {
+        throw new Error(`Flodesk subscriber request failed (${response.status}): ${responseBody}`);
+      }
+    }
+
+    try {
+      await recordMarketingOptIn({
         email: normalizedEmail,
-        first_name: firstName,
-        last_name,
-        segment_ids: cleanedSegmentIds,
-      }),
-    });
-
-    const responseBody = await response.text();
-    const alreadySubscribed = isAlreadySubscribedResponse(
-      response.status,
-      responseBody,
-    );
-
-    if (!response.ok && !alreadySubscribed) {
-      throw new Error(
-        `Flodesk subscriber request failed (${response.status}): ${responseBody}`,
-      );
+        firstName,
+        lastName: cleanString(last_name),
+        source: cleanString(body.source) || 'lead_capture_popup',
+        context: {
+          pageType: cleanString(body.page_type || body.message_variant),
+          pathname: cleanString(body.pathname),
+          segmentIds: cleanedSegmentIds,
+          leadMagnetSlug,
+          channelOwner: sesOwned ? 'SES' : 'FLODESK',
+        },
+      });
+    } catch (error) {
+      console.error('Marketing contact ledger sync failed', error);
     }
 
     let analyticsSaved = true;

@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
+import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 type GoogleTokenInfo = {
   aud?: string;
@@ -128,6 +130,20 @@ export async function POST(request: Request) {
             },
           })
         : user;
+
+    if (!existingUser && belongsToSesMarketing(verifiedUser.createdAt)) {
+      try {
+        await recordMarketingOptIn({
+          email: verifiedUser.userEmail,
+          firstName: verifiedUser.userFirstname,
+          lastName: verifiedUser.userLastname,
+          source: 'google_account_after_ses_cutover',
+          context: { pidUser: verifiedUser.pidUser, channelOwner: 'SES' },
+        });
+      } catch (error) {
+        console.error('Unable to add Google user to the SES marketing ledger:', error);
+      }
+    }
 
     const token = generateToken({
       pidUser: verifiedUser.pidUser,

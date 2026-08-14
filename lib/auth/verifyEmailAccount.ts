@@ -2,6 +2,8 @@ import { after, NextRequest, NextResponse } from 'next/server';
 
 import { getEmailVerificationLinkStatus } from '@/lib/auth/emailVerificationPolicy';
 import { prisma } from '@/lib/prisma';
+import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 function authRedirect(
   request: NextRequest,
@@ -65,6 +67,21 @@ export async function verifyEmailAccount(
   }
 
   after(async () => {
+    if (belongsToSesMarketing(user.createdAt)) {
+      try {
+        await recordMarketingOptIn({
+          email: user.userEmail,
+          firstName: user.userFirstname,
+          lastName: user.userLastname,
+          source: 'verified_account_after_ses_cutover',
+          context: { pidUser: user.pidUser, channelOwner: 'SES' },
+        });
+      } catch (error) {
+        console.error('Unable to add verified user to the SES marketing ledger:', error);
+      }
+      return;
+    }
+
     try {
       await fetch('https://api.flodesk.com/v1/subscribers', {
         method: 'POST',

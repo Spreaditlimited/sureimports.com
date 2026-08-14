@@ -13,6 +13,8 @@ import { redirect } from 'next/navigation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import { secureInput } from '@/utils/secureInput';
+import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
@@ -88,23 +90,35 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  //ADD USER TO FLODESK
-  const response = await fetch('https://api.flodesk.com/v1/subscribers', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
-      'User-Agent': 'Sure Imports (www.sureimports.com)',
-    },
-    body: JSON.stringify({
-      email: email,
-      first_name: email,
-      last_name: '',
-      segment_ids: ['67699403ee348d7f8cb68f3a'],
-    }),
-  });
+  try {
+    await recordMarketingOptIn({
+      email,
+      source: 'footer_newsletter',
+      context: {
+        service: service || 'SUREIMPORTS',
+        channelOwner: belongsToSesMarketing(create.createdAt) ? 'SES' : 'FLODESK',
+      },
+    });
+  } catch (error) {
+    console.error('Marketing contact ledger sync failed', error);
+  }
 
-  console.log('response', response);
+  if (!belongsToSesMarketing(create.createdAt)) {
+    await fetch('https://api.flodesk.com/v1/subscribers', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Basic ${Buffer.from(process.env.FLODESK_API_KEY + ':').toString('base64')}`,
+        'User-Agent': 'Sure Imports (www.sureimports.com)',
+      },
+      body: JSON.stringify({
+        email: email,
+        first_name: email,
+        last_name: '',
+        segment_ids: ['67699403ee348d7f8cb68f3a'],
+      }),
+    });
+  }
 
   // if (!response.ok) {
   // throw new Error('Failed to add subscriber to Flodesk');
