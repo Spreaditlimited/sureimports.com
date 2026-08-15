@@ -2,7 +2,7 @@ import { after, NextRequest, NextResponse } from 'next/server';
 
 import { getEmailVerificationLinkStatus } from '@/lib/auth/emailVerificationPolicy';
 import { prisma } from '@/lib/prisma';
-import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
 import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 function authRedirect(
@@ -69,7 +69,7 @@ export async function verifyEmailAccount(
   after(async () => {
     if (belongsToSesMarketing(user.createdAt)) {
       try {
-        await recordMarketingOptIn({
+        await requestMarketingOptIn({
           email: user.userEmail,
           firstName: user.userFirstname,
           lastName: user.userLastname,

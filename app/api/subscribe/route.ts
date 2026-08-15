@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
-import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
 import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 const DEFAULT_SEGMENT_ID = '67699403ee348d7f8cb68f3a';
@@ -153,7 +153,7 @@ export async function POST(request: Request) {
     }
 
     try {
-      await recordMarketingOptIn({
+      await requestMarketingOptIn({
         email: normalizedEmail,
         firstName,
         lastName: cleanString(last_name),
@@ -168,6 +168,15 @@ export async function POST(request: Request) {
       });
     } catch (error) {
       console.error('Marketing contact ledger sync failed', error);
+      if (sesOwned) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'We could not send your confirmation email. Please try again.',
+          },
+          { status: 500 },
+        );
+      }
     }
 
     let analyticsSaved = true;
@@ -318,7 +327,9 @@ export async function POST(request: Request) {
       leadMagnetDownloadUrl,
       message: alreadySubscribed
         ? 'This email is already subscribed.'
-        : 'Subscription successful.',
+        : sesOwned
+          ? 'Please check your email and confirm that you want to receive our updates.'
+          : 'Subscription successful.',
     });
   } catch (error) {
     console.error('Error adding subscriber', error);

@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
-import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
 import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 type GoogleTokenInfo = {
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
 
     if (!existingUser && belongsToSesMarketing(verifiedUser.createdAt)) {
       try {
-        await recordMarketingOptIn({
+        await requestMarketingOptIn({
           email: verifiedUser.userEmail,
           firstName: verifiedUser.userFirstname,
           lastName: verifiedUser.userLastname,

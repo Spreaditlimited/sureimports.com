@@ -13,7 +13,7 @@ import { redirect } from 'next/navigation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import { secureInput } from '@/utils/secureInput';
-import { recordMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
 import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 
 export async function POST(request: NextRequest) {
@@ -69,6 +69,35 @@ export async function POST(request: NextRequest) {
 
   //Check if user exists
   if (user) {
+    if (belongsToSesMarketing(user.createdAt)) {
+      try {
+        await requestMarketingOptIn({
+          email,
+          source: 'footer_newsletter',
+          context: { service: service || 'SUREIMPORTS', channelOwner: 'SES' },
+        });
+        return NextResponse.json(
+          {
+            messagex: 'Please check your email and confirm your subscription.',
+            statusx: 'SUCCESS',
+            successx: true,
+            userx: null,
+          },
+          { status: 200 },
+        );
+      } catch (error) {
+        console.error('Marketing confirmation resend failed', error);
+        return NextResponse.json(
+          {
+            messagex: 'We could not send your confirmation email. Please try again.',
+            statusx: 'FAILED',
+            successx: false,
+            userx: null,
+          },
+          { status: 500 },
+        );
+      }
+    }
     //RETURN RESPONSE
     return NextResponse.json(
       {
@@ -91,7 +120,7 @@ export async function POST(request: NextRequest) {
   });
 
   try {
-    await recordMarketingOptIn({
+    await requestMarketingOptIn({
       email,
       source: 'footer_newsletter',
       context: {
@@ -101,6 +130,17 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Marketing contact ledger sync failed', error);
+    if (belongsToSesMarketing(create.createdAt)) {
+      return NextResponse.json(
+        {
+          messagex: 'We could not send your confirmation email. Please try again.',
+          statusx: 'FAILED',
+          successx: false,
+          userx: null,
+        },
+        { status: 500 },
+      );
+    }
   }
 
   if (!belongsToSesMarketing(create.createdAt)) {
@@ -183,7 +223,9 @@ See you inside.<br /><br />
   if (create) {
     return NextResponse.json(
       {
-        messagex: 'Thank you for subscribing! 🎉',
+        messagex: belongsToSesMarketing(create.createdAt)
+          ? 'Please check your email and confirm your subscription.'
+          : 'Thank you for subscribing! 🎉',
         statusx: 'SUCCESS',
         successx: true,
         userx: null,
