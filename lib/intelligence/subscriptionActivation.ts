@@ -213,7 +213,10 @@ export async function activateIntelligenceSubscriptionPayment(payment: any) {
         channelOwner: 'SES',
       },
     }).catch((error) => {
-      console.error('Supplier Intelligence marketing opt-in email failed:', error);
+      console.error(
+        'Supplier Intelligence marketing opt-in email failed:',
+        error,
+      );
     });
   }
 
