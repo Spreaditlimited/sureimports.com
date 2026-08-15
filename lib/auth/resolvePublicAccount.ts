@@ -4,6 +4,8 @@ import { Prisma } from '@prisma/client';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { sendMail } from '@/lib/mail';
+import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
+import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 import { prisma } from '@/lib/prisma';
 
 type ResolvePublicAccountInput = {
@@ -57,6 +59,24 @@ export async function sendPublicAccountSetupEmail(input: {
       '<p>Your checkout can continue independently while you complete your account setup.</p>',
     buttonTitle: 'Choose my password',
     buttonLink: setupUrl,
+  });
+}
+
+export async function requestPublicAccountMarketingOptIn(input: {
+  user: PublicUser;
+  source: string;
+  context: Prisma.InputJsonValue;
+}) {
+  if (!belongsToSesMarketing(input.user.createdAt)) {
+    return { status: 'BEFORE_SES_CUTOVER' as const, confirmationSent: false };
+  }
+
+  return requestMarketingOptIn({
+    email: input.user.userEmail,
+    firstName: input.user.userFirstname,
+    lastName: input.user.userLastname,
+    source: input.source,
+    context: input.context,
   });
 }
 

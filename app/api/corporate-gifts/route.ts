@@ -11,7 +11,11 @@ import {
   getCorporateSourcingPayment,
   hashCorporateSubmissionToken,
 } from '@/lib/corporateSourcing/payments';
-import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
+import {
+  requestPublicAccountMarketingOptIn,
+  resolvePublicAccount,
+  sendPublicAccountSetupEmail,
+} from '@/lib/auth/resolvePublicAccount';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -224,6 +228,7 @@ export async function POST(req: NextRequest) {
     }
 
     let pidUser = payment.pidUser;
+    let newUser = null;
     if (!pidUser) {
       const existing = await prisma.users.findUnique({
         where: { userEmail: data.contactEmail.toLowerCase() },
@@ -241,7 +246,10 @@ export async function POST(req: NextRequest) {
           affiliateRef: 'corporate-sourcing',
           accountSetupKey: `corporate_sourcing:${pidPayment}`,
         });
-        if (account.status === 'ready') pidUser = account.user.pidUser;
+        if (account.status === 'ready') {
+          pidUser = account.user.pidUser;
+          if (account.createdNewAccount) newUser = account.user;
+        }
       }
     }
     if (!pidUser) {
@@ -342,6 +350,26 @@ export async function POST(req: NextRequest) {
         },
       });
     });
+
+    if (newUser) {
+      await sendPublicAccountSetupEmail({
+        user: newUser,
+        context: 'your Corporate Sourcing request',
+      }).catch((error) => {
+        console.error('Corporate Sourcing account setup email failed:', error);
+      });
+      await requestPublicAccountMarketingOptIn({
+        user: newUser,
+        source: 'paid_corporate_sourcing_account',
+        context: {
+          pidUser: newUser.pidUser,
+          pidPayment,
+          channelOwner: 'SES',
+        },
+      }).catch((error) => {
+        console.error('Corporate Sourcing marketing opt-in email failed:', error);
+      });
+    }
 
     const notificationResult = await notifyCustomerCorporateGiftStatus({
       requestId: pidRequest,

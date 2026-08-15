@@ -1,7 +1,10 @@
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 
-import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
+import {
+  requestPublicAccountMarketingOptIn,
+  resolvePublicAccount,
+} from '@/lib/auth/resolvePublicAccount';
 import { sendMail } from '@/lib/mail';
 import { prisma } from '@/lib/prisma';
 import {
@@ -129,7 +132,7 @@ async function ensureBuyer(order: {
     const user = await prisma.users.findUnique({
       where: { pidUser: order.pidUser },
     });
-    if (user) return user;
+    if (user) return { user, createdNewAccount: false };
   }
 
   const existing = await prisma.users.findUnique({
@@ -140,7 +143,7 @@ async function ensureBuyer(order: {
       where: { pidOrder: order.pidOrder },
       data: { pidUser: existing.pidUser, updatedAt: new Date() },
     });
-    return existing;
+    return { user: existing, createdNewAccount: false };
   }
 
   const account = await resolvePublicAccount({
@@ -156,13 +159,16 @@ async function ensureBuyer(order: {
       where: { userEmail: order.email.trim().toLowerCase() },
     });
     if (!concurrent) throw new Error('Unable to connect the buyer account.');
-    return concurrent;
+    return { user: concurrent, createdNewAccount: false };
   }
   await prisma.intelligence_report_orders.update({
     where: { pidOrder: order.pidOrder },
     data: { pidUser: account.user.pidUser, updatedAt: new Date() },
   });
-  return account.user;
+  return {
+    user: account.user,
+    createdNewAccount: account.createdNewAccount,
+  };
 }
 
 export async function deliverReportOrder(pidOrder: string) {
@@ -217,7 +223,7 @@ export async function deliverReportOrder(pidOrder: string) {
   }
 
   try {
-    const buyer = await ensureBuyer(order);
+    const { user: buyer, createdNewAccount } = await ensureBuyer(order);
     const downloadUrl = siteUrl(
       `/api/intelligence/reports/download?token=${encodeURIComponent(order.downloadToken)}`,
     );
@@ -240,6 +246,19 @@ export async function deliverReportOrder(pidOrder: string) {
       buttonTitle: 'Download my report',
       buttonLink: downloadUrl,
     });
+    if (createdNewAccount) {
+      await requestPublicAccountMarketingOptIn({
+        user: buyer,
+        source: 'paid_supplier_report_account',
+        context: {
+          pidUser: buyer.pidUser,
+          pidOrder,
+          channelOwner: 'SES',
+        },
+      }).catch((error) => {
+        console.error('Supplier report marketing opt-in email failed:', error);
+      });
+    }
     await prisma.intelligence_report_orders.updateMany({
       where: { pidOrder, fulfillmentClaimedAt: now, status: 'paid' },
       data: {

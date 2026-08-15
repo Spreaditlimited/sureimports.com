@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { requestPublicAccountMarketingOptIn } from '@/lib/auth/resolvePublicAccount';
 import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
 import {
   disablePaystackSubscription,
@@ -197,6 +198,24 @@ export async function activateIntelligenceSubscriptionPayment(payment: any) {
     where: { pidUser: activatedSubscription.pidUser },
     data: { userCid: 'VERIFIED', updatedAt: new Date() },
   });
+
+  const isNewAccountForThisSubscription =
+    subscription.status !== 'active' &&
+    user.loginKey ===
+      `supplier_intelligence_subscription:${subscription.pidSubscription}`;
+  if (isNewAccountForThisSubscription) {
+    await requestPublicAccountMarketingOptIn({
+      user,
+      source: 'paid_supplier_intelligence_account',
+      context: {
+        pidUser: user.pidUser,
+        pidSubscription: subscription.pidSubscription,
+        channelOwner: 'SES',
+      },
+    }).catch((error) => {
+      console.error('Supplier Intelligence marketing opt-in email failed:', error);
+    });
+  }
 
   return { subscription: activatedSubscription, user };
 }

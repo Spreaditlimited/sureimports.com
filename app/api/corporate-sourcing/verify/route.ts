@@ -7,6 +7,7 @@ import {
   hashCorporateSubmissionToken,
 } from '@/lib/corporateSourcing/payments';
 import {
+  requestPublicAccountMarketingOptIn,
   resolvePublicAccount,
   sendPublicAccountSetupEmail,
 } from '@/lib/auth/resolvePublicAccount';
@@ -123,6 +124,17 @@ export async function POST(request: Request) {
       context: 'your Corporate Sourcing request',
     }).catch((error) => {
       console.error('Corporate Sourcing account setup email failed:', error);
+    });
+    await requestPublicAccountMarketingOptIn({
+      user: newUser,
+      source: 'paid_corporate_sourcing_account',
+      context: {
+        pidUser: newUser.pidUser,
+        pidPayment,
+        channelOwner: 'SES',
+      },
+    }).catch((error) => {
+      console.error('Corporate Sourcing marketing opt-in email failed:', error);
     });
     response.cookies.set(
       'token',
