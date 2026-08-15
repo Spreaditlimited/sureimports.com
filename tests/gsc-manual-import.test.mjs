@@ -13,6 +13,10 @@ const manualRouteSource = await readFile(
 const vercelConfig = JSON.parse(
   await readFile(new URL('../vercel.json', import.meta.url), 'utf8'),
 );
+const opportunityDedupeMigration = await readFile(
+  new URL('../prisma/migrations/20260814224500_dedupe_active_seo_opportunities_by_blog/migration.sql', import.meta.url),
+  'utf8',
+);
 
 test('GSC imports remain manual and are not registered as a Vercel cron', () => {
   const cronPaths = (vercelConfig.crons || []).map((cron) => cron.path);
@@ -43,4 +47,23 @@ test('the importer rejects overlapping active jobs and saves row progress', () =
 test('GSC import and opportunity generation never invoke OpenAI', () => {
   assert.doesNotMatch(importerSource, /openai|responses\.create|chat\.completions/i);
   assert.doesNotMatch(manualRouteSource, /openai|responses\.create|chat\.completions/i);
+});
+
+test('actionable queries are reduced to one highest-impression opportunity per blog page', () => {
+  assert.match(importerSource, /candidatesByPage/);
+  assert.match(importerSource, /right\.impressions - left\.impressions/);
+  assert.match(importerSource, /queryCluster: Array\.from\(new Set/);
+  assert.match(importerSource, /for \(const candidate of pageCandidates\.slice\(0, 50\)\)/);
+  assert.doesNotMatch(
+    importerSource.split('async function createOrRefreshOpportunity')[1]
+      .split('export async function generateSearchConsoleOpportunities')[0],
+    /AND primaryQuery = \$\{candidate\.primaryQuery\}/,
+  );
+});
+
+test('existing duplicate active opportunities are dismissed without replacing a review in progress', () => {
+  assert.match(opportunityDedupeMigration, /PARTITION BY ranked\.blogSlug/);
+  assert.match(opportunityDedupeMigration, /ranked\.status = 'reviewing'/);
+  assert.match(opportunityDedupeMigration, /ranked\.impressions DESC/);
+  assert.match(opportunityDedupeMigration, /SET opportunity\.status = 'dismissed'/);
 });

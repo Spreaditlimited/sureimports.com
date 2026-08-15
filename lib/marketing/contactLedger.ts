@@ -5,19 +5,32 @@ import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
 
 const OPT_IN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+const OPT_IN_RESEND_COOLDOWN_MS = 60 * 1000;
+export const MARKETING_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function tokenHash(token: string) {
   return createHash('sha256').update(token).digest('hex');
 }
 
 function publicRootUrl() {
-  return (process.env.ROOT_URL || 'https://www.sureimports.com').replace(/\/$/, '');
+  return (process.env.ROOT_URL || 'https://www.sureimports.com').replace(
+    /\/$/,
+    '',
+  );
 }
 
 function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (char) => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  })[char] || char);
+  return value.replace(
+    /[&<>"']/g,
+    (char) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char] || char,
+  );
 }
 
 export async function requestMarketingOptIn(input: {
@@ -28,9 +41,15 @@ export async function requestMarketingOptIn(input: {
   context?: Prisma.InputJsonValue;
 }) {
   const email = input.email.trim().toLowerCase();
-  const existing = await prisma.marketing_contacts.findUnique({ where: { email } });
+  const existing = await prisma.marketing_contacts.findUnique({
+    where: { email },
+  });
   if (existing?.consentStatus === 'OPTED_IN') {
-    return { contact: existing, status: 'ALREADY_CONFIRMED' as const, confirmationSent: false };
+    return {
+      contact: existing,
+      status: 'ALREADY_CONFIRMED' as const,
+      confirmationSent: false,
+    };
   }
 
   const token = randomBytes(32).toString('hex');
@@ -68,7 +87,9 @@ export async function requestMarketingOptIn(input: {
   });
 
   const confirmationUrl = `${publicRootUrl()}/api/marketing/confirm?token=${encodeURIComponent(token)}`;
-  const greeting = input.firstName?.trim() ? `Hello ${escapeHtml(input.firstName.trim())},` : 'Hello,';
+  const greeting = input.firstName?.trim()
+    ? `Hello ${escapeHtml(input.firstName.trim())},`
+    : 'Hello,';
   await xMail2({
     xEmail: email,
     xTitle: 'Confirm your Sure Imports email updates',
@@ -84,7 +105,11 @@ export async function requestMarketingOptIn(input: {
     throwOnError: true,
   });
 
-  return { contact, status: 'PENDING_CONFIRMATION' as const, confirmationSent: true };
+  return {
+    contact,
+    status: 'PENDING_CONFIRMATION' as const,
+    confirmationSent: true,
+  };
 }
 
 export async function confirmMarketingOptIn(token: string) {
@@ -112,4 +137,41 @@ export async function confirmMarketingOptIn(token: string) {
     },
   });
   return 'CONFIRMED' as const;
+}
+
+export async function resendMarketingOptInConfirmation(emailInput: string) {
+  const email = emailInput.trim().toLowerCase();
+  if (!MARKETING_EMAIL_PATTERN.test(email)) return 'INVALID_EMAIL' as const;
+
+  const existing = await prisma.marketing_contacts.findUnique({
+    where: { email },
+  });
+
+  if (existing?.consentStatus === 'OPTED_IN') {
+    return 'NOT_REQUIRED' as const;
+  }
+
+  if (existing?.bouncedAt || existing?.complainedAt) {
+    return 'NOT_ELIGIBLE' as const;
+  }
+
+  if (
+    existing?.optInRequestedAt &&
+    existing.optInRequestedAt.getTime() > Date.now() - OPT_IN_RESEND_COOLDOWN_MS
+  ) {
+    return 'TOO_SOON' as const;
+  }
+
+  await requestMarketingOptIn({
+    email,
+    firstName: existing?.firstName,
+    lastName: existing?.lastName,
+    source: 'confirmation_resubmission',
+    context: {
+      requestedFrom: 'email_preferences_confirmation_page',
+      previousConsentStatus: existing?.consentStatus || null,
+    },
+  });
+
+  return 'SENT' as const;
 }

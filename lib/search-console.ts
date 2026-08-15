@@ -72,6 +72,7 @@ type OpportunityCandidate = {
   confidence: number;
   recommendedCta: string;
   recommendation: string;
+  queryCluster: string[];
 };
 
 function clean(value: unknown, max = 1000) {
@@ -424,10 +425,10 @@ function getBlogSlugFromPageUrl(pageUrl: string) {
   try {
     const url = new URL(pageUrl);
     const match = url.pathname.match(/^\/blog\/([^/?#]+)/);
-    return match ? decodeURIComponent(match[1]) : null;
+    return match ? decodeURIComponent(match[1]).trim().toLowerCase() : null;
   } catch {
     const match = pageUrl.match(/\/blog\/([^/?#]+)/);
-    return match ? decodeURIComponent(match[1]) : null;
+    return match ? decodeURIComponent(match[1]).trim().toLowerCase() : null;
   }
 }
 
@@ -526,36 +527,69 @@ async function createOrRefreshOpportunity(
   startDate: string,
   endDate: string,
 ) {
-  const [existing] = await prisma.$queryRaw<Array<{ pidOpportunity: string }>>(
+  const [existing] = await prisma.$queryRaw<Array<{
+    pidOpportunity: string;
+    status: string;
+  }>>(
     Prisma.sql`
-      SELECT pidOpportunity
+      SELECT pidOpportunity, status
       FROM seo_opportunities
-      WHERE status = 'open'
-        AND blogSlug <=> ${candidate.blogSlug}
-        AND opportunityType = ${candidate.opportunityType}
-        AND primaryQuery = ${candidate.primaryQuery}
+      WHERE status IN ('open', 'reviewing')
+        AND (
+          blogSlug = ${candidate.blogSlug}
+          OR (${candidate.blogSlug} IS NULL AND blogSlug IS NULL AND pageUrl = ${candidate.pageUrl})
+        )
+      ORDER BY
+        CASE WHEN status = 'reviewing' THEN 0 ELSE 1 END,
+        impressions DESC,
+        updatedAt DESC
       LIMIT 1
     `,
   );
 
   if (existing?.pidOpportunity) {
-    await prisma.$executeRaw(
-      Prisma.sql`
-        UPDATE seo_opportunities
-        SET pageUrl = ${candidate.pageUrl},
-            clicks = ${candidate.clicks},
-            impressions = ${candidate.impressions},
-            ctr = ${candidate.ctr},
-            position = ${candidate.position},
-            confidence = ${candidate.confidence},
-            recommendation = ${buildRecommendation(candidate)},
-            recommendedCta = ${candidate.recommendedCta},
-            sourceStartDate = ${sqlDate(startDate)},
-            sourceEndDate = ${sqlDate(endDate)},
-            updatedAt = ${new Date()}
-        WHERE pidOpportunity = ${existing.pidOpportunity}
-      `,
-    );
+    const updates = [
+      prisma.$executeRaw(
+        Prisma.sql`
+          UPDATE seo_opportunities
+          SET status = 'dismissed', updatedAt = ${new Date()}
+          WHERE pidOpportunity <> ${existing.pidOpportunity}
+            AND status IN ('open', 'reviewing')
+            AND (
+              blogSlug = ${candidate.blogSlug}
+              OR (${candidate.blogSlug} IS NULL AND blogSlug IS NULL AND pageUrl = ${candidate.pageUrl})
+            )
+        `,
+      ),
+    ];
+
+    if (existing.status === 'open') {
+      updates.unshift(
+        prisma.$executeRaw(
+          Prisma.sql`
+            UPDATE seo_opportunities
+            SET pageUrl = ${candidate.pageUrl},
+                opportunityType = ${candidate.opportunityType},
+                primaryQuery = ${candidate.primaryQuery},
+                queryCluster = ${JSON.stringify(candidate.queryCluster)},
+                clicks = ${candidate.clicks},
+                impressions = ${candidate.impressions},
+                ctr = ${candidate.ctr},
+                position = ${candidate.position},
+                confidence = ${candidate.confidence},
+                recommendation = ${buildRecommendation(candidate)},
+                recommendedCta = ${candidate.recommendedCta},
+                sourceStartDate = ${sqlDate(startDate)},
+                sourceEndDate = ${sqlDate(endDate)},
+                updatedAt = ${new Date()}
+            WHERE pidOpportunity = ${existing.pidOpportunity}
+              AND status = 'open'
+          `,
+        ),
+      );
+    }
+
+    await prisma.$transaction(updates);
     return existing.pidOpportunity;
   }
 
@@ -568,7 +602,7 @@ async function createOrRefreshOpportunity(
         recommendedCta, sourceStartDate, sourceEndDate, createdAt, updatedAt
       ) VALUES (
         ${pidOpportunity}, ${candidate.pageUrl}, ${candidate.blogSlug}, ${candidate.opportunityType},
-        ${candidate.primaryQuery}, ${JSON.stringify([candidate.primaryQuery])}, ${candidate.clicks},
+        ${candidate.primaryQuery}, ${JSON.stringify(candidate.queryCluster)}, ${candidate.clicks},
         ${candidate.impressions}, ${candidate.ctr}, ${candidate.position}, ${candidate.confidence},
         'open', ${buildRecommendation(candidate)}, ${candidate.recommendedCta},
         ${sqlDate(startDate)}, ${sqlDate(endDate)}, ${new Date()}, ${new Date()}
@@ -611,7 +645,7 @@ export async function generateSearchConsoleOpportunities(input: {
       GROUP BY pageUrl, query
       HAVING impressions >= ${minImpressions}
       ORDER BY impressions DESC
-      LIMIT 200
+      LIMIT 2000
     `,
   );
 
@@ -645,17 +679,38 @@ export async function generateSearchConsoleOpportunities(input: {
         confidence,
         recommendedCta: inferCtaIntent(row.query, row.pageUrl),
         recommendation: '',
+        queryCluster: [clean(row.query, 700)],
       };
     })
     .filter((candidate): candidate is OpportunityCandidate => Boolean(candidate));
 
+  const candidatesByPage = new Map<string, OpportunityCandidate[]>();
+  for (const candidate of candidates) {
+    const pageKey = candidate.blogSlug || candidate.pageUrl.toLowerCase().replace(/[?#].*$/, '').replace(/\/$/, '');
+    const pageCandidates = candidatesByPage.get(pageKey) || [];
+    pageCandidates.push(candidate);
+    candidatesByPage.set(pageKey, pageCandidates);
+  }
+
+  const pageCandidates = Array.from(candidatesByPage.values())
+    .map((items) => {
+      const ranked = [...items].sort((left, right) => right.impressions - left.impressions);
+      const primary = ranked[0];
+      return {
+        ...primary,
+        queryCluster: Array.from(new Set(ranked.map((item) => item.primaryQuery))),
+      };
+    })
+    .sort((left, right) => right.impressions - left.impressions);
+
   const saved: string[] = [];
-  for (const candidate of candidates.slice(0, 50)) {
+  for (const candidate of pageCandidates.slice(0, 50)) {
     saved.push(await createOrRefreshOpportunity(candidate, input.startDate, input.endDate));
   }
 
   return {
-    candidates: candidates.length,
+    actionableQueries: candidates.length,
+    candidates: pageCandidates.length,
     saved: saved.length,
     opportunityIds: saved,
   };

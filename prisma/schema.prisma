@@ -421,6 +421,7 @@ model seo_opportunities {
   updatedAt       DateTime?
 
   @@index([blogSlug])
+  @@index([blogSlug, status])
   @@index([opportunityType])
   @@index([status])
   @@index([createdAt])
