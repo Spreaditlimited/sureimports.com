@@ -591,7 +591,7 @@ export default function BlogDetail({
 
       {/* Related Articles */}
       {relatedPosts.length > 0 && (
-        <section className="mt-16 bg-slate-50 border-t border-slate-200 py-16 dark:bg-slate-900/50 dark:border-slate-800">
+        <section className="public-solid-section mt-16 bg-slate-50 border-t border-slate-200 py-16 dark:bg-slate-900/50 dark:border-slate-800">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">Keep Reading</h2>

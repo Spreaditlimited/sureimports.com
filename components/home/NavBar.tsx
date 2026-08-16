@@ -444,7 +444,8 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
             )}
           </div>
 
-          <div className="lg:hidden">
+          <div className="flex items-center gap-2 lg:hidden">
+            <ThemeToggle lightSurface={useLightNavbar} />
             <Sheet>
               <SheetTrigger asChild>
                 <Button
@@ -463,14 +464,13 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                   Main Navigation Menu
                 </SheetTitle>
                 <div className="p-6">
-                  <div className="mb-8 flex items-center justify-between gap-4">
+                  <div className="mb-8 flex items-center gap-4">
                     <Image
                       src="/images/svg-logo-white.svg"
                       alt="Sure Imports"
                       width={140}
                       height={30}
                     />
-                    <ThemeToggle />
                   </div>
 
                   <div className="flex flex-col gap-2">

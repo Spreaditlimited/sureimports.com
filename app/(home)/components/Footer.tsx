@@ -6,7 +6,7 @@ import FooterNewsletterForm from './FooterNewsletterForm';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
+    <footer className="bg-slate-950 text-slate-400">
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           
@@ -82,7 +82,7 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="border-t border-slate-900 bg-slate-950 py-6 text-center text-xs">
+      <div className="bg-slate-950 py-6 text-center text-xs">
         <p>© {new Date().getFullYear()} Sure Importers Limited. All rights reserved.</p>
       </div>
     </footer>

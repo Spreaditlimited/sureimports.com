@@ -261,7 +261,7 @@ export default function BlogList({
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       
       {/* Enhanced Hero Section */}
-      <div className="relative overflow-hidden border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
+      <div className="public-solid-section relative overflow-hidden border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
         <div className="absolute inset-0 z-0">
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
@@ -446,7 +446,7 @@ export default function BlogList({
 
       {/* Featured Posts Section */}
       {searchQuery === '' && selectedCategory === 'All' && currentPage === 1 && !selectedTag && (
-        <section className="bg-slate-50 border-b border-slate-200 py-16 lg:py-24 dark:bg-slate-900/50 dark:border-slate-800">
+        <section className="public-solid-section bg-slate-50 border-b border-slate-200 py-16 lg:py-24 dark:bg-slate-900/50 dark:border-slate-800">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             
             <div className="mb-12 lg:mb-16">

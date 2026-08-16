@@ -165,7 +165,10 @@
 /* Remove only page-section separators; card and form borders remain intact. */
 .public-site-theme section[class~='border-y'],
 .public-site-theme section[class~='border-t'],
-.public-site-theme section[class~='border-b'] {
+.public-site-theme section[class~='border-b'],
+.public-site-theme .public-solid-section[class~='border-y'],
+.public-site-theme .public-solid-section[class~='border-t'],
+.public-site-theme .public-solid-section[class~='border-b'] {
   border-top-width: 0 !important;
   border-bottom-width: 0 !important;
 }
@@ -181,6 +184,11 @@
  */
 .dark .public-site-theme > section,
 .dark .public-site-theme main > section {
+  background-color: rgb(var(--public-section-dark)) !important;
+}
+
+/* Apply the same solid-section canvas to nested or non-section page regions. */
+.dark .public-site-theme .public-solid-section {
   background-color: rgb(var(--public-section-dark)) !important;
 }
 

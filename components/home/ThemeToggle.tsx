@@ -18,10 +18,10 @@ export default function ThemeToggle({
       variant="ghost"
       size="icon"
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      className={`relative h-10 w-10 rounded-full border transition-colors ${
+      className={`relative h-10 w-10 rounded-full border-0 bg-transparent transition-colors hover:bg-transparent ${
         lightSurface
-          ? 'border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white'
-          : 'border-white/15 text-white hover:bg-white/10 hover:text-white'
+          ? 'text-slate-700 hover:text-slate-950 dark:text-slate-200 dark:hover:text-white'
+          : 'text-white/90 hover:text-white'
       }`}
       aria-label="Toggle light and dark mode"
       title="Toggle light and dark mode"

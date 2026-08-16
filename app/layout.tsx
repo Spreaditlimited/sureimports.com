@@ -5,11 +5,7 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { AuthProvider } from '@/app/context/AuthContext';
-import { Suspense } from 'react';
-import { FacebookPixel } from '@/components/FacebookPixel';
-import { Analytics } from '@/components/GoogleAnalytics';
-import LeadCapturePopup from '@/components/lead-capture/LeadCapturePopup';
-import LiveChat from '@/components/LiveChat';
+import DeferredGlobalEnhancements from '@/components/DeferredGlobalEnhancements';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import SiteThemeProvider from '@/components/theme/SiteThemeProvider';
 import {
@@ -178,16 +174,11 @@ export default function RootLayout({
 
             {children}
 
-            <LeadCapturePopup />
-            <LiveChat />
+            <DeferredGlobalEnhancements />
             <Script
               src="https://checkout.flutterwave.com/v3.js"
               strategy="lazyOnload"
             />
-            <Suspense fallback={null}>
-              <FacebookPixel />
-            </Suspense>
-            <Analytics />
             <Toaster />
             <SonnerToaster position="top-right" richColors />
           </AuthProvider>
