@@ -163,9 +163,9 @@ export default function ReportCheckoutForm({
         </PopoverTrigger>
         <PopoverContent
           align="start"
-          className="w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-xl border-slate-200 bg-white p-0 shadow-xl"
+          className="w-[var(--radix-popover-trigger-width)] overflow-hidden rounded-xl border-slate-200 bg-white p-0 shadow-xl dark:border-slate-700 dark:bg-slate-900"
         >
-          <Command className="bg-white">
+          <Command className="bg-white dark:bg-slate-900 dark:text-slate-100">
             <CommandInput
               placeholder="Search country..."
               className="border-none focus:ring-0"

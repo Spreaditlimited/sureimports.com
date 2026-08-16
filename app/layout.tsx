@@ -11,6 +11,7 @@ import { Analytics } from '@/components/GoogleAnalytics';
 import LeadCapturePopup from '@/components/lead-capture/LeadCapturePopup';
 import LiveChat from '@/components/LiveChat';
 import { JsonLdScript } from '@/components/seo/JsonLd';
+import SiteThemeProvider from '@/components/theme/SiteThemeProvider';
 import {
   organizationSchema,
   websiteSchema,
@@ -128,67 +129,69 @@ export default function RootLayout({
       </head>
 
       <body className={`${inter.className} hide-scrollbar`}>
-        <AuthProvider>
-              {/* Google Tag Manager (noscript) */}
-              <noscript>
-                <iframe
-                  src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
-                  height="0"
-                  width="0"
-                  style={{ display: 'none', visibility: 'hidden' }}
-                />
-              </noscript>
+        <SiteThemeProvider>
+          <AuthProvider>
+            {/* Google Tag Manager (noscript) */}
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+                height="0"
+                width="0"
+                style={{ display: 'none', visibility: 'hidden' }}
+              />
+            </noscript>
 
-              <Script
-                id="gtm"
-                strategy="lazyOnload"
-                dangerouslySetInnerHTML={{
-                  __html: `
+            <Script
+              id="gtm"
+              strategy="lazyOnload"
+              dangerouslySetInnerHTML={{
+                __html: `
                     (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
                     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
                     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
                     })(window,document,'script','dataLayer','${GTM_ID}');
                   `,
-                }}
-              />
-              <Script
-                src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
-                strategy="lazyOnload"
-              />
-              <Script
-                id="google-ads-init"
-                strategy="lazyOnload"
-                dangerouslySetInnerHTML={{
-                  __html: `
+              }}
+            />
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+              strategy="lazyOnload"
+            />
+            <Script
+              id="google-ads-init"
+              strategy="lazyOnload"
+              dangerouslySetInnerHTML={{
+                __html: `
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
                     gtag('js', new Date());
                     gtag('config', '${GOOGLE_ADS_ID}');
                   `,
-                }}
-              />
+              }}
+            />
 
-              {/* JSON-LD Structured Data */}
-              <JsonLdScript
-                data={[organizationSchema, websiteSchema, serviceSchema]}
-              />
+            {/* JSON-LD Structured Data */}
+            <JsonLdScript
+              data={[organizationSchema, websiteSchema, serviceSchema]}
+            />
 
-              {children}
+            {children}
 
-              <LeadCapturePopup />
-              <LiveChat />
-              <Script
-                src="https://checkout.flutterwave.com/v3.js"
-                strategy="lazyOnload"
-              />
-              <Suspense fallback={null}>
-                <FacebookPixel />
-              </Suspense>
-              <Analytics />
-              <Toaster />
-              <SonnerToaster position="top-right" richColors />
-        </AuthProvider>
+            <LeadCapturePopup />
+            <LiveChat />
+            <Script
+              src="https://checkout.flutterwave.com/v3.js"
+              strategy="lazyOnload"
+            />
+            <Suspense fallback={null}>
+              <FacebookPixel />
+            </Suspense>
+            <Analytics />
+            <Toaster />
+            <SonnerToaster position="top-right" richColors />
+          </AuthProvider>
+        </SiteThemeProvider>
       </body>
     </html>
   );

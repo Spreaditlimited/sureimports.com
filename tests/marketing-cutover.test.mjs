@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import { belongsToSesMarketing, SES_MARKETING_CUTOVER_AT } from '../lib/marketing/cutover.ts';
 
-test('the SES marketing cutover is fixed at midnight London time on 14 August 2026', () => {
+test('the SES marketing cutover is fixed at midnight WAT on 14 August 2026', () => {
   assert.equal(SES_MARKETING_CUTOVER_AT.toISOString(), '2026-08-13T23:00:00.000Z');
 });
 

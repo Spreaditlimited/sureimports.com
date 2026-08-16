@@ -82,10 +82,11 @@ function statusLabel(status: string) {
 export default async function BookConsultationPage({
   searchParams,
 }: {
-  searchParams?: { manage?: string };
+  searchParams?: Promise<{ manage?: string }>;
 }) {
   const amountKobo = consultationAmountKobo();
-  const manageToken = clean(searchParams?.manage, 180);
+  const resolvedSearchParams = await searchParams;
+  const manageToken = clean(resolvedSearchParams?.manage, 180);
 
   if (manageToken) {
     const rows = await prisma.$queryRaw<ManagedBooking[]>`

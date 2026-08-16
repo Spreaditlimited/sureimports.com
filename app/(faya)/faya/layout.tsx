@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <div className="relative">
+      <div className="public-site-theme relative">
         <Header />
         {/* <LiveChatWidgetComponent /> */}
         {children}

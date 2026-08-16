@@ -8,5 +8,9 @@ export default function ShopLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ShopCartProvider>{children}</ShopCartProvider>;
+  return (
+    <ShopCartProvider>
+      <div className="public-site-theme contents">{children}</div>
+    </ShopCartProvider>
+  );
 }

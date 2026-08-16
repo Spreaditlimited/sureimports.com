@@ -4,7 +4,6 @@ import Sidebar from '@/components/dashboard/sidenavbar/components/sidebar';
 import Header from '@/components/dashboard/header/header';
 import { cn } from '@/_lib/utils';
 import { useSidebar } from '@/hooks/useSidebar';
-import { ThemeProvider } from '@/components/dashboard/theme-provider';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -65,43 +64,36 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
   return (
     <>
       {/* <LiveChatWidgetComponent /> */}
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <ModalProvider>
-          <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-black dark:text-white">
-            <div className="a-auto z-20 flex">
-              <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />
-            </div>
-            <Header />
-
-            <div className="mt-[90px] flex h-full min-h-screen flex-col overflow-hidden bg-slate-50 dark:bg-black lg:ml-[80px]">
-              <main
-                className={cn(
-                  'hide-scrollbar h-full overflow-x-hidden overflow-y-scroll bg-slate-50 pb-1 transition-all duration-200 dark:bg-black',
-                  isOpen && 'lg:ml-[156px]',
-                )}
-              >
-                {/* Add the WhatsApp button */}
-                <WhatsAppButton
-                  waID="5VFC67ZUTMWPF1"
-                  message="Hello! I'd like to ask about your services."
-                  position="bottom-left"
-                />
-
-                <AlertProvider>
-                  <RecordCountProcurementProvider>
-                    <ShopCartProvider>{props.children}</ShopCartProvider>
-                  </RecordCountProcurementProvider>
-                </AlertProvider>
-              </main>
-            </div>
+      <ModalProvider>
+        <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-black dark:text-white">
+          <div className="a-auto z-20 flex">
+            <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />
           </div>
-        </ModalProvider>
-      </ThemeProvider>
+          <Header />
+
+          <div className="mt-[90px] flex h-full min-h-screen flex-col overflow-hidden bg-slate-50 dark:bg-black lg:ml-[80px]">
+            <main
+              className={cn(
+                'hide-scrollbar h-full overflow-x-hidden overflow-y-scroll bg-slate-50 pb-1 transition-all duration-200 dark:bg-black',
+                isOpen && 'lg:ml-[156px]',
+              )}
+            >
+              {/* Add the WhatsApp button */}
+              <WhatsAppButton
+                waID="5VFC67ZUTMWPF1"
+                message="Hello! I'd like to ask about your services."
+                position="bottom-left"
+              />
+
+              <AlertProvider>
+                <RecordCountProcurementProvider>
+                  <ShopCartProvider>{props.children}</ShopCartProvider>
+                </RecordCountProcurementProvider>
+              </AlertProvider>
+            </main>
+          </div>
+        </div>
+      </ModalProvider>
     </>
   );
 };

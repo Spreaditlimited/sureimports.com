@@ -48,6 +48,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { useAuth } from '@/app/context/AuthContext';
+import ThemeToggle from '@/components/home/ThemeToggle';
 
 const MENU_ITEMS = {
   services: [
@@ -250,13 +251,13 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
           ? 'bg-slate-900/10 text-slate-900'
           : 'bg-white/10 text-white'
         : useLightNavbar
-          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+          ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white'
           : 'text-slate-300 hover:bg-white/10 hover:text-white'
     }`;
 
   const desktopDropdownClass = `rounded-full bg-transparent px-4 py-2 text-sm font-semibold transition-colors focus:bg-transparent ${
     useLightNavbar
-      ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900'
+      ? 'text-slate-700 hover:bg-slate-100 hover:text-slate-900 data-[state=open]:bg-slate-100 data-[state=open]:text-slate-900 dark:text-slate-300 dark:hover:bg-white/10 dark:hover:text-white dark:data-[state=open]:bg-white/10 dark:data-[state=open]:text-white'
       : 'text-slate-300 hover:bg-white/10 hover:text-white data-[state=open]:bg-white/10 data-[state=open]:text-white'
   }`;
 
@@ -304,8 +305,8 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
       className={`fixed top-0 z-50 w-full transition-all duration-300 ${
         useLightNavbar
           ? scrolled
-            ? 'border-b border-slate-200 bg-white/95 py-3 shadow-lg shadow-slate-200/60 backdrop-blur-xl'
-            : 'border-b border-slate-200/80 bg-white/85 py-5 backdrop-blur-xl'
+            ? 'border-b border-slate-200 bg-white/95 py-3 shadow-lg shadow-slate-200/60 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/90 dark:shadow-black/10'
+            : 'border-b border-slate-200/80 bg-white/85 py-5 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/85'
           : scrolled
             ? 'border-b border-slate-800/60 bg-slate-950/80 py-3 shadow-xl shadow-black/10 backdrop-blur-xl'
             : 'bg-transparent py-5'
@@ -317,18 +318,34 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
             href="/"
             className="z-50 flex items-center transition-opacity hover:opacity-80"
           >
-            <Image
-              src={
-                useLightNavbar
-                  ? '/images/svg-logo.svg'
-                  : '/images/svg-logo-white.svg'
-              }
-              alt="Sure Imports"
-              width={180}
-              height={40}
-              priority
-              className="h-8 w-auto"
-            />
+            {useLightNavbar ? (
+              <>
+                <Image
+                  src="/images/svg-logo.svg"
+                  alt="Sure Imports"
+                  width={180}
+                  height={40}
+                  priority
+                  className="h-8 w-auto dark:hidden"
+                />
+                <Image
+                  src="/images/svg-logo-white.svg"
+                  alt=""
+                  width={180}
+                  height={40}
+                  className="hidden h-8 w-auto dark:block"
+                />
+              </>
+            ) : (
+              <Image
+                src="/images/svg-logo-white.svg"
+                alt="Sure Imports"
+                width={180}
+                height={40}
+                priority
+                className="h-8 w-auto"
+              />
+            )}
           </Link>
 
           <div className="hidden lg:block">
@@ -399,6 +416,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
           </div>
 
           <div className="hidden items-center gap-4 lg:flex">
+            <ThemeToggle lightSurface={useLightNavbar} />
             {user ? (
               <>
                 <Button
@@ -432,7 +450,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className={`border-0 ${useLightNavbar ? 'text-slate-800 hover:bg-slate-100' : 'text-white hover:bg-white/10'}`}
+                  className={`border-0 ${useLightNavbar ? 'text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-white/10' : 'text-white hover:bg-white/10'}`}
                 >
                   <Menu className="h-6 w-6" />
                 </Button>
@@ -445,13 +463,15 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                   Main Navigation Menu
                 </SheetTitle>
                 <div className="p-6">
-                  <Image
-                    src="/images/svg-logo-white.svg"
-                    alt="Sure Imports"
-                    width={140}
-                    height={30}
-                    className="mb-8"
-                  />
+                  <div className="mb-8 flex items-center justify-between gap-4">
+                    <Image
+                      src="/images/svg-logo-white.svg"
+                      alt="Sure Imports"
+                      width={140}
+                      height={30}
+                    />
+                    <ThemeToggle />
+                  </div>
 
                   <div className="flex flex-col gap-2">
                     {TOP_LEVEL_NAV.map((item) => {

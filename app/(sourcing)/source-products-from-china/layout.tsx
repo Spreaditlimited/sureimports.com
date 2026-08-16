@@ -19,7 +19,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <>
+    <div className="public-site-theme contents">
       <Suspense fallback={null}>{children}</Suspense>
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
@@ -27,6 +27,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         position="bottom-left"
       />
       <BackToTopButton />
-    </>
+    </div>
   );
 }

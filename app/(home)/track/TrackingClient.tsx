@@ -60,7 +60,7 @@ export default function TrackingClient({
     <main className="min-h-[75vh] bg-slate-50 px-4 pb-20 pt-32 text-slate-950">
       <div className="mx-auto max-w-5xl">
         <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
             <PackageSearch className="h-8 w-8" />
           </div>
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-brand-orange-600">
@@ -83,7 +83,7 @@ export default function TrackingClient({
             onChange={(event) => setTrackingId(event.target.value)}
             aria-label="Shipment tracking ID"
             placeholder="Enter your tracking ID"
-            className="min-w-0 flex-1 rounded-xl px-4 py-3 font-mono text-sm outline-none"
+            className="min-w-0 flex-1 rounded-xl bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
           />
           <button className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">
             <Search className="h-4 w-4" /> Track
@@ -100,7 +100,7 @@ export default function TrackingClient({
           </div>
         )}
         {error && (
-          <div className="mx-auto mt-10 max-w-2xl rounded-xl border border-red-200 bg-red-50 p-5 text-center text-sm text-red-700">
+          <div className="mx-auto mt-10 max-w-2xl rounded-xl border border-red-200 bg-red-50 p-5 text-center text-sm text-red-700 dark:border-red-900/70 dark:bg-red-950/40 dark:text-red-300">
             {error}
           </div>
         )}

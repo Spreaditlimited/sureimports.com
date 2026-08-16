@@ -24,7 +24,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
-      <div className="relative">
+      <div className="public-site-theme relative">
         <Header />
         {/* <LiveChatWidgetComponent /> */}
         <Suspense fallback={null}>{children}</Suspense>

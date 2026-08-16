@@ -88,6 +88,7 @@
   }
 
   .dark {
+    color-scheme: dark;
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
 
@@ -146,6 +147,190 @@
 .group:hover .animate-marquee-left-sm,
 .group:hover .animate-marquee-right-sm {
   animation-play-state: paused;
+}
+
+/* Shared public-site colour contract, based on the Ship With Us treatment. */
+.public-site-theme {
+  --public-page-dark: 2 6 23;
+  --public-section-dark: 2 6 23;
+  --public-card-dark: 15 23 42;
+  --public-field-dark: 30 41 59;
+  --public-border-dark: 51 65 85;
+  --public-heading-dark: 248 250 252;
+  --public-copy-dark: 203 213 225;
+  --public-muted-dark: 148 163 184;
+  --public-accent: 249 90 14;
+}
+
+/* Remove only page-section separators; card and form borders remain intact. */
+.public-site-theme section[class~='border-y'],
+.public-site-theme section[class~='border-t'],
+.public-site-theme section[class~='border-b'] {
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
+}
+
+.dark .public-site-theme {
+  color: rgb(var(--public-heading-dark));
+}
+
+/*
+ * Keep full-width solid sections on the same slate-950 canvas as the Tools
+ * pages. Background images and gradients remain visible because this only
+ * normalizes the colour beneath them; nested cards keep their own surfaces.
+ */
+.dark .public-site-theme > section,
+.dark .public-site-theme main > section {
+  background-color: rgb(var(--public-section-dark)) !important;
+}
+
+/*
+ * Older public pages use fixed light utilities. These fallbacks apply only
+ * when a component has not supplied its own explicit dark-mode treatment.
+ */
+.dark .public-site-theme [class~='bg-[#fcfcfd]']:not([class*='dark:bg-']),
+.dark .public-site-theme [class~='bg-slate-50']:not([class*='dark:bg-']),
+.dark .public-site-theme [class~='bg-slate-50/50']:not([class*='dark:bg-']),
+.dark .public-site-theme [class~='bg-slate-50/70']:not([class*='dark:bg-']) {
+  background-color: rgb(var(--public-page-dark));
+}
+
+.dark .public-site-theme [class~='bg-white']:not([class*='dark:bg-']) {
+  background-color: rgb(var(--public-card-dark) / 0.72);
+}
+
+.dark .public-site-theme [class~='bg-slate-100']:not([class*='dark:bg-']) {
+  background-color: rgb(var(--public-field-dark) / 0.78);
+}
+
+.dark .public-site-theme [class~='bg-slate-200']:not([class*='dark:bg-']) {
+  background-color: rgb(51 65 85);
+}
+
+.dark .public-site-theme [class~='bg-brand-orange-50']:not([class*='dark:bg-']),
+.dark
+  .public-site-theme
+  [class~='bg-brand-orange-50/40']:not([class*='dark:bg-']),
+.dark
+  .public-site-theme
+  [class~='bg-brand-orange-50/50']:not([class*='dark:bg-']) {
+  background-color: rgb(var(--public-accent) / 0.08);
+}
+
+.dark .public-site-theme [class~='bg-amber-100']:not([class*='dark:bg-']) {
+  background-color: rgb(120 53 15 / 0.35);
+}
+
+.dark .public-site-theme [class~='text-slate-950']:not([class*='dark:text-']),
+.dark .public-site-theme [class~='text-slate-900']:not([class*='dark:text-']),
+.dark .public-site-theme [class~='text-slate-800']:not([class*='dark:text-']) {
+  color: rgb(var(--public-heading-dark));
+}
+
+.dark .public-site-theme [class~='text-slate-700']:not([class*='dark:text-']),
+.dark .public-site-theme [class~='text-slate-600']:not([class*='dark:text-']) {
+  color: rgb(var(--public-copy-dark));
+}
+
+.dark .public-site-theme [class~='text-amber-800']:not([class*='dark:text-']),
+.dark .public-site-theme [class~='text-amber-900']:not([class*='dark:text-']) {
+  color: rgb(253 230 138);
+}
+
+.dark
+  .public-site-theme
+  [class~='border-slate-100']:not([class*='dark:border-']),
+.dark
+  .public-site-theme
+  [class~='border-slate-200']:not([class*='dark:border-']),
+.dark
+  .public-site-theme
+  [class~='border-slate-200/60']:not([class*='dark:border-']),
+.dark
+  .public-site-theme
+  [class~='divide-slate-200']:not([class*='dark:divide-'])
+  > :not([hidden])
+  ~ :not([hidden]) {
+  border-color: rgb(var(--public-border-dark));
+}
+
+.dark
+  .public-site-theme
+  [class~='border-slate-300']:not([class*='dark:border-']) {
+  border-color: rgb(71 85 105);
+}
+
+.dark
+  .public-site-theme
+  [class~='border-brand-orange-200']:not([class*='dark:border-']),
+.dark
+  .public-site-theme
+  [class~='border-amber-200']:not([class*='dark:border-']) {
+  border-color: rgb(249 115 22 / 0.38);
+}
+
+.dark .public-site-theme [class*='shadow-slate-'] {
+  --tw-shadow-color: rgb(0 0 0 / 0.3);
+  --tw-shadow: var(--tw-shadow-colored);
+}
+
+/* One form treatment for every public page, including native autofill. */
+.dark
+  .public-site-theme
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+        [type='button']
+      ):not([type='file']):not([type='hidden']),
+    textarea,
+    select,
+    [role='combobox']
+  ) {
+  border-color: rgb(var(--public-border-dark)) !important;
+  background-color: rgb(var(--public-field-dark) / 0.5) !important;
+  color: rgb(var(--public-heading-dark)) !important;
+  color-scheme: dark;
+}
+
+.dark .public-site-theme :where(input, textarea)::placeholder {
+  color: rgb(100 116 139) !important;
+  opacity: 1;
+}
+
+.dark
+  .public-site-theme
+  :where(
+    input:not([type='checkbox']):not([type='radio']):not([type='submit']):not(
+        [type='button']
+      ):not([type='file']):not([type='hidden']),
+    textarea,
+    select,
+    [role='combobox']
+  ):focus {
+  border-color: rgb(var(--public-accent)) !important;
+  box-shadow: 0 0 0 3px rgb(var(--public-accent) / 0.14) !important;
+  outline: none !important;
+}
+
+.dark .public-site-theme :where(input, textarea):-webkit-autofill,
+.dark .public-site-theme :where(input, textarea):-webkit-autofill:hover,
+.dark .public-site-theme :where(input, textarea):-webkit-autofill:focus {
+  -webkit-text-fill-color: rgb(var(--public-heading-dark)) !important;
+  box-shadow: 0 0 0 1000px rgb(var(--public-field-dark)) inset !important;
+  caret-color: rgb(var(--public-heading-dark)) !important;
+}
+
+.dark .public-site-theme select option {
+  background-color: rgb(var(--public-card-dark));
+  color: rgb(var(--public-heading-dark));
+}
+
+.dark .public-site-theme [class~='hover:bg-slate-100']:hover {
+  background-color: rgb(var(--public-field-dark));
+}
+
+.dark .public-site-theme [class~='hover:text-slate-700']:hover,
+.dark .public-site-theme [class~='hover:text-slate-950']:hover {
+  color: rgb(255 255 255);
 }
 
 .shadow-emboss {

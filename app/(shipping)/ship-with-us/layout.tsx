@@ -18,16 +18,16 @@ interface ShipWithUsLayoutProps {
 
 export default function ShipWithUsLayout({ children }: ShipWithUsLayoutProps) {
   return (
-    <div className="relative min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+    <div className="public-site-theme relative min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
       {children}
-      
+
       {/* Sales Conversion: Specifically mentions "shipping service" */}
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
         message="Hello! I'm on the Ship With Us page and I'd like to ask about your shipping-only logistics service."
         position="bottom-left"
       />
-      
+
       <BackToTopButton />
     </div>
   );

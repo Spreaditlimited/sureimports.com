@@ -62,7 +62,7 @@ function notifyAdminOfSearch(input: {
         `Search time: ${new Date().toLocaleString('en-GB', {
           dateStyle: 'medium',
           timeStyle: 'short',
-          timeZone: 'Europe/London',
+          timeZone: 'Africa/Lagos',
         })}`,
         input.resultSlugs?.length
           ? `Matched result: ${input.resultSlugs.join(', ')}`

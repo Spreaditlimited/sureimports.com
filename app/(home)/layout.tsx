@@ -11,7 +11,7 @@ type HomeLayoutProps = {
 
 const HomeLayout = ({ children }: HomeLayoutProps) => {
   return (
-    <>
+    <div className="public-site-theme contents">
       <Suspense fallback={null}>
         <TrackingPixels />
       </Suspense>
@@ -23,7 +23,7 @@ const HomeLayout = ({ children }: HomeLayoutProps) => {
         position="bottom-left"
       />
       <BackToTopButton />
-    </>
+    </div>
   );
 };
 

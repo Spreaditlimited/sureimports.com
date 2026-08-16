@@ -1,4 +1,4 @@
-// 14 August 2026, midnight in Europe/London (BST).
+// 14 August 2026, midnight in West Africa Time (Africa/Lagos, UTC+1).
 // Keep the fallback fixed: using `new Date()` would move the boundary on every deploy.
 export const SES_MARKETING_CUTOVER_AT = new Date(
   process.env.SES_MARKETING_CUTOVER_AT || '2026-08-13T23:00:00.000Z',

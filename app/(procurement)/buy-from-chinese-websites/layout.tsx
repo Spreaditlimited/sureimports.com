@@ -41,9 +41,7 @@ export const metadata: Metadata = {
     title: 'Buy From Chinese Websites in Nigeria | Sure Imports',
     description:
       'Buy from 1688, Alibaba, Taobao, Pinduoduo and other Chinese websites from Nigeria with Sure Imports.',
-    images: [
-      'https://www.sureimports.com/images/sure-imports-social-card.png',
-    ],
+    images: ['https://www.sureimports.com/images/sure-imports-social-card.png'],
   },
 };
 
@@ -53,7 +51,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <>
+    <div className="public-site-theme contents">
       {children}
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
@@ -61,6 +59,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         position="bottom-left"
       />
       <BackToTopButton />
-    </>
+    </div>
   );
 }
