@@ -5,7 +5,10 @@ import {
   type ShippingRateCurrency,
 } from './shippingMath';
 
-export type { ShippingMeasurementUnit, ShippingRateCurrency } from './shippingMath';
+export type {
+  ShippingMeasurementUnit,
+  ShippingRateCurrency,
+} from './shippingMath';
 
 export const PROCUREMENT_SHIPPING_PRICING_VERSION = 2;
 
@@ -47,7 +50,9 @@ export async function resolveNewProcurementShippingPricing(
 
   const plan = country?.shippingPlans[0];
   if (!country?.countryName || !plan?.shippingPlanName) {
-    throw new Error('The selected shipping plan is not available for this destination.');
+    throw new Error(
+      'The selected shipping plan is not available for this destination.',
+    );
   }
 
   if (isNigeriaSeaShipping(country.countryName, plan.shippingPlanName)) {

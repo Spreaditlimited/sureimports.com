@@ -49,8 +49,7 @@ export function procurementEstimateInUsd(
   serviceChargePercent: number,
   vatPercent: number,
 ) {
-  const serviceChargeValueUsd =
-    productsTotalUsd * (serviceChargePercent / 100);
+  const serviceChargeValueUsd = productsTotalUsd * (serviceChargePercent / 100);
   const vatValueUsd = serviceChargeValueUsd * (vatPercent / 100);
   return {
     serviceChargeValueUsd,
@@ -94,10 +93,7 @@ export function refundAmountInNgn(
   }
   return (
     Math.round(
-      Math.max(refundAmountUsd, 0) *
-        ngnPerUsd *
-        deductionMultiplier *
-        100,
+      Math.max(refundAmountUsd, 0) * ngnPerUsd * deductionMultiplier * 100,
     ) / 100
   );
 }

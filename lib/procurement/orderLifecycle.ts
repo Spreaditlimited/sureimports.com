@@ -6,10 +6,7 @@ import {
   shippingCostInUsd,
 } from './shippingMath';
 
-const EDITABLE_ESTIMATE_STATUSES = new Set([
-  'saved',
-  'on-hold',
-]);
+const EDITABLE_ESTIMATE_STATUSES = new Set(['saved', 'on-hold']);
 
 const money = (value: number) =>
   Math.round((value + Number.EPSILON) * 100) / 100;
@@ -139,8 +136,7 @@ export async function getProcurementOrderLifecycle(
     : finite(order.orderTotalCost, dynamicGrandTotalUsd);
 
   const actualMeasurement = finite(order.orderWeight);
-  const actualDomesticShippingCostUsd =
-    finite(order.shippingCost1) / cnyPerUsd;
+  const actualDomesticShippingCostUsd = finite(order.shippingCost1) / cnyPerUsd;
   const actualInternationalShippingCostUsd = shippingCostInUsd(
     actualMeasurement,
     shippingRate,
@@ -200,10 +196,8 @@ export async function getProcurementOrderLifecycle(
     actualDomesticShippingCostUsd,
     actualInternationalShippingCostUsd,
     actualTotalShippingCostUsd,
-    costDifferenceUsd:
-      actualTotalShippingCostUsd - estimatedShippingCostUsd,
-    onHoldDifferenceUsd:
-      dynamicGrandTotalUsd - finite(order.orderTotalCost),
+    costDifferenceUsd: actualTotalShippingCostUsd - estimatedShippingCostUsd,
+    onHoldDifferenceUsd: dynamicGrandTotalUsd - finite(order.orderTotalCost),
     rates: {
       ngnPerUsd,
       cnyPerUsd,
@@ -221,9 +215,7 @@ export async function getProcurementOrderLifecycle(
       orderWeight: String(totalMeasurement),
       orderShippingCost: String(dynamicEstimatedShippingCostUsd),
       vat: String(financial.vat ?? vatPercent),
-      serviceCharge: String(
-        financial.service_charge ?? serviceChargePercent,
-      ),
+      serviceCharge: String(financial.service_charge ?? serviceChargePercent),
       exchangeRate1: String(financial.exNairaToDollar ?? ngnPerUsd),
       exchangeRate2: String(financial.exYuanToDollar ?? cnyPerUsd),
       exchangeRate3: String(financial.exNairaToYuan ?? 0),
