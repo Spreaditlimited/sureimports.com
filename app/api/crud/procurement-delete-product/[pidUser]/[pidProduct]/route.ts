@@ -19,7 +19,9 @@ export async function GET(
       where: {
         pidUser: pidUser,
         pidProduct: pidProduct,
-        //status: 'saved',
+        orders: {
+          status: { in: ['saved', 'on-hold'] },
+        },
       },
     });
 

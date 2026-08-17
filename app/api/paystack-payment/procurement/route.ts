@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 import { NextResponse } from 'next/server';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
@@ -26,10 +27,6 @@ export async function POST(request: Request) {
       service_id,
       service_name,
       description,
-      nextStatus,
-      newTotalAmount,
-      newTotalWeight,
-      newEstimatedTotalShippingCost,
     } = await request.json();
 
     if (!PAYSTACK_SECRET_KEY) {
@@ -46,42 +43,86 @@ export async function POST(request: Request) {
       );
     }
 
-    const requestedAmount = Number(amount || 0);
-    const requestedCurrency = String(currency || '').toUpperCase();
-    const order = await prisma.orders.findFirst({
-      where: { pidOrder: service_id, pidUser: consumer_id },
-      select: { status: true, destinationCountry: true },
+    const existingPayment = await prisma.payments.findFirst({
+      where: { txRef: reference, paymentStatus: 'PAID' },
     });
+    if (existingPayment) {
+      return NextResponse.json({
+        status: 'success',
+        message: 'Payment verified successfully',
+      });
+    }
 
-    if (!order) {
+    let lifecycle;
+    try {
+      lifecycle = await getProcurementOrderLifecycle(service_id, consumer_id);
+    } catch {
       return NextResponse.json(
         { status: 'error', message: 'Order not found' },
         { status: 404 },
       );
     }
 
-    const destinationCountry = order.destinationCountry
-      ? await prisma.country.findUnique({
-          where: { pidCountry: String(order.destinationCountry) },
-          select: { countryName: true },
-        })
-      : null;
-    const destinationName = String(
-      destinationCountry?.countryName || order.destinationCountry || '',
-    )
-      .trim()
-      .toLowerCase();
+    if (!lifecycle.payment.isPayable) {
+      return NextResponse.json(
+        { status: 'error', message: 'This order has no payment due.' },
+        { status: 400 },
+      );
+    }
+
+    const requestedAmount = Number(amount || 0);
+    const requestedCurrency = String(currency || '').toUpperCase();
+    const expectedAmount = lifecycle.payment.due;
+    const expectedCurrency = lifecycle.payment.currency;
+    const currentOrderStatus = String(lifecycle.order.status || '');
 
     if (
-      String(order.status || '') === 'saved' &&
-      destinationName.includes('nigeria') &&
-      (requestedCurrency !== 'NGN' || requestedAmount < 100000)
+      currentOrderStatus === 'saved' &&
+      expectedCurrency === 'NGN' &&
+      expectedAmount < 100000
     ) {
       return NextResponse.json(
         {
           status: 'error',
           message:
             'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+        },
+        { status: 400 },
+      );
+    }
+    if (
+      currentOrderStatus === 'saved' &&
+      expectedCurrency === 'USD' &&
+      expectedAmount < 200
+    ) {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message:
+            'We cannot process orders below $200 for this destination. Please edit your order before paying.',
+        },
+        { status: 400 },
+      );
+    }
+    if (
+      currentOrderStatus === 'saved' &&
+      expectedCurrency === 'USD' &&
+      lifecycle.totalMeasurement < 10
+    ) {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message:
+            'We cannot ship orders below 10kg to this destination. Please edit your order before paying.',
+        },
+        { status: 400 },
+      );
+    }
+    if (expectedCurrency === 'USD' && expectedAmount >= 1000) {
+      return NextResponse.json(
+        {
+          status: 'error',
+          message: 'Please use bank deposit for orders of $1,000 and above.',
         },
         { status: 400 },
       );
@@ -110,13 +151,14 @@ export async function POST(request: Request) {
 
     const paymentData = data.data;
     const verifiedAmount = Number(paymentData.amount || 0) / 100;
-    const paidAmount = verifiedAmount || requestedAmount;
-    const paidCurrency = String(paymentData.currency || currency || 'NGN');
+    const paidCurrency = String(paymentData.currency || '').toUpperCase();
 
     if (
       !Number.isFinite(verifiedAmount) ||
-      Math.abs(verifiedAmount - requestedAmount) > 0.01 ||
-      (requestedCurrency && paidCurrency.toUpperCase() !== requestedCurrency)
+      Math.abs(verifiedAmount - expectedAmount) > 0.01 ||
+      paidCurrency !== expectedCurrency ||
+      Math.abs(requestedAmount - expectedAmount) > 0.01 ||
+      requestedCurrency !== expectedCurrency
     ) {
       return NextResponse.json(
         {
@@ -128,26 +170,11 @@ export async function POST(request: Request) {
     }
 
     const paymentID = 'PAY' + randomGenerator(10);
-    const existingPayment = await prisma.payments.findFirst({
-      where: { txRef: reference },
-    });
-
-    if (existingPayment?.paymentStatus === 'PAID') {
-      return NextResponse.json({
-        status: 'success',
-        message: 'Payment verified successfully',
-      });
-    }
-
     const user = await prisma.users.findUnique({
       where: { pidUser: consumer_id },
     });
-    const currentOrderStatus = String(order.status || '');
-    const targetStatus = String(nextStatus || '');
+    const targetStatus = lifecycle.payment.nextStatus;
     const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
-    const financialRates = shouldUpdateOrderTotals
-      ? await prisma.exchange_rate.findUnique({ where: { id: 1 } })
-      : null;
 
     await prisma.$transaction(async (tx) => {
       await tx.payments.create({
@@ -163,8 +190,8 @@ export async function POST(request: Request) {
           txRef: reference,
           paymentStatus: 'PAID',
           paymentType: paymentData.channel || payment_type || 'PAYSTACK',
-          currency: paidCurrency,
-          amount: paidAmount,
+          currency: expectedCurrency,
+          amount: expectedAmount,
           serviceID: service_id,
           serviceName: service_name || 'PROCUREMENT',
           serviceDescription: description || 'General procurement payment',
@@ -174,35 +201,62 @@ export async function POST(request: Request) {
       });
 
       if (targetStatus) {
-        await tx.orders.update({
-          where: { pidOrder: service_id },
+        const updatedOrder = await tx.orders.updateMany({
+          where: {
+            pidOrder: service_id,
+            pidUser: consumer_id,
+            status: currentOrderStatus,
+          },
           data: {
             status: targetStatus,
+            orderTotalCostOld:
+              currentOrderStatus === 'on-hold'
+                ? lifecycle.order.orderTotalCost
+                : undefined,
+            orderWeightOld:
+              currentOrderStatus === 'on-hold'
+                ? lifecycle.order.orderWeight
+                : undefined,
+            orderShippingCostOld:
+              currentOrderStatus === 'on-hold'
+                ? lifecycle.order.orderShippingCost
+                : undefined,
             orderTotalCost:
-              shouldUpdateOrderTotals && newTotalAmount
-                ? String(newTotalAmount)
+              shouldUpdateOrderTotals
+                ? lifecycle.snapshot.orderTotalCost
                 : undefined,
             orderWeight:
-              shouldUpdateOrderTotals && newTotalWeight
-                ? String(newTotalWeight)
+              shouldUpdateOrderTotals
+                ? lifecycle.snapshot.orderWeight
                 : undefined,
             orderShippingCost:
-              shouldUpdateOrderTotals && newEstimatedTotalShippingCost
-                ? String(newEstimatedTotalShippingCost)
+              shouldUpdateOrderTotals
+                ? lifecycle.snapshot.orderShippingCost
                 : undefined,
-            vat: financialRates?.vat ?? undefined,
-            serviceCharge: financialRates?.service_charge ?? undefined,
-            exchangeRate1: financialRates?.exNairaToDollar ?? undefined,
-            exchangeRate2: financialRates?.exYuanToDollar ?? undefined,
-            exchangeRate3: financialRates?.exNairaToYuan ?? undefined,
+            vat: shouldUpdateOrderTotals ? lifecycle.snapshot.vat : undefined,
+            serviceCharge: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.serviceCharge
+              : undefined,
+            exchangeRate1: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.exchangeRate1
+              : undefined,
+            exchangeRate2: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.exchangeRate2
+              : undefined,
+            exchangeRate3: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.exchangeRate3
+              : undefined,
             updatedAt: new Date(),
           },
         });
+        if (updatedOrder.count !== 1) {
+          throw new Error('Order status changed while payment was processing.');
+        }
       }
     });
 
     const customerEmail = email || user?.userEmail;
-    const displayAmount = formatAmount(paidAmount, paidCurrency);
+    const displayAmount = formatAmount(expectedAmount, expectedCurrency);
 
     if (customerEmail) {
       const xEmail = customerEmail;
@@ -255,6 +309,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       status: 'success',
       message: 'Payment verified successfully',
+      nextStatus: targetStatus,
     });
   } catch (error) {
     console.error('Error verifying Paystack procurement payment:', error);

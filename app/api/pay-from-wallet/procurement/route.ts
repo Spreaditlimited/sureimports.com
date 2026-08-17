@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { recordWalletDebit } from '@/lib/walletLedger';
+import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 
 const formatNaira = (value: number) =>
   value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -9,15 +10,7 @@ const formatNaira = (value: number) =>
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const {
-      pidUser,
-      pidOrder,
-      amount,
-      nextStatus,
-      newTotalAmount,
-      newTotalWeight,
-      newEstimatedTotalShippingCost,
-    } = body || {};
+    const { pidUser, pidOrder, amount } = body || {};
 
     if (!pidUser || !pidOrder || !amount) {
       return NextResponse.json(
@@ -29,8 +22,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const payAmount = Number(amount);
-    if (!Number.isFinite(payAmount) || payAmount <= 0) {
+    const requestedAmount = Number(amount);
+    if (!Number.isFinite(requestedAmount) || requestedAmount <= 0) {
       return NextResponse.json(
         { statusx: 'FAILED', message: 'Invalid amount' },
         { status: 400 },
@@ -47,28 +40,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const order = await prisma.orders.findFirst({
-      where: { pidOrder: String(pidOrder), pidUser: String(pidUser) },
-    });
-    if (!order) {
+    let lifecycle;
+    try {
+      lifecycle = await getProcurementOrderLifecycle(
+        String(pidOrder),
+        String(pidUser),
+      );
+    } catch {
       return NextResponse.json(
         { statusx: 'FAILED', message: 'Order not found' },
         { status: 404 },
       );
     }
 
-    const destinationCountry = order.destinationCountry
-      ? await prisma.country.findUnique({
-          where: { pidCountry: String(order.destinationCountry) },
-          select: { countryName: true },
-        })
-      : null;
-    const destinationName = String(
-      destinationCountry?.countryName || order.destinationCountry || '',
-    )
-      .trim()
-      .toLowerCase();
-    if (!destinationName.includes('nigeria')) {
+    if (lifecycle.payment.currency !== 'NGN') {
       return NextResponse.json(
         {
           statusx: 'UNSUPPORTED_DESTINATION',
@@ -78,7 +63,30 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (String(order.status || '') === 'saved' && payAmount < 100000) {
+    if (!lifecycle.payment.isPayable) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'This order has no payment due.' },
+        { status: 400 },
+      );
+    }
+
+    const payAmount = lifecycle.payment.due;
+    if (Math.abs(requestedAmount - payAmount) > 0.01) {
+      return NextResponse.json(
+        {
+          statusx: 'ORDER_AMOUNT_CHANGED',
+          message:
+            'The order amount changed. Refresh the order and try again.',
+          meta: { requiredAmount: payAmount },
+        },
+        { status: 409 },
+      );
+    }
+
+    if (
+      String(lifecycle.order.status || '') === 'saved' &&
+      payAmount < 100000
+    ) {
       return NextResponse.json(
         {
           statusx: 'MINIMUM_ORDER_AMOUNT',
@@ -155,12 +163,9 @@ export async function POST(request: NextRequest) {
     const fullName =
       `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() ||
       'Customer';
-    const currentOrderStatus = String(order.status || '');
-    const targetStatus = String(nextStatus || 'pending');
+    const currentOrderStatus = String(lifecycle.order.status || '');
+    const targetStatus = lifecycle.payment.nextStatus;
     const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
-    const financialRates = shouldUpdateOrderTotals
-      ? await prisma.exchange_rate.findUnique({ where: { id: 1 } })
-      : null;
     const pidDebit = `DEB${randomGenerator(12)}`;
 
     await prisma.$transaction(async (tx) => {
@@ -216,30 +221,57 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      await tx.orders.update({
-        where: { pidOrder: String(pidOrder) },
+      const updatedOrder = await tx.orders.updateMany({
+        where: {
+          pidOrder: String(pidOrder),
+          pidUser: String(pidUser),
+          status: currentOrderStatus,
+        },
         data: {
           status: targetStatus,
+          orderTotalCostOld:
+            currentOrderStatus === 'on-hold'
+              ? lifecycle.order.orderTotalCost
+              : undefined,
+          orderWeightOld:
+            currentOrderStatus === 'on-hold'
+              ? lifecycle.order.orderWeight
+              : undefined,
+          orderShippingCostOld:
+            currentOrderStatus === 'on-hold'
+              ? lifecycle.order.orderShippingCost
+              : undefined,
           orderTotalCost:
-            shouldUpdateOrderTotals && newTotalAmount
-              ? String(newTotalAmount)
+            shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderTotalCost
               : undefined,
           orderWeight:
-            shouldUpdateOrderTotals && newTotalWeight
-              ? String(newTotalWeight)
+            shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderWeight
               : undefined,
           orderShippingCost:
-            shouldUpdateOrderTotals && newEstimatedTotalShippingCost
-              ? String(newEstimatedTotalShippingCost)
+            shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderShippingCost
               : undefined,
-          vat: financialRates?.vat ?? undefined,
-          serviceCharge: financialRates?.service_charge ?? undefined,
-          exchangeRate1: financialRates?.exNairaToDollar ?? undefined,
-          exchangeRate2: financialRates?.exYuanToDollar ?? undefined,
-          exchangeRate3: financialRates?.exNairaToYuan ?? undefined,
+          vat: shouldUpdateOrderTotals ? lifecycle.snapshot.vat : undefined,
+          serviceCharge: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.serviceCharge
+            : undefined,
+          exchangeRate1: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.exchangeRate1
+            : undefined,
+          exchangeRate2: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.exchangeRate2
+            : undefined,
+          exchangeRate3: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.exchangeRate3
+            : undefined,
           updatedAt: new Date(),
         },
       });
+      if (updatedOrder.count !== 1) {
+        throw new Error('Order status changed while payment was processing.');
+      }
     });
 
     return NextResponse.json({

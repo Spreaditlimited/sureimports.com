@@ -1,299 +1,127 @@
-// app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
+import { prisma } from '@/lib/prisma';
+import randomGenerator from '@/lib/helpers/randomGenerator';
 import xMail from '@/lib/email/xMail2';
-
-const prisma = new PrismaClient();
+import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { refundAmountInNgn } from '@/lib/procurement/shippingMath';
 
 export async function POST(request: Request) {
-  //GET FORM DATA
-  const formData = await request.formData();
-  const pidUser = formData.get('pidUser') as string;
-  const pidOrder = formData.get('pidOrder') as string;
-  const currentStatus = formData.get('currentStatus') as string;
-  const newStatus = formData.get('newStatus') as string;
-  const refundAmount = formData.get('refundAmount') as any;
-  const serviceType = formData.get('serviceType') as string;
+  try {
+    const formData = await request.formData();
+    const pidUser = String(formData.get('pidUser') || '');
+    const pidOrder = String(formData.get('pidOrder') || '');
+    const newStatus = String(formData.get('newStatus') || '');
 
-  //const message = formData.get('message') as string;
-  //const pidMessage = formData.get('pidMessage') as string;
+    if (!pidUser || !pidOrder || newStatus !== 'in-transit') {
+      return NextResponse.json(
+        { statusx: 'ACTION_FAILED', message: 'Invalid order transition.' },
+        { status: 400 },
+      );
+    }
 
-  //CHECK IF USER PID AND CID EXISTS
-  const user = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser,
-      //userEmail: email,
-    },
-  });
+    const user = await prisma.users.findUnique({ where: { pidUser } });
+    if (!user) {
+      return NextResponse.json(
+        { statusx: 'ACTION_FAILED', message: 'Customer account not found.' },
+        { status: 404 },
+      );
+    }
 
-  //UPDATE SERVICE STATUS
-  const updatex = await prisma.orders.update({
-    where: {
-      pidUser: pidUser,
-      pidOrder: pidOrder,
-    },
-    data: {
-      status: newStatus,
-      updatedAt: new Date(),
-    },
-  });
-
-  //*************************************** MESSAGING BLOCK STARTS ***************************************//
-  if (updatex) {
-    //SEND EMAIL TO USER
-    try {
-      // .................... ON-HOLD(DECLINED) STAGE MAIL ....................//
-      if (newStatus == 'on-hold') {
-        const xEmail = 'hello@sureimports.com' as string;
-        const xTitle = `Order moved to On-Hold`;
-        const xBodyTitle = `Customer Order for Shipping has been moved to On-Hold`;
-
-        const xBody1 =
-          `Hello Admin, ` +
-          user?.userFirstname +
-          `,` +
-          `<p>has moved order with ID :<b>` +
-          pidOrder +
-          `</b> to <b>On-Hold</b>.</p>
-          <p>You may choose to review or ignore this order, as the customer is responsible for the next action.</p>
-          <p>Log into the SureImports admin dashboard, go to <b>On-Hold Orders</b> to view this order.</p>`;
-
-        const xBody2 = ``;
-        const xButtonTitle = '';
-        const xButtonLink = '';
-        await xMail({
-          xEmail,
-          xTitle,
-          xBodyTitle,
-          xBody1,
-          xBody2,
-          xButtonTitle,
-          xButtonLink,
-        });
-        //success update
-        return NextResponse.json(
-          {
-            statusx: 'SUCCESS',
-            message: 'Order has been successfully moved to On-Hold.',
-          },
-          { status: 200 },
-        );
-      }
-
-      // .................... IN-TRANSIT STAGE MAIL ....................//
-      if (newStatus == 'in-transit') {
-        //CHECK IF NUMBER IS NEGATIVE
-        let statusz: string = 'default';
-        let refundAmountz = parseFloat(refundAmount);
-
-        if (parseFloat(refundAmountz as any) < 0) {
-          console.log('Number was negative');
-          statusz = 'NEGATIVE';
-        }
-
-        if (parseFloat(refundAmountz as any) >= 0) {
-          console.log('Number was positive');
-          statusz = 'POSITIVE';
-        }
-
-        //SEND EMAIL TO ADMIN
-        const xEmail = 'hello@sureimports.com' as string;
-        const xTitle = `An Order has been moved to In-Transit`;
-        const xBodyTitle = `Customer Order has been moved to In-Transit`;
-
-        const xBody1 =
-          `Hello Admin, ` +
-          user?.userFirstname +
-          `,` +
-          `<p>has moved order with ID :<b>` +
-          pidOrder +
-          `</b> to <b>In-Transit</b>.</p>
-            <p>You necessary action is required to start processing the shipment of the order.</p>
-            <p>Log into the SureImports admin dashboard, go to <b>In-Transit Orders</b> to view this order.</p>`;
-
-        const xBody2 = ``;
-        const xButtonTitle = '';
-        const xButtonLink = '';
-        await xMail({
-          xEmail,
-          xTitle,
-          xBodyTitle,
-          xBody1,
-          xBody2,
-          xButtonTitle,
-          xButtonLink,
-        });
-
-        //CREATE REFUND RECORD AND SEND REFUND EMAIL
-        if (statusz == 'NEGATIVE') {
-          let refundAmountx = (refundAmountz * -1).toString(); //remove negative sign
-          const pidRefund = 'RFND' + randomGenerator(15);
-          const createx = await prisma.refund_records.create({
-            data: {
-              pidRefund: pidRefund,
-              pidUser: pidUser,
-              pidOrder: pidOrder,
-              amount: refundAmountx,
-              refundStatus: 'pending',
-              serviceType: serviceType,
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
-
-          //SEND EMAIL TO ADMIN
-          const xEmail = user?.userEmail as string;
-          const xTitle = `Refund Initiated`;
-          const xBodyTitle = `Refund has been initiated for your order`;
-
-          const xBody1 =
-            `Hello ` +
-            user?.userFirstname +
-            `,` +
-            `<p>A refund for Order with ID :<b>` +
-            pidOrder +
-            `</b> has been initiated.</p>
-            <p><i>Refund Amount</i>: <b>$` +
-            -refundAmountz.toFixed(2) +
-            ` USD</b></p>
-            <p>Log into the SureImports admin dashboard, go to <b>Refunds</b> to view your refunds.</p>`;
-
-          const xBody2 = ``;
-          const xButtonTitle = '';
-          const xButtonLink = '';
-          await xMail({
-            xEmail,
-            xTitle,
-            xBodyTitle,
-            xBody1,
-            xBody2,
-            xButtonTitle,
-            xButtonLink,
-          });
-          //success update
-          return NextResponse.json(
-            {
-              statusx: 'SUCCESS',
-              message:
-                'Order has been successfully moved to In-Transit. Refund has also been initiated.',
-            },
-            { status: 200 },
-          );
-        }
-
-        //success update
-        return NextResponse.json(
-          {
-            statusx: 'SUCCESS',
-            message: 'Order has been successfully moved to In-Transit.',
-          },
-          { status: 200 },
-        );
-      }
-
-      // .................... PENDING STAGE MAIL ....................//
-      if (newStatus == 'pending') {
-        const xEmail = 'hello@sureimports.com' as string;
-        const xTitle = `An Order has been moved to Pending`;
-        const xBodyTitle = `Customer Order has been moved to Pending`;
-
-        const xBody1 =
-          `Hello Admin, ` +
-          user?.userFirstname +
-          `,` +
-          `<p>has moved order with ID :<b>` +
-          pidOrder +
-          `</b> to <b>Pending</b>.</p>
-            <p>You necessary action is required to start processing the order to approved.</p>
-            <p>Log into the SureImports admin dashboard, go to <b>Pending Orders</b> to view this order.</p>`;
-
-        const xBody2 = ``;
-        const xButtonTitle = '';
-        const xButtonLink = '';
-        await xMail({
-          xEmail,
-          xTitle,
-          xBodyTitle,
-          xBody1,
-          xBody2,
-          xButtonTitle,
-          xButtonLink,
-        });
-        //success update
-        return NextResponse.json(
-          {
-            statusx: 'SUCCESS',
-            message: 'Order has been successfully moved to Pending.',
-          },
-          { status: 200 },
-        );
-      }
-
-      // .................... PENDING STAGE MAIL ....................//
-      if (newStatus == 'cancelled') {
-        const xEmail = 'hello@sureimports.com' as string;
-        const xTitle = `An Order has been Cancelled`;
-        const xBodyTitle = `Customer Order has been Cancelled`;
-
-        const xBody1 =
-          `Hello Admin, ` +
-          user?.userFirstname +
-          `,` +
-          `<p>has cancelled the order with ID :<b>` +
-          pidOrder +
-          `</b>.</p>
-            <p>You may choose to repond to this action.</p>
-            <p>Log into the SureImports admin dashboard, go to <b>Cancelled Orders</b> to view this order.</p>`;
-
-        const xBody2 = ``;
-        const xButtonTitle = '';
-        const xButtonLink = '';
-        await xMail({
-          xEmail,
-          xTitle,
-          xBodyTitle,
-          xBody1,
-          xBody2,
-          xButtonTitle,
-          xButtonLink,
-        });
-        //success update
-        return NextResponse.json(
-          {
-            statusx: 'SUCCESS',
-            message: 'Order has been successfully Cancelled.',
-          },
-          { status: 200 },
-        );
-      }
-    } catch (error) {
-      //success update
+    const lifecycle = await getProcurementOrderLifecycle(pidOrder, pidUser);
+    if (lifecycle.order.status !== 'pay-for-shipping') {
       return NextResponse.json(
         {
           statusx: 'ACTION_FAILED',
-          message:
-            'Action Failed! You may need to try again, or contact the Admin. Error MSG:' +
-            error,
+          message: 'Order status changed. Refresh and try again.',
         },
-        { status: 401 },
+        { status: 409 },
       );
     }
-  } else {
-    //success update
+    if (lifecycle.costDifferenceUsd > 0.01) {
+      return NextResponse.json(
+        {
+          statusx: 'ACTION_FAILED',
+          message: 'The outstanding shipping balance must be paid first.',
+        },
+        { status: 409 },
+      );
+    }
+
+    const refundAmountNgn =
+      lifecycle.costDifferenceUsd < -0.01
+        ? refundAmountInNgn(
+            Math.abs(lifecycle.costDifferenceUsd),
+            lifecycle.rates.ngnPerUsd,
+          )
+        : 0;
+
+    await prisma.$transaction(async (tx) => {
+      const updated = await tx.orders.updateMany({
+        where: { pidUser, pidOrder, status: 'pay-for-shipping' },
+        data: { status: 'in-transit', updatedAt: new Date() },
+      });
+      if (updated.count !== 1) {
+        throw new Error('Order status changed while it was being updated.');
+      }
+
+      if (refundAmountNgn > 0) {
+        await tx.refund_records.create({
+          data: {
+            pidRefund: `RFND${randomGenerator(15)}`,
+            pidUser,
+            pidOrder,
+            amount: String(refundAmountNgn),
+            currency: 'NGN',
+            refundStatus: 'pending',
+            serviceType: 'PROCUREMENT',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+    });
+
+    try {
+      await Promise.all([
+        xMail({
+          xEmail: 'hello@sureimports.com',
+          xTitle: 'An Order has been moved to In-Transit',
+          xBodyTitle: 'Customer Order has been moved to In-Transit',
+          xBody1: `${user.userFirstname || 'A customer'} moved order <b>${pidOrder}</b> to <b>In-Transit</b>.`,
+          xBody2: '',
+          xButtonTitle: '',
+          xButtonLink: '',
+        }),
+        ...(refundAmountNgn > 0 && user.userEmail
+          ? [
+              xMail({
+                xEmail: user.userEmail,
+                xTitle: 'Refund Initiated',
+                xBodyTitle: 'Refund has been initiated for your order',
+                xBody1: `A refund of <b>₦${refundAmountNgn.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> has been initiated for order <b>${pidOrder}</b>.`,
+                xBody2: '',
+                xButtonTitle: '',
+                xButtonLink: '',
+              }),
+            ]
+          : []),
+      ]);
+    } catch (error) {
+      console.error('Failed to send procurement transition email:', error);
+    }
+
+    return NextResponse.json({
+      statusx: 'SUCCESS',
+      message:
+        refundAmountNgn > 0
+          ? 'Order moved to In-Transit and the refund was initiated.'
+          : 'Order moved to In-Transit.',
+    });
+  } catch (error) {
+    console.error('Procurement customer transition failed:', error);
     return NextResponse.json(
-      {
-        statusx: 'ACTION_FAILED',
-        message:
-          'Action Failed! You may need to try again, or contact the Admin.',
-      },
-      { status: 401 },
+      { statusx: 'ACTION_FAILED', message: 'Unable to update the order.' },
+      { status: 500 },
     );
   }
-
-  //END
 }

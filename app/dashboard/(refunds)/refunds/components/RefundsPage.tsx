@@ -26,30 +26,64 @@ import {
 } from '../components/ui/dialog';
 
 const STATUS_MAP = {
-  Paid: {
+  paid: {
     label: 'Paid',
     color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   },
-  Pending: {
+  refunded: {
+    label: 'Refunded',
+    color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+  },
+  pending: {
     label: 'Pending',
     color: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
   },
-  Requested: {
+  requested: {
     label: 'Requested',
     color: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
   },
-  Rejected: {
+  rejected: {
     label: 'Rejected',
     color: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
   },
-  Cancelled: {
+  cancelled: {
     label: 'Cancelled',
     color: 'bg-slate-500/10 text-slate-600 border-slate-500/20',
   },
+  'wallet-transferred': {
+    label: 'Moved to wallet',
+    color: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
+  },
+};
+
+const REFUNDABLE_STATUSES = new Set(['pending', 'requested']);
+
+const isRefundable = (refund: any) =>
+  REFUNDABLE_STATUSES.has(String(refund.refundStatus || '').toLowerCase()) &&
+  String(refund.currency || '').toUpperCase() === 'NGN' &&
+  parseFloat(refund.amount || 0) > 0;
+
+const isPendingRefund = (refund: any) =>
+  String(refund.refundStatus || '').toLowerCase() === 'pending' &&
+  String(refund.currency || '').toUpperCase() === 'NGN' &&
+  parseFloat(refund.amount || 0) > 0;
+
+const formatRefundAmount = (amount: unknown, currency: unknown) => {
+  const value = Number(amount || 0);
+  const normalizedCurrency = String(currency || '').toUpperCase();
+  if (normalizedCurrency !== 'NGN') {
+    return `${normalizedCurrency || 'Currency unavailable'} ${value.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency: 'NGN',
+    minimumFractionDigits: 2,
+  }).format(value);
 };
 
 function StatusTag({ status }: { status: string }) {
-  const config = STATUS_MAP[status] || STATUS_MAP.Pending;
+  const config =
+    STATUS_MAP[String(status || '').toLowerCase()] || STATUS_MAP.pending;
   return (
     <span
       className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${config.color}`}
@@ -61,17 +95,29 @@ function StatusTag({ status }: { status: string }) {
 
 export default function RefundsPage({ records }: any) {
   const router = useRouter();
-  const [refundData] = useState(records || []);
+  const [refundData, setRefundData] = useState(records || []);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showRefundDestinationModal, setShowRefundDestinationModal] =
     useState(false);
   const [showRefundModal, setShowRefundModal] = useState(false);
-  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [requestingDestination, setRequestingDestination] = useState<
+    'bank' | 'wallet' | null
+  >(null);
+  const [transferringRefundId, setTransferringRefundId] = useState<
+    string | null
+  >(null);
+  const [walletTransferFeedback, setWalletTransferFeedback] = useState<{
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+    actionHref?: string;
+    actionLabel?: string;
+  } | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const filterOptions = ['All', 'Pending', 'Requested', 'Paid'];
+  const filterOptions = ['All', 'Pending', 'Requested', 'Refunded', 'Paid'];
   const itemsPerPage = 8;
 
   // Handle outside click for dropdown
@@ -99,37 +145,135 @@ export default function RefundsPage({ records }: any) {
             selectedFilter.toLowerCase(),
         );
 
-  const transferRefundToWallet = async (pidRefund: string) => {
+  const transferRefundsToWallet = async (refunds: any[]) => {
+    const isBulkTransfer = refunds.length > 1;
+    setTransferringRefundId(isBulkTransfer ? 'all' : refunds[0]?.pidRefund);
     try {
       const res = await fetch('/api/refunds/transfer-to-wallet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pidRefund }),
+        body: JSON.stringify({
+          pidRefunds: refunds.map((refund) => refund.pidRefund),
+        }),
       });
       const data = await res.json();
       if (!res.ok || data?.statusx !== 'SUCCESS') {
+        setShowRefundDestinationModal(false);
         if (data?.statusx === 'NO_WALLET') {
-          alert(data.message || 'Please activate your wallet first.');
-          router.push('/dashboard/wallet');
+          setWalletTransferFeedback({
+            type: 'error',
+            title: data?.actionHref
+              ? 'Complete your wallet profile'
+              : 'Wallet activation unavailable',
+            message: data.message || 'Please activate your wallet first.',
+            actionHref: data?.actionHref,
+            actionLabel: data?.actionLabel,
+          });
           return;
         }
-        alert(data?.message || 'Unable to transfer refund to wallet');
+        setWalletTransferFeedback({
+          type: 'error',
+          title: 'Transfer unsuccessful',
+          message:
+            data?.message ||
+            'Unable to transfer this refund to your wallet right now.',
+        });
         return;
       }
-      alert(data.message || 'Refund transferred to wallet successfully.');
+      const transferredIds = new Set(
+        data?.data?.transferredRefundIds ||
+          refunds.map((refund) => refund.pidRefund),
+      );
+      setRefundData((current: any[]) =>
+        current.map((item) =>
+          transferredIds.has(item.pidRefund)
+            ? { ...item, refundStatus: 'wallet-transferred' }
+            : item,
+        ),
+      );
+      const transferredAmount = refunds.reduce(
+        (sum, refund) => sum + Number(refund.amount || 0),
+        0,
+      );
+      setShowRefundDestinationModal(false);
+      setWalletTransferFeedback({
+        type: 'success',
+        title: isBulkTransfer ? 'Refunds transferred' : 'Refund transferred',
+        message: `${formatRefundAmount(transferredAmount, 'NGN')} has been credited to your Sure Wallet successfully.`,
+      });
       router.refresh();
-    } catch (error) {
-      alert('Failed to transfer refund to wallet');
+    } catch {
+      setShowRefundDestinationModal(false);
+      setWalletTransferFeedback({
+        type: 'error',
+        title: 'Transfer unsuccessful',
+        message:
+          'We could not transfer the refund to your wallet. Please try again.',
+      });
+    } finally {
+      setTransferringRefundId(null);
     }
   };
 
-  const totalAmount = filteredData.reduce(
-    (sum: number, item: any) => sum + parseFloat(item.amount || 0),
+  const requestBankRefund = async () => {
+    setRequestingDestination('bank');
+    try {
+      const res = await fetch('/api/refunds/refund-request', {
+        method: 'POST',
+      });
+      const data = await res.json();
+
+      if (!res.ok || data?.statusx !== 'SUCCESS') {
+        setShowRefundDestinationModal(false);
+        setWalletTransferFeedback({
+          type: 'error',
+          title:
+            data?.statusx === 'PROFILE_REQUIRED'
+              ? 'Bank details required'
+              : 'Request unsuccessful',
+          message:
+            data?.message ||
+            'We could not submit your bank refund request. Please try again.',
+          actionHref: data?.actionHref,
+          actionLabel: data?.actionLabel,
+        });
+        return;
+      }
+
+      const requestedIds = new Set(data?.data?.requestedRefundIds || []);
+      setRefundData((current: any[]) =>
+        current.map((item) =>
+          requestedIds.has(item.pidRefund)
+            ? { ...item, refundStatus: 'requested' }
+            : item,
+        ),
+      );
+      setShowRefundDestinationModal(false);
+      setShowRefundModal(true);
+      router.refresh();
+    } catch {
+      setShowRefundDestinationModal(false);
+      setWalletTransferFeedback({
+        type: 'error',
+        title: 'Request unsuccessful',
+        message:
+          'We could not submit your bank refund request. Please try again.',
+      });
+    } finally {
+      setRequestingDestination(null);
+    }
+  };
+
+  const totalAmount = refundData.reduce(
+    (sum: number, item: any) =>
+      isRefundable(item) && String(item.currency || '').toUpperCase() === 'NGN'
+        ? sum + parseFloat(item.amount || 0)
+        : sum,
     0,
   );
-  const hasRefundableAmounts = refundData.some(
-    (item: any) => parseFloat(item.amount) > 0,
-  );
+  const hasRefundableAmounts = refundData.some(isPendingRefund);
+  const refundableRecords = refundData.filter(isPendingRefund);
+  const hasPendingBankRefunds = hasRefundableAmounts;
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const currentPageData = filteredData.slice(
@@ -257,7 +401,7 @@ export default function RefundsPage({ records }: any) {
                         {item.pidRefund}
                       </td>
                       <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">
-                        ₦{parseFloat(item.amount).toLocaleString()}
+                        {formatRefundAmount(item.amount, item.currency)}
                       </td>
                       <td className="px-6 py-4 text-xs font-medium text-slate-500">
                         {item.serviceType}
@@ -266,16 +410,15 @@ export default function RefundsPage({ records }: any) {
                         <StatusTag status={item.refundStatus} />
                       </td>
                       <td className="px-6 py-4 text-right">
-                        {['pending', 'requested'].includes(
-                          String(item.refundStatus || '').toLowerCase(),
-                        ) ? (
+                        {isPendingRefund(item) ? (
                           <button
-                            onClick={() =>
-                              transferRefundToWallet(item.pidRefund)
-                            }
-                            className="text-xs font-bold text-blue-600 hover:underline"
+                            onClick={() => transferRefundsToWallet([item])}
+                            disabled={transferringRefundId === item.pidRefund}
+                            className="text-xs font-bold text-blue-600 hover:underline disabled:cursor-wait disabled:opacity-60"
                           >
-                            Transfer to Wallet
+                            {transferringRefundId === item.pidRefund
+                              ? 'Transferring...'
+                              : 'Transfer to Wallet'}
                           </button>
                         ) : (
                           <button className="text-xs font-bold text-blue-600 hover:underline">
@@ -350,30 +493,43 @@ export default function RefundsPage({ records }: any) {
           </DialogHeader>
           <div className="grid gap-3 py-4">
             <button
-              onClick={() => {
-                setShowRefundDestinationModal(false);
-                setShowRefundModal(true);
-              }}
-              className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-blue-600 hover:bg-blue-50/50 dark:border-slate-800 dark:hover:bg-blue-900/10"
+              onClick={requestBankRefund}
+              disabled={
+                !hasPendingBankRefunds || requestingDestination !== null
+              }
+              className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-blue-600 hover:bg-blue-50/50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:hover:bg-blue-900/10"
             >
               <Banknote className="h-8 w-8 text-slate-400 group-hover:text-blue-600" />
               <span className="font-bold text-slate-900 dark:text-white">
-                Bank Transfer
+                {requestingDestination === 'bank'
+                  ? 'Submitting...'
+                  : 'Bank Transfer'}
               </span>
               <span className="text-xs text-slate-500">
-                To your saved settlement account
+                {hasPendingBankRefunds
+                  ? 'Submit to admin for manual payment'
+                  : 'Your available refunds are already requested'}
               </span>
             </button>
             <button
-              onClick={() => {
-                setShowRefundDestinationModal(false);
-                setShowWalletModal(true);
+              onClick={async () => {
+                setRequestingDestination('wallet');
+                try {
+                  await transferRefundsToWallet(refundableRecords);
+                } finally {
+                  setRequestingDestination(null);
+                }
               }}
-              className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-emerald-600 hover:bg-emerald-50/50 dark:border-slate-800 dark:hover:bg-emerald-900/10"
+              disabled={
+                refundableRecords.length === 0 || requestingDestination !== null
+              }
+              className="group flex flex-col items-center gap-2 rounded-2xl border-2 border-slate-100 p-6 transition hover:border-emerald-600 hover:bg-emerald-50/50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:hover:bg-emerald-900/10"
             >
               <Wallet className="h-8 w-8 text-slate-400 group-hover:text-emerald-600" />
               <span className="font-bold text-slate-900 dark:text-white">
-                Sure Wallet
+                {requestingDestination === 'wallet'
+                  ? 'Transferring...'
+                  : 'Sure Wallet'}
               </span>
               <span className="text-xs text-slate-500">
                 Instant credit for future orders
@@ -410,26 +566,43 @@ export default function RefundsPage({ records }: any) {
         </DialogContent>
       </Dialog>
 
-      {/* Wallet Error Modal */}
-      <Dialog open={showWalletModal} onOpenChange={setShowWalletModal}>
-        <DialogContent className="rounded-[32px] text-center sm:max-w-md">
-          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-rose-50 dark:bg-rose-900/20">
-            <X className="h-10 w-10 text-rose-600" />
+      <Dialog
+        open={Boolean(walletTransferFeedback)}
+        onOpenChange={(open) => {
+          if (!open) setWalletTransferFeedback(null);
+        }}
+      >
+        <DialogContent className="rounded-[32px] p-8 text-center sm:max-w-md">
+          <div
+            className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
+              walletTransferFeedback?.type === 'success'
+                ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                : 'bg-rose-100 dark:bg-rose-900/30'
+            }`}
+          >
+            {walletTransferFeedback?.type === 'success' ? (
+              <CheckCircle className="h-8 w-8 text-emerald-600" />
+            ) : (
+              <X className="h-8 w-8 text-rose-600" />
+            )}
           </div>
           <DialogHeader>
-            <DialogTitle className="mt-4 text-center text-2xl font-bold">
-              Unavailable
+            <DialogTitle className="text-center text-xl font-bold text-slate-900 dark:text-white">
+              {walletTransferFeedback?.title}
             </DialogTitle>
+            <DialogDescription className="mt-2 text-center leading-relaxed text-slate-500">
+              {walletTransferFeedback?.message}
+            </DialogDescription>
           </DialogHeader>
-          <p className="leading-relaxed text-slate-500">
-            Wallet refunds are currently disabled for maintenance. Please use
-            the <span className="font-bold">Bank Transfer</span> option instead.
-          </p>
           <button
-            onClick={() => setShowWalletModal(false)}
-            className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800"
+            onClick={() => {
+              const actionHref = walletTransferFeedback?.actionHref;
+              setWalletTransferFeedback(null);
+              if (actionHref) router.push(actionHref);
+            }}
+            className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
           >
-            Close
+            {walletTransferFeedback?.actionLabel || 'Done'}
           </button>
         </DialogContent>
       </Dialog>

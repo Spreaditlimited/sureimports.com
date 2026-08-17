@@ -49,6 +49,7 @@ interface ProductData {
   productCategory: string;
   productPrice: string;
   productWeight: string;
+  shippingMeasurePerUnit?: string;
   productQuantity: string;
   productInfo: string;
   createdAt: string;
@@ -117,10 +118,15 @@ export default function MoreOrders({
   const [destinationCountry, setDestinationCountry] = useState<string>('...');
   const [shippingPlanName, setShippingPlanName] = useState<string>('...');
   const [shippingPlanRate, setShippingPlanRate] = useState<number>(0);
+  const [shippingPlanUnit, setShippingPlanUnit] = useState<'KG' | 'CBM'>('KG');
+  const [shippingRateCurrency, setShippingRateCurrency] = useState<'USD' | 'NGN'>('USD');
+  const [usesMeasurementPricing, setUsesMeasurementPricing] = useState(false);
   const [domesticShippingCost, setDomesticShippingCost] = useState<number>(0);
   const [estimatedTotalShippingCost, setEstimatedTotalShippingCost] = useState<number>(0);
   const [grandTotalCost, setGrandTotalCost] = useState<number>(0);
   const [onHoldDifference, setOnHoldDifference] = useState<number>(0);
+  const [paymentDue, setPaymentDue] = useState<number>(0);
+  const [paymentDueCurrency, setPaymentDueCurrency] = useState<'USD' | 'NGN'>('USD');
 
   const [amountNaira, setAmountNaira] = useState<number>(0);
   const [amountNairaDifference, setAmountNairaDifference] = useState<number>(0);
@@ -139,6 +145,14 @@ export default function MoreOrders({
     normalizedDestination.includes('nigeria') &&
     Number(amountNaira || 0) < 100000;
   const returnTo = `/dashboard/procurement/view-orders/${status || 'saved'}`;
+  const paymentDueUsd =
+    paymentDueCurrency === 'NGN' && exNairaToDollar > 0
+      ? paymentDue / exNairaToDollar
+      : paymentDue;
+  const paymentDueNaira =
+    paymentDueCurrency === 'NGN'
+      ? paymentDue
+      : paymentDue * exNairaToDollar;
 
   function replaceNullWithZero<T>(value: T | null): T | number {
     return value === null ? 0 : value;
@@ -172,6 +186,9 @@ export default function MoreOrders({
         setDestinationCountry(data.destinationCountry);
         setShippingPlanName(data.shippingPlanName);
         setShippingPlanRate(replaceNullWithZero(data.shippingPlanRate) as number);
+        setShippingPlanUnit(data.shippingPlanUnit === 'CBM' ? 'CBM' : 'KG');
+        setShippingRateCurrency(data.shippingRateCurrency === 'NGN' ? 'NGN' : 'USD');
+        setUsesMeasurementPricing(Boolean(data.usesMeasurementPricing));
         setDomesticShippingCost(replaceNullWithZero(data.domesticShippingCost) as number);
         setEstimatedTotalShippingCost(replaceNullWithZero(data.estimatedTotalShippingCost) as number);
         setAmountNaira(replaceNullWithZero(data.grandTotalCost) as number * (replaceNullWithZero(data.exNairaToDollar) as number));
@@ -179,6 +196,8 @@ export default function MoreOrders({
         setAmountPounds(replaceNullWithZero(data.grandTotalCost) as number * 0.8);
         setGrandTotalCost(replaceNullWithZero(data.grandTotalCost) as number);
         setOnHoldDifference(replaceNullWithZero(data.onHoldDifference) as number);
+        setPaymentDue(replaceNullWithZero(data.paymentDue) as number);
+        setPaymentDueCurrency(data.paymentDueCurrency === 'NGN' ? 'NGN' : 'USD');
       } else {
         setGetAllProducts([]);
       }
@@ -212,8 +231,8 @@ export default function MoreOrders({
 
     const query = new URLSearchParams({
       service: 'procurement',
-      amount: String(params.amount),
-      amountNaira: String(params.amountNaira),
+      amount: String(paymentDueUsd),
+      amountNaira: String(paymentDueNaira),
       currencyType,
       exNairaToDollar: String(exNairaToDollar),
       destinationCountry,
@@ -345,7 +364,7 @@ export default function MoreOrders({
         body: JSON.stringify({
           pidUser: user?.pidUser,
           pidOrder,
-          amount: payload.amountNaira,
+          amount: paymentDueNaira,
           nextStatus: payload.nextStatus,
           newTotalAmount: payload.newTotalAmount,
           newTotalWeight: payload.newTotalWeight,
@@ -533,7 +552,7 @@ export default function MoreOrders({
                 <th className="pb-3 pl-2">Item</th>
                 <th className="pb-3">Unit Price ({currencyType})</th>
                 <th className="pb-3">Qty</th>
-                <th className="pb-3">Weight</th>
+                <th className="pb-3">{shippingPlanUnit === 'CBM' ? 'CBM per item' : 'Weight per item'}</th>
                 <th className="pb-3">Total</th>
                 {['saved', 'on-hold'].includes(status) && <th className="pb-3 text-right pr-2">Actions</th>}
               </tr>
@@ -558,7 +577,9 @@ export default function MoreOrders({
                   </td>
                   <td className="py-4 font-medium text-slate-600 dark:text-slate-300">{formatCurrency(datax.productPrice)}</td>
                   <td className="py-4 font-medium text-slate-600 dark:text-slate-300">{datax.productQuantity}</td>
-                  <td className="py-4 font-medium text-slate-600 dark:text-slate-300">{datax.productWeight} kg</td>
+                  <td className="py-4 font-medium text-slate-600 dark:text-slate-300">
+                    {usesMeasurementPricing ? datax.shippingMeasurePerUnit : datax.productWeight} {shippingPlanUnit}
+                  </td>
                   <td className="py-4 font-bold text-slate-900 dark:text-white">{formatCurrency(datax.productPrice * datax.productQuantity)}</td>
                   
                   {['saved', 'on-hold'].includes(status) && (
@@ -605,13 +626,13 @@ export default function MoreOrders({
                 <span className="font-semibold text-slate-900 dark:text-white">{destinationCountry}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Est. Total Weight</span>
-                <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(productsTotalWeight)} kg</span>
+                <span className="text-slate-500">Est. Total {shippingPlanUnit === 'CBM' ? 'Volume' : 'Weight'}</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{formatCurrency(productsTotalWeight)} {shippingPlanUnit}</span>
               </div>
               {showActualShippingBreakdown && (
                 <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
-                  <span className="text-slate-500 font-bold">Actual Confirmed Weight</span>
-                  <span className="font-black text-indigo-600 dark:text-indigo-400">{formatCurrency(actualWeightValue)} kg</span>
+                  <span className="text-slate-500 font-bold">Actual Confirmed {shippingPlanUnit === 'CBM' ? 'Volume' : 'Weight'}</span>
+                  <span className="font-black text-indigo-600 dark:text-indigo-400">{formatCurrency(actualWeightValue)} {shippingPlanUnit}</span>
                 </div>
               )}
             </div>
@@ -624,7 +645,7 @@ export default function MoreOrders({
                 </h4>
               </div>
               <p className="text-sm font-semibold text-blue-700 dark:text-blue-300">
-                Rate: ${shippingPlanRate} {shippingPlanName === 'SEA_SHIPPING' ? '(N500,000/CBM)' : 'per Kg'}
+                Rate: {shippingRateCurrency === 'NGN' ? '₦' : '$'}{Number(shippingPlanRate).toLocaleString()} per {shippingPlanUnit}
               </p>
             </div>
 
@@ -797,8 +818,8 @@ export default function MoreOrders({
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
                 <PaystackProcurementPaymentButton
-                  amount={grandTotalCost}
-                  amountNaira={amountNaira}
+                  amount={paymentDueUsd}
+                  amountNaira={paymentDueNaira}
                   destinationCountry={destinationCountry}
                   totalWeight={productsTotalWeight}
                   email={user?.userEmail || ''}
@@ -812,9 +833,6 @@ export default function MoreOrders({
                   description={'General Procurement & Shipping Service'}
                   isDisabled={isDisabled}
                   nextStatus="pending"
-                  newTotalAmount={grandTotalCost}
-                  newTotalWeight={productsTotalWeight}
-                  newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                   enforceMinimumOrderRules
                   onMinimumOrderBlocked={showMinimumOrderNotice}
                   className={isDisabled 
@@ -942,8 +960,8 @@ export default function MoreOrders({
                 {onHoldDifference > 0 && (
                   <div className="flex flex-col sm:flex-row gap-3">
                     <PaystackProcurementPaymentButton
-                      amount={onHoldDifference}
-                      amountNaira={amountNairaDifference}
+                      amount={paymentDueUsd}
+                      amountNaira={paymentDueNaira}
                       destinationCountry={destinationCountry}
                       totalWeight={productsTotalWeight}
                       email={user?.userEmail || ''}
@@ -957,9 +975,6 @@ export default function MoreOrders({
                       description={'General Procurement & Shipping Service'}
                       isDisabled={isDisabled}
                       nextStatus="pending"
-                      newTotalAmount={grandTotalCost}
-                      newTotalWeight={productsTotalWeight}
-                      newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                       className={isDisabled 
                         ? "flex h-12 flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                         : "flex h-12 flex-1 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -1037,8 +1052,8 @@ export default function MoreOrders({
                 </label>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <PaystackProcurementPaymentButton
-                    amount={actualTotalShippingCost - estimatedTotalShippingCost}
-                    amountNaira={(actualTotalShippingCost - estimatedTotalShippingCost) * exNairaToDollar}
+                    amount={paymentDueUsd}
+                    amountNaira={paymentDueNaira}
                     destinationCountry={destinationCountry}
                     totalWeight={productsTotalWeight}
                     email={user?.userEmail || ''}
@@ -1052,9 +1067,6 @@ export default function MoreOrders({
                     description={'General Procurement & Shipping Service'}
                     isDisabled={isDisabled}
                     nextStatus="in-transit"
-                    newTotalAmount={grandTotalCost}
-                    newTotalWeight={productsTotalWeight}
-                    newEstimatedTotalShippingCost={estimatedTotalShippingCost}
                     className={isDisabled 
                       ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                       : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}

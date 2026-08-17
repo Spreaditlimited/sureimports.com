@@ -18,6 +18,7 @@ interface ProductData {
   productCategory: string;
   productPrice: string;
   productWeight: string;
+  shippingMeasurePerUnit?: string;
   productQuantity: string;
   productInfo: string;
   createdAt: string;

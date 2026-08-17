@@ -13,7 +13,8 @@ import {
   MapPin,
   Package,
   FileText,
-  Globe
+  Globe,
+  HelpCircle,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -34,6 +35,7 @@ type ShippingPlan = {
   shippingPlanName: string;
   shippingPlanRate: number;
   shippingPlanUnit?: string | null;
+  shippingPlanCurrency?: 'USD' | 'NGN';
 };
 
 type Country = {
@@ -82,6 +84,7 @@ export default function PublicOrderFlow() {
   const [productDraft, setProductDraft] = useState<ProductDraft>(initialProduct);
   const [products, setProducts] = useState<ProductDraft[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [showMeasurementHelp, setShowMeasurementHelp] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,13 +117,25 @@ export default function PublicOrderFlow() {
     };
   }, []);
 
+  const formatPlanUnit = (unit?: string | null) =>
+    unit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
+
   const selectedCountry = useMemo(
     () => countries.find((country) => country.pidCountry === order.destinationCountry),
     [countries, order.destinationCountry],
   );
-
-  const formatPlanUnit = (unit?: string | null) =>
-    unit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
+  const selectedPlan = useMemo(
+    () =>
+      selectedCountry?.shippingPlans.find(
+        (plan) => plan.pidShippingPlan === order.shippingPlan,
+      ),
+    [selectedCountry, order.shippingPlan],
+  );
+  const measurementUnit = formatPlanUnit(selectedPlan?.shippingPlanUnit);
+  const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
+  const lineMeasurement =
+    Number(productDraft.productQuantity || 0) *
+    Number(productDraft.productWeight || 0);
 
   const totalEstimatedValue = useMemo(() => {
     return products.reduce((total, p) => total + (Number(p.productPrice) * Number(p.productQuantity)), 0);
@@ -140,7 +155,9 @@ export default function PublicOrderFlow() {
       !productDraft.productWeight ||
       !productDraft.productQuantity
     ) {
-      toast.error('Complete product name, link, price, weight and quantity.');
+      toast.error(
+        `Complete product name, link, price, ${measurementName} and quantity.`,
+      );
       return;
     }
 
@@ -149,7 +166,9 @@ export default function PublicOrderFlow() {
       Number(productDraft.productWeight) <= 0 ||
       Number(productDraft.productQuantity) <= 0
     ) {
-      toast.error('Price, weight and quantity must be greater than zero.');
+      toast.error(
+        `Price, ${measurementName} and quantity must be greater than zero.`,
+      );
       return;
     }
 
@@ -330,7 +349,11 @@ export default function PublicOrderFlow() {
                   <select
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.destinationCountry}
-                    onChange={(e) => setOrder((prev) => ({ ...prev, destinationCountry: e.target.value, shippingPlan: '' }))}
+                    onChange={(e) => {
+                      setOrder((prev) => ({ ...prev, destinationCountry: e.target.value, shippingPlan: '' }));
+                      setProductDraft((prev) => ({ ...prev, productWeight: '' }));
+                      setProducts([]);
+                    }}
                   >
                     <option value="" className="dark:bg-slate-900">Select destination country</option>
                     {countriesLoading ? (
@@ -349,7 +372,11 @@ export default function PublicOrderFlow() {
                   <select
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.shippingPlan}
-                    onChange={(e) => setOrder((prev) => ({ ...prev, shippingPlan: e.target.value }))}
+                    onChange={(e) => {
+                      setOrder((prev) => ({ ...prev, shippingPlan: e.target.value }));
+                      setProductDraft((prev) => ({ ...prev, productWeight: '' }));
+                      setProducts([]);
+                    }}
                     disabled={!selectedCountry}
                   >
                     <option value="" className="dark:bg-slate-900">
@@ -357,7 +384,7 @@ export default function PublicOrderFlow() {
                     </option>
                     {selectedCountry?.shippingPlans.map((plan) => (
                       <option key={plan.pidShippingPlan} value={plan.pidShippingPlan} className="dark:bg-slate-900">
-                        {convertToTitleCase(plan.shippingPlanName)} (${plan.shippingPlanRate}/{formatPlanUnit(plan.shippingPlanUnit)})
+                        {convertToTitleCase(plan.shippingPlanName)} ({plan.shippingPlanCurrency === 'NGN' ? '₦' : '$'}{Number(plan.shippingPlanRate).toLocaleString()}/{formatPlanUnit(plan.shippingPlanUnit)})
                       </option>
                     ))}
                   </select>
@@ -426,8 +453,39 @@ export default function PublicOrderFlow() {
                     <Input placeholder="0.00" type="number" value={productDraft.productPrice} onChange={(e) => setProductDraft((prev) => ({ ...prev, productPrice: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Unit Weight (kg)</label>
-                    <Input placeholder="0.5" type="number" value={productDraft.productWeight} onChange={(e) => setProductDraft((prev) => ({ ...prev, productWeight: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
+                    <div className="flex items-center gap-2">
+                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                        {measurementUnit === 'CBM' ? 'CBM per item' : 'Weight per item (kg)'}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setShowMeasurementHelp((current) => !current)}
+                        className="text-indigo-600 hover:text-indigo-800"
+                        aria-label={`Explain per-item ${measurementName}`}
+                      >
+                        <HelpCircle className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <Input
+                      placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 0.5'}
+                      type="number"
+                      min="0.0001"
+                      step="any"
+                      disabled={!selectedPlan}
+                      value={productDraft.productWeight}
+                      onChange={(e) => setProductDraft((prev) => ({ ...prev, productWeight: e.target.value }))}
+                      className="h-12 rounded-xl bg-white dark:bg-slate-900"
+                    />
+                    {selectedPlan && productDraft.productWeight && Number(productDraft.productQuantity) > 0 && (
+                      <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
+                        {productDraft.productQuantity} item{Number(productDraft.productQuantity) === 1 ? '' : 's'} × {productDraft.productWeight} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
+                      </p>
+                    )}
+                    {showMeasurementHelp && (
+                      <p className="rounded-lg bg-indigo-50 p-3 text-xs leading-relaxed text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-200">
+                        Enter the {measurementName} of one item, not the whole product line. If your supplier gave you a total for all items, divide that total by the quantity. For example, 10 CBM for 100 items means 0.1 CBM per item.
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Quantity</label>
@@ -478,7 +536,7 @@ export default function PublicOrderFlow() {
                             Qty: {product.productQuantity}
                           </span>
                           <span className="flex items-center gap-1 rounded-md bg-white px-2 py-1 shadow-sm dark:bg-slate-900">
-                            {product.productWeight}kg
+                            {product.productWeight} {measurementUnit}
                           </span>
                         </div>
                       </div>

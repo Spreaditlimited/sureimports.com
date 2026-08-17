@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     const debits = await prisma.debits.findMany({
       where: {
         pidUser: pidUser as string,
+        paymentStatus: 'DEBITED',
       },
       orderBy: {
         createdAt: 'desc', // Most recent first
@@ -49,9 +50,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate total debited amount
-    const totalDebited = debits
-      .filter((debit) => debit.paymentStatus === 'DEBITED')
-      .reduce((sum, debit) => sum + (debit.amount || 0), 0);
+    const totalDebited = debits.reduce(
+      (sum, debit) => sum + (debit.amount || 0),
+      0,
+    );
 
     return NextResponse.json(
       {

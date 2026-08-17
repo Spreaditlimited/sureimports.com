@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
+import { resolveNewProcurementShippingPricing } from '@/lib/procurement/shippingPricing';
 
 const prisma = new PrismaClient();
 
@@ -56,6 +57,24 @@ export async function POST(request: Request) {
     /////////////// RETURN RESPONSE ///////////////
     //CREATE REQUEST
 
+    let shippingPricing;
+    try {
+      shippingPricing = await resolveNewProcurementShippingPricing(
+        destinationCountry,
+        shippingPlan,
+      );
+    } catch (error) {
+      const responsex = {
+        message:
+          error instanceof Error ? error.message : 'Invalid shipping selection.',
+        status: 'INVALID_SHIPPING_SELECTION',
+      };
+      return NextResponse.json(
+        { responsex, successx: false, userx: null },
+        { status: 400 },
+      );
+    }
+
     const createx = await prisma.orders.create({
       data: {
         pidOrder,
@@ -66,6 +85,10 @@ export async function POST(request: Request) {
         shippingPlan,
         orderCategory,
         shippingAddress,
+        shippingPricingVersion: shippingPricing.version,
+        shippingMeasurementUnit: shippingPricing.measurementUnit,
+        shippingRateSnapshot: shippingPricing.rate,
+        shippingRateCurrency: shippingPricing.rateCurrency,
         status: 'saved',
         createdAt: new Date(),
         updatedAt: new Date(),

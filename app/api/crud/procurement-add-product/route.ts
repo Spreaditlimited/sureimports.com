@@ -31,6 +31,8 @@ export async function POST(request: Request) {
     productInfo,
   } = await request.json();
   const normalizedProductLink = normalizeProductUrl(productLink);
+  const measurementValue = Number(productWeight);
+  const quantityValue = Number(productQuantity);
 
   console.log('JESUS IS KING');
 
@@ -40,7 +42,11 @@ export async function POST(request: Request) {
     //productCategory === '' ||
     productPrice === '' ||
     productWeight === '' ||
-    productQuantity === ''
+    productQuantity === '' ||
+    !Number.isFinite(measurementValue) ||
+    measurementValue <= 0 ||
+    !Number.isFinite(quantityValue) ||
+    quantityValue < 1
   ) {
     const responsex = {
       message: 'Fields cannot be submitted empty!',
@@ -64,6 +70,29 @@ export async function POST(request: Request) {
     /////////////// RETURN RESPONSE ///////////////
     //CREATE REQUEST
 
+    const order = await prisma.orders.findFirst({
+      where: { pidOrder, pidUser },
+      select: { shippingPricingVersion: true, status: true },
+    });
+    if (!order) {
+      const responsex = { message: 'Order not found.', status: 'ORDER_NOT_FOUND' };
+      return NextResponse.json(
+        { responsex, successx: false, userx: null },
+        { status: 404 },
+      );
+    }
+    if (!['saved', 'on-hold'].includes(String(order.status || ''))) {
+      const responsex = {
+        message: 'Products can only be changed while an order is saved or on hold.',
+        status: 'ORDER_NOT_EDITABLE',
+      };
+      return NextResponse.json(
+        { responsex, successx: false, userx: null },
+        { status: 409 },
+      );
+    }
+    const usesMeasurementPricing = order.shippingPricingVersion === 2;
+
     const createx = await prisma.products.create({
       data: {
         pidProduct,
@@ -72,8 +101,11 @@ export async function POST(request: Request) {
         productName,
         productLink: normalizedProductLink,
         productPrice: parseFloat(productPrice),
-        productWeight: parseFloat(productWeight),
-        productQuantity: parseFloat(productQuantity),
+        productWeight: usesMeasurementPricing ? null : measurementValue,
+        shippingMeasurePerUnit: usesMeasurementPricing
+          ? measurementValue
+          : null,
+        productQuantity: quantityValue,
         productInfo,
         createdAt: new Date(),
         updatedAt: new Date(),

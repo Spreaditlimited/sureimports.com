@@ -69,12 +69,18 @@ type FormValues = z.infer<typeof formSchema>;
 type ProductData = Partial<FormValues> & {
   productPrice?: string | number | null;
   productWeight?: string | number | null;
+  shippingMeasurePerUnit?: string | number | null;
 };
 
 const toTwoDecimals = (value: unknown): string => {
   const n = Number(value);
   if (!Number.isFinite(n)) return '';
   return n.toFixed(2);
+};
+
+const toMeasurementValue = (value: unknown): string => {
+  const n = Number(value);
+  return Number.isFinite(n) ? String(n) : '';
 };
 
 export default function EditProductForm({
@@ -91,6 +97,7 @@ export default function EditProductForm({
 
   const pidOrderx = params?.pidOrder as string;
   const [currency, setCurrencyType] = useState<string>('USD');
+  const [measurementUnit, setMeasurementUnit] = useState<'KG' | 'CBM'>('KG');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form with existing product data
@@ -104,7 +111,9 @@ export default function EditProductForm({
       productName: product?.productName || '',
       productLink: product?.productLink || '',
       productPrice: toTwoDecimals(product?.productPrice),
-      productWeight: toTwoDecimals(product?.productWeight),
+      productWeight: toMeasurementValue(
+        product?.shippingMeasurePerUnit ?? product?.productWeight,
+      ),
       productQuantity: product?.productQuantity?.toString() || '1',
       productInfo: product?.productInfo || '',
     },
@@ -120,6 +129,9 @@ export default function EditProductForm({
         );
         const data = await res.json();
         setCurrencyType(data.getOneRecord?.currencyType || 'USD');
+        setMeasurementUnit(
+          data.getOneRecord?.shippingMeasurementUnit === 'CBM' ? 'CBM' : 'KG',
+        );
       } catch (error) {
         console.error('Error fetching order data:', error);
       }
@@ -131,7 +143,7 @@ export default function EditProductForm({
     const normalizedValues: FormValues = {
       ...values,
       productPrice: toTwoDecimals(values.productPrice),
-      productWeight: toTwoDecimals(values.productWeight),
+      productWeight: toMeasurementValue(values.productWeight),
     };
 
     if (parseFloat(normalizedValues.productPrice) < 0.001) {
@@ -170,6 +182,11 @@ export default function EditProductForm({
       setIsSubmitting(false);
     }
   };
+
+  const quantity = Number(form.watch('productQuantity') || 0);
+  const perItemMeasurement = Number(form.watch('productWeight') || 0);
+  const lineMeasurement = quantity * perItemMeasurement;
+  const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
 
   return (
     <>
@@ -498,22 +515,25 @@ export default function EditProductForm({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">
-                      Estimated Weight per unit (kg)
+                      {measurementUnit === 'CBM'
+                        ? 'Estimated CBM per item'
+                        : 'Estimated weight per item (kg)'}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Scale className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <Input
                           type="number"
-                          step="0.01"
-                          placeholder="e.g., 1.5"
+                          min="0.0001"
+                          step="any"
+                          placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 1.5'}
                           className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
                           onBlur={(e) => {
                             field.onBlur();
                             form.setValue(
                               'productWeight',
-                              toTwoDecimals(e.target.value),
+                              toMeasurementValue(e.target.value),
                               {
                                 shouldDirty: true,
                                 shouldValidate: true,
@@ -524,25 +544,30 @@ export default function EditProductForm({
                       </div>
                     </FormControl>
                     <FormMessage className="text-xs text-rose-500" />
+                    {perItemMeasurement > 0 && quantity > 0 && (
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                        {quantity} item{quantity === 1 ? '' : 's'} × {perItemMeasurement} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
 
               {/* Contextual Weight Guide */}
               <div
-                onClick={openModal}
+                onClick={measurementUnit === 'KG' ? openModal : undefined}
                 className="group cursor-pointer rounded-2xl border border-blue-200 bg-blue-50 p-4 transition-all hover:bg-blue-100 dark:border-blue-900/30 dark:bg-blue-900/10 dark:hover:bg-blue-900/20"
               >
                 <div className="flex items-start gap-3">
                   <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <div>
                     <h4 className="text-sm font-bold text-blue-900 dark:text-blue-100">
-                      Need help with weight?
+                      Need help with {measurementName}?
                     </h4>
                     <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
-                      Product weight determines your shipping cost. Click here
-                      for tips on finding accurate weights or to view our
-                      estimates guide.
+                      {measurementUnit === 'CBM'
+                        ? 'Enter CBM for one item. If your supplier gave 10 CBM for 100 items, enter 0.1 CBM per item.'
+                        : 'Enter the weight of one item. Click here for tips on finding an accurate per-item weight.'}
                     </p>
                   </div>
                 </div>

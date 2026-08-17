@@ -1,75 +1,83 @@
-// app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/prisma';
+import randomGenerator from '@/lib/helpers/randomGenerator';
+import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { refundAmountInNgn } from '@/lib/procurement/shippingMath';
 
-const prisma = new PrismaClient();
-
-// Function to handle GET requests for moving an order to pending status from on-hold status
 export async function GET(request: NextRequest) {
-  const pidUser = request.nextUrl.searchParams.get('pidUser') as any;
-  const pidOrder = request.nextUrl.searchParams.get('pidOrder') as any;
-  const refundAmount = request.nextUrl.searchParams.get('refundAmount') as any;
-
-  //refund amount less 2.5% inconvenience fee
-  const refundAmountx =
-    parseFloat(refundAmount) * -1 -
-    (2.5 / 100) * (parseFloat(refundAmount) * -1);
-  const pidRefundx = 'RFND' + randomGenerator(15);
-
-  try {
-    //UPDATE SERVICE STATUS
-    const updatex = await prisma.orders.update({
-      where: {
-        pidUser: pidUser,
-        pidOrder: pidOrder,
-      },
-      data: {
-        status: 'pending',
-        updatedAt: new Date(),
-      },
-    });
-
-    //CREATE REFUND RECORD
-    const refund = await prisma.refund_records.create({
-      data: {
-        pidRefund: pidRefundx,
-        pidUser: pidUser,
-        pidOrder: pidOrder,
-        amount: refundAmountx.toString(),
-        //currency: 'USD',
-        refundStatus: 'pending',
-        serviceType: 'PROCUREMENT',
-        // ext1: 'refund',
-        // ext2: 'pending',
-        // xStatus: 'pending',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
-
+  const pidUser = request.nextUrl.searchParams.get('pidUser');
+  const pidOrder = request.nextUrl.searchParams.get('pidOrder');
+  if (!pidUser || !pidOrder) {
     return NextResponse.json(
-      {
-        statusx: 'SUCCESS',
-        message:
-          'Your Refund record has been updated and the Order was successfully moved to pending for admin processing.',
-      },
-      { status: 200 },
+      { statusx: 'FAILED', message: 'Order details are required.' },
+      { status: 400 },
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        statusx: 'FAILED',
-        message: 'Failed to delete admin user Error:' + error,
-      },
-      { status: 200 },
-    );
-  } finally {
-    await prisma.$disconnect();
   }
 
-  //END
+  try {
+    const lifecycle = await getProcurementOrderLifecycle(pidOrder, pidUser);
+    if (lifecycle.order.status !== 'on-hold') {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'This order is no longer on hold.' },
+        { status: 409 },
+      );
+    }
+    if (lifecycle.onHoldDifferenceUsd >= -0.01) {
+      return NextResponse.json(
+        { statusx: 'FAILED', message: 'This order has no refund due.' },
+        { status: 409 },
+      );
+    }
+
+    const refundBeforeFeeUsd = Math.abs(lifecycle.onHoldDifferenceUsd);
+    const refundAmountNgn = refundAmountInNgn(
+      refundBeforeFeeUsd,
+      lifecycle.rates.ngnPerUsd,
+      2.5,
+    );
+    const pidRefund = `RFND${randomGenerator(15)}`;
+
+    await prisma.$transaction(async (tx) => {
+      const updated = await tx.orders.updateMany({
+        where: { pidUser, pidOrder, status: 'on-hold' },
+        data: {
+          status: 'pending',
+          orderTotalCostOld: lifecycle.order.orderTotalCost,
+          orderWeightOld: lifecycle.order.orderWeight,
+          orderShippingCostOld: lifecycle.order.orderShippingCost,
+          ...lifecycle.snapshot,
+          updatedAt: new Date(),
+        },
+      });
+      if (updated.count !== 1) {
+        throw new Error('Order status changed while refund was created.');
+      }
+
+      await tx.refund_records.create({
+        data: {
+          pidRefund,
+          pidUser,
+          pidOrder,
+          amount: String(refundAmountNgn),
+          currency: 'NGN',
+          refundStatus: 'pending',
+          serviceType: 'PROCUREMENT',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    });
+
+    return NextResponse.json({
+      statusx: 'SUCCESS',
+      message:
+        'Your refund was recorded and the order returned for admin processing.',
+    });
+  } catch (error) {
+    console.error('Failed to refund on-hold procurement order:', error);
+    return NextResponse.json(
+      { statusx: 'FAILED', message: 'Unable to update the order right now.' },
+      { status: 500 },
+    );
+  }
 }

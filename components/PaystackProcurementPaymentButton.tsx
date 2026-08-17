@@ -2,8 +2,15 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CreditCard } from 'lucide-react';
+import { CheckCircle2, CreditCard, XCircle } from 'lucide-react';
 import { Button } from './ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from './ui/dialog';
 
 interface PaymentButtonProps {
   amount: number;
@@ -22,9 +29,6 @@ interface PaymentButtonProps {
   className?: string;
   isDisabled?: boolean;
   nextStatus?: string;
-  newTotalAmount?: number;
-  newTotalWeight?: number;
-  newEstimatedTotalShippingCost?: number;
   enforceMinimumOrderRules?: boolean;
   onMinimumOrderBlocked?: () => void;
 }
@@ -100,19 +104,31 @@ export default function PaystackProcurementPaymentButton({
   className,
   isDisabled,
   nextStatus,
-  newTotalAmount,
-  newTotalWeight,
-  newEstimatedTotalShippingCost,
   enforceMinimumOrderRules,
   onMinimumOrderBlocked,
 }: PaymentButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentFeedback, setPaymentFeedback] = useState<{
+    type: 'success' | 'error';
+    title: string;
+    message: string;
+    redirectTo: string;
+  } | null>(null);
+
+  const closePaymentFeedback = () => {
+    const redirectTo = paymentFeedback?.redirectTo;
+    setPaymentFeedback(null);
+    if (redirectTo) router.push(redirectTo);
+  };
 
   const handlePayment = async () => {
+    if (!isDisabled) return;
+
     const amountNairax = Number(amountNaira || 0);
     const totalWeightx = Number(totalWeight || 0);
-    const isNigeria = destinationCountry === 'Nigeria';
+    const isNigeria =
+      destinationCountry.trim().toLowerCase() === 'nigeria';
 
     if (amount >= 1000 && !isNigeria) {
       alert(
@@ -146,8 +162,6 @@ export default function PaystackProcurementPaymentButton({
       return;
     }
 
-    if (!isDisabled) return;
-
     const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
     if (!publicKey) {
       alert('Paystack public key is not configured.');
@@ -156,8 +170,37 @@ export default function PaystackProcurementPaymentButton({
 
     setIsLoading(true);
 
-    const payCurrency = isNigeria ? 'NGN' : currency || 'USD';
-    const payAmount = isNigeria ? amountNairax : amount;
+    let quoteResponse: Response;
+    try {
+      quoteResponse = await fetch(
+        `/api/get-data/procurement-product-data?pidOrder=${encodeURIComponent(service_id)}`,
+        { cache: 'no-store' },
+      );
+    } catch {
+      setIsLoading(false);
+      alert('Unable to confirm the current order amount. Please try again.');
+      return;
+    }
+    if (!quoteResponse.ok) {
+      setIsLoading(false);
+      alert('Unable to confirm the current order amount. Please try again.');
+      return;
+    }
+    const quote = await quoteResponse.json();
+    const payCurrency = quote.paymentDueCurrency === 'NGN' ? 'NGN' : 'USD';
+    const payAmount = Number(quote.paymentDue || 0);
+    const displayedAmount = isNigeria ? amountNairax : amount;
+    const displayedCurrency = isNigeria ? 'NGN' : currency || 'USD';
+    if (
+      payAmount <= 0 ||
+      payCurrency !== displayedCurrency ||
+      Math.abs(payAmount - displayedAmount) > 0.01
+    ) {
+      setIsLoading(false);
+      alert('The order amount changed. The page will refresh before payment.');
+      router.refresh();
+      return;
+    }
     const reference = `PROCPAY_${Date.now()}`;
 
     const paystackReady = await ensurePaystackScript();
@@ -212,37 +255,97 @@ export default function PaystackProcurementPaymentButton({
           service_id,
           service_name,
           description,
-          nextStatus,
-          newTotalAmount,
-          newTotalWeight,
-          newEstimatedTotalShippingCost,
         }),
       });
       const data = await response.json();
 
       if (data.status === 'success') {
-        alert('Payment verified successfully!');
-        router.push(
-          nextStatus
-            ? `/dashboard/procurement/view-orders/${nextStatus}`
+        const paidAmount = new Intl.NumberFormat(
+          paymentCurrency === 'NGN' ? 'en-NG' : 'en-US',
+          {
+            style: 'currency',
+            currency: paymentCurrency,
+            minimumFractionDigits: 2,
+          },
+        ).format(paymentAmount);
+        setPaymentFeedback({
+          type: 'success',
+          title: 'Payment verified',
+          message: `${paidAmount} has been received successfully. Your order is ready to continue.`,
+          redirectTo:
+            data.nextStatus || nextStatus
+            ? `/dashboard/procurement/view-orders/${data.nextStatus || nextStatus}`
             : '/dashboard/success/payment',
-        );
+        });
       } else {
-        alert(data.message || 'Payment verification failed.');
-        router.push('/dashboard/failed/payment');
+        setPaymentFeedback({
+          type: 'error',
+          title: 'Verification unsuccessful',
+          message:
+            data.message ||
+            'We could not verify this payment. Please review the payment status.',
+          redirectTo: '/dashboard/failed/payment',
+        });
       }
     } catch (error) {
       console.error('Error verifying Paystack payment:', error);
-      alert('An error occurred while verifying the payment.');
+      setPaymentFeedback({
+        type: 'error',
+        title: 'Verification unsuccessful',
+        message:
+          'An error occurred while verifying the payment. Please review the payment status before trying again.',
+        redirectTo: '/dashboard/failed/payment',
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Button onClick={handlePayment} disabled={isLoading} className={className}>
-      <CreditCard />
-      {isLoading ? '  Processing...  ' : '  Pay with Paystack  '}
-    </Button>
+    <>
+      <Button onClick={handlePayment} disabled={isLoading} className={className}>
+        <CreditCard />
+        {isLoading ? '  Processing...  ' : '  Pay with Paystack  '}
+      </Button>
+
+      <Dialog
+        open={Boolean(paymentFeedback)}
+        onOpenChange={(open) => {
+          if (!open) closePaymentFeedback();
+        }}
+      >
+        <DialogContent className="w-[calc(100vw-2rem)] rounded-[32px] p-8 text-center sm:max-w-md">
+          <div
+            className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${
+              paymentFeedback?.type === 'success'
+                ? 'bg-emerald-100 dark:bg-emerald-900/30'
+                : 'bg-rose-100 dark:bg-rose-900/30'
+            }`}
+          >
+            {paymentFeedback?.type === 'success' ? (
+              <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+            ) : (
+              <XCircle className="h-8 w-8 text-rose-600" />
+            )}
+          </div>
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl font-bold text-slate-900 dark:text-white">
+              {paymentFeedback?.title}
+            </DialogTitle>
+            <DialogDescription className="mt-2 text-center leading-relaxed text-slate-500">
+              {paymentFeedback?.message}
+            </DialogDescription>
+          </DialogHeader>
+          <Button
+            onClick={closePaymentFeedback}
+            className="mt-6 w-full rounded-xl bg-slate-900 py-3 font-bold text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100"
+          >
+            {paymentFeedback?.type === 'success'
+              ? 'Continue'
+              : 'View Payment Status'}
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

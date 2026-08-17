@@ -88,13 +88,17 @@ export default function Wallet() {
       amount: Number(tx.amount || 0) / 100,
       createdAt: tx.paid_at || tx.created_at,
     })),
-    ...(debitsData?.debits || []).map((db: any) => ({
-      id: `d-${db.txRef || db.id}`,
-      type: 'debit',
-      title: db.serviceDescription || 'Service Payment',
-      amount: Number(db.amount || 0),
-      createdAt: db.createdAt,
-    })),
+    ...(debitsData?.debits || [])
+      .filter(
+        (db: any) => String(db.paymentStatus || '').toUpperCase() === 'DEBITED',
+      )
+      .map((db: any) => ({
+        id: `d-${db.txRef || db.id}`,
+        type: 'debit',
+        title: db.serviceDescription || 'Service Payment',
+        amount: Number(db.amount || 0),
+        createdAt: db.createdAt,
+      })),
   ].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );

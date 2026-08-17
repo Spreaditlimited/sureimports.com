@@ -97,30 +97,37 @@ function formatMoney(value: number, currency: 'USD' | 'NGN') {
 }
 
 async function getShippingRates(): Promise<ShippingRateRow[]> {
-  const countries = await prisma.country.findMany({
-    where: {
-      shippingPlans: {
-        some: {
-          shippingPlanRate: {
-            not: null,
+  const [countries, financial] = await Promise.all([
+    prisma.country.findMany({
+      where: {
+        shippingPlans: {
+          some: {
+            shippingPlanRate: {
+              not: null,
+            },
           },
         },
       },
-    },
-    select: {
-      countryName: true,
-      shippingPlans: {
-        select: {
-          shippingPlanName: true,
-          shippingPlanRate: true,
-          shippingPlanUnit: true,
+      select: {
+        countryName: true,
+        shippingPlans: {
+          select: {
+            shippingPlanName: true,
+            shippingPlanRate: true,
+            shippingPlanUnit: true,
+          },
         },
       },
-    },
-    orderBy: {
-      countryName: 'asc',
-    },
-  });
+      orderBy: {
+        countryName: 'asc',
+      },
+    }),
+    prisma.exchange_rate.findUnique({
+      where: { id: 1 },
+      select: { quotationSeaRateNgnPerCbm: true },
+    }),
+  ]);
+  const nigeriaSeaRate = Number(financial?.quotationSeaRateNgnPerCbm || 0);
 
   return countries
     .map((country) => ({
@@ -144,7 +151,9 @@ async function getShippingRates(): Promise<ShippingRateRow[]> {
           return {
             name,
             label: formatPlanLabel(name),
-            rate: isNigeriaSeaRate ? 470000 : Number(plan.shippingPlanRate || 0),
+            rate: isNigeriaSeaRate
+              ? nigeriaSeaRate
+              : Number(plan.shippingPlanRate || 0),
             currency,
             unit: isNigeriaSeaRate
               ? 'CBM'

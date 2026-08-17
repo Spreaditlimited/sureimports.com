@@ -36,10 +36,19 @@ function toAmount(value: unknown) {
 }
 
 function walletHolderName(user: WalletUser) {
-  return `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() || user.userEmail || user.email || 'Customer';
+  return (
+    `${user.userFirstname || ''} ${user.userLastname || ''}`.trim() ||
+    user.userEmail ||
+    user.email ||
+    'Customer'
+  );
 }
 
-export async function ensureWallet(db: WalletDb, user: WalletUser, currency = 'NGN') {
+export async function ensureWallet(
+  db: WalletDb,
+  user: WalletUser,
+  currency = 'NGN',
+) {
   return db.wallet.upsert({
     where: { pidUser: user.pidUser },
     update: {
@@ -174,10 +183,7 @@ async function dedupeWalletLedgerInTx(db: WalletDb, user: WalletUser) {
         not: null,
       },
     },
-    orderBy: [
-      { date: 'asc' },
-      { createdAt: 'asc' },
-    ],
+    orderBy: [{ date: 'asc' }, { createdAt: 'asc' }],
     select: {
       id: true,
       categoryId: true,
@@ -275,7 +281,8 @@ export async function syncLegacyWalletDebits(db: WalletDb, user: WalletUser) {
   });
 
   for (const row of rows) {
-    const isRefundCredit = String(row.paymentStatus || '').toUpperCase() === 'REFUND_CREDIT';
+    const isRefundCredit =
+      String(row.paymentStatus || '').toUpperCase() === 'REFUND_CREDIT';
     const reference = `${isRefundCredit ? 'REFUND' : 'DEBIT'}:${row.pidDebit}`;
     const description =
       row.serviceDescription ||
@@ -302,6 +309,9 @@ export async function syncLegacyWalletDebits(db: WalletDb, user: WalletUser) {
 
 export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
   const email = user.userEmail || user.email;
+  const paystackSecretKey =
+    process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY ||
+    process.env.PAYSTACK_SECRET_KEY;
   if (!email) {
     return {
       statusx: 'NO_ACCOUNT',
@@ -310,18 +320,7 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
     };
   }
 
-  const customerResponse = await fetch(`https://api.paystack.co/customer/${encodeURIComponent(email)}`, {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    cache: 'no-store',
-  });
-  const customerData = await customerResponse.json();
-  const dedicatedAccounts = customerData?.data?.dedicated_accounts;
-
-  if (!customerResponse.ok || !Array.isArray(dedicatedAccounts) || dedicatedAccounts.length === 0) {
+  if (!paystackSecretKey) {
     return {
       statusx: 'NO_ACCOUNT',
       customerDetails: null,
@@ -329,7 +328,34 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
     };
   }
 
-  const dedicatedAccount = customerData?.data?.dedicated_account || dedicatedAccounts[0];
+  const customerResponse = await fetch(
+    `https://api.paystack.co/customer/${encodeURIComponent(email)}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${paystackSecretKey}`,
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store',
+    },
+  );
+  const customerData = await customerResponse.json();
+  const dedicatedAccounts = customerData?.data?.dedicated_accounts;
+
+  if (
+    !customerResponse.ok ||
+    !Array.isArray(dedicatedAccounts) ||
+    dedicatedAccounts.length === 0
+  ) {
+    return {
+      statusx: 'NO_ACCOUNT',
+      customerDetails: null,
+      paystackTransactions: [] as PaystackTransaction[],
+    };
+  }
+
+  const dedicatedAccount =
+    customerData?.data?.dedicated_account || dedicatedAccounts[0];
   const customerDetails = {
     bankName: dedicatedAccount?.bank?.name || null,
     bankAccountName: dedicatedAccount?.account_name || null,
@@ -351,13 +377,17 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
+        Authorization: `Bearer ${paystackSecretKey}`,
       },
       cache: 'no-store',
     },
   );
   const transactionData = await transactionResponse.json();
-  const transactions: PaystackTransaction[] = Array.isArray(transactionData?.data) ? transactionData.data : [];
+  const transactions: PaystackTransaction[] = Array.isArray(
+    transactionData?.data,
+  )
+    ? transactionData.data
+    : [];
   const walletCredits = transactions.filter(
     (transaction) =>
       String(transaction.channel || '').toLowerCase() === 'dedicated_nuban' &&
@@ -369,9 +399,12 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
     await recordWalletCredit(prisma, user, {
       amount: toAmount(transaction.amount) / 100,
       reference,
-      description: transaction.gateway_response || 'Wallet funding via dedicated account',
+      description:
+        transaction.gateway_response || 'Wallet funding via dedicated account',
       currency: transaction.currency || customerDetails.currency || 'NGN',
-      date: transaction.created_at ? new Date(transaction.created_at) : undefined,
+      date: transaction.created_at
+        ? new Date(transaction.created_at)
+        : undefined,
     });
   }
 

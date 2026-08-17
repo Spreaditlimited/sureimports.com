@@ -30,6 +30,7 @@ export async function GET(
         productCategory: true,
         productPrice: true,
         productWeight: true,
+        shippingMeasurePerUnit: true,
         productQuantity: true,
         productInfo: true,
         createdAt: true,

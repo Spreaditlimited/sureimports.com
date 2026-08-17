@@ -109,17 +109,15 @@ export default async function RefundTable({ records }: any) {
     // const formData = new FormData() as any;
     // formData.append('pidUser', pidUser);
     // formData.append('userEmail', user?.userEmail);
-    const email = user?.userEmail;
-    const pidUser = user?.pidUser;
     //formData.append('amount', refunds.reduce((sum:any, r:any) => sum + Number.parseFloat(r.amount || "0"), 0));
 
     //MAKE REQUEST ATTEMPT
     try {
       toast.info('Processing Refund Request . . .');
       //MAKE REQUEST
-      const res = await fetch(
-        '/api/refunds/refund-request?email=' + email + '&pidUser=' + pidUser,
-      );
+      const res = await fetch('/api/refunds/refund-request', {
+        method: 'POST',
+      });
 
       // GET & PROCESS RESPONSE FROM API
       const data: any = await res.json();

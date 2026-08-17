@@ -75,6 +75,7 @@ export default function AddProductForm() {
   const pidOrderx = params?.pidOrder as string;
   const [pidProduct] = useState('PRD' + new Date().getTime().toString());
   const [currency, setCurrencyType] = useState<string>('USD');
+  const [measurementUnit, setMeasurementUnit] = useState<'KG' | 'CBM'>('KG');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<FormValues>({
@@ -102,6 +103,9 @@ export default function AddProductForm() {
         );
         const data = await res.json();
         setCurrencyType(data.getOneRecord?.currencyType || 'USD');
+        setMeasurementUnit(
+          data.getOneRecord?.shippingMeasurementUnit === 'CBM' ? 'CBM' : 'KG',
+        );
       } catch (error) {
         console.error('Error fetching order data:', error);
       }
@@ -145,6 +149,11 @@ export default function AddProductForm() {
     }
   };
 
+  const quantity = Number(form.watch('productQuantity') || 0);
+  const perItemMeasurement = Number(form.watch('productWeight') || 0);
+  const lineMeasurement = quantity * perItemMeasurement;
+  const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
+
   return (
     <>
       {/* Redesigned Weight Guide Modal */}
@@ -157,19 +166,36 @@ export default function AddProductForm() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20">
                   <Scale className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </span>
-                Product Weight Guide
+                Product {measurementUnit === 'CBM' ? 'CBM' : 'Weight'} Guide
               </DialogTitle>
 
               <DialogClose className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-900 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
                 <X className="h-5 w-5" />
                 <span className="sr-only">
-                  Close product weight guide modal
+                  Close product {measurementName} guide modal
                 </span>
               </DialogClose>
             </div>
           </div>
 
           <div className="custom-scrollbar min-h-0 flex-1 space-y-8 overflow-y-auto bg-white p-5 dark:bg-[#161629] sm:p-8">
+            {measurementUnit === 'CBM' ? (
+              <div className="space-y-5">
+                <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-950/30 dark:text-indigo-100">
+                  <h3 className="font-bold">Enter CBM for one item</h3>
+                  <p className="mt-2 text-sm leading-relaxed">
+                    If your supplier gives you the total CBM for the whole product line, divide it by the quantity. For example, 10 CBM for 100 items means you should enter 0.1 CBM per item.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
+                  <h3 className="font-bold text-slate-900 dark:text-white">Ask your supplier</h3>
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                    Request the packed carton dimensions or the total shipment CBM. Use packed dimensions, including packaging, rather than the bare product dimensions.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
             {/* Video Guide */}
             <div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-800">
               <div className="flex items-center gap-2 border-b border-slate-200 p-4 dark:border-slate-700">
@@ -322,6 +348,8 @@ export default function AddProductForm() {
                 </div>
               </div>
             </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
@@ -461,21 +489,29 @@ export default function AddProductForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="text-xs font-bold uppercase tracking-widest text-slate-500">
-                      Estimated Weight per unit (kg)
+                      {measurementUnit === 'CBM'
+                        ? 'Estimated CBM per item'
+                        : 'Estimated weight per item (kg)'}
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Scale className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                         <Input
                           type="number"
-                          step="0.01"
-                          placeholder="e.g., 1.5"
+                          step="any"
+                          min="0.0001"
+                          placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 1.5'}
                           className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
                         />
                       </div>
                     </FormControl>
                     <FormMessage className="text-xs text-rose-500" />
+                    {perItemMeasurement > 0 && quantity > 0 && (
+                      <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
+                        {quantity} item{quantity === 1 ? '' : 's'} × {perItemMeasurement} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
+                      </p>
+                    )}
                   </FormItem>
                 )}
               />
@@ -489,12 +525,11 @@ export default function AddProductForm() {
                   <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" />
                   <div>
                     <h4 className="text-sm font-bold text-blue-900 dark:text-blue-100">
-                      Need help with weight?
+                      Need help with {measurementName}?
                     </h4>
                     <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
-                      Product weight determines your shipping cost. Click here
-                      for tips on finding accurate weights or to view our
-                      estimates guide.
+                      Enter the {measurementName} of one item. Click here for an
+                      explanation and an example using your product quantity.
                     </p>
                   </div>
                 </div>

@@ -46,6 +46,8 @@ interface ShippingPlan {
   pidShippingPlan: string;
   shippingPlanName: string;
   shippingPlanRate: number;
+  shippingPlanUnit?: string | null;
+  shippingPlanCurrency?: 'USD' | 'NGN';
 }
 
 const currencyTypeArray = [
@@ -91,6 +93,8 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
     register,
     handleSubmit,
     control,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -112,7 +116,12 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
   const handleCountryChange = (value: string) => {
     const country = countries.find((c) => c.pidCountry === value) || null;
     setSelectedCountry(country);
+    setValue('shippingPlan', '');
   };
+  const selectedShippingPlan = selectedCountry?.shippingPlans.find(
+    (plan) => plan.pidShippingPlan === watch('shippingPlan'),
+  );
+  const usesCbm = selectedShippingPlan?.shippingPlanUnit === 'CBM';
 
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
     const submissionData = { ...formData, pidOrder, pidUser, emailUser };
@@ -287,7 +296,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
                       {selectedCountry?.shippingPlans.map((plan) => (
                         <SelectItem key={plan.pidShippingPlan} value={plan.pidShippingPlan}>
-                          {convertToTitleCase(plan.shippingPlanName)} - ${plan.shippingPlanRate}/Kg
+                          {convertToTitleCase(plan.shippingPlanName)} - {plan.shippingPlanCurrency === 'NGN' ? '₦' : '$'}{Number(plan.shippingPlanRate).toLocaleString()}/{plan.shippingPlanUnit === 'CBM' ? 'CBM' : 'kg'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -303,9 +312,15 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
               <div>
-                <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">Shipping Weight Notice</h3>
+                <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                  {usesCbm ? 'Shipping Volume Notice' : 'Shipping Weight Notice'}
+                </h3>
                 <p className="mt-1 text-xs leading-relaxed text-amber-700 dark:text-amber-400/90">
-                  Kindly note that for orders weighing less than <strong>10kg</strong>, we must use Air Shipping, even if Sea Shipping is selected.
+                  {usesCbm ? (
+                    <>For this Nigeria sea-shipping order, each product must include its estimated <strong>CBM per item</strong>. You will see a worked example when adding each product.</>
+                  ) : (
+                    <>Kindly note that for orders weighing less than <strong>10kg</strong>, we must use Air Shipping, even if Sea Shipping is selected.</>
+                  )}
                 </p>
               </div>
             </div>

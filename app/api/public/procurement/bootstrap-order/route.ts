@@ -6,6 +6,7 @@ import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 import { PROCUREMENT_RESUME_CHECKOUT_PATH } from '@/lib/auth/loginRedirect';
 import { normalizeProductUrl } from '@/lib/productUrl';
+import { resolveNewProcurementShippingPricing } from '@/lib/procurement/shippingPricing';
 
 type ProductInput = {
   productName: string;
@@ -123,6 +124,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let shippingPricing;
+    try {
+      shippingPricing = await resolveNewProcurementShippingPricing(
+        destinationCountry,
+        shippingPlan,
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          statusx: 'INVALID_SHIPPING_SELECTION',
+          message:
+            error instanceof Error ? error.message : 'Invalid shipping selection.',
+        },
+        { status: 400 },
+      );
+    }
+
     const token = request.cookies.get('token')?.value;
     let authenticatedPidUser: string | null = null;
 
@@ -167,36 +185,42 @@ export async function POST(request: NextRequest) {
     }
     const { user, createdNewAccount } = account;
 
-    await prisma.orders.create({
-      data: {
-        pidOrder,
-        pidUser: user.pidUser,
-        orderName,
-        destinationCountry,
-        currencyType,
-        shippingPlan,
-        orderCategory,
-        shippingAddress,
-        status: 'saved',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    });
+    await prisma.$transaction(async (tx) => {
+      await tx.orders.create({
+        data: {
+          pidOrder,
+          pidUser: user.pidUser,
+          orderName,
+          destinationCountry,
+          currencyType,
+          shippingPlan,
+          orderCategory,
+          shippingAddress,
+          shippingPricingVersion: shippingPricing.version,
+          shippingMeasurementUnit: shippingPricing.measurementUnit,
+          shippingRateSnapshot: shippingPricing.rate,
+          shippingRateCurrency: shippingPricing.rateCurrency,
+          status: 'saved',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
 
-    await prisma.products.createMany({
-      data: normalizedProducts.map((item) => ({
-        pidProduct: `PRD${Date.now()}${randomGenerator(5)}`,
-        pidOrder,
-        pidUser: user!.pidUser,
-        productName: normalize(item.productName),
-        productLink: item.productLink!,
-        productPrice: Number(item.productPrice),
-        productWeight: Number(item.productWeight),
-        productQuantity: Number(item.productQuantity),
-        productInfo: normalize(item.productInfo),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })),
+      await tx.products.createMany({
+        data: normalizedProducts.map((item) => ({
+          pidProduct: `PRD${Date.now()}${randomGenerator(5)}`,
+          pidOrder,
+          pidUser: user.pidUser,
+          productName: normalize(item.productName),
+          productLink: item.productLink!,
+          productPrice: Number(item.productPrice),
+          shippingMeasurePerUnit: Number(item.productWeight),
+          productQuantity: Number(item.productQuantity),
+          productInfo: normalize(item.productInfo),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })),
+      });
     });
 
     // Non-blocking CAPI lead event for public procurement submissions.
