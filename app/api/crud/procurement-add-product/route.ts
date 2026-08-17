@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
+import { normalizeProductUrl } from '@/lib/productUrl';
 
 const prisma = new PrismaClient();
 
@@ -29,12 +30,13 @@ export async function POST(request: Request) {
     productQuantity,
     productInfo,
   } = await request.json();
+  const normalizedProductLink = normalizeProductUrl(productLink);
 
   console.log('JESUS IS KING');
 
   if (
     productName === '' ||
-    productLink === '' ||
+    !normalizedProductLink ||
     //productCategory === '' ||
     productPrice === '' ||
     productWeight === '' ||
@@ -68,7 +70,7 @@ export async function POST(request: Request) {
         pidOrder,
         pidUser,
         productName,
-        productLink,
+        productLink: normalizedProductLink,
         productPrice: parseFloat(productPrice),
         productWeight: parseFloat(productWeight),
         productQuantity: parseFloat(productQuantity),

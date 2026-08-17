@@ -5,6 +5,7 @@ import { generateToken, verifyToken } from '@/lib/jwt';
 import { resolvePublicAccount } from '@/lib/auth/resolvePublicAccount';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 import { PROCUREMENT_RESUME_CHECKOUT_PATH } from '@/lib/auth/loginRedirect';
+import { normalizeProductUrl } from '@/lib/productUrl';
 
 type ProductInput = {
   productName: string;
@@ -93,10 +94,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const invalidProduct = products.find(
+    const normalizedProducts = products.map((item) => ({
+      ...item,
+      productLink: normalizeProductUrl(item.productLink),
+    }));
+
+    const invalidProduct = normalizedProducts.find(
       (item) =>
         !normalize(item.productName) ||
-        !normalize(item.productLink) ||
+        !item.productLink ||
         Number.isNaN(Number(item.productPrice)) ||
         Number(item.productPrice) < 0.01 ||
         Number.isNaN(Number(item.productWeight)) ||
@@ -111,7 +117,7 @@ export async function POST(request: NextRequest) {
         {
           statusx: 'FAILED_VALIDATION',
           message:
-            'Each product requires name, link, info, and valid price/weight/quantity values.',
+            'Each product requires a valid web link, name, info, and valid price/weight/quantity values.',
         },
         { status: 400 },
       );
@@ -178,12 +184,12 @@ export async function POST(request: NextRequest) {
     });
 
     await prisma.products.createMany({
-      data: products.map((item) => ({
+      data: normalizedProducts.map((item) => ({
         pidProduct: `PRD${Date.now()}${randomGenerator(5)}`,
         pidOrder,
         pidUser: user!.pidUser,
         productName: normalize(item.productName),
-        productLink: normalize(item.productLink),
+        productLink: item.productLink!,
         productPrice: Number(item.productPrice),
         productWeight: Number(item.productWeight),
         productQuantity: Number(item.productQuantity),

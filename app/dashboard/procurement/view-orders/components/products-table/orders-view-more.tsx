@@ -18,6 +18,7 @@ import { Input } from '@/components/ui/input-with-dark-mode';
 import Loader from '@/components/uix/Loader';
 import { useAuth } from '@/app/context/AuthContext';
 import { useNavigationWithAlert } from '@/hooks/useNavigationWithAlert';
+import { normalizeProductUrl } from '@/lib/productUrl';
 
 // Icons
 import { 
@@ -538,15 +539,22 @@ export default function MoreOrders({
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {getAllProducts.map((datax: any, index: number) => (
-                <tr key={datax.pidProduct} className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
+              {getAllProducts.map((datax: any, index: number) => {
+                const productUrl = normalizeProductUrl(datax.productLink);
+
+                return (
+                  <tr key={datax.pidProduct} className="transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50">
                   <td className="py-4 pl-2">
                     <div className="font-semibold text-slate-900 dark:text-white line-clamp-1 max-w-[300px]">
                       {datax.productName}
                     </div>
-                    <Link href={datax.productLink} target="_blank" className="text-xs text-blue-500 hover:underline line-clamp-1 max-w-[300px]">
-                      {datax.productLink}
-                    </Link>
+                    {productUrl ? (
+                      <a href={productUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:underline line-clamp-1 max-w-[300px]">
+                        {productUrl}
+                      </a>
+                    ) : (
+                      <span className="text-xs text-slate-500">Invalid product link</span>
+                    )}
                   </td>
                   <td className="py-4 font-medium text-slate-600 dark:text-slate-300">{formatCurrency(datax.productPrice)}</td>
                   <td className="py-4 font-medium text-slate-600 dark:text-slate-300">{datax.productQuantity}</td>
@@ -575,8 +583,9 @@ export default function MoreOrders({
                       </div>
                     </td>
                   )}
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

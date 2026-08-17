@@ -145,6 +145,9 @@ export async function POST(request: Request) {
     const currentOrderStatus = String(order.status || '');
     const targetStatus = String(nextStatus || '');
     const shouldUpdateOrderTotals = currentOrderStatus !== 'pay-for-shipping';
+    const financialRates = shouldUpdateOrderTotals
+      ? await prisma.exchange_rate.findUnique({ where: { id: 1 } })
+      : null;
 
     await prisma.$transaction(async (tx) => {
       await tx.payments.create({
@@ -187,6 +190,11 @@ export async function POST(request: Request) {
               shouldUpdateOrderTotals && newEstimatedTotalShippingCost
                 ? String(newEstimatedTotalShippingCost)
                 : undefined,
+            vat: financialRates?.vat ?? undefined,
+            serviceCharge: financialRates?.service_charge ?? undefined,
+            exchangeRate1: financialRates?.exNairaToDollar ?? undefined,
+            exchangeRate2: financialRates?.exYuanToDollar ?? undefined,
+            exchangeRate3: financialRates?.exNairaToYuan ?? undefined,
             updatedAt: new Date(),
           },
         });

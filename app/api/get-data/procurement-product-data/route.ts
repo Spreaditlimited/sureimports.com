@@ -210,11 +210,19 @@ export async function GET(request: NextRequest) {
     } else {
       grandTotalCost = parseFloat(order?.orderTotalCost as any);
       estimatedTotalShippingCost = parseFloat(order?.orderShippingCost as any);
-      vat = parseFloat(order?.vat as any);
-      serviceCharge = parseFloat(order?.serviceCharge as any);
-      exNairaToDollar = parseFloat(order?.exchangeRate1 as any);
-      exYuanToDollar = parseFloat(order?.exchangeRate2 as any);
-      exNairaToYuan = parseFloat(order?.exchangeRate3 as any);
+      vat = order?.vat == null ? vat : parseFloat(order.vat);
+      serviceCharge = order?.serviceCharge == null
+        ? serviceCharge
+        : parseFloat(order.serviceCharge);
+      exNairaToDollar = order?.exchangeRate1 == null
+        ? exNairaToDollar
+        : parseFloat(order.exchangeRate1);
+      exYuanToDollar = order?.exchangeRate2 == null
+        ? exYuanToDollar
+        : parseFloat(order.exchangeRate2);
+      exNairaToYuan = order?.exchangeRate3 == null
+        ? exNairaToYuan
+        : parseFloat(order.exchangeRate3);
     }
 
     //ACTUAL WEIGHT & DOMESTIC SHIPPING COST

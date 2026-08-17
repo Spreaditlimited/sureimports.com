@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
+import { normalizeProductUrl } from '@/lib/productUrl';
 
 const prisma = new PrismaClient();
 
@@ -36,6 +37,18 @@ export async function POST(request: Request) {
     productQuantity,
     productInfo,
   } = await request.json();
+  const normalizedProductLink = normalizeProductUrl(productLink);
+
+  if (!normalizedProductLink) {
+    const responsex = {
+      message: 'Please enter a valid product link.',
+      status: 'INVALID_PRODUCT_LINK',
+    };
+    return NextResponse.json(
+      { responsex, successx: false, userx: null },
+      { status: 400 },
+    );
+  }
 
   console.log('JESUS IS KING FOREVER');
 
@@ -76,7 +89,7 @@ export async function POST(request: Request) {
       where: { pidUser: pidUser as string, pidProduct: pidProduct },
       data: {
         productName,
-        productLink,
+        productLink: normalizedProductLink,
         //productCategory,
         productPrice: parseFloat(productPrice),
         productWeight: parseFloat(productWeight),
