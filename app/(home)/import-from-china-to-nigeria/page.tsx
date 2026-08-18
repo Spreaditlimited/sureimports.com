@@ -24,6 +24,10 @@ import {
 } from '@/app/(home)/actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import {
+  LINESCOUT_BULK_SOURCING_URL,
+  LINESCOUT_MACHINE_SOURCING_URL,
+} from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/import-from-china-to-nigeria`;
@@ -86,7 +90,7 @@ const featuredGuides = [
   },
   {
     title: 'Corporate sourcing from China to Nigeria',
-    text: 'For business buyers who need supplier search, quote comparison, inspection planning and bulk sourcing.',
+    text: 'For banks, large companies and institutions that need a structured procurement process, formal approvals and reporting.',
     href: '/blog/corporate-sourcing-from-china-to-nigeria-pillar-guide-for-business-buyers',
     icon: Factory,
   },
@@ -109,9 +113,9 @@ const pathways = [
   },
   {
     eyebrow: 'I need sourcing help',
-    title: 'Use Corporate Sourcing',
-    text: 'For supplier search, branded/custom products, bulk orders and business procurement planning.',
-    href: '/corporate-sourcing',
+    title: 'Start a LineScout project',
+    text: 'For individuals and small businesses sourcing white-label products, wholesale stock or other products in bulk.',
+    href: LINESCOUT_BULK_SOURCING_URL,
     icon: FileSearch,
   },
   {
@@ -125,8 +129,15 @@ const pathways = [
     eyebrow: 'Machines/equipment',
     title: 'Use LineScout',
     text: 'For industrial sourcing where rigorous specifications and supplier qualification matter.',
-    href: 'https://linescout.sureimports.com/',
+    href: LINESCOUT_MACHINE_SOURCING_URL,
     icon: Factory,
+  },
+  {
+    eyebrow: 'Established organisations',
+    title: 'Use Corporate Sourcing',
+    text: 'For banks, large companies, institutions, government bodies and NGOs with formal procurement requirements.',
+    href: '/corporate-sourcing',
+    icon: ShieldCheck,
   },
   {
     eyebrow: 'Phones/laptops',
@@ -149,7 +160,7 @@ const faqs = [
   {
     question: 'What is the best way to import from China to Nigeria?',
     answer:
-      'The best route depends on your situation. If you already have product links, use "Buy from Chinese Websites". If you need supplier search or custom/bulk sourcing, use "Corporate Sourcing". If goods are already bought, use "Ship With Us".',
+      'The best route depends on your situation. If you already have product links, use "Buy from Chinese Websites". Individuals and small businesses that need supplier search, white-label products, bulk sourcing or machines should use LineScout. Established organisations with formal procurement requirements should use Corporate Sourcing. If goods are already bought, use "Ship With Us".',
   },
   {
     question: 'Can Sure Imports help me calculate landed cost?',
@@ -440,15 +451,15 @@ export default async function ImportFromChinaHubPage() {
               Not sure which path fits your import?
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
-              If you need supplier comparison, custom branding, or a bulk quote, use Corporate Sourcing. If you already have product links, use the Public Order route.
+              Individuals and small businesses can use LineScout for supplier comparison, custom branding, bulk products and machines. Corporate Sourcing is reserved for established organisations with formal procurement needs.
             </p>
             
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link 
-                href="/corporate-sourcing"
+                href={LINESCOUT_BULK_SOURCING_URL}
                 className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-sm font-bold text-white transition hover:bg-brand-orange-600"
               >
-                Explore Corporate Sourcing <PackageCheck className="h-4 w-4" />
+                Start with LineScout <PackageCheck className="h-4 w-4" />
               </Link>
               <Link 
                 href="/buy-from-chinese-websites" 

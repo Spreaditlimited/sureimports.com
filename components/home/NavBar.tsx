@@ -91,7 +91,7 @@ const MENU_ITEMS = {
       title: 'Corporate Sourcing',
       href: '/corporate-sourcing',
       icon: Gift,
-      desc: 'Machinery, equipment, branded products and bulk sourcing',
+      desc: 'Institutional procurement for established organisations',
       color: 'from-amber-400 to-orange-500',
     },
     {
@@ -103,9 +103,9 @@ const MENU_ITEMS = {
     },
     {
       title: 'LineScout',
-      href: 'https://linescout.sureimports.com/',
+      href: 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing',
       icon: Sparkles,
-      desc: 'Machines and equipment sourcing guidance',
+      desc: 'White label, bulk product and machine sourcing',
       color: 'from-purple-500 to-pink-600',
     },
   ],

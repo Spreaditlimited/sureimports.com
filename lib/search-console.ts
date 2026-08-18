@@ -62,6 +62,7 @@ export type SearchConsoleImportStartResult =
 
 type OpportunityCandidate = {
   pageUrl: string;
+  pageType: SearchPageType;
   blogSlug: string | null;
   opportunityType: string;
   primaryQuery: string;
@@ -74,6 +75,15 @@ type OpportunityCandidate = {
   recommendation: string;
   queryCluster: string[];
 };
+
+type SearchPageType =
+  | 'blog'
+  | 'commercial'
+  | 'sureimports_home'
+  | 'linescout_home'
+  | 'white_label_catalog'
+  | 'white_label_product'
+  | 'public_page';
 
 function clean(value: unknown, max = 1000) {
   return String(value || '').trim().slice(0, max);
@@ -272,6 +282,7 @@ export async function ensureSearchConsoleTables() {
       id INT NOT NULL AUTO_INCREMENT,
       pidOpportunity VARCHAR(80) NOT NULL,
       pageUrl TEXT NOT NULL,
+      pageType VARCHAR(40) NOT NULL DEFAULT 'blog',
       blogSlug VARCHAR(500) NULL,
       opportunityType VARCHAR(80) NOT NULL,
       primaryQuery VARCHAR(700) NULL,
@@ -295,6 +306,11 @@ export async function ensureSearchConsoleTables() {
       KEY seo_opportunities_status_idx (status),
       KEY seo_opportunities_createdAt_idx (createdAt)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE seo_opportunities
+    ADD COLUMN IF NOT EXISTS pageType VARCHAR(40) NOT NULL DEFAULT 'blog' AFTER pageUrl
   `);
 
   await prisma.$executeRawUnsafe(`
@@ -396,6 +412,9 @@ export async function ensureSearchConsoleTables() {
       ('SEOLINK_CORPORATE_SOURCING', '/corporate-sourcing', '/corporate-sourcing', 'Corporate Sourcing', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
       ('SEOLINK_BUY_CHINESE_WEBSITES', '/buy-from-chinese-websites', '/buy-from-chinese-websites', 'Buy From Chinese Websites', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
       ('SEOLINK_LINESCOUT', 'https://linescout.sureimports.com/', 'https://linescout.sureimports.com/', 'LineScout', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
+      ('SEOLINK_LINESCOUT_WHITE_LABEL', 'https://linescout.sureimports.com/sourcing-project?route_type=white_label', 'https://linescout.sureimports.com/sourcing-project?route_type=white_label', 'LineScout White Label Sourcing', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
+      ('SEOLINK_LINESCOUT_BULK', 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing', 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing', 'LineScout Bulk Product Sourcing', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
+      ('SEOLINK_LINESCOUT_MACHINES', 'https://linescout.sureimports.com/sourcing-project?route_type=machine_sourcing', 'https://linescout.sureimports.com/sourcing-project?route_type=machine_sourcing', 'LineScout Machine Sourcing', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
       ('SEOLINK_SHIP_WITH_US', '/ship-with-us', '/ship-with-us', 'Ship With Us', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3)),
       ('SEOLINK_IMPORT_HUB', '/import-from-china-to-nigeria', '/import-from-china-to-nigeria', 'Import Hub', 'active', 'system', CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3), CURRENT_TIMESTAMP(3))
   `);
@@ -432,19 +451,81 @@ function getBlogSlugFromPageUrl(pageUrl: string) {
   }
 }
 
+function normalizeOpportunityPageUrl(pageUrl: string) {
+  try {
+    const url = new URL(pageUrl);
+    url.hash = '';
+    url.search = '';
+    url.pathname = url.pathname.replace(/\/+$/, '') || '/';
+    return url.toString().replace(/\/$/, url.pathname === '/' ? '/' : '');
+  } catch {
+    return pageUrl.toLowerCase().replace(/[?#].*$/, '').replace(/\/$/, '');
+  }
+}
+
+function classifySearchPage(pageUrl: string): SearchPageType {
+  try {
+    const url = new URL(pageUrl);
+    const host = url.hostname.toLowerCase();
+    const pathname = url.pathname.replace(/\/+$/, '') || '/';
+
+    if (host === 'linescout.sureimports.com') {
+      if (pathname === '/') return 'linescout_home';
+      if (pathname === '/white-label') return 'white_label_catalog';
+      if (/^\/white-label\/[^/]+$/.test(pathname)) return 'white_label_product';
+      return 'public_page';
+    }
+
+    if (/^\/blog\/[^/]+$/.test(pathname)) return 'blog';
+    if (pathname === '/') return 'sureimports_home';
+    if (
+      /^\/(corporate-sourcing|supplier-intelligence|buy-from-chinese-websites|source-products-from-china|import-from-china-to-nigeria|ship-with-us|buy-phones-from-china|laptops-for-business)(\/|$)/.test(
+        pathname,
+      )
+    ) {
+      return 'commercial';
+    }
+    return 'public_page';
+  } catch {
+    return pageUrl.includes('/blog/') ? 'blog' : 'public_page';
+  }
+}
+
+function isEligibleSearchPage(pageUrl: string) {
+  try {
+    const url = new URL(pageUrl);
+    const host = url.hostname.toLowerCase();
+    if (host !== 'www.sureimports.com' && host !== 'sureimports.com' && host !== 'linescout.sureimports.com') {
+      return false;
+    }
+    return !/^\/(api|auth|dashboard|internal|sign-in|sign-up)(\/|$)/.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
 function inferCtaIntent(query: string, pageUrl: string) {
   const text = `${query} ${pageUrl}`.toLowerCase();
+  if (
+    pageUrl.includes('/corporate-sourcing') ||
+    /\b(bank|financial institution|government|ministry|corporate organisation|corporate organization|large company|school|church|ngo|hospital|institutional procurement)\b/.test(text)
+  ) {
+    return 'corporate_sourcing';
+  }
+  if (/\b(white label|white-label|private label|private-label|oem|odm|custom brand|branded product)\b/.test(text)) {
+    return 'linescout_white_label';
+  }
   if (/\b(machine|machines|machinery|equipment|industrial|production line|factory equipment|packaging machine)\b/.test(text)) {
-    return 'linescout';
+    return 'linescout_machine_sourcing';
   }
   if (/\b(verify|verification|scam|supplier check|fake supplier|trusted supplier)\b/.test(text)) {
-    return 'corporate_sourcing';
+    return 'supplier_intelligence';
   }
   if (/\b(ship|shipping|freight|air freight|sea freight|customs|clearing|delivery)\b/.test(text)) {
     return 'ship_with_us';
   }
   if (/\b(pay|payment|rmb|yuan|alipay|wechat|supplier payment)\b/.test(text)) {
-    return 'corporate_sourcing';
+    return 'pay_supplier';
   }
   if (/\b(phone|phones|iphone|android|samsung|pixel)\b/.test(text)) {
     return 'phone_sourcing';
@@ -452,21 +533,19 @@ function inferCtaIntent(query: string, pageUrl: string) {
   if (/\b(laptop|laptops|macbook|computer)\b/.test(text)) {
     return 'laptop_sourcing';
   }
-  if (/\b(corporate|gift|gifts|company|school|church|ngo|bulk)\b/.test(text)) {
-    return 'corporate_sourcing';
-  }
-  if (/\b(landed cost|cost calculator|duty|duties|profit|margin|manufacturer|manufacturers|moq|supplier comparison|custom product|quality check|quality control|sourcing strategy)\b/.test(text)) {
-    return 'corporate_sourcing';
+  if (/\b(bulk|wholesale|manufacturer|manufacturers|moq|supplier comparison|custom product|quality check|quality control|sourcing strategy|product sourcing)\b/.test(text)) {
+    return 'linescout_bulk_sourcing';
   }
   return 'buy_from_chinese_websites';
 }
 
 function buildRecommendation(candidate: OpportunityCandidate) {
+  const subject = candidate.pageType === 'blog' ? 'article' : 'page';
   if (candidate.opportunityType === 'low_ctr') {
-    return `Improve the title and meta description for "${candidate.primaryQuery}". The page has strong impressions but weak CTR.`;
+    return `Improve the ${subject} title and meta description for "${candidate.primaryQuery}". The page has strong impressions but weak CTR.`;
   }
   if (candidate.opportunityType === 'ranking_push') {
-    return `Expand the article around "${candidate.primaryQuery}" and add an FAQ/internal link section. The page is close to page-one gains.`;
+    return `Expand the ${subject} around "${candidate.primaryQuery}" and strengthen its FAQ and internal links. The page is close to page-one gains.`;
   }
   return `Review "${candidate.primaryQuery}" for a possible content refresh or new supporting article.`;
 }
@@ -567,9 +646,10 @@ async function createOrRefreshOpportunity(
       updates.unshift(
         prisma.$executeRaw(
           Prisma.sql`
-            UPDATE seo_opportunities
-            SET pageUrl = ${candidate.pageUrl},
-                opportunityType = ${candidate.opportunityType},
+          UPDATE seo_opportunities
+          SET pageUrl = ${candidate.pageUrl},
+              pageType = ${candidate.pageType},
+              opportunityType = ${candidate.opportunityType},
                 primaryQuery = ${candidate.primaryQuery},
                 queryCluster = ${JSON.stringify(candidate.queryCluster)},
                 clicks = ${candidate.clicks},
@@ -597,11 +677,11 @@ async function createOrRefreshOpportunity(
   await prisma.$executeRaw(
     Prisma.sql`
       INSERT INTO seo_opportunities (
-        pidOpportunity, pageUrl, blogSlug, opportunityType, primaryQuery, queryCluster,
+        pidOpportunity, pageUrl, pageType, blogSlug, opportunityType, primaryQuery, queryCluster,
         clicks, impressions, ctr, position, confidence, status, recommendation,
         recommendedCta, sourceStartDate, sourceEndDate, createdAt, updatedAt
       ) VALUES (
-        ${pidOpportunity}, ${candidate.pageUrl}, ${candidate.blogSlug}, ${candidate.opportunityType},
+        ${pidOpportunity}, ${candidate.pageUrl}, ${candidate.pageType}, ${candidate.blogSlug}, ${candidate.opportunityType},
         ${candidate.primaryQuery}, ${JSON.stringify(candidate.queryCluster)}, ${candidate.clicks},
         ${candidate.impressions}, ${candidate.ctr}, ${candidate.position}, ${candidate.confidence},
         'open', ${buildRecommendation(candidate)}, ${candidate.recommendedCta},
@@ -620,6 +700,8 @@ export async function generateSearchConsoleOpportunities(input: {
   await ensureSearchConsoleTables();
 
   const minImpressions = Math.max(10, Number(input.minImpressions || 50));
+  const productMinImpressions = Math.max(10, Math.round(minImpressions / 5));
+  const supportingPageMinImpressions = Math.max(20, Math.round(minImpressions / 2));
   const rows = await prisma.$queryRaw<
     Array<{
       pageUrl: string;
@@ -637,30 +719,41 @@ export async function generateSearchConsoleOpportunities(input: {
         SUM(clicks) AS clicks,
         SUM(impressions) AS impressions,
         CASE WHEN SUM(impressions) > 0 THEN SUM(clicks) / SUM(impressions) ELSE 0 END AS ctr,
-        AVG(position) AS position
+        CASE
+          WHEN SUM(impressions) > 0 THEN SUM(position * impressions) / SUM(impressions)
+          ELSE AVG(position)
+        END AS position
       FROM search_console_query_stats
       WHERE date >= ${sqlDate(input.startDate)}
         AND date <= ${sqlDate(input.endDate)}
-        AND pageUrl LIKE '%/blog/%'
+        AND pageUrl LIKE '%sureimports.com%'
       GROUP BY pageUrl, query
-      HAVING impressions >= ${minImpressions}
+      HAVING impressions >= ${productMinImpressions}
       ORDER BY impressions DESC
-      LIMIT 2000
+      LIMIT 5000
     `,
   );
 
   const candidates: OpportunityCandidate[] = rows
     .map((row) => {
+      if (!isEligibleSearchPage(row.pageUrl)) return null;
+      const pageType = classifySearchPage(row.pageUrl);
       const ctr = Number(row.ctr || 0);
       const position = Number(row.position || 0);
       const impressions = Number(row.impressions || 0);
+      const requiredImpressions =
+        pageType === 'white_label_product'
+          ? productMinImpressions
+          : pageType === 'blog'
+            ? minImpressions
+            : supportingPageMinImpressions;
       let opportunityType = '';
       let confidence = 0;
 
-      if (impressions >= minImpressions && ctr < 0.015 && position <= 12) {
+      if (impressions >= requiredImpressions && ctr < 0.015 && position <= 12) {
         opportunityType = 'low_ctr';
         confidence = Math.min(0.95, 0.82 + impressions / 10000);
-      } else if (impressions >= minImpressions && position >= 5 && position <= 20) {
+      } else if (impressions >= requiredImpressions && position >= 5 && position <= 20) {
         opportunityType = 'ranking_push';
         confidence = Math.min(0.93, 0.78 + impressions / 12000);
       }
@@ -669,6 +762,7 @@ export async function generateSearchConsoleOpportunities(input: {
 
       return {
         pageUrl: clean(row.pageUrl, 2000),
+        pageType,
         blogSlug: getBlogSlugFromPageUrl(row.pageUrl),
         opportunityType,
         primaryQuery: clean(row.query, 700),
@@ -686,7 +780,7 @@ export async function generateSearchConsoleOpportunities(input: {
 
   const candidatesByPage = new Map<string, OpportunityCandidate[]>();
   for (const candidate of candidates) {
-    const pageKey = candidate.blogSlug || candidate.pageUrl.toLowerCase().replace(/[?#].*$/, '').replace(/\/$/, '');
+    const pageKey = candidate.blogSlug || normalizeOpportunityPageUrl(candidate.pageUrl);
     const pageCandidates = candidatesByPage.get(pageKey) || [];
     pageCandidates.push(candidate);
     candidatesByPage.set(pageKey, pageCandidates);
@@ -708,10 +802,16 @@ export async function generateSearchConsoleOpportunities(input: {
     saved.push(await createOrRefreshOpportunity(candidate, input.startDate, input.endDate));
   }
 
+  const candidatesByPageType = pageCandidates.reduce<Record<string, number>>((totals, candidate) => {
+    totals[candidate.pageType] = (totals[candidate.pageType] || 0) + 1;
+    return totals;
+  }, {});
+
   return {
     actionableQueries: candidates.length,
     candidates: pageCandidates.length,
     saved: saved.length,
+    candidatesByPageType,
     opportunityIds: saved,
   };
 }

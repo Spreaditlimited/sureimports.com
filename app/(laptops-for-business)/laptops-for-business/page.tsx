@@ -25,6 +25,7 @@ import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/laptops-for-business`;
@@ -215,7 +216,7 @@ export default function LaptopsForBusinessPage() {
               
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
                 <Link
-                  href="/corporate-sourcing"
+                  href={LINESCOUT_BULK_SOURCING_URL}
                   className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
                 >
                   <span className="relative z-10 flex items-center gap-2">
@@ -510,7 +511,7 @@ export default function LaptopsForBusinessPage() {
               </Link>
               
               <Link
-                href="/corporate-sourcing"
+                href={LINESCOUT_BULK_SOURCING_URL}
                 className="group flex flex-col items-center text-center rounded-[2.5rem] border-2 border-brand-orange-500 bg-brand-orange-50/50 p-10 shadow-md transition-all hover:bg-brand-orange-50 dark:border-brand-orange-500/50 dark:bg-brand-orange-500/5 dark:hover:bg-brand-orange-500/10"
               >
                 <div className="h-16 w-16 rounded-2xl bg-brand-orange-100 dark:bg-brand-orange-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -520,7 +521,7 @@ export default function LaptopsForBusinessPage() {
                   Request bulk sourcing
                 </h3>
                 <p className="mt-4 text-slate-600 dark:text-slate-400">
-                  Submit a custom laptop requirement for your company, school, or reseller pipeline.
+                  Start a LineScout project for a custom laptop requirement for your company, school or reseller pipeline.
                 </p>
               </Link>
             </div>

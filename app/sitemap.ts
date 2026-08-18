@@ -1,10 +1,12 @@
 import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
+import { isRedirectedBlogSlug } from '@/lib/blogRedirects';
 
 interface BlogForSitemap {
   blogSlug: string | null;
   createdAt: Date | null;
+  updatedAt: Date | null;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -48,12 +50,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/source-products-from-china`,
-      lastModified: currentDate,
-      changeFrequency: 'weekly',
-      priority: 0.8,
     },
     {
       url: `${baseUrl}/buy-from-chinese-websites`,
@@ -179,6 +175,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       select: {
         blogSlug: true,
         createdAt: true,
+        updatedAt: true,
       },
       orderBy: {
         createdAt: 'desc',
@@ -187,11 +184,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     blogPages = blogs
       .filter(
-        (blog: BlogForSitemap) => blog.blogSlug && blog.blogSlug.length > 0,
+        (blog: BlogForSitemap) =>
+          blog.blogSlug &&
+          blog.blogSlug.length > 0 &&
+          !isRedirectedBlogSlug(blog.blogSlug),
       )
       .map((blog: BlogForSitemap) => ({
         url: `${baseUrl}/blog/${blog.blogSlug}`,
-        lastModified: blog.createdAt?.toISOString() || currentDate,
+        lastModified:
+          blog.updatedAt?.toISOString() ||
+          blog.createdAt?.toISOString() ||
+          currentDate,
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       }));

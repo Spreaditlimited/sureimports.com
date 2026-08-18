@@ -277,6 +277,20 @@ export default function CorporateGiftsClient({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+      <div className="rounded-2xl border border-brand-orange-200 bg-brand-orange-50 p-5 text-sm leading-relaxed text-slate-700 dark:border-brand-orange-500/20 dark:bg-brand-orange-500/10 dark:text-slate-300">
+        <p className="font-bold text-slate-950 dark:text-white">This form is for established organisations.</p>
+        <p className="mt-1">
+          If you are an individual or small business sourcing white-label products,
+          wholesale stock or machines,{' '}
+          <a
+            href="https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing"
+            className="font-bold text-brand-orange-600 underline underline-offset-4 dark:text-brand-orange-400"
+          >
+            start your project in LineScout
+          </a>
+          .
+        </p>
+      </div>
       
       {/* Progress Indicator */}
       <div className="space-y-4 mb-8">
@@ -301,7 +315,7 @@ export default function CorporateGiftsClient({
       <div className="min-h-[300px]">
         {currentStep === 0 && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Tell us about your business</h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Tell us about your organisation</h3>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <TextField label="Business/Organization Name" required value={values.business_name} onChange={(v) => onChange('business_name', v)} placeholder="E.g. Zenith Bank" error={errors.business_name} />
               <TextField label="Your Full Name" required value={values.contact_person_full_name} onChange={(v) => onChange('contact_person_full_name', v)} placeholder="John Doe" error={errors.contact_person_full_name} />

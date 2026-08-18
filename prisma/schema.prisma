@@ -403,6 +403,7 @@ model seo_opportunities {
   id              Int       @id @default(autoincrement())
   pidOpportunity  String    @unique() @db.VarChar(80)
   pageUrl         String    @db.Text
+  pageType        String    @default("blog") @db.VarChar(40)
   blogSlug        String?   @db.VarChar(500)
   opportunityType String    @db.VarChar(80)
   primaryQuery    String?   @db.VarChar(700)
@@ -422,6 +423,7 @@ model seo_opportunities {
 
   @@index([blogSlug])
   @@index([blogSlug, status])
+  @@index([pageType])
   @@index([opportunityType])
   @@index([status])
   @@index([createdAt])

@@ -2,6 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { getBlogReadingTime } from '@/lib/blogReadingTime';
+import { routeBlogSourcingLinks } from '@/lib/blogSourcingRouting';
 
 // Media base URL for serving filename-based images during migration
 const MEDIA_PUBLIC_URL =
@@ -148,6 +149,7 @@ export interface BlogPost {
   category: string;
   tags: string[];
   publishDate: string;
+  updatedDate: string;
   readTime: number;
   featured: boolean;
   image: string;
@@ -393,7 +395,12 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
       ? dbBlog.blogContent.replace(/<[^>]*>/g, '').substring(0, 200) + '...'
       : 'No excerpt available');
 
-  const readTime = getBlogReadingTime(dbBlog.blogContent);
+  const routedContent = routeBlogSourcingLinks({
+    slug: dbBlog.blogSlug || '',
+    title: dbBlog.blogTitle,
+    html: dbBlog.blogContent || '',
+  });
+  const readTime = getBlogReadingTime(routedContent);
 
   // Get image URL
   const imageUrl = resolveBlogImageUrl(dbBlog.blogImage);
@@ -448,7 +455,7 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
     id: dbBlog.pidBlog,
     title: dbBlog.blogTitle,
     excerpt,
-    content: dbBlog.blogContent || '',
+    content: routedContent,
     author: {
       name: authorName,
       avatar: authorAvatar,
@@ -460,6 +467,9 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
     publishDate: dbBlog.createdAt
       ? dbBlog.createdAt.toISOString().split('T')[0]
       : new Date().toISOString().split('T')[0],
+    updatedDate: (dbBlog.updatedAt || dbBlog.createdAt || new Date())
+      .toISOString()
+      .split('T')[0],
     readTime,
     featured: dbBlog.blogFeatured === true || seo.featured === true,
     image: imageUrl,

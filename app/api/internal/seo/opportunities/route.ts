@@ -24,12 +24,14 @@ export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const status = clean(params.get('status') || 'open', 40);
   const opportunityType = clean(params.get('type'), 80);
+  const pageType = clean(params.get('pageType'), 40);
   const limit = Math.min(100, Math.max(1, Number(params.get('limit') || 50)));
 
   const rows = await prisma.$queryRaw<
     Array<{
       pidOpportunity: string;
       pageUrl: string;
+      pageType: string;
       blogSlug: string | null;
       opportunityType: string;
       primaryQuery: string | null;
@@ -51,6 +53,7 @@ export async function GET(request: NextRequest) {
       SELECT
         pidOpportunity,
         pageUrl,
+        pageType,
         blogSlug,
         opportunityType,
         primaryQuery,
@@ -69,6 +72,7 @@ export async function GET(request: NextRequest) {
       FROM seo_opportunities
       WHERE status = ${status}
         AND (${opportunityType || null} IS NULL OR opportunityType = ${opportunityType || null})
+        AND (${pageType || null} IS NULL OR pageType = ${pageType || null})
       ORDER BY confidence DESC, impressions DESC, createdAt DESC
       LIMIT ${limit}
     `,

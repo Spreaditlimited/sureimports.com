@@ -12,6 +12,12 @@ const nextConfig = {
           destination: '/dashboard/corporate-sourcing',
           permanent: true,
         },
+        {
+          source: '/source-products-from-china',
+          destination:
+            'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing',
+          permanent: true,
+        },
       ];
     },
     env: {

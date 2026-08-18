@@ -94,6 +94,8 @@ export async function POST(request: Request) {
       typeof email === 'string' ? email.trim().toLowerCase() : '';
     const firstName =
       typeof first_name === 'string' ? first_name.trim() : '';
+    const source = cleanString(body.source) || 'lead_capture_popup';
+    const requiresFirstName = !source.includes('footer_newsletter');
 
     if (!EMAIL_PATTERN.test(normalizedEmail)) {
       return NextResponse.json(
@@ -102,7 +104,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!firstName) {
+    if (requiresFirstName && !firstName) {
       return NextResponse.json(
         { success: false, error: 'First name is required.' },
         { status: 400 },
@@ -155,9 +157,9 @@ export async function POST(request: Request) {
     try {
       await requestMarketingOptIn({
         email: normalizedEmail,
-        firstName,
+        firstName: firstName || null,
         lastName: cleanString(last_name),
-        source: cleanString(body.source) || 'lead_capture_popup',
+        source,
         context: {
           pageType: cleanString(body.page_type || body.message_variant),
           pathname: cleanString(body.pathname),
@@ -213,10 +215,10 @@ export async function POST(request: Request) {
             updatedAt
           ) VALUES (
             ${pidLead},
-            ${firstName},
+            ${firstName || null},
             ${normalizedEmail},
             ${cleanedSegmentIds[0] || DEFAULT_SEGMENT_ID},
-            ${cleanString(body.source) || 'lead_capture_popup'},
+            ${source},
             ${cleanString(body.page_type || body.message_variant)},
             ${cleanString(body.page_url || body.pageUrl)},
             ${cleanString(body.pathname)},

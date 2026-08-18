@@ -49,7 +49,7 @@ test('GSC import and opportunity generation never invoke OpenAI', () => {
   assert.doesNotMatch(manualRouteSource, /openai|responses\.create|chat\.completions/i);
 });
 
-test('actionable queries are reduced to one highest-impression opportunity per blog page', () => {
+test('actionable queries are reduced to one highest-impression opportunity per public page', () => {
   assert.match(importerSource, /candidatesByPage/);
   assert.match(importerSource, /right\.impressions - left\.impressions/);
   assert.match(importerSource, /queryCluster: Array\.from\(new Set/);

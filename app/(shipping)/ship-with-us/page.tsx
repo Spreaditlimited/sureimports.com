@@ -28,6 +28,7 @@ import Footer from '@/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicShippingOnlyFlow from './components/PublicShippingOnlyFlow';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/ship-with-us`;
@@ -129,9 +130,9 @@ const relatedServices = [
     icon: ShoppingCart,
   },
   {
-    title: 'Corporate Sourcing',
-    text: 'Use this for branded gifts, custom products, staff kits and bulk procurement that requires supplier comparison.',
-    href: '/corporate-sourcing',
+    title: 'LineScout Sourcing',
+    text: 'Use this for white-label products, wholesale stock or machines that still require supplier sourcing.',
+    href: LINESCOUT_BULK_SOURCING_URL,
     icon: BadgeCheck,
   },
   {
@@ -279,9 +280,9 @@ export default function ShipWithUsPage() {
                 <Link href="/buy-from-chinese-websites" className={inlineLinkClass}>
                   Buy From Chinese Websites
                 </Link>
-                . If you need branded procurement, use{' '}
-                <Link href="/corporate-sourcing" className={inlineLinkClass}>
-                  Corporate Sourcing
+                . If you still need a supplier for white-label products, wholesale stock or machines, use{' '}
+                <Link href={LINESCOUT_BULK_SOURCING_URL} className={inlineLinkClass}>
+                  LineScout
                 </Link>
                 . If you need payment support, use{' '}
                 <Link href={paySupplierHref} className={inlineLinkClass}>

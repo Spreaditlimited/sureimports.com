@@ -87,15 +87,15 @@ const existingPublicCtaPaths = new Set([
   '/corporate-sourcing',
   '/shipping-rate',
   '/tools/landed-cost-estimator',
+  '/import-from-china-to-nigeria',
+  '/supplier-intelligence',
 ]);
 
 const legacyCtaPathMap: Record<string, string> = {
   '/procurement': '/buy-from-chinese-websites',
   '/corporate-gifts': '/corporate-sourcing',
-  '/source-products-from-china': '/corporate-sourcing',
-  '/pay-supplier': '/corporate-sourcing',
-  '/verify-supplier': '/corporate-sourcing',
-  '/contact': '/corporate-sourcing',
+  '/verify-supplier': '/supplier-intelligence',
+  '/contact': '/import-from-china-to-nigeria',
 };
 
 const serviceCtaCopy: Record<string, { headline: string; body: string }> = {
@@ -108,8 +108,8 @@ const serviceCtaCopy: Record<string, { headline: string; body: string }> = {
     body: 'Use Ship With Us when your goods are ready in China. Your supplier sends the items to the SureImports China warehouse and we coordinate shipping, consolidation updates and delivery support.',
   },
   '/corporate-sourcing': {
-    headline: 'Need structured sourcing with a clearer cost view?',
-    body: 'Use Corporate Sourcing for machinery, equipment, business products or branded bulk orders that need supplier comparison, specification review, inspection planning, shipping and delivery support.',
+    headline: 'Procuring for an established organisation?',
+    body: 'Use Corporate Sourcing for banks, large companies, institutions, government bodies and NGOs that need a formal procurement process, supplier comparison, inspection planning and delivery support.',
   },
   '/buy-phones-from-china': {
     headline: 'Buying phones or mobile devices from China?',
@@ -127,25 +127,63 @@ const serviceCtaCopy: Record<string, { headline: string; body: string }> = {
     headline: 'Need a clearer landed cost estimate first?',
     body: 'Use the landed cost estimator to model product cost, shipping assumptions and margin before you decide whether an order is worth pursuing.',
   },
+  '/supplier-intelligence': {
+    headline: 'Want to reduce supplier risk before paying?',
+    body: 'Use Supplier Intelligence to review verified supplier information and get pre-payment guidance before committing funds to a China supplier.',
+  },
+  '/import-from-china-to-nigeria': {
+    headline: 'Not sure which importing route fits?',
+    body: 'Use the Sure Imports China-to-Nigeria hub to choose the right route for buying, product sourcing, shipping, supplier checks and institutional procurement.',
+  },
+  '/auth/login': {
+    headline: 'Already have a confirmed supplier?',
+    body: 'Sign in to use Pay Supplier when the supplier and invoice are already confirmed and you need payment support through your Sure Imports account.',
+  },
 };
 
-const lineScoutCtaCopy = {
-  headline: 'Sourcing machines, equipment or industrial products?',
-  body: 'Use LineScout for machinery and equipment sourcing guidance where supplier qualification, specifications, inspection expectations and total project risk need closer review.',
+const lineScoutCtaCopy: Record<string, { headline: string; body: string }> = {
+  white_label: {
+    headline: 'Ready to build a white-label product?',
+    body: 'Continue in LineScout with the product idea, supplier requirements and project context together through sourcing, quotes, payments and project conversations.',
+  },
+  machine_sourcing: {
+    headline: 'Sourcing a machine or production equipment?',
+    body: 'Use LineScout to manage specifications, supplier qualification, quotes, inspection expectations and the complete machine sourcing project.',
+  },
+  simple_sourcing: {
+    headline: 'Need a supplier for products in bulk?',
+    body: 'Use LineScout to manage supplier research, quotes and multiple sourcing projects for wholesale stock or other products bought in volume.',
+  },
 };
 
 function normalizeUrl(value: unknown, baseUrl: string) {
   const raw = clean(value);
-  if (!raw) return new URL('/corporate-sourcing', baseUrl).toString();
+  if (!raw) return new URL('/import-from-china-to-nigeria', baseUrl).toString();
 
   try {
     const parsed = new URL(raw);
     if (parsed.hostname === 'linescout.sureimports.com') {
-      return 'https://linescout.sureimports.com/';
+      const isAllowedPath =
+        parsed.pathname === '/' ||
+        parsed.pathname === '/white-label' ||
+        parsed.pathname === '/sourcing-project' ||
+        /^\/white-label\/[a-z0-9-]+$/i.test(parsed.pathname);
+      return isAllowedPath
+        ? parsed.toString()
+        : 'https://linescout.sureimports.com/';
+    }
+    if (parsed.pathname === '/source-products-from-china') {
+      return 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing';
+    }
+    if (parsed.pathname === '/pay-supplier') {
+      return new URL(
+        '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate',
+        baseUrl,
+      ).toString();
     }
     const mappedPath = legacyCtaPathMap[parsed.pathname] || parsed.pathname;
     if (!existingPublicCtaPaths.has(mappedPath)) {
-      return new URL('/corporate-sourcing', baseUrl).toString();
+      return new URL('/import-from-china-to-nigeria', baseUrl).toString();
     }
     return new URL(
       `${mappedPath}${parsed.search}${parsed.hash}`,
@@ -155,16 +193,25 @@ function normalizeUrl(value: unknown, baseUrl: string) {
     try {
       const path = raw.startsWith('/') ? raw : `/${raw}`;
       const parsed = new URL(path, baseUrl);
+      if (parsed.pathname === '/source-products-from-china') {
+        return 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing';
+      }
+      if (parsed.pathname === '/pay-supplier') {
+        return new URL(
+          '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate',
+          baseUrl,
+        ).toString();
+      }
       const mappedPath = legacyCtaPathMap[parsed.pathname] || parsed.pathname;
       if (!existingPublicCtaPaths.has(mappedPath)) {
-        return new URL('/corporate-sourcing', baseUrl).toString();
+        return new URL('/import-from-china-to-nigeria', baseUrl).toString();
       }
       return new URL(
         `${mappedPath}${parsed.search}${parsed.hash}`,
         baseUrl,
       ).toString();
     } catch {
-      return new URL('/corporate-sourcing', baseUrl).toString();
+      return new URL('/import-from-china-to-nigeria', baseUrl).toString();
     }
   }
 }
@@ -172,8 +219,11 @@ function normalizeUrl(value: unknown, baseUrl: string) {
 function getServiceCtaCopy(url: string) {
   try {
     const parsed = new URL(url);
-    if (parsed.hostname === 'linescout.sureimports.com')
-      return lineScoutCtaCopy;
+    if (parsed.hostname === 'linescout.sureimports.com') {
+      const routeType =
+        parsed.searchParams.get('route_type') || 'simple_sourcing';
+      return lineScoutCtaCopy[routeType] || lineScoutCtaCopy.simple_sourcing;
+    }
     return (
       serviceCtaCopy[parsed.pathname] || serviceCtaCopy['/corporate-sourcing']
     );

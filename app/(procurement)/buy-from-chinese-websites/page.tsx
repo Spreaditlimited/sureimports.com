@@ -23,6 +23,10 @@ import Footer from '@/app/(home)/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import CloudflareExplainerVideo from './components/CloudflareExplainerVideo';
+import {
+  LINESCOUT_BULK_SOURCING_URL,
+  LINESCOUT_WHITE_LABEL_URL,
+} from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/buy-from-chinese-websites`;
@@ -464,9 +468,9 @@ export default function BuyFromChineseWebsitesPage() {
                   Best use cases for this service
                 </h2>
                 <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Buy From Chinese Websites works best when you already have product links. For large custom branding projects, use{' '}
-                  <Link href="/corporate-sourcing" className={inlineServiceLinkClass}>
-                    Corporate Sourcing
+                  Buy From Chinese Websites works best when you already have product links. If you still need suppliers for white-label products or bulk stock, use{' '}
+                  <Link href={LINESCOUT_BULK_SOURCING_URL} className={inlineServiceLinkClass}>
+                    LineScout
                   </Link>
                   .
                 </p>
@@ -486,9 +490,9 @@ export default function BuyFromChineseWebsitesPage() {
                     <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                       {item.title === 'Product samples' ? (
                         <>
-                          Small trial orders before committing to higher-volume sourcing, white label or{' '}
-                          <Link href="/corporate-sourcing" className={inlineServiceLinkClass}>
-                            corporate procurement
+                          Small trial orders before committing to higher-volume sourcing or{' '}
+                          <Link href={LINESCOUT_WHITE_LABEL_URL} className={inlineServiceLinkClass}>
+                            white-label production
                           </Link>
                           .
                         </>

@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import Script from 'next/script';
 
@@ -16,6 +16,7 @@ import {
   getBlogReadingTime,
   getBlogWordCount,
 } from '@/lib/blogReadingTime';
+import { getBlogRedirectTarget } from '@/lib/blogRedirects';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -115,7 +116,7 @@ export async function generateMetadata({
       siteName: 'Sure Imports',
       locale: 'en_US',
       publishedTime: post.publishDate,
-      modifiedTime: post.publishDate,
+      modifiedTime: post.updatedDate,
       authors: [post.author.name],
       section: post.category,
       tags: post.tags,
@@ -146,6 +147,7 @@ export async function generateMetadata({
     },
     other: {
       'article:published_time': post.publishDate,
+      'article:modified_time': post.updatedDate,
       'article:author': post.author.name,
       'article:section': post.category,
       'article:tag': post.tags?.join(',') || '',
@@ -156,6 +158,8 @@ export async function generateMetadata({
 
 export default async function BlogDetailsPage({ params }: PageProps) {
   const { slug } = await params;
+  const redirectTarget = getBlogRedirectTarget(slug);
+  if (redirectTarget) permanentRedirect(redirectTarget);
   const post = await fetchBlogBySlug(slug);
 
   if (!post) {
@@ -189,7 +193,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
       height: 630,
     },
     datePublished: post.publishDate,
-    dateModified: post.publishDate,
+    dateModified: post.updatedDate,
     author: {
       '@type': 'Person',
       name: post.author.name,
@@ -277,7 +281,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
       url: ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`,
     },
     datePublished: post.publishDate,
-    dateModified: post.publishDate,
+    dateModified: post.updatedDate,
     breadcrumb: {
       '@id': `${canonicalUrl}#breadcrumb`,
     },

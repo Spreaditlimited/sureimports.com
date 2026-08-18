@@ -7,7 +7,7 @@ import FooterNewsletterForm from './FooterNewsletterForm';
 export default function Footer() {
   return (
     <footer className="bg-slate-950 text-slate-400">
-      <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 pb-8 pt-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           
           <div className="space-y-6">
@@ -51,8 +51,6 @@ export default function Footer() {
               <li><Link href="/ship-with-us" className="transition-colors hover:text-white">Ship With Us</Link></li>
               <li><Link href="/track" className="transition-colors hover:text-white">Track Shipment</Link></li>
               <li><Link href="/shipping-rate" className="transition-colors hover:text-white">Shipping Rates</Link></li>
-              <li><Link href="/corporate-sourcing" className="transition-colors hover:text-white">Corporate Sourcing</Link></li>
-              <li><Link href="/laptops-for-business" className="transition-colors hover:text-white">Laptops for Business</Link></li>
             </ul>
           </div>
 
@@ -82,7 +80,7 @@ export default function Footer() {
         </div>
       </div>
       
-      <div className="bg-slate-950 py-6 text-center text-xs">
+      <div className="bg-slate-950 py-4 text-center text-xs">
         <p>© {new Date().getFullYear()} Sure Importers Limited. All rights reserved.</p>
       </div>
     </footer>

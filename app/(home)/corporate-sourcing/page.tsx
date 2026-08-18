@@ -34,21 +34,25 @@ import {
   DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
 } from '@/lib/corporateSourcing/pricing';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import {
+  LINESCOUT_BASE_URL,
+  LINESCOUT_BULK_SOURCING_URL,
+} from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/corporate-sourcing`;
 
 export const metadata: Metadata = {
-  title: 'Corporate Sourcing from China for Nigerian Businesses | Sure Imports',
+  title: 'Corporate Procurement from China for Nigerian Organisations | Sure Imports',
   description:
-    'Source machinery, equipment, branded corporate gifts and bulk business products from China. Sure Imports handles supplier search, verification, inspection, shipping and delivery to Nigeria.',
+    'Structured China procurement for banks, large companies, institutions, government bodies and NGOs. Sure Imports handles supplier search, verification, inspection, shipping and delivery to Nigeria.',
   keywords: [
     'corporate sourcing Nigeria',
     'corporate gifts from China Nigeria',
     'branded corporate gifts Nigeria',
     'promotional items from China',
-    'bulk product sourcing from China',
-    'machine sourcing from China Nigeria',
+    'institutional procurement from China',
+    'enterprise procurement Nigeria',
     'industrial equipment sourcing Nigeria',
     'custom branded products Nigeria',
     'staff welcome kits Nigeria',
@@ -58,9 +62,9 @@ export const metadata: Metadata = {
     canonical: pageUrl,
   },
   openGraph: {
-    title: 'Corporate Sourcing from China for Nigerian Businesses',
+    title: 'Corporate Procurement from China for Nigerian Organisations',
     description:
-      'Source machinery, equipment, branded gifts and bulk business products from China with supplier checks, customization support, inspection and delivery.',
+      'Structured China procurement for banks, large companies, institutions, government bodies and NGOs, with supplier checks, inspection and delivery.',
     url: pageUrl,
     siteName: 'Sure Imports',
     type: 'website',
@@ -75,9 +79,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Corporate Sourcing from China for Nigerian Businesses',
+    title: 'Corporate Procurement from China for Nigerian Organisations',
     description:
-      'Machinery, equipment, branded corporate gifts and bulk products sourced from China for Nigerian businesses.',
+      'Formal China procurement support for established Nigerian organisations and institutional buyers.',
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
@@ -160,6 +164,12 @@ const buyerChecks = [
 
 const serviceLinks = [
   {
+    title: 'LineScout Sourcing',
+    text: 'Individuals and small businesses can manage white-label, wholesale product and machine sourcing projects in LineScout.',
+    href: LINESCOUT_BULK_SOURCING_URL,
+    icon: Package,
+  },
+  {
     title: 'Buy from Chinese Websites',
     text: 'Already found product links on 1688, Alibaba, Taobao or Pinduoduo? Submit them directly.',
     href: '/buy-from-chinese-websites',
@@ -177,19 +187,13 @@ const serviceLinks = [
     href: '/laptops-for-business',
     icon: Laptop,
   },
-  {
-    title: 'Sure Imports Shop',
-    text: 'For available phones, laptops and gadgets, browse products already listed in the shop.',
-    href: '/shop',
-    icon: PackageCheck,
-  },
 ];
 
 const faqs = [
   {
     question: 'What is corporate sourcing?',
     answer:
-      'Corporate sourcing is the process of finding, verifying, customizing, inspecting and importing products for business use. For Sure Imports, this includes machinery and equipment, branded corporate gifts, promotional items, staff kits and bulk business products from China.',
+      'Corporate sourcing is a structured procurement service for established organisations buying from China. Sure Imports supports formal briefs, supplier comparison, verification, customization, inspection, shipping, delivery and the records needed for internal review.',
   },
   {
     question: 'Can Sure Imports source machines and equipment for my business?',
@@ -204,7 +208,7 @@ const faqs = [
   {
     question: 'Is this service only for large companies?',
     answer:
-      'No. Corporate sourcing works for companies, agencies, schools, churches, event teams, ecommerce brands, NGOs, startups and departments that need products in bulk or with custom branding.',
+      'This service is designed for banks, large companies, established institutions, government bodies and NGOs with formal procurement requirements. Individuals, entrepreneurs and small businesses sourcing white-label products, bulk stock or machines should use LineScout instead.',
   },
   {
     question: 'Can I request samples before bulk production?',
@@ -219,7 +223,7 @@ const faqs = [
   {
     question: 'What if I already have a supplier?',
     answer:
-      'If you already have a supplier and only need payment support, use Pay Supplier after signing in. If you need us to compare options, verify supplier fit, manage branding and coordinate the import, use Corporate Sourcing.',
+      'If your organisation already has a supplier and only needs payment support, use Pay Supplier after signing in. If you need a structured supplier comparison, verification, production oversight and delivery process, use Corporate Sourcing.',
   },
 ];
 
@@ -237,9 +241,9 @@ const serviceSchema = {
     '@type': 'Country',
     name: 'Nigeria',
   },
-  serviceType: 'Machinery and equipment sourcing, branded merchandise procurement and bulk product sourcing from China',
+  serviceType: 'Institutional and enterprise procurement from China',
   description:
-    'Corporate sourcing service for Nigerian businesses that need machinery, equipment, branded gifts, promotional items and bulk products sourced from China.',
+    'Corporate procurement service for Nigerian banks, large companies, institutions, government bodies and NGOs buying from China.',
 };
 
 const faqSchema = {
@@ -274,10 +278,13 @@ export default function CorporateGiftsPage() {
                 Corporate Sourcing
               </div>
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                Machines, equipment and bulk products <span className="text-white">sourced from China</span>
+                <span className="block">China procurement</span>
+                <span className="mt-2 block text-[0.78em] leading-[1.05] text-white">
+                  built for established organisations
+                </span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Sure Imports helps Nigerian businesses source machinery, equipment, branded gifts and other bulk products. We handle supplier checks, specifications, customization, inspection and door-to-door delivery.
+                Sure Imports supports banks, large companies, institutions, government bodies and NGOs with structured supplier search, specifications, approvals, inspection, shipping and delivery.
               </p>
               
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
@@ -290,10 +297,10 @@ export default function CorporateGiftsPage() {
                   </span>
                 </a>
                 <Link
-                  href="/buy-from-chinese-websites"
+                  href={LINESCOUT_BASE_URL}
                   className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
                 >
-                  Submit Product Links
+                  Small business? Use LineScout
                 </Link>
               </div>
             </div>
@@ -311,10 +318,10 @@ export default function CorporateGiftsPage() {
                 Built for business buying
               </span>
               <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
-                Source business products and machines without gambling on random suppliers.
+                Procurement that can stand up to organisational scrutiny.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Corporate sourcing isn't casual shopping. It can involve technical specifications, production capacity, exact quantities, firm deadlines, customization and internal approvals. A poor supplier can deliver the wrong machine configuration, miss your deadline or ship inferior materials.
+                Institutional procurement can involve technical specifications, production capacity, exact quantities, firm deadlines, customization, internal approvals and several stakeholders. We keep the supplier and order process clear enough for your team to review and act on.
               </p>
             </div>
 
@@ -433,12 +440,13 @@ export default function CorporateGiftsPage() {
                  Request a quote
                </span>
                <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                 Pay and Submit your sourcing brief.
+                 Submit your organisation&apos;s procurement brief.
                </h2>
                <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-                 Share the product or machine details, specifications, quantity,
-                 delivery timeline, and any customization requirements. Our team
-                 will review your request and get in touch. Please note that a{' '}
+                 Share the organisation name, product or equipment details,
+                 specifications, quantity, approval timeline and any customization
+                 requirements. This route is intended for established organisations
+                 with formal procurement needs. Please note that a{' '}
                  <strong className="font-bold text-slate-900 dark:text-white">
                    ₦50,000 or $50 research fee
                  </strong>{' '}
@@ -470,7 +478,7 @@ export default function CorporateGiftsPage() {
                 Choose the right route for your order.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Corporate Sourcing is best when you need help finding and comparing suppliers for machinery, business products or custom-branded orders. Other Sure Imports services may fit better if your supplier is already decided.
+                Corporate Sourcing is for established organisations with formal procurement requirements. Individuals and small businesses sourcing white-label products, wholesale stock or machines should manage those projects in LineScout.
               </p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">

@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop, ShieldCheck } from 'lucide-react';
+import { Search, Gift, Ship, ShoppingCart, ArrowRight, Laptop, ShieldCheck, Sparkles } from 'lucide-react';
+import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
 interface ServicesSectionProps {
   onNavigateToSignUp?: () => void;
@@ -28,10 +29,17 @@ export default function ServicesSection(_: ServicesSectionProps) {
       href: '/ship-with-us',
     },
     {
+      title: 'LineScout Sourcing',
+      icon: Sparkles,
+      desc: 'For individuals and small businesses sourcing white-label products, wholesale stock or machines, with every project managed in one workspace.',
+      tags: ['White Label', 'Bulk Products', 'Machines'],
+      href: LINESCOUT_BULK_SOURCING_URL,
+    },
+    {
       title: 'Corporate Sourcing',
       icon: Gift,
-      desc: 'Source machinery, equipment, branded products and bulk business supplies from China with supplier checks, customization, inspection and delivery support.',
-      tags: ['Machinery & Equipment', 'Bulk Orders', 'Branded Products'],
+      desc: 'Structured China procurement for banks, large companies, institutions, government bodies and NGOs with formal briefs and approval requirements.',
+      tags: ['Institutional Orders', 'Formal Procurement', 'Enterprise Support'],
       href: '/corporate-sourcing',
     },
     {

@@ -49,6 +49,7 @@ export default function Home() {
     category: 'Import Guide',
     tags: [],
     publishDate: new Date().toISOString().split('T')[0],
+    updatedDate: new Date().toISOString().split('T')[0],
     readTime: 0,
     featured: false,
     image: '',
