@@ -1,6 +1,19 @@
 export type ShippingMeasurementUnit = 'KG' | 'CBM';
 export type ShippingRateCurrency = 'USD' | 'NGN';
 
+export function finiteNumber(value: unknown, fallback = 0) {
+  if (
+    value === null ||
+    value === undefined ||
+    (typeof value === 'string' && value.trim() === '')
+  ) {
+    return fallback;
+  }
+
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 export const isNigeriaSeaShipping = (countryName: string, planName: string) =>
   countryName.trim().toLowerCase() === 'nigeria' &&
   planName.trim().toUpperCase() === 'SEA_SHIPPING';

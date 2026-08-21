@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  finiteNumber,
   lineShippingMeasurement,
   measurementUnitForNewOrder,
   paymentDueInUsd,
@@ -10,6 +11,15 @@ import {
   refundAmountInNgn,
   shippingCostInUsd,
 } from '../lib/procurement/shippingMath.ts';
+
+test('missing legacy snapshots use their configured fallback', () => {
+  assert.equal(finiteNumber(null, 1500), 1500);
+  assert.equal(finiteNumber(undefined, 7), 7);
+  assert.equal(finiteNumber('', 15), 15);
+  assert.equal(finiteNumber('   ', 7.5), 7.5);
+  assert.equal(finiteNumber('0', 15), 0);
+  assert.equal(finiteNumber('12.5', 0), 12.5);
+});
 
 test('Nigeria sea shipping uses per-item CBM while every other route uses KG', () => {
   assert.equal(measurementUnitForNewOrder('Nigeria', 'SEA_SHIPPING'), 'CBM');

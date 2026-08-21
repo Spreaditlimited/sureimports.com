@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import {
+  finiteNumber,
   perItemMeasurementForOrder,
   paymentDueInUsd,
   procurementEstimateInUsd,
@@ -10,11 +11,6 @@ const EDITABLE_ESTIMATE_STATUSES = new Set(['saved', 'on-hold']);
 
 const money = (value: number) =>
   Math.round((value + Number.EPSILON) * 100) / 100;
-
-function finite(value: unknown, fallback = 0) {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
 
 export async function getProcurementOrderLifecycle(
   pidOrder: string,
@@ -54,18 +50,23 @@ export async function getProcurementOrderLifecycle(
   const usesMeasurementPricing = order.shippingPricingVersion === 2;
   const useLatestEstimate = EDITABLE_ESTIMATE_STATUSES.has(order.status || '');
   const ngnPerUsd = useLatestEstimate
-    ? finite(financial.exNairaToDollar)
-    : finite(order.exchangeRate1, finite(financial.exNairaToDollar));
+    ? finiteNumber(financial.exNairaToDollar)
+    : finiteNumber(
+        order.exchangeRate1,
+        finiteNumber(financial.exNairaToDollar),
+      );
   const cnyPerUsd = useLatestEstimate
-    ? finite(financial.exYuanToDollar)
-    : finite(order.exchangeRate2, finite(financial.exYuanToDollar));
+    ? finiteNumber(financial.exYuanToDollar)
+    : finiteNumber(order.exchangeRate2, finiteNumber(financial.exYuanToDollar));
   if (ngnPerUsd <= 0 || cnyPerUsd <= 0) {
     throw new Error('Exchange-rate configuration is invalid.');
   }
 
   const productsTotalRaw = products.reduce(
     (total, product) =>
-      total + finite(product.productQuantity) * finite(product.productPrice),
+      total +
+      finiteNumber(product.productQuantity) *
+        finiteNumber(product.productPrice),
     0,
   );
   const productsTotalUsd =
@@ -77,7 +78,7 @@ export async function getProcurementOrderLifecycle(
   const totalMeasurement = products.reduce(
     (total, product) =>
       total +
-      finite(product.productQuantity) *
+      finiteNumber(product.productQuantity) *
         perItemMeasurementForOrder(
           order.shippingPricingVersion,
           product.productWeight,
@@ -87,8 +88,8 @@ export async function getProcurementOrderLifecycle(
   );
 
   const shippingRate = usesMeasurementPricing
-    ? finite(order.shippingRateSnapshot)
-    : finite(plan?.shippingPlanRate, 10);
+    ? finiteNumber(order.shippingRateSnapshot)
+    : finiteNumber(plan?.shippingPlanRate, 10);
   const shippingUnit = usesMeasurementPricing
     ? order.shippingMeasurementUnit === 'CBM'
       ? 'CBM'
@@ -112,11 +113,14 @@ export async function getProcurementOrderLifecycle(
   const dynamicEstimatedShippingCostUsd =
     domesticShippingCostUsd + internationalShippingCostUsd;
   const serviceChargePercent = useLatestEstimate
-    ? finite(financial.service_charge, 15)
-    : finite(order.serviceCharge, finite(financial.service_charge, 15));
+    ? finiteNumber(financial.service_charge, 15)
+    : finiteNumber(
+        order.serviceCharge,
+        finiteNumber(financial.service_charge, 15),
+      );
   const vatPercent = useLatestEstimate
-    ? finite(financial.vat, 7)
-    : finite(order.vat, finite(financial.vat, 7));
+    ? finiteNumber(financial.vat, 7)
+    : finiteNumber(order.vat, finiteNumber(financial.vat, 7));
   const {
     serviceChargeValueUsd,
     vatValueUsd,
@@ -130,13 +134,14 @@ export async function getProcurementOrderLifecycle(
 
   const estimatedShippingCostUsd = useLatestEstimate
     ? dynamicEstimatedShippingCostUsd
-    : finite(order.orderShippingCost, dynamicEstimatedShippingCostUsd);
+    : finiteNumber(order.orderShippingCost, dynamicEstimatedShippingCostUsd);
   const grandTotalUsd = useLatestEstimate
     ? dynamicGrandTotalUsd
-    : finite(order.orderTotalCost, dynamicGrandTotalUsd);
+    : finiteNumber(order.orderTotalCost, dynamicGrandTotalUsd);
 
-  const actualMeasurement = finite(order.orderWeight);
-  const actualDomesticShippingCostUsd = finite(order.shippingCost1) / cnyPerUsd;
+  const actualMeasurement = finiteNumber(order.orderWeight);
+  const actualDomesticShippingCostUsd =
+    finiteNumber(order.shippingCost1) / cnyPerUsd;
   const actualInternationalShippingCostUsd = shippingCostInUsd(
     actualMeasurement,
     shippingRate,
@@ -158,9 +163,9 @@ export async function getProcurementOrderLifecycle(
   const paymentDueUsd = paymentDueInUsd(
     status,
     dynamicGrandTotalUsd,
-    finite(order.orderTotalCost),
+    finiteNumber(order.orderTotalCost),
     actualTotalShippingCostUsd,
-    finite(order.orderShippingCost),
+    finiteNumber(order.orderShippingCost),
   );
 
   const destinationCountry = country?.countryName || '';
@@ -197,11 +202,12 @@ export async function getProcurementOrderLifecycle(
     actualInternationalShippingCostUsd,
     actualTotalShippingCostUsd,
     costDifferenceUsd: actualTotalShippingCostUsd - estimatedShippingCostUsd,
-    onHoldDifferenceUsd: dynamicGrandTotalUsd - finite(order.orderTotalCost),
+    onHoldDifferenceUsd:
+      dynamicGrandTotalUsd - finiteNumber(order.orderTotalCost),
     rates: {
       ngnPerUsd,
       cnyPerUsd,
-      ngnPerCny: finite(financial.exNairaToYuan),
+      ngnPerCny: finiteNumber(financial.exNairaToYuan),
     },
     payment: {
       dueUsd: money(paymentDueUsd),
