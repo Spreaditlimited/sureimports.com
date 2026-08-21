@@ -28,6 +28,7 @@ type ReportResult = {
   editionLabel: string;
   coverImageUrl: string | null;
   supplierCount: number;
+  priceNaira: number;
   priceUsdCents: number;
   searchableText: string;
 };
@@ -314,9 +315,17 @@ export default function ReportSearchExperience({
                         <p className="text-xs font-semibold text-slate-500">
                           One-time purchase
                         </p>
-                        <p className="mt-1 text-lg font-black text-slate-950">
-                          From {formatReportPrice(report.priceUsdCents, 'USD')}
-                        </p>
+                        <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                          <p className="text-lg font-black text-slate-950">
+                            {formatReportPrice(report.priceNaira, 'NGN')}
+                          </p>
+                          <span className="text-xs font-semibold text-slate-400">
+                            or
+                          </span>
+                          <p className="text-base font-black text-slate-700">
+                            {formatReportPrice(report.priceUsdCents, 'USD')}
+                          </p>
+                        </div>
                       </div>
                       <Link
                         href={`/supplier-intelligence/reports/${report.slug}`}

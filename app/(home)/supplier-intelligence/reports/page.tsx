@@ -40,6 +40,7 @@ export default async function SupplierIntelligenceReportsPage() {
       editionLabel: report.editionLabel,
       coverImageUrl: report.coverImageUrl,
       supplierCount: report.supplierCount,
+      priceNaira: report.priceNaira,
       priceUsdCents: report.priceUsdCents,
       searchableText: [
         report.slug,
