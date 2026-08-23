@@ -2,6 +2,10 @@ import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 import { isRedirectedBlogSlug } from '@/lib/blogRedirects';
+import {
+  BODY_CAMERA_LAUNCH_READY,
+  bodyCameraLaunchPaths,
+} from '@/lib/bodyCameraSolutions/config';
 
 interface BlogForSitemap {
   blogSlug: string | null;
@@ -160,6 +164,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
   ];
+
+  if (BODY_CAMERA_LAUNCH_READY) {
+    staticPages.push(
+      ...bodyCameraLaunchPaths.map((path, index) => ({
+        url: `${baseUrl}${path}`,
+        lastModified: currentDate,
+        changeFrequency: 'weekly' as const,
+        priority: index === 0 ? 0.95 : 0.85,
+      })),
+    );
+  }
 
   // Fetch published blog posts dynamically
   let blogPages: MetadataRoute.Sitemap = [];

@@ -20,6 +20,7 @@ import {
   Tags,
   Laptop,
   CalendarClock,
+  Camera,
   Database,
   PackageSearch,
   type LucideIcon,
@@ -58,6 +59,13 @@ const MENU_ITEMS = {
       icon: Database,
       desc: 'Verified supplier research for global importers',
       color: 'from-slate-700 to-slate-950',
+    },
+    {
+      title: 'Body Cam Solutions',
+      href: '/body-camera-solutions',
+      icon: Camera,
+      desc: 'Body cameras, evidence management and live command systems',
+      color: 'from-blue-700 to-indigo-950',
     },
     {
       title: 'Book Consultation',
@@ -103,7 +111,7 @@ const MENU_ITEMS = {
     },
     {
       title: 'LineScout',
-      href: 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing',
+      href: 'https://linescout.sureimports.com/',
       icon: Sparkles,
       desc: 'White label, bulk product and machine sourcing',
       color: 'from-purple-500 to-pink-600',
