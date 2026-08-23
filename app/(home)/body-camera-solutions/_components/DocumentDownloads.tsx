@@ -3,11 +3,11 @@ import { ArrowRight, Download, FileText } from 'lucide-react';
 import { bodyCameraDocuments } from '@/lib/bodyCameraSolutions/documents';
 
 const sectionEyebrow =
-  'text-xs font-bold uppercase tracking-[0.22em] text-brand-orange-600';
+  'text-xs font-bold uppercase tracking-[0.22em] text-brand-orange-600 dark:text-brand-orange-400';
 
 export default function DocumentDownloads() {
   return (
-    <section className="border-t border-slate-200 px-6 py-10 dark:border-slate-800 sm:px-10 sm:py-12">
+    <section className="border-t border-slate-200 py-16 dark:border-slate-800 sm:py-20">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className={`${sectionEyebrow} flex items-center gap-2`}>
@@ -30,10 +30,10 @@ export default function DocumentDownloads() {
         {bodyCameraDocuments.map((document) => (
           <article
             key={document.slug}
-            className="flex h-full flex-col rounded-2xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-800 dark:bg-slate-950 sm:p-6"
+            className="group flex h-full flex-col rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.05)] transition hover:-translate-y-0.5 hover:shadow-[0_22px_60px_rgba(15,23,42,0.09)] dark:border-white/10 dark:bg-slate-900 sm:p-7"
           >
             <div className="flex items-start justify-between gap-4">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white text-blue-700 shadow-sm ring-1 ring-slate-200 dark:bg-slate-900 dark:text-blue-300 dark:ring-slate-800">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[#0b1930] text-cyan-300 shadow-sm ring-1 ring-white/10">
                 <FileText className="h-5 w-5" />
               </span>
               <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
@@ -60,7 +60,7 @@ export default function DocumentDownloads() {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-col gap-5 rounded-2xl bg-blue-50 p-5 dark:bg-blue-500/10 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+      <div className="mt-6 flex flex-col gap-5 border-l-2 border-brand-orange-500 bg-slate-100 p-6 dark:bg-white/[0.04] sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-bold text-slate-950 dark:text-white">
             Need current NGN or USD pricing?

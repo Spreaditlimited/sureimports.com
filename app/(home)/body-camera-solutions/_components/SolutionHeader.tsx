@@ -175,7 +175,7 @@ export default function SolutionHeader() {
             <SheetTrigger asChild>
               <button
                 type="button"
-                className="grid h-11 w-11 place-items-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 xl:hidden"
+                className="grid h-11 w-11 place-items-center rounded-full bg-transparent text-slate-800 transition hover:bg-slate-950/5 active:scale-95 dark:text-white dark:hover:bg-white/10 xl:hidden"
                 aria-label="Open body camera solutions menu"
               >
                 <Menu className="h-5 w-5" />
