@@ -27,7 +27,7 @@ export default function TechnologyStage({
 }: TechnologyStageProps) {
   return (
     <figure
-      className={`relative isolate overflow-hidden bg-[#07111f] text-white ${compact ? 'min-h-[300px] rounded-none shadow-none' : 'min-h-[460px] rounded-[2rem] shadow-[0_30px_80px_rgba(8,20,40,0.22)]'} ${className}`}
+      className={`relative isolate w-full min-w-0 max-w-full overflow-hidden bg-[#07111f] text-white ${compact ? 'min-h-[300px] rounded-none shadow-none' : 'min-h-[460px] rounded-[2rem] shadow-[0_30px_80px_rgba(8,20,40,0.22)]'} ${className}`}
     >
       <div className="absolute inset-0 bg-[linear-gradient(rgba(114,145,183,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(114,145,183,0.1)_1px,transparent_1px)] bg-[size:42px_42px] [mask-image:linear-gradient(to_bottom,black,transparent_88%)]" />
       <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border border-cyan-300/15" />
@@ -39,7 +39,7 @@ export default function TechnologyStage({
         <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
         {status}
       </div>
-      <div className="absolute right-5 top-5 z-10 text-right sm:right-7 sm:top-7">
+      <div className="absolute right-5 top-5 z-10 hidden text-right sm:right-7 sm:top-7 sm:block">
         <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-300/70">
           {eyebrow}
         </p>

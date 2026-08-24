@@ -28,6 +28,7 @@ import {
 import AssessmentSection from './_components/AssessmentSection';
 import DocumentDownloads from './_components/DocumentDownloads';
 import BodyCameraVideo from './_components/BodyCameraVideo';
+import HeroTitle from './_components/HeroTitle';
 import TechnologyStage from './_components/TechnologyStage';
 import { bodyCameraProductImages } from '@/lib/bodyCameraSolutions/images';
 
@@ -214,7 +215,7 @@ export default function BodyCameraSolutionsPage() {
       <section className="relative px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[620px] bg-[radial-gradient(circle_at_72%_18%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.055)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
-          <div className="max-w-2xl">
+          <div className="min-w-0 max-w-2xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-900/10 bg-white/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-900 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-cyan-200">
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Enterprise evidence technology
@@ -223,13 +224,13 @@ export default function BodyCameraSolutionsPage() {
               {bodyCameraBrand.partnerDesignation} ·{' '}
               {bodyCameraBrand.partnerRegion}
             </p>
-            <h1 className="mt-4 text-[2.65rem] font-semibold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-[4.5rem]">
-              <span className="block">Evidence systems</span>
-              <span className="block whitespace-nowrap">
-                built for the moment
-              </span>
-              <span className="block">it matters.</span>
-            </h1>
+            <HeroTitle
+              lines={[
+                'Evidence systems',
+                'built for the moment',
+                'it matters.',
+              ]}
+            />
             <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
               Hytera body-worn cameras, secure evidence management and optional
               live command—designed and supported for organisations in Nigeria

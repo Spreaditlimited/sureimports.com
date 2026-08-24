@@ -14,6 +14,7 @@ import {
 import { solutionImageBySlug } from '@/lib/bodyCameraSolutions/images';
 import AssessmentSection from '../_components/AssessmentSection';
 import DocumentDownloads from '../_components/DocumentDownloads';
+import HeroTitle from '../_components/HeroTitle';
 import TechnologyStage from '../_components/TechnologyStage';
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -59,6 +60,55 @@ export async function generateMetadata({
 
 const sectionEyebrow =
   'text-xs font-bold uppercase tracking-[0.22em] text-brand-orange-600 dark:text-brand-orange-400';
+
+const heroTitleLinesBySlug: Record<string, string[]> = {
+  'hytera-body-cameras': [
+    'Hytera body',
+    'cameras for',
+    'accountable field',
+    'operations',
+  ],
+  'hytera-sc580': ['Hytera SC580', 'smart 4G', 'body camera'],
+  'hytera-gc550': ['Hytera GC550', 'compact 2K', 'body camera'],
+  'digital-evidence-management': [
+    'Digital Evidence',
+    'Management for',
+    'secure, auditable',
+    'footage',
+  ],
+  'hytera-eds30-docking-station': [
+    'Hytera EDS30',
+    'portable eight-bay',
+    'docking station',
+  ],
+  'live-command-and-dispatch': ['Live body-camera', 'command and', 'dispatch'],
+  'body-cameras-for-banks': [
+    'Body-camera',
+    'systems for banks',
+    'and financial',
+    'institutions',
+  ],
+  'body-cameras-for-security-companies': [
+    'Body cameras',
+    'for private security',
+    'companies',
+  ],
+  'body-cameras-for-government': [
+    'Body-camera and',
+    'evidence systems',
+    'for government',
+  ],
+  'body-cameras-for-transport-and-logistics': [
+    'Body cameras',
+    'for transport and',
+    'logistics operations',
+  ],
+  'body-cameras-for-oil-gas-and-industry': [
+    'Body cameras for',
+    'oil, gas and',
+    'industrial teams',
+  ],
+};
 
 export default async function SolutionDetailPage({ params }: PageProps) {
   const { slug } = await params;
@@ -156,15 +206,13 @@ export default async function SolutionDetailPage({ params }: PageProps) {
           </nav>
 
           <header className="mt-10 grid items-center gap-x-14 gap-y-8 lg:mt-14 lg:grid-cols-[0.92fr_1.08fr]">
-            <div className="max-w-2xl">
+            <div className="min-w-0 max-w-2xl">
               <div className="inline-flex items-center gap-2 rounded-full border border-blue-900/10 bg-white/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-900 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-cyan-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Professional evidence systems
               </div>
               <p className={`${sectionEyebrow} mt-7`}>{page.eyebrow}</p>
-              <h1 className="mt-4 text-5xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-6xl lg:text-[4.25rem]">
-                {page.title}
-              </h1>
+              <HeroTitle lines={heroTitleLinesBySlug[slug] ?? [page.title]} />
               <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
                 {page.description}
               </p>
