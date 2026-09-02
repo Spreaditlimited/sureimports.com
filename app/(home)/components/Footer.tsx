@@ -92,6 +92,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/supplier-verification"
+                  className="transition-colors hover:text-white"
+                >
+                  Supplier Verification
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/book-consultation"
                   className="transition-colors hover:text-white"
                 >

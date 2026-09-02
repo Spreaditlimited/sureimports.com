@@ -23,6 +23,7 @@ import {
   Camera,
   Database,
   PackageSearch,
+  ShieldCheck,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -59,6 +60,13 @@ const MENU_ITEMS = {
       icon: Database,
       desc: 'Verified supplier research for global importers',
       color: 'from-slate-700 to-slate-950',
+    },
+    {
+      title: 'Supplier Verification',
+      href: '/supplier-verification',
+      icon: ShieldCheck,
+      desc: 'Online checks and physical supplier visits in China',
+      color: 'from-emerald-500 to-teal-700',
     },
     {
       title: 'Body Cam Solutions',

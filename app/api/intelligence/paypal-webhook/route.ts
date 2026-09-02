@@ -11,6 +11,7 @@ import {
   confirmCorporateSourcingPayment,
   ensureCorporateSourcingPayments,
 } from '@/lib/corporateSourcing/payments';
+import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/service';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -67,6 +68,68 @@ export async function POST(request: Request) {
   ).trim();
   if (!orderId && !captureReference)
     return NextResponse.json({ received: true });
+  const supplierPayment = await prisma.supplier_verification_payments.findFirst({
+    where: {
+      paymentProvider: 'paypal',
+      OR: [
+        ...(orderId ? [{ providerReference: orderId }] : []),
+        ...(captureReference ? [{ providerCaptureReference: captureReference }] : []),
+      ],
+    },
+  }).catch(() => null);
+  if (supplierPayment) {
+    if (
+      event === 'PAYMENT.CAPTURE.REFUNDED' ||
+      event === 'PAYMENT.CAPTURE.REVERSED' ||
+      event === 'PAYMENT.CAPTURE.DENIED' ||
+      event === 'PAYMENT.CAPTURE.DECLINED' ||
+      event.startsWith('CUSTOMER.DISPUTE.')
+    ) {
+      const nextStatus = event.includes('REFUNDED') ? 'refunded' : 'disputed';
+      const requestUpdate =
+        supplierPayment.paymentPurpose === 'PHYSICAL_VISIT'
+          ? {
+              transportQuoteStatus: nextStatus.toUpperCase(),
+              updatedAt: new Date(),
+            }
+          : supplierPayment.paymentPurpose === 'LEGACY_COMBINED'
+            ? {
+                status: nextStatus.toUpperCase(),
+                transportQuoteStatus: nextStatus.toUpperCase(),
+                updatedAt: new Date(),
+              }
+            : { status: nextStatus.toUpperCase(), updatedAt: new Date() };
+      await prisma.$transaction([
+        prisma.supplier_verification_payments.update({
+          where: { pidPayment: supplierPayment.pidPayment },
+          data: { status: nextStatus },
+        }),
+        prisma.verify_supplier.update({
+          where: { pidVerifySupplier: supplierPayment.requestId },
+          data: requestUpdate,
+        }),
+      ]);
+      return NextResponse.json({ received: true });
+    }
+    const paypalOrder = await getPayPalOrder(orderId || supplierPayment.providerReference || '');
+    const unit = paypalOrder?.purchase_units?.[0];
+    const capture = unit?.payments?.captures?.[0];
+    if (
+      String(paypalOrder?.status || '').toUpperCase() === 'COMPLETED' &&
+      String(capture?.status || '').toUpperCase() === 'COMPLETED' &&
+      String(unit?.custom_id || '') === supplierPayment.pidPayment &&
+      Math.round(Number(capture?.amount?.value || 0) * 100) === supplierPayment.amountMinor &&
+      String(capture?.amount?.currency_code || '').toUpperCase() === supplierPayment.currency
+    ) {
+      await confirmSupplierVerificationPayment({
+        pidPayment: supplierPayment.pidPayment,
+        paidAt: capture?.create_time ? new Date(capture.create_time) : null,
+        providerEventId: String(body?.id || '') || null,
+        providerCaptureReference: String(capture?.id || '') || null,
+      });
+    }
+    return NextResponse.json({ received: true });
+  }
   await ensureCorporateSourcingPayments();
   const corporateRows = await prisma.$queryRaw<Array<{
     pidPayment: string;

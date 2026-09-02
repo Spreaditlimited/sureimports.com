@@ -12,6 +12,7 @@ import {
   ReceiptText,
   Database,
   FileText,
+  ShieldCheck,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import { BsTiktok, BsYoutube } from 'react-icons/bs';
@@ -69,6 +70,12 @@ export const NavItems: NavItem[] = [
     title: 'My Supplier Reports',
     icon: FileText,
     href: '/dashboard/my-reports',
+    color: 'text-white',
+  },
+  {
+    title: 'Verify a Supplier',
+    icon: ShieldCheck,
+    href: '/dashboard/verify-supplier',
     color: 'text-white',
   },
   {
@@ -176,6 +183,12 @@ export const MobileNavItems: NavItem[] = [
     title: 'My Supplier Reports',
     icon: FileText,
     href: '/dashboard/my-reports',
+    color: 'text-white',
+  },
+  {
+    title: 'Verify a Supplier',
+    icon: ShieldCheck,
+    href: '/dashboard/verify-supplier',
     color: 'text-white',
   },
   {

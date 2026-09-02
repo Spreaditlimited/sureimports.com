@@ -22,6 +22,13 @@ export default function ServicesSection(_: ServicesSectionProps) {
       href: '/supplier-intelligence',
     },
     {
+      title: 'Supplier Verification',
+      icon: ShieldCheck,
+      desc: 'Check a supplier you already found through online company due diligence or a physical visit by our China team before you commit funds.',
+      tags: ['Company Checks', 'Physical Visits', 'Verification Report'],
+      href: '/supplier-verification',
+    },
+    {
       title: 'Ship with us',
       icon: Ship,
       desc: 'Already bought your goods? Submit your shipment details and we handle freight, warehouse intake, consolidation, and final delivery updates in your dashboard.',

@@ -19,6 +19,7 @@ import {
   IntelligenceSubscriptionNotFoundError,
   IntelligenceSubscriptionPaymentError,
 } from '@/lib/intelligence/subscriptionActivation';
+import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/service';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -98,6 +99,40 @@ export async function POST(request: Request) {
         })
       : null;
     if (!order && reference) {
+      const supplierPayment = await prisma.supplier_verification_payments.findFirst({
+        where: { providerReference: reference, paymentProvider: 'paystack' },
+      }).catch(() => null);
+      if (supplierPayment) {
+        const nextStatus = event === 'refund.processed'
+          ? Number(data.amount || 0) >= supplierPayment.amountMinor
+            ? 'refunded'
+            : 'disputed'
+          : 'disputed';
+        const requestUpdate =
+          supplierPayment.paymentPurpose === 'PHYSICAL_VISIT'
+            ? {
+                transportQuoteStatus: nextStatus.toUpperCase(),
+                updatedAt: new Date(),
+              }
+            : supplierPayment.paymentPurpose === 'LEGACY_COMBINED'
+              ? {
+                  status: nextStatus.toUpperCase(),
+                  transportQuoteStatus: nextStatus.toUpperCase(),
+                  updatedAt: new Date(),
+                }
+              : { status: nextStatus.toUpperCase(), updatedAt: new Date() };
+        await prisma.$transaction([
+          prisma.supplier_verification_payments.update({
+            where: { pidPayment: supplierPayment.pidPayment },
+            data: { status: nextStatus },
+          }),
+          prisma.verify_supplier.update({
+            where: { pidVerifySupplier: supplierPayment.requestId },
+            data: requestUpdate,
+          }),
+        ]);
+        return NextResponse.json({ received: true });
+      }
       const corporateRows = await prisma.$queryRaw<Array<{
         pidPayment: string;
         amountMinor: number;
@@ -234,6 +269,26 @@ export async function POST(request: Request) {
   }
 
   const payment = payload.data;
+  if (payment?.metadata?.product === 'supplier_verification') {
+    const pidPayment = String(payment.metadata?.pidPayment || '').trim();
+    const supplierPayment = pidPayment
+      ? await prisma.supplier_verification_payments.findUnique({ where: { pidPayment } })
+      : null;
+    if (
+      supplierPayment &&
+      supplierPayment.paymentProvider === 'paystack' &&
+      supplierPayment.providerReference === payment.reference &&
+      Number(payment.amount) === supplierPayment.amountMinor &&
+      String(payment.currency || '').toUpperCase() === supplierPayment.currency
+    ) {
+      await confirmSupplierVerificationPayment({
+        pidPayment,
+        paidAt: payment.paid_at ? new Date(payment.paid_at) : null,
+        providerEventId: `paystack:charge.success:${String(payment.id || payment.reference)}`,
+      });
+    }
+    return NextResponse.json({ received: true });
+  }
   if (payment?.metadata?.product === 'corporate_sourcing_research_fee') {
     const pidPayment = String(payment.metadata?.pidPayment || '').trim();
     const corporatePayment = pidPayment

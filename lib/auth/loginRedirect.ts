@@ -9,6 +9,11 @@ export const CORPORATE_SOURCING_RESUME_PATH =
 export const PENDING_SHIPPING_ONLY_CHECKOUT_KEY =
   'sureimports:pendingShippingOnlyCheckout';
 export const SHIPPING_ONLY_RESUME_PATH = '/checkout/resume-shipping-only';
+export const PENDING_SUPPLIER_VERIFICATION_KEY =
+  'sureimports:pendingSupplierVerification';
+export const SUPPLIER_VERIFICATION_DRAFT_VERSION = 1;
+export const SUPPLIER_VERIFICATION_RESUME_PATH =
+  '/checkout/resume-supplier-verification';
 export const SUPPLIER_INTELLIGENCE_PATH = '/supplier-intelligence';
 
 export function getSupplierReportResumePath(reportSlug: string) {
@@ -41,6 +46,8 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
     const isCorporateSourcingResume =
       url.pathname === CORPORATE_SOURCING_RESUME_PATH;
     const isShippingCheckoutResume = url.pathname === SHIPPING_ONLY_RESUME_PATH;
+    const isSupplierVerificationResume =
+      url.pathname === SUPPLIER_VERIFICATION_RESUME_PATH;
     const isIntelligencePath = url.pathname.startsWith('/intelligence');
     const isSupplierReportCheckoutResume =
       /^\/supplier-intelligence\/reports\/[^/]+$/.test(url.pathname) &&
@@ -57,6 +64,7 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
       isProcurementCheckoutResume ||
       isCorporateSourcingResume ||
       isShippingCheckoutResume ||
+      isSupplierVerificationResume ||
       isIntelligencePath ||
       isSupplierReportCheckoutResume ||
       isSupplierSubscriptionResume
