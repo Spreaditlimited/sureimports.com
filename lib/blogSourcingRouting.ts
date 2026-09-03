@@ -28,8 +28,16 @@ function routeCorporateLinks(
 ) {
   return html.replace(
     CORPORATE_LINK,
-    (_match, before, _quote, after) =>
-      `<a${before}href="${destination}"${after}>${label}</a>`,
+    (match, before, _quote, after, anchorHtml) => {
+      const attributes = `${before} ${after}`;
+      const anchorText = String(anchorHtml || '').replace(/<[^>]*>/g, ' ');
+      const isExplicitCorporateRoute =
+        /data-sourcing-audience\s*=\s*(["'])corporate\1/i.test(attributes) ||
+        /\bcorporate sourcing\b/i.test(anchorText);
+
+      if (isExplicitCorporateRoute) return match;
+      return `<a${before}href="${destination}"${after}>${label}</a>`;
+    },
   );
 }
 

@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { enhanceBlogTables } from '@/lib/blogHtml';
 
 // X (Twitter) icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -370,7 +371,11 @@ export default function BlogDetail({
         <div className="mx-auto max-w-3xl">
           <div className="blog-html-content">
             {isHtmlContent(post.content) ? (
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: enhanceBlogTables(post.content),
+                }}
+              />
             ) : (
               <div className="whitespace-pre-wrap">
                 {post.content}
@@ -572,6 +577,159 @@ export default function BlogDetail({
 
         .dark .blog-html-content ol li::marker {
           color: #818cf8;
+        }
+
+        /* Responsive data tables */
+        .blog-html-content .blog-table-scroll {
+          width: 100%;
+          max-width: 100%;
+          margin: 2.5rem 0;
+          overflow-x: auto;
+          overflow-y: hidden;
+          border: 1px solid #e2e8f0;
+          border-radius: 1rem;
+          background: #ffffff;
+          box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+          overscroll-behavior-inline: contain;
+          scrollbar-width: thin;
+          scrollbar-color: #94a3b8 #f1f5f9;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .blog-html-content .blog-table-scroll:focus-visible {
+          outline: 3px solid rgb(99 102 241 / 0.35);
+          outline-offset: 3px;
+        }
+
+        .blog-html-content .blog-table-scroll::-webkit-scrollbar {
+          display: block;
+          height: 0.65rem;
+        }
+
+        .blog-html-content .blog-table-scroll::-webkit-scrollbar-track {
+          background: #f1f5f9;
+        }
+
+        .blog-html-content .blog-table-scroll::-webkit-scrollbar-thumb {
+          border: 2px solid #f1f5f9;
+          border-radius: 999px;
+          background: #94a3b8;
+        }
+
+        .blog-html-content .blog-table-scroll table {
+          width: 100%;
+          min-width: 42rem;
+          max-width: none;
+          border-collapse: separate;
+          border-spacing: 0;
+          font-size: 0.9375rem;
+          line-height: 1.55;
+          text-align: left;
+        }
+
+        .blog-html-content .blog-table-scroll th,
+        .blog-html-content .blog-table-scroll td {
+          min-width: 10rem;
+          padding: 1rem;
+          border-right: 1px solid #e2e8f0;
+          border-bottom: 1px solid #e2e8f0;
+          vertical-align: top;
+          white-space: normal;
+        }
+
+        .blog-html-content .blog-table-scroll th:first-child,
+        .blog-html-content .blog-table-scroll td:first-child {
+          min-width: 12rem;
+        }
+
+        .blog-html-content .blog-table-scroll th {
+          background: #f8fafc;
+          color: #0f172a;
+          font-size: 0.8125rem;
+          font-weight: 800;
+          line-height: 1.4;
+        }
+
+        .blog-html-content .blog-table-scroll td {
+          color: #475569;
+        }
+
+        .blog-html-content .blog-table-scroll th:last-child,
+        .blog-html-content .blog-table-scroll td:last-child {
+          border-right: 0;
+        }
+
+        .blog-html-content .blog-table-scroll tbody tr:last-child td {
+          border-bottom: 0;
+        }
+
+        .blog-html-content .blog-table-scroll tbody tr:nth-child(even) td {
+          background: #f8fafc;
+        }
+
+        .blog-html-content .blog-table-scroll tbody tr:hover td {
+          background: #eef2ff;
+        }
+
+        .blog-html-content .blog-table-scroll td > :last-child,
+        .blog-html-content .blog-table-scroll th > :last-child {
+          margin-bottom: 0;
+        }
+
+        .dark .blog-html-content .blog-table-scroll {
+          border-color: #334155;
+          background: #0f172a;
+          box-shadow: none;
+          scrollbar-color: #64748b #1e293b;
+        }
+
+        .dark .blog-html-content .blog-table-scroll::-webkit-scrollbar-track {
+          background: #1e293b;
+        }
+
+        .dark .blog-html-content .blog-table-scroll::-webkit-scrollbar-thumb {
+          border-color: #1e293b;
+          background: #64748b;
+        }
+
+        .dark .blog-html-content .blog-table-scroll th,
+        .dark .blog-html-content .blog-table-scroll td {
+          border-color: #334155;
+        }
+
+        .dark .blog-html-content .blog-table-scroll th {
+          background: #1e293b;
+          color: #f8fafc;
+        }
+
+        .dark .blog-html-content .blog-table-scroll td {
+          color: #cbd5e1;
+        }
+
+        .dark .blog-html-content .blog-table-scroll tbody tr:nth-child(even) td {
+          background: rgb(30 41 59 / 0.55);
+        }
+
+        .dark .blog-html-content .blog-table-scroll tbody tr:hover td {
+          background: rgb(49 46 129 / 0.28);
+        }
+
+        @media (max-width: 640px) {
+          .blog-html-content .blog-table-scroll {
+            margin: 2rem 0;
+            border-radius: 0.875rem;
+          }
+
+          .blog-html-content .blog-table-scroll th,
+          .blog-html-content .blog-table-scroll td {
+            min-width: 9.5rem;
+            padding: 0.875rem;
+          }
+
+          .blog-html-content .blog-table-scroll th:first-child,
+          .blog-html-content .blog-table-scroll td:first-child {
+            min-width: 11rem;
+          }
         }
 
         /* Images inside content */

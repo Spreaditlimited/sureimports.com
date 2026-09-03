@@ -27,6 +27,36 @@ test('generic white-label articles route to the LineScout white-label flow', () 
   assert.match(html, /route_type=white_label/);
 });
 
+test('machine articles preserve links explicitly intended for corporate organisations', () => {
+  const html = routeBlogSourcingLinks({
+    slug: 'rice-milling-production-line-nigeria',
+    title: 'Rice Milling Production Line in Nigeria',
+    html: `
+      <p><a href="/corporate-sourcing">Get machine sourcing help</a></p>
+      <p>Established organisations can use
+        <a data-sourcing-audience="corporate" href="/corporate-sourcing">Sure Imports Corporate Sourcing</a>.
+      </p>
+    `,
+  });
+
+  assert.match(html, /route_type=machine_sourcing/);
+  assert.match(
+    html,
+    /data-sourcing-audience="corporate" href="\/corporate-sourcing"/,
+  );
+  assert.match(html, />Sure Imports Corporate Sourcing<\/a>/);
+});
+
+test('corporate sourcing anchor text is not silently rerouted to LineScout', () => {
+  const html = routeBlogSourcingLinks({
+    slug: 'industrial-machinery-guide',
+    title: 'Industrial Machinery Guide',
+    html: '<a href="/corporate-sourcing">Corporate Sourcing</a>',
+  });
+
+  assert.equal(html, '<a href="/corporate-sourcing">Corporate Sourcing</a>');
+});
+
 test('the corporate pillar keeps corporate sourcing and declares its audience', () => {
   const html = routeBlogSourcingLinks({
     slug: 'corporate-sourcing-from-china-to-nigeria-pillar-guide-for-business-buyers',
