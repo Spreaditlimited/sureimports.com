@@ -1,18 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  ArrowRight,
-  ExternalLink,
-  Info,
-  PackageCheck,
-  Search,
-  Ship,
-} from 'lucide-react';
+import { ArrowRight, Info, PackageCheck, Search, Ship } from 'lucide-react';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { prisma } from '@/lib/prisma';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import ShippingRatesTable, { type ShippingRateRow } from './ShippingRatesTable';
 
 export const dynamic = 'force-dynamic';
 
@@ -39,40 +33,6 @@ const planOrder: Record<string, number> = {
   SEA_SHIPPING: 4,
 };
 
-const countryColorThemes = [
-  {
-    row: 'bg-blue-50/45 hover:bg-blue-50 dark:bg-blue-950/20 dark:hover:bg-blue-950/35',
-    border: 'border-blue-500',
-    badge: 'bg-blue-100 text-blue-800 ring-blue-200 dark:bg-blue-950 dark:text-blue-200 dark:ring-blue-800/60',
-  },
-  {
-    row: 'bg-brand-orange-50/55 hover:bg-brand-orange-50 dark:bg-brand-orange-950/20 dark:hover:bg-brand-orange-950/35',
-    border: 'border-brand-orange-500',
-    badge: 'bg-brand-orange-100 text-brand-orange-800 ring-brand-orange-200 dark:bg-brand-orange-950 dark:text-brand-orange-200 dark:ring-brand-orange-800/60',
-  },
-  {
-    row: 'bg-indigo-50/50 hover:bg-indigo-50 dark:bg-indigo-950/20 dark:hover:bg-indigo-950/35',
-    border: 'border-indigo-500',
-    badge: 'bg-indigo-100 text-indigo-800 ring-indigo-200 dark:bg-indigo-950 dark:text-indigo-200 dark:ring-indigo-800/60',
-  },
-  {
-    row: 'bg-slate-50 hover:bg-slate-100/70 dark:bg-slate-900/70 dark:hover:bg-slate-800/80',
-    border: 'border-slate-500',
-    badge: 'bg-slate-200 text-slate-800 ring-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:ring-slate-700',
-  },
-];
-
-type ShippingRateRow = {
-  countryName: string;
-  rates: Array<{
-    name: string;
-    label: string;
-    rate: number;
-    currency: 'USD' | 'NGN';
-    unit: string;
-  }>;
-};
-
 function formatPlanLabel(value: string) {
   return (
     planLabels[value] ||
@@ -86,14 +46,6 @@ function formatPlanLabel(value: string) {
 
 function formatPlanUnit(value: string | null | undefined) {
   return value?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
-}
-
-function formatMoney(value: number, currency: 'USD' | 'NGN') {
-  return new Intl.NumberFormat(currency === 'NGN' ? 'en-NG' : 'en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: currency === 'NGN' ? 0 : 2,
-  }).format(value);
 }
 
 async function getShippingRates(): Promise<ShippingRateRow[]> {
@@ -200,11 +152,11 @@ export default async function ShippingRatePage() {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  href="/shipping-policy"
+                  href="#shipping-rates"
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-6 text-base font-bold text-white transition hover:bg-white/10"
                 >
-                  Shipping policy
-                  <ExternalLink className="h-4 w-4" />
+                  Shipping Rates
+                  <Search className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -263,84 +215,7 @@ export default async function ShippingRatePage() {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-              <div className="flex flex-col gap-3 border-b border-slate-100 px-5 py-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-lg font-black text-slate-950 dark:text-white">
-                    Current Shipping Rates
-                  </h2>
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    Rates are displayed in USD by shipping method and billing
-                    unit.
-                  </p>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                  <Search className="h-3.5 w-3.5" />
-                  {rates.length} destinations
-                </div>
-              </div>
-
-              {rates.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[760px] text-left text-sm">
-                    <thead>
-                      <tr className="border-b border-slate-100 bg-slate-50 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:border-slate-800 dark:bg-slate-800/60 dark:text-slate-400">
-                        <th className="px-6 py-4">Destination</th>
-                        <th className="px-6 py-4">Shipping Method</th>
-                        <th className="px-6 py-4">Estimated Rate</th>
-                        <th className="px-6 py-4">Billing Unit</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rates.map((country, countryIndex) => {
-                        const theme =
-                          countryColorThemes[
-                            countryIndex % countryColorThemes.length
-                          ];
-
-                        return country.rates.map((rate, index) => (
-                            <tr
-                              key={`${country.countryName}-${rate.name}`}
-                              className={`border-b border-white/70 transition dark:border-slate-950/40 ${theme.row}`}
-                            >
-                              {index === 0 ? (
-                                <td
-                                  rowSpan={country.rates.length}
-                                  className={`border-l-4 px-6 py-5 align-top font-black text-slate-950 dark:text-white ${theme.border}`}
-                                >
-                                  <span
-                                    className={`inline-flex rounded-full px-3 py-1.5 text-xs font-black ring-1 ${theme.badge}`}
-                                  >
-                                    {country.countryName}
-                                  </span>
-                                </td>
-                              ) : null}
-                              <td className="px-6 py-5 font-semibold text-slate-700 dark:text-slate-200">
-                                {rate.label}
-                              </td>
-                              <td className="px-6 py-5 font-black text-slate-950 dark:text-white">
-                                {formatMoney(rate.rate, rate.currency)}
-                              </td>
-                              <td className="px-6 py-5 text-slate-600 dark:text-slate-300">
-                                Per {rate.unit}
-                              </td>
-                            </tr>
-                          ));
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="px-6 py-16 text-center">
-                  <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                    No shipping rates are currently listed.
-                  </p>
-                  <p className="mt-2 text-sm text-slate-500">
-                    Please chat with us using the WhatsApp button on this page.
-                  </p>
-                </div>
-              )}
-            </div>
+            <ShippingRatesTable rates={rates} />
 
             <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl bg-slate-950 p-6 text-white sm:flex-row sm:items-center">
               <div>

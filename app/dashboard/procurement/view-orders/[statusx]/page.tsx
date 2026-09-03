@@ -4,6 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 import OrderSection from '../../view-orders/components/order-section';
+import ProcurementDraftTools from '../../view-orders/components/ProcurementDraftTools';
 import CreateOrder from '../../create-order/components/createOrder';
 import Loader from '@/components/uix/Loader';
 import { Search, LayoutList } from 'lucide-react';
@@ -152,6 +153,7 @@ export function ViewOrders({ params }: orderStatus) {
       </div>
 
       <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        {normalizedStatus === 'saved' && <ProcurementDraftTools onChanged={() => fetchOrder(pidUser!, normalizedStatus)} />}
         
         {countRecords.length === 0 ? (
           /* Premium Empty State */

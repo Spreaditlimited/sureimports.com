@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
 
 const prisma = new PrismaClient();
 
@@ -16,6 +17,8 @@ export async function GET(
   { params }: { params: Promise<{ pidUser: string; pidOrder: string }> },
 ) {
   const { pidUser, pidOrder } = await params;
+  const user = await requireProcurementUser();
+  if (!user || user.pidUser !== pidUser) return NextResponse.json({ responsex: { message: 'Unauthorized', status: 'FAILED' }, successx: false }, { status: 401 });
 
   // const responsex = {
   //   message: 'TEST DELETE!!!!!!!!!!!!!------------------------------',
@@ -31,7 +34,7 @@ export async function GET(
       where: {
         pidUser: pidUser,
         pidOrder: pidOrder,
-        //status: 'saved',
+        status: 'saved',
       },
     });
 
@@ -73,7 +76,5 @@ export async function GET(
       { responsex, successx: true, userx: null },
       { status: 401 },
     );
-  } finally {
-    await prisma.$disconnect();
-  }
+  } finally {}
 }

@@ -16,7 +16,6 @@ import {
   Info,
   Loader2,
   ShoppingCart,
-  MessageCircle,
   PlayCircle,
   X,
 } from 'lucide-react';
@@ -184,170 +183,154 @@ export default function AddProductForm() {
                 <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 text-indigo-900 dark:border-indigo-900/40 dark:bg-indigo-950/30 dark:text-indigo-100">
                   <h3 className="font-bold">Enter CBM for one item</h3>
                   <p className="mt-2 text-sm leading-relaxed">
-                    If your supplier gives you the total CBM for the whole product line, divide it by the quantity. For example, 10 CBM for 100 items means you should enter 0.1 CBM per item.
+                    If your supplier gives you the total CBM for the whole
+                    product line, divide it by the quantity. For example, 10 CBM
+                    for 100 items means you should enter 0.1 CBM per item.
                   </p>
                 </div>
                 <div className="rounded-2xl border border-slate-200 p-6 dark:border-slate-700">
-                  <h3 className="font-bold text-slate-900 dark:text-white">Ask your supplier</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    Ask your supplier
+                  </h3>
                   <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
-                    Request the packed carton dimensions or the total shipment CBM. Use packed dimensions, including packaging, rather than the bare product dimensions.
+                    Request the packed carton dimensions or the total shipment
+                    CBM. Use packed dimensions, including packaging, rather than
+                    the bare product dimensions.
                   </p>
                 </div>
               </div>
             ) : (
               <>
-            {/* Video Guide */}
-            <div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-800">
-              <div className="flex items-center gap-2 border-b border-slate-200 p-4 dark:border-slate-700">
-                <PlayCircle className="h-4 w-4 text-rose-500" />
-                <span className="text-sm font-bold text-slate-900 dark:text-white">
-                  Video Tutorial
-                </span>
-              </div>
-              <div className="relative aspect-video w-full">
-                <iframe
-                  className="absolute inset-0 h-full w-full"
-                  src={`https://www.youtube.com/embed/${'ZTgoROlS5NY'}`}
-                  title="YouTube Video Player"
-                  frameBorder="0"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            </div>
+                {/* Video Guide */}
+                <div className="overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-800">
+                  <div className="flex items-center gap-2 border-b border-slate-200 p-4 dark:border-slate-700">
+                    <PlayCircle className="h-4 w-4 text-rose-500" />
+                    <span className="text-sm font-bold text-slate-900 dark:text-white">
+                      Video Tutorial
+                    </span>
+                  </div>
+                  <div className="relative aspect-video w-full">
+                    <iframe
+                      className="absolute inset-0 h-full w-full"
+                      src={`https://www.youtube.com/embed/${'ZTgoROlS5NY'}`}
+                      title="YouTube Video Player"
+                      frameBorder="0"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                </div>
 
-            {/* Direct Support */}
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10 sm:flex-row">
-              <div className="flex-1">
-                <h3 className="font-bold text-blue-900 dark:text-blue-100">
-                  Need exact weights?
-                </h3>
-                <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
-                  Chat with our sourcing specialists in China. Share the product
-                  link, and we&apos;ll confirm the exact weight for you.
-                  (Response within 24hrs).
-                </p>
-              </div>
-              <a
-                href="https://wa.me/message/TZOKMEAUXVSCG1"
-                target="_blank"
-                rel="noreferrer"
-                className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
-              >
-                <MessageCircle className="h-4 w-4" /> Message Support
-              </a>
-            </div>
-
-            {/* General Tips */}
-            <div>
-              <h3 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
-                Sourcing Tips
-              </h3>
-              <ul className="list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-400">
-                <li>
-                  Study the 1688 product page details; some suppliers list the
-                  weight there.
-                </li>
-                <li>
-                  Do an image search on <strong>Alibaba.com</strong> for the
-                  same product, as Alibaba listings almost always include
-                  weight.
-                </li>
-                <li>
-                  Check <strong>Amazon.com</strong> for the same product to find
-                  accurate shipping weights.
-                </li>
-              </ul>
-            </div>
-
-            {/* Estimated Weights Table */}
-            <div>
-              <h3 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
-                Estimated Weights Reference
-              </h3>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                  <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
-                    Footwear
-                  </h4>
-                  <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                    <li className="flex justify-between">
-                      <span>Sneakers/Canvas</span>{' '}
-                      <span className="font-bold">0.6kg - 1kg</span>
+                {/* General Tips */}
+                <div>
+                  <h3 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
+                    Sourcing Tips
+                  </h3>
+                  <ul className="list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-400">
+                    <li>
+                      Study the 1688 product page details; some suppliers list
+                      the weight there.
                     </li>
-                    <li className="flex justify-between">
-                      <span>Corporate Shoes</span>{' '}
-                      <span className="font-bold">1.0kg</span>
+                    <li>
+                      Do an image search on <strong>Alibaba.com</strong> for the
+                      same product, as Alibaba listings almost always include
+                      weight.
                     </li>
-                    <li className="flex justify-between">
-                      <span>Boots</span>{' '}
-                      <span className="font-bold">2.0kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Female Heels/Flats</span>{' '}
-                      <span className="font-bold">0.5kg - 0.6kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Slippers</span>{' '}
-                      <span className="font-bold">0.4kg</span>
+                    <li>
+                      Check <strong>Amazon.com</strong> for the same product to
+                      find accurate shipping weights.
                     </li>
                   </ul>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                  <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
-                    Bags & Accessories
-                  </h4>
-                  <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                    <li className="flex justify-between">
-                      <span>Big Handbags</span>{' '}
-                      <span className="font-bold">1.0kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Small Handbags</span>{' '}
-                      <span className="font-bold">0.6kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Set of Bags (3-in-1)</span>{' '}
-                      <span className="font-bold">1.5kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Wallets/Purses</span>{' '}
-                      <span className="font-bold">0.2kg - 0.3kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Watches/Jewelry</span>{' '}
-                      <span className="font-bold">0.1kg - 0.2kg</span>
-                    </li>
-                  </ul>
+
+                {/* Estimated Weights Table */}
+                <div>
+                  <h3 className="mb-3 text-sm font-bold text-slate-900 dark:text-white">
+                    Estimated Weights Reference
+                  </h3>
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                      <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
+                        Footwear
+                      </h4>
+                      <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                        <li className="flex justify-between">
+                          <span>Sneakers/Canvas</span>{' '}
+                          <span className="font-bold">0.6kg - 1kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Corporate Shoes</span>{' '}
+                          <span className="font-bold">1.0kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Boots</span>{' '}
+                          <span className="font-bold">2.0kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Female Heels/Flats</span>{' '}
+                          <span className="font-bold">0.5kg - 0.6kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Slippers</span>{' '}
+                          <span className="font-bold">0.4kg</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                      <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
+                        Bags & Accessories
+                      </h4>
+                      <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                        <li className="flex justify-between">
+                          <span>Big Handbags</span>{' '}
+                          <span className="font-bold">1.0kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Small Handbags</span>{' '}
+                          <span className="font-bold">0.6kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Set of Bags (3-in-1)</span>{' '}
+                          <span className="font-bold">1.5kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Wallets/Purses</span>{' '}
+                          <span className="font-bold">0.2kg - 0.3kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Watches/Jewelry</span>{' '}
+                          <span className="font-bold">0.1kg - 0.2kg</span>
+                        </li>
+                      </ul>
+                    </div>
+                    <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                      <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
+                        Clothing & Hair
+                      </h4>
+                      <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                        <li className="flex justify-between">
+                          <span>Shirts/Gowns/Shorts</span>{' '}
+                          <span className="font-bold">0.3kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Jeans</span>{' '}
+                          <span className="font-bold">0.5kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Suits</span>{' '}
+                          <span className="font-bold">2.0kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Hair Wigs</span>{' '}
+                          <span className="font-bold">0.3kg</span>
+                        </li>
+                        <li className="flex justify-between">
+                          <span>Hair Attachment</span>{' '}
+                          <span className="font-bold">0.2kg</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-                  <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-black uppercase tracking-widest text-slate-400 dark:border-slate-700">
-                    Clothing & Hair
-                  </h4>
-                  <ul className="space-y-1 text-sm text-slate-600 dark:text-slate-300">
-                    <li className="flex justify-between">
-                      <span>Shirts/Gowns/Shorts</span>{' '}
-                      <span className="font-bold">0.3kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Jeans</span>{' '}
-                      <span className="font-bold">0.5kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Suits</span>{' '}
-                      <span className="font-bold">2.0kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Hair Wigs</span>{' '}
-                      <span className="font-bold">0.3kg</span>
-                    </li>
-                    <li className="flex justify-between">
-                      <span>Hair Attachment</span>{' '}
-                      <span className="font-bold">0.2kg</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
               </>
             )}
           </div>
@@ -500,7 +483,11 @@ export default function AddProductForm() {
                           type="number"
                           step="any"
                           min="0.0001"
-                          placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 1.5'}
+                          placeholder={
+                            measurementUnit === 'CBM'
+                              ? 'e.g., 0.1'
+                              : 'e.g., 1.5'
+                          }
                           className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
                         />
@@ -509,7 +496,10 @@ export default function AddProductForm() {
                     <FormMessage className="text-xs text-rose-500" />
                     {perItemMeasurement > 0 && quantity > 0 && (
                       <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                        {quantity} item{quantity === 1 ? '' : 's'} × {perItemMeasurement} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
+                        {quantity} item{quantity === 1 ? '' : 's'} ×{' '}
+                        {perItemMeasurement} {measurementUnit} ={' '}
+                        {Number(lineMeasurement.toFixed(4))} {measurementUnit}{' '}
+                        total.
                       </p>
                     )}
                   </FormItem>

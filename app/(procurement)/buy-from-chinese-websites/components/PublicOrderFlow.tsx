@@ -85,6 +85,7 @@ export default function PublicOrderFlow() {
   const [products, setProducts] = useState<ProductDraft[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [showMeasurementHelp, setShowMeasurementHelp] = useState(false);
+  const [duplicateDraft, setDuplicateDraft] = useState<{ pidOrder: string; orderName?: string } | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -181,7 +182,7 @@ export default function PublicOrderFlow() {
     setProducts((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const proceedToPayment = async () => {
+  const proceedToPayment = async (allowSeparateOrder = false) => {
     if (!order.orderName.trim() || !order.destinationCountry || !order.shippingPlan || !order.shippingAddress.trim()) {
       toast.error('Complete order name, destination, shipping plan and address.');
       return;
@@ -208,6 +209,7 @@ export default function PublicOrderFlow() {
         productQuantity: Number(item.productQuantity),
       })),
       ...leadMeta,
+      allowSeparateOrder,
     };
 
     setSubmitting(true);
@@ -257,6 +259,11 @@ export default function PublicOrderFlow() {
         return;
       }
 
+      if (data?.statusx === 'EXISTING_SAVED_ORDERS' && data.existingDraft) {
+        setDuplicateDraft(data.existingDraft);
+        return;
+      }
+
       if (
         data?.statusx === 'AUTH_REQUIRED' ||
         data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED'
@@ -288,6 +295,7 @@ export default function PublicOrderFlow() {
 
   return (
     <div className="bg-transparent">
+      {duplicateDraft && <div role="alertdialog" aria-modal="true" aria-labelledby="duplicate-order-title" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"><div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:p-8"><h2 id="duplicate-order-title" className="text-2xl font-black text-slate-900 dark:text-white">You already have a saved order</h2><p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">Add these products to <b>{duplicateDraft.orderName || duplicateDraft.pidOrder}</b> to avoid duplicate shipments and charges. Only create another order if this must ship separately.</p><div className="mt-6 flex flex-col gap-3"><Button onClick={() => router.push(`/dashboard/procurement/add-product/${duplicateDraft.pidOrder}`)} className="min-h-12 bg-indigo-600 font-bold hover:bg-indigo-700">Continue saved order</Button><Button variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className="min-h-12 font-bold">Review or merge saved orders</Button><button type="button" onClick={() => { setDuplicateDraft(null); void proceedToPayment(true); }} className="min-h-11 text-sm font-bold text-slate-600 underline underline-offset-4 dark:text-slate-300">This is a separate shipment — create it</button><button type="button" onClick={() => setDuplicateDraft(null)} className="min-h-11 text-sm text-slate-500">Go back</button></div></div></div>}
       {/* Main Flow Content */}
       <section className="w-full">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)] 2xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start">
@@ -572,7 +580,7 @@ export default function PublicOrderFlow() {
                 <Button
                   type="button"
                   className="h-14 w-full rounded-xl bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-70 border-0"
-                  onClick={proceedToPayment}
+                  onClick={() => void proceedToPayment()}
                   disabled={submitting}
                 >
                   {submitting ? (

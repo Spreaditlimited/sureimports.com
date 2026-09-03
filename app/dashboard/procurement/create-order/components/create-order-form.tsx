@@ -88,6 +88,9 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
   
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+  const [savedOrders, setSavedOrders] = useState<Array<{ pidOrder: string; orderName: string | null; productCount: number }>>([]);
+  const [checkingDrafts, setCheckingDrafts] = useState(true);
+  const [allowSeparateOrder, setAllowSeparateOrder] = useState(false);
 
   const {
     register,
@@ -111,6 +114,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
       }
     };
     fetchCountries();
+    fetch('/api/procurement/drafts', { cache: 'no-store' })
+      .then((response) => response.ok ? response.json() : { orders: [] })
+      .then((data) => setSavedOrders(data.orders || []))
+      .finally(() => setCheckingDrafts(false));
   }, []);
 
   const handleCountryChange = (value: string) => {
@@ -124,7 +131,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
   const usesCbm = selectedShippingPlan?.shippingPlanUnit === 'CBM';
 
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
-    const submissionData = { ...formData, pidOrder, pidUser, emailUser };
+    const submissionData = { ...formData, pidOrder, pidUser, emailUser, allowSeparateOrder };
 
     try {
       const response = await fetch('/api/crud/procurement-create', {
@@ -143,6 +150,9 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
           'Your request has been submitted!'
         );
         router.refresh();
+      } else if (data.responsex.status === 'EXISTING_SAVED_ORDERS') {
+        setSavedOrders(data.responsex.drafts || []);
+        setAllowSeparateOrder(false);
       } else {
         toast.warning(data.responsex.message || 'Action failed. Please try again.');
       }
@@ -150,6 +160,34 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
       toast.error('An error occurred. Please check your connection.');
     }
   };
+
+  if (checkingDrafts) {
+    return <div className="flex min-h-48 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>;
+  }
+
+  if (savedOrders.length > 0 && !allowSeparateOrder) {
+    const first = savedOrders[0];
+    return (
+      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-900 dark:bg-blue-950/30 sm:p-7">
+        <div className="flex items-start gap-4">
+          <div className="rounded-xl bg-blue-600 p-3 text-white"><BoxIcon className="h-5 w-5" /></div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-lg font-black text-slate-900 dark:text-white">You already have {savedOrders.length === 1 ? 'a saved order' : `${savedOrders.length} saved orders`}</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Most products can be added to one order. Continue the saved order below to avoid paying for separate shipments.</p>
+            <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4 dark:border-blue-900 dark:bg-slate-900">
+              <p className="font-bold text-slate-900 dark:text-white">{first.orderName || first.pidOrder}</p>
+              <p className="mt-1 text-xs text-slate-500">{first.productCount} product{first.productCount === 1 ? '' : 's'} · {first.pidOrder}</p>
+            </div>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+              <Button type="button" onClick={() => router.push(`/dashboard/procurement/add-product/${first.pidOrder}`)} className="min-h-12 flex-1 bg-blue-600 font-bold hover:bg-blue-700">Continue saved order</Button>
+              <Button type="button" variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className="min-h-12 flex-1 font-bold">View or combine saved orders</Button>
+            </div>
+            <button type="button" onClick={() => setAllowSeparateOrder(true)} className="mt-5 min-h-11 w-full text-sm font-bold text-slate-600 underline underline-offset-4 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">This is a separate shipment — create another order</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>

@@ -535,7 +535,7 @@ export default function MoreOrders({
         {/* PDF Header (Only really visible/useful in PDF or top of card) */}
         <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Invoice Ref</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Order ID</p>
             <p className="font-mono text-lg font-black text-slate-900 dark:text-white">{pidOrder}</p>
           </div>
           <div className="text-right">

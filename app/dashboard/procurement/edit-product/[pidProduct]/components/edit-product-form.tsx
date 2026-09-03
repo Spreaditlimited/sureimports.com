@@ -16,7 +16,6 @@ import {
   Info,
   Loader2,
   Save,
-  MessageCircle,
   PlayCircle,
   X,
 } from 'lucide-react';
@@ -230,28 +229,6 @@ export default function EditProductForm({
                   allowFullScreen
                 ></iframe>
               </div>
-            </div>
-
-            {/* Direct Support */}
-            <div className="flex flex-col items-center gap-4 rounded-2xl border border-blue-100 bg-blue-50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10 sm:flex-row">
-              <div className="flex-1">
-                <h3 className="font-bold text-blue-900 dark:text-blue-100">
-                  Need exact weights?
-                </h3>
-                <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300">
-                  Chat with our sourcing specialists in China. Share the product
-                  link, and we&apos;ll confirm the exact weight for you.
-                  (Response within 24hrs).
-                </p>
-              </div>
-              <a
-                href="https://wa.me/message/TZOKMEAUXVSCG1"
-                target="_blank"
-                rel="noreferrer"
-                className="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-blue-500"
-              >
-                <MessageCircle className="h-4 w-4" /> Message Support
-              </a>
             </div>
 
             {/* General Tips */}
@@ -526,7 +503,11 @@ export default function EditProductForm({
                           type="number"
                           min="0.0001"
                           step="any"
-                          placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 1.5'}
+                          placeholder={
+                            measurementUnit === 'CBM'
+                              ? 'e.g., 0.1'
+                              : 'e.g., 1.5'
+                          }
                           className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50"
                           {...field}
                           onBlur={(e) => {
@@ -546,7 +527,10 @@ export default function EditProductForm({
                     <FormMessage className="text-xs text-rose-500" />
                     {perItemMeasurement > 0 && quantity > 0 && (
                       <p className="text-xs font-medium text-blue-700 dark:text-blue-300">
-                        {quantity} item{quantity === 1 ? '' : 's'} × {perItemMeasurement} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
+                        {quantity} item{quantity === 1 ? '' : 's'} ×{' '}
+                        {perItemMeasurement} {measurementUnit} ={' '}
+                        {Number(lineMeasurement.toFixed(4))} {measurementUnit}{' '}
+                        total.
                       </p>
                     )}
                   </FormItem>

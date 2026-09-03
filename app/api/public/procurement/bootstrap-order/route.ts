@@ -37,6 +37,7 @@ type Payload = {
   fbp?: string;
   fbc?: string;
   pageUrl?: string;
+  allowSeparateOrder?: boolean;
 };
 
 function normalize(value: string | undefined): string {
@@ -184,6 +185,23 @@ export async function POST(request: NextRequest) {
       );
     }
     const { user, createdNewAccount } = account;
+
+    const existingDraft = await prisma.orders.findFirst({
+      where: { pidUser: user.pidUser, status: 'saved', mergedIntoOrderId: null },
+      orderBy: { updatedAt: 'desc' },
+      select: { pidOrder: true, orderName: true },
+    });
+    if (existingDraft && body.allowSeparateOrder !== true) {
+      return NextResponse.json(
+        {
+          statusx: 'EXISTING_SAVED_ORDERS',
+          message: 'You already have a saved order. Continue it from your dashboard, or explicitly choose a separate shipment.',
+          existingDraft,
+          continuePath: `/dashboard/procurement/add-product/${existingDraft.pidOrder}`,
+        },
+        { status: 409 },
+      );
+    }
 
     await prisma.$transaction(async (tx) => {
       await tx.orders.create({

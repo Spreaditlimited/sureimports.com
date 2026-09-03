@@ -1,7 +1,10 @@
 import xMail from '@/lib/email/xMail';
-import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
+
+const FIRST_REMINDER_DAY = 3;
+const SECOND_REMINDER_DAY = 10;
+const FINAL_REMINDER_DAY = 13;
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -39,7 +42,7 @@ Dear [First Name],<br /><br />
 Thank you for creating a Buy from Chinese Websites order on sureimports.com.<br /><br />
 We understand life gets busy, so this is just a gentle reminder to complete your payment of Order [Order ID], so we can begin processing your order and arranging shipment right away.<br /><br />
 Its been [Days] days since you placed your order, and we want to ensure you don't miss out on the great products you've selected.<br /><br />
-<b>Please note: if payment is not made within the next 7 days, the system will automatically cancel and delete the order.</b><br /><br />
+<b>Your saved order will be kept for 14 days. You have 11 days left to complete it before it is automatically removed.</b><br /><br />
 We truly appreciate your trust in Sure Imports and look forward to serving you.<br /><br />
 Warm regards,<br /><br />
 The Sure Imports Team
@@ -49,7 +52,7 @@ The Sure Imports Team
   const xBody2 = `
 Dear [First Name],<br /><br />
 We noticed that your Buy from Chinese Websites order is still unpaid, and we don’t want you to miss out. Once payment is made, our team can immediately begin sourcing and shipping your items.<br /><br />
-Just a reminder: orders must be paid within 7 days of receiving our first reminder email. After that, the system will automatically delete the order.<br /><br />
+Your saved order will be kept for 14 days. You now have 4 days left to complete it before it is automatically removed.<br /><br />
 Its been [Days] days since you placed your order, and we want to ensure you don't miss out on the great products you've selected.<br /><br />
 If you’re ready, simply log in to your account and complete payment today to keep your order active.<br /><br />
 We appreciate you choosing Sure Imports and look forward to helping you get your products without stress.<br /><br />
@@ -79,9 +82,9 @@ The Sure Imports Team
   // Loop through each pending order and send reminder email
   for (const order of pendingOrders) {
     try {
-      const daysPending = getDaysDifference(order.updatedAt as any);
+      const daysPending = getDaysDifference(order.createdAt as any);
 
-      // Send reminder if the order has been pending for 7 days
+      // Reminders are timed against the 14-day saved-order window.
       const user = await prisma.users.findUnique({
         where: { pidUser: order.pidUser },
       });
@@ -89,8 +92,8 @@ The Sure Imports Team
       if (user) {
         const xEmail = user.userEmail as string;
 
-        //EMAIL 1: Send email at 2nd day after creation
-        if (daysPending === 1) {
+        // EMAIL 1: 11 days before removal.
+        if (daysPending === FIRST_REMINDER_DAY) {
           const xTitle = `Reminder: Complete Your Order (Order ID: ${order.pidOrder})`;
           const personalizedBody = xBody1
             .replace('[First Name]', user.userFirstname as any)
@@ -110,8 +113,8 @@ The Sure Imports Team
           );
         }
 
-        //EMAIL 2: Send email at 4 days
-        if (daysPending === 4) {
+        // EMAIL 2: 4 days before removal.
+        if (daysPending === SECOND_REMINDER_DAY) {
           const xTitle = `Quick Reminder: Your Order Is Waiting (Order ID: ${order.pidOrder})`;
           const personalizedBody = xBody2
             .replace('[First Name]', user.userFirstname as any)
@@ -131,8 +134,8 @@ The Sure Imports Team
           );
         }
 
-        //EMAIL 3: Send email at 2 days before deletion
-        if (daysPending === 7) {
+        // EMAIL 3: 24 hours before removal.
+        if (daysPending === FINAL_REMINDER_DAY) {
           const xTitle = `Final Reminder: Your Order Will Be Cancelled Tomorrow (Order ID: ${order.pidOrder})`;
           const personalizedBody = xBody3
             .replace('[First Name]', user.userFirstname as any)
@@ -152,43 +155,6 @@ The Sure Imports Team
           );
         }
 
-        //DELETE ORDER AND PRODUCTS TIED TO IT
-        //(daysPending >= 8)
-        if (daysPending === 8888) {
-          // First, find all products associated with this order
-          const orderProducts = await prisma.products.findMany({
-            where: {
-              pidOrder: order.pidOrder,
-            },
-          });
-
-          // Log the products found for this order
-          console.log(
-            `Found ${orderProducts.length} products for order ${order.pidOrder}`,
-          );
-
-          // Delete all products associated with this order
-          if (orderProducts.length > 0) {
-            const deletedProducts = await prisma.products.deleteMany({
-              where: {
-                pidOrder: order.pidOrder,
-              },
-            });
-            console.log(
-              `Deleted ${deletedProducts.count} products for order ${order.pidOrder}`,
-            );
-          }
-
-          // Now delete the order itself
-          const deletedOrder = await prisma.orders.delete({
-            where: {
-              pidOrder: order.pidOrder,
-              status: 'saved', // Ensure we only delete if still 'testing'
-            },
-          });
-
-          console.log(`Deleted order ${order.pidOrder} successfully`);
-        }
       }
     } catch (error) {
       console.error(`Failed to send email for order ${order.pidOrder}:`, error);

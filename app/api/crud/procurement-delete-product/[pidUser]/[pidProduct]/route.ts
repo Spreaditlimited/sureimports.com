@@ -6,6 +6,7 @@ import fileFilter from '@/utils/fileFilter';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
 
 const prisma = new PrismaClient();
 
@@ -15,6 +16,8 @@ export async function GET(
 ) {
   try {
     const { pidUser, pidProduct } = await params;
+    const user = await requireProcurementUser();
+    if (!user || user.pidUser !== pidUser) return NextResponse.json({ responsex: { message: 'Unauthorized', status: 'FAILED' }, successx: false }, { status: 401 });
     const deletedProduct = await prisma.products.deleteMany({
       where: {
         pidUser: pidUser,
@@ -57,7 +60,5 @@ export async function GET(
       { responsex, successx: true, userx: null },
       { status: 401 },
     );
-  } finally {
-    await prisma.$disconnect();
-  }
+  } finally {}
 }

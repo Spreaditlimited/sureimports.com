@@ -9,6 +9,7 @@ import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
 import { normalizeProductUrl } from '@/lib/productUrl';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
 
 const prisma = new PrismaClient();
 
@@ -58,20 +59,15 @@ export async function POST(request: Request) {
     );
   }
 
-  //CHECK IF USER PID AND CID EXISTS
-  const user = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser,
-      userEmail: emailUser,
-    },
-  });
+  const user = await requireProcurementUser();
+  if (!user) return NextResponse.json({ responsex: { message: 'Please sign in again.', status: 'UNAUTHORIZED' }, successx: false }, { status: 401 });
 
   if (user) {
     /////////////// RETURN RESPONSE ///////////////
     //CREATE REQUEST
 
     const order = await prisma.orders.findFirst({
-      where: { pidOrder, pidUser },
+      where: { pidOrder, pidUser: user.pidUser },
       select: { shippingPricingVersion: true, status: true },
     });
     if (!order) {
@@ -97,7 +93,7 @@ export async function POST(request: Request) {
       data: {
         pidProduct,
         pidOrder,
-        pidUser,
+        pidUser: user.pidUser,
         productName,
         productLink: normalizedProductLink,
         productPrice: parseFloat(productPrice),

@@ -164,9 +164,7 @@ export async function confirmSupplierVerificationPayment(input: {
       payment.paymentPurpose === SUPPLIER_PAYMENT_PURPOSES.PHYSICAL_VISIT;
     const isLegacyCombined =
       payment.paymentPurpose === SUPPLIER_PAYMENT_PURPOSES.LEGACY_COMBINED;
-    const nextStatus = isPhysicalVisitPayment
-      ? payment.request.status
-      : 'PAID';
+    const nextStatus = isPhysicalVisitPayment ? payment.request.status : 'PAID';
     const nextTransportQuoteStatus = isPhysicalVisitPayment
       ? 'PAID'
       : isLegacyCombined && payment.request.verificationType === 'PHYSICAL'
@@ -244,13 +242,13 @@ export function publicVerificationRequest<T extends Record<string, any>>(
       ['READY', 'PAID', 'DECLINED'].includes(
         String(request.transportQuoteStatus || ''),
       )
-      ? {
-          recommendedMode: travel.recommendedMode || null,
-          roundTripDistanceKm: travel.roundTripDistanceKm || null,
-          lodgingNights: selectedOption?.lodgingNights ?? null,
-          estimatedTotalCny: selectedOption?.totalCny ?? null,
-          pricingAsOf: travel.pricingAsOf || null,
-        }
-      : null,
+        ? {
+            recommendedMode: travel.recommendedMode || null,
+            roundTripDistanceKm: travel.roundTripDistanceKm || null,
+            lodgingNights: selectedOption?.lodgingNights ?? null,
+            estimatedTotalCny: selectedOption?.totalCny ?? null,
+            pricingAsOf: travel.pricingAsOf || null,
+          }
+        : null,
   };
 }

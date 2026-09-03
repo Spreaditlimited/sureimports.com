@@ -1,22 +1,10 @@
 // app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
-import { PaystackButton } from 'react-paystack';
-import { useRouter } from 'next/navigation';
 import { resolveNewProcurementShippingPricing } from '@/lib/procurement/shippingPricing';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
 
 export async function POST(request: Request) {
-  //GET FORM JSON DATA
-
-  console.log('JESUS IS GOD');
-
   const {
     pidOrder,
     pidUser,
@@ -27,31 +15,21 @@ export async function POST(request: Request) {
     shippingPlan,
     orderCategory,
     shippingAddress,
+    allowSeparateOrder,
   } = await request.json();
-
-  // {
-  //   //"orderName":"TEST ORDER X 777",
-  //   //"destinationCountry":"CTY1737279402903",
-  //   //"currencyType":"USD",
-  //   //"shippingPlan":"SHP1737280820075",
-  //   //"orderCategory":"Raw Batteries",
-  //   //"shippingAddress":"This is order 777",
-  //   //"pidOrder":"DR1737425818459",
-  //   //"pidUser":"CUSQ61E2A8WXT",
-  //   //"emailUser":"atsuemmanuel@gmail.com"
-  // }
-
-  console.log('JESUS IS KING' + pidOrder);
-
-  //CHECK IF USER EXISTS
-  const user = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser,
-      userEmail: emailUser,
-    },
+  const user = await requireProcurementUser();
+  if (!user) return NextResponse.json({ responsex: { status: 'UNAUTHORIZED', message: 'Please sign in again.' }, successx: false }, { status: 401 });
+  const existingDrafts = await prisma.orders.findMany({
+    where: { pidUser: user.pidUser, status: 'saved', mergedIntoOrderId: null },
+    orderBy: { updatedAt: 'desc' },
+    select: { pidOrder: true, orderName: true, updatedAt: true, _count: { select: { products: true } } },
   });
-
-  console.log('JESUS IS GREAT!!!!!!!');
+  if (existingDrafts.length && allowSeparateOrder !== true) {
+    return NextResponse.json({
+      responsex: { status: 'EXISTING_SAVED_ORDERS', message: 'Continue your saved order, or explicitly choose a separate shipment.', drafts: existingDrafts.map(({ _count, ...draft }) => ({ ...draft, productCount: _count.products })) },
+      successx: false,
+    }, { status: 409 });
+  }
 
   if (user) {
     /////////////// RETURN RESPONSE ///////////////
@@ -78,7 +56,7 @@ export async function POST(request: Request) {
     const createx = await prisma.orders.create({
       data: {
         pidOrder,
-        pidUser,
+        pidUser: user.pidUser,
         orderName,
         destinationCountry,
         currencyType,

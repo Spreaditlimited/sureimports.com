@@ -9,6 +9,7 @@ import { generateSlug } from '@/utils/slugGenerator';
 import { PaystackButton } from 'react-paystack';
 import { useRouter } from 'next/navigation';
 import { normalizeProductUrl } from '@/lib/productUrl';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
 
 const prisma = new PrismaClient();
 
@@ -89,12 +90,8 @@ export async function POST(request: Request) {
 
   //CHECK IF USER PID AND CID EXISTS
 
-  const user = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser,
-      userEmail: emailUser,
-    },
-  });
+  const user = await requireProcurementUser();
+  if (!user) return NextResponse.json({ responsex: { message: 'Please sign in again.', status: 'UNAUTHORIZED' }, successx: false }, { status: 401 });
 
   if (user) {
     /////////////// RETURN RESPONSE ///////////////
@@ -103,7 +100,7 @@ export async function POST(request: Request) {
     //UPDATE RECORD
 
     const existingProduct = await prisma.products.findFirst({
-      where: { pidUser, pidProduct },
+      where: { pidUser: user.pidUser, pidProduct },
       select: {
         orders: { select: { shippingPricingVersion: true, status: true } },
       },
@@ -129,7 +126,7 @@ export async function POST(request: Request) {
       existingProduct.orders.shippingPricingVersion === 2;
 
     const updatex = await prisma.products.update({
-      where: { pidUser: pidUser as string, pidProduct: pidProduct },
+      where: { pidUser: user.pidUser, pidProduct: pidProduct },
       data: {
         productName,
         productLink: normalizedProductLink,

@@ -24,8 +24,10 @@ import {
   PlusCircle,
   AlertTriangle,
   ChevronDown,
+  Clock3,
 } from 'lucide-react';
 
+import { getSavedOrderCountdown } from '@/lib/procurement/savedOrderExpiry';
 import MoreOrders from './products-table/orders-view-more';
 
 interface Order {
@@ -51,6 +53,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
   const [productData, setProductData] = useState<any>(null);
   const [pidUser] = useState(user?.pidUser);
   const [loading, setLoading] = useState(false);
+  const [countdownNow, setCountdownNow] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -68,6 +71,28 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
     };
     fetchProducts();
   }, [pidUser, order.pidOrder]);
+
+  useEffect(() => {
+    if (order.status !== 'saved') return;
+
+    const updateCountdown = () => setCountdownNow(Date.now());
+    updateCountdown();
+    const intervalId = window.setInterval(updateCountdown, 60_000);
+
+    return () => window.clearInterval(intervalId);
+  }, [order.status]);
+
+  const savedOrderCountdown =
+    order.status === 'saved' && countdownNow !== null
+      ? getSavedOrderCountdown(order.createdAt, countdownNow)
+      : null;
+
+  const countdownTone =
+    savedOrderCountdown?.tone === 'urgent'
+      ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300'
+      : savedOrderCountdown?.tone === 'warning'
+        ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300'
+        : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300';
 
   const handleDelete = async () => {
     // Rely on parent to handle API call and state removal for optimistic UI
@@ -109,6 +134,15 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
                     {order.pidOrder}
                   </span>
                 </div>
+                {savedOrderCountdown ? (
+                  <div
+                    className={`mt-2 inline-flex w-fit items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold ${countdownTone}`}
+                    title={`This saved order will be removed on ${savedOrderCountdown.expiresAt.toLocaleString('en-GB')}`}
+                  >
+                    <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+                    <span>{savedOrderCountdown.text}</span>
+                  </div>
+                ) : null}
               </div>
             </div>
 
