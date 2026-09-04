@@ -22,7 +22,7 @@ import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
-import CloudflareExplainerVideo from './components/CloudflareExplainerVideo';
+import YouTubeFrame from '@/components/uix/YouTubeFrame';
 import {
   LINESCOUT_BULK_SOURCING_URL,
   LINESCOUT_WHITE_LABEL_URL,
@@ -30,12 +30,10 @@ import {
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/buy-from-chinese-websites`;
-const explainerVideoUrl =
-  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/manifest/video.m3u8';
-const explainerPosterUrl =
-  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/thumbnails/thumbnail.jpg';
-const explainerEmbedUrl =
-  'https://customer-1vkeaflxib2kotwm.cloudflarestream.com/2f9049540b0587a11a1975527906ea2a/iframe';
+const explainerVideoId = 'HJVlH0XT0ok';
+const explainerVideoUrl = `https://www.youtube.com/watch?v=${explainerVideoId}`;
+const explainerPosterUrl = `https://i.ytimg.com/vi/${explainerVideoId}/maxresdefault.jpg`;
+const explainerEmbedUrl = `https://www.youtube-nocookie.com/embed/${explainerVideoId}`;
 
 const platforms = [
   '1688',
@@ -316,7 +314,11 @@ export default function BuyFromChineseWebsitesPage() {
                 Step by Step Video Guide
               </h2>
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900">
-                <CloudflareExplainerVideo />
+                <YouTubeFrame
+                  videoId={explainerVideoId}
+                  title="How Buy From Chinese Websites works at Sure Imports"
+                  thumbnailQuality="maxresdefault"
+                />
               </div>
             </div>
           </div>

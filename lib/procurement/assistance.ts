@@ -22,7 +22,13 @@ export async function requireProcurementUser() {
   if (!payload?.pidUser) return null;
   return prisma.users.findUnique({
     where: { pidUser: payload.pidUser },
-    select: { pidUser: true, userEmail: true, userPhone: true, phone: true },
+    select: {
+      pidUser: true,
+      userFirstname: true,
+      userEmail: true,
+      userPhone: true,
+      phone: true,
+    },
   });
 }
 

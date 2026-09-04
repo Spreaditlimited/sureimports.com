@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   ASSISTANCE_DURATION_DAYS,
@@ -6,6 +7,63 @@ import {
   procurementId,
   requireProcurementUser,
 } from '@/lib/procurement/assistance';
+import {
+  sendAssistanceAuthorizedEmail,
+  sendAssistanceRevokedEmail,
+} from '@/lib/procurement/assistanceEmails';
+
+async function expireOldRequests(pidUser: string) {
+  const staleCases = await prisma.procurement_assistance_cases.findMany({
+    where: { pidUser, status: 'ACTIVE', expiresAt: { lte: new Date() } },
+    select: { pidCase: true, assignedAdminPidUser: true },
+  });
+  if (!staleCases.length) return;
+
+  const createdOrderEvents =
+    await prisma.procurement_assistance_events.findMany({
+      where: {
+        pidCase: { in: staleCases.map((item) => item.pidCase) },
+        eventType: 'ORDER_CREATED',
+        pidOrder: { not: null },
+      },
+      select: { pidCase: true, pidOrder: true },
+    });
+  const orderReleaseOperations = staleCases.flatMap((item) => {
+    if (!item.assignedAdminPidUser) return [];
+    const orderIds = createdOrderEvents.flatMap((event) =>
+      event.pidCase === item.pidCase && event.pidOrder ? [event.pidOrder] : [],
+    );
+    return orderIds.length
+      ? [
+          prisma.orders.updateMany({
+            where: {
+              pidOrder: { in: orderIds },
+              pidUser,
+              status: 'saved',
+              pidAdmin: item.assignedAdminPidUser,
+            },
+            data: { pidAdmin: null },
+          }),
+        ]
+      : [];
+  });
+  await prisma.$transaction([
+    ...orderReleaseOperations,
+    prisma.procurement_assistance_cases.updateMany({
+      where: {
+        pidCase: { in: staleCases.map((item) => item.pidCase) },
+        status: 'ACTIVE',
+      },
+      data: {
+        status: 'EXPIRED',
+        activeRequestKey: null,
+        assignedAdminPidUser: null,
+        assignedAdminName: null,
+        claimedAt: null,
+      },
+    }),
+  ]);
+}
 
 export async function POST(request: Request) {
   const user = await requireProcurementUser();
@@ -20,6 +78,26 @@ export async function POST(request: Request) {
         actionHref: '/dashboard/profile-update',
       },
       { status: 422 },
+    );
+  }
+  await expireOldRequests(user.pidUser);
+  const activeRequest = await prisma.procurement_assistance_cases.findFirst({
+    where: {
+      pidUser: user.pidUser,
+      status: 'ACTIVE',
+      expiresAt: { gt: new Date() },
+    },
+    select: { pidCase: true },
+  });
+  if (activeRequest) {
+    return NextResponse.json(
+      {
+        statusx: 'ACTIVE_REQUEST_EXISTS',
+        message:
+          'You already have an active order help request. Remove access before starting another.',
+        pidCase: activeRequest.pidCase,
+      },
+      { status: 409 },
     );
   }
   const body = await request.json();
@@ -57,35 +135,63 @@ export async function POST(request: Request) {
   const expiresAt = new Date(
     Date.now() + ASSISTANCE_DURATION_DAYS * 86_400_000,
   );
-  await prisma.$transaction([
-    prisma.procurement_assistance_cases.create({
-      data: {
-        pidCase,
-        pidUser: user.pidUser,
-        supportNote: String(body.supportNote || '').slice(0, 3000) || null,
-        canCreateOrder: Boolean(body.canCreateOrder),
-        canEditOrder: true,
-        canManageProducts: true,
-        canMergeOrders: orderIds.length > 1,
-        expiresAt,
-      },
-    }),
-    ...orderIds.map((pidOrder) =>
-      prisma.procurement_assistance_case_orders.create({
-        data: { pidCase, pidOrder },
+  try {
+    await prisma.$transaction([
+      prisma.procurement_assistance_cases.create({
+        data: {
+          pidCase,
+          pidUser: user.pidUser,
+          activeRequestKey: user.pidUser,
+          supportNote: String(body.supportNote || '').slice(0, 3000) || null,
+          canCreateOrder: Boolean(body.canCreateOrder),
+          canEditOrder: true,
+          canManageProducts: true,
+          canMergeOrders: orderIds.length > 1,
+          expiresAt,
+        },
       }),
-    ),
-    prisma.procurement_assistance_events.create({
-      data: {
-        pidEvent: procurementId('PE'),
-        pidCase,
-        actorType: 'USER',
-        actorPid: user.pidUser,
-        eventType: 'AUTHORIZED',
-        detailsJson: { orderIds, canCreateOrder: Boolean(body.canCreateOrder) },
-      },
-    }),
-  ]);
+      ...orderIds.map((pidOrder) =>
+        prisma.procurement_assistance_case_orders.create({
+          data: { pidCase, pidOrder },
+        }),
+      ),
+      prisma.procurement_assistance_events.create({
+        data: {
+          pidEvent: procurementId('PE'),
+          pidCase,
+          actorType: 'USER',
+          actorPid: user.pidUser,
+          eventType: 'AUTHORIZED',
+          detailsJson: {
+            orderIds,
+            canCreateOrder: Boolean(body.canCreateOrder),
+          },
+        },
+      }),
+    ]);
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === 'P2002'
+    ) {
+      return NextResponse.json(
+        {
+          statusx: 'ACTIVE_REQUEST_EXISTS',
+          message:
+            'You already have an active order help request. Remove access before starting another.',
+        },
+        { status: 409 },
+      );
+    }
+    throw error;
+  }
+  await sendAssistanceAuthorizedEmail({
+    email: user.userEmail,
+    firstName: user.userFirstname,
+    expiresAt,
+    orderCount: orderIds.length,
+    canCreateOrder: Boolean(body.canCreateOrder),
+  });
   return NextResponse.json({ statusx: 'SUCCESS', pidCase, expiresAt });
 }
 
@@ -119,6 +225,7 @@ export async function PATCH(request: Request) {
       where: { pidCase, pidUser: user.pidUser, status: 'ACTIVE' },
       data: {
         status: 'REVOKED',
+        activeRequestKey: null,
         revokedAt: new Date(),
         assignedAdminPidUser: null,
         assignedAdminName: null,
@@ -155,5 +262,9 @@ export async function PATCH(request: Request) {
       { message: 'Active authorization not found.' },
       { status: 404 },
     );
+  await sendAssistanceRevokedEmail({
+    email: user.userEmail,
+    firstName: user.userFirstname,
+  });
   return NextResponse.json({ statusx: 'SUCCESS' });
 }
