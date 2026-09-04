@@ -15,6 +15,7 @@ interface YouTubeFrameProps {
     | 'maxresdefault';
   width?: string;
   height?: string;
+  loadImmediately?: boolean;
 }
 
 function getYouTubeVideoId(input: string): string {
@@ -40,8 +41,9 @@ const YouTubeFrame: React.FC<YouTubeFrameProps> = ({
   thumbnailQuality = 'hqdefault',
   width = '100%',
   height = '100%',
+  loadImmediately = false,
 }) => {
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(loadImmediately);
   const resolvedVideoId = useMemo(
     () => getYouTubeVideoId(videoId || src || ''),
     [src, videoId],
@@ -67,6 +69,7 @@ const YouTubeFrame: React.FC<YouTubeFrameProps> = ({
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
           referrerPolicy="strict-origin-when-cross-origin"
           allowFullScreen
+          loading="lazy"
         />
       ) : (
         <button

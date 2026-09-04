@@ -15,7 +15,7 @@ import {
   Info,
   CheckCircle2,
   Link as LinkIcon,
-  Lock
+  Lock,
 } from 'lucide-react';
 import PublicOrderFlow from './components/PublicOrderFlow';
 import Header from '@/app/(home)/components/Navigation';
@@ -164,7 +164,7 @@ const videoSchema = {
   description:
     'A guided walkthrough showing how to submit Chinese product links, create or access a Sure Imports account, and continue the saved order through the customer dashboard.',
   thumbnailUrl: [explainerPosterUrl],
-  uploadDate: '2026-08-09',
+  uploadDate: '2026-09-04T05:31:28-07:00',
   duration: 'PT18M53S',
   contentUrl: explainerVideoUrl,
   embedUrl: explainerEmbedUrl,
@@ -206,11 +206,13 @@ function renderFaqAnswer(question: string, answer: string) {
   if (question === 'Is this the same as Pay Supplier?') {
     return (
       <>
-        No. Buy From Chinese Websites is for link-based purchases where you want Sure Imports to help process the product order.{' '}
+        No. Buy From Chinese Websites is for link-based purchases where you want
+        Sure Imports to help process the product order.{' '}
         <Link href={paySupplierHref} className={inlineServiceLinkClass}>
           Pay Supplier
         </Link>{' '}
-        is for users who already have a confirmed supplier and mainly need supplier payment support after signing in.
+        is for users who already have a confirmed supplier and mainly need
+        supplier payment support after signing in.
       </>
     );
   }
@@ -222,7 +224,8 @@ function renderFaqAnswer(question: string, answer: string) {
         <Link href="/laptops-for-business" className={inlineServiceLinkClass}>
           laptops
         </Link>{' '}
-        require careful specification and inspection. You can also browse available products directly from the{' '}
+        require careful specification and inspection. You can also browse
+        available products directly from the{' '}
         <Link href="/shop" className={inlineServiceLinkClass}>
           Sure Imports shop
         </Link>
@@ -239,13 +242,12 @@ export default function BuyFromChineseWebsitesPage() {
     <>
       <JsonLdScript data={[serviceSchema, faqSchema, videoSchema]} />
       <Header />
-      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
-        
+      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 selection:bg-brand-orange-500/30 dark:bg-slate-950 dark:text-white">
         {/* --- HERO SECTION --- */}
         <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
           <PublicHeroBackground />
           <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
-          
+
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-4xl flex-col items-center">
               <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.15)] backdrop-blur-md">
@@ -255,13 +257,13 @@ export default function BuyFromChineseWebsitesPage() {
 
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
                 Buy from Chinese websites with{' '}
-                <span className="text-white">
-                  confidence
-                </span>
+                <span className="text-white">confidence</span>
               </h1>
 
               <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-slate-300">
-                Paste links from 1688, Alibaba, Taobao, and Pinduoduo. We handle the checkout, RMB supplier payments, shipping routes, and door-to-door delivery.
+                Paste links from 1688, Alibaba, Taobao, and Pinduoduo. We handle
+                the checkout, RMB supplier payments, shipping routes, and
+                door-to-door delivery.
               </p>
 
               <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
@@ -270,7 +272,8 @@ export default function BuyFromChineseWebsitesPage() {
                   className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
                 >
                   <span className="relative z-10 flex items-center gap-2">
-                    Start Your Order <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Start Your Order{' '}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </a>
                 <a
@@ -285,7 +288,7 @@ export default function BuyFromChineseWebsitesPage() {
         </section>
 
         {/* --- SUPPORTED PLATFORMS BAR --- */}
-        <section className="bg-white py-8 dark:bg-slate-900/50 overflow-hidden">
+        <section className="overflow-hidden bg-white py-8 dark:bg-slate-900/50">
           <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
             <p className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
               Supported Websites:
@@ -294,7 +297,7 @@ export default function BuyFromChineseWebsitesPage() {
               {platforms.map((platform) => (
                 <span
                   key={platform}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 transition-colors hover:border-brand-orange-400"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-brand-orange-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
                 >
                   {platform}
                 </span>
@@ -318,6 +321,7 @@ export default function BuyFromChineseWebsitesPage() {
                   videoId={explainerVideoId}
                   title="How Buy From Chinese Websites works at Sure Imports"
                   thumbnailQuality="maxresdefault"
+                  loadImmediately
                 />
               </div>
             </div>
@@ -327,32 +331,40 @@ export default function BuyFromChineseWebsitesPage() {
         {/* --- WHY USE THIS SERVICE --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mx-auto text-center mb-16">
+            <div className="mx-auto mb-16 max-w-3xl text-center">
               <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
                 Sourcing made clearer
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 dark:text-white md:text-5xl">
                 Stop guessing your way through Chinese shopping websites.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Chinese websites have the best prices, but Nigerian buyers face language barriers, 
-                RMB payment blocks, and complex logistics. We give you a structured way to submit 
-                order details, checkout, and keep everything tied to a trackable record.
+                Chinese websites have the best prices, but Nigerian buyers face
+                language barriers, RMB payment blocks, and complex logistics. We
+                give you a structured way to submit order details, checkout, and
+                keep everything tied to a trackable record.
               </p>
             </div>
 
             {/* PROCESS TIMELINE */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-12">
+            <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {process.map((item, index) => (
-                <div key={item.title} className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 hover:-translate-y-1">
-                  <span className="absolute -top-4 -right-4 text-8xl font-black text-slate-100 dark:text-white/[0.02] pointer-events-none transition-transform group-hover:scale-110">
+                <div
+                  key={item.title}
+                  className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50"
+                >
+                  <span className="pointer-events-none absolute -right-4 -top-4 text-8xl font-black text-slate-100 transition-transform group-hover:scale-110 dark:text-white/[0.02]">
                     {index + 1}
                   </span>
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500">
+                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="relative text-xl font-bold text-slate-950 dark:text-white">{item.title}</h3>
-                  <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.text}</p>
+                  <h3 className="relative text-xl font-bold text-slate-950 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    {item.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -366,38 +378,41 @@ export default function BuyFromChineseWebsitesPage() {
         >
           {/* Subtle Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-          <div className="absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-brand-orange-500/5 blur-[120px] pointer-events-none" />
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[120px]" />
 
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-               <div>
-                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
-                    <LinkIcon className="h-4 w-4" />
-                    Secure Submission Portal
-                 </div>
-                 <h2 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                   Paste your product links here.
-                 </h2>
-                 <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                   Drop your links from 1688, Alibaba, or Taobao below. We'll verify the products, calculate shipping, and handle the RMB payments.
-                 </p>
-               </div>
+              <div>
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
+                  <LinkIcon className="h-4 w-4" />
+                  Secure Submission Portal
+                </div>
+                <h2 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+                  Paste your product links here.
+                </h2>
+                <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Drop your links from 1688, Alibaba, or Taobao below. We'll
+                  verify the products, calculate shipping, and handle the RMB
+                  payments.
+                </p>
+              </div>
 
-               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                      <Lock className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-black text-slate-950 dark:text-white">
-                        Secure checkout handoff
-                      </p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                        Your submitted links move into a dashboard order record before payment.
-                      </p>
-                    </div>
+              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <Lock className="h-5 w-5" />
                   </div>
-               </div>
+                  <div>
+                    <p className="text-sm font-black text-slate-950 dark:text-white">
+                      Secure checkout handoff
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      Your submitted links move into a dashboard order record
+                      before payment.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Secure App Wrapper */}
@@ -409,7 +424,7 @@ export default function BuyFromChineseWebsitesPage() {
                     <span className="h-3 w-3 rounded-full bg-amber-300 dark:bg-amber-500/70" />
                     <span className="h-3 w-3 rounded-full bg-emerald-300 dark:bg-emerald-500/70" />
                   </div>
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-white/90 px-4 py-1.5 text-xs font-mono font-medium text-slate-500 shadow-sm dark:bg-slate-800/80 dark:text-slate-400">
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-white/90 px-4 py-1.5 font-mono text-xs font-medium text-slate-500 shadow-sm dark:bg-slate-800/80 dark:text-slate-400">
                     <Lock className="h-3 w-3 shrink-0 text-emerald-500" />
                     <span className="truncate">my.sureimports.com/order</span>
                   </div>
@@ -421,12 +436,21 @@ export default function BuyFromChineseWebsitesPage() {
                   <PublicOrderFlow />
                 </Suspense>
               </div>
-              
+
               <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
                 <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-500"/> Verified Suppliers</span>
-                  <span className="flex items-center gap-2"><CreditCard className="h-4 w-4 text-blue-500"/> Secure NGN Payment</span>
-                  <span className="flex items-center gap-2"><Truck className="h-4 w-4 text-brand-orange-500"/> End-to-End Tracking</span>
+                  <span className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4 text-emerald-500" />{' '}
+                    Verified Suppliers
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4 text-blue-500" /> Secure NGN
+                    Payment
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-brand-orange-500" />{' '}
+                    End-to-End Tracking
+                  </span>
                 </div>
               </div>
             </div>
@@ -436,25 +460,31 @@ export default function BuyFromChineseWebsitesPage() {
         {/* --- CHECKS & USE CASES BENTO --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            
             {/* Checklist Box */}
             <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 dark:bg-slate-800 text-brand-orange-500 mb-6">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-slate-800">
                   <ShieldCheck className="h-6 w-6" />
                 </div>
                 <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
                   What to confirm before submitting
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  The better your product information, the easier it is to avoid wrong variants, incorrect quantities, and surprise shipping fees.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  The better your product information, the easier it is to avoid
+                  wrong variants, incorrect quantities, and surprise shipping
+                  fees.
                 </p>
               </div>
               <ul className="space-y-4">
                 {checks.map((check) => (
-                  <li key={check} className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                  <li
+                    key={check}
+                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50"
+                  >
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{check}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {check}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -463,15 +493,20 @@ export default function BuyFromChineseWebsitesPage() {
             {/* Use Cases Box */}
             <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-slate-900 text-brand-orange-500 mb-6 border border-slate-200 dark:border-slate-700">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-orange-500 dark:border-slate-700 dark:bg-slate-900">
                   <ClipboardCheck className="h-6 w-6" />
                 </div>
                 <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
                   Best use cases for this service
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Buy From Chinese Websites works best when you already have product links. If you still need suppliers for white-label products or bulk stock, use{' '}
-                  <Link href={LINESCOUT_BULK_SOURCING_URL} className={inlineServiceLinkClass}>
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Buy From Chinese Websites works best when you already have
+                  product links. If you still need suppliers for white-label
+                  products or bulk stock, use{' '}
+                  <Link
+                    href={LINESCOUT_BULK_SOURCING_URL}
+                    className={inlineServiceLinkClass}
+                  >
                     LineScout
                   </Link>
                   .
@@ -479,10 +514,16 @@ export default function BuyFromChineseWebsitesPage() {
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 {useCases.map((item) => (
-                  <div key={item.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-                    <h3 className="font-bold text-slate-950 dark:text-white text-sm mb-2">
+                  <div
+                    key={item.title}
+                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                  >
+                    <h3 className="mb-2 text-sm font-bold text-slate-950 dark:text-white">
                       {item.title === 'Phones, laptops and gadgets' ? (
-                        <Link href="/shop" className="transition hover:text-brand-orange-500">
+                        <Link
+                          href="/shop"
+                          className="transition hover:text-brand-orange-500"
+                        >
                           {item.title}
                         </Link>
                       ) : (
@@ -492,8 +533,12 @@ export default function BuyFromChineseWebsitesPage() {
                     <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                       {item.title === 'Product samples' ? (
                         <>
-                          Small trial orders before committing to higher-volume sourcing or{' '}
-                          <Link href={LINESCOUT_WHITE_LABEL_URL} className={inlineServiceLinkClass}>
+                          Small trial orders before committing to higher-volume
+                          sourcing or{' '}
+                          <Link
+                            href={LINESCOUT_WHITE_LABEL_URL}
+                            className={inlineServiceLinkClass}
+                          >
                             white-label production
                           </Link>
                           .
@@ -506,52 +551,74 @@ export default function BuyFromChineseWebsitesPage() {
                 ))}
               </div>
             </div>
-
           </div>
         </section>
 
         {/* --- EDUCATION & BLOG LINKS --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28 relative overflow-hidden">
-          <div className="absolute right-0 top-0 h-64 w-64 bg-brand-orange-500/20 blur-[100px] pointer-events-none" />
-          
-          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 relative">
-            <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] items-center">
+        <section className="relative overflow-hidden bg-slate-950 py-20 text-white md:py-28">
+          <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 bg-brand-orange-500/20 blur-[100px]" />
+
+          <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
-                <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500 flex items-center gap-2 mb-4">
+                <span className="mb-4 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-orange-500">
                   <Info className="h-4 w-4" /> Buyer Education
                 </span>
-                <h2 className="text-3xl font-black tracking-tight md:text-5xl leading-tight">
+                <h2 className="text-3xl font-black leading-tight tracking-tight md:text-5xl">
                   1688, Alibaba and Taobao are not the same experience.
                 </h2>
                 <div className="mt-6 space-y-6 text-lg leading-relaxed text-slate-400">
                   <p>
-                    Alibaba is usually easier for export buyers because suppliers understand international orders. 
-                    1688 offers stronger domestic wholesale pricing but is harder for Nigerian buyers due to language barriers and RMB payments.
+                    Alibaba is usually easier for export buyers because
+                    suppliers understand international orders. 1688 offers
+                    stronger domestic wholesale pricing but is harder for
+                    Nigerian buyers due to language barriers and RMB payments.
                   </p>
                   <p>
-                    The platform is only one part of the decision. A profitable import still needs correct product details, realistic landed cost calculations, and a structured shipping plan.
+                    The platform is only one part of the decision. A profitable
+                    import still needs correct product details, realistic landed
+                    cost calculations, and a structured shipping plan.
                   </p>
                 </div>
               </div>
-              
-              <div className="rounded-[2rem] bg-white/5 border border-white/10 p-8 md:p-10 backdrop-blur-sm">
-                <BadgeCheck className="h-10 w-10 text-brand-orange-400 mb-6" />
-                <h3 className="text-2xl font-black mb-6">Useful guides before you buy</h3>
+
+              <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 backdrop-blur-sm md:p-10">
+                <BadgeCheck className="mb-6 h-10 w-10 text-brand-orange-400" />
+                <h3 className="mb-6 text-2xl font-black">
+                  Useful guides before you buy
+                </h3>
                 <div className="grid gap-4">
                   {[
-                    ['How to buy from 1688 safely', '/blog/how-to-buy-from-1688-and-ship-to-nigeria-safely'],
-                    ['How to buy from Alibaba safely', '/blog/how-to-buy-from-alibaba-and-ship-to-nigeria-safely-in-2026'],
-                    ['Alibaba vs 1688 for Nigerians', '/blog/alibaba-vs-1688-which-is-better-for-nigerian-importers-in-2026'],
-                    ['Paying Chinese suppliers safely', '/blog/how-to-pay-chinese-suppliers-from-nigeria-safely-in-2026'],
-                    ['Cost of shipping to Nigeria', '/blog/cost-of-shipping-from-china-to-nigeria-in-2026-air-sea-express-breakdown'],
+                    [
+                      'How to buy from 1688 safely',
+                      '/blog/how-to-buy-from-1688-and-ship-to-nigeria-safely',
+                    ],
+                    [
+                      'How to buy from Alibaba safely',
+                      '/blog/how-to-buy-from-alibaba-and-ship-to-nigeria-safely-in-2026',
+                    ],
+                    [
+                      'Alibaba vs 1688 for Nigerians',
+                      '/blog/alibaba-vs-1688-which-is-better-for-nigerian-importers-in-2026',
+                    ],
+                    [
+                      'Paying Chinese suppliers safely',
+                      '/blog/how-to-pay-chinese-suppliers-from-nigeria-safely-in-2026',
+                    ],
+                    [
+                      'Cost of shipping to Nigeria',
+                      '/blog/cost-of-shipping-from-china-to-nigeria-in-2026-air-sea-express-breakdown',
+                    ],
                   ].map(([title, href]) => (
                     <Link
                       key={href}
                       href={href}
-                      className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-brand-orange-500/50"
+                      className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                     >
-                      <span className="font-bold text-slate-200 group-hover:text-brand-orange-300 transition-colors">{title}</span>
-                      <ArrowRight className="h-4 w-4 text-slate-500 group-hover:text-brand-orange-400 transition-transform group-hover:translate-x-1" />
+                      <span className="font-bold text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                        {title}
+                      </span>
+                      <ArrowRight className="h-4 w-4 text-slate-500 transition-transform group-hover:translate-x-1 group-hover:text-brand-orange-400" />
                     </Link>
                   ))}
                 </div>
@@ -563,22 +630,22 @@ export default function BuyFromChineseWebsitesPage() {
         {/* --- NATIVE ACCORDION FAQS --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-center text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl mb-12">
+            <h2 className="mb-12 text-center text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
               Buying from China FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <details 
-                  key={faq.question} 
-                  className="group rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 shadow-sm [&_summary::-webkit-details-marker]:hidden"
+                <details
+                  key={faq.question}
+                  className="group rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold text-slate-950 dark:text-white outline-none transition hover:text-brand-orange-500 dark:hover:text-brand-orange-400">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
                     <span>{renderFaqQuestion(faq.question)}</span>
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800 transition group-open:rotate-180">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 transition group-open:rotate-180 dark:bg-slate-800">
                       <ChevronDown className="h-4 w-4 text-slate-500" />
                     </span>
                   </summary>
-                  <div className="px-6 pb-6 text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <div className="px-6 pb-6 leading-relaxed text-slate-600 dark:text-slate-400">
                     <p>{renderFaqAnswer(faq.question, faq.answer)}</p>
                   </div>
                 </details>
@@ -586,7 +653,6 @@ export default function BuyFromChineseWebsitesPage() {
             </div>
           </div>
         </section>
-
       </main>
       <Footer />
     </>
