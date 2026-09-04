@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail2';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
 
 export async function POST(request: Request) {
   try {
@@ -71,9 +72,7 @@ export async function POST(request: Request) {
     const expectedAmount = lifecycle.payment.due;
     const expectedCurrency = lifecycle.payment.currency;
     const requestedAmount =
-      expectedCurrency === 'NGN'
-        ? requestedNairaAmount
-        : requestedUsdAmount;
+      expectedCurrency === 'NGN' ? requestedNairaAmount : requestedUsdAmount;
 
     if (
       !Number.isFinite(requestedAmount) ||
@@ -92,13 +91,14 @@ export async function POST(request: Request) {
     if (
       currentStatus === 'saved' &&
       expectedCurrency === 'NGN' &&
-      expectedAmount < 100000
+      expectedAmount < lifecycle.payment.minimumOrderNgn
     ) {
       return NextResponse.json(
         {
           statusx: 'MINIMUM_ORDER_AMOUNT',
-          message:
-            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+          message: procurementMinimumOrderMessage(
+            lifecycle.payment.minimumOrderNgn,
+          ),
         },
         { status: 400 },
       );

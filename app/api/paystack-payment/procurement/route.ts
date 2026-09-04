@@ -3,6 +3,7 @@ import xMail from '@/lib/email/xMail';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 import { NextResponse } from 'next/server';
+import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -79,13 +80,14 @@ export async function POST(request: Request) {
     if (
       currentOrderStatus === 'saved' &&
       expectedCurrency === 'NGN' &&
-      expectedAmount < 100000
+      expectedAmount < lifecycle.payment.minimumOrderNgn
     ) {
       return NextResponse.json(
         {
           status: 'error',
-          message:
-            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+          message: procurementMinimumOrderMessage(
+            lifecycle.payment.minimumOrderNgn,
+          ),
         },
         { status: 400 },
       );
@@ -221,18 +223,15 @@ export async function POST(request: Request) {
               currentOrderStatus === 'on-hold'
                 ? lifecycle.order.orderShippingCost
                 : undefined,
-            orderTotalCost:
-              shouldUpdateOrderTotals
-                ? lifecycle.snapshot.orderTotalCost
-                : undefined,
-            orderWeight:
-              shouldUpdateOrderTotals
-                ? lifecycle.snapshot.orderWeight
-                : undefined,
-            orderShippingCost:
-              shouldUpdateOrderTotals
-                ? lifecycle.snapshot.orderShippingCost
-                : undefined,
+            orderTotalCost: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderTotalCost
+              : undefined,
+            orderWeight: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderWeight
+              : undefined,
+            orderShippingCost: shouldUpdateOrderTotals
+              ? lifecycle.snapshot.orderShippingCost
+              : undefined,
             vat: shouldUpdateOrderTotals ? lifecycle.snapshot.vat : undefined,
             serviceCharge: shouldUpdateOrderTotals
               ? lifecycle.snapshot.serviceCharge

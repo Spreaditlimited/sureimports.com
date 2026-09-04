@@ -38,6 +38,11 @@ import {
 } from 'lucide-react';
 
 import PaystackProcurementPaymentButton from '@/components/PaystackProcurementPaymentButton';
+import {
+  DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
+  formatNairaAmount,
+  normalizeProcurementMinimumOrderNgn,
+} from '@/lib/procurement/minimumOrder';
 
 interface ProductData {
   id: number;
@@ -127,6 +132,9 @@ export default function MoreOrders({
   const [onHoldDifference, setOnHoldDifference] = useState<number>(0);
   const [paymentDue, setPaymentDue] = useState<number>(0);
   const [paymentDueCurrency, setPaymentDueCurrency] = useState<'USD' | 'NGN'>('USD');
+  const [minimumOrderNgn, setMinimumOrderNgn] = useState(
+    DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
+  );
 
   const [amountNaira, setAmountNaira] = useState<number>(0);
   const [amountNairaDifference, setAmountNairaDifference] = useState<number>(0);
@@ -143,7 +151,7 @@ export default function MoreOrders({
   const isSavedNigeriaOrderBelowMinimum =
     status === 'saved' &&
     normalizedDestination.includes('nigeria') &&
-    Number(amountNaira || 0) < 100000;
+    Number(amountNaira || 0) < minimumOrderNgn;
   const returnTo = `/dashboard/procurement/view-orders/${status || 'saved'}`;
   const paymentDueUsd =
     paymentDueCurrency === 'NGN' && exNairaToDollar > 0
@@ -198,6 +206,9 @@ export default function MoreOrders({
         setOnHoldDifference(replaceNullWithZero(data.onHoldDifference) as number);
         setPaymentDue(replaceNullWithZero(data.paymentDue) as number);
         setPaymentDueCurrency(data.paymentDueCurrency === 'NGN' ? 'NGN' : 'USD');
+        setMinimumOrderNgn(
+          normalizeProcurementMinimumOrderNgn(data.minimumOrderNgn),
+        );
       } else {
         setGetAllProducts([]);
       }
@@ -504,7 +515,7 @@ export default function MoreOrders({
               </h2>
               <p className="pt-2 text-sm leading-relaxed text-slate-200">
                 We cannot process Nigeria-bound procurement orders below{' '}
-                <span className="font-bold text-white">₦100,000</span>. Please edit
+                <span className="font-bold text-white">{formatNairaAmount(minimumOrderNgn)}</span>. Please edit
                 your order and increase the total before choosing Paystack, wallet,
                 or bank deposit.
               </p>
@@ -834,6 +845,7 @@ export default function MoreOrders({
                   isDisabled={isDisabled}
                   nextStatus="pending"
                   enforceMinimumOrderRules
+                  minimumOrderNgn={minimumOrderNgn}
                   onMinimumOrderBlocked={showMinimumOrderNotice}
                   className={isDisabled 
                     ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 

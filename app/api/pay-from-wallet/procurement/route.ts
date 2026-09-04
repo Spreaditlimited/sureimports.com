@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { recordWalletDebit } from '@/lib/walletLedger';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
 
 const formatNaira = (value: number) =>
   value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -75,8 +76,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           statusx: 'ORDER_AMOUNT_CHANGED',
-          message:
-            'The order amount changed. Refresh the order and try again.',
+          message: 'The order amount changed. Refresh the order and try again.',
           meta: { requiredAmount: payAmount },
         },
         { status: 409 },
@@ -85,13 +85,14 @@ export async function POST(request: NextRequest) {
 
     if (
       String(lifecycle.order.status || '') === 'saved' &&
-      payAmount < 100000
+      payAmount < lifecycle.payment.minimumOrderNgn
     ) {
       return NextResponse.json(
         {
           statusx: 'MINIMUM_ORDER_AMOUNT',
-          message:
-            'We cannot process Nigeria-bound procurement orders below ₦100,000. Please edit your order before paying.',
+          message: procurementMinimumOrderMessage(
+            lifecycle.payment.minimumOrderNgn,
+          ),
         },
         { status: 400 },
       );
@@ -189,17 +190,21 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      await recordWalletDebit(tx, {
-        pidUser: String(pidUser),
-        userEmail: user.userEmail,
-        userFirstname: user.userFirstname,
-        userLastname: user.userLastname,
-      }, {
-        amount: payAmount,
-        reference: `DEBIT:${pidDebit}`,
-        description: 'General procurement payment via wallet',
-        currency: 'NGN',
-      });
+      await recordWalletDebit(
+        tx,
+        {
+          pidUser: String(pidUser),
+          userEmail: user.userEmail,
+          userFirstname: user.userFirstname,
+          userLastname: user.userLastname,
+        },
+        {
+          amount: payAmount,
+          reference: `DEBIT:${pidDebit}`,
+          description: 'General procurement payment via wallet',
+          currency: 'NGN',
+        },
+      );
 
       await tx.payments.create({
         data: {
@@ -241,18 +246,15 @@ export async function POST(request: NextRequest) {
             currentOrderStatus === 'on-hold'
               ? lifecycle.order.orderShippingCost
               : undefined,
-          orderTotalCost:
-            shouldUpdateOrderTotals
-              ? lifecycle.snapshot.orderTotalCost
-              : undefined,
-          orderWeight:
-            shouldUpdateOrderTotals
-              ? lifecycle.snapshot.orderWeight
-              : undefined,
-          orderShippingCost:
-            shouldUpdateOrderTotals
-              ? lifecycle.snapshot.orderShippingCost
-              : undefined,
+          orderTotalCost: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.orderTotalCost
+            : undefined,
+          orderWeight: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.orderWeight
+            : undefined,
+          orderShippingCost: shouldUpdateOrderTotals
+            ? lifecycle.snapshot.orderShippingCost
+            : undefined,
           vat: shouldUpdateOrderTotals ? lifecycle.snapshot.vat : undefined,
           serviceCharge: shouldUpdateOrderTotals
             ? lifecycle.snapshot.serviceCharge

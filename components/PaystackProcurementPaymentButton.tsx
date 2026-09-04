@@ -11,6 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
+import {
+  DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
+  procurementMinimumOrderMessage,
+} from '@/lib/procurement/minimumOrder';
 
 interface PaymentButtonProps {
   amount: number;
@@ -31,6 +35,7 @@ interface PaymentButtonProps {
   nextStatus?: string;
   enforceMinimumOrderRules?: boolean;
   onMinimumOrderBlocked?: () => void;
+  minimumOrderNgn?: number;
 }
 
 type PaystackHandler = {
@@ -106,6 +111,7 @@ export default function PaystackProcurementPaymentButton({
   nextStatus,
   enforceMinimumOrderRules,
   onMinimumOrderBlocked,
+  minimumOrderNgn = DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
 }: PaymentButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -127,8 +133,7 @@ export default function PaystackProcurementPaymentButton({
 
     const amountNairax = Number(amountNaira || 0);
     const totalWeightx = Number(totalWeight || 0);
-    const isNigeria =
-      destinationCountry.trim().toLowerCase() === 'nigeria';
+    const isNigeria = destinationCountry.trim().toLowerCase() === 'nigeria';
 
     if (amount >= 1000 && !isNigeria) {
       alert(
@@ -144,13 +149,15 @@ export default function PaystackProcurementPaymentButton({
       return;
     }
 
-    if (enforceMinimumOrderRules && amountNairax < 100000 && isNigeria) {
+    if (
+      enforceMinimumOrderRules &&
+      amountNairax < minimumOrderNgn &&
+      isNigeria
+    ) {
       if (onMinimumOrderBlocked) {
         onMinimumOrderBlocked();
       } else {
-        alert(
-          'We do not process orders less than N100,000. Please, edit your order.',
-        );
+        alert(procurementMinimumOrderMessage(minimumOrderNgn));
       }
       return;
     }
@@ -274,8 +281,8 @@ export default function PaystackProcurementPaymentButton({
           message: `${paidAmount} has been received successfully. Your order is ready to continue.`,
           redirectTo:
             data.nextStatus || nextStatus
-            ? `/dashboard/procurement/view-orders/${data.nextStatus || nextStatus}`
-            : '/dashboard/success/payment',
+              ? `/dashboard/procurement/view-orders/${data.nextStatus || nextStatus}`
+              : '/dashboard/success/payment',
         });
       } else {
         setPaymentFeedback({
@@ -303,7 +310,11 @@ export default function PaystackProcurementPaymentButton({
 
   return (
     <>
-      <Button onClick={handlePayment} disabled={isLoading} className={className}>
+      <Button
+        onClick={handlePayment}
+        disabled={isLoading}
+        className={className}
+      >
         <CreditCard />
         {isLoading ? '  Processing...  ' : '  Pay with Paystack  '}
       </Button>

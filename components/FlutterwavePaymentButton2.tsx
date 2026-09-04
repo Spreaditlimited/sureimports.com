@@ -79,13 +79,6 @@ export default function PaymentButton({
     // }
 
     //check minimum amount limit in naira
-    // if (amountNairax < 100000 && destinationCountryx == 'Nigeria') {
-    //   alert(
-    //     'We do not process orders less than N100,000. Please, edit your order.',
-    //   );
-    //   return;
-    // }
-
     //check amount limit in naira
     if (totalWeightx < 10 && destinationCountryx != 'Nigeria') {
       alert(

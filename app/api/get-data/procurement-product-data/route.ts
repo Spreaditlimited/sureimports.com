@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
       paymentDue: lifecycle.payment.due,
       paymentDueCurrency: lifecycle.payment.currency,
       lifecycleNextStatus: lifecycle.payment.nextStatus,
+      minimumOrderNgn: lifecycle.payment.minimumOrderNgn,
     });
   } catch (error) {
     console.error('Error calculating procurement order lifecycle:', error);

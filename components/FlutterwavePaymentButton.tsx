@@ -14,6 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog';
+import {
+  DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
+  procurementMinimumOrderMessage,
+} from '@/lib/procurement/minimumOrder';
 
 interface PaymentButtonProps {
   amount: number;
@@ -31,6 +35,7 @@ interface PaymentButtonProps {
   description?: string;
   className?: string;
   isDisabled?: true | false;
+  minimumOrderNgn?: number;
 }
 
 declare global {
@@ -55,6 +60,7 @@ export default function PaymentButton({
   description,
   className,
   isDisabled,
+  minimumOrderNgn = DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
 }: PaymentButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showFlutterwaveLimitModal, setShowFlutterwaveLimitModal] =
@@ -80,17 +86,15 @@ export default function PaymentButton({
       return;
     }
 
-    //check amount limit in naira
-    if (amountNairax >= 50000 && destinationCountryx == 'Nigeria') {
-      setShowFlutterwaveLimitModal(true);
+    //check minimum amount limit in naira
+    if (amountNairax < minimumOrderNgn && destinationCountryx == 'Nigeria') {
+      alert(procurementMinimumOrderMessage(minimumOrderNgn));
       return;
     }
 
-    //check minimum amount limit in naira
-    if (amountNairax < 100000 && destinationCountryx == 'Nigeria') {
-      alert(
-        'We do not process orders less than N100,000. Please, edit your order.',
-      );
+    //check amount limit in naira
+    if (amountNairax >= 50000 && destinationCountryx == 'Nigeria') {
+      setShowFlutterwaveLimitModal(true);
       return;
     }
 

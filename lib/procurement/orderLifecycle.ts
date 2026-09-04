@@ -6,6 +6,7 @@ import {
   procurementEstimateInUsd,
   shippingCostInUsd,
 } from './shippingMath';
+import { normalizeProcurementMinimumOrderNgn } from './minimumOrder';
 
 const EDITABLE_ESTIMATE_STATUSES = new Set(['saved', 'on-hold']);
 
@@ -174,6 +175,9 @@ export async function getProcurementOrderLifecycle(
   const paymentDue = money(
     paymentCurrency === 'NGN' ? paymentDueUsd * ngnPerUsd : paymentDueUsd,
   );
+  const minimumOrderNgn = normalizeProcurementMinimumOrderNgn(
+    financial.procurementMinimumOrderNgn,
+  );
 
   return {
     order,
@@ -215,6 +219,7 @@ export async function getProcurementOrderLifecycle(
       currency: paymentCurrency,
       nextStatus: nextPaidStatus,
       isPayable: paymentDue > 0 && Boolean(nextPaidStatus),
+      minimumOrderNgn,
     },
     snapshot: {
       orderTotalCost: String(dynamicGrandTotalUsd),
