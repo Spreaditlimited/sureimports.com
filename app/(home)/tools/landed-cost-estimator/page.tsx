@@ -66,7 +66,7 @@ function toNumber(v: string): number | null {
   return Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function useOnClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void) {
+function useOnClickOutside(ref: React.RefObject<HTMLElement | null>, handler: () => void) {
   useEffect(() => {
     function onDown(e: MouseEvent) {
       if (!ref.current || ref.current.contains(e.target as Node)) return;

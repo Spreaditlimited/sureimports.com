@@ -1,13 +1,12 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { verifyRecaptchaToken } from '@/lib/security/recaptcha';
+import { prisma } from '@/lib/prisma';
+import { claimAffiliateAttribution } from '@/lib/affiliate/attribution';
 
-const prisma = new PrismaClient();
-
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const { userEmail, userPassword, recaptchaToken } = await request.json();
 
   const isCaptchaValid = await verifyRecaptchaToken(
@@ -126,6 +125,21 @@ export async function POST(request: Request) {
         },
         { status: 200 },
       );
+    }
+
+    const affiliateClaim = await claimAffiliateAttribution(
+      request,
+      user.pidUser,
+      user.userEmail,
+    );
+    if (
+      affiliateClaim &&
+      user.userAffiliateRef !== affiliateClaim.referralCode
+    ) {
+      await prisma.users.update({
+        where: { pidUser: user.pidUser },
+        data: { userAffiliateRef: affiliateClaim.referralCode },
+      });
     }
 
     //generate token with user data payload

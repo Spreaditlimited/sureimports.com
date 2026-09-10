@@ -4,6 +4,10 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 import { recordWalletDebit } from '@/lib/walletLedger';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 const formatNaira = (value: number) =>
   value.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -275,6 +279,19 @@ export async function POST(request: NextRequest) {
         throw new Error('Order status changed while payment was processing.');
       }
     });
+
+    if (currentOrderStatus !== 'pay-for-shipping') {
+      await recordAffiliateConversion({
+        customerReference: String(pidUser),
+        serviceKey: AFFILIATE_SERVICE_KEYS.BUY_FROM_CHINESE_WEBSITES,
+        externalOrderReference: `procurement:${String(pidOrder)}`,
+        externalPaymentReference: `wallet:${txRef}`,
+        paymentCurrency: 'NGN',
+        grossAmount: payAmount,
+        eligibleAmount:
+          lifecycle.productsTotalUsd * lifecycle.rates.ngnPerUsd,
+      });
+    }
 
     return NextResponse.json({
       statusx: 'SUCCESS',

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 
 import {
   confirmReportOrderPayment,
@@ -12,24 +12,63 @@ import {
   ensureCorporateSourcingPayments,
 } from '@/lib/corporateSourcing/payments';
 import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/service';
+import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
+import { paypalEventReversesCommission } from '@/lib/affiliate/reversalPolicy';
+import { sendAffiliateAccountNotification } from '@/lib/affiliate/emailNotifications';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+type AffiliatePayoutNotice = { id: number; pidPayout: string; affiliateId: number; provider: string; currency: string; amount: unknown };
+
+function notifyAffiliatePayout(payout: AffiliatePayoutNotice, status: 'PAID' | 'PROCESSING' | 'FAILED' | 'REVERSED') {
+  const paid = status === 'PAID';
+  const reversed = status === 'REVERSED';
+  const processing = status === 'PROCESSING';
+  after(() => sendAffiliateAccountNotification({
+    affiliateId: payout.affiliateId,
+    eventKey: `payout:${status.toLowerCase()}:${payout.pidPayout}`,
+    eventType: paid ? 'PAYOUT_PAID' : processing ? 'PAYOUT_PROCESSING' : reversed ? 'PAYOUT_REVERSED' : 'PAYOUT_FAILED',
+    subject: paid ? 'Your Sure Imports affiliate payout has been paid' : processing ? 'Your Sure Imports affiliate payout is processing' : reversed ? 'Your Sure Imports affiliate payout was reversed' : 'Your Sure Imports affiliate payout failed',
+    title: paid ? 'Payout completed' : processing ? 'Payout is processing' : reversed ? 'Payout reversed' : 'Payout was not completed',
+    message: paid
+      ? 'Your affiliate payout was completed successfully. Provider processing times may affect when the funds appear in PayPal.'
+      : processing
+        ? 'Your payout has been approved and submitted to PayPal for processing.'
+        : reversed
+          ? 'PayPal reported that this payout was returned or reversed. Review the payout page or contact support if you need assistance.'
+          : 'PayPal could not complete this payout. Review the payout page for the latest status.',
+    facts: [
+      { label: 'Reference', value: payout.pidPayout },
+      { label: 'Provider', value: payout.provider },
+      { label: 'Amount', value: new Intl.NumberFormat('en-US', { style: 'currency', currency: payout.currency }).format(Number(payout.amount)) },
+      { label: 'Status', value: status },
+    ],
+    actionLabel: 'Track payout',
+    actionPath: '/dashboard/payouts',
+  }));
+}
+
 export async function POST(request: Request) {
   const body = await request.json().catch(() => ({}));
+  const signatureHeaders = {
+    'paypal-transmission-id': request.headers.get('paypal-transmission-id'),
+    'paypal-transmission-time': request.headers.get('paypal-transmission-time'),
+    'paypal-cert-url': request.headers.get('paypal-cert-url'),
+    'paypal-auth-algo': request.headers.get('paypal-auth-algo'),
+    'paypal-transmission-sig': request.headers.get('paypal-transmission-sig'),
+  };
+  if (Object.values(signatureHeaders).some((value) => !value)) {
+    return NextResponse.json(
+      { message: 'Invalid PayPal signature.' },
+      { status: 401 },
+    );
+  }
+
   const verification = await verifyPayPalWebhookSignature({
     body,
-    headers: {
-      'paypal-transmission-id': request.headers.get('paypal-transmission-id'),
-      'paypal-transmission-time': request.headers.get(
-        'paypal-transmission-time',
-      ),
-      'paypal-cert-url': request.headers.get('paypal-cert-url'),
-      'paypal-auth-algo': request.headers.get('paypal-auth-algo'),
-      'paypal-transmission-sig': request.headers.get('paypal-transmission-sig'),
-    },
-  });
+    headers: signatureHeaders,
+  }).catch(() => null);
   if (
     String(verification?.verification_status || '').toUpperCase() !== 'SUCCESS'
   ) {
@@ -40,6 +79,82 @@ export async function POST(request: Request) {
   }
 
   const event = String(body?.event_type || '').toUpperCase();
+  if (
+    event.startsWith('PAYMENT.PAYOUTSBATCH.') ||
+    event.startsWith('PAYMENT.PAYOUTS-ITEM.')
+  ) {
+    const senderItemReference = String(
+      body?.resource?.payout_item?.sender_item_id || '',
+    ).trim();
+    const batchReference = String(
+      body?.resource?.batch_header?.payout_batch_id ||
+        body?.resource?.payout_batch_id ||
+        '',
+    ).trim();
+    if (batchReference || senderItemReference) {
+      const payouts = await prisma.$queryRaw<Array<AffiliatePayoutNotice>>`
+        SELECT id, pidPayout, affiliateId, provider, currency, amount FROM affiliate_payouts
+        WHERE externalReference = ${batchReference}
+           OR pidPayout = ${senderItemReference}
+        LIMIT 1
+      `;
+      const payout = payouts[0];
+      if (payout && event === 'PAYMENT.PAYOUTS-ITEM.SUCCEEDED') {
+        await prisma.$transaction([
+          prisma.$executeRaw`
+            UPDATE affiliate_payouts
+            SET status = 'PAID', providerStatus = 'SUCCESS', processedAt = ${new Date()},
+                lastCheckedAt = ${new Date()}, updatedAt = ${new Date()}
+            WHERE id = ${payout.id}
+          `,
+          prisma.$executeRaw`
+            UPDATE affiliate_conversions c
+            INNER JOIN affiliate_payout_items i ON i.conversionId = c.id
+            SET c.status = 'PAID', c.updatedAt = ${new Date()}
+            WHERE i.payoutId = ${payout.id} AND c.status = 'RESERVED'
+          `,
+        ]);
+        notifyAffiliatePayout(payout, 'PAID');
+      } else if (payout && [
+        'PAYMENT.PAYOUTSBATCH.DENIED',
+        'PAYMENT.PAYOUTSBATCH.CANCELED',
+        'PAYMENT.PAYOUTS-ITEM.BLOCKED',
+        'PAYMENT.PAYOUTS-ITEM.CANCELED',
+        'PAYMENT.PAYOUTS-ITEM.FAILED',
+        'PAYMENT.PAYOUTS-ITEM.REFUNDED',
+        'PAYMENT.PAYOUTS-ITEM.RETURNED',
+      ].includes(event)) {
+        await prisma.$transaction([
+          prisma.$executeRaw`
+            UPDATE affiliate_payouts
+            SET status = 'FAILED', providerStatus = ${event.split('.').pop() || 'FAILED'},
+                failedAt = ${new Date()}, processedAt = NULL,
+                lastCheckedAt = ${new Date()}, updatedAt = ${new Date()}
+            WHERE id = ${payout.id}
+          `,
+          prisma.$executeRaw`
+            UPDATE affiliate_conversions c
+            INNER JOIN affiliate_payout_items i ON i.conversionId = c.id
+            SET c.status = 'RESERVED', c.updatedAt = ${new Date()}
+            WHERE i.payoutId = ${payout.id} AND c.status <> 'VOIDED'
+          `,
+        ]);
+        notifyAffiliatePayout(
+          payout,
+          ['PAYMENT.PAYOUTS-ITEM.REFUNDED', 'PAYMENT.PAYOUTS-ITEM.RETURNED'].includes(event) ? 'REVERSED' : 'FAILED',
+        );
+      } else if (payout) {
+        await prisma.$executeRaw`
+          UPDATE affiliate_payouts
+          SET status = 'PROCESSING', providerStatus = ${event.split('.').pop() || 'PROCESSING'},
+              lastCheckedAt = ${new Date()}, updatedAt = ${new Date()}
+          WHERE id = ${payout.id} AND status NOT IN ('PAID', 'FAILED')
+        `;
+        notifyAffiliatePayout(payout, 'PROCESSING');
+      }
+    }
+    return NextResponse.json({ received: true });
+  }
   if (
     ![
       'PAYMENT.CAPTURE.COMPLETED',
@@ -68,6 +183,16 @@ export async function POST(request: Request) {
   ).trim();
   if (!orderId && !captureReference)
     return NextResponse.json({ received: true });
+  const reversesPayment = paypalEventReversesCommission(event);
+  if (reversesPayment) {
+    await voidAffiliateConversions({
+      externalPaymentReferences: [captureReference, orderId]
+        .filter(Boolean)
+        .map((reference) => `paypal:${reference}`),
+      reason: `PayPal reported ${event}.`,
+      reversalReference: `paypal:${String(body?.id || captureReference || orderId)}`,
+    });
+  }
   const supplierPayment = await prisma.supplier_verification_payments.findFirst({
     where: {
       paymentProvider: 'paypal',
@@ -109,6 +234,11 @@ export async function POST(request: Request) {
           data: requestUpdate,
         }),
       ]);
+      await voidAffiliateConversions({
+        externalOrderReference: `supplier-verification:${supplierPayment.requestId}`,
+        reason: `PayPal reported ${event} for Supplier Verification request ${supplierPayment.requestId}.`,
+        reversalReference: `paypal:${String(body?.id || captureReference || orderId)}`,
+      });
       return NextResponse.json({ received: true });
     }
     const paypalOrder = await getPayPalOrder(orderId || supplierPayment.providerReference || '');

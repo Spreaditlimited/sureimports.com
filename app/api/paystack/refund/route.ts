@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
 
 interface RefundRequest {
   transaction: string | number;
@@ -117,6 +118,17 @@ export async function POST(request: NextRequest) {
         },
         { status: paystackResponse.status },
       );
+    }
+
+    const transactionReference = String(
+      responseData.data?.transaction?.reference || body.transaction,
+    ).trim();
+    if (transactionReference) {
+      await voidAffiliateConversions({
+        externalPaymentReferences: [`paystack:${transactionReference}`],
+        reason: `Paystack accepted refund ${String(responseData.data?.id || transactionReference)}.`,
+        reversalReference: `paystack-refund:${String(responseData.data?.id || transactionReference)}`,
+      });
     }
 
     // Return successful response

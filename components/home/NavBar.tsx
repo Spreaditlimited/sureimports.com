@@ -340,7 +340,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                   src="/images/svg-logo.svg"
                   alt="Sure Imports"
                   width={180}
-                  height={40}
+                  height={29}
                   priority
                   className="h-8 w-auto dark:hidden"
                 />
@@ -348,7 +348,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                   src="/images/svg-logo-white.svg"
                   alt=""
                   width={180}
-                  height={40}
+                  height={29}
                   className="hidden h-8 w-auto dark:block"
                 />
               </>
@@ -357,7 +357,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                 src="/images/svg-logo-white.svg"
                 alt="Sure Imports"
                 width={180}
-                height={40}
+                height={29}
                 priority
                 className="h-8 w-auto"
               />
@@ -485,7 +485,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                       src="/images/svg-logo-white.svg"
                       alt="Sure Imports"
                       width={140}
-                      height={30}
+                      height={22}
                     />
                   </div>
 

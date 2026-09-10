@@ -243,7 +243,7 @@ export async function POST(req: NextRequest) {
           lastName: names.slice(1).join(' '),
           phone: data.whatsappNumber,
           country: payment.billingCountry || undefined,
-          affiliateRef: 'corporate-sourcing',
+          attributionRequest: req,
           accountSetupKey: `corporate_sourcing:${pidPayment}`,
         });
         if (account.status === 'ready') {

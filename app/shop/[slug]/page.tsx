@@ -28,9 +28,9 @@ import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
 function ProductDetailsContent({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const resolvedParams = use(params);
+  const resolvedParams = params;
   const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useShopCart();
 
@@ -412,10 +412,11 @@ function ProductDetailsContent({
   );
 }
 
-export default function ProductDetailsPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default function ProductDetailsPage(
+  props: {
+    params: Promise<{ slug: string }>;
+  }
+) {
+  const params = use(props.params);
   return <ProductDetailsContent params={params} />;
 }

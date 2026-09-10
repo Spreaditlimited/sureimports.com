@@ -17,6 +17,7 @@ type UserLayoutProps = {
 };
 
 function PaySupplier(props: UserLayoutProps) {
+  const { children } = props;
   const router = useRouter();
   const path = usePathname();
 
@@ -50,7 +51,7 @@ function PaySupplier(props: UserLayoutProps) {
       <main>
         <RecordCountSpecialSourcingProvider>
           <OrderCount params={{ statusx: 'saved' }} />
-          {props.children}
+          {children}
         </RecordCountSpecialSourcingProvider>
       </main>
     </div>

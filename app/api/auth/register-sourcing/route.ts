@@ -12,7 +12,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
-import { secureInput } from '@/utils/secureInput';
+import {
+  claimAffiliateAttribution,
+  resolveAffiliateReference,
+} from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
@@ -23,25 +26,7 @@ export async function POST(request: NextRequest) {
     phone,
     password,
     confirmPassword,
-    userAffiliateRef,
   } = await request.json();
-
-  // Clean affiliate code
-  const userAffiliateRefx = secureInput(userAffiliateRef);
-  if (!userAffiliateRefx) {
-    //GET RESPONSE MESSAGE FOR THE FORM FEEDBACK
-    const messagex = {
-      message1: 'Invalid Data Processed',
-      message2: 'SUCCESS',
-      message3: 200,
-    };
-    const statusx = 'SUCCESS';
-    //RETURN RESPONSE
-    return NextResponse.json(
-      { messagex, statusx, success: false, userx: null },
-      { status: 401 },
-    );
-  }
 
   const sessioncode = randomGenerator(10);
 
@@ -166,6 +151,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const userAffiliateRefx = await resolveAffiliateReference(request, email);
+
   // Create a user in db
   const create = await prisma.users.create({
     data: {
@@ -184,6 +171,7 @@ export async function POST(request: NextRequest) {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+  await claimAffiliateAttribution(request, create.pidUser, email);
 
   //send mail
   try {

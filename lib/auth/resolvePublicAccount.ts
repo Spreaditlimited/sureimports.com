@@ -1,12 +1,17 @@
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
+import type { NextRequest } from 'next/server';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { sendMail } from '@/lib/mail';
 import { requestMarketingOptIn } from '@/lib/marketing/contactLedger';
 import { belongsToSesMarketing } from '@/lib/marketing/cutover';
 import { prisma } from '@/lib/prisma';
+import {
+  claimAffiliateAttribution,
+  resolveAffiliateReference,
+} from '@/lib/affiliate/attribution';
 
 type ResolvePublicAccountInput = {
   authenticatedPidUser?: string | null;
@@ -15,7 +20,7 @@ type ResolvePublicAccountInput = {
   lastName?: string;
   phone?: string;
   country?: string;
-  affiliateRef: string;
+  attributionRequest?: NextRequest;
   defaultFirstName?: string;
   accountSetupKey?: string;
 };
@@ -113,6 +118,9 @@ export async function resolvePublicAccount(
   const setupExpiresAt = requiresSetup
     ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
     : null;
+  const affiliateRef = input.attributionRequest
+    ? await resolveAffiliateReference(input.attributionRequest, email)
+    : 'NO_REF';
 
   const baseData = {
     pidUser: `CUS${randomGenerator(10)}`,
@@ -134,7 +142,7 @@ export async function resolvePublicAccount(
     loginStamp: setupExpiresAt,
     userStatus: 'AL1',
     userAffiliateCode: randomGenerator(6),
-    userAffiliateRef: input.affiliateRef,
+    userAffiliateRef: affiliateRef,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -148,6 +156,13 @@ export async function resolvePublicAccount(
           userAffiliateCode: randomGenerator(6),
         },
       });
+      if (input.attributionRequest) {
+        await claimAffiliateAttribution(
+          input.attributionRequest,
+          user.pidUser,
+          email,
+        );
+      }
       return { status: 'ready', user, createdNewAccount: true };
     } catch (error) {
       const concurrentUser = await prisma.users.findUnique({

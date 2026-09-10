@@ -35,15 +35,13 @@ const nextConfig = {
       ignoreBuildErrors: true,
     },
   
-    eslint: {
-        ignoreDuringBuilds: true,
-      },
     experimental: {
       serverActions: {
         bodySizeLimit: '55mb',
       },
     },
     images: {
+        qualities: [75, 100],
         remotePatterns: [
           {
             protocol: 'https',

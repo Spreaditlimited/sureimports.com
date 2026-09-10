@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
+import type { NextRequest } from 'next/server';
 
 import {
   requestPublicAccountMarketingOptIn,
@@ -11,6 +12,12 @@ import {
   isTerminalReportOrderStatus,
   TERMINAL_REPORT_ORDER_STATUSES,
 } from '@/lib/intelligence/reportOrderPolicy';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+  voidAffiliateConversions,
+} from '@/lib/affiliate/commissions';
+import { claimAffiliateReferralByReference } from '@/lib/affiliate/attribution';
 
 function siteUrl(path: string) {
   const base =
@@ -31,6 +38,28 @@ function escapeHtml(value: string | null | undefined) {
 
 function eventId() {
   return `SIRE${randomBytes(12).toString('hex').toUpperCase()}`;
+}
+
+async function recordReportAffiliateConversion(order: {
+  pidOrder: string;
+  pidUser: string | null;
+  affiliateReferralReference: string | null;
+  paymentProvider: string;
+  providerReference: string | null;
+  providerCaptureReference: string | null;
+  amountMinor: number;
+  currency: string;
+}) {
+  return recordAffiliateConversion({
+    customerReference: order.pidUser,
+    referralReference: order.affiliateReferralReference,
+    serviceKey: AFFILIATE_SERVICE_KEYS.SUPPLIER_REPORTS,
+    externalOrderReference: `supplier-report:${order.pidOrder}`,
+    externalPaymentReference: `${order.paymentProvider}:${order.providerCaptureReference || order.providerReference || order.pidOrder}`,
+    paymentCurrency: order.currency,
+    grossAmount: order.amountMinor / 100,
+    eligibleAmount: order.amountMinor / 100,
+  });
 }
 
 export async function recordReportOrderEvent(input: {
@@ -80,6 +109,10 @@ export async function confirmReportOrderPayment(input: {
   });
   if (!existing) throw new Error('Report order was not found.');
   if (isTerminalReportOrderStatus(existing.status)) return existing;
+  if (existing.status === 'paid') {
+    await recordReportAffiliateConversion(existing);
+    return existing;
+  }
 
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
@@ -106,7 +139,12 @@ export async function confirmReportOrderPayment(input: {
     where: { pidOrder: input.pidOrder },
   });
   if (!updated) throw new Error('Report order was not found.');
-  if (paymentUpdate.count === 0) return updated;
+  if (paymentUpdate.count === 0) {
+    if (updated.status === 'paid') {
+      await recordReportAffiliateConversion(updated);
+    }
+    return updated;
+  }
   if (existing.status !== 'paid' || input.providerEventId) {
     await recordReportOrderEvent({
       orderId: input.pidOrder,
@@ -117,28 +155,50 @@ export async function confirmReportOrderPayment(input: {
       nextStatus: 'paid',
     });
   }
+  await recordReportAffiliateConversion(updated);
   return updated;
 }
 
-async function ensureBuyer(order: {
-  pidOrder: string;
-  pidUser: string | null;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  billingCountry: string | null;
-}) {
+async function ensureBuyer(
+  order: {
+    pidOrder: string;
+    pidUser: string | null;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    billingCountry: string | null;
+    affiliateReferralReference: string | null;
+  },
+  attributionRequest?: NextRequest,
+) {
+  const attachAffiliate = async (pidUser: string, email: string) => {
+    const claim = await claimAffiliateReferralByReference(
+      order.affiliateReferralReference,
+      pidUser,
+      email,
+    );
+    if (claim) {
+      await prisma.users.updateMany({
+        where: { pidUser, userAffiliateRef: { not: claim.referralCode } },
+        data: { userAffiliateRef: claim.referralCode },
+      });
+    }
+  };
   if (order.pidUser) {
     const user = await prisma.users.findUnique({
       where: { pidUser: order.pidUser },
     });
-    if (user) return { user, createdNewAccount: false };
+    if (user) {
+      await attachAffiliate(user.pidUser, user.userEmail);
+      return { user, createdNewAccount: false };
+    }
   }
 
   const existing = await prisma.users.findUnique({
     where: { userEmail: order.email.trim().toLowerCase() },
   });
   if (existing) {
+    await attachAffiliate(existing.pidUser, existing.userEmail);
     await prisma.intelligence_report_orders.update({
       where: { pidOrder: order.pidOrder },
       data: { pidUser: existing.pidUser, updatedAt: new Date() },
@@ -151,7 +211,7 @@ async function ensureBuyer(order: {
     firstName: order.firstName || undefined,
     lastName: order.lastName || undefined,
     country: order.billingCountry || undefined,
-    affiliateRef: 'supplier-intelligence-report',
+    attributionRequest,
     accountSetupKey: `supplier_intelligence_report:${order.pidOrder}`,
   });
   if (account.status !== 'ready') {
@@ -159,19 +219,28 @@ async function ensureBuyer(order: {
       where: { userEmail: order.email.trim().toLowerCase() },
     });
     if (!concurrent) throw new Error('Unable to connect the buyer account.');
+    await attachAffiliate(concurrent.pidUser, concurrent.userEmail);
+    await prisma.intelligence_report_orders.update({
+      where: { pidOrder: order.pidOrder },
+      data: { pidUser: concurrent.pidUser, updatedAt: new Date() },
+    });
     return { user: concurrent, createdNewAccount: false };
   }
   await prisma.intelligence_report_orders.update({
     where: { pidOrder: order.pidOrder },
     data: { pidUser: account.user.pidUser, updatedAt: new Date() },
   });
+  await attachAffiliate(account.user.pidUser, account.user.userEmail);
   return {
     user: account.user,
     createdNewAccount: account.createdNewAccount,
   };
 }
 
-export async function deliverReportOrder(pidOrder: string) {
+export async function deliverReportOrder(
+  pidOrder: string,
+  attributionRequest?: NextRequest,
+) {
   const order = await prisma.intelligence_report_orders.findUnique({
     where: { pidOrder },
   });
@@ -223,7 +292,10 @@ export async function deliverReportOrder(pidOrder: string) {
   }
 
   try {
-    const { user: buyer, createdNewAccount } = await ensureBuyer(order);
+    const { user: buyer, createdNewAccount } = await ensureBuyer(
+      order,
+      attributionRequest,
+    );
     const downloadUrl = siteUrl(
       `/api/intelligence/reports/download?token=${encodeURIComponent(order.downloadToken)}`,
     );
@@ -332,7 +404,7 @@ export async function transitionReportOrderAccess(input: {
     });
     if (!accepted) return order;
   }
-  return prisma.intelligence_report_orders.update({
+  const updated = await prisma.intelligence_report_orders.update({
     where: { pidOrder: input.pidOrder },
     data: {
       status: input.status,
@@ -343,4 +415,13 @@ export async function transitionReportOrderAccess(input: {
       updatedAt: new Date(),
     },
   });
+  await voidAffiliateConversions({
+    externalOrderReference: `supplier-report:${input.pidOrder}`,
+    reason:
+      input.reason ||
+      `Supplier Report order ${input.pidOrder} was ${input.status}.`,
+    reversalReference:
+      input.providerEventId || `${input.source}:${input.eventType}`,
+  });
+  return updated;
 }

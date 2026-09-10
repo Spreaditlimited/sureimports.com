@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
       firstName: normalize(body?.account?.firstName),
       lastName: normalize(body?.account?.lastName),
       phone: normalize(body?.account?.phone),
-      affiliateRef: 'NO_REF',
+      attributionRequest: request,
     });
     if (account.status === 'login_required') {
       return NextResponse.json(

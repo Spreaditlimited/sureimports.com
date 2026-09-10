@@ -25,9 +25,9 @@ import { resolveMediaUrl } from '@/lib/cloudinary/url';
 function ProductDetailsContent({
   params,
 }: {
-  params: Promise<{ productId: string }>;
+  params: { productId: string };
 }) {
-  const resolvedParams = use(params);
+  const resolvedParams = params;
   const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useShopCart();
 
@@ -410,10 +410,11 @@ function ProductDetailsContent({
   );
 }
 
-export default function ProductDetailsPage({
-  params,
-}: {
-  params: Promise<{ productId: string }>;
-}) {
+export default function ProductDetailsPage(
+  props: {
+    params: Promise<{ productId: string }>;
+  }
+) {
+  const params = use(props.params);
   return <ProductDetailsContent params={params} />;
 }

@@ -8,4 +8,3 @@ export default async function CustomerInvoicePage({
   const { accessToken } = await params;
   return <CustomerInvoiceClient accessToken={accessToken} />;
 }
-

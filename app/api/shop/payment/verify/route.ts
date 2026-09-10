@@ -25,6 +25,10 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import xMail from '@/lib/email/xMail3';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 export async function GET(request: NextRequest) {
   try {
@@ -89,6 +93,7 @@ export async function GET(request: NextRequest) {
     const pidUser = metadata.pidUser;
     const cartItems = metadata.cart_items || [];
     const amount = transactionData.amount / 100; // Convert from kobo to naira
+    const paymentCurrency = String(transactionData.currency || 'NGN').toUpperCase();
     const shippingAddressSnapshot =
       typeof metadata?.shipping_address === 'string'
         ? metadata.shipping_address.trim()
@@ -109,6 +114,42 @@ export async function GET(request: NextRequest) {
         },
         { status: 404 },
       );
+    }
+
+    const productIds = cartItems
+      .map((item: any) => String(item?.pidProduct || '').trim())
+      .filter(Boolean);
+    const purchasedProducts = productIds.length
+      ? await prisma.store.findMany({
+          where: { pidProduct: { in: productIds } },
+          select: { productCategory: true },
+        })
+      : [];
+    const hasEligiblePhoneOrLaptop = purchasedProducts.some((product) =>
+      ['phone', 'laptop'].includes(
+        String(product.productCategory || '').trim().toLowerCase(),
+      ),
+    );
+
+    const existingPayment = await prisma.payments.findFirst({
+      where: { txRef: reference, paymentStatus: 'PAID', serviceName: 'SHOP' },
+    });
+    if (existingPayment) {
+      if (hasEligiblePhoneOrLaptop) {
+        await recordAffiliateConversion({
+          customerReference: String(pidUser),
+          serviceKey: AFFILIATE_SERVICE_KEYS.PHONES_AND_LAPTOPS,
+          externalOrderReference: `shop:${reference}`,
+          externalPaymentReference: `paystack:${reference}`,
+          paymentCurrency,
+          grossAmount: amount,
+          eligibleAmount: amount,
+        });
+      }
+      return NextResponse.json({
+        statusx: 'SUCCESS',
+        message: 'Payment already verified.',
+      });
     }
 
     const email = user.userEmail;
@@ -137,7 +178,7 @@ export async function GET(request: NextRequest) {
           txRef: txREF,
           paymentStatus: 'PAID',
           paymentType: 'PAYSTACK',
-          currency: 'NGN',
+          currency: paymentCurrency,
           amount: amount,
           serviceID: serviceID,
           serviceName: 'SHOP',
@@ -185,6 +226,18 @@ export async function GET(request: NextRequest) {
     });
 
     console.log('Database records created successfully');
+
+    if (hasEligiblePhoneOrLaptop) {
+      await recordAffiliateConversion({
+        customerReference: String(pidUser),
+        serviceKey: AFFILIATE_SERVICE_KEYS.PHONES_AND_LAPTOPS,
+        externalOrderReference: `shop:${reference}`,
+        externalPaymentReference: `paystack:${reference}`,
+        paymentCurrency,
+        grossAmount: amount,
+        eligibleAmount: amount,
+      });
+    }
 
     // Send confirmation emails
     console.log('Sending confirmation emails...');

@@ -21,7 +21,7 @@ async function getBusinessName(pidUser: string) {
 }
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get('token')?.value;
 
   if (!token) {

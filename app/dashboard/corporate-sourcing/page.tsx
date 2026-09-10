@@ -311,7 +311,7 @@ export default function CorporateGiftsDashboardPage() {
         }
         if (data?.statusx === 'NO_WALLET') {
           toast.warning(data.message || 'Please activate your wallet first.');
-          window.location.href = '/dashboard/wallet';
+          router.push('/dashboard/wallet');
           return;
         }
         if (data?.statusx === 'INSUFFICIENT_WALLET_BALANCE') {

@@ -8,10 +8,11 @@ type UserLayoutProps = {
 };
 
 const ProcurementLayout = (props: UserLayoutProps) => {
+  const { children } = props;
   return (
     <main className="bg-slate-50 dark:bg-black">
       <RecordCountProcurementProvider>
-        {props.children}
+        {children}
       </RecordCountProcurementProvider>
     </main>
   );

@@ -5,21 +5,38 @@ import { useEffect } from 'react';
 export const AffiliateTracker = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const affRef = urlParams.get('affRef');
+    const affiliateCode = urlParams.get('ref') || urlParams.get('affRef');
 
-    if (affRef) {
-      // Set cookie for 30 days
-      const expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + 30);
+    if (!affiliateCode) return;
 
-      document.cookie = `affRef=${affRef}; expires=${expiryDate.toUTCString()}; path=/; domain=.sureimports.com; secure; sameSite=lax`;
-
-      // Optional: Store in localStorage as backup
-      localStorage.setItem('affRef', affRef);
-      localStorage.setItem('affRefTimestamp', Date.now().toString());
-
-      console.log('Affiliate reference tracked:', affRef);
+    let source = urlParams.get('utm_source') || '';
+    if (!source && document.referrer) {
+      try {
+        source = new URL(document.referrer).hostname;
+      } catch {
+        source = '';
+      }
     }
+
+    void fetch('/api/affiliate/track', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        code: affiliateCode,
+        landingPath: window.location.pathname,
+        source,
+      }),
+    }).finally(() => {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.searchParams.delete('ref');
+      cleanUrl.searchParams.delete('affRef');
+      window.history.replaceState(
+        window.history.state,
+        '',
+        `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`,
+      );
+    });
   }, []);
 
   return null;

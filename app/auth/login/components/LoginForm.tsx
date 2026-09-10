@@ -153,6 +153,7 @@ export default function LoginForm() {
             src="/images/hero-background-1.png"
             alt="Global Logistics Port"
             fill
+            sizes="50vw"
             className="object-cover opacity-30 mix-blend-luminosity"
             priority
           />
@@ -168,7 +169,7 @@ export default function LoginForm() {
               src="/images/svg-logo-white.svg"
               alt="Sure Imports"
               width={180}
-              height={40}
+              height={29}
               className="h-8 w-auto"
             />
           </Link>
@@ -196,7 +197,7 @@ export default function LoginForm() {
                 src="/images/svg-logo.svg"
                 alt="Sure Imports"
                 width={140}
-                height={32}
+                height={22}
                 className="h-8 w-auto dark:hidden"
               />
               <Image

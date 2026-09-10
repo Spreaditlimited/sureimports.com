@@ -1,9 +1,7 @@
 'use client';
 
-import React from 'react';
-import logo from '@/public/assets/images/svg/Printin_logo.svg';
-import Image from 'next/image';
-import { PaystackButton } from 'react-paystack';
+import React, { useRef } from 'react';
+import PaystackPop from '@paystack/inline-js';
 import '@/app/styles/App.css';
 import { useRouter } from 'next/navigation';
 import xMail from '@/lib/email/xMail';
@@ -28,16 +26,8 @@ const Paystack: React.FC<Props> = ({
   disabled,
 }) => {
   const router = useRouter();
-  let amountz = amountx;
-  let ref = new Date().getTime().toString();
-
-  const config = {
-    reference: ref,
-    email: emailx,
-    amount: amountz * 100 * quantityx, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY as string,
-    currency: currency,
-  };
+  const amountz = amountx;
+  const reference = useRef<string | null>(null);
 
   // you can call this function anything
   const handlePaystackSuccessAction = async (reference: any) => {
@@ -49,7 +39,7 @@ const Paystack: React.FC<Props> = ({
     const xTitle = `SureImport Receipt`;
     const xBodyTitle = `SureImport Receipt`;
     const xBody1 = `Thank you for placing your order with <b>SureImport, </b>.</i>`;
-    const line1 = `<h3>Request Order Ref: <b>${ref}</b></h3><hr />`;
+    const line1 = `<h3>Request Order Ref: <b>${reference.current}</b></h3><hr />`;
     const line2 = `<h3>Amount Paid: <b>₦${amountz.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b></h3><hr />`;
     const xBody2 = line1 + line2;
     const xButtonTitle = `Go to Dashboard`;
@@ -76,19 +66,36 @@ const Paystack: React.FC<Props> = ({
     console.log('closed');
   };
 
-  const componentProps = {
-    ...config,
-    text: titlex,
-    disabled: disabled,
-    onSuccess: (reference: any) => handlePaystackSuccessAction(reference),
-    onClose: handlePaystackCloseAction,
+  const openCheckout = () => {
+    const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY;
+    if (!publicKey) {
+      console.error('NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY is not configured.');
+      return;
+    }
+
+    const paymentReference = `SUREIMPORTS-${Date.now()}`;
+    reference.current = paymentReference;
+    const paystack = new PaystackPop();
+    paystack.newTransaction({
+      key: publicKey,
+      reference: paymentReference,
+      email: emailx,
+      amount: amountz * 100 * quantityx,
+      currency,
+      onSuccess: handlePaystackSuccessAction,
+      onCancel: handlePaystackCloseAction,
+    });
   };
 
   return (
-    <PaystackButton
+    <button
+      type="button"
       className="flex w-full flex-1 items-center justify-center rounded-md bg-blue-600 p-3 font-medium text-white transition-colors hover:bg-blue-700"
-      {...componentProps}
-    />
+      disabled={disabled}
+      onClick={openCheckout}
+    >
+      {titlex}
+    </button>
   );
 };
 

@@ -1,5 +1,9 @@
 import { randomBytes } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 export const SUPPLIER_VERIFICATION_SETTINGS_KEY = 'supplier_verification';
 export const SUPPLIER_VERIFICATION_TERMS_VERSION = '2026-09-02';
@@ -142,14 +146,14 @@ export async function confirmSupplierVerificationPayment(input: {
   providerEventId?: string | null;
   paidAt?: Date | null;
 }) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const payment = await tx.supplier_verification_payments.findUnique({
       where: { pidPayment: input.pidPayment },
       include: { request: true },
     });
     if (!payment)
       throw new Error('Supplier Verification payment was not found.');
-    if (payment.status === 'paid') return payment;
+    if (payment.status === 'paid') return { payment, request: payment.request };
     const updatedPayment = await tx.supplier_verification_payments.update({
       where: { pidPayment: payment.pidPayment },
       data: {
@@ -200,8 +204,24 @@ export async function confirmSupplierVerificationPayment(input: {
         visibility: 'CUSTOMER',
       },
     });
-    return updatedPayment;
+    return { payment: updatedPayment, request: payment.request };
   });
+
+  if (
+    result.payment.paymentPurpose !== SUPPLIER_PAYMENT_PURPOSES.PHYSICAL_VISIT
+  ) {
+    await recordAffiliateConversion({
+      customerReference: result.request.pidUser,
+      serviceKey: AFFILIATE_SERVICE_KEYS.SUPPLIER_VERIFICATION,
+      externalOrderReference: `supplier-verification:${result.payment.requestId}`,
+      externalPaymentReference: `${result.payment.paymentProvider}:${result.payment.providerCaptureReference || result.payment.providerReference || result.payment.pidPayment}`,
+      paymentCurrency: result.payment.currency,
+      grossAmount: result.payment.amountMinor / 100,
+      eligibleAmount: result.payment.serviceFeeMinor / 100,
+    });
+  }
+
+  return result.payment;
 }
 
 export function publicVerificationRequest<T extends Record<string, any>>(

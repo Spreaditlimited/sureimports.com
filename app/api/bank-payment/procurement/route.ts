@@ -149,25 +149,7 @@ export async function POST(request: Request) {
     }
 
     const shouldFreezeEstimate = currentStatus !== 'pay-for-shipping';
-    await prisma.$transaction(async (tx) => {
-      await tx.bank_payment.create({
-        data: {
-          pidUser,
-          pidOrder: serviceID,
-          pidBankPayment,
-          pidBank: bank,
-          amount: String(expectedAmount),
-          currency: expectedCurrency,
-          depositorName: depositor,
-          trxNumber: pidBankPayment,
-          serviceType: pendingStatus,
-          bankStatus: 'PENDING',
-          ext1: serviceDescription,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
-
+    const canonicalBankPayment = await prisma.$transaction(async (tx) => {
       const updatedOrder = await tx.orders.updateMany({
         where: { pidUser, pidOrder: serviceID, status: currentStatus },
         data: {
@@ -203,6 +185,65 @@ export async function POST(request: Request) {
       if (updatedOrder.count !== 1) {
         throw new Error('Order status changed while payment was submitted.');
       }
+
+      const existingPending = await tx.bank_payment.findFirst({
+        where: {
+          pidOrder: serviceID,
+          serviceType: pendingStatus,
+          bankStatus: 'PENDING',
+        },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      });
+
+      if (existingPending) {
+        await tx.bank_payment.updateMany({
+          where: {
+            pidOrder: serviceID,
+            serviceType: pendingStatus,
+            bankStatus: 'PENDING',
+            id: { not: existingPending.id },
+          },
+          data: {
+            bankStatus: 'SUPERSEDED',
+            status: 'SUPERSEDED',
+            updatedAt: new Date(),
+          },
+        });
+        return tx.bank_payment.update({
+          where: { id: existingPending.id },
+          data: {
+            pidUser,
+            pidBank: bank,
+            amount: String(expectedAmount),
+            currency: expectedCurrency,
+            depositorName: depositor,
+            trxNumber: existingPending.pidBankPayment,
+            bankStatus: 'PENDING',
+            status: 'PENDING',
+            ext1: serviceDescription,
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      return tx.bank_payment.create({
+        data: {
+          pidUser,
+          pidOrder: serviceID,
+          pidBankPayment,
+          pidBank: bank,
+          amount: String(expectedAmount),
+          currency: expectedCurrency,
+          depositorName: depositor,
+          trxNumber: pidBankPayment,
+          serviceType: pendingStatus,
+          bankStatus: 'PENDING',
+          status: 'PENDING',
+          ext1: serviceDescription,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
     });
 
     try {
@@ -220,7 +261,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { statusx: 'SUCCESS', message: 'Bank details uploaded successfully!' },
+      {
+        statusx: 'SUCCESS',
+        message: 'Bank details uploaded successfully!',
+        pidBankPayment: canonicalBankPayment.pidBankPayment,
+      },
       { status: 200 },
     );
   } catch (error) {

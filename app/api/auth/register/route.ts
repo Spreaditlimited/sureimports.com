@@ -12,8 +12,11 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
-import { secureInput } from '@/utils/secureInput';
 import { verifyRecaptchaToken } from '@/lib/security/recaptcha';
+import {
+  claimAffiliateAttribution,
+  resolveAffiliateReference,
+} from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
@@ -24,7 +27,6 @@ export async function POST(request: NextRequest) {
     phone,
     password,
     confirmPassword,
-    userAffiliateRef,
     recaptchaToken,
   } = await request.json();
 
@@ -42,23 +44,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { messagex, statusx: 'FAILED_CAPTCHA', successx: false, userx: null },
       { status: 400 },
-    );
-  }
-
-  // Clean affiliate code
-  const userAffiliateRefx = secureInput(userAffiliateRef);
-  if (!userAffiliateRefx) {
-    //GET RESPONSE MESSAGE FOR THE FORM FEEDBACK
-    const messagex = {
-      message1: 'Invalid Data Processed',
-      message2: 'SUCCESS',
-      message3: 200,
-    };
-    const statusx = 'SUCCESS';
-    //RETURN RESPONSE
-    return NextResponse.json(
-      { messagex, statusx, successx: false, userx: null },
-      { status: 401 },
     );
   }
 
@@ -187,6 +172,8 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const userAffiliateRefx = await resolveAffiliateReference(request, email);
+
   // Create a user in db
   const create = await prisma.users.create({
     data: {
@@ -205,6 +192,7 @@ export async function POST(request: NextRequest) {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+  await claimAffiliateAttribution(request, create.pidUser, email);
 
   // Send the verification email after responding so SMTP delays do not block signup.
   after(async () => {

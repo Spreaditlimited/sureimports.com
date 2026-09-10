@@ -17,6 +17,10 @@ import {
   getIntelligenceSubscriptionPaymentError,
   getPaystackPaymentPlanCode,
 } from '@/lib/intelligence/subscriptionPaymentPolicy';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 export class IntelligenceSubscriptionNotFoundError extends Error {}
 export class IntelligenceSubscriptionPaymentError extends Error {}
@@ -185,6 +189,16 @@ export async function activateIntelligenceSubscriptionPayment(payment: any) {
     amount: configuredPlan.monthlySearchCredits,
     reason: `${planKey}_monthly_search_credits`,
     reference,
+  });
+
+  await recordAffiliateConversion({
+    customerReference: activatedSubscription.pidUser,
+    serviceKey: AFFILIATE_SERVICE_KEYS.SUPPLIER_INTELLIGENCE,
+    externalOrderReference: `supplier-intelligence:${activatedSubscription.pidSubscription}:${reference}`,
+    externalPaymentReference: `paystack:${reference}`,
+    paymentCurrency: String(payment.currency || activatedSubscription.currency),
+    grossAmount: Number(payment.amount) / 100,
+    eligibleAmount: Number(payment.amount) / 100,
   });
 
   if (planKey === 'pro') {

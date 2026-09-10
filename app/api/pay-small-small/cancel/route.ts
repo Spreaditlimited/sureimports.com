@@ -1,54 +1,36 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
+import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
 
 export async function GET(request: NextRequest) {
-  const pidUser = request.nextUrl.searchParams.get('pidUser');
   const pidPaySmallSmall = request.nextUrl.searchParams.get('pidPaySmallSmall');
-  const pidProduct = request.nextUrl.searchParams.get('pidProduct');
-  const amount = request.nextUrl.searchParams.get('amount');
-
-  // console.log('pidUser:', pidUser);
-  // console.log('pidPaySmallSmall:', pidPaySmallSmall);
-  // console.log('pidProduct:', pidProduct);
-  // console.log('amount:', amount);
-  // return;
-
-  const user: any = await prisma.users.findUnique({
-    where: {
-      pidUser: pidUser as string | undefined,
-    },
-    // select: {
-    //   countryName: true,
-    // },
-  });
-
-  const email = user.userEmail;
-  const first_name = user.userFirstname;
-  const last_name = user.userLastname;
-  const phone = user.phone;
-
-  // check if user exist
-  if (user) {
-    //console.log('User found:', user);
-    //return NextResponse.json({ user });
-  } else {
+  const user = await requireProcurementUser();
+  if (!user || !pidPaySmallSmall) {
     return NextResponse.json(
       {
         statusx: 'FAILED',
-        message: 'Please contact support for assistance',
+        message: 'Unauthorized',
       },
-      { status: 200 },
+      { status: 401 },
     );
   }
 
-  // Update single
-  const updatex = await prisma.paysmallsmall.update({
-    where: { pidPaySmallSmall: pidPaySmallSmall as string | undefined },
+  const updatex = await prisma.paysmallsmall.updateMany({
+    where: {
+      pidPaySmallSmall,
+      pidUser: user.pidUser,
+      status: { not: 'COMPLETED' },
+    },
     data: { status: 'CANCELLED' },
   });
 
-  if (updatex) {
-    //console.log('Deleted successfully');
+  if (updatex.count === 1) {
+    await voidAffiliateConversions({
+      externalOrderReference: `pay-small-small:${pidPaySmallSmall}`,
+      reason: `Pay Small Small order ${pidPaySmallSmall} was cancelled by the customer.`,
+      reversalReference: `customer-cancellation:${pidPaySmallSmall}`,
+    });
     return NextResponse.json(
       {
         statusx: 'SUCCESS',
@@ -57,13 +39,12 @@ export async function GET(request: NextRequest) {
       { status: 200 },
     );
   } else {
-    //console.log('Failed to delete');
     return NextResponse.json(
       {
         statusx: 'FAILED',
         message: 'PaySmallSmall Profile was NOT Cancelled',
       },
-      { status: 200 },
+      { status: 409 },
     );
   }
 }

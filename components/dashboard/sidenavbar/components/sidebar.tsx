@@ -46,9 +46,9 @@ export default function Sidebar({ className }: SidebarProps) {
               loading="lazy"
               src="/images/svg-logo-white.svg"
               alt="Logo"
-              width={72}
-              height={10}
-              className="ml-[25px] h-12 w-36 self-center"
+              width={144}
+              height={23}
+              className="ml-[25px] h-auto w-36 self-center"
             />
           </div>
         )}

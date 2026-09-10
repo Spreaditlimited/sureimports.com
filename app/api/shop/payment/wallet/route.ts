@@ -26,6 +26,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import xMail from '@/lib/email/xMail3';
 import { recordWalletDebit } from '@/lib/walletLedger';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 export async function POST(request: NextRequest) {
   try {
@@ -217,6 +221,7 @@ export async function POST(request: NextRequest) {
           },
           select: {
             pidProduct: true,
+            productCategory: true,
             affiliatePayout: true,
             superAffiliatePayout: true,
           },
@@ -258,6 +263,12 @@ export async function POST(request: NextRequest) {
       totalSuperAffiliatePayout,
       productsCount: productDetailsWithQuantity.length,
     });
+    const hasEligiblePhoneOrLaptop = productDetailsWithQuantity.some(
+      ({ product }) =>
+        ['phone', 'laptop'].includes(
+          String(product?.productCategory || '').trim().toLowerCase(),
+        ),
+    );
 
     // Hardcoded percentages (as per existing implementation)
     const affiliatePayoutPercentage = 2.5;
@@ -353,6 +364,18 @@ export async function POST(request: NextRequest) {
 
       return { create_debits, create_payment, salesRecords };
     });
+
+    if (hasEligiblePhoneOrLaptop) {
+      await recordAffiliateConversion({
+        customerReference: String(pidUser),
+        serviceKey: AFFILIATE_SERVICE_KEYS.PHONES_AND_LAPTOPS,
+        externalOrderReference: `shop:${txREF}`,
+        externalPaymentReference: `wallet:${txREF}`,
+        paymentCurrency: 'NGN',
+        grossAmount: purchaseAmount,
+        eligibleAmount: purchaseAmount,
+      });
+    }
 
     // If transaction is successful, send emails
     if (result.create_debits && result.create_payment) {

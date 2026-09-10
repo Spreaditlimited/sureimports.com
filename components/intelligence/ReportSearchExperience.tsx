@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
@@ -69,6 +70,7 @@ export default function ReportSearchExperience({
 }: {
   reports: ReportResult[];
 }) {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [email, setEmail] = useState('');
   const [showAll, setShowAll] = useState(false);
@@ -162,7 +164,9 @@ export default function ReportSearchExperience({
         throw new Error(payload?.error || 'Your vote could not be recorded.');
       }
       if (payload.availableReport?.slug) {
-        window.location.href = `/supplier-intelligence/reports/${payload.availableReport.slug}`;
+        router.push(
+          `/supplier-intelligence/reports/${payload.availableReport.slug}`,
+        );
         return;
       }
       setDemand(payload.data || demand);

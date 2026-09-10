@@ -21,7 +21,7 @@ const Page = async ({
   }
 
   // Get cookies
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get('token')?.value; // replace 'token' with your actual cookie name
 
   if (!token) {

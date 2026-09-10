@@ -4,6 +4,10 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 import { NextResponse } from 'next/server';
 import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+} from '@/lib/affiliate/commissions';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -13,6 +17,31 @@ const formatAmount = (amount: number, currency: string) => {
     .toFixed(2)
     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 };
+
+async function recordProcurementConversion(input: {
+  pidUser: string;
+  pidOrder: string;
+  paymentReference: string;
+  paymentAmount: number;
+  paymentCurrency: string;
+  productsTotalUsd: number;
+  ngnPerUsd: number;
+  commissionable: boolean;
+}) {
+  if (!input.commissionable) return;
+  await recordAffiliateConversion({
+    customerReference: input.pidUser,
+    serviceKey: AFFILIATE_SERVICE_KEYS.BUY_FROM_CHINESE_WEBSITES,
+    externalOrderReference: `procurement:${input.pidOrder}`,
+    externalPaymentReference: `paystack:${input.paymentReference}`,
+    paymentCurrency: input.paymentCurrency,
+    grossAmount: input.paymentAmount,
+    eligibleAmount:
+      input.paymentCurrency === 'NGN'
+        ? input.productsTotalUsd * input.ngnPerUsd
+        : input.productsTotalUsd,
+  });
+}
 
 export async function POST(request: Request) {
   try {
@@ -48,6 +77,20 @@ export async function POST(request: Request) {
       where: { txRef: reference, paymentStatus: 'PAID' },
     });
     if (existingPayment) {
+      const paidLifecycle = await getProcurementOrderLifecycle(
+        service_id,
+        consumer_id,
+      );
+      await recordProcurementConversion({
+        pidUser: consumer_id,
+        pidOrder: service_id,
+        paymentReference: reference,
+        paymentAmount: Number(existingPayment.amount),
+        paymentCurrency: String(existingPayment.currency || 'NGN'),
+        productsTotalUsd: paidLifecycle.productsTotalUsd,
+        ngnPerUsd: paidLifecycle.rates.ngnPerUsd,
+        commissionable: String(paidLifecycle.order.status) !== 'in-transit',
+      });
       return NextResponse.json({
         status: 'success',
         message: 'Payment verified successfully',
@@ -252,6 +295,17 @@ export async function POST(request: Request) {
           throw new Error('Order status changed while payment was processing.');
         }
       }
+    });
+
+    await recordProcurementConversion({
+      pidUser: consumer_id,
+      pidOrder: service_id,
+      paymentReference: reference,
+      paymentAmount: expectedAmount,
+      paymentCurrency: expectedCurrency,
+      productsTotalUsd: lifecycle.productsTotalUsd,
+      ngnPerUsd: lifecycle.rates.ngnPerUsd,
+      commissionable: currentOrderStatus !== 'pay-for-shipping',
     });
 
     const customerEmail = email || user?.userEmail;

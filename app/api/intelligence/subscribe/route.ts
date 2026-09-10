@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { checkAuth } from '@/lib/auth/checkAuth';
@@ -24,7 +24,7 @@ function absoluteUrl(path: string) {
   return `${baseUrl.replace(/\/$/, '')}${path}`;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (!PAYSTACK_SECRET_KEY) {
     return NextResponse.json(
       { message: 'Paystack secret key is not configured.' },
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     firstName,
     lastName,
     phone,
-    affiliateRef: 'supplier-intelligence',
+    attributionRequest: request,
     defaultFirstName: 'Subscriber',
     accountSetupKey: `supplier_intelligence_subscription:${pidSubscription}`,
   });

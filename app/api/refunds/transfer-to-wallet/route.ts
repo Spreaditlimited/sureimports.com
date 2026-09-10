@@ -8,6 +8,10 @@ import {
   syncPaystackDedicatedNubanCredits,
 } from '@/lib/walletLedger';
 import { ensurePaystackWalletAccount } from '@/lib/wallet/paystackProvisioning';
+import {
+  affiliateOrderReferenceForRefund,
+  voidAffiliateConversions,
+} from '@/lib/affiliate/commissions';
 
 class RefundTransferConflictError extends Error {}
 
@@ -197,6 +201,20 @@ export async function POST(request: NextRequest) {
         });
       }
     });
+
+    for (const refund of refunds) {
+      const externalOrderReference = affiliateOrderReferenceForRefund(
+        refund.serviceType,
+        refund.pidOrder,
+      );
+      if (externalOrderReference) {
+        await voidAffiliateConversions({
+          externalOrderReference,
+          reason: `Refund ${refund.pidRefund} was transferred to the customer wallet.`,
+          reversalReference: refund.pidRefund,
+        });
+      }
+    }
 
     return NextResponse.json({
       statusx: 'SUCCESS',

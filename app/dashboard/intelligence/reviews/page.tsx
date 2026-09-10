@@ -233,129 +233,129 @@ function ReviewCard({ request }: { request: Awaited<ReturnType<typeof getUserInt
 
   return (
     <article className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8 transition-shadow hover:shadow-md">
-                      {/* Request Header */}
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b border-slate-100 pb-6">
-                        <div>
-                          <div className="mb-3 flex items-center gap-3">
-                            {statusBadge(request.status)}
-                            <span className="font-mono text-[10px] font-bold text-slate-400">
-                              REF: {request.pidRequest.split('-')[0]}
-                            </span>
-                          </div>
-                          <h3 className="text-xl font-bold text-slate-900">
-                            {request.supplierName || request.nicheName || 'General Review Request'}
-                          </h3>
-                          <p className="mt-1.5 text-sm text-slate-500 capitalize flex items-center gap-2">
-                            {request.requestType.replace(/_/g, ' ')} 
-                            <span className="text-slate-300">•</span> 
-                            {formatDate(request.createdAt)}
-                          </p>
-                        </div>
-                      </div>
+      {/* Request Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b border-slate-100 pb-6">
+        <div>
+          <div className="mb-3 flex items-center gap-3">
+            {statusBadge(request.status)}
+            <span className="font-mono text-[10px] font-bold text-slate-400">
+              REF: {request.pidRequest.split('-')[0]}
+            </span>
+          </div>
+          <h3 className="text-xl font-bold text-slate-900">
+            {request.supplierName || request.nicheName || 'General Review Request'}
+          </h3>
+          <p className="mt-1.5 text-sm text-slate-500 capitalize flex items-center gap-2">
+            {request.requestType.replace(/_/g, ' ')}
+            <span className="text-slate-300">•</span>
+            {formatDate(request.createdAt)}
+          </p>
+        </div>
+      </div>
 
-                      {/* Request Details Grid */}
-                      <div className="mt-6 grid gap-6 sm:grid-cols-2">
-                        {request.supplierWebsite && (
-                          <div className="flex items-start gap-3">
-                             <LinkIcon className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
-                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Supplier Link</p>
-                                <p className="mt-1 text-sm text-slate-700 break-all">{request.supplierWebsite}</p>
-                             </div>
-                          </div>
-                        )}
-                        {request.targetQuantity && (
-                          <div className="flex items-start gap-3">
-                             <Package className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
-                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Quantity</p>
-                                <p className="mt-1 text-sm text-slate-700">{request.targetQuantity}</p>
-                             </div>
-                          </div>
-                        )}
-                      </div>
+      {/* Request Details Grid */}
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        {request.supplierWebsite && (
+          <div className="flex items-start gap-3">
+             <LinkIcon className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+             <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Supplier Link</p>
+                <p className="mt-1 text-sm text-slate-700 break-all">{request.supplierWebsite}</p>
+             </div>
+          </div>
+        )}
+        {request.targetQuantity && (
+          <div className="flex items-start gap-3">
+             <Package className="h-4 w-4 text-slate-400 shrink-0 mt-0.5" />
+             <div>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Quantity</p>
+                <p className="mt-1 text-sm text-slate-700">{request.targetQuantity}</p>
+             </div>
+          </div>
+        )}
+      </div>
 
-                      {/* User's Decision Needed */}
-                      <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50 p-5">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                          Decision Needed
-                        </p>
-                        <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
-                          {request.decisionNeeded}
-                        </p>
-                      </div>
+      {/* User's Decision Needed */}
+      <div className="mt-6 rounded-2xl border border-slate-100 bg-slate-50 p-5">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+          Decision Needed
+        </p>
+        <p className="text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+          {request.decisionNeeded}
+        </p>
+      </div>
 
-                      {attachments.length > 0 ? (
-                        <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-5">
-                          <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                            <Paperclip className="h-3.5 w-3.5" />
-                            Supporting Files
-                          </p>
-                          <div className="grid gap-2">
-                            {attachments.map((file) => (
-                              <a
-                                key={file.url}
-                                href={file.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand-orange-200 hover:bg-brand-orange-50"
-                              >
-                                <span className="min-w-0 truncate">{file.name || 'Attachment'}</span>
-                                <span className="shrink-0 text-xs text-slate-400">
-                                  {formatFileSize(file.size)}
-                                </span>
-                              </a>
-                            ))}
-                          </div>
-                        </div>
-                      ) : null}
+      {attachments.length > 0 ? (
+        <div className="mt-6 rounded-2xl border border-slate-100 bg-white p-5">
+          <p className="mb-3 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+            <Paperclip className="h-3.5 w-3.5" />
+            Supporting Files
+          </p>
+          <div className="grid gap-2">
+            {attachments.map((file) => (
+              <a
+                key={file.url}
+                href={file.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-brand-orange-200 hover:bg-brand-orange-50"
+              >
+                <span className="min-w-0 truncate">{file.name || 'Attachment'}</span>
+                <span className="shrink-0 text-xs text-slate-400">
+                  {formatFileSize(file.size)}
+                </span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
-                      {/* --- ADMIN RESPONSE AREA --- */}
-                      {request.adminResponse ? (
-                        <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2">
-                              <Sparkles className="h-4 w-4 text-blue-600" />
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-900">
-                                Sure Imports Analysis
-                              </p>
-                            </div>
-                            {request.adminRiskLevel && (
-                              <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${
-                                request.adminRiskLevel.toLowerCase() === 'high' ? 'bg-red-100 text-red-700' :
-                                request.adminRiskLevel.toLowerCase() === 'medium' ? 'bg-amber-100 text-amber-700' :
-                                'bg-emerald-100 text-emerald-700'
-                              }`}>
-                                Risk: {request.adminRiskLevel}
-                              </span>
-                            )}
-                          </div>
-                          
-                          <p className="whitespace-pre-line text-sm leading-relaxed text-blue-900/90">
-                            {request.adminResponse}
-                          </p>
+      {/* --- ADMIN RESPONSE AREA --- */}
+      {request.adminResponse ? (
+        <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/50 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-blue-600" />
+              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-900">
+                Sure Imports Analysis
+              </p>
+            </div>
+            {request.adminRiskLevel && (
+              <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md ${
+                request.adminRiskLevel.toLowerCase() === 'high' ? 'bg-red-100 text-red-700' :
+                request.adminRiskLevel.toLowerCase() === 'medium' ? 'bg-amber-100 text-amber-700' :
+                'bg-emerald-100 text-emerald-700'
+              }`}>
+                Risk: {request.adminRiskLevel}
+              </span>
+            )}
+          </div>
 
-                          {request.adminRecommendations && (
-                            <div className="mt-5 border-t border-blue-200/50 pt-5">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-900 mb-2">
-                                Recommended Next Steps
-                              </p>
-                              <p className="whitespace-pre-line text-sm leading-relaxed text-blue-900/90 font-medium">
-                                {request.adminRecommendations}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
-                          <div className="flex gap-3">
-                            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                            <p className="text-sm leading-relaxed text-amber-900">
-                              This request is awaiting review. <strong>Do not treat this as clearance to pay the supplier yet.</strong>
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </article>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-blue-900/90">
+            {request.adminResponse}
+          </p>
+
+          {request.adminRecommendations && (
+            <div className="mt-5 border-t border-blue-200/50 pt-5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-blue-900 mb-2">
+                Recommended Next Steps
+              </p>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-blue-900/90 font-medium">
+                {request.adminRecommendations}
+              </p>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex gap-3">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <p className="text-sm leading-relaxed text-amber-900">
+              This request is awaiting review. <strong>Do not treat this as clearance to pay the supplier yet.</strong>
+            </p>
+          </div>
+        </div>
+      )}
+    </article>
   );
 }

@@ -14,6 +14,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nodemailer from 'nodemailer';
 import isValidPhoneNumber from '@/lib/helpers/validatePhoneNumber';
 import xMail from '@/lib/email/xMail';
+import {
+  claimAffiliateAttribution,
+  resolveAffiliateReference,
+} from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
@@ -24,7 +28,6 @@ export async function POST(request: NextRequest) {
     userPhone,
     userPassword,
     confirmPassword,
-    userAffiliateRef,
   } = await request.json();
 
   const sessioncode = randomGenerator(10);
@@ -164,6 +167,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  const userAffiliateRefx = await resolveAffiliateReference(
+    request,
+    userEmail,
+  );
+
   // Create a user in db
   const create = await prisma.users.create({
     data: {
@@ -179,9 +187,10 @@ export async function POST(request: NextRequest) {
       loginStatus: 'RESET',
       userStatus: 'AL1',
       userAffiliateCode: randomGenerator(6),
-      userAffiliateRef: userAffiliateRef,
+      userAffiliateRef: userAffiliateRefx,
     },
   });
+  await claimAffiliateAttribution(request, create.pidUser, userEmail);
 
   //send mail
   try {

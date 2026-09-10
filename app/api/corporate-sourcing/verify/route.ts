@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { generateToken } from '@/lib/jwt';
 import {
@@ -22,7 +22,7 @@ function paypalCapture(order: any) {
   return order?.purchase_units?.[0]?.payments?.captures?.[0] || null;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (!checkoutOriginIsAllowed(request)) {
     return NextResponse.json({ message: 'This verification request is not allowed.' }, { status: 403 });
   }
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         firstName: payment.firstName || undefined,
         lastName: payment.lastName || undefined,
         country: payment.billingCountry || undefined,
-        affiliateRef: 'corporate-sourcing',
+        attributionRequest: request,
         accountSetupKey: `corporate_sourcing:${pidPayment}`,
       });
       if (account.status === 'ready') {

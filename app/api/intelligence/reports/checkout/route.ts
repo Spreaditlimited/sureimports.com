@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'node:crypto';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -13,6 +13,10 @@ import {
 import { getPublishedReportBySlug } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 import { getSupplierReportResumePath } from '@/lib/auth/loginRedirect';
+import {
+  affiliateEmailFingerprint,
+  getAttributedReferral,
+} from '@/lib/affiliate/attribution';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -23,7 +27,7 @@ function clean(value: unknown, max = 255) {
     .slice(0, max);
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (!checkoutOriginIsAllowed(request)) {
     return NextResponse.json(
       { message: 'This checkout request is not allowed.' },
@@ -104,6 +108,13 @@ export async function POST(request: Request) {
   }
   const buyerEmail =
     authenticatedBuyer?.userEmail.trim().toLowerCase() || email;
+  const attributedReferral = await getAttributedReferral(request);
+  const affiliateReferralReference =
+    attributedReferral &&
+    affiliateEmailFingerprint(buyerEmail) !==
+      attributedReferral.affiliate.emailHash
+      ? attributedReferral.pidReferral
+      : null;
 
   const downloadToken = randomBytes(48).toString('base64url');
   const amountMinor =
@@ -120,6 +131,7 @@ export async function POST(request: Request) {
       reportId: report.pidReport,
       versionId: version.pidVersion,
       pidUser: authenticatedBuyer?.pidUser || null,
+      affiliateReferralReference,
       email: buyerEmail,
       firstName,
       lastName: lastName || null,

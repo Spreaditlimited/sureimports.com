@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
 import { checkAuth } from '@/lib/auth/checkAuth';
@@ -17,7 +17,7 @@ function paypalCapture(order: any) {
   return order?.purchase_units?.[0]?.payments?.captures?.[0] || null;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   if (!checkoutOriginIsAllowed(request)) {
     return NextResponse.json(
       { message: 'This verification request is not allowed.' },
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
   let deliveryPending = false;
   let fulfilled;
   try {
-    fulfilled = await deliverReportOrder(pidOrder);
+    fulfilled = await deliverReportOrder(pidOrder, request);
   } catch (error) {
     deliveryPending = true;
     console.error(

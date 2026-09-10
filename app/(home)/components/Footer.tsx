@@ -21,7 +21,7 @@ export default function Footer() {
               src="/images/svg-logo-white.svg"
               alt="Sure Imports"
               width={160}
-              height={30}
+              height={26}
             />
             <p className="text-sm leading-relaxed">
               Your trusted partner for China product sourcing. We connect

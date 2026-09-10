@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import PaySmallSmall from './components/PaySmallSmall';
+
 //import ProductClaim from './components/ProductClaim';
 
 const Page = async ({
@@ -22,7 +23,7 @@ const Page = async ({
   }
 
   // Get cookies
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get('token')?.value; // replace 'token' with your actual cookie name
 
   if (!token) {

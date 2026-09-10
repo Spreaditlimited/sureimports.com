@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
 import {
@@ -18,6 +19,7 @@ export default function IntelligenceSignupForm({
   plan,
   note,
 }: IntelligenceSignupFormProps) {
+  const router = useRouter();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -83,7 +85,6 @@ export default function IntelligenceSignupForm({
       setIsLoading(false);
     }
     // This runs only for the matching plan after returning from login.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFreePlan, pendingSubscriptionKey, plan]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -101,7 +102,7 @@ export default function IntelligenceSignupForm({
           email,
           phone,
         });
-        window.location.href = `/auth/signup?${params.toString()}`;
+        router.push(`/auth/signup?${params.toString()}`);
         return;
       }
 

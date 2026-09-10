@@ -125,7 +125,7 @@ export default function SolutionHeader() {
             src="/images/svg-logo.svg"
             alt="Sure Imports"
             width={180}
-            height={40}
+            height={29}
             priority
             className="h-7 w-auto dark:hidden sm:h-8"
           />
@@ -133,7 +133,7 @@ export default function SolutionHeader() {
             src="/images/svg-logo-white.svg"
             alt=""
             width={180}
-            height={40}
+            height={29}
             priority
             className="hidden h-7 w-auto dark:block sm:h-8"
           />
@@ -194,7 +194,7 @@ export default function SolutionHeader() {
                   src="/images/svg-logo-white.svg"
                   alt="Sure Imports"
                   width={180}
-                  height={40}
+                  height={29}
                   className="h-8 w-auto"
                 />
               </div>

@@ -46,8 +46,8 @@ export const MobileSidebar = () => {
               src="/images/svg-logo-white.svg"
               alt="Logo"
               width={144}
-              height={48}
-              className="mb-4 ml-[25px] h-12 w-36 self-center hover:cursor-pointer"
+              height={23}
+              className="mb-4 ml-[25px] h-auto w-36 self-center hover:cursor-pointer"
               onClick={() => {
                 router.push('/');
               }}

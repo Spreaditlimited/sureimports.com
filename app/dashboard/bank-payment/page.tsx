@@ -64,11 +64,12 @@ async function getPaymentChannels(): Promise<AdminBankAccount[]> {
   }
 }
 
-export default async function BankPayment({
-  searchParams,
-}: {
-  searchParams?: Promise<{ returnTo?: string }>;
-}) {
+export default async function BankPayment(
+  props: {
+    searchParams?: Promise<{ returnTo?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const backHref =
     resolvedSearchParams?.returnTo &&
@@ -77,7 +78,7 @@ export default async function BankPayment({
       : '/dashboard/procurement';
 
   const channels = await getPaymentChannels();
-  
+
   const bankOptions: BankOption[] = [
     { optionName: '- Select Bank Used -', optionValue: '__SELECT_BANK__' },
     ...channels.map((channel, index) => {

@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { NextResponse } from 'next/server';
+import { after, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
 import { grantIntelligenceCredits } from '@/lib/intelligence/credits';
@@ -20,6 +20,13 @@ import {
   IntelligenceSubscriptionPaymentError,
 } from '@/lib/intelligence/subscriptionActivation';
 import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/service';
+import {
+  AFFILIATE_SERVICE_KEYS,
+  recordAffiliateConversion,
+  voidAffiliateConversions,
+} from '@/lib/affiliate/commissions';
+import { paystackEventReversesCommission } from '@/lib/affiliate/reversalPolicy';
+import { sendAffiliateAccountNotification } from '@/lib/affiliate/emailNotifications';
 
 const PAYSTACK_SECRET_KEY = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
 
@@ -72,6 +79,33 @@ function signatureIsValid(body: string, signature: string | null) {
   );
 }
 
+type AffiliatePayoutNotice = { id: number; pidPayout: string; affiliateId: number; provider: string; currency: string; amount: unknown };
+
+function notifyAffiliatePayout(payout: AffiliatePayoutNotice, status: 'PAID' | 'FAILED' | 'REVERSED') {
+  const reversed = status === 'REVERSED';
+  const paid = status === 'PAID';
+  after(() => sendAffiliateAccountNotification({
+    affiliateId: payout.affiliateId,
+    eventKey: `payout:${status.toLowerCase()}:${payout.pidPayout}`,
+    eventType: paid ? 'PAYOUT_PAID' : reversed ? 'PAYOUT_REVERSED' : 'PAYOUT_FAILED',
+    subject: paid ? 'Your Sure Imports affiliate payout has been paid' : reversed ? 'Your Sure Imports affiliate payout was reversed' : 'Your Sure Imports affiliate payout failed',
+    title: paid ? 'Payout completed' : reversed ? 'Payout reversed' : 'Payout was not completed',
+    message: paid
+      ? 'Your affiliate payout was completed successfully. Provider processing times may affect when the funds appear at your destination.'
+      : reversed
+        ? 'Paystack reported that this payout was reversed. Review the payout page or contact support if you need assistance.'
+        : 'Paystack could not complete this payout. Review the payout page for the latest status.',
+    facts: [
+      { label: 'Reference', value: payout.pidPayout },
+      { label: 'Provider', value: payout.provider },
+      { label: 'Amount', value: new Intl.NumberFormat(payout.currency === 'NGN' ? 'en-NG' : 'en-US', { style: 'currency', currency: payout.currency }).format(Number(payout.amount)) },
+      { label: 'Status', value: status },
+    ],
+    actionLabel: 'Track payout',
+    actionPath: '/dashboard/payouts',
+  }));
+}
+
 export async function POST(request: Request) {
   const rawBody = await request.text();
 
@@ -85,6 +119,60 @@ export async function POST(request: Request) {
   const payload = JSON.parse(rawBody);
   const event = String(payload?.event || '').trim();
 
+  if (event.startsWith('transfer.')) {
+    const data = payload?.data || {};
+    const payoutReference = String(data.reference || '').trim();
+    const transferCode = String(data.transfer_code || '').trim();
+    const transferReference = transferCode || null;
+    const payouts = await prisma.$queryRaw<Array<AffiliatePayoutNotice>>`
+      SELECT id, pidPayout, affiliateId, provider, currency, amount FROM affiliate_payouts
+      WHERE pidPayout = ${payoutReference}
+         OR externalReference = ${transferCode}
+      LIMIT 1
+    `;
+    const payout = payouts[0];
+    if (payout) {
+      const providerStatus = event.replace('transfer.', '').toUpperCase();
+      if (event === 'transfer.success') {
+        await prisma.$transaction([
+          prisma.$executeRaw`
+            UPDATE affiliate_payouts
+            SET status = 'PAID', providerStatus = ${providerStatus},
+                externalReference = COALESCE(${transferReference}, externalReference),
+                processedAt = ${new Date()}, lastCheckedAt = ${new Date()}, updatedAt = ${new Date()}
+            WHERE id = ${payout.id}
+          `,
+          prisma.$executeRaw`
+            UPDATE affiliate_conversions c
+            INNER JOIN affiliate_payout_items i ON i.conversionId = c.id
+            SET c.status = 'PAID', c.updatedAt = ${new Date()}
+            WHERE i.payoutId = ${payout.id} AND c.status = 'RESERVED'
+          `,
+        ]);
+        notifyAffiliatePayout(payout, 'PAID');
+      } else if (event === 'transfer.failed' || event === 'transfer.reversed') {
+        await prisma.$transaction([
+          prisma.$executeRaw`
+            UPDATE affiliate_payouts
+            SET status = 'FAILED', providerStatus = ${providerStatus},
+                externalReference = COALESCE(${transferReference}, externalReference),
+                failedAt = ${new Date()}, processedAt = NULL,
+                lastCheckedAt = ${new Date()}, updatedAt = ${new Date()}
+            WHERE id = ${payout.id}
+          `,
+          prisma.$executeRaw`
+            UPDATE affiliate_conversions c
+            INNER JOIN affiliate_payout_items i ON i.conversionId = c.id
+            SET c.status = 'RESERVED', c.updatedAt = ${new Date()}
+            WHERE i.payoutId = ${payout.id} AND c.status <> 'VOIDED'
+          `,
+        ]);
+        notifyAffiliatePayout(payout, event === 'transfer.reversed' ? 'REVERSED' : 'FAILED');
+      }
+    }
+    return NextResponse.json({ received: true });
+  }
+
   if (event.startsWith('refund.') || event.startsWith('charge.dispute.')) {
     const data = payload?.data || {};
     const reference = String(
@@ -93,6 +181,14 @@ export async function POST(request: Request) {
         data.reference ||
         '',
     ).trim();
+    const shouldVoidCommission = paystackEventReversesCommission(event, data);
+    if (reference && shouldVoidCommission) {
+      await voidAffiliateConversions({
+        externalPaymentReferences: [`paystack:${reference}`],
+        reason: `Paystack reported ${event} for ${reference}.`,
+        reversalReference: `paystack:${event}:${String(data.refund_reference || data.id || reference)}`,
+      });
+    }
     const order = reference
       ? await prisma.intelligence_report_orders.findFirst({
           where: { providerReference: reference, paymentProvider: 'paystack' },
@@ -415,6 +511,17 @@ export async function POST(request: Request) {
     reference:
       payment.reference ||
       `${subscription.pidSubscription}:${periodEnd.toISOString().slice(0, 10)}`,
+  });
+
+  const paymentReference = String(payment.reference || '').trim();
+  await recordAffiliateConversion({
+    customerReference: subscription.pidUser,
+    serviceKey: AFFILIATE_SERVICE_KEYS.SUPPLIER_INTELLIGENCE,
+    externalOrderReference: `supplier-intelligence:${subscription.pidSubscription}:${paymentReference}`,
+    externalPaymentReference: `paystack:${paymentReference}`,
+    paymentCurrency: String(payment.currency || 'NGN'),
+    grossAmount: Number(payment.amount) / 100,
+    eligibleAmount: Number(payment.amount) / 100,
   });
 
   return NextResponse.json({ received: true });

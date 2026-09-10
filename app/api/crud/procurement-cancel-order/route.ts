@@ -7,6 +7,7 @@ import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import { requireProcurementUser } from '@/lib/procurement/assistance';
+import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
 
 const prisma = new PrismaClient();
 
@@ -30,6 +31,11 @@ export async function GET(request: NextRequest) {
     });
 
     if (updatex) {
+      await voidAffiliateConversions({
+        externalOrderReference: `procurement:${String(pidOrder)}`,
+        reason: `Procurement order ${String(pidOrder)} was cancelled by the customer.`,
+        reversalReference: `customer-cancellation:${String(pidOrder)}`,
+      });
       const responsex = {
         message: 'Order was successfully cancelled!',
         status: 'SUCCESS',

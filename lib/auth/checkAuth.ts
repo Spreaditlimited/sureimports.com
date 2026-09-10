@@ -11,7 +11,7 @@ interface UserPayload {
 }
 
 export async function checkAuth(): Promise<UserPayload | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = (await cookieStore).get('token')?.value;
 
   if (!token) {

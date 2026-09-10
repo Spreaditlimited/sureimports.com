@@ -91,7 +91,6 @@ export default function ReportCheckoutForm({
       window.localStorage.removeItem(pendingCheckoutKey);
     }
     // This should run once when returning from the login page.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingCheckoutKey, reportSlug]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   Bot,
   Clock3,
@@ -133,6 +134,7 @@ function BuyCreditsPanel({
 }: {
   extraCreditPriceNaira: number;
 }) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -150,9 +152,9 @@ function BuyCreditsPanel({
       });
 
       if (response.status === 401) {
-        window.location.href = `/auth/login?next=${encodeURIComponent(
-          '/dashboard/intelligence',
-        )}`;
+        router.push(
+          `/auth/login?next=${encodeURIComponent('/dashboard/intelligence')}`,
+        );
         return;
       }
 

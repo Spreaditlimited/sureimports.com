@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
 
@@ -16,6 +17,7 @@ export default function SubscribeButton({
   children,
   className = '',
 }: SubscribeButtonProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,7 +33,9 @@ export default function SubscribeButton({
       });
 
       if (response.status === 401) {
-        window.location.href = `/auth/login?next=${encodeURIComponent('/supplier-intelligence')}`;
+        router.push(
+          `/auth/login?next=${encodeURIComponent('/supplier-intelligence')}`,
+        );
         return;
       }
 

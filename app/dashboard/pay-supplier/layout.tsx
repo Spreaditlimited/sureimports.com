@@ -12,6 +12,7 @@ type UserLayoutProps = {
 };
 
 function PaySupplier(props: UserLayoutProps) {
+  const { children } = props;
   const router = useRouter();
 
   return (
@@ -58,7 +59,7 @@ function PaySupplier(props: UserLayoutProps) {
         </div>
 
         <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-          {props.children}
+          {children}
         </main>
       </RecordCountPaySupplierProvider>
     </div>
