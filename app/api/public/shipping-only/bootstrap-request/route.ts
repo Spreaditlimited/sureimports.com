@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { verifyToken } from '@/lib/jwt';
 import { notifyNewShippingOnlyRequest } from '@/lib/notifications/shippingOnly';
 import { sendFacebookLeadCapiEvent } from '@/lib/facebookCapi';
 import { SHIPPING_ONLY_RESUME_PATH } from '@/lib/auth/loginRedirect';
+import { createShippingRequest, websiteShippingOwner } from '@/lib/shipping/createShippingRequest';
+import { sendAffiliateAccountNotification } from '@/lib/affiliate/emailNotifications';
 
 type Payload = {
   account?: {
@@ -116,28 +117,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pidShippingOnly = `SL${Date.now()}${randomGenerator(4)}`;
-
-    await prisma.shipping_only.create({
-      data: {
-        pidShippingOnly,
-        pidUser: user.pidUser,
-        whatsappNumber,
-        shippingName,
-        shippingTo,
-        grossWeight,
-        trackingNumber,
-        shippingPlan,
-        expectedShipments,
-        description: notes,
-        wantProductVerification: Boolean(body.request.wantProductVerification),
-        wantConsolidation: Boolean(body.request.wantConsolidation),
-        multipleSuppliers: Boolean(body.request.multipleSuppliers),
-        status: 'request-received',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
+    const owner = await websiteShippingOwner(user.pidUser);
+    const created = await createShippingRequest({
+      pidUser: user.pidUser, whatsappNumber, shippingName, shippingTo, grossWeight,
+      trackingNumber, shippingPlan, expectedShipments, description: notes,
+      wantProductVerification: body.request.wantProductVerification,
+      wantConsolidation: body.request.wantConsolidation,
+      multipleSuppliers: body.request.multipleSuppliers,
+      owner,
     });
+    const pidShippingOnly = created.shippingRequest.pidShippingOnly;
+    if (owner && created.attribution) after(() => sendAffiliateAccountNotification({
+      affiliateId: owner.affiliateId,
+      eventKey: `shipping:owned:${created.attribution!.pidAttribution}`,
+      eventType: 'SHIPPING_REQUEST_OWNED', subject: 'A shipping request was attributed to you', title: 'You own a new shipping request',
+      message: 'A referred customer submitted a Ship with Us request. If its eligible invoice is fully paid, your commission will be calculated from the final billable quantity.',
+      facts: [{ label: 'Request', value: pidShippingOnly }, { label: 'Destination', value: shippingTo }, { label: 'Estimated weight', value: grossWeight }],
+      actionLabel: 'Open affiliate dashboard', actionPath: '/dashboard/referrals',
+    }).then(() => undefined));
 
     try {
       await notifyNewShippingOnlyRequest({
