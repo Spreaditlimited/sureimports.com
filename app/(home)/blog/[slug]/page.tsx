@@ -94,7 +94,7 @@ export async function generateMetadata({
   const readingTime = getBlogReadingTime(post.content);
 
   return {
-    title: `${title} | Sure Imports`,
+    title,
     description:
       description.length > 160
         ? description.slice(0, 157) + '...'

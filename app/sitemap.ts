@@ -13,6 +13,10 @@ interface BlogForSitemap {
   updatedAt: Date | null;
 }
 
+// Blog publication is database-driven, including future-dated scheduled posts.
+// Generate the sitemap at request time so newly public posts appear without a redeploy.
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.sureimports.com';
   const currentDate = new Date().toISOString();
