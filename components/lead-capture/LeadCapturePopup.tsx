@@ -27,6 +27,7 @@ const excludedPathPrefixes = [
   '/shop/order-success',
   '/receipt',
   '/invoice',
+  '/developers',
 ];
 
 function isExcludedPath(pathname: string) {
