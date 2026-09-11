@@ -19,6 +19,7 @@ export const AFFILIATE_SERVICE_KEYS = {
   SUPPLIER_INTELLIGENCE: 'SUPPLIER_INTELLIGENCE',
   SUPPLIER_VERIFICATION: 'SUPPLIER_VERIFICATION',
   SHIP_WITH_US: 'SHIP_WITH_US',
+  LINESCOUT_SOURCING: 'LINESCOUT_SOURCING',
 } as const;
 
 export type AffiliateServiceKey =
@@ -35,6 +36,13 @@ export type RecordAffiliateConversionInput = {
   paymentCurrency: string;
   grossAmount: MoneyValue;
   eligibleAmount: MoneyValue;
+  eventKey?: string | null;
+  commissionBasisUnit?: 'KG' | 'CBM' | null;
+  commissionBasisQuantity?: MoneyValue | null;
+  destinationCountry?: string | null;
+  shippingMode?: 'AIR' | 'SEA' | null;
+  sourceSystem?: string | null;
+  paymentLedgerEntryId?: number | null;
 };
 
 export type ConversionResult =
@@ -106,7 +114,11 @@ export async function recordAffiliateConversion(
   const paymentReference = reference(input.externalPaymentReference, 160);
   const service = await prisma.affiliate_program_services.findFirst({
     where: { serviceKey: input.serviceKey, active: true },
-    include: { currencyRates: { where: { active: true } } },
+    include: {
+      currencyRates: { where: { active: true } },
+      unitRates: { where: { active: true } },
+      eventRules: { where: { active: true } },
+    },
   });
   if (!service) return { recorded: false, reason: 'SERVICE_INACTIVE' };
 
@@ -137,17 +149,32 @@ export async function recordAffiliateConversion(
     return { recorded: false, reason: 'NO_ELIGIBLE_AMOUNT' };
   }
 
+  const eventKey = input.eventKey?.trim().toUpperCase() || null;
+  const eventRule = eventKey
+    ? service.eventRules.find((rule) => rule.eventKey === eventKey)
+    : null;
+  if (eventKey && !eventRule) {
+    return { recorded: false, reason: 'RATE_NOT_CONFIGURED' };
+  }
+  const commissionType = eventRule?.commissionType || service.commissionType;
   const currencyRate = service.currencyRates.find(
     (rate) => rate.currency === commissionCurrency,
   );
   let commissionAmount: Prisma.Decimal;
-  if (service.commissionType === 'FIXED') {
+  let commissionBasisUnit: string | null = null;
+  let commissionBasisQuantity: Prisma.Decimal | null = null;
+  let commissionRate: Prisma.Decimal | null = null;
+  if (commissionType === 'FIXED') {
     if (!currencyRate?.fixedAmount) {
       return { recorded: false, reason: 'RATE_NOT_CONFIGURED' };
     }
     commissionAmount = currencyRate.fixedAmount.toDecimalPlaces(2);
-  } else if (service.commissionType === 'PERCENTAGE') {
-    const percentage = currencyRate?.percentageRate ?? service.percentageRate;
+    commissionRate = currencyRate.fixedAmount;
+  } else if (commissionType === 'PERCENTAGE') {
+    const percentage =
+      eventRule?.percentageRate ??
+      currencyRate?.percentageRate ??
+      service.percentageRate;
     if (!percentage) {
       return { recorded: false, reason: 'RATE_NOT_CONFIGURED' };
     }
@@ -155,6 +182,44 @@ export async function recordAffiliateConversion(
       .mul(percentage)
       .div(100)
       .toDecimalPlaces(2);
+    commissionRate = percentage;
+  } else if (commissionType === 'PER_UNIT') {
+    const unit = input.commissionBasisUnit?.trim().toUpperCase();
+    const quantity = new Prisma.Decimal(
+      String(input.commissionBasisQuantity ?? ''),
+    ).toDecimalPlaces(4);
+    if (
+      !unit ||
+      !['KG', 'CBM'].includes(unit) ||
+      !quantity.isFinite() ||
+      quantity.lte(0)
+    ) {
+      return { recorded: false, reason: 'NO_ELIGIBLE_AMOUNT' };
+    }
+    const destination = (input.destinationCountry || '*').trim().toUpperCase();
+    const mode = (input.shippingMode || '*').trim().toUpperCase();
+    const candidates = service.unitRates
+      .filter(
+        (rate) =>
+          rate.currency === commissionCurrency &&
+          rate.billingUnit.toUpperCase() === unit &&
+          (rate.destinationCountry.toUpperCase() === '*' ||
+            rate.destinationCountry.toUpperCase() === destination) &&
+          (rate.shippingMode.toUpperCase() === '*' ||
+            rate.shippingMode.toUpperCase() === mode),
+      )
+      .sort((a, b) => {
+        const score = (rate: typeof a) =>
+          (rate.destinationCountry.toUpperCase() === destination ? 2 : 0) +
+          (rate.shippingMode.toUpperCase() === mode ? 1 : 0);
+        return score(b) - score(a);
+      });
+    const unitRate = candidates[0]?.unitRate;
+    if (!unitRate) return { recorded: false, reason: 'RATE_NOT_CONFIGURED' };
+    commissionBasisUnit = unit;
+    commissionBasisQuantity = quantity;
+    commissionRate = unitRate;
+    commissionAmount = quantity.mul(unitRate).toDecimalPlaces(2);
   } else {
     return { recorded: false, reason: 'RATE_NOT_CONFIGURED' };
   }
@@ -185,9 +250,16 @@ export async function recordAffiliateConversion(
           eligibleAmount,
           commissionCurrency,
           commissionAmount,
+          commissionBasisUnit,
+          commissionBasisQuantity,
+          commissionRate,
           status: 'PENDING',
           releaseMode,
           releaseAt,
+          sourceSystem:
+            input.sourceSystem?.trim().toUpperCase() || 'SURE_IMPORTS',
+          sourceEventKey: eventKey,
+          paymentLedgerEntryId: input.paymentLedgerEntryId || null,
         },
       }),
       prisma.affiliate_referrals.updateMany({

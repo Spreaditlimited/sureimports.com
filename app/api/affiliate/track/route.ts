@@ -13,6 +13,10 @@ import {
   parseAttributionValue,
   visitorFingerprint,
 } from '@/lib/affiliate/attribution';
+import {
+  createLineScoutAttributionValue,
+  LINESCOUT_ATTRIBUTION_COOKIE,
+} from '@/lib/affiliate/linescoutAttribution';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -36,6 +40,7 @@ function requestIsSameOrigin(request: NextRequest) {
 function responseWithAttribution(
   request: NextRequest,
   pidReferral: string,
+  referralCode: string,
   expiresAt?: number,
 ) {
   const expiry = expiresAt ?? Date.now() + 30 * 24 * 60 * 60 * 1000;
@@ -47,6 +52,16 @@ function responseWithAttribution(
   response.cookies.set({
     name: ATTRIBUTION_COOKIE,
     value: createAttributionValue(pidReferral, expiry),
+    httpOnly: true,
+    secure: productionHost,
+    sameSite: 'lax',
+    path: '/',
+    expires: new Date(expiry),
+    ...(productionHost ? { domain: '.sureimports.com' } : {}),
+  });
+  response.cookies.set({
+    name: LINESCOUT_ATTRIBUTION_COOKIE,
+    value: createLineScoutAttributionValue(referralCode, expiry),
     httpOnly: true,
     secure: productionHost,
     sameSite: 'lax',
@@ -74,7 +89,10 @@ export async function POST(request: NextRequest) {
         pidReferral: existingPayload.referral,
         affiliate: { status: 'ACTIVE' },
       },
-      select: { pidReferral: true },
+      select: {
+        pidReferral: true,
+        affiliate: { select: { referralCode: true } },
+      },
     });
     if (existing) {
       await prisma.affiliate_referrals.update({
@@ -84,6 +102,7 @@ export async function POST(request: NextRequest) {
       return responseWithAttribution(
         request,
         existing.pidReferral,
+        existing.affiliate.referralCode,
         existingPayload.expiresAt,
       );
     }
@@ -106,7 +125,7 @@ export async function POST(request: NextRequest) {
 
   const affiliate = await prisma.affiliate_accounts.findFirst({
     where: { referralCode: code, status: 'ACTIVE' },
-    select: { id: true, emailHash: true },
+    select: { id: true, emailHash: true, referralCode: true },
   });
   if (!affiliate) {
     return NextResponse.json(
@@ -137,7 +156,11 @@ export async function POST(request: NextRequest) {
       firstTouchAt: { gte: attributionWindowStart },
     },
     orderBy: { firstTouchAt: 'asc' },
-    select: { pidReferral: true, firstTouchAt: true },
+    select: {
+      pidReferral: true,
+      firstTouchAt: true,
+      affiliate: { select: { referralCode: true } },
+    },
   });
   if (repeatVisit) {
     await prisma.affiliate_referrals.update({
@@ -149,6 +172,7 @@ export async function POST(request: NextRequest) {
     return responseWithAttribution(
       request,
       repeatVisit.pidReferral,
+      repeatVisit.affiliate.referralCode,
       expiresAt,
     );
   }
@@ -175,5 +199,9 @@ export async function POST(request: NextRequest) {
     select: { pidReferral: true },
   });
 
-  return responseWithAttribution(request, referral.pidReferral);
+  return responseWithAttribution(
+    request,
+    referral.pidReferral,
+    affiliate.referralCode,
+  );
 }

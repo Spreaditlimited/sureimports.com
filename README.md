@@ -35,3 +35,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+# LineScout payment ledger
+
+`POST /api/internal/payments/linescout` is the signed, idempotent ingress for LineScout referral and payment events. Configure `LINESCOUT_LEDGER_SECRET` to the same strong secret used by LineScout. The same secret signs the 30-day, cross-subdomain attribution bridge created when a visitor enters Sure Imports through an affiliate link. The endpoint retains original payment currency and applies affiliate commissions centrally; LineScout shipping always uses the configured Ship With Us KG/CBM rules.
