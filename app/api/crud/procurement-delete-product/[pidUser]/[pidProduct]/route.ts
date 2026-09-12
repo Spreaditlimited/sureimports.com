@@ -23,6 +23,7 @@ export async function GET(
         pidUser: pidUser,
         pidProduct: pidProduct,
         orders: {
+          partnerOwnership: { is: null },
           status: { in: ['saved', 'on-hold'] },
         },
       },

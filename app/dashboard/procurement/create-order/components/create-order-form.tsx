@@ -75,9 +75,10 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface ReportFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<{ isOpen: boolean }>>;
+  partner?: { countries: Country[]; onSubmit: (values: FormValues) => Promise<void> };
 }
 
-const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
+const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   const router = useRouter();
   const navigateWithAlert = useNavigationWithAlert();
   const { user } = useAuth();
@@ -104,6 +105,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
   });
 
   useEffect(() => {
+    if (partner) { setCountries(partner.countries); setCheckingDrafts(false); return; }
     const fetchCountries = async () => {
       try {
         const response = await fetch('/api/get-data/countries-shipping-plan');
@@ -118,7 +120,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
       .then((response) => response.ok ? response.json() : { orders: [] })
       .then((data) => setSavedOrders(data.orders || []))
       .finally(() => setCheckingDrafts(false));
-  }, []);
+  }, [partner]);
 
   const handleCountryChange = (value: string) => {
     const country = countries.find((c) => c.pidCountry === value) || null;
@@ -131,6 +133,11 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
   const usesCbm = selectedShippingPlan?.shippingPlanUnit === 'CBM';
 
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
+    if (partner) {
+      try { await partner.onSubmit(formData); setIsOpen({ isOpen: false }); }
+      catch (error) { toast.error(error instanceof Error ? error.message : 'Unable to save order.'); }
+      return;
+    }
     const submissionData = { ...formData, pidOrder, pidUser, emailUser, allowSeparateOrder };
 
     try {
@@ -385,7 +392,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen }) => {
               <div>
                 <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">Delivery Logistics</h3>
                 <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300/80">
-                  Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, and Mexico are fulfilled via DHL. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.
+                  {partner ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.' : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, and Mexico are fulfilled via DHL. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
                 </p>
               </div>
             </div>

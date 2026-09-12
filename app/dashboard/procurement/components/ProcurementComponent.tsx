@@ -16,7 +16,7 @@ import {
 import { useModal } from '@/app/context/ModalContext';
 import { useAuth } from '@/app/context/AuthContext';
 
-export default function Procurement() {
+export default function Procurement({ partner }: { partner?: { createControl: React.ReactNode; onOrders: () => void; welcomeText?: string } }) {
   const { user } = useAuth();
   const router = useRouter();
   const { isModalOpen, openModal, closeModal } = useModal();
@@ -32,7 +32,7 @@ export default function Procurement() {
     };
   }, [isModalOpen]);
 
-  const videoGuides = [
+  const videoGuides = partner ? [{ id: 'qpUBdhmVK7c', title: 'How to create your order · Sure Imports platform guide' }] : [
     { id: 'qpUBdhmVK7c', title: 'How to create Orders on SureImports' },
     {
       id: 'zxkPU0ZCTlM',
@@ -116,13 +116,13 @@ export default function Procurement() {
               Shop from China.
             </h1>
             <p className="mt-4 text-base text-slate-400 leading-relaxed md:text-lg md:mt-6">
-              Paste product links from any Chinese e-commerce site. We handle the purchase, quality inspection, and doorstep delivery.
+              {partner ? partner.welcomeText || 'Paste your product links, add the quantities and specifications, then pay securely. Your business reviews your order and arranges delivery to you.' : 'Paste product links from any Chinese e-commerce site. We handle the purchase, quality inspection, and doorstep delivery.'}
             </p>
             
             {/* Action Area: Stacked on Mobile, Row on Desktop */}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-10">
               <div className="w-full sm:w-auto">
-                <CreateOrder className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 rounded-xl transition-all font-bold shadow-lg shadow-blue-600/20" />
+                {partner?.createControl ?? <CreateOrder className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 rounded-xl transition-all font-bold shadow-lg shadow-blue-600/20" />}
               </div>
               
               <div className="flex gap-2 w-full sm:w-auto">
@@ -136,7 +136,7 @@ export default function Procurement() {
                 </Button>
                 
                 <Button
-                  onClick={() => router.push('/dashboard/procurement/view-orders/saved')}
+                  onClick={() => partner ? partner.onOrders() : router.push('/dashboard/procurement/view-orders/saved')}
                   variant="ghost"
                   className="flex-1 sm:flex-none text-slate-400 hover:text-white hover:bg-slate-800 h-12 px-5 rounded-xl"
                 >
@@ -171,7 +171,7 @@ export default function Procurement() {
         </div>
 
         <div className="rounded-2xl">
-          <Stores />
+          <Stores validLinksOnly={Boolean(partner)} />
         </div>
       </main>
     </div>

@@ -9,12 +9,15 @@ import { useSidebar } from '@/hooks/useSidebar';
 import { ChevronLeft } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import type { NavItem } from '../types';
 
 interface SidebarProps {
   className?: string;
+  items?: NavItem[];
+  brand?: { name: string; href: string; logoUrl?: string };
 }
 
-export default function Sidebar({ className }: SidebarProps) {
+export default function Sidebar({ className, items, brand }: SidebarProps) {
   const { isOpen, toggle } = useSidebar();
   const [status, setStatus] = useState(false);
   //const router = useRouter();
@@ -39,29 +42,29 @@ export default function Sidebar({ className }: SidebarProps) {
           <div
             className="flex h-[90px] items-center hover:cursor-pointer"
             onClick={() => {
-              router.push('/');
+              router.push(brand?.href || '/');
             }}
           >
-            <Image
+            {brand ? <span className="ml-[25px] max-w-40 break-words text-lg font-bold text-white">{brand.logoUrl ? <Image unoptimized src={brand.logoUrl} alt={brand.name} width={160} height={56} className="max-h-14 w-auto max-w-40 object-contain" /> : brand.name}</span> : <Image
               loading="lazy"
               src="/images/svg-logo-white.svg"
               alt="Logo"
               width={144}
               height={23}
               className="ml-[25px] h-auto w-36 self-center"
-            />
+            />}
           </div>
         )}
         {!isOpen && (
           <div className="flex h-[90px] items-center justify-center">
-            <Image
+            {brand ? <span className="text-xl font-bold text-white" title={brand.name}>{brand.name.slice(0, 1)}</span> : <Image
               loading="lazy"
               src="/favico.png"
               alt="Logo"
               width={30}
               height={30}
               className="items-center self-center"
-            />
+            />}
           </div>
         )}
         <button
@@ -81,7 +84,7 @@ export default function Sidebar({ className }: SidebarProps) {
           <div className="mt-3 space-y-1">
             <SideNav
               className="absolute text-background opacity-0"
-              items={NavItems}
+              items={items ?? NavItems}
             />
           </div>
         </div>

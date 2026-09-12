@@ -6,7 +6,6 @@ import fileFilter from '@/utils/fileFilter';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
-import { useRouter } from 'next/navigation';
 
 const prisma = new PrismaClient();
 

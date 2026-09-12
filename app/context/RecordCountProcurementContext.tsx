@@ -42,8 +42,10 @@ export const useRecord = () => {
 
 export const RecordCountProcurementProvider = ({
   children,
+  tenantScoped = false,
 }: {
   children: ReactNode;
+  tenantScoped?: boolean;
 }) => {
   const { user } = useAuth();
   const pidUser = user?.pidUser;
@@ -52,7 +54,7 @@ export const RecordCountProcurementProvider = ({
   const cacheKey = pidUser ? `procurement-count:${pidUser}` : null;
 
   useEffect(() => {
-    if (!pidUser) return;
+    if (tenantScoped || !pidUser) return;
 
     if (cacheKey) {
       const cached = sessionStorage.getItem(cacheKey);
@@ -76,10 +78,10 @@ export const RecordCountProcurementProvider = ({
       }
     };
     fetchRecord();
-  }, [pidUser, cacheKey]);
+  }, [pidUser, cacheKey, tenantScoped]);
 
   //alert(pidUser)
-  if (!user?.pidUser) {
+  if (!tenantScoped && !user?.pidUser) {
     return <Loader />;
   }
 

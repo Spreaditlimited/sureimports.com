@@ -43,9 +43,10 @@ interface OrderCardProps {
   id: number;
   order: Order;
   onDelete: (id: string) => void; // Expect string to match pidOrder
+  partner?: { content: React.ReactNode; onExpand: () => void; onAddProduct?: () => void };
 }
 
-export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
+export default function OrderCard({ id, order, onDelete, partner }: OrderCardProps) {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -57,7 +58,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!pidUser || !order.pidOrder) return;
+      if (partner || !pidUser || !order.pidOrder) return;
       try {
         const res = await fetch(
           `/api/get-data/procurement-order-products/${pidUser}/${order.pidOrder}`,
@@ -70,17 +71,17 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
       }
     };
     fetchProducts();
-  }, [pidUser, order.pidOrder]);
+  }, [pidUser, order.pidOrder, Boolean(partner)]);
 
   useEffect(() => {
-    if (order.status !== 'saved') return;
+    if (partner || order.status !== 'saved') return;
 
     const updateCountdown = () => setCountdownNow(Date.now());
     updateCountdown();
     const intervalId = window.setInterval(updateCountdown, 60_000);
 
     return () => window.clearInterval(intervalId);
-  }, [order.status]);
+  }, [order.status, Boolean(partner)]);
 
   const savedOrderCountdown =
     order.status === 'saved' && countdownNow !== null
@@ -102,10 +103,11 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
 
   const handleAddProduct = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent accordion from toggling
+    if (partner) { partner.onAddProduct?.(); return; }
     router.push(`/dashboard/procurement/add-product/${order.pidOrder}`);
   };
 
-  if (!productData) {
+  if (!productData && !partner) {
     return (
       <div className="h-24 w-full animate-pulse rounded-[24px] bg-slate-50 dark:bg-slate-800/50" />
     );
@@ -113,7 +115,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
 
   return (
     <div className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
-      <Accordion type="single" collapsible className="w-full border-none">
+      <Accordion type="single" collapsible className="w-full border-none" onValueChange={value => { if (value) partner?.onExpand(); }}>
         <AccordionItem value={`item-${order.pidOrder}`} className="border-none">
           {/* Card Header (Always Visible) */}
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
@@ -149,7 +151,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
             {/* Right Action Section */}
             <div className="flex items-center gap-2 sm:shrink-0">
               {/* Add Product Button */}
-              {(order.status === 'saved' || order.status === 'on-hold') && (
+              {(partner ? Boolean(partner.onAddProduct) : order.status === 'saved' || order.status === 'on-hold') && (
                 <button
                   onClick={handleAddProduct}
                   className="flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-5 text-xs font-bold text-white shadow-md shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-95"
@@ -159,7 +161,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
               )}
 
               {/* Delete Button & Modal */}
-              {order.status === 'saved' && (
+              {!partner && order.status === 'saved' && (
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                   <DialogTrigger asChild>
                     <button
@@ -209,7 +211,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
               )}
 
               {/* Custom Accordion Trigger */}
-              <AccordionTrigger className="flex h-10 w-10 !flex-none items-center !justify-center rounded-xl bg-slate-50 p-0 !py-0 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:text-white [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180">
+              <AccordionTrigger aria-label={`View order ${order.orderName}`} className="flex h-10 w-10 !flex-none items-center !justify-center rounded-xl bg-slate-50 p-0 !py-0 text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-800/50 dark:hover:bg-slate-800 dark:hover:text-white [&>svg:last-child]:hidden [&[data-state=open]>svg:first-child]:rotate-180">
                 <ChevronDown className="h-5 w-5 transition-transform duration-200" />
               </AccordionTrigger>
             </div>
@@ -217,7 +219,7 @@ export default function OrderCard({ id, order, onDelete }: OrderCardProps) {
 
           {/* Expandable Content (Products Table) */}
           <AccordionContent className="border-t border-slate-100 bg-slate-50/50 p-0 dark:border-slate-800 dark:bg-slate-900/30">
-            <MoreOrders products={productData as any} />
+            {partner ? partner.content : <MoreOrders products={productData as any} />}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

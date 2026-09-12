@@ -65,7 +65,7 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export default function AddProductForm() {
+export default function AddProductForm({ partner }: { partner?: { currency: string; unit: 'KG' | 'CBM'; initial?: Partial<FormValues>; onSave: (values: FormValues) => Promise<void> } }) {
   const { isModalOpen, openModal, closeModal } = useModal();
   const params = useParams();
   const navigateWithAlert = useNavigationWithAlert();
@@ -90,10 +90,12 @@ export default function AddProductForm() {
       productWeight: '',
       productQuantity: '1',
       productInfo: '',
+      ...partner?.initial,
     },
   });
 
   useEffect(() => {
+    if (partner) { setCurrencyType(partner.currency); setMeasurementUnit(partner.unit); return; }
     async function fetchDataOrder() {
       if (!pidOrderx) return;
       try {
@@ -110,7 +112,7 @@ export default function AddProductForm() {
       }
     }
     fetchDataOrder();
-  }, [pidOrderx]);
+  }, [pidOrderx, partner]);
 
   const onSubmit = async (values: FormValues) => {
     if (parseFloat(values.productPrice) < 0.001) {
@@ -124,6 +126,7 @@ export default function AddProductForm() {
 
     setIsSubmitting(true);
     try {
+      if (partner) { await partner.onSave(values); return; }
       const res = await fetch('/api/crud/procurement-add-product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -141,8 +144,8 @@ export default function AddProductForm() {
       } else {
         toast.warning(data.responsex.message || 'Action failed.');
       }
-    } catch {
-      toast.error('Connection error. Please try again.');
+    } catch (error) {
+      toast.error(partner && error instanceof Error ? error.message : 'Connection error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

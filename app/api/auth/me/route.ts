@@ -5,14 +5,7 @@ import { cookies } from 'next/headers';
 
 const prisma = new PrismaClient();
 
-async function ensureUsersBusinessNameColumn() {
-  await prisma.$executeRawUnsafe(
-    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
-  );
-}
-
 async function getBusinessName(pidUser: string) {
-  await ensureUsersBusinessNameColumn();
   const rows = (await prisma.$queryRawUnsafe(
     `SELECT businessName FROM users WHERE pidUser = ? LIMIT 1`,
     pidUser,

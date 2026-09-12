@@ -8,23 +8,23 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import r2ImageUpload from '@/lib/helpers/r2ImageUpload';
 import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
+import { currentUser } from '@/lib/auth/current-user';
 
 const prisma = new PrismaClient();
 
-async function ensureUsersBusinessNameColumn() {
-  await prisma.$executeRawUnsafe(
-    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
-  );
-}
-
 export async function POST(request: Request) {
-  await ensureUsersBusinessNameColumn();
+  const denied = (message: string, status: number) => NextResponse.json(
+    { responsex: { status: 'FAILED', message }, successx: false, userx: null }, { status });
+  if (request.headers.get('origin') !== new URL(request.url).origin) return denied('Invalid origin', 403);
+  const session = await currentUser();
+  if (!session) return denied('Unauthorized', 401);
   //GET FORM DATA
   const formData = await request.formData();
 
   const file = formData.get('file') as File;
   const pidUser = formData.get('pidUser') as string;
   const email = formData.get('email') as string;
+  if (pidUser !== session.pidUser || email !== session.userEmail) return denied('Forbidden', 403);
   const fullName = formData.get('fullName') as string;
   const gender = formData.get('gender') as string;
   const dob = formData.get('dob') as string;

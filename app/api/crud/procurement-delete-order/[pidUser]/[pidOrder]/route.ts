@@ -35,6 +35,7 @@ export async function GET(
         pidUser: pidUser,
         pidOrder: pidOrder,
         status: 'saved',
+        partnerOwnership: { is: null },
       },
     });
 
@@ -43,6 +44,7 @@ export async function GET(
         pidUser: pidUser,
         pidOrder: pidOrder,
         //status: 'saved',
+        orders: { partnerOwnership: { is: null } },
       },
     });
 

@@ -20,9 +20,9 @@ function Storecard({ title, icon, href }: StoreItems) {
     prefersDarkVariant && !hasDarkVariantError ? darkVariant : icon;
 
   return (
-    <Link href={href as any} target="_blank">
-      <div className="flex h-[210px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:cursor-pointer hover:shadow-md dark:border-slate-700 dark:bg-[#161629] xl:w-[274px]">
-        <div className="flex h-[152px] items-center justify-center rounded-md border border-slate-100 bg-slate-50 px-3 dark:border-slate-700 dark:bg-[#f8fafc] max-xl:w-[200px] max-sm:w-[300px] xl:w-[250px]">
+    <Link href={href as any} target="_blank" rel="noopener noreferrer" className="min-w-0">
+      <div className="flex h-[210px] w-full min-w-0 flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:cursor-pointer hover:shadow-md dark:border-slate-700 dark:bg-[#161629]">
+        <div className="flex h-[152px] w-full min-w-0 items-center justify-center rounded-md border border-slate-100 bg-slate-50 px-3 dark:border-slate-700 dark:bg-[#f8fafc]">
           <Image
             src={imageSrc}
             alt="store"

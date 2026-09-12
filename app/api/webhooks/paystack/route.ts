@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { POST as handleSureImportsPaystackEvent } from '../../intelligence/paystack-webhook/route';
+import { handlePartnerPaystackEvent } from '@/lib/partners/paystack-order-events';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,12 @@ export async function POST(request: Request) {
   let payload: unknown;
   try { payload = JSON.parse(rawBody); } catch { return NextResponse.json({ message: 'Invalid webhook payload.' }, { status: 400 }); }
   const signature = request.headers.get('x-paystack-signature') || '';
+  const partnerPayload = payload as { data?: { reference?: string; transaction?: { reference?: string } } };
+  const partnerReference = String(partnerPayload.data?.reference || partnerPayload.data?.transaction?.reference || '');
+  if (partnerReference.startsWith('PCO_')) {
+    try { return await handlePartnerPaystackEvent(rawBody, signature); }
+    catch { return NextResponse.json({ message: 'Partner payment requires retry or reconciliation.' }, { status: 503 }); }
+  }
   if (isLineScoutEvent(payload)) {
     const url = (process.env.LINESCOUT_PAYSTACK_WEBHOOK_URL || 'https://linescout.sureimports.com/api/webhooks/paystack').trim();
     const response = await fetch(url, {

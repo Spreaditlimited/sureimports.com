@@ -881,6 +881,39 @@ model admin {
   //posts     Post[]
 }
 
+model procurement_storefront_customers {
+  id           String @id @default(cuid()) @db.VarChar(191)
+  partnerId    String @db.VarChar(191)
+  pidUser      String @db.VarChar(191)
+  email        String @db.VarChar(191)
+  firstName    String @db.VarChar(100)
+  passwordHash String @db.VarChar(191)
+  verifiedAt   DateTime?
+  version      Int @default(0)
+  createdAt    DateTime @default(now())
+  @@unique([partnerId,email])
+  @@unique([partnerId,pidUser])
+}
+
+model procurement_storefront_auth_tokens {
+  hash       String @id @db.Char(64)
+  customerId String @db.VarChar(191)
+  hostname   String @db.VarChar(191)
+  purpose    String @db.VarChar(16)
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+  @@index([customerId,purpose,createdAt], map:"storefront_auth_token_customer_purpose_idx")
+  @@index([expiresAt])
+}
+
+model procurement_storefront_auth_limits {
+  key       String @id @db.Char(64)
+  count     Int @default(0)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
 model users {
   id                        Int                          @id @default(autoincrement())
   pidUser                   String                       @unique()
@@ -947,13 +980,13 @@ model products {
   pidOrder               String
   pidUser                String?
   productName            String?
-  productLink            String?
+  productLink            String? @db.Text
   productCategory        String?
   productPrice           Float?
   productWeight          Float?
   shippingMeasurePerUnit Float?
   productQuantity        Float?
-  productInfo            String?
+  productInfo            String? @db.Text
   productStatus          String?
   pidAdmin               String?
   ext1                   String?
@@ -1012,6 +1045,7 @@ model paysmallsmall {
 }
 
 model orders {
+  partnerOwnership          procurement_partner_orders?
   id                        Int        @id @default(autoincrement())
   pidOrder                  String     @unique()
   pidUser                   String
@@ -1061,6 +1095,224 @@ model orders {
   updatedAt                 DateTime?
   products                  products[]
   user                      users      @relation(fields: [pidUser], references: [pidUser])
+}
+
+// White-label procurement foundation. No live collection until approved.
+// Exclusive commercial membership keyed by affiliate-email-v1 HMAC.
+model commercial_program_memberships {
+  emailHash String @id @db.Char(64)
+  program String @db.VarChar(16)
+  subjectId String @db.VarChar(191)
+  createdAt DateTime @default(now())
+  @@index([program, subjectId], map: "commercial_membership_subject_idx")
+}
+
+model procurement_partners {
+  id                       String @id @default(cuid()) @db.VarChar(191)
+  slug                     String @unique @db.VarChar(80)
+  legalName                String @db.VarChar(191)
+  registrationNumber       String @unique @db.VarChar(80)
+  ownerPidUser             String @unique @db.VarChar(191)
+  status                   String @default("PENDING") @db.VarChar(32)
+  country                  String @default("NG") @db.Char(2)
+  settlementCurrency       String @default("NGN") @db.Char(3)
+  serviceChargeBps         Int @default(1500)
+  partnerShareBps          Int @default(500)
+  pricingRevision          Int @default(1)
+  liveCollectionEnabled    Boolean @default(false)
+  settlementPolicy         String @default("UNCONFIRMED") @db.VarChar(40)
+  paystackSubaccountCode   String? @unique @db.VarChar(80)
+  bankVerifiedAt           DateTime?
+  approvedAt               DateTime?
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  storefront               procurement_partner_storefronts?
+  domains                  procurement_partner_domains[]
+  orders                   procurement_partner_orders[]
+  procurementRequests      procurement_partner_requests[]
+  customerOrders           procurement_partner_customer_orders[]
+  kyc                      procurement_partner_kyc?
+}
+
+model procurement_partner_kyc {
+  partnerId         String @id @db.VarChar(191)
+  status            String @default("DRAFT") @db.VarChar(32)
+  revision          Int @default(0)
+  policyVersion     String @default("2026-09-11") @db.VarChar(24)
+  detailsCiphertext String? @db.LongText
+  reviewCiphertext  String? @db.LongText
+  submittedAt       DateTime?
+  updatedAt         DateTime @updatedAt
+  partner           procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  documents         procurement_partner_kyc_documents[]
+  events            procurement_partner_kyc_events[]
+}
+
+model procurement_partner_kyc_documents {
+  id                String @id @default(cuid()) @db.VarChar(191)
+  partnerId         String @db.VarChar(191)
+  slot              String @db.VarChar(191)
+  cloudinaryId      String @unique @db.VarChar(191)
+  mimeType          String @db.VarChar(40)
+  bytes             Int
+  sha256            String @db.Char(64)
+  status            String @default("UPLOADING") @db.VarChar(24)
+  createdAt         DateTime @default(now())
+  kyc               procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
+  @@index([partnerId, slot, status])
+}
+
+model procurement_partner_kyc_events {
+  id          String @id @default(cuid()) @db.VarChar(191)
+  partnerId   String @db.VarChar(191)
+  actorPid    String @db.VarChar(191)
+  action      String @db.VarChar(40)
+  documentId  String? @db.VarChar(191)
+  detailsCiphertext String? @db.LongText
+  createdAt   DateTime @default(now())
+  kyc         procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
+  emailStatus String @default("NONE") @db.VarChar(24)
+  emailAttempts Int @default(0)
+  emailLockedAt DateTime?
+  emailNextAttemptAt DateTime?
+  emailSentAt DateTime?
+  emailFailureCode String? @db.VarChar(40)
+  @@index([partnerId, createdAt])
+  @@index([emailStatus, emailNextAttemptAt], map: "partner_kyc_email_queue_idx")
+}
+
+model procurement_partner_storefronts {
+  partnerId        String @id @db.VarChar(191)
+  displayName      String @db.VarChar(191)
+  templateKey      String @default("procurement-v1") @db.VarChar(80)
+  content          Json?
+  draftSettings    Json?
+  previousSettings Json?
+  revision         Int @default(0)
+  logoUrl          String? @db.Text
+  primaryColor     String @default("#1d4ed8") @db.VarChar(7)
+  supportEmail     String @db.VarChar(191)
+  supportPhone     String @db.VarChar(32)
+  // Partner receiving destination, never an end-customer delivery address.
+  receivingAddress String @db.Text
+  published        Boolean @default(false)
+  updatedAt        DateTime @updatedAt
+  partner          procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+}
+
+model procurement_partner_domains {
+  id                    String @id @default(cuid()) @db.VarChar(191)
+  partnerId             String @db.VarChar(191)
+  hostname              String @unique @db.VarChar(191)
+  verificationTokenHash String @db.Char(64)
+  verifiedAt            DateTime?
+  readyAt               DateTime?
+  status                String @default("OWNERSHIP_REQUIRED") @db.VarChar(40)
+  primary               Boolean @default(false)
+  lastCheckedAt         DateTime?
+  lastError             String? @db.VarChar(500)
+  dnsInstructions       Json?
+  leaseUntil            DateTime?
+  leaseToken            String? @db.VarChar(80)
+  disconnectedAt        DateTime?
+  expiresAt             DateTime?
+  registrarReference    String? @db.VarChar(191)
+  createdAt             DateTime @default(now())
+  partner               procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  @@index([partnerId])
+}
+
+model procurement_partner_domain_events {
+  id        String @id @default(cuid()) @db.VarChar(191)
+  domainId  String @db.VarChar(191)
+  partnerId String @db.VarChar(191)
+  action    String @db.VarChar(40)
+  message   String @db.VarChar(500)
+  createdAt DateTime @default(now())
+  @@index([partnerId, createdAt])
+  @@index([domainId, createdAt])
+}
+
+model procurement_partner_orders {
+  pidOrder                  String @id @db.VarChar(191)
+  partnerId                 String @db.VarChar(191)
+  source                    String @db.VarChar(24)
+  externalReference         String @db.VarChar(191)
+  currency                  String @default("NGN") @db.Char(3)
+  pricingRevision           Int
+  serviceChargeBps           Int
+  partnerShareBps            Int
+  productCostMinor          BigInt
+  serviceChargeMinor        BigInt
+  partnerEarningsMinor      BigInt
+  sureImportsServiceMinor   BigInt
+  shippingMinor             BigInt
+  taxMinor                  BigInt
+  otherChargesMinor         BigInt
+  // Excludes processing fees; the processor fee is reconciled at checkout.
+  orderTotalMinor           BigInt
+  partnerReceivingAddress   String @db.Text
+  lockedAt                  DateTime @default(now())
+  partner                   procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  order                     orders @relation(fields: [pidOrder], references: [pidOrder], onDelete: Restrict)
+  @@unique([partnerId, externalReference])
+  @@index([partnerId, lockedAt])
+}
+
+// Immutable intake, separate from payable orders and earnings until a verified quote is accepted.
+model procurement_partner_requests {
+  id                  String @id @db.VarChar(80)
+  partnerId           String @db.VarChar(191)
+  externalReference   String @db.VarChar(80)
+  idempotencyKey      String @db.VarChar(100)
+  payloadHash         String @db.Char(64)
+  detailsCiphertext   String @db.LongText
+  status              String @default("SUBMITTED") @db.VarChar(32)
+  actorPid            String @db.VarChar(191)
+  createdAt           DateTime @default(now())
+  partner             procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  @@unique([partnerId, externalReference], map: "partner_request_reference_key")
+  @@unique([partnerId, idempotencyKey], map: "partner_request_retry_key")
+  @@index([partnerId, createdAt], map: "partner_request_owner_idx")
+  @@index([status, createdAt], map: "partner_request_queue_idx")
+}
+
+// Customer drafts remain outside the SI operational orders table until paid and partner-approved.
+model procurement_partner_customer_orders {
+  id                       String @id @db.VarChar(80)
+  partnerId                String @db.VarChar(191)
+  customerPidUser          String @db.VarChar(191)
+  idempotencyKey           String @db.VarChar(100)
+  payloadHash              String @db.Char(64)
+  detailsCiphertext        String @db.LongText
+  status                   String @default("saved") @db.VarChar(32)
+  revision                 Int @default(1)
+  paymentStatus            String @default("UNPAID") @db.VarChar(24)
+  verifiedPaymentReference String? @unique(map: "partner_customer_payment_key") @db.VarChar(191)
+  paidRevision             Int?
+  partnerReview            String @default("NOT_READY") @db.VarChar(24)
+  approvedAt               DateTime?
+  releasedOrderId           String? @unique(map: "partner_customer_release_key") @db.VarChar(191)
+  checkoutReference        String? @unique(map: "partner_customer_checkout_key") @db.VarChar(100)
+  checkoutCiphertext       String? @db.LongText
+  events                   procurement_partner_order_events[]
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  partner                  procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  @@unique([partnerId, customerPidUser, idempotencyKey], map: "partner_customer_retry_key")
+  @@index([partnerId, customerPidUser, createdAt], map: "partner_customer_order_owner_idx")
+  @@index([partnerId, paymentStatus, partnerReview], map: "partner_customer_review_idx")
+}
+
+model procurement_partner_order_events {
+  id               String @id @db.VarChar(80)
+  customerOrderId  String @db.VarChar(80)
+  actorPid         String @db.VarChar(191)
+  action           String @db.VarChar(40)
+  detailsCiphertext String? @db.LongText
+  createdAt        DateTime @default(now())
+  order            procurement_partner_customer_orders @relation(fields: [customerOrderId], references: [id], onDelete: Restrict)
+  @@index([customerOrderId, createdAt], map: "partner_order_event_idx")
 }
 
 model procurement_assistance_cases {

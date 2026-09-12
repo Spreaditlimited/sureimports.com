@@ -33,6 +33,7 @@ export function TrackingPixels() {
         dangerouslySetInnerHTML={{
           __html: `
             !function (w, d, t) {
+              w.TiktokAnalyticsObject = 'ttq';
               var ttq = w.ttq = w.ttq || [];
               ttq.methods = ["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];
               ttq.setAndDefer = function (obj, method) {
@@ -42,7 +43,7 @@ export function TrackingPixels() {
               ttq.load = function (id, config) {
                 var script = d.createElement("script");
                 script.type = "text/javascript"; script.async = true;
-                script.src = "https://analytics.tiktok.com/i18n/pixel/events.js";
+                script.src = "https://analytics.tiktok.com/i18n/pixel/events.js?sdkid=" + encodeURIComponent(id) + "&lib=ttq";
                 var firstScript = d.getElementsByTagName("script")[0];
                 firstScript.parentNode.insertBefore(script, firstScript);
                 ttq._i = ttq._i || {}; ttq._i[id] = [];

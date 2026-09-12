@@ -51,6 +51,7 @@ export type ConversionResult =
       recorded: false;
       reason:
         | 'NO_ATTRIBUTION'
+        | 'PARTNER_ORDER'
         | 'SERVICE_INACTIVE'
         | 'UNSUPPORTED_CURRENCY'
         | 'RATE_NOT_CONFIGURED'
@@ -111,6 +112,10 @@ export async function recordAffiliateConversion(
   input: RecordAffiliateConversionInput,
 ): Promise<ConversionResult> {
   const orderReference = reference(input.externalOrderReference, 120);
+  if (orderReference.startsWith('procurement:')) {
+    const partnerOrder = await prisma.procurement_partner_orders.findUnique({ where: { pidOrder: orderReference.slice('procurement:'.length) }, select: { pidOrder: true } });
+    if (partnerOrder) return { recorded: false, reason: 'PARTNER_ORDER' };
+  }
   const paymentReference = reference(input.externalPaymentReference, 160);
   const service = await prisma.affiliate_program_services.findFirst({
     where: { serviceKey: input.serviceKey, active: true },

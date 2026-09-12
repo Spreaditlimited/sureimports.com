@@ -4,12 +4,6 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-async function ensureUsersBusinessNameColumn() {
-  await prisma.$executeRawUnsafe(
-    `ALTER TABLE users ADD COLUMN IF NOT EXISTS businessName VARCHAR(191) NULL`,
-  );
-}
-
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
 
@@ -25,7 +19,6 @@ export async function GET(req: NextRequest) {
   const pidUser = String((userData as any)?.pidUser || '').trim();
   if (!pidUser) return NextResponse.json({ user: userData });
 
-  await ensureUsersBusinessNameColumn();
   const rows = (await prisma.$queryRawUnsafe(
     `SELECT businessName FROM users WHERE pidUser = ? LIMIT 1`,
     pidUser,

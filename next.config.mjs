@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    allowedDevOrigins: ['192.168.1.173'],
     async redirects() {
       return [
+        {
+          source: '/partners/:path*',
+          destination: `${process.env.NODE_ENV === 'development' ? 'http://localhost:3003' : 'https://partner.sureimports.com'}/partners/:path*`,
+          permanent: false,
+        },
         {
           source: '/corporate-gifts',
           destination: '/corporate-sourcing',

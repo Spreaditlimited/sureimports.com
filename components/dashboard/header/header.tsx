@@ -17,7 +17,7 @@ const user = {
   email: 'spreaditglobal@gmail.com',
 };
 
-export default function Header() {
+export default function Header({ title, mobileNavigation, accountActions }: { title?: string; mobileNavigation?: React.ReactNode; accountActions?: React.ReactNode }) {
   const router = useRouter();
   const { isOpen } = useSidebar();
   const { user, logout } = useAuth();
@@ -34,7 +34,7 @@ export default function Header() {
       <nav className="mx-4 flex h-[90px] items-center justify-between py-[20px] lg:ml-0">
         <div className="flex flex-1">
           <div className={cn('flex gap-5 lg:hidden')}>
-            <MobileSidebar />
+            {mobileNavigation ?? <MobileSidebar />}
             <div className="item-center flex md:hidden">
               <Image
                 loading="lazy"
@@ -47,11 +47,11 @@ export default function Header() {
             </div>
           </div>
           <div className="flex flex-1 md:pl-5 lg:ml-[36px] lg:p-0">
-            <Search />
+            {title ? <span className="font-semibold text-slate-900 dark:text-white">{title}</span> : <Search />}
           </div>
         </div>
         <div className="ml-4 flex items-center gap-[23px] max-xl:gap-[10px]">
-          <div className="hidden items-center gap-[15px] lg:flex">
+          {!accountActions && <div className="hidden items-center gap-[15px] lg:flex">
             <Button
               className="h-[50px] w-[52px] rounded-[19px] bg-slate-100 hover:bg-[#161629]/10 dark:bg-gray-700 dark:hover:bg-gray-600"
               onClick={() => {
@@ -60,8 +60,8 @@ export default function Header() {
             >
               <Settings className="h-5 w-5 text-slate-700 dark:text-slate-200" />
             </Button>
-          </div>
-          <UserNav userz={user as any} />
+          </div>}
+          {accountActions ?? <UserNav userz={user as any} />}
         </div>
       </nav>
     </div>

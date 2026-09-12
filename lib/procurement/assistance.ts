@@ -85,7 +85,7 @@ export async function mergeSavedOrders(input: {
       throw new Error('One or more orders were not found.');
     if (
       orders.some(
-        (order) => order.status !== 'saved' || order.mergedIntoOrderId,
+        (order) => order.status !== 'saved' || order.mergedIntoOrderId || order.orderType === 'PARTNER_PROCUREMENT',
       )
     ) {
       throw new Error('Only active saved orders can be merged.');

@@ -3,6 +3,8 @@
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
+import ProcurementTrackerFrame from '../components/ProcurementTrackerFrame';
+import ProcurementEmptyState from '../components/ProcurementEmptyState';
 import OrderSection from '../../view-orders/components/order-section';
 import ProcurementDraftTools from '../../view-orders/components/ProcurementDraftTools';
 import CreateOrder from '../../create-order/components/createOrder';
@@ -95,94 +97,18 @@ export function ViewOrders({ params }: orderStatus) {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Deep Slate Hero Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <div className="mb-3 flex items-center gap-2">
-                <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-400">
-                  Procurement Tracker
-                </span>
-              </div>
-              
-              {/* Inline Status Navigation */}
-              <div className="flex items-center gap-3">
-                <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-                  Viewing
-                </h1>
-                <Select value={normalizedStatus} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="h-10 w-40 rounded-xl border-white/20 bg-white/10 px-4 text-lg font-bold text-white shadow-none backdrop-blur-md focus:ring-0 focus:ring-offset-0 dark:border-slate-700 dark:bg-slate-800 sm:h-12 sm:w-56 sm:text-2xl">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
-                    {PROCUREMENT_STATUS_ITEMS.map((item) => (
-                      <SelectItem key={item.value} value={item.value}>
-                        {item.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <h1 className="text-3xl font-bold tracking-tight md:text-5xl">
-                  Orders
-                </h1>
-              </div>
-              
-              <p className="mt-4 text-sm font-medium text-slate-400 md:text-base">
-                View, track, and manage your sourcing requests.
-              </p>
-            </div>
-            
-            <div className="flex shrink-0 flex-col items-stretch gap-3 sm:items-end">
-              <CreateOrder className="h-12 rounded-xl bg-[#2E62D9] px-6 text-sm font-semibold text-white shadow-lg shadow-[#2E62D9]/30 hover:bg-[#2754BC] max-md:w-full md:w-auto xl:w-auto" />
-              <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20">
-                  <LayoutList className="h-5 w-5 text-indigo-400" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-white">Total Count</p>
-                  <p className="text-sm font-black text-indigo-400">{countRecords.length} Items</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+  return <ProcurementTrackerFrame status={normalizedStatus} onStatusChange={handleStatusChange} count={countRecords.length} createControl={<CreateOrder className="h-12 rounded-xl bg-[#2E62D9] px-6 text-sm font-semibold text-white" />}>
         {normalizedStatus === 'saved' && <ProcurementDraftTools onChanged={() => fetchOrder(pidUser!, normalizedStatus)} />}
         
         {countRecords.length === 0 ? (
-          /* Premium Empty State */
-          <div className="flex flex-col items-center justify-center rounded-[32px] border border-dashed border-slate-300 bg-white/50 py-24 text-center backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50">
-            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-              <Search className="h-10 w-10 text-slate-400 dark:text-slate-500" />
-            </div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-              No {normalizedStatus.charAt(0).toUpperCase() + normalizedStatus.slice(1)} Orders
-            </h3>
-            <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-              You currently don&apos;t have any procurement requests in this state.
-            </p>
-            <button
-              onClick={() => router.push('/dashboard/procurement/create-order')}
-              className="mt-8 flex items-center gap-2 rounded-xl bg-[#2E62D9] px-8 py-4 text-sm font-bold text-white shadow-lg shadow-[#2E62D9]/30 transition hover:bg-[#2754BC] active:scale-[0.98]"
-            >
-              Create New Order
-            </button>
-          </div>
+          <ProcurementEmptyState status={normalizedStatus} action={<button onClick={() => router.push('/dashboard/procurement/create-order')} className="rounded-xl bg-[#2E62D9] px-8 py-4 text-sm font-bold text-white shadow-lg shadow-[#2E62D9]/30 transition hover:bg-[#2754BC]">Create New Order</button>} />
         ) : (
           /* Order Section Wrapper */
           <div className="rounded-[32px] bg-transparent">
             <OrderSection initialOrders={orderData} />
           </div>
         )}
-      </main>
-    </div>
-  );
+  </ProcurementTrackerFrame>;
 }
 
 export default ViewOrders;

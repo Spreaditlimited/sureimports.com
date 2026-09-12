@@ -15,9 +15,10 @@ import { PackagePlus, X } from 'lucide-react';
 
 interface CreateOrderProps {
   className?: string;
+  renderForm?: (close: () => void) => React.ReactNode;
 }
 
-function CreateOrder({ className }: CreateOrderProps) {
+function CreateOrder({ className, renderForm }: CreateOrderProps) {
   const [isOpen, setIsOpen] = useState<{ isOpen: boolean }>({ isOpen: false });
 
   const handleOpenChange = (open: boolean) => {
@@ -55,7 +56,7 @@ function CreateOrder({ className }: CreateOrderProps) {
         </div>
 
         <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 dark:bg-[#161629] sm:px-8">
-          <CreateOrderForm setIsOpen={setIsOpen} />
+          {renderForm ? renderForm(() => handleOpenChange(false)) : <CreateOrderForm setIsOpen={setIsOpen} />}
           {/* <CreateOrderForm /> */}
         </div>
       </DialogContent>

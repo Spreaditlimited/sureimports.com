@@ -23,6 +23,7 @@ export async function GET(request: NextRequest) {
         pidUser: user.pidUser,
         pidOrder: pidOrder as string,
         status: { not: 'merged' },
+        partnerOwnership: { is: null },
       },
       data: {
         status: 'cancelled',

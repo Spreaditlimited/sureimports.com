@@ -18,6 +18,10 @@ import { LiveChatWidgetComponent } from '@/components/live-chat-widget';
 
 type UserLayoutProps = {
   children: React.ReactNode;
+  navigation?: React.ReactNode;
+  topbar?: React.ReactNode;
+  hideSureImportsSupport?: boolean;
+  tenantScoped?: boolean;
 };
 
 const DashboardLayoutProvider = (props: UserLayoutProps) => {
@@ -67,9 +71,9 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
       <ModalProvider>
         <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-black dark:text-white">
           <div className="a-auto z-20 flex">
-            <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />
+            {props.navigation ?? <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />}
           </div>
-          <Header />
+          {props.topbar ?? <Header />}
 
           <div className="mt-[90px] flex h-full min-h-screen flex-col overflow-hidden bg-slate-50 dark:bg-black lg:ml-[80px]">
             <main
@@ -79,14 +83,14 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
               )}
             >
               {/* Add the WhatsApp button */}
-              <WhatsAppButton
+              {!props.hideSureImportsSupport && <WhatsAppButton
                 waID="5VFC67ZUTMWPF1"
                 message="Hello! I'd like to ask about your services."
                 position="bottom-left"
-              />
+              />}
 
               <AlertProvider>
-                <RecordCountProcurementProvider>
+                <RecordCountProcurementProvider tenantScoped={props.tenantScoped}>
                   <ShopCartProvider>{props.children}</ShopCartProvider>
                 </RecordCountProcurementProvider>
               </AlertProvider>

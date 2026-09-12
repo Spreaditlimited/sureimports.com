@@ -1,9 +1,13 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
+import { currentUser } from '@/lib/auth/current-user';
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await currentUser();
+    if (!session) return NextResponse.json({ statusx: 'FAILED', message: 'Unauthorized' }, { status: 401 });
     const pidUser = request.nextUrl.searchParams.get('pidUser');
+    if (pidUser !== session.pidUser) return NextResponse.json({ statusx: 'FAILED', message: 'Forbidden' }, { status: 403 });
 
     // Validate required parameter
     if (!pidUser) {

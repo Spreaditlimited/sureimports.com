@@ -29,7 +29,7 @@ export function useHorizontalScroll<T extends HTMLDivElement>() {
   return elRef;
 }
 
-export default function OrderTypes() {
+export default function OrderTypes({ partner }: { partner?: { status: string; counts: Record<string, number>; onSelect: (status: string) => void } }) {
   const { user } = useAuth();
   const path = usePathname();
   const scrollRef = useHorizontalScroll<HTMLDivElement>();
@@ -39,7 +39,7 @@ export default function OrderTypes() {
 
   useEffect(() => {
     const fetchRecord = async () => {
-      if (!pidUser) return;
+      if (!pidUser || partner) return;
       try {
         const res = await fetch(`/api/get-data/procurement-count/${pidUser}/saved`);
         const data = await res.json();
@@ -49,16 +49,17 @@ export default function OrderTypes() {
       }
     };
     fetchRecord();
-  }, [pidUser]);
+  }, [pidUser, Boolean(partner)]);
 
-  if (!user?.pidUser) {
+  if (!user?.pidUser && !partner) {
     return <Loader />;
   }
 
-    const OrderTypeItems = PROCUREMENT_STATUS_ITEMS.map((item) => ({
+    const OrderTypeItems = PROCUREMENT_STATUS_ITEMS.filter(item => !partner || !item.value.startsWith('bank-pending')).map((item) => ({
     title: item.title,
-    href: item.href,
-    count: recordx?.[item.countKey],
+    href: partner ? '#' : item.href,
+    value: item.value,
+    count: partner ? partner.counts[item.value] || 0 : recordx?.[item.countKey],
   }));
 
   return (
@@ -68,13 +69,14 @@ export default function OrderTypes() {
         className="no-scrollbar flex gap-2 overflow-x-auto py-3 px-1 scroll-smooth"
       >
         {OrderTypeItems.map((item) => {
-          const isActive = path === item.href;
+          const isActive = partner ? partner.status === item.value : path === item.href;
           const count = item.count as number | undefined;
 
           return (
             <Link
               href={item.href}
               key={item.title}
+              onClick={partner ? event => { event.preventDefault(); partner.onSelect(item.value); } : undefined}
               className={cn(
                 "group relative flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200",
                 isActive

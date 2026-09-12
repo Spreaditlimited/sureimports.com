@@ -21,6 +21,7 @@ export async function getProcurementOrderLifecycle(
     where: { pidOrder, ...(pidUser ? { pidUser } : {}) },
   });
   if (!order) throw new Error('Order not found.');
+  if (order.orderType === 'PARTNER_PROCUREMENT') throw new Error('Manage this order through its partner storefront workflow.');
 
   const [products, country, plan, financial] = await Promise.all([
     prisma.products.findMany({

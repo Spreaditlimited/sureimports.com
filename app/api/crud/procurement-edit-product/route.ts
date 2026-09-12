@@ -6,7 +6,6 @@ import fileFilter from '@/utils/fileFilter';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
-import { useRouter } from 'next/navigation';
 import { normalizeProductUrl } from '@/lib/productUrl';
 import { requireProcurementUser } from '@/lib/procurement/assistance';
 
@@ -101,7 +100,7 @@ export async function POST(request: Request) {
     const existingProduct = await prisma.products.findFirst({
       where: { pidUser: user.pidUser, pidProduct },
       select: {
-        orders: { select: { shippingPricingVersion: true, status: true } },
+        orders: { select: { shippingPricingVersion: true, status: true, orderType: true } },
       },
     });
     if (!existingProduct) {
@@ -111,7 +110,7 @@ export async function POST(request: Request) {
         { status: 404 },
       );
     }
-    if (!['saved', 'on-hold'].includes(String(existingProduct.orders.status || ''))) {
+    if (existingProduct.orders.orderType === 'PARTNER_PROCUREMENT' || !['saved', 'on-hold'].includes(String(existingProduct.orders.status || ''))) {
       const responsex = {
         message: 'Products can only be changed while an order is saved or on hold.',
         status: 'ORDER_NOT_EDITABLE',
