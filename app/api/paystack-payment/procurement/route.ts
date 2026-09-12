@@ -288,6 +288,7 @@ export async function POST(request: Request) {
             exchangeRate3: shouldUpdateOrderTotals
               ? lifecycle.snapshot.exchangeRate3
               : undefined,
+            productPricingVersion: shouldUpdateOrderTotals ? lifecycle.snapshot.productPricingVersion : undefined,
             updatedAt: new Date(),
           },
         });

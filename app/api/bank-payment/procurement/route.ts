@@ -178,6 +178,7 @@ export async function POST(request: Request) {
           exchangeRate3: shouldFreezeEstimate
             ? lifecycle.snapshot.exchangeRate3
             : undefined,
+          productPricingVersion: shouldFreezeEstimate ? lifecycle.snapshot.productPricingVersion : undefined,
           status: pendingStatus,
           updatedAt: new Date(),
         },

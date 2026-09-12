@@ -36,8 +36,8 @@ const partner = {
   settlementPolicy: 'UNCONFIRMED',
 };
 
-test('standard split collection is permitted only after all business and bank gates pass', () => {
-  assert.equal(partnerCollectionBlockReason({ ...partner, liveCollectionEnabled: true, settlementPolicy: 'PAYSTACK_AUTO_SPLIT' }), null);
+test('wallet collection is permitted after business approval without a subaccount', () => {
+  assert.equal(partnerCollectionBlockReason({ ...partner, liveCollectionEnabled: true, settlementPolicy: 'EARNINGS_WALLET' }), null);
 });
 
 test('production collection stays blocked, even if toggled on prematurely', () => {
@@ -75,6 +75,6 @@ test('country, approval and bank checks fail closed', () => {
   );
   assert.equal(
     partnerCollectionBlockReason({ ...partner, bankVerifiedAt: null }),
-    'BANK_NOT_VERIFIED',
+    'COLLECTION_DISABLED',
   );
 });

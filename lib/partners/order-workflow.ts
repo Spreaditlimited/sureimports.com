@@ -1,3 +1,4 @@
+import { creditWallet } from './wallet';
 import 'server-only';
 import { createHmac, hkdfSync, randomUUID } from 'node:crypto';
 import type { Prisma } from '@prisma/client';
@@ -40,7 +41,8 @@ type Checkout = {
   reference: string;
   revision: number;
   domain: 'live';
-  subaccount: string;
+  subaccount?: string;
+  settlementPolicy?: 'EARNINGS_WALLET';
   callbackHost: string;
   url?: string;
 };
@@ -142,6 +144,8 @@ async function currentCost(row: Row) {
   return priceCustomerOrder(input, shipping, {
     ngnPerUsd: Number(financial.exNairaToDollar),
     cnyPerUsd: Number(financial.exYuanToDollar),
+    ngnPerCny: Number(financial.exNairaToYuan),
+    productPricingVersion: 2,
     vatPercent: Number(financial.vat),
     minimumOrderNgn: Number(financial.procurementMinimumOrderNgn),
     serviceChargeBps: partner.serviceChargeBps,
@@ -168,8 +172,11 @@ export async function customerOrderDetail(
       })
     : null;
   // Never expose partner earning allocations or internal receiving addresses to customers.
+  const [receipt] = await prisma.$queryRaw<Array<{ deliveryConfirmedAt: Date | null; state: string }>>`SELECT deliveryConfirmedAt,state FROM partner_wallet_credits WHERE orderId=${id}`;
   return {
     id: row.id,
+    receiptConfirmedAt: receipt?.deliveryConfirmedAt?.toISOString() || null,
+    canConfirmReceipt: Boolean(receipt?.state === 'PENDING' && !receipt.deliveryConfirmedAt && operational?.status === 'completed' && row.paymentStatus === 'PAID'),
     revision: row.revision,
     status: operational?.status || row.status,
     paymentStatus: row.paymentStatus,
@@ -186,6 +193,12 @@ export async function customerOrderDetail(
       meetsMinimum: cost.meetsMinimum,
     },
     shipping: cost.shipping,
+    rates: {
+      ngnPerUsd: cost.config.ngnPerUsd,
+      cnyPerUsd: cost.config.cnyPerUsd,
+      ngnPerCny: cost.config.ngnPerCny || 0,
+      directRmbToNgn: cost.config.productPricingVersion === 2,
+    },
     processingFeeMinor:
       paid?.processingFeeMinor ??
       (cost.orderTotalMinor > 0
@@ -343,7 +356,7 @@ export async function initiateCustomerCheckout(
       reference: `PCO_${randomUUID()}`,
       revision,
       domain: 'live',
-      subaccount: p.paystackSubaccountCode!,
+      settlementPolicy: 'EARNINGS_WALLET',
       callbackHost: domain.hostname,
     };
     const encrypted = seal(checkout, row, 'customer-checkout');
@@ -361,6 +374,7 @@ export async function initiateCustomerCheckout(
     await event(tx, row, customerPid, 'CHECKOUT_INITIALIZED');
     return { row, email: customer.userEmail, checkout };
   });
+  if (intent.checkout.settlementPolicy !== 'EARNINGS_WALLET' || intent.checkout.subaccount) throw new FlowError('This older checkout uses a different settlement arrangement. Contact support before making payment.', 409);
   if (intent.checkout.url) return { url: intent.checkout.url };
   const checkout = intent.checkout;
   if (!checkout.callbackHost)
@@ -383,17 +397,13 @@ export async function initiateCustomerCheckout(
         amount: checkout.totalMinor,
         currency: 'NGN',
         reference: checkout.reference,
-        subaccount: checkout.subaccount,
-        transaction_charge:
-          checkout.totalMinor - checkout.cost.partnerEarningsMinor,
-        bearer: 'account',
         channels: ['bank', 'ussd'],
         callback_url: `https://${checkout.callbackHost}/dashboard`,
         metadata: {
           partnerCustomerOrderId: id,
           partnerId: intent.row.partnerId,
           revision,
-          settlementPolicy: 'PAYSTACK_AUTO_SPLIT',
+          settlementPolicy: 'EARNINGS_WALLET',
         },
       }),
     },
@@ -516,6 +526,7 @@ export async function commitVerifiedCustomerPayment(
       },
     });
     await tx.$executeRaw`UPDATE procurement_partner_customer_orders SET status = 'pending', paymentStatus = 'PAID', verifiedPaymentReference = ${reference}, paidRevision = revision, partnerReview = 'AWAITING_REVIEW', updatedAt = NOW(3) WHERE id = ${row.id}`;
+    if (checkout.settlementPolicy === 'EARNINGS_WALLET' && !checkout.subaccount) await creditWallet(tx, row.partnerId, row.id, checkout.cost.partnerEarningsMinor);
     await event(tx, row, 'PAYSTACK_VERIFIED', 'PAYMENT_CONFIRMED');
     return { id: row.id, duplicate: false };
   });
@@ -596,6 +607,8 @@ export async function approveCustomerOrder(
         serviceCharge: String(cost.serviceChargeBps / 100),
         exchangeRate1: String(cost.config.ngnPerUsd),
         exchangeRate2: String(cost.config.cnyPerUsd),
+        exchangeRate3: String(cost.config.ngnPerCny || 0),
+        productPricingVersion: cost.config.productPricingVersion ?? 1,
         updatedAt: new Date(),
       },
     });

@@ -7,6 +7,7 @@ import {
   shippingCostInUsd,
 } from './shippingMath';
 import { normalizeProcurementMinimumOrderNgn } from './minimumOrder';
+import { procurementProductValue } from './productPricing';
 
 const EDITABLE_ESTIMATE_STATUSES = new Set(['saved', 'on-hold']);
 
@@ -74,12 +75,12 @@ export async function getProcurementOrderLifecycle(
         finiteNumber(product.productPrice),
     0,
   );
-  const productsTotalUsd =
-    order.currencyType === 'CNY'
-      ? productsTotalRaw / cnyPerUsd
-      : order.currencyType === 'NGN'
-        ? productsTotalRaw / ngnPerUsd
-        : productsTotalRaw;
+  const productPricingVersion = useLatestEstimate ? 2 : order.productPricingVersion ?? 1;
+  const ngnPerCny = useLatestEstimate
+    ? finiteNumber(financial.exNairaToYuan)
+    : finiteNumber(order.exchangeRate3);
+  const productValue = procurementProductValue(productsTotalRaw, order.currencyType || 'USD', country?.countryName || '', {ngnPerUsd, cnyPerUsd, ngnPerCny}, productPricingVersion);
+  const productsTotalUsd = productValue.usd;
   const totalMeasurement = products.reduce(
     (total, product) =>
       total +
@@ -193,6 +194,8 @@ export async function getProcurementOrderLifecycle(
     shippingUnit,
     shippingRateCurrency,
     productsTotalUsd,
+    productsTotalNgn: productValue.ngn,
+    directRmbToNgn: productValue.direct,
     productsCount: products.length,
     totalMeasurement,
     domesticShippingCostUsd,
@@ -215,7 +218,7 @@ export async function getProcurementOrderLifecycle(
     rates: {
       ngnPerUsd,
       cnyPerUsd,
-      ngnPerCny: finiteNumber(financial.exNairaToYuan),
+      ngnPerCny,
     },
     payment: {
       dueUsd: money(paymentDueUsd),
@@ -226,6 +229,7 @@ export async function getProcurementOrderLifecycle(
       minimumOrderNgn,
     },
     snapshot: {
+      productPricingVersion,
       orderTotalCost: String(dynamicGrandTotalUsd),
       orderWeight: String(totalMeasurement),
       orderShippingCost: String(dynamicEstimatedShippingCostUsd),

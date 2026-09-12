@@ -109,6 +109,8 @@ export default function MoreOrders({
   const [currencyType, setCurrencyType] = useState<string>('...');
   const [exNairaToDollar, setExNairaToDollar] = useState<number>(0);
   const [exYuanToDollar, setExYuanToDollar] = useState<number>(0);
+  const [exNairaToYuan, setExNairaToYuan] = useState(0);
+  const [directRmbToNgn, setDirectRmbToNgn] = useState(false);
 
   const [serviceCharge, setServiceCharge] = useState<number>(0);
   const [serviceChargeValue, setServiceChargeValue] = useState<number>(0);
@@ -148,6 +150,9 @@ export default function MoreOrders({
   const shouldShowYuanRate =
     normalizedCurrency === 'CNY' && Number(exYuanToDollar) > 0;
   const isWalletEligibleForOrder = normalizedDestination.includes('nigeria');
+  const formatOrderAmount = (usd: number) => isWalletEligibleForOrder
+    ? `₦${formatCurrency(usd * exNairaToDollar)}`
+    : `$${formatCurrency(usd)}`;
   const isSavedNigeriaOrderBelowMinimum =
     status === 'saved' &&
     normalizedDestination.includes('nigeria') &&
@@ -187,6 +192,8 @@ export default function MoreOrders({
         setCurrencyType(data.currencyType);
         setExNairaToDollar(replaceNullWithZero(data.exNairaToDollar) as number);
         setExYuanToDollar(replaceNullWithZero(data.exYuanToDollar) as number);
+        setExNairaToYuan(Number(data.exNairaToYuan || 0));
+        setDirectRmbToNgn(Boolean(data.directRmbToNgn));
         setServiceCharge(replaceNullWithZero(data.serviceCharge) as number);
         setServiceChargeValue(replaceNullWithZero(data.serviceChargeValue) as number);
         setVat(replaceNullWithZero(data.vat) as number);
@@ -662,9 +669,11 @@ export default function MoreOrders({
 
             {/* Exchange Rates Display */}
             <div className="space-y-2 pt-2 text-xs text-slate-500">
-              <p className="font-bold uppercase tracking-widest mb-1 text-[10px]">Active Exchange Rates</p>
+              <p className="font-bold uppercase tracking-widest mb-1 text-[10px]">Exchange Rates</p>
               {shouldShowYuanRate && <p>1 USD = ¥{formatCurrency(exYuanToDollar)} Yuan</p>}
               {shouldShowNairaRate && <p>1 USD = ₦{formatCurrency(exNairaToDollar)} Naira</p>}
+              {shouldShowNairaRate && exNairaToYuan > 0 && <p>1 RMB = ₦{formatCurrency(exNairaToYuan)}</p>}
+              {directRmbToNgn && <p>RMB product prices are converted directly to Naira.</p>}
               {!shouldShowYuanRate && !shouldShowNairaRate && (
                 <p className="text-slate-400">Exchange rates unavailable for this route.</p>
               )}
@@ -681,7 +690,7 @@ export default function MoreOrders({
               <div className="flex justify-between">
                 <span className="text-slate-500">Products Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  ${formatCurrency(productsTotalPrice)}
+                  {formatOrderAmount(productsTotalPrice)}
                 </span>
               </div>
 
@@ -690,42 +699,42 @@ export default function MoreOrders({
                 <>
                   <div className="flex justify-between text-slate-500">
                     <span>Est. Domestic Shipping</span>
-                    <span>${formatCurrency(domesticShippingCost)}</span>
+                    <span>{formatOrderAmount(domesticShippingCost)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Est. Intl. Shipping</span>
-                    <span>${formatCurrency(estimatedTotalShippingCost - domesticShippingCost)}</span>
+                    <span>{formatOrderAmount(estimatedTotalShippingCost - domesticShippingCost)}</span>
                   </div>
                   <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
                     <span className="font-semibold text-slate-900 dark:text-white">Est. Total Shipping</span>
-                    <span className="font-bold text-slate-900 dark:text-white">${formatCurrency(estimatedTotalShippingCost)}</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{formatOrderAmount(estimatedTotalShippingCost)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Actual Domestic Shipping</span>
-                    <span>${formatCurrency(actualDomesticShippingCostValue)}</span>
+                    <span>{formatOrderAmount(actualDomesticShippingCostValue)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Actual Intl. Shipping</span>
-                    <span>${formatCurrency(actualInternationalShippingCost)}</span>
+                    <span>{formatOrderAmount(actualInternationalShippingCost)}</span>
                   </div>
                   <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
                     <span className="font-semibold text-slate-900 dark:text-white">Actual Total Shipping</span>
-                    <span className="font-bold text-slate-900 dark:text-white">${formatCurrency(actualTotalShippingCost)}</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{formatOrderAmount(actualTotalShippingCost)}</span>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="flex justify-between text-slate-500">
                     <span>Est. Domestic Shipping</span>
-                    <span>${formatCurrency(domesticShippingCost)}</span>
+                    <span>{formatOrderAmount(domesticShippingCost)}</span>
                   </div>
                   <div className="flex justify-between text-slate-500">
                     <span>Est. Intl. Shipping</span>
-                    <span>${formatCurrency(estimatedTotalShippingCost - domesticShippingCost)}</span>
+                    <span>{formatOrderAmount(estimatedTotalShippingCost - domesticShippingCost)}</span>
                   </div>
                   <div className="flex justify-between border-t border-slate-200 pt-2 dark:border-slate-700">
                     <span className="font-semibold text-slate-900 dark:text-white">Est. Total Shipping</span>
-                    <span className="font-bold text-slate-900 dark:text-white">${formatCurrency(estimatedTotalShippingCost)}</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{formatOrderAmount(estimatedTotalShippingCost)}</span>
                   </div>
                 </>
               )}
@@ -733,11 +742,11 @@ export default function MoreOrders({
               {/* Fees */}
               <div className="flex justify-between pt-2">
                 <span className="text-slate-500">Service Charge ({serviceCharge}%)</span>
-                <span className="text-slate-500">${formatCurrency(serviceChargeValue)}</span>
+                <span className="text-slate-500">{formatOrderAmount(serviceChargeValue)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">VAT ({vat}%)</span>
-                <span className="text-slate-500">${formatCurrency(vatValue)}</span>
+                <span className="text-slate-500">{formatOrderAmount(vatValue)}</span>
               </div>
             </div>
 
@@ -762,7 +771,7 @@ export default function MoreOrders({
                   )}
                   {currencyType === 'CNY' && (
                     <p className="break-words text-sm font-semibold leading-tight">
-                      ¥{formatCurrency(grandTotalCost * exYuanToDollar)}
+                      ¥{formatCurrency(directRmbToNgn && exNairaToYuan > 0 ? grandTotalCost * exNairaToDollar / exNairaToYuan : grandTotalCost * exYuanToDollar)}
                     </p>
                   )}
                   {destinationCountry === 'United Kingdom' && (

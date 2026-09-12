@@ -1,3 +1,4 @@
+import { walletTransferWebhook, WalletError } from '@/lib/partners/wallet';
 import { NextResponse } from 'next/server';
 import { POST as handleSureImportsPaystackEvent } from '../../intelligence/paystack-webhook/route';
 import { handlePartnerPaystackEvent } from '@/lib/partners/paystack-order-events';
@@ -17,7 +18,11 @@ export async function POST(request: Request) {
   try { payload = JSON.parse(rawBody); } catch { return NextResponse.json({ message: 'Invalid webhook payload.' }, { status: 400 }); }
   const signature = request.headers.get('x-paystack-signature') || '';
   const partnerPayload = payload as { data?: { reference?: string; transaction?: { reference?: string } } };
-  const partnerReference = String(partnerPayload.data?.reference || partnerPayload.data?.transaction?.reference || '');
+  const partnerReference = String(partnerPayload.data?.transaction?.reference || partnerPayload.data?.reference || '');
+  if (partnerReference.startsWith('pww_')) {
+    try { return NextResponse.json(await walletTransferWebhook(rawBody, signature)); }
+    catch (error) { return NextResponse.json({ message: 'Partner transfer reconciliation required.' }, { status: error instanceof WalletError ? error.status : 503 }); }
+  }
   if (partnerReference.startsWith('PCO_')) {
     try { return await handlePartnerPaystackEvent(rawBody, signature); }
     catch { return NextResponse.json({ message: 'Partner payment requires retry or reconciliation.' }, { status: 503 }); }

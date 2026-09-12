@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { registerHooks } from 'node:module';
+process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY='sk_test_synthetic';
+const fixture={payments:[],updates:[],conversions:[],mails:[],verifiedAmount:25000000};
+fixture.lifecycle={productsTotalUsd:100,rates:{ngnPerUsd:1500},order:{status:'saved'},payment:{isPayable:true,due:250000,currency:'NGN',minimumOrderNgn:1000,nextStatus:'pending'},snapshot:{orderTotalCost:'166.666666',exchangeRate1:'1500',exchangeRate2:'7',exchangeRate3:'225',productPricingVersion:2}};
+fixture.db={payments:{findFirst:async()=>fixture.payments[0],create:async({data})=>fixture.payments.push(data)},users:{findUnique:async()=>({userFirstname:'Synthetic',userEmail:'synthetic@example.test'})},orders:{updateMany:async({data})=>{fixture.updates.push(data);return {count:1}}},$transaction:async fn=>fn(fixture.db)};
+globalThis.__procPay=fixture;
+const inline=s=>({url:'data:text/javascript,'+encodeURIComponent(s),shortCircuit:true});
+const hook=registerHooks({resolve(s,c,n){
+ if(s==='next/server')return inline('export const NextResponse=Response');
+ if(s==='@/lib/prisma')return inline('export const prisma=globalThis.__procPay.db');
+ if(s==='@/lib/email/xMail')return inline('export default async function mail(v){globalThis.__procPay.mails.push(v)}');
+ if(s==='@/lib/helpers/randomGenerator')return inline('export default ()=>"synthetic"');
+ if(s==='@/lib/procurement/orderLifecycle')return inline('export const getProcurementOrderLifecycle=async()=>globalThis.__procPay.lifecycle');
+ if(s==='@/lib/procurement/minimumOrder')return inline('export const procurementMinimumOrderMessage=()=>"Below minimum"');
+ if(s==='@/lib/affiliate/commissions')return inline('export const AFFILIATE_SERVICE_KEYS={BUY_FROM_CHINESE_WEBSITES:"procurement"};export const recordAffiliateConversion=async v=>globalThis.__procPay.conversions.push(v)');
+ return n(s,c);
+}});
+const {POST}=await import('../app/api/paystack-payment/procurement/route.ts');hook.deregister();
+globalThis.fetch=async(url)=>{assert.match(url,/api.paystack.co\/transaction\/verify\/PROCPAY_fixture/);return Response.json({status:true,data:{status:'success',amount:fixture.verifiedAmount,currency:'NGN',reference:'PROCPAY_fixture'}})};
+const pay=()=>POST(new Request('https://sureimports.test/api/paystack-payment/procurement',{method:'POST',body:JSON.stringify({reference:'PROCPAY_fixture',consumer_id:'customer',service_id:'order',currency:'NGN',amount:250000})}));
+test('ordinary Sure Imports procurement verifies, records payment, freezes pricing and sends receipts',async()=>{
+ fixture.verifiedAmount=100;assert.equal((await pay()).status,400);assert.equal(fixture.payments.length,0);
+ fixture.verifiedAmount=25000000;assert.equal((await pay()).status,200);
+ assert.equal(fixture.payments.length,1);assert.equal(fixture.payments[0].amount,250000);assert.equal(fixture.payments[0].paymentStatus,'PAID');
+ assert.equal(fixture.updates[0].status,'pending');assert.equal(fixture.updates[0].productPricingVersion,2);
+ assert.equal(fixture.conversions[0].eligibleAmount,150000);assert.equal(fixture.mails.length,2);
+ assert.equal((await pay()).status,200);assert.equal(fixture.payments.length,1);assert.equal(fixture.updates.length,1);
+});

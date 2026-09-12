@@ -5,7 +5,7 @@ import { customerProcessingFee } from '../lib/partners/processing-fee.ts';
 process.env.AFFILIATE_SECURITY_KEY = Buffer.alloc(32, 9).toString('base64');
 process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY = 'sk_live_synthetic_never_sent';
 let row, payments = [], orders = [], products = [], ownership = [], requestCount = 0, failProducts = false;
-const partner = { id: 'partner-a', slug: 'shop-a', ownerPidUser: 'owner', status: 'ACTIVE', approvedAt: new Date(), country: 'NG', settlementCurrency: 'NGN', kyc: { status: 'VERIFIED' }, storefront: { published: true, receivingAddress: 'Partner Lagos depot' }, bankVerifiedAt: new Date(), paystackSubaccountCode: 'ACCT_synthetic', liveCollectionEnabled: true, settlementPolicy: 'PAYSTACK_AUTO_SPLIT', serviceChargeBps: 1500, partnerShareBps: 500, pricingRevision: 2 };
+const partner = { id: 'partner-a', slug: 'shop-a', ownerPidUser: 'owner', status: 'ACTIVE', approvedAt: new Date(), country: 'NG', settlementCurrency: 'NGN', kyc: { status: 'VERIFIED' }, storefront: { published: true, receivingAddress: 'Partner Lagos depot' }, bankVerifiedAt: new Date(), paystackSubaccountCode: 'ACCT_synthetic', liveCollectionEnabled: true, settlementPolicy: 'EARNINGS_WALLET', serviceChargeBps: 1500, partnerShareBps: 500, pricingRevision: 2 };
 const tx = {
   $queryRaw: async (strings, ...values) => {
     const sql = strings.join('?');
@@ -26,7 +26,7 @@ const tx = {
   },
   procurement_partners: { findUnique: async () => partner },
   users: { findUnique: async ({ where }) => ({ userEmail: `${where.pidUser}@example.test`, userFirstname: 'Synthetic', userLastname: 'Test' }) },
-  exchange_rate: { findUnique: async () => ({ exNairaToDollar: '1500', exYuanToDollar: '7', vat: '7.5', procurementMinimumOrderNgn: 1000 }) },
+  exchange_rate: { findUnique: async () => ({ exNairaToDollar: '1500', exYuanToDollar: '7', exNairaToYuan: '225', vat: '7.5', procurementMinimumOrderNgn: 1000 }) },
   payments: { findFirst: async ({ where }) => payments.find(p => p.txRef === where.txRef), create: async ({ data }) => { payments.push(data); return data; } },
   orders: { create: async ({ data }) => { orders.push(data); return data; } },
   products: { createMany: async ({ data }) => { if (failProducts) throw new Error('Synthetic transaction failure'); products.push(...data); } },
@@ -38,6 +38,7 @@ globalThis.__partnerFlowDb = { ...tx, $transaction: async callback => {
   try { return await callback(tx); } catch (error) { ({ row, payments, orders, products, ownership } = before); throw error; }
 } };
 const hooks = registerHooks({ resolve(specifier, context, next) {
+  if (specifier === './wallet') return {url:'data:text/javascript,export async function creditWallet(db,partnerId,orderId,amount){if(!Number.isSafeInteger(amount)||amount<0)throw new Error("Invalid wallet earning")}',shortCircuit:true};
   if (specifier === 'server-only') return { url: 'data:text/javascript,export{}', shortCircuit: true };
   if (specifier === '@/lib/prisma') return { url: 'data:text/javascript,export const prisma=globalThis.__partnerFlowDb', shortCircuit: true };
   if (specifier === '@/lib/procurement/shippingPricing') return { url: 'data:text/javascript,export async function resolveNewProcurementShippingPricing(){return {countryName:"Nigeria",planName:"Sea",measurementUnit:"CBM",rateCurrency:"NGN",rate:250000,version:2}}', shortCircuit: true };
@@ -54,9 +55,9 @@ const decode = () => JSON.parse(decryptKyc(Buffer.from(row.checkoutCiphertext, '
 globalThis.fetch = async (url, options) => {
   assert.equal(url, 'https://api.paystack.co/transaction/initialize'); requestCount++;
   const body = JSON.parse(options.body), checkout = decode();
-  assert.equal(body.amount - body.transaction_charge, checkout.cost.partnerEarningsMinor);
+  assert.equal(body.transaction_charge, undefined);
   assert.equal(body.amount, checkout.cost.orderTotalMinor + checkout.processingFeeMinor);
-  assert.equal(body.subaccount, partner.paystackSubaccountCode);
+  assert.equal(body.subaccount, undefined); assert.equal(checkout.settlementPolicy, "EARNINGS_WALLET");
   assert.deepEqual(body.channels, ['bank', 'ussd']);
   return Response.json({ status: true, data: { reference: body.reference, authorization_url: 'https://checkout.paystack.com/synthetic' } });
 };
@@ -81,10 +82,10 @@ test('checkout, verification and partner release enforce ownership, amount and i
   await assert.rejects(initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 0), { status: 409 });
   partner.liveCollectionEnabled = true;
   await assert.rejects(initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 1), { status: 409 });
-  // 150,000 products + 32,500 shipping + 22,500 service + 1,687.50 VAT + 2,000 fee.
-  const result = await initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 20868750);
+  // 157,500 direct-RMB products + 32,500 shipping + 23,625 service + 1,771.88 VAT + 2,000 fee.
+  const result = await initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 21739688);
   assert.equal(result.url, 'https://checkout.paystack.com/synthetic');
-  assert.equal((await initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 20868750)).url, result.url);
+  assert.equal((await initiateCustomerCheckout('shop-a', 'customer', row.id, 1, 21739688)).url, result.url);
   assert.equal(requestCount, 1); assert.equal(orders.length, 0); assert.equal(payments.length, 0);
   const checkout = decode();
   const receipt = { status: 'success', reference: row.checkoutReference, amount: checkout.totalMinor, currency: 'NGN', domain: 'live', orderId: row.id, transactionId: '1234567890' };
@@ -101,7 +102,8 @@ test('checkout, verification and partner release enforce ownership, amount and i
   assert.equal((await approveCustomerOrder('owner', row.id, 1)).duplicate, true);
   assert.equal(orders.length, 1); assert.equal(products.length, 1); assert.equal(ownership.length, 1);
   assert.equal(orders[0].pidUser, 'owner'); assert.equal(orders[0].shippingAddress, 'Partner Lagos depot');
-  assert.equal(orders[0].status, 'pending'); assert.equal(ownership[0].partnerEarningsMinor, 750000n);
+  assert.equal(orders[0].status, 'pending'); assert.equal(ownership[0].partnerEarningsMinor, 787500n);
+  assert.equal(orders[0].productPricingVersion, 2); assert.equal(orders[0].exchangeRate3, '225');
   assert.equal(ownership[0].pricingRevision, 2);
 });
 test('saved cancellation cannot cross customers or touch paid/initialized orders', async () => {

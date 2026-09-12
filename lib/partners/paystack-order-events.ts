@@ -1,3 +1,4 @@
+import { holdWalletCredit } from './wallet';
 import 'server-only';
 import { createHmac, timingSafeEqual, randomUUID } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
@@ -51,7 +52,7 @@ export async function handlePartnerPaystackEvent(
     return Response.json({ message: 'Invalid signature.' }, { status: 401 });
   const event = JSON.parse(raw);
   const reference = String(
-    event.data?.reference || event.data?.transaction?.reference || '',
+    event.data?.transaction?.reference || event.data?.reference || '',
   );
   if (!reference.startsWith('PCO_'))
     return Response.json(
@@ -63,16 +64,20 @@ export async function handlePartnerPaystackEvent(
   } else if (
     [
       'refund.processed',
+      'refund.pending',
+      'refund.processing',
       'charge.dispute.create',
+      'charge.dispute.remind',
       'charge.dispute.resolve',
     ].includes(event.event)
   ) {
     // A dispute resolution is never automatic permission to release goods again.
     await prisma.$transaction(async (tx) => {
       const [row] = await tx.$queryRaw<
-        Array<{ id: string; releasedOrderId: string | null }>
-      >`SELECT id, releasedOrderId FROM procurement_partner_customer_orders WHERE checkoutReference = ${reference} FOR UPDATE`;
-      if (!row) return;
+        Array<{ id: string; partnerId: string; releasedOrderId: string | null; paymentStatus: string }>
+      >`SELECT id, partnerId, releasedOrderId, paymentStatus FROM procurement_partner_customer_orders WHERE checkoutReference = ${reference} FOR UPDATE`;
+      if (!row || row.paymentStatus === 'REVERSED') return;
+      await holdWalletCredit(tx, row.partnerId, row.id, event.event === 'refund.processed', 'PAYSTACK');
       const status =
         event.event === 'refund.processed' ? 'REVERSED' : 'DISPUTED';
       await tx.$executeRaw`UPDATE procurement_partner_customer_orders SET paymentStatus = ${status}, partnerReview = 'REVIEW_REQUIRED', updatedAt = NOW(3) WHERE id = ${row.id}`;

@@ -11,7 +11,7 @@ export type PartnerGate = {
 
 /** Standard settlement explicitly authorised; not escrow or a delivery hold. */
 const supportedSettlementPolicies: ReadonlySet<string> = new Set([
-  'PAYSTACK_AUTO_SPLIT',
+  'EARNINGS_WALLET',
 ]);
 
 export function partnerCollectionBlockReason(
@@ -21,8 +21,6 @@ export function partnerCollectionBlockReason(
     return 'NIGERIA_ONLY';
   if (partner.status !== 'ACTIVE' || !partner.approvedAt)
     return 'PARTNER_NOT_APPROVED';
-  if (!partner.bankVerifiedAt || !partner.paystackSubaccountCode)
-    return 'BANK_NOT_VERIFIED';
   if (!partner.liveCollectionEnabled) return 'COLLECTION_DISABLED';
   if (!supportedSettlementPolicies.has(partner.settlementPolicy))
     return 'SETTLEMENT_POLICY_UNCONFIRMED';

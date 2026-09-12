@@ -1060,6 +1060,7 @@ model orders {
   orderTotalCost            String?
   orderWeight               String?
   shippingPricingVersion    Int?
+  productPricingVersion     Int?
   shippingMeasurementUnit   String?
   shippingRateSnapshot      Float?
   shippingRateCurrency      String?
@@ -1112,6 +1113,8 @@ model procurement_partners {
   slug                     String @unique @db.VarChar(80)
   legalName                String @db.VarChar(191)
   registrationNumber       String @unique @db.VarChar(80)
+  businessType             String? @db.VarChar(32)
+  companyEra               String? @db.VarChar(16)
   ownerPidUser             String @unique @db.VarChar(191)
   status                   String @default("PENDING") @db.VarChar(32)
   country                  String @default("NG") @db.Char(2)
@@ -1132,6 +1135,7 @@ model procurement_partners {
   procurementRequests      procurement_partner_requests[]
   customerOrders           procurement_partner_customer_orders[]
   kyc                      procurement_partner_kyc?
+  earningsWallet           partner_wallet_accounts?
 }
 
 model procurement_partner_kyc {
@@ -1279,6 +1283,7 @@ model procurement_partner_requests {
 
 // Customer drafts remain outside the SI operational orders table until paid and partner-approved.
 model procurement_partner_customer_orders {
+  walletCredit             partner_wallet_credits?
   id                       String @id @db.VarChar(80)
   partnerId                String @db.VarChar(191)
   customerPidUser          String @db.VarChar(191)
@@ -1302,6 +1307,61 @@ model procurement_partner_customer_orders {
   @@unique([partnerId, customerPidUser, idempotencyKey], map: "partner_customer_retry_key")
   @@index([partnerId, customerPidUser, createdAt], map: "partner_customer_order_owner_idx")
   @@index([partnerId, paymentStatus, partnerReview], map: "partner_customer_review_idx")
+}
+
+model partner_wallet_accounts {
+  partnerId String @id @db.VarChar(191)
+  bankCiphertext String? @db.LongText
+  bankVerifiedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  partner procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict, map: "partner_wallet_owner_fk")
+  credits partner_wallet_credits[]
+  withdrawals partner_wallet_withdrawals[]
+  events partner_wallet_events[]
+}
+
+model partner_wallet_credits {
+  orderId String @id @db.VarChar(80)
+  partnerId String @db.VarChar(191)
+  amountMinor BigInt
+  state String @default("PENDING") @db.VarChar(24)
+  deliveryConfirmedAt DateTime?
+  deliveryMode String? @db.VarChar(24)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_credit_owner_fk")
+  order procurement_partner_customer_orders @relation(fields: [orderId], references: [id], onDelete: Restrict, map: "partner_wallet_credit_order_fk")
+  @@index([partnerId, state], map: "partner_wallet_credit_state_idx")
+}
+
+model partner_wallet_withdrawals {
+  id String @id @db.VarChar(80)
+  partnerId String @db.VarChar(191)
+  retryKey String @db.VarChar(100)
+  amountMinor BigInt
+  status String @default("REQUESTED") @db.VarChar(24)
+  destinationCiphertext String @db.LongText
+  transferCode String? @db.VarChar(100)
+  failureCode String? @db.VarChar(100)
+  processingAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_withdraw_owner_fk")
+  @@unique([partnerId, retryKey], map: "partner_wallet_withdraw_retry_key")
+  @@index([partnerId, status], map: "partner_wallet_withdraw_status_idx")
+}
+
+model partner_wallet_events {
+  id String @id @db.VarChar(80)
+  partnerId String @db.VarChar(191)
+  subjectId String @db.VarChar(100)
+  actorPid String @db.VarChar(191)
+  action String @db.VarChar(40)
+  detailsCiphertext String? @db.LongText
+  createdAt DateTime @default(now())
+  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_event_owner_fk")
+  @@index([partnerId, createdAt], map: "partner_wallet_audit_idx")
 }
 
 model procurement_partner_order_events {

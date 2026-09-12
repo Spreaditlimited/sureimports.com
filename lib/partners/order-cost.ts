@@ -1,13 +1,13 @@
 import type { CustomerOrderInput } from './customer-order-policy';
 import { calculatePartnerPricing } from './pricing';
-import {
-  procurementEstimateInUsd,
-  shippingCostInUsd,
-} from '../procurement/shippingMath';
+import { procurementProductValue } from '../procurement/productPricing';
+import { shippingCostInUsd } from '../procurement/shippingMath';
 
 export type CostConfiguration = {
   ngnPerUsd: number;
   cnyPerUsd: number;
+  ngnPerCny: number;
+  productPricingVersion?: number;
   vatPercent: number;
   serviceChargeBps: number;
   partnerShareBps: number;
@@ -65,12 +65,7 @@ export function priceCustomerOrder(
       meetsMinimum: false,
       minimumOrderNgn: config.minimumOrderNgn,
     };
-  const productUsd =
-    input.currencyType === 'CNY'
-      ? raw / config.cnyPerUsd
-      : input.currencyType === 'NGN'
-        ? raw / config.ngnPerUsd
-        : raw;
+  const productValue = procurementProductValue(raw, input.currencyType, shipping.countryName, config);
   const measurement = input.products.reduce(
     (sum, p) => sum + p.shippingMeasurePerUnit * p.productQuantity,
     0,
@@ -84,22 +79,18 @@ export function priceCustomerOrder(
       shipping.rateCurrency,
       config.ngnPerUsd,
     );
-  const estimate = procurementEstimateInUsd(
-    productUsd,
-    shippingUsd,
-    config.serviceChargeBps / 100,
-    config.vatPercent,
-  );
   const minor = (usd: number) => Math.round(usd * config.ngnPerUsd * 100);
-  const allocation = calculatePartnerPricing({
+  const beforeTax = calculatePartnerPricing({
     currency: 'NGN',
-    productCostMinor: minor(productUsd),
+    productCostMinor: Math.round(productValue.ngn * 100),
     shippingMinor: minor(shippingUsd),
-    taxMinor: minor(estimate.vatValueUsd),
+    taxMinor: 0,
     otherChargesMinor: 0,
     serviceChargeBps: config.serviceChargeBps,
     partnerShareBps: config.partnerShareBps,
   });
+  const taxMinor = Number((BigInt(beforeTax.serviceChargeMinor) * BigInt(Math.round(config.vatPercent * 100)) + BigInt(5000)) / BigInt(10000));
+  const allocation = calculatePartnerPricing({ ...beforeTax, taxMinor });
   return {
     ...allocation,
     measurement,
