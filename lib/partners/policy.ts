@@ -10,7 +10,9 @@ export type PartnerGate = {
 };
 
 /** Standard settlement explicitly authorised; not escrow or a delivery hold. */
-const supportedSettlementPolicies: ReadonlySet<string> = new Set(['PAYSTACK_AUTO_SPLIT']);
+const supportedSettlementPolicies: ReadonlySet<string> = new Set([
+  'PAYSTACK_AUTO_SPLIT',
+]);
 
 export function partnerCollectionBlockReason(
   partner: PartnerGate,

@@ -7,7 +7,12 @@ export async function currentUser() {
   if (!process.env.JWT_SECRET) return null;
   const token = (await cookies()).get('token')?.value;
   const payload = token ? verifyToken(token) : null;
-  if (!payload || !('pidUser' in payload) || typeof payload.pidUser !== 'string') return null;
+  if (
+    !payload ||
+    !('pidUser' in payload) ||
+    typeof payload.pidUser !== 'string'
+  )
+    return null;
   return prisma.users.findUnique({
     where: { pidUser: payload.pidUser },
     select: { pidUser: true, userEmail: true },

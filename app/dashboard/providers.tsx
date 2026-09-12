@@ -71,7 +71,9 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
       <ModalProvider>
         <div className="dashboard flex h-full min-h-screen border-collapse flex-col bg-white text-slate-900 dark:bg-black dark:text-white">
           <div className="a-auto z-20 flex">
-            {props.navigation ?? <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />}
+            {props.navigation ?? (
+              <Sidebar className="z-20 h-full bg-[#0E0E1F] text-white" />
+            )}
           </div>
           {props.topbar ?? <Header />}
 
@@ -83,14 +85,18 @@ const DashboardLayoutProvider = (props: UserLayoutProps) => {
               )}
             >
               {/* Add the WhatsApp button */}
-              {!props.hideSureImportsSupport && <WhatsAppButton
-                waID="5VFC67ZUTMWPF1"
-                message="Hello! I'd like to ask about your services."
-                position="bottom-left"
-              />}
+              {!props.hideSureImportsSupport && (
+                <WhatsAppButton
+                  waID="5VFC67ZUTMWPF1"
+                  message="Hello! I'd like to ask about your services."
+                  position="bottom-left"
+                />
+              )}
 
               <AlertProvider>
-                <RecordCountProcurementProvider tenantScoped={props.tenantScoped}>
+                <RecordCountProcurementProvider
+                  tenantScoped={props.tenantScoped}
+                >
                   <ShopCartProvider>{props.children}</ShopCartProvider>
                 </RecordCountProcurementProvider>
               </AlertProvider>

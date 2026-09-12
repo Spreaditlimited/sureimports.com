@@ -113,7 +113,10 @@ export async function recordAffiliateConversion(
 ): Promise<ConversionResult> {
   const orderReference = reference(input.externalOrderReference, 120);
   if (orderReference.startsWith('procurement:')) {
-    const partnerOrder = await prisma.procurement_partner_orders.findUnique({ where: { pidOrder: orderReference.slice('procurement:'.length) }, select: { pidOrder: true } });
+    const partnerOrder = await prisma.procurement_partner_orders.findUnique({
+      where: { pidOrder: orderReference.slice('procurement:'.length) },
+      select: { pidOrder: true },
+    });
     if (partnerOrder) return { recorded: false, reason: 'PARTNER_ORDER' };
   }
   const paymentReference = reference(input.externalPaymentReference, 160);
