@@ -294,7 +294,7 @@ export default function PublicOrderFlow() {
   };
 
   return (
-    <div className="bg-transparent">
+    <div className="si-public-form bg-transparent">
       {duplicateDraft && <div role="alertdialog" aria-modal="true" aria-labelledby="duplicate-order-title" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"><div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:p-8"><h2 id="duplicate-order-title" className="text-2xl font-black text-slate-900 dark:text-white">You already have a saved order</h2><p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">Add these products to <b>{duplicateDraft.orderName || duplicateDraft.pidOrder}</b> to avoid duplicate shipments and charges. Only create another order if this must ship separately.</p><div className="mt-6 flex flex-col gap-3"><Button onClick={() => router.push(`/dashboard/procurement/add-product/${duplicateDraft.pidOrder}`)} className="min-h-12 bg-indigo-600 font-bold hover:bg-indigo-700">Continue saved order</Button><Button variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className="min-h-12 font-bold">Review or merge saved orders</Button><button type="button" onClick={() => { setDuplicateDraft(null); void proceedToPayment(true); }} className="min-h-11 text-sm font-bold text-slate-600 underline underline-offset-4 dark:text-slate-300">This is a separate shipment — create it</button><button type="button" onClick={() => setDuplicateDraft(null)} className="min-h-11 text-sm text-slate-500">Go back</button></div></div></div>}
       {/* Main Flow Content */}
       <section className="w-full">
@@ -317,20 +317,20 @@ export default function PublicOrderFlow() {
               
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
-                  <Input placeholder="John" value={account.firstName} onChange={(e) => setAccount((prev) => ({ ...prev, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="procurement-field-1" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
+                  <Input id="procurement-field-1" placeholder="John" value={account.firstName} onChange={(e) => setAccount((prev) => ({ ...prev, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
-                  <Input placeholder="Doe" value={account.lastName} onChange={(e) => setAccount((prev) => ({ ...prev, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="procurement-field-2" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
+                  <Input id="procurement-field-2" placeholder="Doe" value={account.lastName} onChange={(e) => setAccount((prev) => ({ ...prev, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
-                  <Input type="email" placeholder="john@example.com" value={account.email} onChange={(e) => setAccount((prev) => ({ ...prev, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="procurement-field-3" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
+                  <Input id="procurement-field-3" type="email" placeholder="john@example.com" value={account.email} onChange={(e) => setAccount((prev) => ({ ...prev, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
-                  <Input placeholder="+234 801 234 5678" value={account.phone} onChange={(e) => setAccount((prev) => ({ ...prev, phone: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="procurement-field-4" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
+                  <Input id="procurement-field-4" placeholder="+234 801 234 5678" value={account.phone} onChange={(e) => setAccount((prev) => ({ ...prev, phone: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
               </div>
             </div>
@@ -349,12 +349,12 @@ export default function PublicOrderFlow() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Order Reference Name</label>
-                  <Input placeholder="e.g., Summer Inventory 2026" value={order.orderName} onChange={(e) => setOrder((prev) => ({ ...prev, orderName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="procurement-field-5" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Order Reference Name</label>
+                  <Input id="procurement-field-5" placeholder="e.g., Summer Inventory 2026" value={order.orderName} onChange={(e) => setOrder((prev) => ({ ...prev, orderName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination Country</label>
-                  <select
+                  <label htmlFor="procurement-field-6" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination Country</label>
+                  <select id="procurement-field-6"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.destinationCountry}
                     onChange={(e) => {
@@ -376,8 +376,8 @@ export default function PublicOrderFlow() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Plan</label>
-                  <select
+                  <label htmlFor="procurement-field-7" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Plan</label>
+                  <select id="procurement-field-7"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.shippingPlan}
                     onChange={(e) => {
@@ -398,8 +398,8 @@ export default function PublicOrderFlow() {
                   </select>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">China Shop Currency</label>
-                  <select
+                  <label htmlFor="procurement-field-8" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">China Shop Currency</label>
+                  <select id="procurement-field-8"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.currencyType}
                     onChange={(e) => setOrder((prev) => ({ ...prev, currencyType: e.target.value }))}
@@ -409,8 +409,8 @@ export default function PublicOrderFlow() {
                   </select>
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Category</label>
-                  <select
+                  <label htmlFor="procurement-field-9" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Category</label>
+                  <select id="procurement-field-9"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
                     value={order.orderCategory}
                     onChange={(e) => setOrder((prev) => ({ ...prev, orderCategory: e.target.value }))}
@@ -422,8 +422,8 @@ export default function PublicOrderFlow() {
                   </select>
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Delivery Address</label>
-                  <Textarea
+                  <label htmlFor="procurement-field-10" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Delivery Address</label>
+                  <Textarea id="procurement-field-10"
                     placeholder="Enter the full delivery address"
                     value={order.shippingAddress}
                     onChange={(e) => setOrder((prev) => ({ ...prev, shippingAddress: e.target.value }))}
@@ -447,22 +447,22 @@ export default function PublicOrderFlow() {
 
               <div className="space-y-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50 sm:p-6">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Name</label>
-                  <Input placeholder="e.g., Wireless Bluetooth Earbuds" value={productDraft.productName} onChange={(e) => setProductDraft((prev) => ({ ...prev, productName: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
+                  <label htmlFor="procurement-field-11" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Name</label>
+                  <Input id="procurement-field-11" placeholder="e.g., Wireless Bluetooth Earbuds" value={productDraft.productName} onChange={(e) => setProductDraft((prev) => ({ ...prev, productName: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Link</label>
-                  <Input placeholder="https://1688.com/..." value={productDraft.productLink} onChange={(e) => setProductDraft((prev) => ({ ...prev, productLink: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
+                  <label htmlFor="procurement-field-12" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Link</label>
+                  <Input id="procurement-field-12" placeholder="https://1688.com/..." value={productDraft.productLink} onChange={(e) => setProductDraft((prev) => ({ ...prev, productLink: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                 </div>
                 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Unit Price</label>
-                    <Input placeholder="0.00" type="number" value={productDraft.productPrice} onChange={(e) => setProductDraft((prev) => ({ ...prev, productPrice: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
+                    <label htmlFor="procurement-field-13" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Unit Price</label>
+                    <Input id="procurement-field-13" placeholder="0.00" type="number" value={productDraft.productPrice} onChange={(e) => setProductDraft((prev) => ({ ...prev, productPrice: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                   </div>
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
+                      <label htmlFor="procurement-field-14" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
                         {measurementUnit === 'CBM' ? 'CBM per item' : 'Weight per item (kg)'}
                       </label>
                       <button
@@ -497,13 +497,13 @@ export default function PublicOrderFlow() {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Quantity</label>
-                    <Input placeholder="1" type="number" value={productDraft.productQuantity} onChange={(e) => setProductDraft((prev) => ({ ...prev, productQuantity: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
+                    <Input id="procurement-field-14" placeholder="1" type="number" value={productDraft.productQuantity} onChange={(e) => setProductDraft((prev) => ({ ...prev, productQuantity: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Variants & Notes (Optional)</label>
-                  <Textarea placeholder="e.g., 50 Red, 50 Blue, US Plug" value={productDraft.productInfo} onChange={(e) => setProductDraft((prev) => ({ ...prev, productInfo: e.target.value }))} className="min-h-[80px] rounded-xl bg-white dark:bg-slate-900" />
+                  <label htmlFor="procurement-field-15" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Variants & Notes (Optional)</label>
+                  <Textarea id="procurement-field-15" placeholder="e.g., 50 Red, 50 Blue, US Plug" value={productDraft.productInfo} onChange={(e) => setProductDraft((prev) => ({ ...prev, productInfo: e.target.value }))} className="min-h-[80px] rounded-xl bg-white dark:bg-slate-900" />
                 </div>
                 
                 <Button type="button" variant="outline" className="h-12 w-full rounded-xl border-dashed border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40" onClick={addProduct}>

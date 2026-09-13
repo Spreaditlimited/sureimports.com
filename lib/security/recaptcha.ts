@@ -1,10 +1,4 @@
-function isLocalhostRequest(request?: Request): boolean {
-  const hostHeader = request?.headers.get('host')?.toLowerCase();
-  const host = hostHeader?.startsWith('[::1]')
-    ? '::1'
-    : hostHeader?.split(':')[0];
-  return host === 'localhost' || host === '127.0.0.1' || host === '::1';
-}
+import { shouldBypassLocalCaptcha } from './localCaptchaBypass';
 
 export async function verifyRecaptchaToken(
   token: string | undefined | null,
@@ -13,7 +7,7 @@ export async function verifyRecaptchaToken(
 ): Promise<boolean> {
   const secret = process.env.GOOGLE_CAPTCHA_SECRET_KEY;
 
-  if (isLocalhostRequest(request)) return true;
+  if (request && shouldBypassLocalCaptcha(new URL(request.url).hostname)) return true;
 
   // If not configured, keep behavior unchanged.
   if (!secret) return true;

@@ -1,5 +1,7 @@
 'use client';
 
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useMemo, useState } from 'react';
 import { 
   Box, 
@@ -88,14 +90,14 @@ export default function CbmVolumetricWeightCalculatorPage() {
 
   return (
     <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
-      <div className="max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8">
+<div className={`${heroLayout.fixed} max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8`}>
         
         {/* Header */}
         <header className="mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:border-indigo-900/30 dark:text-indigo-400 text-xs font-black uppercase tracking-widest mb-6">
+<HeroPill className="mb-6">
             <Scale className="w-3.5 h-3.5" />
             Freight Estimation
-          </div>
+          </HeroPill>
           <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
             CBM & Volumetric <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">Weight Calculator</span>
           </h1>

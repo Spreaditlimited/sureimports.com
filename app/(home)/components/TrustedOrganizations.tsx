@@ -19,7 +19,7 @@ const clients = [
   {
     name: 'CafeOne',
     src: '/cafeOne.PNG',
-    logoClass: 'max-h-24 max-w-[220px] md:max-h-28 md:max-w-[270px]',
+    logoClass: 'max-h-24 max-w-[220px] md:max-h-28 md:max-w-[270px] dark:brightness-0 dark:invert',
   },
   {
     name: 'Dr. Muibat Adeniran',

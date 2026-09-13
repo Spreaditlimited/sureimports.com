@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -212,14 +214,14 @@ export default function BodyCameraSolutionsPage() {
     <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
       <JsonLdScript data={schema} />
 
-      <section className="relative px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24">
+<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[620px] bg-[radial-gradient(circle_at_72%_18%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.055)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
           <div className="min-w-0 max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-900/10 bg-white/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-900 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-cyan-200">
+<HeroPill>
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Enterprise evidence technology
-            </div>
+            </HeroPill>
             <p className={`${sectionEyebrow} mt-7`}>
               {bodyCameraBrand.partnerDesignation} ·{' '}
               {bodyCameraBrand.partnerRegion}
@@ -243,10 +245,10 @@ export default function BodyCameraSolutionsPage() {
             eyebrow="Connected operations"
             status="SC580 · Online"
             priority
-            className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+            className="order-3 lg:col-start-2 lg:row-span-2 lg:row-start-1"
           />
 
-          <div className="order-3 max-w-2xl lg:col-start-1 lg:row-start-2">
+          <div className="order-2 max-w-2xl lg:col-start-1 lg:row-start-2">
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="#assessment"

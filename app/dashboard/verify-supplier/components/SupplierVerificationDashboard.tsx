@@ -1,5 +1,7 @@
 'use client';
 
+import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -332,7 +334,7 @@ export default function SupplierVerificationDashboard({
                     void load();
                   }}
                   disabled={loading}
-                  className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 dark:bg-[#161629] dark:hover:bg-[#1d1f36]"
+                  className={`${darkHeader.sync} si-dashboard-sync flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-60 dark:bg-[#161629] dark:hover:bg-[#1d1f36]`}
                 >
                   <RefreshCcw
                     className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`}
@@ -358,7 +360,7 @@ export default function SupplierVerificationDashboard({
                   className="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800/50 p-5 backdrop-blur-sm dark:bg-[#161629]/70"
                 >
                   <div
-                    className={`rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}
+                    className={`${darkHeader.tile} rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}
                   >
                     <stat.icon className="h-6 w-6" />
                   </div>

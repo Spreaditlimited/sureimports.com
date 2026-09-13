@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { shouldBypassLocalCaptcha } from './localCaptchaBypass';
 
 declare global {
   interface Window {
@@ -19,14 +20,6 @@ let recaptchaScriptPromise: Promise<void> | null = null;
 
 function isValidSiteKey(configuredSiteKey: string): boolean {
   return /^[A-Za-z0-9_-]+$/.test(configuredSiteKey);
-}
-
-function isLocalhost(): boolean {
-  return (
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
-    window.location.hostname === '::1'
-  );
 }
 
 function loadRecaptchaScript(configuredSiteKey: string): Promise<void> {
@@ -55,7 +48,7 @@ function loadRecaptchaScript(configuredSiteKey: string): Promise<void> {
 
 export function useRecaptchaV3() {
   return useCallback(async (action: string): Promise<string | undefined> => {
-    if (typeof window === 'undefined' || isLocalhost() || !siteKey) {
+    if (typeof window === 'undefined' || shouldBypassLocalCaptcha(window.location.hostname) || !siteKey) {
       return undefined;
     }
 

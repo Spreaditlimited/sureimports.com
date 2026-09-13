@@ -9,5 +9,5 @@
 import { Suspense, type ReactNode } from 'react';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
-  return <Suspense fallback={null}>{children}</Suspense>;
+  return <div className="si-auth"><Suspense fallback={null}>{children}</Suspense></div>;
 }

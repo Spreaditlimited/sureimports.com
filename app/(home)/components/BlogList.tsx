@@ -1,4 +1,6 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import {
   Search,
@@ -266,13 +268,13 @@ export default function BlogList({
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
 
-        <div className="relative z-10 mx-auto max-w-[1440px] px-4 pb-16 pt-48 sm:px-6 lg:px-8">
+<div className={`${heroLayout.fixed} relative z-10 mx-auto max-w-[1440px] px-4 pb-16 pt-48 sm:px-6 lg:px-8`}>
           
           <div className="mb-12 text-center lg:mb-16">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+<HeroPill className="mb-6">
               <BookOpen className="h-3.5 w-3.5" />
               Import Insights & Expert Guides
-            </div>
+            </HeroPill>
 
             <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Import Insights{' '}

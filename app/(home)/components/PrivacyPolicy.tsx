@@ -1,5 +1,7 @@
 'use client';
 
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect, useState } from 'react';
 import {
   Shield,
@@ -66,12 +68,12 @@ export default function PrivacyPolicy() {
     <div className="bg-[#fcfcfd] dark:bg-slate-950">
       
       {/* Premium Page Header */}
-      <div className="border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900">
+<div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+<HeroPill className="mb-6">
               <Shield className="h-3.5 w-3.5" /> Legal Documentation
-            </div>
+            </HeroPill>
             <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
               Privacy Policy
             </h1>

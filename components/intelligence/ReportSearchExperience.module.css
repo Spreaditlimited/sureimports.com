@@ -1,0 +1,20 @@
+.quickSearch.quickSearch {
+  border: 1px solid var(--si-border);
+  border-radius: 10px;
+  background: var(--si-surface);
+  color: var(--si-ink);
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  transition: background-color .15s ease, border-color .15s ease;
+}
+.quickSearch.quickSearch:hover {
+  background: var(--si-soft);
+  border-color: var(--si-accent);
+  color: var(--si-ink);
+}
+.quickSearch.quickSearch:focus-visible {
+  outline: 2px solid var(--si-accent);
+  outline-offset: 3px;
+}

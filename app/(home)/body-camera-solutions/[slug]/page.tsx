@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -185,7 +187,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
     <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
       <JsonLdScript data={schema} />
 
-      <section className="relative px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:pb-24">
+<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:pb-24`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(circle_at_75%_20%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.05)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto max-w-7xl">
           <nav
@@ -207,10 +209,10 @@ export default async function SolutionDetailPage({ params }: PageProps) {
 
           <header className="mt-10 grid items-center gap-x-14 gap-y-8 lg:mt-14 lg:grid-cols-[0.92fr_1.08fr]">
             <div className="min-w-0 max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-900/10 bg-white/80 px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-900 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-cyan-200">
+<HeroPill>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Professional evidence systems
-              </div>
+              </HeroPill>
               <p className={`${sectionEyebrow} mt-7`}>{page.eyebrow}</p>
               <HeroTitle lines={heroTitleLinesBySlug[slug] ?? [page.title]} />
               <p className="mt-6 max-w-xl text-base leading-7 text-slate-600 dark:text-slate-300 sm:text-lg">
@@ -224,11 +226,11 @@ export default async function SolutionDetailPage({ params }: PageProps) {
                 eyebrow={page.eyebrow}
                 status="Solution profile"
                 priority
-                className="order-2 lg:col-start-2 lg:row-span-2 lg:row-start-1"
+                className="order-3 lg:col-start-2 lg:row-span-2 lg:row-start-1"
               />
             ) : null}
 
-            <div className="order-3 max-w-2xl lg:col-start-1 lg:row-start-2">
+            <div className="order-2 max-w-2xl lg:col-start-1 lg:row-start-2">
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="#assessment"

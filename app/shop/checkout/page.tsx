@@ -1,4 +1,5 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -375,9 +376,9 @@ function CheckoutContent() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
-                <span className="rounded-full border border-indigo-500/20 bg-indigo-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                <HeroPill>
                   Step 2 of 2
-                </span>
+                </HeroPill>
               </div>
               <h1 className="text-3xl font-black tracking-tight md:text-5xl">Checkout</h1>
               <p className="mt-3 text-sm font-medium text-slate-300 md:text-base">

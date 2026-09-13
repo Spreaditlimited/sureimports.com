@@ -31,7 +31,7 @@ export default function Sidebar({ className, items, brand }: SidebarProps) {
   return (
     <nav
       className={cn(
-        `fixed z-10 hidden h-full border-r border-slate-800 lg:block`,
+        `si-sidebar fixed z-10 hidden h-full border-r border-slate-800 lg:block`,
         status && 'duration-500',
         isOpen ? 'h-full w-[236px]' : 'h-full w-[78px]',
         className,
@@ -68,6 +68,9 @@ export default function Sidebar({ className, items, brand }: SidebarProps) {
           </div>
         )}
         <button
+          type="button"
+          aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+          aria-expanded={isOpen}
           className={cn(
             'fixed top-[25px] ml-[218px] flex h-[40px] w-[40px] cursor-pointer justify-center rounded-full border border-slate-700 bg-slate-900 pt-2.5 text-3xl text-white duration-500',
             !isOpen &&

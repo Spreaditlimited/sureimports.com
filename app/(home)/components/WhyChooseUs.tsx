@@ -15,7 +15,7 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="bg-slate-950 py-24 text-white">
+    <section className="si-dark-surface bg-slate-950 py-24 text-white">
       <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         
         <div className="mb-20 text-center">

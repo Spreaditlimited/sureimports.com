@@ -1,8 +1,10 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
+import styles from './Hero.module.css';
 
 interface HeroProps {
   title: string;
@@ -20,14 +22,14 @@ export default function Hero({
   showCTA = false,
 }: HeroProps) {
   return (
-    <section
-      className={`relative flex w-full flex-col items-center justify-center overflow-hidden bg-slate-950 ${
+<section
+      className={`${heroLayout.fixed} ${styles.hero} relative flex w-full flex-col items-center justify-center overflow-hidden ${
         size === 'large'
           ? 'min-h-[85vh] pb-20 pt-32'
           : 'min-h-[40vh] pb-16 pt-32'
       }`}
     >
-      <div className="absolute inset-0 z-0">
+      <div className={`${styles.art} absolute inset-0 z-0`}>
         <Image
           src={imageUrl}
           alt="Logistics Background"
@@ -40,9 +42,9 @@ export default function Hero({
 
       <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center px-4 text-center sm:px-6">
         {size === 'large' && (
-          <span className="mb-6 inline-flex items-center rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange-400 backdrop-blur-sm">
+<HeroPill className="mb-6">
             #1 China to Africa Logistics
-          </span>
+          </HeroPill>
         )}
 
         <h1
@@ -68,7 +70,7 @@ export default function Hero({
               className="h-14 w-full rounded-full border-0 bg-brand-orange-500 px-8 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98] sm:w-auto"
             >
               <Link href="/auth/login">
-                Start Sourcing Now <ArrowRight className="ml-2 h-5 w-5" />
+                Start Sourcing Now
               </Link>
             </Button>
             <Button
@@ -82,7 +84,7 @@ export default function Hero({
         )}
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#fcfcfd] to-transparent dark:from-slate-950" />
+      <div className={styles.fade} />
     </section>
   );
 }

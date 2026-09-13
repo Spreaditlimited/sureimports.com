@@ -1,0 +1,6 @@
+.trust.trust { color: var(--si-muted, #526078); }
+.trust .accent { color: var(--si-accent, #48439b); }
+.headline.headline { text-wrap: initial; }
+@media (min-width: 1024px) {
+  .headlineEnding { display: block; }
+}

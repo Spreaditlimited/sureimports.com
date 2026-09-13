@@ -10,6 +10,7 @@ import { useSidebar } from '@/hooks/useSidebar';
 import { useAuth } from '@/app/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Settings } from 'lucide-react';
+import ThemeToggle from '@/components/home/ThemeToggle';
 
 const user = {
   name: 'Admin',
@@ -51,6 +52,7 @@ export default function Header({ title, mobileNavigation, accountActions }: { ti
           </div>
         </div>
         <div className="ml-4 flex items-center gap-[23px] max-xl:gap-[10px]">
+          <ThemeToggle lightSurface />
           {!accountActions && <div className="hidden items-center gap-[15px] lg:flex">
             <Button
               className="h-[50px] w-[52px] rounded-[19px] bg-slate-100 hover:bg-[#161629]/10 dark:bg-gray-700 dark:hover:bg-gray-600"

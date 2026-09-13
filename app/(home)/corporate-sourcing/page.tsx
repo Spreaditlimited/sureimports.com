@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -34,6 +36,7 @@ import {
   DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
 } from '@/lib/corporateSourcing/pricing';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import workflowStyles from '@/components/home/Workflow.module.css';
 import {
   LINESCOUT_BASE_URL,
   LINESCOUT_BULK_SOURCING_URL,
@@ -267,16 +270,16 @@ export default function CorporateGiftsPage() {
       <main className="min-h-screen bg-[#fcfcfd] text-slate-950 antialiased dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
         
         {/* --- HERO SECTION --- */}
-        <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
           <PublicHeroBackground />
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-4xl flex-col items-center">
-              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+<HeroPill className="mb-6">
                 <Briefcase className="h-4 w-4" />
                 Corporate Sourcing
-              </div>
+              </HeroPill>
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 <span className="block">China procurement</span>
                 <span className="mt-2 block text-[0.78em] leading-[1.05] text-white">
@@ -340,33 +343,32 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- WORKFLOW TIMELINE --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28 relative overflow-hidden">
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[800px] rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
+        <section className={`${workflowStyles.workflow} py-20 md:py-28 relative overflow-hidden`}>
           
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+              <span className={`${workflowStyles.accent} text-xs font-black uppercase tracking-widest`}>
                 How it works
               </span>
               <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl leading-tight">
                 A sourcing workflow your team can actually follow.
               </h2>
-              <p className="mt-6 text-lg leading-relaxed text-slate-400">
+              <p className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}>
                 The goal isn't just a low price. It is the right product or machine, correct specifications and quantity, and a clear landed cost before a single Naira is committed.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {workflow.map((step, index) => (
-                <div key={step.title} className="relative rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm transition hover:bg-white/[0.04]">
-                  <span className="absolute top-6 right-6 text-6xl font-black text-white/[0.03] pointer-events-none">
+                <div key={step.title} className={`${workflowStyles.card} relative rounded-3xl border p-8`}>
+                  <span className={`${workflowStyles.number} absolute top-6 right-6 text-6xl font-black pointer-events-none`}>
                     {index + 1}
                   </span>
-                  <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 text-brand-orange-400">
+                  <div className={`${workflowStyles.icon} mb-6 flex h-12 w-12 items-center justify-center rounded-xl border`}>
                     <step.icon className="h-5 w-5" />
                   </div>
                   <h3 className="text-xl font-bold">{step.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">{step.text}</p>
+                  <p className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}>{step.text}</p>
                 </div>
               ))}
             </div>

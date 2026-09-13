@@ -1,5 +1,7 @@
 'use client';
 
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import React from 'react';
 import faya from '@/public/assets/img/faya.png';
 import heroImg from '@/public/assets/img/hero-img.png';
@@ -10,8 +12,7 @@ import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 
 export default function Hero() {
   return (
-    <section
-      className="relative overflow-hidden pb-[35px] pt-[70px] sm:pb-[25px] xl:pt-[102px]"
+    <section className={`${heroLayout.fixed} relative overflow-hidden pb-[35px] pt-[70px] sm:pb-[25px] xl:pt-[102px]`}
       style={{
         background:
           'linear-gradient(96deg, #161629 0%, #474784 95.54%), #D9D9D9',
@@ -28,9 +29,7 @@ export default function Hero() {
             viewport={{ once: true }}
             className="flex w-full flex-col items-center justify-center xl:w-fit xl:items-start xl:justify-start 2xl:pt-[53px]"
           >
-            <button className="rounded-[32px] bg-[#3E3E57] px-5 py-2.5 text-[16px] leading-[150%] text-white sm:px-[30px] sm:py-3 sm:text-[20px] sm:font-medium sm:leading-[200%]">
-              One Year Warranty
-            </button>
+            <HeroPill>One Year Warranty</HeroPill>
 
             <div className="py-6">
               <h1 className="flex items-center justify-center gap-3 whitespace-nowrap pb-2 xl:justify-start">

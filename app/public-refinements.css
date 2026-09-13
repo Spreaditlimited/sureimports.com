@@ -1,0 +1,84 @@
+/* Public page components consume the same tokens as auth and the workspace.
+   Kept separate from dashboard density and transactional status styles. */
+.public-site-theme :is(article,section,div):is(.rounded-2xl,.rounded-3xl,.rounded-\[32px\],.rounded-\[2rem\]).border:is(.bg-white,.bg-white\/90,.bg-slate-50) {
+  background-color: var(--si-surface);
+  border-color: var(--si-border);
+  border-radius: 20px;
+  box-shadow: var(--si-shadow);
+  backdrop-filter: none;
+}
+.public-site-theme :is(article,section,div):is(.rounded-2xl,.rounded-3xl,.rounded-\[32px\],.rounded-\[2rem\]).border:hover {
+  --tw-translate-y: 0;
+}
+.public-site-theme :is(h2,h3) { text-wrap: balance; }
+.public-site-theme article :is(p,li) { line-height: 1.7; }
+.public-site-theme .si-public-cta { background: var(--si-surface); color: var(--si-ink); border-color: var(--si-border); }
+.public-site-theme .si-public-cta p { color: var(--si-muted); }
+.public-site-theme footer.si-dark-surface > .bg-slate-950 { background: transparent; }
+.public-site-theme .si-dark-surface .text-indigo-400 { color: var(--si-accent); }
+.dark .public-site-theme :is(.dark\:bg-slate-900\/40,.dark\:bg-slate-900\/50,.dark\:bg-slate-900\/70,.dark\:bg-slate-950\/60) { background-color: var(--si-surface); }
+.public-site-theme .si-public-form { scroll-margin-top: 100px; }
+.public-site-theme :is(form,.si-public-form) :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']),select,textarea,[role='combobox']) {
+  border: 1px solid var(--si-border);
+  border-radius: 10px;
+  background-color: var(--si-inset);
+  color: var(--si-ink);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.public-site-theme :is(form,.si-public-form) :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']),select,[role='combobox']) { min-height: 48px; }
+.public-site-theme :is(form,.si-public-form) textarea { min-height: 128px; resize: vertical; }
+.public-site-theme :is(form,.si-public-form) label {
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--si-ink);
+}
+.public-site-theme :is(form,.si-public-form) :is(input,textarea)::placeholder { color: var(--si-muted); opacity: .85; }
+.public-site-theme :is(form,.si-public-form) :is(input,select,textarea,[role='combobox']):focus-visible {
+  outline: 2px solid var(--si-accent);
+  outline-offset: 2px;
+  border-color: var(--si-accent);
+  --tw-ring-color: transparent;
+  box-shadow: none;
+}
+.public-site-theme :is(form,.si-public-form) :is(input,select,textarea)[aria-invalid='true'] { border-color: #dc2626; }
+.public-site-theme :is(form,.si-public-form) :is(input,select,textarea,button):disabled { opacity: .6; cursor: not-allowed; }
+.public-site-theme :is(form,.si-public-form) button[type='submit'] { min-height: 48px; border-radius: 10px; }
+.public-site-theme :is(form,.si-public-form) :is(.text-xs,.text-\[11px\]):not(button):not([role='button']) { font-size: 13px; line-height: 1.6; }
+.public-site-theme .si-dark-surface :is(input,textarea) { color: #f2f3f7; background: #191b21; border-color: #30333e; }
+/* Portaled select menus use the root semantic palette, not a page's background. */
+[data-si-select-content] { background: var(--si-raised); color: var(--si-ink); border: 1px solid var(--si-border); border-radius: 12px; box-shadow: var(--si-shadow); }
+@media(max-width:640px) {
+  .public-site-theme :is(article,section,div):is(.rounded-3xl,.rounded-\[32px\],.rounded-\[2rem\]).border:is(.p-8,.p-10,.p-12) { padding: 24px; }
+  .public-site-theme :is(form,.si-public-form) :is(.grid,.flex) > * { min-width: 0; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .public-site-theme :is(a,button,article,input,textarea) { transition: none; }
+}
+/* Hero supporting labels need the same contrast as the heading and subtext. */
+:is(section,header,div):has(> .si-hero-art) .text-slate-300 { color: var(--si-muted); }
+:is(section,header,div):has(> .si-hero-art) .text-indigo-400 { color: var(--si-accent); }
+.si-body-hero { background: var(--si-hero-surface); color: var(--si-ink); }
+.si-body-hero > .pointer-events-none { opacity: .3; }
+.si-body-hero .si-body-hero-title {
+  max-width: 16ch; font-size: clamp(2.25rem, 4vw, 3.65rem); line-height: 1.08;
+  letter-spacing: -.04em; text-wrap: balance; color: var(--si-ink);
+}
+.si-body-hero a[href='#assessment'] { background: var(--si-primary); color: var(--si-on-primary); box-shadow: var(--si-shadow); border-radius: 10px; }
+.si-body-hero a[href='#assessment']:hover { background: var(--si-primary); filter: brightness(.95); }
+.si-body-hero a[href^='#'] svg.lucide-arrow-right { display: none; }
+.si-body-hero figure { background-color: #15171c; border: 1px solid #30333e; border-radius: 20px; }
+.si-body-hero figure .text-cyan-300 { color: #b8b2ff; }
+.si-body-hero .order-2 > :first-child { margin-top: 0; }
+.si-body-hero .order-2 .text-\[9px\] { font-size: 11px; color: var(--si-muted); }
+.si-body-hero .order-2 .text-\[11px\] { font-size: 12px; }
+@media (max-width: 639px) {
+  .si-body-hero .si-body-hero-title { max-width: 18ch; font-size: clamp(2rem, 8.8vw, 2.7rem); }
+  .si-body-hero figure { min-height: 340px; }
+  .si-body-hero a[href^='#'] { width: 100%; min-height: 48px; }
+}

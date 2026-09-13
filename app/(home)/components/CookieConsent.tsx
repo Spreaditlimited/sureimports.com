@@ -26,7 +26,7 @@ export default function CookieConsent({ onNavigateToPrivacyPolicy }: CookieConse
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 right-6 z-50 mx-auto max-w-4xl rounded-3xl border border-slate-800 bg-slate-950/90 p-6 shadow-2xl backdrop-blur-xl sm:flex sm:items-center sm:justify-between sm:gap-6">
+    <div className="si-menu fixed bottom-6 left-6 right-6 z-[60] mx-auto max-w-4xl rounded-3xl border border-slate-800 bg-slate-950/90 p-6 shadow-2xl sm:flex sm:items-center sm:justify-between sm:gap-6">
       <button onClick={() => setIsVisible(false)} className="absolute right-4 top-4 text-slate-500 hover:text-white">
         <X className="h-5 w-5" />
       </button>

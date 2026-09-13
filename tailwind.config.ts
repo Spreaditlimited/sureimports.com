@@ -35,14 +35,14 @@ const config = {
       colors: {
         // --- CORE BRAND TOKENS ---
         blue: {
-          50: '#EEF4FF', 100: '#DCE8FF', 200: '#BDD3FF', 300: '#93B6FF',
-          400: '#6695FF', 500: '#4579F0', 600: '#2E62D9', 700: '#2754BC',
-          800: '#20459B', 900: '#1B397F', 950: '#112553',
+          50: '#f4f2fc', 100: '#eeecfa', 200: '#dcd7f6', 300: '#c6bef0',
+          400: '#b0a7e8', 500: '#746ac4', 600: '#48439b', 700: '#40398b',
+          800: '#35316f', 900: '#292539', 950: '#19152d',
         },
         indigo: {
-          50: '#EEF4FF', 100: '#DCE8FF', 200: '#BDD3FF', 300: '#93B6FF',
-          400: '#6695FF', 500: '#4579F0', 600: '#2E62D9', 700: '#2754BC',
-          800: '#20459B', 900: '#1B397F', 950: '#112553',
+          50: '#f4f2fc', 100: '#eeecfa', 200: '#dcd7f6', 300: '#c6bef0',
+          400: '#b0a7e8', 500: '#746ac4', 600: '#48439b', 700: '#40398b',
+          800: '#35316f', 900: '#292539', 950: '#19152d',
         },
         // NEW: Strategic Brand Orange for CTAs and Conversions
         'brand-orange': {
@@ -55,7 +55,7 @@ const config = {
         'buy-sourcing-white': "#FFF",
         'buy-sourcing-black': "#000",
         'buy-sourcing-bglightwhite': "rgba(255, 255, 255, 0.13)",
-        'buy-sourcing-blue': "#2E62D9",
+        'buy-sourcing-blue': "#48439b",
         'buy-sourcing-purple': "#3E4095",
         'buy-sourcing-darkblack': "#161629",
         'buy-sourcing-gray': "#475569",
@@ -69,7 +69,7 @@ const config = {
         'store-white': "#FFF",
         'store-black': "#000",
         'store-bglightwhite': "rgba(255, 255, 255, 0.13)",
-        'store-blue': "#2E62D9",
+        'store-blue': "#48439b",
         'store-purple': "#3E4095",
         'store-darkblack': "#161629",
         'store-gray': "#475569",

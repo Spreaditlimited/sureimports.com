@@ -118,17 +118,7 @@
     --ring: 240 4.9% 83.9%;
   }
 }
-.dashboard {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  /* other light mode variables */
-}
-
-.dashboard.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  /* other dark mode variables */
-}
+/* Dashboard surfaces inherit the active theme's semantic colours. */
 
 @layer base {
   * {
@@ -294,13 +284,13 @@
     [role='combobox']
   ) {
   border-color: rgb(var(--public-border-dark)) !important;
-  background-color: rgb(var(--public-field-dark) / 0.5) !important;
+  background-color: var(--si-inset) !important;
   color: rgb(var(--public-heading-dark)) !important;
   color-scheme: dark;
 }
 
 .dark .public-site-theme :where(input, textarea)::placeholder {
-  color: rgb(100 116 139) !important;
+  color: var(--si-muted) !important;
   opacity: 1;
 }
 
@@ -314,9 +304,10 @@
     select,
     [role='combobox']
   ):focus {
-  border-color: rgb(var(--public-accent)) !important;
-  box-shadow: 0 0 0 3px rgb(var(--public-accent) / 0.14) !important;
-  outline: none !important;
+  border-color: var(--si-accent) !important;
+  box-shadow: none !important;
+  outline: 2px solid var(--si-accent) !important;
+  outline-offset: 2px;
 }
 
 .dark .public-site-theme :where(input, textarea):-webkit-autofill,

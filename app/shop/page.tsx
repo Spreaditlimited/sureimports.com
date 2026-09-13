@@ -1,5 +1,7 @@
 'use client';
 
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -20,6 +22,7 @@ import { toast } from 'sonner';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import heroStyles from './ShopHero.module.css';
 
 type StoreProduct = {
   pidProduct: string;
@@ -132,35 +135,35 @@ function ShopContent() {
     <>
       <Navbar />
       <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-        <section className="relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white`}>
           <PublicHeroBackground />
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center">
-              <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-400 backdrop-blur-sm">
+            <div className="mx-auto max-w-6xl text-center">
+<HeroPill className="mb-6">
                 <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
-              </span>
-              <h1 className="mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
+              </HeroPill>
+              <h1 className={`${heroStyles.headline} mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}>
                 Premium Tech & Gadgets,{' '}
-                <span className="text-white">Sourced Direct</span>
+                <span className={`${heroStyles.headlineEnding} text-white`}>Sourced Direct</span>
               </h1>
-              <p className="mb-8 text-lg text-slate-300">
+              <p className="mx-auto mb-8 max-w-3xl text-lg text-slate-300">
                 Order directly from verified Chinese manufacturers. Delivered to
                 your doorstep in Nigeria within 10 business days.
               </p>
             </div>
 
             <div className="mt-10 flex flex-wrap items-center justify-center gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
+              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
                 <ShieldCheck className="h-5 w-5 text-emerald-400" /> 8+ Years
                 Experience
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
-                <Clock className="h-5 w-5 text-indigo-400" /> 10-Day Shipping
+              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
+                <Clock className={`${heroStyles.accent} h-5 w-5`} /> 10-Day Shipping
                 Guarantee
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div className="flex items-center gap-3 text-sm font-semibold text-slate-300">
+              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
                 <Globe className="h-5 w-5 text-brand-orange-400" /> Offices in
                 Lagos & China
               </div>

@@ -1,0 +1,160 @@
+/* Shared visual contract. Semantic status colours (success/error/warning) remain independent. */
+:root {
+  --si-canvas: #f6f8fc;
+  --si-hero-surface: #eeedf6;
+  --si-surface: #fff;
+  --si-raised: #fff;
+  --si-inset: #eef1f7;
+  --si-ink: #18243b;
+  --si-muted: #526078;
+  --si-border: #e3e8f0;
+  --si-accent: #48439b;
+  --si-primary: #48439b;
+  --si-on-primary: #fff;
+  --si-soft: #eeecfa;
+  --si-shadow: 0 8px 32px rgb(24 36 59 / 5%);
+  --background: 220 50% 98%;
+  --foreground: 220 42% 16%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 42% 16%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 42% 16%;
+  --primary: 243 40% 44%;
+  --primary-foreground: 0 0% 100%;
+  --border: 217 30% 92%;
+  --input: 217 30% 92%;
+  --ring: 243 40% 44%;
+}
+.dark {
+  --si-canvas: #101114;
+  --si-hero-surface: #15151d;
+  --si-surface: #191b21;
+  --si-raised: #21242c;
+  --si-inset: #13151a;
+  --si-ink: #f2f3f7;
+  --si-muted: #adb2c0;
+  --si-border: #30333e;
+  --si-accent: #b8b2ff;
+  --si-primary: #b0a7f5;
+  --si-on-primary: #19152d;
+  --si-soft: #292539;
+  --si-shadow: 0 8px 32px rgb(0 0 0 / 12%);
+  --background: 225 11% 7%;
+  --foreground: 228 24% 96%;
+  --card: 225 14% 11%;
+  --card-foreground: 228 24% 96%;
+  --popover: 224 14% 15%;
+  --popover-foreground: 228 24% 96%;
+  --primary: 247 80% 81%;
+  --primary-foreground: 250 36% 13%;
+  --border: 227 13% 22%;
+  --input: 227 13% 22%;
+  --ring: 247 80% 81%;
+  --muted: 224 14% 15%;
+  --muted-foreground: 224 13% 72%;
+}
+body { background: var(--si-canvas); color: var(--si-ink); }
+.public-site-theme {
+  --public-page-dark: 16 17 20;
+  --public-section-dark: 16 17 20;
+  --public-card-dark: 25 27 33;
+  --public-field-dark: 33 36 44;
+  --public-border-dark: 48 51 62;
+  --public-heading-dark: 242 243 247;
+  --public-copy-dark: 173 178 192;
+  --public-muted-dark: 173 178 192;
+  --public-accent: 72 67 155;
+}
+/* Bridge existing utility-based pages to the tokens without changing their behaviour. */
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.bg-white,.bg-white\/95,.bg-white\/85) { background-color: var(--si-surface); }
+:is(.public-site-theme,.dashboard,.si-auth) :is(.bg-slate-50,.bg-slate-50\/50,.bg-\[\#fcfcfd\]) { background-color: var(--si-canvas); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.text-slate-900,.text-slate-950,.text-gray-900) { color: var(--si-ink); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.text-slate-500,.text-slate-600,.text-slate-700,.text-gray-500,.text-gray-600) { color: var(--si-muted); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.border-slate-100,.border-slate-200,.border-gray-200) { border-color: var(--si-border); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.text-brand-orange-400,.text-brand-orange-500,.text-brand-orange-600,.text-indigo-600,.text-blue-600) { color: var(--si-accent); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.bg-brand-orange-500,.bg-brand-orange-600,.bg-indigo-600,.bg-blue-600) { background-color: var(--si-primary); color: var(--si-on-primary); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.bg-indigo-50,.bg-blue-50,.bg-brand-orange-50,.bg-brand-orange-500\/10) { background-color: var(--si-soft); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.border-brand-orange-500\/30,.border-indigo-200) { border-color: var(--si-border); }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(button,[role='button'],a.inline-flex) { border-radius: 10px; }
+:is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(button,a,input,select,textarea):focus-visible { outline: 2px solid var(--si-accent); outline-offset: 3px; }
+:is(.public-site-theme,.dashboard,.si-auth) :is(.shadow-xl,.shadow-2xl) { box-shadow: var(--si-shadow); }
+:is(.public-site-theme,.dashboard) :is(.rounded-\[32px\],.rounded-3xl) { border-radius: 20px; }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.dark\:bg-slate-950,.dark\:bg-black,.dark\:bg-\[\#000000\]) { background-color: var(--si-canvas); }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.dark\:bg-slate-900,.dark\:bg-gray-900) { background-color: var(--si-surface); }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.dark\:bg-slate-800,.dark\:bg-gray-800,.dark\:bg-gray-700) { background-color: var(--si-raised); }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.dark\:border-slate-800,.dark\:border-gray-700,.dark\:border-slate-700) { border-color: var(--si-border); }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(.dark\:text-indigo-400,.dark\:text-blue-400,.dark\:text-brand-orange-400) { color: var(--si-accent); }
+.dark :is(.public-site-theme,.dashboard,.si-auth,.si-menu) :is(input,select,textarea) { color: var(--si-ink); background-color: var(--si-inset); border-color: var(--si-border); }
+.dashboard { color: var(--si-ink); background: var(--si-canvas); }
+.dashboard .bg-slate-900 { background-color: #15171c; }
+.dashboard [class*='backdrop-blur'] { backdrop-filter: none; }
+.dashboard :is(th,label) { font-size: 14px; }
+.dashboard td { font-size: 14px; line-height: 1.6; }
+.si-auth form :is(input:not([type='checkbox']):not([type='radio']),select) { min-height: 48px; font-size: 16px; border-radius: 10px; }
+.si-auth form label { font-size: 14px; }
+.si-auth form button[type='submit'] { min-height: 48px; }
+.si-auth h1 { font-weight: 650; letter-spacing: -.045em; }
+.si-auth h2 { font-weight: 650; letter-spacing: -.035em; }
+.si-auth form { padding-bottom: 24px; }
+/* The photographic authentication panel intentionally stays dark in both themes. */
+.si-auth .lg\:flex.bg-slate-900 { background-color: #15171c; }
+.si-auth .lg\:flex.bg-slate-900 .text-brand-orange-500 { color: #b8b2ff; }
+.si-menu { background: var(--si-raised) !important; color: var(--si-ink); border-color: var(--si-border) !important; box-shadow: var(--si-shadow); }
+.si-menu :is(.text-white,.text-slate-300) { color: var(--si-ink); }
+.si-menu .text-slate-400 { color: var(--si-muted); }
+.si-menu a:hover,.si-menu button:hover { background-color: var(--si-soft); color: var(--si-ink); }
+.si-menu [class*='bg-gradient-to-'] { background-image: none; background-color: var(--si-soft); color: var(--si-accent); }
+.si-menu [class*='bg-gradient-to-'] svg { color: var(--si-accent); }
+.si-navbar { background-color: var(--si-surface) !important; border-bottom: 1px solid var(--si-border); backdrop-filter: none !important; box-shadow: none !important; }
+.si-navbar :is(.text-white,.text-slate-300) { color: var(--si-ink); }
+.si-navbar a.bg-brand-orange-500 { color: var(--si-on-primary); }
+.public-site-theme .si-dark-surface {
+  --si-accent: #b8b2ff;
+  --si-primary: #b0a7f5;
+  --si-on-primary: #19152d;
+  --si-soft: #292539;
+  --si-muted: #adb2c0;
+  --si-border: #30333e;
+  background-color: #101114;
+}
+:is(.public-site-theme,.si-auth,.dashboard,.si-menu) [class*='shadow-brand-orange-'] { --tw-shadow-color: rgb(72 67 155 / 10%); }
+:is(.public-site-theme,.si-auth,.dashboard,.si-menu) [class~='hover:bg-brand-orange-600']:hover { background-color: var(--si-primary); filter: brightness(.94); }
+:is(.public-site-theme,.si-auth,.dashboard,.si-menu) [class~='hover:text-brand-orange-600']:hover { color: var(--si-accent); }
+.public-site-theme :is(h2,h3).font-black { font-weight: 650; letter-spacing: -.035em; }
+.si-auth > main > .flex > .flex.w-full { padding-top: 56px; padding-bottom: 56px; }
+.si-menu .bg-brand-orange-500\/80 { background-color: var(--si-accent); }
+.si-menu :is(input,textarea) { font-size: 14px; border: 1px solid var(--si-border); background-color: var(--si-inset); color: var(--si-ink); border-radius: 10px; }
+.si-menu :is(.bg-brand-orange-500,.bg-brand-orange-600):hover { background: var(--si-primary); color: var(--si-on-primary); }
+.si-menu .bg-brand-orange-500\/20 { background: var(--si-soft); }
+.si-menu :is(.bg-brand-orange-500,.bg-brand-orange-600) { color: var(--si-on-primary); }
+.dark .dashboard :is(.dark\:bg-\[\#161629\],.dark\:bg-\[\#0E0E1F\]) { background-color: var(--si-surface); }
+.dark .dashboard :is(.text-black,.text-gray-700,.text-gray-800,.text-slate-800) { color: var(--si-ink); }
+.dashboard :is(.bg-gray-50,.bg-gray-100,.bg-slate-100) { background-color: var(--si-inset); }
+.dashboard :is(.border-gray-100,.border-gray-300) { border-color: var(--si-border); }
+.dashboard .bg-\[\#0E0E1F\] { background-color: #15171c; }
+.dashboard [class*='dark:supports-backdrop-blur:'] { background-color: var(--si-surface); border-bottom: 1px solid var(--si-border); }
+/* Public service heroes share one theme-aware treatment, including pre-image-load contrast. */
+:is(section,header,div):has(> .si-hero-art) { background-color: var(--si-hero-surface) !important; color: var(--si-ink); }
+.si-hero-art { opacity: .07; }
+.dark .si-hero-art { opacity: .2; }
+:is(section,header,div):has(> .si-hero-art) :is(h1,h1 span) { color: var(--si-ink); font-weight: 650; letter-spacing: -.045em; text-wrap: balance; }
+:is(section,header,div):has(> .si-hero-art) p { color: var(--si-muted); }
+:is(section,header,div):has(> .si-hero-art) a[class*='bg-white/'] { color: var(--si-ink); background-color: var(--si-surface); border-color: var(--si-border); backdrop-filter: none; }
+.si-auth .si-auth-fields :is(label,.uppercase) { text-transform: none; letter-spacing: normal; }
+/* Replace literal legacy orange glows as well as Tailwind colour shadows. */
+:is(.public-site-theme,.si-auth,.dashboard,.si-menu) :is(a,button)[class*='shadow-']:is([class*='brand-orange'],[class*='249,115,22']) {
+  box-shadow: 0 6px 18px rgb(24 24 40 / 10%);
+}
+/* Fixed dark editorial panels need readable accents even in light mode. */
+.public-site-theme :is(section,article,aside,div).bg-slate-950:not(:has(> .si-hero-art)):not([class*='dark:bg-']) {
+  --si-accent: #b8b2ff;
+  --si-primary: #b0a7f5;
+  --si-on-primary: #19152d;
+  --si-soft: #292539;
+}
+.dark :is(.public-site-theme,.dashboard,.si-auth) :is(.text-indigo-500,.text-indigo-600,.text-indigo-700,.text-indigo-800,.text-indigo-900,.text-purple-500,.text-purple-600,.text-purple-700,.text-violet-600) {
+  color: var(--si-accent);
+}
+.public-site-theme :is(.si-dark-surface,.bg-slate-950) :is(.text-indigo-500,.text-indigo-600,.text-indigo-700,.text-indigo-800,.text-purple-600,.text-violet-600) {
+  color: var(--si-accent);
+}

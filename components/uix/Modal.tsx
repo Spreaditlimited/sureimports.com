@@ -1,51 +1,19 @@
-// components/Modal.tsx
-import React from 'react';
+'use client';
+import type { ReactNode } from 'react';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
-interface ModalProps {
+export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
+  title?: string;
+  className?: string;
 }
-
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="modal-overlay">
-      <div className="modal">
-        <button className="close-button text-gray-300" onClick={onClose}>
-          x
-        </button>
-        <div className="modal-content">{children}</div>
-      </div>
-      <style jsx>{`
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-        .modal {
-          background: white;
-          padding: 20px;
-          border-radius: 32px;
-          max-width: 500px;
-          width: calc(100vw - 2rem);
-          position: relative;
-        }
-        .close-button {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-        }
-      `}</style>
-    </div>
-  );
-};
-
-export default Modal;
+export default function Modal({ isOpen, onClose, children, title = 'Details', className }: ModalProps) {
+  return <Dialog open={isOpen} onOpenChange={open => { if (!open) onClose(); }}>
+    <DialogContent className={className} aria-describedby={undefined}>
+      <DialogTitle className="sr-only">{title}</DialogTitle>
+      <div className="pt-5">{children}</div>
+    </DialogContent>
+  </Dialog>;
+}

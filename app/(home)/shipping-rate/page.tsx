@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Info, PackageCheck, Search, Ship } from 'lucide-react';
@@ -127,15 +129,15 @@ export default async function ShippingRatePage() {
     <>
       <Navbar />
       <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white">
-        <section className="relative overflow-hidden bg-slate-950 px-4 pb-16 pt-48 text-white sm:px-6 lg:px-8">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 px-4 pb-16 pt-48 text-white sm:px-6 lg:px-8`}>
           <PublicHeroBackground />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%)]" />
           <div className="relative mx-auto max-w-[1440px]">
             <div className="max-w-3xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-orange-400/30 bg-orange-400/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-orange-300">
+<HeroPill className="mb-6">
                 <Ship className="h-3.5 w-3.5" />
                 Live Shipping Estimates
-              </div>
+              </HeroPill>
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 Shipping Rates
               </h1>

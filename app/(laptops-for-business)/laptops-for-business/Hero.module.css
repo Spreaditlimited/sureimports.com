@@ -1,0 +1,4 @@
+.headline.headline { width: 100%; text-wrap: initial; }
+@media (min-width: 1024px) {
+  .ending { display: block; }
+}

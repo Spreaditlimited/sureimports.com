@@ -1,5 +1,7 @@
 'use client';
 
+import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+
 import { Button } from '@/components/ui/button';
 import React from 'react';
 import { useRouter } from 'next/navigation';
@@ -35,7 +37,7 @@ function PaySupplier(props: UserLayoutProps) {
                 <Button
                   type="button"
                   variant="secondary"
-                  className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]"
+                  className={`${darkHeader.sync} si-dashboard-sync flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]`}
                   onClick={() => router.refresh()}
                 >
                   <RefreshCcw className="h-4 w-4" />
@@ -58,7 +60,7 @@ function PaySupplier(props: UserLayoutProps) {
           </div>
         </div>
 
-        <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <main className={`${darkHeader.overlap} mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8`}>
           {children}
         </main>
       </RecordCountPaySupplierProvider>

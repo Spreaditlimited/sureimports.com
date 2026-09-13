@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { 
@@ -117,12 +119,12 @@ export default async function BookConsultationPage({
       <div className="flex min-h-screen flex-col bg-[#fcfcfd] text-slate-600 antialiased selection:bg-brand-orange-500/30">
         <Navigation forceLightNavbar />
         <main className="flex-1">
-          <div className="mx-auto max-w-[1440px] px-4 pb-24 pt-48 sm:px-6 lg:px-8">
+<div className={`${heroLayout.fixed} mx-auto max-w-[1440px] px-4 pb-24 pt-48 sm:px-6 lg:px-8`}>
             <header className="mx-auto mb-12 max-w-3xl text-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-indigo-600">
+<HeroPill className="mb-6">
               <CalendarClock className="h-3.5 w-3.5" />
               Paid Consultation
-            </div>
+            </HeroPill>
             <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
               Manage your{' '}
               <span className="bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent">
@@ -154,15 +156,15 @@ export default async function BookConsultationPage({
       <Navigation />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative overflow-hidden bg-slate-950 px-4 pb-16 pt-32 text-center text-white sm:px-6 sm:pb-24 sm:pt-44 lg:px-8">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 px-4 pb-16 pt-32 text-center text-white sm:px-6 sm:pb-24 sm:pt-44 lg:px-8`}>
         <PublicHeroBackground />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand-orange-500/15 blur-[100px] sm:h-[600px] sm:w-[800px]" />
         
         <div className="relative mx-auto max-w-5xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md sm:mb-6 sm:px-4 sm:py-1.5 sm:text-xs">
+<HeroPill className="mb-6">
             <PhoneCall className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             1-on-1 Strategy Call
-          </div>
+          </HeroPill>
           
           <h1 className="text-[clamp(2.25rem,6.4vw,4.5rem)] font-black leading-[1.08] tracking-tight">
             <span className="md:block md:whitespace-nowrap">

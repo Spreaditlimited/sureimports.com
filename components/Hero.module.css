@@ -1,0 +1,12 @@
+.hero { background: var(--si-hero-surface) !important; }
+.hero .art { opacity: .07; }
+.hero h1 { color: var(--si-ink); font-weight: 650; letter-spacing: -.055em; max-width: 1000px; text-wrap: balance; }
+.hero p { color: var(--si-muted); font-weight: 400; text-wrap: balance; }
+.hero a { border-radius: 10px; }
+.hero a[href='/book-consultation'] { background: var(--si-surface); color: var(--si-ink); border-color: var(--si-border); backdrop-filter: none; }
+.fade { position: absolute; bottom: 0; left: 0; right: 0; height: 100px; pointer-events: none; background: linear-gradient(transparent,var(--si-canvas)); }
+:global(.dark) .hero .art { opacity: .24; }
+@media(max-width:640px) {
+  .hero h1 { width: 100%; max-width: 100%; font-size: clamp(2rem, 9.25vw, 2.5rem); line-height: 1.12; text-wrap: initial; }
+  .hero { min-height: 720px; }
+}

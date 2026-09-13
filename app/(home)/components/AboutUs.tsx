@@ -1,5 +1,7 @@
 'use client';
 
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import Image from 'next/image';
 import { 
   Users, 
@@ -71,15 +73,15 @@ export default function AboutUs() {
     <div className="bg-[#fcfcfd] dark:bg-slate-950">
       
       {/* Premium Hero Section */}
-      <div className="relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-32 pb-20 dark:border-slate-800 dark:bg-slate-900">
+<div className={`${heroLayout.fixed} relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-32 pb-20 dark:border-slate-800 dark:bg-slate-900`}>
         <div className="absolute inset-0 z-0">
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
         
         <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
+<HeroPill className="mb-6">
             <Heart className="h-3.5 w-3.5" /> Our Story
-          </div>
+          </HeroPill>
           <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-6xl">
             Transforming Global <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">

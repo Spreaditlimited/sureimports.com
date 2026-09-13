@@ -14,6 +14,7 @@ import jsPDF from 'jspdf';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
+import bankDepositStyles from '@/components/dashboard/BankDepositButton.module.css';
 import { Input } from '@/components/ui/input-with-dark-mode';
 import Loader from '@/components/uix/Loader';
 import { useAuth } from '@/app/context/AuthContext';
@@ -862,9 +863,7 @@ export default function MoreOrders({
                 />
                 <Button
                   disabled={!isDisabled}
-                  className={isDisabled 
-                    ? "h-12 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
-                    : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                  className={bankDepositStyles.button}
                   onClick={() => {
                     goToBankPayment({
                       amount: grandTotalCost,
@@ -1002,9 +1001,7 @@ export default function MoreOrders({
                     />
                 <Button
                       disabled={!isDisabled}
-                      className={isDisabled 
-                        ? "h-12 flex-1 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
-                        : "h-12 flex-1 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                      className={`${bankDepositStyles.button} flex-1`}
                       onClick={() => {
                         goToBankPayment({
                           amount: onHoldDifference,
@@ -1094,9 +1091,7 @@ export default function MoreOrders({
                   />
                   <Button
                     disabled={!isDisabled}
-                    className={isDisabled 
-                      ? "h-12 rounded-xl bg-slate-900 px-6 font-bold text-white shadow-md transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900" 
-                      : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
+                    className={bankDepositStyles.button}
                     onClick={() => {
                       goToBankPayment({
                         amount: actualTotalShippingCost - estimatedTotalShippingCost,

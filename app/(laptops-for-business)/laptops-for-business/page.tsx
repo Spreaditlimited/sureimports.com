@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -25,6 +27,8 @@ import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import heroStyles from './Hero.module.css';
+import workflowStyles from '@/components/home/Workflow.module.css';
 import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
@@ -198,17 +202,17 @@ export default function LaptopsForBusinessPage() {
       <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
         
         {/* --- HERO SECTION --- */}
-        <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-32 md:pt-44">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-32 md:pt-44`}>
           <PublicHeroBackground />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center">
-              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md shadow-[0_0_20px_rgba(249,115,22,0.15)]">
+            <div className="mx-auto flex w-full max-w-7xl flex-col items-center">
+<HeroPill className="mb-6">
                 <Laptop className="h-4 w-4" />
                 Enterprise Hardware Sourcing
-              </div>
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                Business laptops from China, <span className="text-white">verified before shipping</span>
+              </HeroPill>
+              <h1 className={`${heroStyles.headline} text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}>
+                Business laptops from China, <span className={`${heroStyles.ending} text-white`}>verified before shipping</span>
               </h1>
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
                 Sure Imports helps Nigerian businesses, schools, and resellers source bulk laptops from China. We handle supplier verification, strict technical inspections, and end-to-door delivery.
@@ -293,19 +297,17 @@ export default function LaptopsForBusinessPage() {
         </section>
 
         {/* --- WORKFLOW TIMELINE --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28 relative overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[500px] w-[800px] rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
+        <section className={`${workflowStyles.workflow} py-20 md:py-28 relative overflow-hidden`}>
           
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+              <span className={`${workflowStyles.accent} text-xs font-black uppercase tracking-widest`}>
                 Procurement workflow
               </span>
               <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl leading-tight">
                 A clear process before money leaves your account.
               </h2>
-              <p className="mt-6 text-lg leading-relaxed text-slate-400">
+              <p className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}>
                 The safest business laptop procurement starts with a written requirement. We help you
                 define the brief, compare realistic supply options, and inspect the batch before shipping.
               </p>
@@ -313,15 +315,15 @@ export default function LaptopsForBusinessPage() {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {process.map((item, index) => (
-                <div key={item.title} className="relative rounded-3xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm">
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 text-brand-orange-400">
+                <div key={item.title} className={`${workflowStyles.card} relative rounded-3xl border p-8`}>
+                  <div className={`${workflowStyles.icon} mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border`}>
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <span className="absolute top-8 right-8 text-6xl font-black text-white/[0.03] pointer-events-none">
+                  <span className={`${workflowStyles.number} absolute top-8 right-8 text-6xl font-black pointer-events-none`}>
                     {index + 1}
                   </span>
                   <h3 className="text-xl font-bold">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">{item.text}</p>
+                  <p className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}>{item.text}</p>
                 </div>
               ))}
             </div>

@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -232,17 +234,17 @@ export default async function SupplierIntelligencePage() {
       <Navigation />
 
       {/* --- HERO SECTION --- */}
-      <section className="relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-28 md:pt-44">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
         <PublicHeroBackground />
         {/* Subtle Ambient Glow */}
         <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
 
         <div className="relative mx-auto flex max-w-[1440px] flex-col items-center px-4 text-center sm:px-6 lg:px-8">
           <div className="mx-auto max-w-4xl">
-            <div className="inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+<HeroPill>
               <LockKeyhole className="h-3.5 w-3.5" />
               China supplier intelligence for global buyers
-            </div>
+            </HeroPill>
             <h1 className="mt-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
               Stop guessing where to find{' '}
               <span className="text-white">China suppliers</span>

@@ -415,7 +415,7 @@ export default function SignUpFormContainer() {
             </Link>
           </div>
 
-          <div className="rounded-[32px] bg-white p-8 shadow-2xl shadow-slate-200/40 dark:border dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-10 lg:bg-transparent lg:p-0 lg:shadow-none dark:lg:border-none dark:lg:bg-transparent">
+          <div className="si-auth-fields py-2 sm:px-2 lg:p-0">
             
             <div className="mb-8 text-center lg:text-left">
               <p className="mb-2 text-sm font-bold uppercase tracking-widest text-brand-orange-500">

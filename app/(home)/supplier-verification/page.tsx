@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -200,16 +202,16 @@ export default async function SupplierVerificationPage() {
       <Navbar />
 
       <main className="flex-1">
-        <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
           <PublicHeroBackground />
           <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
 
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-4xl flex-col items-center">
-              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+<HeroPill className="mb-6">
                 <ShieldCheck className="h-4 w-4" />
                 China supplier due diligence
-              </div>
+              </HeroPill>
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 Verify a Chinese supplier{' '}
                 <span className="text-white">before you pay</span>

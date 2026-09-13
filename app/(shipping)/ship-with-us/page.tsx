@@ -1,3 +1,5 @@
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -225,16 +227,16 @@ export default function ShipWithUsPage() {
       <main className="flex-1">
         
         {/* --- HERO SECTION --- */}
-        <section className="relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44">
+<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
           <PublicHeroBackground />
           <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
           
           <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
             <div className="mx-auto flex max-w-4xl flex-col items-center">
-              <div className="mb-6 inline-flex items-center justify-center gap-2 rounded-full border border-brand-orange-500/30 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-400 backdrop-blur-md">
+<HeroPill className="mb-6">
                 <Ship className="h-4 w-4" />
                 Shipping-only logistics
-              </div>
+              </HeroPill>
               <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
                 Ship goods from China to Nigeria <span className="text-white">after buying</span>
               </h1>

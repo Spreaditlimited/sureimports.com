@@ -1,5 +1,7 @@
 'use client';
 
+import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -50,7 +52,7 @@ function ShippingOnlyTopHeader() {
         <div className="flex gap-3">
           <button
             onClick={() => router.refresh()}
-            className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]"
+            className={`${darkHeader.sync} si-dashboard-sync flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]`}
           >
             <RefreshCcw className="h-4 w-4" />
             Sync
@@ -70,7 +72,7 @@ function ShippingOnlyTopHeader() {
             key={stat.label}
             className="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800/50 p-5 backdrop-blur-sm dark:border-slate-700 dark:bg-[#161629]/70"
           >
-            <div className={`rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}>
+            <div className={`${darkHeader.tile} rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}>
               <stat.icon className="h-6 w-6" />
             </div>
             <div>
@@ -118,7 +120,7 @@ export default function ShippingOnlyLayout({ children }: ShippingOnlyLayoutProps
         </div>
 
         {/* Main Content Area */}
-        <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <main className={`${darkHeader.overlap} mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8`}>
           {/* This renders the page.tsx below */}
           {children}
         </main>

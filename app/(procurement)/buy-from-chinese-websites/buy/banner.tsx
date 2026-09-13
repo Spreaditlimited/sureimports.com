@@ -1,4 +1,5 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
 import React, { useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -22,8 +23,7 @@ const Banner = () => {
             data-aos="fade-up"
             className="relative z-[5] w-full max-sm:text-center sm:max-w-[400px] xl:max-w-[620px] xl14:max-w-[695px]"
           >
-            <div className="mx-auto mb-6 inline-block rounded-[10px] bg-white/20 p-[8px_15px] xl:p-[10px_30px]">
-              <p className="text-base font-medium text-white max-[420px]:text-xs xl:text-lg">
+            <HeroPill className="mb-6"><span>
                 Spreaditglobal.com is now{' '}
                 <Link
                   href="https://www.sureimports.com/"
@@ -32,8 +32,7 @@ const Banner = () => {
                 >
                   Sureimports.com
                 </Link>
-              </p>
-            </div>
+              </span></HeroPill>
             <h1 className="text-[42px] font-semibold capitalize leading-tight text-white max-xl:text-[26px] max-sm:text-[34px] max-[375px]:text-[28px]">
               Buy From Chinese <br className="block sm:hidden" /> Websites The
               Smart, <br className="block sm:hidden" /> Stress-Free Way

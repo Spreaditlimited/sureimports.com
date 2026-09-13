@@ -1,7 +1,5 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-
 import { ThemeProvider } from '@/components/dashboard/theme-provider';
 
 export default function SiteThemeProvider({
@@ -9,12 +7,8 @@ export default function SiteThemeProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const isDashboard =
-    pathname === '/dashboard' || pathname.startsWith('/dashboard/');
-
   return (
-    <ThemeProvider forcedTheme={isDashboard ? 'light' : undefined}>
+    <ThemeProvider>
       {children}
     </ThemeProvider>
   );

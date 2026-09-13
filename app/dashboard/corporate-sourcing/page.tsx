@@ -1,5 +1,7 @@
 'use client';
 
+import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
@@ -392,7 +394,7 @@ export default function CorporateGiftsDashboardPage() {
             <div className="flex gap-3">
               <button
                 onClick={fetchRequests}
-                className="flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]"
+                className={`${darkHeader.sync} si-dashboard-sync flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-sm font-medium transition hover:bg-slate-700 dark:bg-[#161629] dark:hover:bg-[#1d1f36]`}
               >
                 <RefreshCcw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
                 Sync
@@ -411,7 +413,7 @@ export default function CorporateGiftsDashboardPage() {
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {stats.map((stat) => (
               <div key={stat.label} className="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800/50 p-5 backdrop-blur-sm dark:border-slate-700 dark:bg-[#161629]/70">
-                <div className={`rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}>
+                <div className={`${darkHeader.tile} rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020] ${stat.color}`}>
                   <stat.icon className="h-6 w-6" />
                 </div>
                 <div>
@@ -580,8 +582,8 @@ export default function CorporateGiftsDashboardPage() {
         {/* Requests List */}
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Projects</h2>
-            <div className="flex items-center gap-2 text-sm text-slate-500">
+            <h2 className={`text-lg font-bold ${showForm ? 'text-slate-900 dark:text-white' : darkHeader.heading}`}>Active Projects</h2>
+            <div className={`flex items-center gap-2 text-sm ${showForm ? 'text-slate-500' : darkHeader.copy}`}>
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
               Live Updates
             </div>

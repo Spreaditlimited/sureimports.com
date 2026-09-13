@@ -1,0 +1,10 @@
+/* Shared solid workflow surfaces for public service pages. */
+.workflow {
+  background: #101114;
+  color: #f2f3f7;
+}
+.card { background: #191b21; border-color: #30333e; }
+.workflow .copy { color: #adb2c0; }
+.workflow .accent { color: #b8b2ff; }
+.workflow .number { color: #8e95a6; }
+.icon { background: #21242c; border-color: #30333e; color: #b8b2ff; }

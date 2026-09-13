@@ -1,4 +1,7 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from './ReportSearchExperience.module.css';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -191,14 +194,14 @@ export default function ReportSearchExperience({
 
   return (
     <>
-      <section className="relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-24 md:pt-44">
+      <section className={`${heroLayout.fixed} relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-24 md:pt-44`}>
         <PublicHeroBackground />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
         <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-orange-400 backdrop-blur">
+          <HeroPill>
             <Search className="h-4 w-4" />
             Supplier Intelligence Search
-          </div>
+          </HeroPill>
           <h1 className="mx-auto mt-7 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl md:text-7xl">
             What product are you trying to source?
           </h1>
@@ -253,7 +256,7 @@ export default function ReportSearchExperience({
                   setQuery(item);
                   setTimeout(() => runSearch(), 0);
                 }}
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 font-semibold text-slate-300 transition hover:border-brand-orange-500/40 hover:text-white"
+                className={styles.quickSearch}
               >
                 {item}
               </button>

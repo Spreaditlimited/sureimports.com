@@ -124,7 +124,7 @@ export function OrderList({ params }: orderStatus) {
   if (!productData) return <Loader />;
   if (countRecords.length == 0)
     return (
-      <div className="pt-24">
+      <div>
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-20 text-center dark:border-slate-700 dark:bg-[#161629]">
           <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
             <Image

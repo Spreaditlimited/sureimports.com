@@ -1,10 +1,7 @@
-//'use client';
-import React, { useState } from 'react';
 import { PrismaClient } from '@prisma/client';
 import { Metadata } from 'next';
-import { checkAuth } from '@/lib/auth/checkAuth';
 import { getUser } from '@/lib/auth/auth';
-import { notFound, redirect } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import RefundsPage from './components/RefundsPage';
 
 const prisma = new PrismaClient();
@@ -48,6 +45,7 @@ export default async function RefundRecordsPage() {
   //   redirect('/auth/login');
   // }
   const user = (await getUser()) as any;
+  if (!user?.pidUser) redirect('/auth/login');
 
   const records: any = await prisma.refund_records.findMany({
     where: {

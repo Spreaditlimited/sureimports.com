@@ -1,4 +1,6 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect } from 'react';
 import Whitebtn from './ui/whitebtn';
 import Link from 'next/link';
@@ -19,7 +21,7 @@ const Banner: React.FC = () => {
   }, []);
 
   return (
-    <div className="banner-image relative overflow-hidden bg-slate-950 pb-[75px] pt-[190px] max-xl17:pb-[50px] max-xl17:pt-[100px] max-xl14:pt-[120px] max-xl:pb-[30px] max-xl:pt-[140px] max-lg:pb-[10px] max-lg:pt-[90px] max-md:pb-[35px] max-sm:pb-[0px] max-sm:pt-[70px] max-[120px]:pt-[10px]">
+    <div className={`${heroLayout.fixed} banner-image relative overflow-hidden bg-slate-950 pb-[75px] pt-[190px] max-xl17:pb-[50px] max-xl17:pt-[100px] max-xl14:pt-[120px] max-xl:pb-[30px] max-xl:pt-[140px] max-lg:pb-[10px] max-lg:pt-[90px] max-md:pb-[35px] max-sm:pb-[0px] max-sm:pt-[70px] max-[120px]:pt-[10px]`}>
       <PublicHeroBackground />
       <div className="relative z-10 px-[30px] max-sm:px-[20px]">
         <div className="fix-width">
@@ -28,9 +30,9 @@ const Banner: React.FC = () => {
               className="w-full max-w-[573px] max-lg:mb-[40px] max-lg:max-w-[100%] max-lg:text-center"
               data-aos="fade-up"
             >
-              <span className="rounded-[23px] bg-store-bglightwhite p-[12px_23px] text-[16px] font-normal leading-[150%] text-store-white max-[420px]:text-[12px]">
+<HeroPill>
                 We ship only genuine devices. No fakes.
-              </span>
+              </HeroPill>
               <h1 className="main-title mt-6 text-5xl font-black uppercase leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl max-sm:hidden">
                 Buy phones & laptops from china - with ease, confidence and
                 warranty

@@ -1,4 +1,6 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useState } from 'react';
 import {
   Calendar,
@@ -302,14 +304,14 @@ export default function BlogDetail({
 
   return (
     <div className="bg-[#fcfcfd] dark:bg-slate-950 pb-24">
-      <article className="mx-auto max-w-4xl px-4 pt-48 sm:px-6 lg:px-8">
+<article className={`${heroLayout.fixed} mx-auto max-w-4xl px-4 pt-48 sm:px-6 lg:px-8`}>
         
         {/* Article Header */}
         <header className="mb-12 text-center">
           <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
-            <span className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[10px] uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+            <HeroPill>
               {post.category}
-            </span>
+            </HeroPill>
             <span className="flex items-center gap-1.5 uppercase tracking-widest">
               <Calendar className="h-3.5 w-3.5" />
               {formatDate(post.publishDate)}

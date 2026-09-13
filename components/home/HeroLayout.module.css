@@ -1,0 +1,18 @@
+.fixed.fixed { padding-top: calc(81px + 48px); }
+.flow.flow { padding-top: 48px; }
+.fixed:global(.flex) { justify-content: flex-start; }
+.flow nav[aria-label='Breadcrumb'] { position: absolute; top: -40px; left: 0; right: 0; }
+.flow nav[aria-label='Breadcrumb'] + header { margin-top: 0; }
+@media (min-width: 1024px) {
+  .fixed.fixed { padding-top: calc(83px + 72px); }
+  .flow.flow { padding-top: 72px; }
+  .flow nav[aria-label='Breadcrumb'] { top: -48px; }
+}
+@media (max-width: 639px) {
+  :is(.fixed.fixed,.flow.flow) h1 {
+    width: 100%; max-width: 100%;
+    font-size: clamp(2rem, 9.25vw, 2.5rem);
+    line-height: 1.12; text-wrap: balance;
+  }
+  :is(.fixed.fixed,.flow.flow) h1 span { white-space: normal; }
+}

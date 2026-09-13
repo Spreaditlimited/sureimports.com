@@ -75,9 +75,9 @@ export default function CustomerReviews(_: CustomerReviewsProps) {
         </div>
 
         <div className="mt-20 text-center">
-          <div className="mx-auto max-w-3xl rounded-[32px] bg-indigo-900 p-10 text-white shadow-2xl sm:p-16">
+          <div className="si-public-cta mx-auto max-w-3xl rounded-[32px] border p-10 shadow-2xl sm:p-16">
             <h3 className="mb-4 text-3xl font-black">Ready to scale your business?</h3>
-            <p className="mb-8 text-indigo-200">Join thousands of businesses importing effortlessly from China.</p>
+            <p className="mb-8">Join thousands of businesses importing effortlessly from China.</p>
             <Link
               href="/auth/login"
               className="inline-flex h-14 items-center justify-center rounded-full border-0 bg-brand-orange-500 px-10 text-base font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98]"

@@ -16,7 +16,7 @@ export default function HomeClient() {
       <main>
         <Hero
           title="Get the best products from China at the best prices"
-          subtitle="We handle procurement, supplier verification, and fast shipping directly to your doorstep in Africa."
+          subtitle="We handle procurement, supplier verification, and fast shipping directly to your doorstep."
           size="large"
           showCTA
         />

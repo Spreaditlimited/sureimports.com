@@ -31,12 +31,12 @@ export const MobileSidebar = ({ items, brand }: { items?: NavItem[]; brand?: { n
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <div className="flex items-center justify-center gap-2">
+        <button type="button" aria-label="Open dashboard menu" className="flex h-11 w-11 items-center justify-center gap-2">
           <MenuIcon />
-        </div>
+        </button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="w-[256px] bg-slate-900 p-0">
+      <SheetContent side="left" className="si-sidebar w-[280px] max-w-[calc(100vw-2rem)] bg-slate-900 p-0">
         <SheetHeader className="sr-only">
           <SheetTitle>Dashboard Menu</SheetTitle>
         </SheetHeader>

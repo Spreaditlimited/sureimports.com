@@ -177,7 +177,7 @@ export default function PublicShippingOnlyFlow() {
   };
 
   return (
-    <div className="bg-transparent">
+    <div className="si-public-form bg-transparent">
       {/* Main Grid */}
       <section className="w-full">
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)] 2xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start">
@@ -199,20 +199,20 @@ export default function PublicShippingOnlyFlow() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
-                  <Input placeholder="John" value={account.firstName} onChange={(e) => setAccount(p => ({ ...p, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-1" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
+                  <Input id="shipping-field-1" placeholder="John" value={account.firstName} onChange={(e) => setAccount(p => ({ ...p, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
-                  <Input placeholder="Doe" value={account.lastName} onChange={(e) => setAccount(p => ({ ...p, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-2" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
+                  <Input id="shipping-field-2" placeholder="Doe" value={account.lastName} onChange={(e) => setAccount(p => ({ ...p, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
-                  <Input type="email" placeholder="john@company.com" value={account.email} onChange={(e) => setAccount(p => ({ ...p, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-3" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
+                  <Input id="shipping-field-3" type="email" placeholder="john@company.com" value={account.email} onChange={(e) => setAccount(p => ({ ...p, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">WhatsApp Number</label>
-                  <Input
+                  <label htmlFor="shipping-field-4" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">WhatsApp Number</label>
+                  <Input id="shipping-field-4"
                     placeholder="+234..."
                     value={request.whatsappNumber}
                     onChange={(e) => {
@@ -240,12 +240,12 @@ export default function PublicShippingOnlyFlow() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Name on Shipment</label>
-                  <Input placeholder="Package label name" value={request.shippingName} onChange={(e) => setRequest(p => ({ ...p, shippingName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-5" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Name on Shipment</label>
+                  <Input id="shipping-field-5" placeholder="Package label name" value={request.shippingName} onChange={(e) => setRequest(p => ({ ...p, shippingName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination</label>
-                  <select
+                  <label htmlFor="shipping-field-6" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination</label>
+                  <select id="shipping-field-6"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm shadow-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:focus:ring-slate-300"
                     value={request.shippingTo}
                     onChange={(e) => setRequest(p => ({ ...p, shippingTo: e.target.value, shippingPlan: '' }))}
@@ -260,8 +260,8 @@ export default function PublicShippingOnlyFlow() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Mode</label>
-                  <select
+                  <label htmlFor="shipping-field-7" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Mode</label>
+                  <select id="shipping-field-7"
                     className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm shadow-sm ring-offset-white focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:focus:ring-slate-300"
                     value={request.shippingPlan}
                     onChange={(e) => setRequest(p => ({ ...p, shippingPlan: e.target.value }))}
@@ -277,12 +277,12 @@ export default function PublicShippingOnlyFlow() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Weight className="h-3 w-3" /> Est. Gross Weight (kg)</label>
-                  <Input placeholder="e.g. 15" value={request.grossWeight} onChange={(e) => setRequest(p => ({ ...p, grossWeight: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-8" className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Weight className="h-3 w-3" /> Est. Gross Weight (kg)</label>
+                  <Input id="shipping-field-8" placeholder="e.g. 15" value={request.grossWeight} onChange={(e) => setRequest(p => ({ ...p, grossWeight: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Hash className="h-3 w-3" /> Tracking ID (Optional)</label>
-                  <Input placeholder="Supplier's tracking number" value={request.trackingNumber} onChange={(e) => setRequest(p => ({ ...p, trackingNumber: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
+                  <label htmlFor="shipping-field-9" className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><Hash className="h-3 w-3" /> Tracking ID (Optional)</label>
+                  <Input id="shipping-field-9" placeholder="Supplier's tracking number" value={request.trackingNumber} onChange={(e) => setRequest(p => ({ ...p, trackingNumber: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
                 </div>
               </div>
 
@@ -310,8 +310,8 @@ export default function PublicShippingOnlyFlow() {
               </div>
 
               <div className="mt-8 space-y-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Expected Shipment (Notes)</label>
-                <Textarea 
+                <label htmlFor="shipping-field-10" className="text-[11px] font-bold uppercase tracking-widest text-slate-500 flex items-center gap-1"><MessageSquare className="h-3 w-3" /> Expected Shipment (Notes)</label>
+                <Textarea id="shipping-field-10"
                   placeholder="What's inside? Batteries, liquids, powders? Please be detailed." 
                   value={request.expectedShipments}
                   onChange={(e) => setRequest(p => ({ ...p, expectedShipments: e.target.value }))}

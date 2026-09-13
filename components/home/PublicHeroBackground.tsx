@@ -9,7 +9,7 @@ export default function PublicHeroBackground({
 }: PublicHeroBackgroundProps) {
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0"
+      className="si-hero-art pointer-events-none absolute inset-0 z-0"
       aria-hidden="true"
     >
       <Image

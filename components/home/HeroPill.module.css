@@ -1,0 +1,37 @@
+.pill.pill {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 7px 14px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  /* Deliberately lighter than the lavender hero: the old #eeecfa fill
+     blended into service heroes and looked like an outline-only badge. */
+  background: #f8f7ff !important;
+  color: #48439b !important;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+  vertical-align: middle;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+/* Match the homepage: centred badge and a consistent gap before the heading. */
+.pill.pill:has(+ h1) { margin-bottom: 24px; }
+.pill.pill + h1 { margin-top: 0; }
+:global(.dark) .pill.pill {
+  background: #292539 !important;
+  color: #b8b2ff !important;
+  border-color: transparent;
+}
+.pill > svg { width: 14px; height: 14px; flex: 0 0 14px; color: inherit; }
+.pill > span { flex-shrink: 0; }

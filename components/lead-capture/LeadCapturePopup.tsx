@@ -230,7 +230,7 @@ export default function LeadCapturePopup() {
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-[80] px-4 pb-4 sm:bottom-6 sm:left-auto sm:right-6 sm:w-[380px] sm:px-0 sm:pb-0">
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900 sm:p-7">
+      <div className="si-menu relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900 sm:p-7">
         {/* Subtle top indicator bar */}
         <div className="absolute inset-x-0 top-0 h-[3px] bg-brand-orange-500/80" />
 

@@ -1,4 +1,6 @@
 'use client';
+import HeroPill from '@/components/home/HeroPill';
+import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect } from 'react';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
@@ -18,7 +20,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-slate-950 p-[70px_0_70px] md:p-[105px_0_85px] xl15:p-[145px_0_188px]">
+    <section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 p-[70px_0_70px] md:p-[105px_0_85px] xl15:p-[145px_0_188px]`}>
       <PublicHeroBackground />
       <div className="px-[30px] max-sm:px-[20px]">
         <div className="fix-width">
@@ -26,8 +28,7 @@ const Hero = () => {
             data-aos="fade-up"
             className="relative z-[5] mx-auto w-full text-center lg:max-w-[590px] xl:max-w-[940px] xl14:max-w-[940px]"
           >
-            <div className="mx-auto mb-6 inline-block rounded-[10px] bg-white/20 p-[8px_20px] md:p-[10px_30px]">
-              <p className="text-base font-medium text-buy-sourcing-white max-[429px]:text-xs lg:text-lg">
+            <HeroPill className="mb-6"><span>
                 Spreaditglobal.com is now{' '}
                 <Link
                   href="https://www.sureimports.com/"
@@ -36,8 +37,7 @@ const Hero = () => {
                 >
                   Sureimports.com
                 </Link>
-              </p>
-            </div>
+              </span></HeroPill>
             {/* <h1 className="text-center text-[42px] font-semibold capitalize leading-tight text-buy-sourcing-white max-xl:text-[26px] max-sm:text-[34px] max-[420px]:text-[26px]"> */}
             <h1 className="text-5xl font-black capitalize leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
               Get Exactly What You Want from China{' '}

@@ -1,0 +1,11 @@
+/* These controls sit on a permanently dark header, including in light mode.
+   Load their colours with the components rather than the root theme bridge. */
+.sync.sync {
+  color: #f2f3f7 !important;
+  background-color: #1e293b !important;
+}
+.sync.sync:hover { background-color: #334155 !important; }
+.heading.heading { color: #f2f3f7 !important; }
+.copy.copy { color: #c3c7d2 !important; }
+.tile.tile { background-color: #1e293b !important; }
+.overlap { position: relative; z-index: 1; }

@@ -215,36 +215,13 @@ type NavbarProps = {
   forceLightNavbar?: boolean;
 };
 
-export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
+export default function Navbar(_props: NavbarProps) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [cartCount, setCartCount] = useState(0);
-  const isShopProductPage =
-    Boolean(pathname?.startsWith('/shop/')) &&
-    pathname !== '/shop/checkout' &&
-    pathname !== '/shop/order-success';
-  const LEGAL_PAGE_PATHS = [
-    '/privacy-policy',
-    '/terms-and-conditions',
-    '/shipping-policy',
-    '/warranty-policy',
-    '/faya-warranty-policy',
-    '/about',
-  ];
-  const isLegalPage = Boolean(pathname && LEGAL_PAGE_PATHS.includes(pathname));
-  const isToolsPage = Boolean(pathname?.startsWith('/tools'));
-  const isBlogPage = Boolean(pathname?.startsWith('/blog'));
-  const isSupplierReportProductPage = Boolean(
-    pathname && /^\/supplier-intelligence\/reports\/[^/]+\/?$/.test(pathname),
-  );
-  const useLightNavbar =
-    forceLightNavbar ||
-    isShopProductPage ||
-    isLegalPage ||
-    isToolsPage ||
-    isBlogPage ||
-    isSupplierReportProductPage;
+  // Retain the prop API for callers; every route now has theme-aware navigation.
+  const useLightNavbar = true;
   const signInHref = '/auth/login';
   const isOnShopPage = Boolean(pathname?.startsWith('/shop'));
 
@@ -318,7 +295,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
+      className={`si-navbar fixed top-0 z-50 w-full transition-all duration-300 ${
         useLightNavbar
           ? scrolled
             ? 'border-b border-slate-200 bg-white/95 py-3 shadow-lg shadow-slate-200/60 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/90 dark:shadow-black/10'
@@ -376,7 +353,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                         </NavigationMenuTrigger>
                         <NavigationMenuContent>
                           <ul
-                            className={`grid ${item.panelClassName} grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl`}
+                            className={`si-menu grid ${item.panelClassName} grid-cols-2 gap-3 rounded-2xl border border-slate-800 bg-slate-900 p-4 shadow-2xl`}
                           >
                             {item.items.map((child) => (
                               <ListItem
@@ -474,7 +451,7 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-full overflow-y-auto border-slate-800 bg-slate-950 p-0 sm:max-w-md"
+                className="si-menu z-[100] w-full overflow-y-auto border-slate-800 bg-slate-950 p-0 sm:max-w-md"
               >
                 <SheetTitle className="sr-only">
                   Main Navigation Menu
@@ -482,11 +459,13 @@ export default function Navbar({ forceLightNavbar = false }: NavbarProps) {
                 <div className="p-6">
                   <div className="mb-8 flex items-center gap-4">
                     <Image
+                      className="hidden dark:block"
                       src="/images/svg-logo-white.svg"
                       alt="Sure Imports"
                       width={140}
                       height={22}
                     />
+                    <Image className="dark:hidden" src="/images/svg-logo.svg" alt="Sure Imports" width={140} height={22} />
                   </div>
 
                   <div className="flex flex-col gap-2">

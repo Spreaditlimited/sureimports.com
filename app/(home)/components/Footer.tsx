@@ -13,7 +13,7 @@ import FooterNewsletterForm from './FooterNewsletterForm';
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-950 text-slate-400">
+    <footer className="si-dark-surface bg-slate-950 text-slate-400">
       <div className="mx-auto max-w-[1440px] px-4 pb-8 pt-16 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-5">
           <div className="space-y-6">
@@ -214,6 +214,7 @@ export default function Footer() {
               </a>
               <a
                 href="https://www.tiktok.com/"
+                aria-label="TikTok"
                 target="_blank"
                 rel="noreferrer"
                 className="text-slate-500 hover:text-white"
