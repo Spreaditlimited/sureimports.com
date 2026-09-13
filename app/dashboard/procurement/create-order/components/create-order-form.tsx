@@ -79,6 +79,9 @@ interface ReportFormProps {
 }
 
 const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
+  const [showCurrencyHelp, setShowCurrencyHelp] = useState(false);
+  const currencyHelpId = React.useId();
+  const currencyFieldId = React.useId();
   const router = useRouter();
   const navigateWithAlert = useNavigationWithAlert();
   const { user } = useAuth();
@@ -205,7 +208,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
           
           {/* Order Name */}
           <div className="space-y-3">
-            <label htmlFor="orderName" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label htmlFor="orderName" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Order Name
             </label>
             <div className="relative">
@@ -222,7 +225,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Order Category */}
           <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Category
             </label>
             <div className="relative">
@@ -252,7 +255,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Country */}
           <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Destination Country
             </label>
             <div className="relative">
@@ -288,9 +291,34 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Currency */}
           <div className="space-y-3">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-              Currency
-            </label>
+            <div className="relative flex h-8 items-center gap-1">
+              <label htmlFor={currencyFieldId} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                Shop Currency
+              </label>
+              <button
+                type="button"
+                aria-label="Help choosing shop currency"
+                aria-expanded={showCurrencyHelp}
+                aria-controls={currencyHelpId}
+                onMouseEnter={() => setShowCurrencyHelp(true)}
+                onMouseLeave={() => setShowCurrencyHelp(false)}
+                onFocus={() => setShowCurrencyHelp(true)}
+                onClick={() => setShowCurrencyHelp(true)}
+                onBlur={() => setShowCurrencyHelp(false)}
+                onKeyDown={(event) => { if (event.key === 'Escape') setShowCurrencyHelp(false); }}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center !border-0 !bg-transparent !shadow-none text-xs font-semibold text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-slate-200"
+              >
+                ?
+              </button>
+              <p
+                id={currencyHelpId}
+                role="tooltip"
+                hidden={!showCurrencyHelp}
+                className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700 shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+              >
+                If buying from 1688, Taobao, Pinduoduo, shop currency is CNY or Yuan or RMB. If buying from Alibaba, please, use USD
+              </p>
+            </div>
             <div className="relative">
               <CreditCard className="absolute left-4 top-1/2 z-10 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <Controller
@@ -299,8 +327,8 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 defaultValue=""
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
-                      <SelectValue placeholder="Select Currency" />
+                    <SelectTrigger id={currencyFieldId} aria-describedby={showCurrencyHelp ? currencyHelpId : undefined} className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                      <SelectValue placeholder="Select Shop Currency" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
                       {currencyTypeArray.map((currency) => (
@@ -392,7 +420,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
               <div>
                 <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">Delivery Logistics</h3>
                 <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300/80">
-                  {partner ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.' : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, and Mexico are fulfilled via DHL. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
+                  {partner ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.' : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, etc are fulfilled by any of our partners - DHL, UPS, Royal Mail, DPD, etc. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
                 </p>
               </div>
             </div>
