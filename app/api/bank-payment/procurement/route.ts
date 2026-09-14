@@ -3,10 +3,15 @@ import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail2';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
 import { procurementMinimumOrderMessage } from '@/lib/procurement/minimumOrder';
+import { checkAuth } from '@/lib/auth/checkAuth';
+import { readBankTransferQuote } from '@/lib/procurement/bankQuote';
+import { bankMatchesDestination } from '@/lib/procurement/destinationPolicy';
 
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
+    const auth = await checkAuth();
+    if (!auth || auth.pidUser !== formData.get('pidUser')) return NextResponse.json({ statusx: 'ACTION_FAILED', message: 'Please sign in again.' }, { status: 401 });
     const pidUser = String(formData.get('pidUser') || '');
     const email = String(formData.get('userEmail') || '');
     const pidBankPayment = String(formData.get('pidBankPayment') || '');
@@ -71,6 +76,14 @@ export async function POST(request: Request) {
     const currentStatus = String(lifecycle.order.status || '');
     const expectedAmount = lifecycle.payment.due;
     const expectedCurrency = lifecycle.payment.currency;
+    const banks = await prisma.$queryRaw<{ country: string; currency: string }[]>`SELECT country, currency FROM invoice_bank_accounts WHERE pidBankAccount = ${bank} AND status = 'ACTIVE' LIMIT 1`;
+    if (!banks[0] || !bankMatchesDestination(banks[0], lifecycle.destinationCountry)) return NextResponse.json({ statusx: 'ACTION_FAILED', message: 'This bank is not available for your order destination.' }, { status: 400 });
+    let transfer;
+    try {
+      transfer = readBankTransferQuote(String(formData.get('transferQuote') || ''));
+      if (transfer.pidOrder !== serviceID || transfer.pidUser !== pidUser || transfer.bankId !== bank || transfer.currency !== banks[0].currency || Math.abs(transfer.usdAmount - lifecycle.payment.dueUsd) > 0.01) throw new Error('Quote mismatch');
+    } catch { return NextResponse.json({ statusx: 'ACTION_FAILED', message: 'Your bank-transfer quote expired or the order changed. Refresh the transfer page. If you already transferred funds, contact support before making another payment.' }, { status: 409 }); }
+    const transferDetails = JSON.stringify({ currency: transfer.currency, amount: transfer.amount, gbpPerUsd: transfer.gbpPerUsd });
     const requestedAmount =
       expectedCurrency === 'NGN' ? requestedNairaAmount : requestedUsdAmount;
 
@@ -221,7 +234,8 @@ export async function POST(request: Request) {
             trxNumber: existingPending.pidBankPayment,
             bankStatus: 'PENDING',
             status: 'PENDING',
-            ext1: serviceDescription,
+            ext1: `${serviceDescription.slice(0, 95)} — Transfer ${transfer.currency} ${transfer.amount.toFixed(2)}`,
+            ext2: transferDetails,
             updatedAt: new Date(),
           },
         });
@@ -240,7 +254,8 @@ export async function POST(request: Request) {
           serviceType: pendingStatus,
           bankStatus: 'PENDING',
           status: 'PENDING',
-          ext1: serviceDescription,
+          ext1: `${serviceDescription.slice(0, 95)} — Transfer ${transfer.currency} ${transfer.amount.toFixed(2)}`,
+          ext2: transferDetails,
           createdAt: new Date(),
           updatedAt: new Date(),
         },

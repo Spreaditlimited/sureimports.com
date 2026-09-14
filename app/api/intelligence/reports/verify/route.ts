@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
+import { assertPayPalOrderMatches, assertPayPalLiveFulfillment } from '@/lib/paypalValidation';
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { generateToken } from '@/lib/jwt';
 import {
@@ -99,9 +100,11 @@ export async function POST(request: NextRequest) {
       );
     }
     let payment = await getPayPalOrder(paypalOrderId);
+    assertPayPalOrderMatches(payment, { customId: pidOrder, amountMinor: order.amountMinor, currency: order.currency });
     if (String(payment?.status).toUpperCase() !== 'COMPLETED')
       payment = await capturePayPalOrder(paypalOrderId);
     const capture = paypalCapture(payment);
+    assertPayPalLiveFulfillment(payment);
     const unit = payment?.purchase_units?.[0];
     const paidAmount = capture?.amount || unit?.amount;
     if (

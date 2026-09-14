@@ -1,10 +1,9 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 import { Metadata } from 'next';
 import { getUser } from '@/lib/auth/auth';
 import { redirect } from 'next/navigation';
 import RefundsPage from './components/RefundsPage';
 
-const prisma = new PrismaClient();
 
 let titlex = 'Dashboard: Refunds';
 let descriptionx =
@@ -48,6 +47,7 @@ export default async function RefundRecordsPage() {
   if (!user?.pidUser) redirect('/auth/login');
 
   const records: any = await prisma.refund_records.findMany({
+    select: { id: true, pidRefund: true, pidOrder: true, amount: true, currency: true, refundStatus: true, serviceType: true, createdAt: true, updatedAt: true },
     where: {
       pidUser: user.pidUser,
       //refundStatus: status,

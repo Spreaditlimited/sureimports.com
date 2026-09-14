@@ -38,6 +38,7 @@ export async function GET(request: NextRequest) {
       currencyLogo:
         currencyType === 'CNY' ? '¥' : currencyType === 'NGN' ? '₦' : '$',
       exNairaToDollar: lifecycle.rates.ngnPerUsd,
+      exGbpPerUsd: lifecycle.rates.gbpPerUsd,
       exYuanToDollar: lifecycle.rates.cnyPerUsd,
       exNairaToYuan: lifecycle.rates.ngnPerCny,
       serviceCharge: lifecycle.serviceChargePercent,

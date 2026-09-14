@@ -421,6 +421,7 @@ export async function voidAffiliateConversions(input: {
           },
           data: { status: 'AVAILABLE' },
         });
+        await tx.$executeRaw`UPDATE affiliate_refund_adjustments SET payoutId=NULL WHERE payoutId=${payoutId}`;
         await tx.affiliate_payout_items.deleteMany({ where: { payoutId } });
         await tx.affiliate_payouts.update({
           where: { id: payoutId },

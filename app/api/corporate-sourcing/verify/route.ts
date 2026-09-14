@@ -12,6 +12,7 @@ import {
   sendPublicAccountSetupEmail,
 } from '@/lib/auth/resolvePublicAccount';
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
+import { assertPayPalOrderMatches, assertPayPalLiveFulfillment } from '@/lib/paypalValidation';
 import { prisma } from '@/lib/prisma';
 import { checkoutOriginIsAllowed } from '@/lib/intelligence/reportCheckoutSecurity';
 
@@ -70,7 +71,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Invalid PayPal order reference.' }, { status: 400 });
     }
     let order = await getPayPalOrder(orderId);
+    assertPayPalOrderMatches(order, { customId: pidPayment, amountMinor: payment.amountMinor, currency: payment.currency });
     if (String(order?.status).toUpperCase() !== 'COMPLETED') order = await capturePayPalOrder(orderId);
+    assertPayPalLiveFulfillment(order);
     const capture = paypalCapture(order);
     const unit = order?.purchase_units?.[0];
     if (

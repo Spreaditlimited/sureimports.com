@@ -11,8 +11,6 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-  //url      = "mysql://u324293482_printin:projectX2020@45.84.205.0:3306/u324293482_printin"
-  //url      = "mysql://root:@localhost:3306/u324293482_printin"
 }
 
 // Shared affiliate-program tables. These are managed by the affiliate/admin
@@ -159,6 +157,7 @@ model affiliate_referrals {
 }
 
 model affiliate_conversions {
+  refundAdjustments        affiliate_refund_adjustments[]
   id                       Int                        @id @default(autoincrement())
   pidConversion            String                     @unique @db.VarChar(80)
   affiliateId              Int
@@ -320,6 +319,7 @@ model shipping_request_attributions {
 }
 
 model affiliate_payouts {
+  refundAdjustments affiliate_refund_adjustments[]
   id                Int                      @id @default(autoincrement())
   pidPayout         String                   @unique @db.VarChar(80)
   affiliateId       Int
@@ -342,6 +342,21 @@ model affiliate_payout_items {
   conversion   affiliate_conversions @relation(fields: [conversionId], references: [id], onDelete: Restrict)
 
   @@index([payoutId])
+}
+
+model affiliate_refund_adjustments {
+  refundId     String   @db.VarChar(191)
+  conversionId Int
+  amount       Decimal  @db.Decimal(18, 2)
+  currency     String   @db.Char(3)
+  payoutId     Int?
+  createdAt    DateTime @default(now()) @db.DateTime(3)
+  conversion   affiliate_conversions @relation(fields: [conversionId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "affiliate_refund_adjustments_conversion_fk")
+  payout       affiliate_payouts? @relation(fields: [payoutId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "affiliate_refund_adjustments_payout_fk")
+
+  @@id([refundId, conversionId])
+  @@index([payoutId], map: "affiliate_refund_adjustments_payout")
+  @@index([conversionId], map: "affiliate_refund_adjustments_conversion")
 }
 
 model affiliate_email_events {
@@ -1283,6 +1298,8 @@ model procurement_partner_requests {
 
 // Customer drafts remain outside the SI operational orders table until paid and partner-approved.
 model procurement_partner_customer_orders {
+  adjustments partner_order_adjustments[]
+  paymentFees partner_order_payment_fees[]
   walletCredit             partner_wallet_credits?
   id                       String @id @db.VarChar(80)
   partnerId                String @db.VarChar(191)
@@ -1453,6 +1470,22 @@ model procurement_order_merge_sources {
   createdAt     DateTime @default(now())
 
   @@index([pidMerge])
+}
+
+model paypal_procurement_checkouts {
+  id                String @id @db.VarChar(64)
+  stageKey          String @unique(map: "paypal_procurement_stage_key") @db.VarChar(64)
+  pidOrder          String
+  pidUser           String
+  providerReference String? @unique(map: "paypal_procurement_reference")
+  captureReference  String?
+  status            String @default("PENDING") @db.VarChar(24)
+  amountMinor       Int
+  context           Json
+  createdAt         DateTime @default(now()) @db.DateTime(3)
+  updatedAt         DateTime @default(now()) @db.DateTime(3)
+
+  @@index([pidUser, pidOrder], map: "paypal_procurement_user_order")
 }
 
 model payments {
@@ -2020,6 +2053,45 @@ model payment_records {
   updatedAt            DateTime?
 }
 
+model refund_provider_legs {
+  id                String    @id @db.VarChar(64)
+  refundId          String    @db.VarChar(191)
+  paymentId         String    @db.VarChar(191)
+  captureId         String    @db.VarChar(191)
+  currency          String    @db.Char(3)
+  amount            Decimal   @db.Decimal(20, 2)
+  status            String    @default("REQUESTED") @db.VarChar(32)
+  providerReference String?   @unique @db.VarChar(191)
+  firstAttemptAt    DateTime? @db.DateTime(3)
+  checkedAt         DateTime? @db.DateTime(3)
+  createdAt         DateTime  @default(now()) @db.DateTime(3)
+  updatedAt         DateTime  @default(now()) @db.DateTime(3)
+
+  @@index([refundId], map: "refund_provider_refund")
+  @@index([captureId], map: "refund_provider_capture")
+  @@index([status, checkedAt], map: "refund_provider_pending")
+}
+
+model refund_settlements {
+  refundId              String   @id @db.VarChar(191)
+  pidUser               String   @db.VarChar(191)
+  sourceCurrency        String   @db.Char(3)
+  sourceAmount          Decimal  @db.Decimal(20, 2)
+  settlementCurrency    String   @db.Char(3)
+  settlementAmount      Decimal  @db.Decimal(20, 2)
+  exchangeRate          Decimal  @db.Decimal(20, 8)
+  method                String   @db.VarChar(32)
+  destinationCiphertext String   @db.Text
+  status                String   @default("REQUESTED") @db.VarChar(32)
+  reference             String?  @unique @db.VarChar(191)
+  approvedBy            String?  @db.VarChar(191)
+  settledAt             DateTime? @db.DateTime(3)
+  createdAt             DateTime @default(now()) @db.DateTime(3)
+  updatedAt             DateTime @default(now()) @db.DateTime(3)
+
+  @@index([pidUser, createdAt], map: "refund_settlements_owner")
+}
+
 model refund_records {
   id           Int       @id @default(autoincrement())
   pidRefund    String    @unique()
@@ -2111,6 +2183,8 @@ model exchange_rate {
   exNairaToYuan              String?
   quotationSeaRateNgnPerCbm  String?   @default("500000")
   procurementMinimumOrderNgn Int       @default(50000)
+  procurementVatForeign     String    @default("20")
+  exGbpPerUsd               String?
   status                     String
   ext1                       String?
   ext2                       String?
@@ -2605,4 +2679,126 @@ enum WarrantyPeriod {
   MONTHS12
   MONTHS24
   MONTHS36
+}
+
+model refund_notifications {
+  refundId      String    @db.VarChar(191)
+  eventType     String    @db.VarChar(24)
+  status        String    @default("PENDING") @db.VarChar(24)
+  attempts      Int       @default(0)
+  claimedAt     DateTime? @db.DateTime(3)
+  nextAttemptAt DateTime  @default(now()) @db.DateTime(3)
+  sentAt        DateTime? @db.DateTime(3)
+  createdAt     DateTime  @default(now()) @db.DateTime(3)
+
+  @@id([refundId, eventType])
+  @@index([sentAt, nextAttemptAt], map: "refund_notifications_due")
+}
+
+model refund_events {
+  id          String   @id @db.VarChar(80)
+  refundId    String   @db.VarChar(191)
+  eventType   String   @db.VarChar(40)
+  actorPid    String   @db.VarChar(191)
+  detailsJson String   @db.Text
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+
+  @@index([refundId, createdAt], map: "refund_events_timeline")
+}
+
+model partner_country_policies {
+  code       String   @id @db.Char(2)
+  policyJson String   @db.Text
+  revision   Int
+  updatedBy  String?  @db.VarChar(191)
+  updatedAt  DateTime @default(now()) @db.DateTime(3)
+}
+
+model partner_country_policy_history {
+  code       String   @db.Char(2)
+  revision   Int
+  policyJson String   @db.Text
+  actorPid   String   @db.VarChar(191)
+  createdAt  DateTime @default(now()) @db.DateTime(3)
+
+  @@id([code, revision])
+}
+
+model partner_application_country_policy {
+  partnerId   String   @id @db.VarChar(191)
+  countryCode String   @db.Char(2)
+  revision    Int
+  policyJson  String   @db.Text
+  createdAt   DateTime @default(now()) @db.DateTime(3)
+}
+
+model partner_order_adjustments {
+  id String @id @db.VarChar(80)
+  orderId String @db.VarChar(80)
+  revision Int
+  status String @default("AWAITING_PARTNER") @db.VarChar(32)
+  currency String @db.Char(3)
+  beforeJson String @db.LongText
+  afterJson String @db.LongText
+  deltaMinor BigInt
+  reason String @db.VarChar(2000)
+  proposedBy String @db.VarChar(191)
+  reviewedBy String? @db.VarChar(191)
+  reviewNote String? @db.VarChar(2000)
+  reviewedAt DateTime?
+  settledAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  order procurement_partner_customer_orders @relation(fields:[orderId],references:[id],onDelete:Restrict,map:"partner_adjustment_order")
+  payment partner_adjustment_payments?
+  refunds partner_adjustment_refunds[]
+  @@unique([orderId,revision],map:"partner_adjustment_revision")
+  @@index([status,updatedAt],map:"partner_adjustment_status")
+}
+model partner_adjustment_payments {
+  id String @id @db.VarChar(80)
+  adjustmentId String @unique(map:"partner_adjustment_checkout") @db.VarChar(80)
+  provider String @db.VarChar(16)
+  currency String @db.Char(3)
+  amountMinor BigInt
+  settlementAmountMinor BigInt
+  status String @default("CREATED") @db.VarChar(32)
+  providerReference String? @db.VarChar(191)
+  captureReference String? @db.VarChar(191)
+  checkoutUrl String? @db.Text
+  attemptedAt DateTime?
+  feeMinor BigInt?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  adjustment partner_order_adjustments @relation(fields:[adjustmentId],references:[id],onDelete:Restrict,map:"partner_adjustment_payment_parent")
+  @@unique([provider,captureReference],map:"partner_adjustment_provider_capture")
+}
+model partner_order_payment_fees {
+  paymentReference String @id @db.VarChar(191)
+  orderId String @db.VarChar(80)
+  currency String @db.Char(3)
+  feeMinor BigInt
+  customerFeeMinor BigInt @default(0)
+  createdAt DateTime @default(now())
+  order procurement_partner_customer_orders @relation(fields:[orderId],references:[id],onDelete:Restrict,map:"partner_fee_order")
+  @@index([orderId],map:"partner_order_fee_lookup")
+}
+model partner_adjustment_refunds {
+  id String @id @db.VarChar(80)
+  adjustmentId String @db.VarChar(80)
+  paymentId String @db.VarChar(191)
+  provider String @db.VarChar(16)
+  captureReference String @db.VarChar(191)
+  currency String @db.Char(3)
+  amountMinor BigInt
+  settlementAmountMinor BigInt
+  status String @default("REQUESTED") @db.VarChar(32)
+  providerReference String? @db.VarChar(191)
+  attemptedAt DateTime?
+  checkedAt DateTime?
+  createdAt DateTime @default(now())
+  adjustment partner_order_adjustments @relation(fields:[adjustmentId],references:[id],onDelete:Restrict,map:"partner_adjustment_refund_parent_fk")
+  @@unique([provider,providerReference],map:"partner_adjustment_refund_provider")
+  @@index([adjustmentId,status],map:"partner_adjustment_refund_parent")
+  @@index([provider,captureReference],map:"partner_adjustment_refund_capture")
 }

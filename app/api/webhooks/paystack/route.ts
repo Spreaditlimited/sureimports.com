@@ -1,7 +1,6 @@
-import { walletTransferWebhook, WalletError } from '@/lib/partners/wallet';
 import { NextResponse } from 'next/server';
 import { POST as handleSureImportsPaystackEvent } from '../../intelligence/paystack-webhook/route';
-import { handlePartnerPaystackEvent } from '@/lib/partners/paystack-order-events';
+import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,13 +18,23 @@ export async function POST(request: Request) {
   const signature = request.headers.get('x-paystack-signature') || '';
   const partnerPayload = payload as { data?: { reference?: string; transaction?: { reference?: string } } };
   const partnerReference = String(partnerPayload.data?.transaction?.reference || partnerPayload.data?.reference || '');
-  if (partnerReference.startsWith('pww_')) {
-    try { return NextResponse.json(await walletTransferWebhook(rawBody, signature)); }
-    catch (error) { return NextResponse.json({ message: 'Partner transfer reconciliation required.' }, { status: error instanceof WalletError ? error.status : 503 }); }
+  const billingPlanName = String((payload as any)?.data?.plan?.name || (payload as any)?.data?.subscription?.plan?.name || '');
+  let partnerBilling = /PBF_[a-f0-9-]{36}/i.test(billingPlanName) || String((payload as any)?.data?.metadata?.partnerPlatformAgreement || '').startsWith('PBF_');
+  const billingSubscription = String((payload as any)?.data?.subscription?.subscription_code || (payload as any)?.data?.subscription_code || '');
+  const billingPlan = String((payload as any)?.data?.plan?.plan_code || (payload as any)?.data?.subscription?.plan?.plan_code || '');
+  if (!partnerBilling && (billingSubscription || billingPlan)) {
+    const known = await prisma.$queryRaw<Array<{id:string}>>`SELECT id FROM partner_platform_agreements WHERE provider='PAYSTACK' AND environment='live' AND (subscriptionCode=${billingSubscription} OR planCode=${billingPlan}) LIMIT 1`;
+    partnerBilling = known.length > 0;
   }
-  if (partnerReference.startsWith('PCO_')) {
-    try { return await handlePartnerPaystackEvent(rawBody, signature); }
-    catch { return NextResponse.json({ message: 'Partner payment requires retry or reconciliation.' }, { status: 503 }); }
+  if (/^(PCO_|PADS_|pww_|PBF_)/.test(partnerReference) || partnerBilling) {
+    // One account webhook, one authoritative partner payment implementation.
+    // Forward the original signed bytes; the partner endpoint verifies them.
+    try {
+      const base = process.env.PARTNER_PAYSTACK_API_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:3003' : 'https://partner.sureimports.com');
+      const result = await fetch(`${base}/api/integrations/paystack`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-paystack-signature': signature }, body: rawBody, signal: AbortSignal.timeout(20000) });
+      if (!result.ok) return NextResponse.json({ message: 'Partner payment reconciliation requires retry.' }, { status: 502 });
+      return NextResponse.json({ received: true });
+    } catch { return NextResponse.json({ message: 'Partner payment reconciliation requires retry.' }, { status: 503 }); }
   }
   if (isLineScoutEvent(payload)) {
     const url = (process.env.LINESCOUT_PAYSTACK_WEBHOOK_URL || 'https://linescout.sureimports.com/api/webhooks/paystack').trim();

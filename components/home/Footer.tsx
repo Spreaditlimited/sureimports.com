@@ -57,6 +57,11 @@ const socialLinks: SocialLink[] = [
 
 const locations: Location[] = [
   {
+    title: 'Warrington, United Kingdom',
+    address: ['Spreadit Sourcing Limited', '33 Bevan Court, Dunlop Street, WA4 6AA, Warrington, England.'],
+    contacts: ['+44 788 119 4138'],
+  },
+  {
     title: 'Lagos, Nigeria',
     address: [
       'Sure Importers Limited',

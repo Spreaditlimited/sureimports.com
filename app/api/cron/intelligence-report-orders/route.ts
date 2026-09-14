@@ -1,12 +1,18 @@
 import { NextResponse } from 'next/server';
 
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
+import { assertPayPalLiveFulfillment, assertPayPalOrderMatches } from '@/lib/paypalValidation';
 import {
   confirmReportOrderPayment,
   deliverReportOrder,
 } from '@/lib/intelligence/reportOrders';
 import { pruneReportCheckoutRateLimits } from '@/lib/intelligence/reportCheckoutSecurity';
 import { prisma } from '@/lib/prisma';
+import { reconcileProcurementPayPalPayments } from '@/lib/procurement/paypalCheckout';
+import { reconcileSpecialSourcingPayPal } from '@/lib/paypalSpecialSourcing';
+import { reconcileOriginalPayPalRefunds } from '@/lib/refunds/paypal-settlement';
+import { reconcileRefundNotifications } from '@/lib/refunds/notifications';
+import { reconcileRefundCommissions } from '@/lib/refunds/commission-adjustments';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -57,6 +63,8 @@ async function reconcilePendingOrder(order: {
 
   if (order.paymentProvider === 'paypal') {
     let payment = await getPayPalOrder(order.providerReference);
+    assertPayPalOrderMatches(payment, { customId: order.pidOrder, amountMinor: order.amountMinor, currency: order.currency });
+    assertPayPalLiveFulfillment(payment);
     if (String(payment?.status || '').toUpperCase() === 'APPROVED') {
       payment = await capturePayPalOrder(order.providerReference);
     }
@@ -149,7 +157,17 @@ export async function GET(request: Request) {
     }),
   ]);
 
+  const procurement = await reconcileProcurementPayPalPayments();
+  const refunds = await reconcileOriginalPayPalRefunds();
+    const refundCommissions = await reconcileRefundCommissions();
+    const refundNotifications = await reconcileRefundNotifications();
+  const specialSourcing = await reconcileSpecialSourcingPayPal();
   return NextResponse.json({
+    specialSourcing,
+    refunds,
+    refundNotifications,
+    refundCommissions,
+    procurement,
     ok: true,
     pendingChecked: reconciled.length,
     paymentsRecovered: reconciled.filter(

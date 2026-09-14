@@ -3,6 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import InternationalRefundRequest from '@/components/InternationalRefundRequest';
 import {
   ChevronLeft,
   ChevronRight,
@@ -96,6 +97,7 @@ function StatusTag({ status }: { status: string }) {
 export default function RefundsPage({ records }: any) {
   const router = useRouter();
   const [refundData, setRefundData] = useState(records || []);
+  useEffect(() => { setRefundData(records || []); }, [records]);
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -173,10 +175,10 @@ export default function RefundsPage({ records }: any) {
         }
         setWalletTransferFeedback({
           type: 'error',
-          title: 'Transfer unsuccessful',
+          title: 'Check your transfer status',
           message:
             data?.message ||
-            'Unable to transfer this refund to your wallet right now.',
+            'We could not confirm the transfer. Refresh your refund and wallet balances before trying again.',
         });
         return;
       }
@@ -206,9 +208,9 @@ export default function RefundsPage({ records }: any) {
       setShowRefundDestinationModal(false);
       setWalletTransferFeedback({
         type: 'error',
-        title: 'Transfer unsuccessful',
+        title: 'Check your transfer status',
         message:
-          'We could not transfer the refund to your wallet. Please try again.',
+          'We could not confirm the transfer. Refresh your refund and wallet balances before trying again.',
       });
     } finally {
       setTransferringRefundId(null);
@@ -230,10 +232,10 @@ export default function RefundsPage({ records }: any) {
           title:
             data?.statusx === 'PROFILE_REQUIRED'
               ? 'Bank details required'
-              : 'Request unsuccessful',
+              : 'Check your refund request',
           message:
             data?.message ||
-            'We could not submit your bank refund request. Please try again.',
+            'We could not confirm your request. Refresh to check its status before trying again.',
           actionHref: data?.actionHref,
           actionLabel: data?.actionLabel,
         });
@@ -255,9 +257,9 @@ export default function RefundsPage({ records }: any) {
       setShowRefundDestinationModal(false);
       setWalletTransferFeedback({
         type: 'error',
-        title: 'Request unsuccessful',
+        title: 'Check your refund request',
         message:
-          'We could not submit your bank refund request. Please try again.',
+          'We could not confirm your request. Refresh to check its status before trying again.',
       });
     } finally {
       setRequestingDestination(null);
@@ -267,11 +269,14 @@ export default function RefundsPage({ records }: any) {
   const totalAmount = refundData.reduce(
     (sum: number, item: any) =>
       isRefundable(item) && String(item.currency || '').toUpperCase() === 'NGN'
-        ? sum + parseFloat(item.amount || 0)
+        ? sum + Math.round(Number(item.amount || 0) * 100) / 100
         : sum,
     0,
   );
   const hasRefundableAmounts = refundData.some(isPendingRefund);
+  const internationalTotal = refundData.reduce((sum: number, item: any) =>
+    item.currency === 'USD' && REFUNDABLE_STATUSES.has(String(item.refundStatus || '').toLowerCase())
+      ? sum + Math.round(Number(item.amount || 0) * 100) / 100 : sum, 0);
   const refundableRecords = refundData.filter(isPendingRefund);
   const hasPendingBankRefunds = hasRefundableAmounts;
 
@@ -305,7 +310,7 @@ export default function RefundsPage({ records }: any) {
             <div className="flex shrink-0 items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm">
               <div className="flex flex-col">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                  Total Refundable
+                  Naira Refundable
                 </span>
                 <span className="text-3xl font-black text-white">
                   ₦
@@ -313,6 +318,7 @@ export default function RefundsPage({ records }: any) {
                     minimumFractionDigits: 2,
                   })}
                 </span>
+                {internationalTotal > 0 && <p className="mt-3 text-sm">USD refundable: <strong>{formatRefundAmount(internationalTotal, 'USD')}</strong><br />Open a refund below to request or track it.</p>}
               </div>
               <button
                 onClick={() => setShowRefundDestinationModal(true)}
@@ -381,7 +387,7 @@ export default function RefundsPage({ records }: any) {
                 <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:bg-slate-800/50">
                   <th className="px-6 py-4">#</th>
                   <th className="px-6 py-4">Refund ID</th>
-                  <th className="px-6 py-4">Amount (NGN)</th>
+                  <th className="px-6 py-4">Refund amount</th>
                   <th className="px-6 py-4">Service Type</th>
                   <th className="px-6 py-4">Status</th>
                   <th className="px-6 py-4 text-right">Actions</th>
@@ -420,11 +426,7 @@ export default function RefundsPage({ records }: any) {
                               ? 'Transferring...'
                               : 'Transfer to Wallet'}
                           </button>
-                        ) : (
-                          <button className="text-xs font-bold text-blue-600 hover:underline">
-                            Details
-                          </button>
-                        )}
+                        ) : <InternationalRefundRequest refundId={item.pidRefund} />}
                       </td>
                     </tr>
                   ))

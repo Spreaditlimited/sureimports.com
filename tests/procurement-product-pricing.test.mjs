@@ -23,7 +23,7 @@ const hook=registerHooks({resolve(s,c,n){
 }});
 let order={pidOrder:'order',currencyType:'CNY',status:'saved',destinationCountry:'ng',shippingPlan:'air',shippingPricingVersion:2,shippingRateSnapshot:10,shippingRateCurrency:'USD',shippingMeasurementUnit:'KG'};
 let financial={exNairaToDollar:1500,exYuanToDollar:7,exNairaToYuan:225,service_charge:15,vat:7.5,procurementMinimumOrderNgn:0};
-globalThis.__pricingDb={orders:{findFirst:async()=>order},products:{findMany:async()=>[{productPrice:70,productQuantity:10,shippingMeasurePerUnit:1}]},country:{findUnique:async()=>({countryName:'Nigeria'})},shippingplan:{findUnique:async()=>({shippingPlanName:'Air'})},exchange_rate:{findUnique:async()=>financial}};
+globalThis.__pricingDb={$queryRaw:async()=>[{procurementVatForeign:'20',exGbpPerUsd:'0.8'}],orders:{findFirst:async()=>order},products:{findMany:async()=>[{productPrice:70,productQuantity:10,shippingMeasurePerUnit:1}]},country:{findUnique:async()=>({countryName:'Nigeria'})},shippingplan:{findUnique:async()=>({shippingPlanName:'Air'})},exchange_rate:{findUnique:async()=>financial}};
 const {getProcurementOrderLifecycle}=await import('../lib/procurement/orderLifecycle.ts');
 const {priceCustomerOrder}=await import('../lib/partners/order-cost.ts');
 hook.deregister();

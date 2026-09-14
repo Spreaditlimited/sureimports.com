@@ -2,6 +2,10 @@ import React from 'react';
 import Link from 'next/link';
 import BankPaymentForm from '@/app/dashboard/bank-payment/components/bank-payment-form';
 import { prisma } from '@/lib/prisma';
+import { checkAuth } from '@/lib/auth/checkAuth';
+import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { bankMatchesDestination } from '@/lib/procurement/destinationPolicy';
+import { signBankTransferQuote } from '@/lib/procurement/bankQuote';
 import { 
   ArrowLeft, 
   Building2, 
@@ -26,6 +30,9 @@ type AdminBankAccount = {
 type BankOption = {
   optionName: string;
   optionValue: string;
+  transferAmount?: number;
+  transferCurrency?: string;
+  quote?: string;
 };
 
 async function getPaymentChannels(): Promise<AdminBankAccount[]> {
@@ -66,7 +73,7 @@ async function getPaymentChannels(): Promise<AdminBankAccount[]> {
 
 export default async function BankPayment(
   props: {
-    searchParams?: Promise<{ returnTo?: string }>;
+    searchParams?: Promise<{ returnTo?: string; service?: string; serviceID?: string }>;
   }
 ) {
   const searchParams = await props.searchParams;
@@ -77,7 +84,13 @@ export default async function BankPayment(
       ? resolvedSearchParams.returnTo
       : '/dashboard/procurement';
 
-  const channels = await getPaymentChannels();
+  let channels = await getPaymentChannels();
+  let lifecycle: Awaited<ReturnType<typeof getProcurementOrderLifecycle>> | null = null;
+  if (resolvedSearchParams?.service === 'procurement') {
+    const auth = await checkAuth();
+    if (auth && resolvedSearchParams.serviceID) lifecycle = await getProcurementOrderLifecycle(resolvedSearchParams.serviceID, auth.pidUser);
+    channels = lifecycle ? channels.filter((bank) => bankMatchesDestination(bank, lifecycle!.destinationCountry)) : [];
+  }
 
   const bankOptions: BankOption[] = [
     { optionName: '- Select Bank Used -', optionValue: '__SELECT_BANK__' },
@@ -89,6 +102,11 @@ export default async function BankPayment(
       ].filter(Boolean);
 
       return {
+        ...(lifecycle && channel.pidBankAccount && (channel.currency === lifecycle.payment.currency || (channel.currency === 'GBP' && lifecycle.rates.gbpPerUsd > 0)) ? (() => {
+          const amount = channel.currency === 'GBP' ? Math.round(lifecycle!.payment.dueUsd * lifecycle!.rates.gbpPerUsd * 100) / 100 : lifecycle!.payment.due;
+          return { transferAmount: amount, transferCurrency: channel.currency,
+            quote: signBankTransferQuote({ pidOrder: lifecycle!.order.pidOrder, pidUser: lifecycle!.order.pidUser, bankId: channel.pidBankAccount!, usdAmount: lifecycle!.payment.dueUsd, amount, currency: channel.currency!, gbpPerUsd: lifecycle!.rates.gbpPerUsd }) };
+        })() : {}),
         optionName: labelParts.join(', '),
         optionValue:
           channel.pidBankAccount ||
@@ -180,6 +198,7 @@ export default async function BankPayment(
                     className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:border-blue-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-slate-700"
                   >
                     <div>
+                      {lifecycle ? <p className="mb-4 text-sm font-semibold text-slate-700 dark:text-slate-200">{bankOptions.find((option) => option.optionValue === channel.pidBankAccount)?.transferAmount !== undefined ? `Transfer ${channel.currency} ${bankOptions.find((option) => option.optionValue === channel.pidBankAccount)!.transferAmount!.toFixed(2)} to this account. This quote is valid for 24 hours.` : 'Transfers to this account are unavailable until its exchange rate is configured.'}</p> : null}
                       <div className="mb-4 flex items-center justify-between border-b border-slate-200 pb-4 dark:border-slate-700">
                         <h3 className="font-bold text-slate-900 dark:text-white">
                           {channel.bankName || 'Bank Channel'}
@@ -237,7 +256,7 @@ export default async function BankPayment(
               <h2 className="mb-6 flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
                 <Receipt className="h-5 w-5 text-slate-400" /> Submit Payment Proof
               </h2>
-              <BankPaymentForm bankOptions={bankOptions} />
+              <BankPaymentForm bankOptions={bankOptions} requiresQuote={resolvedSearchParams?.service === 'procurement'} />
             </div>
 
           </div>

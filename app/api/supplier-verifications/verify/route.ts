@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
+import { assertPayPalOrderMatches, assertPayPalLiveFulfillment } from '@/lib/paypalValidation';
 import { prisma } from '@/lib/prisma';
 import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/service';
 
@@ -82,9 +83,11 @@ export async function POST(request: Request) {
     paidAt = data?.paid_at ? new Date(data.paid_at) : null;
   } else {
     let order = await getPayPalOrder(parsed.data.reference);
+    assertPayPalOrderMatches(order, { customId: payment.pidPayment, amountMinor: payment.amountMinor, currency: payment.currency });
     if (String(order?.status).toUpperCase() !== 'COMPLETED')
       order = await capturePayPalOrder(parsed.data.reference);
     const unit = order?.purchase_units?.[0];
+    assertPayPalLiveFulfillment(order);
     const capture = unit?.payments?.captures?.[0];
     if (
       String(order?.status).toUpperCase() !== 'COMPLETED' ||

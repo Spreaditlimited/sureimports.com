@@ -30,6 +30,7 @@ import Paystack from '@/components/uix/Paystack';
 import { CurrencyDollarIcon } from '@heroicons/react/16/solid';
 import RadButton from '@/components/uix/xForm/RadButtonIcon';
 import RadButtonIcon from '@/components/uix/xForm/RadButtonIcon';
+import SpecialSourcingCardPayment from '@/components/SpecialSourcingCardPayment';
 import FlutterwavePaymentButton from '@/components/FlutterwavePaymentButton';
 
 // Define an interface for the props
@@ -445,7 +446,7 @@ const OrderCard: React.FC<ProductsProps> = ({
 
                 <div>
                   <RadButtonIcon
-                    label={'Pay | Flutterwave'}
+                    label={'Make payment'}
                     onClick={openModal}
                   />
                   <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -474,7 +475,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                     /> */}
 
                     {/* *********************************************************************************************************** */}
-                    <FlutterwavePaymentButton
+                    {currency === 'USD' ? <SpecialSourcingCardPayment requestId={pidSpecialSourcing} disabled={isDisabled} /> : (<FlutterwavePaymentButton
                       amount={amount}
                       email={user?.userEmail as string}
                       name={user?.userFirstname as string}
@@ -494,7 +495,7 @@ const OrderCard: React.FC<ProductsProps> = ({
                           : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
                       }
                       destinationCountry={''}
-                    />
+                    />)}
                     {/* *********************************************************************************************************** */}
                   </Modal>
                 </div>

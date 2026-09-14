@@ -135,13 +135,6 @@ export default function PaystackProcurementPaymentButton({
     const totalWeightx = Number(totalWeight || 0);
     const isNigeria = destinationCountry.trim().toLowerCase() === 'nigeria';
 
-    if (amount >= 1000 && !isNigeria) {
-      alert(
-        'Please, use the bank deposit payment option for orders of $1,000 and above.',
-      );
-      return;
-    }
-
     if (enforceMinimumOrderRules && amount < 200 && !isNigeria) {
       alert(
         'We cannot process orders of less than $200 for orders going to your destination. Please, edit your order',
@@ -166,6 +159,23 @@ export default function PaystackProcurementPaymentButton({
       alert(
         'We cannot ship orders with weight less than 10kg to your destination. Please, edit your order.',
       );
+      return;
+    }
+
+    if (!isNigeria) {
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/paypal/procurement', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pidOrder: service_id }),
+        });
+        const result = await response.json();
+        if (!response.ok || !result.authorizationUrl) throw new Error(result.message || 'Unable to start checkout.');
+        window.location.assign(result.authorizationUrl);
+      } catch (error) {
+        setIsLoading(false);
+        setPaymentFeedback({ type: 'error', title: 'Checkout unavailable', message: error instanceof Error ? error.message : 'Please try again.', redirectTo: '' });
+      }
       return;
     }
 
@@ -316,7 +326,7 @@ export default function PaystackProcurementPaymentButton({
         className={className}
       >
         <CreditCard />
-        {isLoading ? '  Processing...  ' : '  Pay with Paystack  '}
+        {isLoading ? '  Processing...  ' : destinationCountry.trim().toLowerCase() === 'nigeria' ? '  Pay with Paystack  ' : '  Pay by card or PayPal  '}
       </Button>
 
       <Dialog

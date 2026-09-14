@@ -158,7 +158,6 @@ export async function ensurePaystackWalletAccount(
     return {
       status: 'FAILED',
       message:
-        String(accountBody?.message || '') ||
         'We could not activate your wallet right now. Please try again or contact support.',
     };
   } catch {

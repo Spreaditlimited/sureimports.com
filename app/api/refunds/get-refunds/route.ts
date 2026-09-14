@@ -1,51 +1,14 @@
-// app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import randomGenerator from '@/lib/helpers/randomGenerator';
-import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
+import { prisma } from '@/lib/prisma';
+import { refundUser } from '@/lib/refunds/request-auth';
+import { NextResponse } from 'next/server';
 
-const prisma = new PrismaClient();
-
-// Function to handle GET requests for moving an order to pending status from on-hold status
-export async function GET(request: NextRequest) {
-  const pidUser = request.nextUrl.searchParams.get('pidUser') as any;
-  const userEmail = request.nextUrl.searchParams.get('email') as any;
-  //const refundAmount = request.nextUrl.searchParams.get('refundAmount') as any;
-
-  //refund amount less 2.5% inconvenience fee
-  // const refundAmountx = (parseFloat(refundAmount) * -1) - (2.5/100 * (parseFloat(refundAmount) * -1));
-  // const pidRefundx = 'RFND' + randomGenerator(15);
-
+export async function GET() {
+  const pidUser = await refundUser();
+  if (!pidUser) return NextResponse.json({ statusx: 'FAILED', message: 'Please sign in.' }, { status: 401 });
   try {
-    const refunds_total = await prisma.refund_records.findMany({
-      where: {
-        pidUser: pidUser,
-        refundStatus: 'pending',
-      },
-    });
-
-    return NextResponse.json(
-      {
-        statusx: 'SUCCESS',
-        message: 'Refunds fetched successfully',
-        data: refunds_total,
-      },
-      { status: 200 },
-    );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        statusx: 'FAILED',
-        message: 'Failed to process request - Error:' + error,
-        data: [],
-      },
-      { status: 200 },
-    );
-  } finally {
-    await prisma.$disconnect();
+    const data = await prisma.refund_records.findMany({ where: { pidUser, refundStatus: 'pending' }, select: { id: true, pidRefund: true, pidOrder: true, amount: true, currency: true, refundStatus: true, serviceType: true, createdAt: true, updatedAt: true } });
+    return NextResponse.json({ statusx: 'SUCCESS', message: 'Refunds fetched successfully', data });
+  } catch {
+    return NextResponse.json({ statusx: 'FAILED', message: 'Unable to load refunds. Please retry.', data: [] }, { status: 503 });
   }
-
-  //END
 }

@@ -6,6 +6,7 @@ import { Check, Handshake, Loader2, Merge, ShieldCheck, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Draft = {
   pidOrder: string;
@@ -280,18 +281,18 @@ export default function ProcurementDraftTools({
                 </Button>
                 {chosen.length >= 2 && (
                   <>
-                    <select
-                      value={target}
-                      onChange={(event) => setTarget(event.target.value)}
-                      className="min-h-12 rounded-md border border-slate-200 bg-white px-3 text-sm dark:border-slate-700 dark:bg-slate-900"
-                    >
-                      <option value="">Choose the order to keep</option>
-                      {chosen.map((draft) => (
-                        <option key={draft.pidOrder} value={draft.pidOrder}>
-                          {draft.orderName || draft.pidOrder}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={target} onValueChange={setTarget} disabled={!!busy}>
+                      <SelectTrigger className="min-h-12 w-full" aria-label="Choose the order to keep">
+                        <SelectValue placeholder="Choose the order to keep" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {chosen.map((draft) => (
+                          <SelectItem key={draft.pidOrder} value={draft.pidOrder}>
+                            {draft.orderName || draft.pidOrder}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <Button
                       variant="outline"
                       onClick={merge}

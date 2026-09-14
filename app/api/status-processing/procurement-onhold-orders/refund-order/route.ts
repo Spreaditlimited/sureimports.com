@@ -2,11 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
-import { refundAmountInNgn } from '@/lib/procurement/shippingMath';
+import { procurementRefund } from '@/lib/refunds/money';
+import { refundUser, sameOriginMutation } from '@/lib/refunds/request-auth';
+import { productPrincipalUsd, productRetentionRatio } from '@/lib/refunds/components';
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const authenticatedUser = await refundUser();
+  if (!authenticatedUser || !sameOriginMutation(request)) return NextResponse.json({ message: 'Please sign in and try again.' }, { status: 403 });
   const pidUser = request.nextUrl.searchParams.get('pidUser');
   const pidOrder = request.nextUrl.searchParams.get('pidOrder');
+  if (pidUser !== authenticatedUser) return NextResponse.json({ message: 'Order not found.' }, { status: 404 });
   if (!pidUser || !pidOrder) {
     return NextResponse.json(
       { statusx: 'FAILED', message: 'Order details are required.' },
@@ -30,12 +35,20 @@ export async function GET(request: NextRequest) {
     }
 
     const refundBeforeFeeUsd = Math.abs(lifecycle.onHoldDifferenceUsd);
-    const refundAmountNgn = refundAmountInNgn(
+    const refund = procurementRefund(
       refundBeforeFeeUsd,
+      lifecycle.destinationCountry,
       lifecycle.rates.ngnPerUsd,
       2.5,
     );
     const pidRefund = `RFND${randomGenerator(15)}`;
+    const previousProductUsd = productPrincipalUsd(
+      String(lifecycle.order.orderTotalCost || '0'),
+      String(lifecycle.order.orderShippingCost || '0'),
+      String(lifecycle.order.serviceCharge || '0'),
+      String(lifecycle.order.vat || '0'),
+    );
+    const componentSnapshot = JSON.stringify({ version: 1, productRetentionRatio: productRetentionRatio(previousProductUsd, lifecycle.productsTotalUsd), previousProductUsd, productUsd: lifecycle.productsTotalUsd, refundBeforeFeeUsd });
 
     await prisma.$transaction(async (tx) => {
       const updated = await tx.orders.updateMany({
@@ -58,8 +71,10 @@ export async function GET(request: NextRequest) {
           pidRefund,
           pidUser,
           pidOrder,
-          amount: String(refundAmountNgn),
-          currency: 'NGN',
+          amount: refund.amount,
+          currency: refund.currency,
+          ext1: 'ORDER_ADJUSTMENT',
+          ext2: componentSnapshot,
           refundStatus: 'pending',
           serviceType: 'PROCUREMENT',
           createdAt: new Date(),

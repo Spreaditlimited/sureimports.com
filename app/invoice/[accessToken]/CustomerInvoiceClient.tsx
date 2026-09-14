@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
+import InvoiceCardCheckout from './InvoiceCardCheckout';
 
 export default function CustomerInvoiceClient({ accessToken }: { accessToken: string }) {
   const [data, setData] = useState<any>(null);
@@ -233,6 +234,7 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
           </table>
         </div>
 
+        {['USD', 'GBP', 'EUR'].includes(invoice.currency) ? <InvoiceCardCheckout accessToken={accessToken} disabled={Number(invoice.balanceDue) <= 0 || ['DRAFT', 'CANCELLED', 'PAID'].includes(invoice.status) || pendingClaims.length > 0} /> : null}
         <div className="grid gap-8 md:grid-cols-5">
           <div className="space-y-6 md:col-span-3">
             <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

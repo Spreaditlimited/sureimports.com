@@ -29,13 +29,17 @@ import Loader from '@/components/uix/Loader';
 type BankOption = {
   optionName: string;
   optionValue: string;
+  transferAmount?: number;
+  transferCurrency?: string;
+  quote?: string;
 };
 
 interface BankPaymentFormProps {
   bankOptions?: BankOption[];
+  requiresQuote?: boolean;
 }
 
-export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormProps) {
+export default function BankPaymentForm({ bankOptions = [], requiresQuote = false }: BankPaymentFormProps) {
   const SELECT_BANK_SENTINEL = '__SELECT_BANK__';
   const searchParams = useSearchParams();
   const navigateWithAlert = useNavigationWithAlert();
@@ -59,6 +63,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
   const isPaySupplierPayment = service === 'pay-supplier';
 
   const [bank, setBank] = useState(SELECT_BANK_SENTINEL);
+  const selectedQuote = bankOptions.find((item) => item.optionValue === bank);
   const [depositor, setDepositor] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -68,6 +73,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
 
   const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (requiresQuote && !selectedQuote?.quote) { toast.error('Select an available bank with a configured transfer rate.'); return; }
     if (!bank || bank === SELECT_BANK_SENTINEL) {
       toast.error('Please select the bank you paid into.');
       return;
@@ -94,6 +100,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
     formData.append('destinationCountry', destinationCountry);
     formData.append('exNairaToDollar', exNairaToDollar.toString());
     formData.append('bank', bank === SELECT_BANK_SENTINEL ? '' : bank);
+    formData.append('transferQuote', selectedQuote?.quote || '');
     formData.append('depositor', depositor);
     formData.append('newTotalAmount', newTotalAmount);
     formData.append('newTotalWeight', newTotalWeight);
@@ -161,7 +168,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
           </div>
           
           <div className="text-left sm:text-right">
-            {isPaySupplierPayment || currencyType === 'NGN' ? (
+            {selectedQuote?.transferAmount !== undefined ? <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{selectedQuote.transferCurrency} {formatCurrency(selectedQuote.transferAmount)}</div> : isPaySupplierPayment || currencyType === 'NGN' ? (
               <div className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
                 ₦{formatCurrency(amount)}
               </div>
@@ -239,7 +246,7 @@ export default function BankPaymentForm({ bankOptions = [] }: BankPaymentFormPro
           </p>
           <Button
             type="submit"
-            disabled={isSubmitting || !bank || bank === SELECT_BANK_SENTINEL || depositor.length < 3}
+            disabled={isSubmitting || !bank || bank === SELECT_BANK_SENTINEL || depositor.length < 3 || (requiresQuote && !selectedQuote?.quote)}
             className="w-full sm:w-auto h-14 rounded-xl bg-indigo-600 px-8 text-sm font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 active:scale-[0.98] disabled:opacity-50"
           >
             {isSubmitting ? (

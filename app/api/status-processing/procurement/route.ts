@@ -3,14 +3,18 @@ import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import xMail from '@/lib/email/xMail2';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
-import { refundAmountInNgn } from '@/lib/procurement/shippingMath';
+import { procurementRefund } from '@/lib/refunds/money';
+import { refundUser, sameOriginMutation } from '@/lib/refunds/request-auth';
 
 export async function POST(request: Request) {
   try {
+    const authenticatedUser = await refundUser();
+    if (!authenticatedUser || !sameOriginMutation(request)) return NextResponse.json({ message: 'Please sign in and try again.' }, { status: 403 });
     const formData = await request.formData();
     const pidUser = String(formData.get('pidUser') || '');
     const pidOrder = String(formData.get('pidOrder') || '');
     const newStatus = String(formData.get('newStatus') || '');
+    if (pidUser !== authenticatedUser) return NextResponse.json({ message: 'Order not found.' }, { status: 404 });
 
     if (!pidUser || !pidOrder || newStatus !== 'in-transit') {
       return NextResponse.json(
@@ -47,13 +51,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const refundAmountNgn =
+    const refund =
       lifecycle.costDifferenceUsd < -0.01
-        ? refundAmountInNgn(
+        ? procurementRefund(
             Math.abs(lifecycle.costDifferenceUsd),
+            lifecycle.destinationCountry,
             lifecycle.rates.ngnPerUsd,
           )
-        : 0;
+        : null;
 
     await prisma.$transaction(async (tx) => {
       const updated = await tx.orders.updateMany({
@@ -64,14 +69,15 @@ export async function POST(request: Request) {
         throw new Error('Order status changed while it was being updated.');
       }
 
-      if (refundAmountNgn > 0) {
+      if (refund && Number(refund.amount) > 0) {
         await tx.refund_records.create({
           data: {
             pidRefund: `RFND${randomGenerator(15)}`,
             pidUser,
             pidOrder,
-            amount: String(refundAmountNgn),
-            currency: 'NGN',
+            amount: refund.amount,
+            currency: refund.currency,
+            ext1: 'SHIPPING_ADJUSTMENT',
             refundStatus: 'pending',
             serviceType: 'PROCUREMENT',
             createdAt: new Date(),
@@ -92,13 +98,13 @@ export async function POST(request: Request) {
           xButtonTitle: '',
           xButtonLink: '',
         }),
-        ...(refundAmountNgn > 0 && user.userEmail
+        ...(refund && Number(refund.amount) > 0 && user.userEmail
           ? [
               xMail({
                 xEmail: user.userEmail,
                 xTitle: 'Refund Initiated',
                 xBodyTitle: 'Refund has been initiated for your order',
-                xBody1: `A refund of <b>₦${refundAmountNgn.toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</b> has been initiated for order <b>${pidOrder}</b>.`,
+                xBody1: `A refund of <b>${refund.currency} ${refund.amount}</b> has been recorded for order <b>${pidOrder}</b>. Open Refunds in your dashboard to request settlement.`,
                 xBody2: '',
                 xButtonTitle: '',
                 xButtonLink: '',
@@ -113,7 +119,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       statusx: 'SUCCESS',
       message:
-        refundAmountNgn > 0
+        refund && Number(refund.amount) > 0
           ? 'Order moved to In-Transit and the refund was initiated.'
           : 'Order moved to In-Transit.',
     });

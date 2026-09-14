@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { verifyToken } from '@/lib/jwt';
+import { refundUser, sameOriginMutation } from '@/lib/refunds/request-auth';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import {
   recordWalletCredit,
@@ -17,24 +16,16 @@ class RefundTransferConflictError extends Error {}
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-
-    if (!token) {
-      return NextResponse.json(
-        { statusx: 'FAILED', message: 'Unauthorized' },
-        { status: 401 },
-      );
-    }
-
-    const payload = verifyToken(token) as { pidUser?: string } | null;
+    const pidUser = await refundUser();
+    const payload = pidUser ? { pidUser } : null;
     if (!payload?.pidUser) {
       return NextResponse.json(
-        { statusx: 'FAILED', message: 'Unauthorized' },
+        { statusx: 'FAILED', message: 'Please sign in to continue.' },
         { status: 401 },
       );
     }
 
+    if (!sameOriginMutation(request)) return NextResponse.json({ statusx: 'FAILED', message: 'Please refresh this page and try again. Sign in again if needed.' }, { status: 403 });
     const body = await request.json();
     const refundIds = Array.from(
       new Set(
@@ -47,9 +38,9 @@ export async function POST(request: NextRequest) {
       ),
     );
 
-    if (refundIds.length === 0) {
+    if (refundIds.length === 0 || refundIds.length > 100) {
       return NextResponse.json(
-        { statusx: 'FAILED', message: 'At least one refund is required' },
+        { statusx: 'FAILED', message: 'Select between 1 and 100 refunds.' },
         { status: 400 },
       );
     }
@@ -143,7 +134,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           statusx: 'FAILED',
-          message: 'One or more refund amounts are invalid',
+          message: 'We need to review the refund amount before transferring it. Please contact support with your refund reference.',
         },
         { status: 400 },
       );
@@ -164,7 +155,6 @@ export async function POST(request: NextRequest) {
           },
           data: {
             refundStatus: 'wallet-transferred',
-            ext1: txRef,
             updatedAt: new Date(),
           },
         });
@@ -199,6 +189,7 @@ export async function POST(request: NextRequest) {
           description: `Refund transfer to wallet (${refund.pidRefund})`,
           currency: 'NGN',
         });
+        await tx.$executeRaw`INSERT INTO refund_settlements (refundId,pidUser,sourceCurrency,sourceAmount,settlementCurrency,settlementAmount,exchangeRate,method,destinationCiphertext,status,reference,settledAt,createdAt,updatedAt) VALUES (${refund.pidRefund},${user.pidUser},'NGN',${amount},'NGN',${amount},1,'WALLET','','SETTLED',${txRef},NOW(3),NOW(3),NOW(3))`;
       }
     });
 
@@ -207,7 +198,7 @@ export async function POST(request: NextRequest) {
         refund.serviceType,
         refund.pidOrder,
       );
-      if (externalOrderReference) {
+      if (externalOrderReference && refund.ext1 !== 'SHIPPING_ADJUSTMENT' && refund.ext1 !== 'ORDER_ADJUSTMENT') {
         await voidAffiliateConversions({
           externalOrderReference,
           reason: `Refund ${refund.pidRefund} was transferred to the customer wallet.`,
@@ -241,7 +232,7 @@ export async function POST(request: NextRequest) {
 
     console.error('Refund to wallet transfer failed:', error);
     return NextResponse.json(
-      { statusx: 'FAILED', message: 'Failed to transfer refund to wallet' },
+      { statusx: 'FAILED', message: 'We could not confirm the wallet transfer. Refresh your refund and wallet balances before trying again, or contact support.' },
       { status: 500 },
     );
   }

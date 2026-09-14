@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { createPayPalOrder } from '@/lib/paypal';
+import { refreshPayPalCheckoutUrl } from '@/lib/paypalCheckoutSession';
 import { prisma } from '@/lib/prisma';
 import {
   checkoutOriginIsAllowed,
@@ -141,7 +142,7 @@ export async function POST(
   });
   if (activePayment?.authorizationUrl) {
     return NextResponse.json({
-      authorizationUrl: activePayment.authorizationUrl,
+      authorizationUrl: provider === 'paypal' ? refreshPayPalCheckoutUrl(activePayment.authorizationUrl) : activePayment.authorizationUrl,
       pidPayment: activePayment.pidPayment,
     });
   }

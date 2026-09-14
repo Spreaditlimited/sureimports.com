@@ -17,8 +17,8 @@ test('the public application defaults to light and persists an explicit theme ch
   assert.match(provider, /enableSystem=\{false\}/);
   assert.match(provider, /storageKey="sureimports-theme"/);
   assert.doesNotMatch(provider, /forcedTheme/);
-  assert.match(boundary, /pathname\.startsWith\('\/dashboard\/'\)/);
-  assert.match(boundary, /forcedTheme=\{isDashboard \? 'light' : undefined\}/);
+  assert.match(boundary, /<ThemeProvider>/);
+  assert.doesNotMatch(boundary, /forcedTheme/);
 });
 
 test('the public navigation exposes accessible desktop and mobile theme controls', () => {

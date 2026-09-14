@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getProcurementOrderLifecycle } from '@/lib/procurement/orderLifecycle';
+import { refundUser, sameOriginMutation } from '@/lib/refunds/request-auth';
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
+  const authenticatedUser = await refundUser();
+  if (!authenticatedUser || !sameOriginMutation(request)) return NextResponse.json({ message: 'Please sign in and try again.' }, { status: 403 });
   const pidUser = request.nextUrl.searchParams.get('pidUser');
   const pidOrder = request.nextUrl.searchParams.get('pidOrder');
+  if (pidUser !== authenticatedUser) return NextResponse.json({ message: 'Order not found.' }, { status: 404 });
   if (!pidUser || !pidOrder) {
     return NextResponse.json(
       { statusx: 'FAILED', message: 'Order details are required.' },

@@ -1,10 +1,14 @@
 import { after, NextResponse } from 'next/server';
+import { handleOriginalPayPalRefundEvent } from '@/lib/refunds/paypal-settlement';
+import { recordExternalPayPalRefund } from '@/lib/refunds/external-paypal';
+import { paypalCaptureReference } from '@/lib/refunds/paypal-reference';
 
 import {
   confirmReportOrderPayment,
   transitionReportOrderAccess,
 } from '@/lib/intelligence/reportOrders';
-import { getPayPalOrder, verifyPayPalWebhookSignature } from '@/lib/paypal';
+import { getPayPalOrder, capturePayPalOrder, verifyPayPalWebhookSignature } from '@/lib/paypal';
+import { assertPayPalOrderMatches } from '@/lib/paypalValidation';
 import { prisma } from '@/lib/prisma';
 import { resolvePayPalAccessStatus } from '@/lib/intelligence/reportOrderPolicy';
 import {
@@ -15,6 +19,8 @@ import { confirmSupplierVerificationPayment } from '@/lib/supplierVerification/s
 import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
 import { paypalEventReversesCommission } from '@/lib/affiliate/reversalPolicy';
 import { sendAffiliateAccountNotification } from '@/lib/affiliate/emailNotifications';
+import { confirmProcurementPayPalCheckout } from '@/lib/procurement/paypalCheckout';
+import { confirmSpecialSourcingPayPal } from '@/lib/paypalSpecialSourcing';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -79,6 +85,7 @@ export async function POST(request: Request) {
   }
 
   const event = String(body?.event_type || '').toUpperCase();
+  if (event === 'PAYMENT.CAPTURE.REFUNDED' && await handleOriginalPayPalRefundEvent(body?.resource)) return NextResponse.json({ received: true });
   if (
     event.startsWith('PAYMENT.PAYOUTSBATCH.') ||
     event.startsWith('PAYMENT.PAYOUTS-ITEM.')
@@ -155,6 +162,14 @@ export async function POST(request: Request) {
     }
     return NextResponse.json({ received: true });
   }
+  if (String(body?.event_type || '').startsWith('BILLING.SUBSCRIPTION.') || String(body?.event_type || '').startsWith('PAYMENT.SALE.')) {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    for (const [key, value] of Object.entries(signatureHeaders)) if (value) headers[key] = value;
+    const upstream = await fetch(`${process.env.PARTNER_PAYPAL_API_BASE_URL || 'https://partner.sureimports.com'}/api/integrations/paypal`, {
+      method: 'POST', headers, body: JSON.stringify(body), cache: 'no-store', signal: AbortSignal.timeout(55000),
+    });
+    return NextResponse.json(upstream.ok ? { received: true } : { message: 'Subscription confirmation requires retry.' }, { status: upstream.ok ? 200 : 503 });
+  }
   if (
     ![
       'PAYMENT.CAPTURE.COMPLETED',
@@ -171,19 +186,50 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   }
   const resource = body?.resource || {};
-  const captureReference = String(
-    resource?.disputed_transactions?.[0]?.seller_transaction_id ||
-      (event.startsWith('PAYMENT.CAPTURE.') ? resource?.id : '') ||
-      '',
-  ).trim();
+  const captureReference = paypalCaptureReference(event, resource);
   const orderId = String(
     resource?.supplementary_data?.related_ids?.order_id ||
       (event === 'CHECKOUT.ORDER.APPROVED' ? resource?.id : '') ||
       '',
   ).trim();
+  if (!orderId && !captureReference && event === 'PAYMENT.CAPTURE.REFUNDED')
+    return NextResponse.json({ message: 'Refund payment linkage will be retried.' }, { status: 503 });
   if (!orderId && !captureReference)
     return NextResponse.json({ received: true });
+  const invoiceCheckouts = await prisma.$queryRaw<{ id: string }[]>`SELECT id FROM paypal_invoice_checkouts
+    WHERE providerReference = ${orderId} OR captureReference = ${captureReference} LIMIT 1`;
+  if (invoiceCheckouts.length) {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    for (const [key, value] of Object.entries(signatureHeaders)) if (value) headers[key] = value;
+    const upstream = await fetch(`${process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com'}/api/invoicing/paypal-webhook`, {
+      method: 'POST', headers, body: JSON.stringify(body), cache: 'no-store', signal: AbortSignal.timeout(55000),
+    });
+    if (!upstream.ok) return NextResponse.json({ message: 'Invoice processing will be retried.' }, { status: 503 });
+    return NextResponse.json({ received: true });
+  }
   const reversesPayment = paypalEventReversesCommission(event);
+  const partnerPayment = captureReference ? await prisma.payments.findFirst({
+    where: { txID: captureReference, paymentType: 'PAYPAL', serviceName: 'PARTNER_PROCUREMENT' },
+    select: { pidPayment: true },
+  }) : null;
+  async function forwardPartnerEvent() {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    for (const [key, value] of Object.entries(signatureHeaders)) if (value) headers[key] = value;
+    const upstream = await fetch(`${process.env.PARTNER_PAYPAL_API_BASE_URL || 'https://partner.sureimports.com'}/api/integrations/paypal`, {
+      method: 'POST', headers, body: JSON.stringify(body), cache: 'no-store', signal: AbortSignal.timeout(55000),
+    });
+    return NextResponse.json(upstream.ok ? { received: true } : { message: 'Partner payment processing will be retried.' }, { status: upstream.ok ? 200 : 503 });
+  }
+  if (partnerPayment) return forwardPartnerEvent();
+  if (event === 'PAYMENT.CAPTURE.REFUNDED') {
+    try {
+      await recordExternalPayPalRefund(String(resource.id || ''), captureReference);
+      return NextResponse.json({ received: true });
+    } catch (error) {
+      console.error('External PayPal refund reconciliation deferred', error);
+      return NextResponse.json({ message: 'Refund processing will be retried.' }, { status: 503 });
+    }
+  }
   if (reversesPayment) {
     await voidAffiliateConversions({
       externalPaymentReferences: [captureReference, orderId]
@@ -192,6 +238,25 @@ export async function POST(request: Request) {
       reason: `PayPal reported ${event}.`,
       reversalReference: `paypal:${String(body?.id || captureReference || orderId)}`,
     });
+  }
+  if (orderId) {
+    const providerOrder = await getPayPalOrder(orderId);
+    if (providerOrder.sureImportsEnvironment === 'sandbox') return NextResponse.json({ received: true, sandbox: true });
+    if (/^(PPCO_|PADS_)/.test(String(providerOrder?.purchase_units?.[0]?.custom_id || ''))) return forwardPartnerEvent();
+    if (String(providerOrder?.purchase_units?.[0]?.custom_id || '').startsWith('PPSRC_')) {
+      if (reversesPayment) await prisma.payments.updateMany({ where: { txRef: orderId, pidPayment: { startsWith: 'PPSRC_' } }, data: { paymentStatus: 'REVERSED', updatedAt: new Date() } });
+      else if (['CHECKOUT.ORDER.APPROVED','PAYMENT.CAPTURE.COMPLETED'].includes(event)) await confirmSpecialSourcingPayPal(orderId);
+      return NextResponse.json({ received: true });
+    }
+    if (String(providerOrder?.purchase_units?.[0]?.custom_id || '').startsWith('PPROC_')) {
+      if (reversesPayment) {
+        await prisma.$executeRaw`UPDATE paypal_procurement_checkouts SET status = 'REVERSED', updatedAt = NOW(3) WHERE providerReference = ${orderId}`;
+        await prisma.payments.updateMany({ where: { txRef: orderId, paymentType: 'PAYPAL' }, data: { paymentStatus: 'REVERSED', updatedAt: new Date() } });
+      } else if (event === 'PAYMENT.CAPTURE.COMPLETED' || event === 'CHECKOUT.ORDER.APPROVED') {
+        await confirmProcurementPayPalCheckout(orderId, undefined, event === 'CHECKOUT.ORDER.APPROVED');
+      }
+      return NextResponse.json({ received: true });
+    }
   }
   const supplierPayment = await prisma.supplier_verification_payments.findFirst({
     where: {
@@ -241,7 +306,11 @@ export async function POST(request: Request) {
       });
       return NextResponse.json({ received: true });
     }
-    const paypalOrder = await getPayPalOrder(orderId || supplierPayment.providerReference || '');
+    let paypalOrder = await getPayPalOrder(orderId || supplierPayment.providerReference || '');
+    if (event === 'CHECKOUT.ORDER.APPROVED' && paypalOrder.status === 'APPROVED') {
+      assertPayPalOrderMatches(paypalOrder, { customId: supplierPayment.pidPayment, amountMinor: supplierPayment.amountMinor, currency: supplierPayment.currency });
+      paypalOrder = await capturePayPalOrder(String(paypalOrder.id));
+    }
     const unit = paypalOrder?.purchase_units?.[0];
     const capture = unit?.payments?.captures?.[0];
     if (
@@ -291,7 +360,11 @@ export async function POST(request: Request) {
       `;
       return NextResponse.json({ received: true });
     }
-    const paypalOrder = await getPayPalOrder(orderId || corporatePayment.providerReference || '');
+    let paypalOrder = await getPayPalOrder(orderId || corporatePayment.providerReference || '');
+    if (event === 'CHECKOUT.ORDER.APPROVED' && paypalOrder.status === 'APPROVED') {
+      assertPayPalOrderMatches(paypalOrder, { customId: corporatePayment.pidPayment, amountMinor: corporatePayment.amountMinor, currency: corporatePayment.currency });
+      paypalOrder = await capturePayPalOrder(String(paypalOrder.id));
+    }
     const unit = paypalOrder?.purchase_units?.[0];
     const capture = unit?.payments?.captures?.[0];
     if (
@@ -339,9 +412,13 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ received: true });
   }
-  const paypalOrder = await getPayPalOrder(
+  let paypalOrder = await getPayPalOrder(
     orderId || reportOrder.providerReference || '',
   );
+  if (event === 'CHECKOUT.ORDER.APPROVED' && paypalOrder.status === 'APPROVED') {
+    assertPayPalOrderMatches(paypalOrder, { customId: reportOrder.pidOrder, amountMinor: reportOrder.amountMinor, currency: reportOrder.currency });
+    paypalOrder = await capturePayPalOrder(String(paypalOrder.id));
+  }
   const unit = paypalOrder?.purchase_units?.[0];
   const capture = unit?.payments?.captures?.[0];
   if (

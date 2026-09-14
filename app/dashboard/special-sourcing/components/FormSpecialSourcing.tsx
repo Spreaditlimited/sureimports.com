@@ -57,6 +57,7 @@ import { useModal } from '@/app/context/ModalContext';
 import Modal from '@/components/uix/Modal';
 import RadSelectCurrency from '@/components/uix/xForm/RadSelectCurrency';
 import { CurrencyDollarIcon } from '@heroicons/react/16/solid';
+import SpecialSourcingCardPayment from '@/components/SpecialSourcingCardPayment';
 import FlutterwavePaymentButton from '@/components/FlutterwavePaymentButton';
 
 const formSchema = z.object({
@@ -303,7 +304,7 @@ function SpecialSourcingForm() {
           /> */}
 
           {/* *********************************************************************************************************** */}
-          <FlutterwavePaymentButton
+          {currency === 'USD' ? <SpecialSourcingCardPayment requestId={pidSpecialSourcing} disabled={isDisabled} /> : (<FlutterwavePaymentButton
             amount={amount}
             email={user?.userEmail as string}
             name={user?.userFirstname as string}
@@ -321,7 +322,7 @@ function SpecialSourcingForm() {
                 : 'flex items-center gap-2 rounded-2xl bg-slate-400 pb-2 pl-5 pr-5 pt-2 hover:bg-slate-500'
             }
             destinationCountry={''}
-          />
+          />)}
           {/* *********************************************************************************************************** */}
         </Modal>
       </div>

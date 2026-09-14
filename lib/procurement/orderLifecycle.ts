@@ -8,6 +8,7 @@ import {
 } from './shippingMath';
 import { normalizeProcurementMinimumOrderNgn } from './minimumOrder';
 import { procurementProductValue } from './productPricing';
+import { destinationVatPercent } from './destinationPolicy';
 
 const EDITABLE_ESTIMATE_STATUSES = new Set(['saved', 'on-hold']);
 
@@ -27,7 +28,7 @@ export async function getProcurementOrderLifecycle(
       'Manage this order through its partner storefront workflow.',
     );
 
-  const [products, country, plan, financial] = await Promise.all([
+  const [products, country, plan, financial, vatSettings] = await Promise.all([
     prisma.products.findMany({
       where: { pidOrder },
       orderBy: { id: 'asc' },
@@ -49,6 +50,9 @@ export async function getProcurementOrderLifecycle(
         })
       : null,
     prisma.exchange_rate.findUnique({ where: { id: 1 } }),
+    prisma.$queryRaw<
+      { procurementVatForeign: string; exGbpPerUsd: string | null }[]
+    >`SELECT procurementVatForeign, exGbpPerUsd FROM exchange_rate WHERE id = 1`,
   ]);
 
   if (!financial) throw new Error('Financial configuration was not found.');
@@ -75,11 +79,19 @@ export async function getProcurementOrderLifecycle(
         finiteNumber(product.productPrice),
     0,
   );
-  const productPricingVersion = useLatestEstimate ? 2 : order.productPricingVersion ?? 1;
+  const productPricingVersion = useLatestEstimate
+    ? 2
+    : (order.productPricingVersion ?? 1);
   const ngnPerCny = useLatestEstimate
     ? finiteNumber(financial.exNairaToYuan)
     : finiteNumber(order.exchangeRate3);
-  const productValue = procurementProductValue(productsTotalRaw, order.currencyType || 'USD', country?.countryName || '', {ngnPerUsd, cnyPerUsd, ngnPerCny}, productPricingVersion);
+  const productValue = procurementProductValue(
+    productsTotalRaw,
+    order.currencyType || 'USD',
+    country?.countryName || '',
+    { ngnPerUsd, cnyPerUsd, ngnPerCny },
+    productPricingVersion,
+  );
   const productsTotalUsd = productValue.usd;
   const totalMeasurement = products.reduce(
     (total, product) =>
@@ -124,9 +136,14 @@ export async function getProcurementOrderLifecycle(
         order.serviceCharge,
         finiteNumber(financial.service_charge, 15),
       );
+  const configuredVat = destinationVatPercent(
+    country?.countryName || '',
+    financial.vat,
+    vatSettings[0]?.procurementVatForeign,
+  );
   const vatPercent = useLatestEstimate
-    ? finiteNumber(financial.vat, 7)
-    : finiteNumber(order.vat, finiteNumber(financial.vat, 7));
+    ? configuredVat
+    : finiteNumber(order.vat, configuredVat);
   const {
     serviceChargeValueUsd,
     vatValueUsd,
@@ -216,6 +233,7 @@ export async function getProcurementOrderLifecycle(
     onHoldDifferenceUsd:
       dynamicGrandTotalUsd - finiteNumber(order.orderTotalCost),
     rates: {
+      gbpPerUsd: Number(vatSettings[0]?.exGbpPerUsd || 0),
       ngnPerUsd,
       cnyPerUsd,
       ngnPerCny,
@@ -233,7 +251,7 @@ export async function getProcurementOrderLifecycle(
       orderTotalCost: String(dynamicGrandTotalUsd),
       orderWeight: String(totalMeasurement),
       orderShippingCost: String(dynamicEstimatedShippingCostUsd),
-      vat: String(financial.vat ?? vatPercent),
+      vat: String(vatPercent),
       serviceCharge: String(financial.service_charge ?? serviceChargePercent),
       exchangeRate1: String(financial.exNairaToDollar ?? ngnPerUsd),
       exchangeRate2: String(financial.exYuanToDollar ?? cnyPerUsd),

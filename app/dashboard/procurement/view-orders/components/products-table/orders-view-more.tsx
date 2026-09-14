@@ -209,7 +209,7 @@ export default function MoreOrders({
         setEstimatedTotalShippingCost(replaceNullWithZero(data.estimatedTotalShippingCost) as number);
         setAmountNaira(replaceNullWithZero(data.grandTotalCost) as number * (replaceNullWithZero(data.exNairaToDollar) as number));
         setAmountNairaDifference(replaceNullWithZero(data.onHoldDifference) as number * (replaceNullWithZero(data.exNairaToDollar) as number));
-        setAmountPounds(replaceNullWithZero(data.grandTotalCost) as number * 0.8);
+        setAmountPounds(Number(data.grandTotalCost || 0) * Number(data.exGbpPerUsd || 0));
         setGrandTotalCost(replaceNullWithZero(data.grandTotalCost) as number);
         setOnHoldDifference(replaceNullWithZero(data.onHoldDifference) as number);
         setPaymentDue(replaceNullWithZero(data.paymentDue) as number);
@@ -308,7 +308,7 @@ export default function MoreOrders({
   const returnOrderNoAction = async () => {
     toast.info('Returning Order...');
     try {
-      const res = await fetch(`/api/status-processing/procurement-onhold-orders/return-order?pidUser=${user?.pidUser}&pidOrder=${pidOrder}`);
+      const res = await fetch(`/api/status-processing/procurement-onhold-orders/return-order?pidUser=${user?.pidUser}&pidOrder=${pidOrder}`, { method: 'POST' });
       const data = await res.json();
       if (data.statusx === 'SUCCESS') {
         toast.success(data.message);
@@ -324,7 +324,7 @@ export default function MoreOrders({
   const returnOrderWithRefund = async () => {
     toast.info('Processing Refund & Returning Order...');
     try {
-      const res = await fetch(`/api/status-processing/procurement-onhold-orders/refund-order?pidUser=${user?.pidUser}&pidOrder=${pidOrder}&refundAmount=${onHoldDifference}`);
+      const res = await fetch(`/api/status-processing/procurement-onhold-orders/refund-order?pidUser=${user?.pidUser}&pidOrder=${pidOrder}`, { method: 'POST' });
       const data = await res.json();
       if (data.statusx === 'SUCCESS') {
         toast.success(data.message);
