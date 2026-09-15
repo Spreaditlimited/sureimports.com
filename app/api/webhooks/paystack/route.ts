@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const known = await prisma.$queryRaw<Array<{id:string}>>`SELECT id FROM partner_platform_agreements WHERE provider='PAYSTACK' AND environment='live' AND (subscriptionCode=${billingSubscription} OR planCode=${billingPlan}) LIMIT 1`;
     partnerBilling = known.length > 0;
   }
-  if (/^(PCO_|PADS_|pww_|PBF_)/.test(partnerReference) || partnerBilling) {
+  if (/^(PCO_|PADS_|pww_|PBF_|SPD_|SPR_)/.test(partnerReference) || partnerBilling) {
     // One account webhook, one authoritative partner payment implementation.
     // Forward the original signed bytes; the partner endpoint verifies them.
     try {

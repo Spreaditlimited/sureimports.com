@@ -242,7 +242,7 @@ export async function POST(request: Request) {
   if (orderId) {
     const providerOrder = await getPayPalOrder(orderId);
     if (providerOrder.sureImportsEnvironment === 'sandbox') return NextResponse.json({ received: true, sandbox: true });
-    if (/^(PPCO_|PADS_)/.test(String(providerOrder?.purchase_units?.[0]?.custom_id || ''))) return forwardPartnerEvent();
+    if (/^(PPCO_|PADS_|SPD_|SPR_)/.test(String(providerOrder?.purchase_units?.[0]?.custom_id || ''))) return forwardPartnerEvent();
     if (String(providerOrder?.purchase_units?.[0]?.custom_id || '').startsWith('PPSRC_')) {
       if (reversesPayment) await prisma.payments.updateMany({ where: { txRef: orderId, pidPayment: { startsWith: 'PPSRC_' } }, data: { paymentStatus: 'REVERSED', updatedAt: new Date() } });
       else if (['CHECKOUT.ORDER.APPROVED','PAYMENT.CAPTURE.COMPLETED'].includes(event)) await confirmSpecialSourcingPayPal(orderId);
