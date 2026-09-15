@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import xMail from '@/lib/email/xMail2';
 import {
-  normalizeReportDemandQuery,
   previousReportDemandWeekKey,
   reportDemandId,
 } from '@/lib/intelligence/reportDemand';
-import { getPublishedReports } from '@/lib/intelligence/reports';
+import { reconcileReportDemandNotifications } from '@/lib/intelligence/reportDemandNotifications';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
@@ -27,83 +26,16 @@ function escapeHtml(value: string) {
   );
 }
 
-function reportMatchScore(query: string, reportText: string) {
-  const terms = normalizeReportDemandQuery(query)
-    .split(' ')
-    .filter((term) => term.length > 1);
-  const normalizedReport = normalizeReportDemandQuery(reportText);
-  if (!terms.length) return 0;
-  return terms.filter((term) => normalizedReport.includes(term)).length / terms.length;
-}
-
-async function reconcilePublishedRequests() {
-  const [requests, reports] = await Promise.all([
-    prisma.$queryRaw<
-      Array<{ pidRequest: string; query: string }>
-    >`
-      SELECT pidRequest, query
-      FROM intelligence_report_requests
-      WHERE status <> 'published' AND publishedReportSlug IS NULL
-    `,
-    getPublishedReports(),
-  ]);
-  let matched = 0;
-
-  for (const reportRequest of requests) {
-    const report = reports
-      .map((item) => ({
-        item,
-        score: reportMatchScore(
-          reportRequest.query,
-          [item.slug, item.title, item.subtitle, item.description]
-            .filter(Boolean)
-            .join(' '),
-        ),
-      }))
-      .filter((item) => item.score >= 0.75)
-      .sort((a, b) => b.score - a.score)[0]?.item;
-    if (!report) continue;
-
-    const voters = await prisma.$queryRaw<Array<{ email: string }>>`
-      SELECT DISTINCT email
-      FROM intelligence_report_request_votes
-      WHERE requestId = ${reportRequest.pidRequest}
-    `;
-    await prisma.$executeRaw`
-      UPDATE intelligence_report_requests
-      SET
-        status = 'published',
-        publishedReportSlug = ${report.slug},
-        updatedAt = ${new Date()}
-      WHERE pidRequest = ${reportRequest.pidRequest}
-    `;
-    matched += 1;
-
-    await Promise.all(
-      voters.map(({ email }) =>
-        xMail({
-          xEmail: email,
-          xTitle: `${reportRequest.query} report is now available`,
-          xBodyTitle: 'Your requested report has been published',
-          xBody1: `You voted for <b>${escapeHtml(reportRequest.query)}</b> on the Sure Imports Research Radar. The report has now passed review and is ready.`,
-          xBody2:
-            'Open the product page to see the edition details, manufacturer count and what the report covers before purchasing.',
-          xButtonTitle: 'View the report',
-          xButtonLink: `https://www.sureimports.com/supplier-intelligence/reports/${report.slug}`,
-        }),
-      ),
-    );
-  }
-  return matched;
-}
-
 export async function GET(request: NextRequest) {
-  if (request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (
+    !process.env.CRON_SECRET ||
+    request.headers.get('authorization') !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return new Response('Unauthorized', { status: 401 });
   }
 
   try {
-    const publishedMatches = await reconcilePublishedRequests();
+    const publishedMatches = await reconcileReportDemandNotifications();
     const weekKey = previousReportDemandWeekKey();
     const topRequests = await prisma.$queryRaw<
       Array<{

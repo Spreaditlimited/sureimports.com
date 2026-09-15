@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
+import { reconcileReportDemandNotifications } from '@/lib/intelligence/reportDemandNotifications';
 
 import { capturePayPalOrder, getPayPalOrder } from '@/lib/paypal';
-import { assertPayPalLiveFulfillment, assertPayPalOrderMatches } from '@/lib/paypalValidation';
+import {
+  assertPayPalLiveFulfillment,
+  assertPayPalOrderMatches,
+} from '@/lib/paypalValidation';
 import {
   confirmReportOrderPayment,
   deliverReportOrder,
@@ -63,7 +67,11 @@ async function reconcilePendingOrder(order: {
 
   if (order.paymentProvider === 'paypal') {
     let payment = await getPayPalOrder(order.providerReference);
-    assertPayPalOrderMatches(payment, { customId: order.pidOrder, amountMinor: order.amountMinor, currency: order.currency });
+    assertPayPalOrderMatches(payment, {
+      customId: order.pidOrder,
+      amountMinor: order.amountMinor,
+      currency: order.currency,
+    });
     assertPayPalLiveFulfillment(payment);
     if (String(payment?.status || '').toUpperCase() === 'APPROVED') {
       payment = await capturePayPalOrder(order.providerReference);
@@ -159,11 +167,18 @@ export async function GET(request: Request) {
 
   const procurement = await reconcileProcurementPayPalPayments();
   const refunds = await reconcileOriginalPayPalRefunds();
-    const refundCommissions = await reconcileRefundCommissions();
-    const refundNotifications = await reconcileRefundNotifications();
+  const refundCommissions = await reconcileRefundCommissions();
+  const refundNotifications = await reconcileRefundNotifications();
   const specialSourcing = await reconcileSpecialSourcingPayPal();
+  const reportNotifications = await reconcileReportDemandNotifications().catch(
+    (error) => {
+      console.error('Report voter notification reconciliation failed', error);
+      return { failed: true };
+    },
+  );
   return NextResponse.json({
     specialSourcing,
+    reportNotifications,
     refunds,
     refundNotifications,
     refundCommissions,
