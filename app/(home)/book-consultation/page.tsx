@@ -121,6 +121,7 @@ export default async function BookConsultationPage({
         <main className="flex-1">
 <div className={`${heroLayout.fixed} mx-auto max-w-[1440px] px-4 pb-24 pt-48 sm:px-6 lg:px-8`}>
             <header className="mx-auto mb-12 max-w-3xl text-center">
+        <PublicHeroBackground darkOnly priority={false} />
 <HeroPill className="mb-6">
               <CalendarClock className="h-3.5 w-3.5" />
               Paid Consultation

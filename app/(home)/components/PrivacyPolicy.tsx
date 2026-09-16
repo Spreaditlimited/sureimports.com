@@ -1,5 +1,6 @@
 'use client';
 
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect, useState } from 'react';
@@ -69,6 +70,7 @@ export default function PrivacyPolicy() {
       
       {/* Premium Page Header */}
 <div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
+        <PublicHeroBackground darkOnly priority={false} />
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
 <HeroPill className="mb-6">

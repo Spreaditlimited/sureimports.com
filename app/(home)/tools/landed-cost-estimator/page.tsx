@@ -1,5 +1,6 @@
 'use client';
 
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -244,6 +245,7 @@ export default function LandedCostEstimatorPage() {
         
         {/* Header */}
         <header className="mb-12">
+        <PublicHeroBackground darkOnly priority={false} />
 <HeroPill className="mb-6">
             <Calculator className="w-3.5 h-3.5" /> Profitability Planning
           </HeroPill>

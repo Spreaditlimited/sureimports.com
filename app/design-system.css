@@ -2,6 +2,7 @@
 :root {
   --si-canvas: #f6f8fc;
   --si-hero-surface: #eeedf6;
+  --si-hero-art-opacity: .07;
   --si-surface: #fff;
   --si-raised: #fff;
   --si-inset: #eef1f7;
@@ -27,7 +28,8 @@
 }
 .dark {
   --si-canvas: #101114;
-  --si-hero-surface: #15151d;
+  --si-hero-surface: #101114;
+  --si-hero-art-opacity: .24;
   --si-surface: #191b21;
   --si-raised: #21242c;
   --si-inset: #13151a;
@@ -135,8 +137,32 @@ body { background: var(--si-canvas); color: var(--si-ink); }
 .dashboard [class*='dark:supports-backdrop-blur:'] { background-color: var(--si-surface); border-bottom: 1px solid var(--si-border); }
 /* Public service heroes share one theme-aware treatment, including pre-image-load contrast. */
 :is(section,header,div):has(> .si-hero-art) { background-color: var(--si-hero-surface) !important; color: var(--si-ink); }
-.si-hero-art { opacity: .07; }
-.dark .si-hero-art { opacity: .2; }
+.si-hero-art { opacity: var(--si-hero-art-opacity); }
+.si-dark-hero-art { display: none; }
+/* One dark background contract, taken from the homepage. No layout changes. */
+.dark .public-site-theme :is(section,header,div):has(> :is(.si-hero-art,.si-dark-hero-art)),
+.dark :is(section,header,div):has(> :is(.si-hero-art,.si-dark-hero-art)) {
+  position: relative;
+  isolation: isolate;
+  background: var(--si-hero-surface) !important;
+}
+.dark :is(.si-hero-art,.si-dark-hero-art) {
+  display: block;
+  opacity: var(--si-hero-art-opacity);
+  z-index: -2;
+}
+.dark :is(section,header,div):has(> :is(.si-hero-art,.si-dark-hero-art))::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 100px;
+  pointer-events: none;
+  z-index: -1;
+  background: linear-gradient(transparent,var(--si-canvas));
+}
+.dark :is(section,header,div):has(> .si-dark-hero-art) > .absolute.inset-0:not(.si-dark-hero-art),
+.dark :is(section,header,div):has(> :is(.si-hero-art,.si-dark-hero-art)) > .pointer-events-none:not(.si-hero-art):not(.si-dark-hero-art),
+.dark .si-body-hero > .pointer-events-none:not(.si-dark-hero-art) { display: none; }
 :is(section,header,div):has(> .si-hero-art) :is(h1,h1 span) { color: var(--si-ink); font-weight: 650; letter-spacing: -.045em; text-wrap: balance; }
 :is(section,header,div):has(> .si-hero-art) p { color: var(--si-muted); }
 :is(section,header,div):has(> .si-hero-art) a[class*='bg-white/'] { color: var(--si-ink); background-color: var(--si-surface); border-color: var(--si-border); backdrop-filter: none; }

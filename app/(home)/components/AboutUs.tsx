@@ -1,5 +1,6 @@
 'use client';
 
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import Image from 'next/image';
@@ -74,6 +75,7 @@ export default function AboutUs() {
       
       {/* Premium Hero Section */}
 <div className={`${heroLayout.fixed} relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-32 pb-20 dark:border-slate-800 dark:bg-slate-900`}>
+        <PublicHeroBackground darkOnly priority={false} />
         <div className="absolute inset-0 z-0">
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>

@@ -1,3 +1,4 @@
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
@@ -215,6 +216,7 @@ export default function BodyCameraSolutionsPage() {
       <JsonLdScript data={schema} />
 
 <section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24`}>
+        <PublicHeroBackground darkOnly priority={false} />
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[620px] bg-[radial-gradient(circle_at_72%_18%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.055)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
           <div className="min-w-0 max-w-2xl">

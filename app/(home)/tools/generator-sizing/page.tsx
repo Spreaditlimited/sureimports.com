@@ -1,5 +1,6 @@
 'use client';
 
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useMemo, useState } from 'react';
@@ -168,6 +169,7 @@ export default function GeneratorSizingTool() {
         
         {/* Header */}
         <header className="mb-12">
+        <PublicHeroBackground darkOnly priority={false} />
 <HeroPill className="mb-6">
             <Zap className="w-3.5 h-3.5" /> Industrial Power Tool
           </HeroPill>

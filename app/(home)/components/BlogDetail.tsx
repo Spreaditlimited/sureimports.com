@@ -1,4 +1,5 @@
 'use client';
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import { useState } from 'react';
@@ -308,6 +309,7 @@ export default function BlogDetail({
         
         {/* Article Header */}
         <header className="mb-12 text-center">
+        <PublicHeroBackground darkOnly priority={false} />
           <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
             <HeroPill>
               {post.category}

@@ -64,7 +64,7 @@
 :is(section,header,div):has(> .si-hero-art) .text-slate-300 { color: var(--si-muted); }
 :is(section,header,div):has(> .si-hero-art) .text-indigo-400 { color: var(--si-accent); }
 .si-body-hero { background: var(--si-hero-surface); color: var(--si-ink); }
-.si-body-hero > .pointer-events-none { opacity: .3; }
+.si-body-hero > .pointer-events-none:not(.si-dark-hero-art) { opacity: .3; }
 .si-body-hero .si-body-hero-title {
   max-width: 16ch; font-size: clamp(2.25rem, 4vw, 3.65rem); line-height: 1.08;
   letter-spacing: -.04em; text-wrap: balance; color: var(--si-ink);

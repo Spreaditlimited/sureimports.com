@@ -2,14 +2,16 @@ import Image from 'next/image';
 
 type PublicHeroBackgroundProps = {
   priority?: boolean;
+  darkOnly?: boolean;
 };
 
 export default function PublicHeroBackground({
   priority = true,
+  darkOnly = false,
 }: PublicHeroBackgroundProps) {
   return (
     <div
-      className="si-hero-art pointer-events-none absolute inset-0 z-0"
+      className={`${darkOnly ? 'si-dark-hero-art' : 'si-hero-art'} pointer-events-none absolute inset-0 z-0`}
       aria-hidden="true"
     >
       <Image

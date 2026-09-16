@@ -1,3 +1,4 @@
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import type { Metadata } from 'next';
 import { CodeXml } from 'lucide-react';
 import Navbar from '@/components/Navbar';
@@ -80,6 +81,7 @@ export default function PartnerShippingApiReference() {
       <Navbar forceLightNavbar />
       <main className={styles.page}>
         <section className={styles.hero}>
+        <PublicHeroBackground darkOnly priority={false} />
           <div>
             <div className={styles.heroIcon}>
               <CodeXml size={32} aria-hidden="true" />

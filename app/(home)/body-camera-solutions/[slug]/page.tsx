@@ -1,3 +1,4 @@
+import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
@@ -188,6 +189,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
       <JsonLdScript data={schema} />
 
 <section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:pb-24`}>
+        <PublicHeroBackground darkOnly priority={false} />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(circle_at_75%_20%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.05)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
         <div className="relative mx-auto max-w-7xl">
           <nav
