@@ -2,7 +2,10 @@
 
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import ProductImage from '@/components/shop/ProductImage';
+import imageStyles from '@/components/shop/ProductImage.module.css';
+import Link from 'next/link';
+import ProductCard from '@/components/shop/ProductCard';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -25,11 +28,7 @@ import Loading from '@/app/dashboard/loading';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
 
-function ProductDetailsContent({
-  params,
-}: {
-  params: { slug: string };
-}) {
+function ProductDetailsContent({ params }: { params: { slug: string } }) {
   const resolvedParams = params;
   const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useShopCart();
@@ -141,27 +140,32 @@ function ProductDetailsContent({
           <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
             <div className="w-full lg:sticky lg:top-24 lg:w-1/2">
               <div className="relative aspect-square w-full overflow-hidden rounded-[40px] border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50">
-                <Image
-                  src={imageUrl}
+                <ProductImage
+                  src={product.productImage ? imageUrl : ''}
                   alt={product.productName || 'Product'}
-                  fill
-                  className="object-contain object-center p-8 mix-blend-multiply dark:mix-blend-normal"
                   priority
+                  detail
                 />
 
                 <div className="absolute left-6 top-6 flex flex-col gap-2">
                   {product.productCondition && (
                     <div className="flex w-fit items-center gap-1.5 rounded-full bg-white/90 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-sm backdrop-blur-md dark:bg-slate-900/90 dark:text-white">
-                      {product.productCondition === 'NEW' ? (
+                      {['NEW', 'BRAND_NEW'].includes(
+                        product.productCondition,
+                      ) ? (
                         <Sparkles className="h-3 w-3 text-blue-600" />
                       ) : (
                         <span className="h-2 w-2 rounded-full bg-blue-600" />
                       )}
-                      {product.productCondition}
+                      {product.productCondition === 'PRE_OWNED'
+                        ? /iphone/i.test(product.productName || '')
+                          ? 'Refurbished'
+                          : 'Pre-owned'
+                        : product.productCondition.replaceAll('_', ' ')}
                     </div>
                   )}
                   {product.productCategory && (
-                    <div className="flex w-fit items-center rounded-full bg-blue-600/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 backdrop-blur-md dark:bg-blue-500/20 dark:text-blue-400">
+                    <div className={imageStyles.label}>
                       {product.productCategory}
                     </div>
                   )}
@@ -295,7 +299,14 @@ function ProductDetailsContent({
                         Warranty
                       </p>
                       <p className="mt-0.5 text-xs text-slate-500">
-                        {product.warrantyPeriod} included
+                        {product.warrantyPeriod === 'MONTHS12'
+                          ? '12-month limited warranty'
+                          : product.warrantyPeriod.replace(/^MONTHS/, '') +
+                            ' months'}
+                        {' · '}
+                        <Link href="/warranty-policy" className="underline">
+                          View policy
+                        </Link>
                       </p>
                     </div>
                   </div>
@@ -307,7 +318,9 @@ function ProductDetailsContent({
                       Delivery
                     </p>
                     <p className="mt-0.5 text-xs text-slate-500">
-                      Pickup & nationwide delivery
+                      {/iphone/i.test(product.productName || '')
+                        ? 'Nigeria doorstep delivery included'
+                        : 'Pickup & nationwide delivery'}
                     </p>
                   </div>
                 </div>
@@ -339,7 +352,7 @@ function ProductDetailsContent({
                 {product.productSpecification && (
                   <div>
                     <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
-                      Easy Buy
+                      Product details
                     </h3>
                     <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words rounded-2xl bg-slate-50 p-6 text-slate-600 [overflow-wrap:anywhere] dark:bg-slate-900/50">
                       {product.productSpecification}
@@ -359,45 +372,18 @@ function ProductDetailsContent({
               </div>
 
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {relatedProducts.map((relatedProduct) => {
-                  const relatedImgUrl =
-                    resolveMediaUrl(relatedProduct.productImage) ||
-                    '/placeholder.svg?height=400&width=400';
-
-                  return (
-                    <div
-                      key={relatedProduct.pidProduct}
-                      onClick={() =>
-                        router.push(`/shop/${relatedProduct.pidProduct}`)
-                      }
-                      className="group flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
-                    >
-                      <div className="relative aspect-[4/3] w-full bg-slate-50 dark:bg-slate-800/50">
-                        <Image
-                          src={relatedImgUrl}
-                          alt={relatedProduct.productName}
-                          fill
-                          className="object-cover object-center mix-blend-multiply transition-transform duration-500 group-hover:scale-105 dark:mix-blend-normal"
-                        />
-                      </div>
-                      <div className="flex flex-1 flex-col p-5">
-                        <h3
-                          className="break-words text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400"
-                          title={relatedProduct.productName}
-                        >
-                          {relatedProduct.productName}
-                        </h3>
-                        <div className="mt-auto pt-4">
-                          <span className="text-lg font-black tracking-tight text-blue-600 dark:text-blue-400">
-                            ₦
-                            {relatedProduct.productPrice?.toLocaleString() ||
-                              '0'}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {relatedProducts.map((relatedProduct) => (
+                  <ProductCard
+                    key={relatedProduct.pidProduct}
+                    id={relatedProduct.pidProduct}
+                    name={relatedProduct.productName || 'Product'}
+                    brand={relatedProduct.productBrand || ''}
+                    category={relatedProduct.productCategory || ''}
+                    priceNGN={Number(relatedProduct.productPrice || 0)}
+                    image={resolveMediaUrl(relatedProduct.productImage) || ''}
+                    condition={relatedProduct.productCondition}
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -412,11 +398,9 @@ function ProductDetailsContent({
   );
 }
 
-export default function ProductDetailsPage(
-  props: {
-    params: Promise<{ slug: string }>;
-  }
-) {
+export default function ProductDetailsPage(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const params = use(props.params);
   return <ProductDetailsContent params={params} />;
 }

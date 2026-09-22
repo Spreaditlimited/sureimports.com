@@ -25,7 +25,7 @@ export async function GET(
       },
     });
 
-    if (!product) {
+    if (!product || !product.productVisibility) {
       return NextResponse.json(
         {
           statusx: 'FAILED',

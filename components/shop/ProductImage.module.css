@@ -1,0 +1,47 @@
+.stage {
+  --product-photo-background: #fff;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  background: var(--product-photo-background);
+  isolation: isolate;
+  overflow: hidden;
+}
+.frame {
+  position: absolute;
+  inset: 17% 12% 11%;
+}
+.image {
+  object-fit: contain;
+  object-position: center;
+  /* Never tint product colours or crop devices to fill their card. */
+  mix-blend-mode: normal;
+  filter: none;
+}
+.detail .frame {
+  inset: 16% 10% 10%;
+}
+.label {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 16px;
+  background: #efedf8;
+  color: #48439b;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.placeholder {
+  height: 100%;
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #616775;
+  font-size: 12px;
+}

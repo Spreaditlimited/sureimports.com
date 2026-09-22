@@ -8,14 +8,7 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/shop/ProductCard';
 import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
 import { useSearchParams } from 'next/navigation';
-import {
-  Search,
-  Filter,
-  ShieldCheck,
-  Globe,
-  Clock,
-  ShoppingCart,
-} from 'lucide-react';
+import { Search, ShieldCheck, Globe, Clock, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -31,6 +24,8 @@ type StoreProduct = {
   productPrice: number | null;
   productImage: string | null;
   productCategory: string | null;
+  productCondition: string | null;
+  productMOQ: number | null;
 };
 
 function ShopContent() {
@@ -41,6 +36,8 @@ function ShopContent() {
   const [products, setProducts] = useState<StoreProduct[]>([]);
   const [categories, setCategories] = useState<string[]>(['All Products']);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showCartSidebar, setShowCartSidebar] = useState(false);
   const categoryRowRef = useRef<HTMLDivElement | null>(null);
 
@@ -64,6 +61,7 @@ function ShopContent() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     const loadProducts = async () => {
       setLoading(true);
       try {
@@ -71,12 +69,13 @@ function ShopContent() {
           search: searchQuery,
           category: activeCategory === 'All Products' ? 'all' : activeCategory,
           sortBy: 'newest',
-          page: '1',
+          page: String(page),
           limit: '24',
         });
 
         const res = await fetch(`/api/shop/products?${params.toString()}`, {
           cache: 'no-store',
+          signal: controller.signal,
         });
         const json = await res.json();
         if (json?.statusx !== 'SUCCESS') {
@@ -85,17 +84,20 @@ function ShopContent() {
         setProducts(
           Array.isArray(json?.data?.products) ? json.data.products : [],
         );
+        setTotalPages(json.data.pagination.totalPages);
       } catch (error: unknown) {
+        if (controller.signal.aborted) return;
         const message =
           error instanceof Error ? error.message : 'Failed to load products';
         toast.error(message);
         setProducts([]);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
     loadProducts();
-  }, [searchQuery, activeCategory]);
+    return () => controller.abort();
+  }, [searchQuery, activeCategory, page]);
 
   useEffect(() => {
     // Prevent restoring a stale horizontal scroll offset that can hide the first chip.
@@ -126,7 +128,9 @@ function ShopContent() {
         brand: product.productBrand || 'Unknown Brand',
         category: product.productCategory || 'General',
         priceNGN: Number(product.productPrice || 0),
-        image: resolveMediaUrl(product.productImage) || '/images/default.png',
+        image: resolveMediaUrl(product.productImage) || '',
+        condition: product.productCondition,
+        minimumQuantity: product.productMOQ,
       })),
     [products],
   );
@@ -134,36 +138,48 @@ function ShopContent() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white`}>
+      <main className={`${heroStyles.shop} min-h-screen`}>
+        <section
+          className={`${heroLayout.fixed} relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white`}
+        >
           <PublicHeroBackground />
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-6xl text-center">
-<HeroPill className="mb-6">
+              <HeroPill className="mb-6">
                 <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
               </HeroPill>
-              <h1 className={`${heroStyles.headline} mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}>
+              <h1
+                className={`${heroStyles.headline} mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}
+              >
                 Premium Tech & Gadgets,{' '}
-                <span className={`${heroStyles.headlineEnding} text-white`}>Sourced Direct</span>
+                <span className={`${heroStyles.headlineEnding} text-white`}>
+                  Sourced Direct
+                </span>
               </h1>
               <p className="mx-auto mb-8 max-w-3xl text-lg text-slate-300">
-                Order directly from verified Chinese manufacturers. Delivered to
-                your doorstep in Nigeria within 10 business days.
+                Discover phones, laptops and everyday tech sourced from China.
+                Shop with clear pricing and delivery to your doorstep in
+                Nigeria.
               </p>
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-6 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
-              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
-                <ShieldCheck className="h-5 w-5 text-emerald-400" /> 8+ Years
-                Experience
+            <div className={heroStyles.assurances}>
+              <div
+                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
+              >
+                <ShieldCheck className="h-5 w-5" /> Since 2018
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
-                <Clock className={`${heroStyles.accent} h-5 w-5`} /> 10-Day Shipping
-                Guarantee
+              <div
+                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
+              >
+                <Clock className={`${heroStyles.accent} h-5 w-5`} /> Order
+                tracking
               </div>
               <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}>
+              <div
+                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
+              >
                 <Globe className="h-5 w-5 text-brand-orange-400" /> Offices in
                 Lagos & China
               </div>
@@ -172,25 +188,33 @@ function ShopContent() {
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="mb-10 flex min-w-0 flex-col gap-5">
             <div className="relative w-full max-w-md">
               <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
               <Input
                 placeholder="Search products, brands, or models..."
+                aria-label="Search products"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setPage(1);
+                }}
                 className="h-12 rounded-xl border-slate-200 bg-white pl-12 text-sm shadow-sm focus-visible:ring-indigo-600 dark:border-slate-800 dark:bg-slate-900"
               />
             </div>
 
             <div
               ref={categoryRowRef}
-              className="hide-scrollbar flex items-center gap-2 overflow-x-auto pb-2 md:pb-0"
+              className="hide-scrollbar flex w-full min-w-0 items-center gap-2 overflow-x-auto pb-2"
             >
               {categories.map((category) => (
                 <button
                   key={category}
-                  onClick={() => setActiveCategory(category)}
+                  onClick={() => {
+                    setActiveCategory(category);
+                    setPage(1);
+                  }}
+                  aria-pressed={activeCategory === category}
                   className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-bold transition-colors ${
                     activeCategory === category
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
@@ -200,12 +224,6 @@ function ShopContent() {
                   {category}
                 </button>
               ))}
-              <Button
-                variant="outline"
-                className="ml-2 h-10 shrink-0 rounded-full border-slate-200 dark:border-slate-800"
-              >
-                <Filter className="mr-2 h-4 w-4" /> Filters
-              </Button>
               <Button
                 onClick={() => setShowCartSidebar(true)}
                 className="relative ml-1 h-10 shrink-0 rounded-full bg-slate-900 px-4 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
@@ -235,6 +253,27 @@ function ShopContent() {
               ))
             )}
           </div>
+          {totalPages > 1 && (
+            <nav className={heroStyles.pagination} aria-label="Product pages">
+              <button
+                type="button"
+                disabled={loading || page === 1}
+                onClick={() => setPage((p) => p - 1)}
+              >
+                Previous
+              </button>
+              <span>
+                Page {page} of {totalPages}
+              </span>
+              <button
+                type="button"
+                disabled={loading || page >= totalPages}
+                onClick={() => setPage((p) => p + 1)}
+              >
+                Next
+              </button>
+            </nav>
+          )}
         </section>
       </main>
       <CartSidebar

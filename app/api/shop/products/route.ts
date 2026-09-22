@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
     const [products, totalCount] = await Promise.all([
       prisma.store.findMany({
         where,
-        orderBy,
+        orderBy: [orderBy, { id: 'desc' }],
         skip,
         take: limit,
       }),

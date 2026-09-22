@@ -30,6 +30,8 @@ docs/FAYA_CABLE_FEATURES.txt
 docs/SUPPLIER_VERIFICATION_LOCAL_TESTING.md
 
 # debug
+.catalogue-backups/
+deliverables/iphone-price-list/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

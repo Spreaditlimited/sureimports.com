@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import ProductImage from '@/components/shop/ProductImage';
+import imageStyles from '@/components/shop/ProductImage.module.css';
+import ProductCard from '../components/ProductCard';
 import { Button } from '@/components/ui/button';
 import {
   ShoppingCart,
@@ -22,11 +24,7 @@ import { toast } from 'sonner';
 import Loading from '../../loading';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 
-function ProductDetailsContent({
-  params,
-}: {
-  params: { productId: string };
-}) {
+function ProductDetailsContent({ params }: { params: { productId: string } }) {
   const resolvedParams = params;
   const router = useRouter();
   const { addToCart, isInCart, getCartItem } = useShopCart();
@@ -134,12 +132,11 @@ function ProductDetailsContent({
           {/* Left: Product Image Showcase (Sticky) */}
           <div className="w-full lg:sticky lg:top-24 lg:w-1/2">
             <div className="relative aspect-square w-full overflow-hidden rounded-[40px] border border-slate-100 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50">
-              <Image
-                src={imageUrl}
+              <ProductImage
+                src={product.productImage ? imageUrl : ''}
                 alt={product.productName || 'Product'}
-                fill
-                className="object-contain object-center p-8 mix-blend-multiply dark:mix-blend-normal"
                 priority
+                detail
               />
 
               {/* Floating Badges */}
@@ -155,7 +152,7 @@ function ProductDetailsContent({
                   </div>
                 )}
                 {product.productCategory && (
-                  <div className="flex w-fit items-center rounded-full bg-blue-600/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-blue-600 backdrop-blur-md dark:bg-blue-500/20 dark:text-blue-400">
+                  <div className={imageStyles.label}>
                     {product.productCategory}
                   </div>
                 )}
@@ -362,46 +359,12 @@ function ProductDetailsContent({
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {relatedProducts.map((relatedProduct) => {
-                const relatedImgUrl =
-                  resolveMediaUrl(relatedProduct.productImage) ||
-                  '/placeholder.svg?height=400&width=400';
-
-                return (
-                  <div
-                    key={relatedProduct.pidProduct}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/shop/${relatedProduct.pidProduct}`,
-                      )
-                    }
-                    className="group flex cursor-pointer flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
-                  >
-                    <div className="relative aspect-[4/3] w-full bg-slate-50 dark:bg-slate-800/50">
-                      <Image
-                        src={relatedImgUrl}
-                        alt={relatedProduct.productName}
-                        fill
-                        className="object-cover object-center mix-blend-multiply transition-transform duration-500 group-hover:scale-105 dark:mix-blend-normal"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col p-5">
-                      <h3
-                        className="break-words text-sm font-bold leading-snug text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400"
-                        title={relatedProduct.productName}
-                      >
-                        {relatedProduct.productName}
-                      </h3>
-                      <div className="mt-auto pt-4">
-                        <span className="text-lg font-black tracking-tight text-blue-600 dark:text-blue-400">
-                          ₦
-                          {relatedProduct.productPrice?.toLocaleString() || '0'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+              {relatedProducts.map((relatedProduct) => (
+                <ProductCard
+                  key={relatedProduct.pidProduct}
+                  product={relatedProduct}
+                />
+              ))}
             </div>
           </div>
         )}
@@ -410,11 +373,9 @@ function ProductDetailsContent({
   );
 }
 
-export default function ProductDetailsPage(
-  props: {
-    params: Promise<{ productId: string }>;
-  }
-) {
+export default function ProductDetailsPage(props: {
+  params: Promise<{ productId: string }>;
+}) {
   const params = use(props.params);
   return <ProductDetailsContent params={params} />;
 }
