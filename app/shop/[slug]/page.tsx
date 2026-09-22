@@ -129,7 +129,7 @@ function ProductDetailsContent({ params }: { params: { slug: string } }) {
     <>
       <Navbar />
       <div className="min-h-screen bg-[#fcfcfd] pt-48 dark:bg-slate-950">
-        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+        <main className="mx-auto max-w-[var(--si-content-max)] px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
           <button
             onClick={() => router.back()}
             className="group mb-8 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-500 transition hover:text-slate-900 dark:hover:text-white"

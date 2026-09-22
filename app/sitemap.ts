@@ -42,6 +42,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/import-hub`,
+      lastModified: '2026-09-22T00:00:00.000Z',
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/import-from-china-to-uk`,
+      lastModified: '2026-09-22T00:00:00.000Z',
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+    {
       url: `${baseUrl}/import-from-china-to-nigeria`,
       lastModified: currentDate,
       changeFrequency: 'weekly',

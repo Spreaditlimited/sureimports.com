@@ -6,7 +6,7 @@ const apply = process.argv.includes('--apply');
 
 const ROUTES = {
   white_label:
-    'https://linescout.sureimports.com/sourcing-project?route_type=white_label',
+    'https://linescout.sureimports.com/white-label',
   machine_sourcing:
     'https://linescout.sureimports.com/sourcing-project?route_type=machine_sourcing',
   simple_sourcing:

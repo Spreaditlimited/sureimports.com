@@ -9,7 +9,7 @@ export const LINESCOUT_BASE_URL = (
 ).replace(/\/$/, '');
 
 export const LINESCOUT_WHITE_LABEL_URL =
-  `${LINESCOUT_BASE_URL}/sourcing-project?route_type=white_label`;
+  'https://linescout.sureimports.com/white-label';
 
 export const LINESCOUT_BULK_SOURCING_URL =
   `${LINESCOUT_BASE_URL}/sourcing-project?route_type=simple_sourcing`;

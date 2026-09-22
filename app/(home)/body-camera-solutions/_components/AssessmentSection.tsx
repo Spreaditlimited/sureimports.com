@@ -15,9 +15,9 @@ export default function AssessmentSection({ source }: { source?: string }) {
   return (
     <section
       id="assessment"
-      className="scroll-mt-28 bg-[#07111f] px-4 py-20 text-white sm:px-6 sm:py-24"
+      className="scroll-mt-28 bg-[#07111f] px-4 py-20 text-white sm:px-6 lg:px-8 sm:py-24"
     >
-      <article className="relative mx-auto grid max-w-7xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b1930] shadow-[0_30px_90px_rgba(0,0,0,0.25)] lg:grid-cols-[0.72fr_1.28fr]">
+      <article className="relative mx-auto grid si-public-inner overflow-hidden rounded-[2rem] border border-white/10 bg-[#0b1930] shadow-[0_30px_90px_rgba(0,0,0,0.25)] lg:grid-cols-[0.72fr_1.28fr]">
         <header className="relative flex h-full flex-col overflow-hidden border-b border-white/10 px-7 py-10 text-white sm:px-10 sm:py-12 lg:border-b-0 lg:border-r lg:px-12 lg:py-14">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,rgba(34,211,238,0.12),transparent_34%),linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:auto,48px_48px,48px_48px]" />
           <p className="relative text-xs font-bold uppercase tracking-[0.22em] text-brand-orange-400">

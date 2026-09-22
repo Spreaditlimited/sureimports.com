@@ -215,10 +215,10 @@ export default function BodyCameraSolutionsPage() {
     <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
       <JsonLdScript data={schema} />
 
-<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pb-24`}>
+<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 lg:px-8 sm:pb-20 sm:pt-16 lg:pb-24`}>
         <PublicHeroBackground darkOnly priority={false} />
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[620px] bg-[radial-gradient(circle_at_72%_18%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.055)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
+        <div className="relative mx-auto grid si-public-inner items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
           <div className="min-w-0 max-w-2xl">
 <HeroPill>
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
@@ -289,8 +289,8 @@ export default function BodyCameraSolutionsPage() {
         </div>
       </section>
 
-      <section className="bg-[#07111f] px-4 py-16 text-white sm:px-6 sm:py-20">
-        <div className="mx-auto max-w-7xl">
+      <section className="bg-[#07111f] px-4 py-16 text-white sm:px-6 lg:px-8 sm:py-20">
+        <div className="mx-auto si-public-inner">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
             The complete evidence lifecycle
           </p>
@@ -330,7 +330,7 @@ export default function BodyCameraSolutionsPage() {
 
       <BodyCameraVideo />
 
-      <article className="mx-auto mb-16 max-w-7xl px-4 sm:px-6">
+      <article className="mx-auto mb-16 max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
         <section id="solutions" className="scroll-mt-28 py-16 sm:py-20">
           <p className={sectionEyebrow}>Choose your operating model</p>
           <h2 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight sm:text-4xl">

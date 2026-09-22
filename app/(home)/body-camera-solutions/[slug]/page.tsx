@@ -188,10 +188,10 @@ export default async function SolutionDetailPage({ params }: PageProps) {
     <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
       <JsonLdScript data={schema} />
 
-<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:pb-24`}>
+<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 lg:px-8 sm:pb-20 sm:pt-10 lg:pb-24`}>
         <PublicHeroBackground darkOnly priority={false} />
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(circle_at_75%_20%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.05)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <div className="relative mx-auto max-w-7xl">
+        <div className="relative mx-auto si-public-inner">
           <nav
             className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400"
             aria-label="Breadcrumb"
@@ -261,7 +261,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
         </div>
       </section>
 
-      <article className="mx-auto mb-16 max-w-7xl px-4 sm:px-6">
+      <article className="mx-auto mb-16 max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
         <section className="grid overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-slate-900 sm:grid-cols-3">
           {[
             { label: 'Best suited to', value: page.audience },

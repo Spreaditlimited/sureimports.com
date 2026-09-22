@@ -189,7 +189,7 @@ const TOP_LEVEL_NAV = [
   {
     type: 'link',
     title: 'Import Hub',
-    href: '/import-from-china-to-nigeria',
+    href: '/import-hub',
     match: 'exact',
   },
   {

@@ -362,7 +362,7 @@ function CheckoutContent() {
       {/* Deep Slate Hero Header */}
       <div className="relative overflow-hidden bg-slate-900 pb-32 pt-12 text-white">
         <PublicHeroBackground />
-        <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
           
           <button 
             onClick={() => router.push('/shop')}
@@ -399,7 +399,7 @@ function CheckoutContent() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="mx-auto -mt-16 max-w-[var(--si-content-max)] px-4 pb-20 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
           
           {/* LEFT COLUMN: Order Details & Address */}

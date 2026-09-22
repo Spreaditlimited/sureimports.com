@@ -1,6 +1,6 @@
 const LINESCOUT_ROUTES = {
   whiteLabel:
-    'https://linescout.sureimports.com/sourcing-project?route_type=white_label',
+    'https://linescout.sureimports.com/white-label',
   bulk: 'https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing',
   machine:
     'https://linescout.sureimports.com/sourcing-project?route_type=machine_sourcing',
@@ -50,6 +50,14 @@ export function routeBlogSourcingLinks(input: {
   const html = (input.html || '').replace(
     /<img\b[^>]*\bsrc\s*=\s*(["'])data:[\s\S]*?\1[^>]*>/gi,
     '',
+  ).replace(
+    /(<a\b[^>]*?\bhref\s*=\s*)(["'])(https?:\/\/linescout\.sureimports\.com\/sourcing-project\?[^"']*)\2/gi,
+    (match, prefix, quote, href) => {
+      const url = new URL(href.replace(/&amp;/gi, '&'));
+      return url.searchParams.get('route_type') === 'white_label'
+        ? `${prefix}${quote}${LINESCOUT_ROUTES.whiteLabel}${quote}`
+        : match;
+    },
   );
   const productGuide = PRODUCT_GUIDES[slug];
 

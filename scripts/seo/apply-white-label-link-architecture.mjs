@@ -41,7 +41,7 @@ const PRODUCT_IDEAS_MODULE = `
     <li><a href="https://linescout.sureimports.com/white-label/dual-compartment-insulated-lunch-bag">Private-label insulated lunch bag sourcing guide</a></li>
     <li><a href="https://linescout.sureimports.com/white-label/foldable-laundry-basket">Private-label foldable laundry basket sourcing guide</a></li>
   </ul>
-  <p>If you already know what you want to produce, <a href="https://linescout.sureimports.com/sourcing-project?route_type=white_label">start a LineScout white-label sourcing project</a>. Your project stays in LineScout through supplier research, quotes, payments and the project conversation.</p>
+  <p>If you already know what you want to produce, <a href="https://linescout.sureimports.com/white-label">start a LineScout white-label sourcing project</a>. Explore product ideas and continue with supplier research, quotes, payments and the project conversation in LineScout.</p>
 </section>`;
 
 function pid() {
@@ -64,7 +64,7 @@ function ensureProductArticleLinks(html, item) {
   return next;
 }
 
-function routeWhiteLabelCtasToLineScout(html, destination = 'https://linescout.sureimports.com/sourcing-project?route_type=white_label') {
+function routeWhiteLabelCtasToLineScout(html, destination = 'https://linescout.sureimports.com/white-label') {
   return html.replace(
     /<a\b[^>]*href=(["'])\/corporate-sourcing\1[^>]*>[\s\S]*?<\/a>/gi,
     `<a href="${destination}">continue with this product in LineScout</a>`,
@@ -94,7 +94,7 @@ async function logAndUpdate(post, after, changeType) {
         }),
         validationJson: JSON.stringify({
           containsLineScoutHub: after.includes('https://linescout.sureimports.com/white-label'),
-          containsLineScoutSourcing: after.includes('/sourcing-project?route_type=white_label'),
+          containsLineScoutSourcing: after.includes('https://linescout.sureimports.com/white-label'),
         }),
         publishedAt: now,
         createdAt: now,

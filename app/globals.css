@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Shared public layout: outer width includes responsive side gutters. */
+:root { --si-content-max: 1440px; --si-content-gutter: 16px; }
+@media (min-width: 640px) { :root { --si-content-gutter: 24px; } }
+@media (min-width: 1024px) { :root { --si-content-gutter: 32px; } }
+
+.si-public-inner {
+  width: 100%;
+  max-width: calc(var(--si-content-max) - var(--si-content-gutter) * 2);
+  margin-inline: auto;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

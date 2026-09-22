@@ -149,7 +149,7 @@ function ShopContent() {
           className={`${heroLayout.fixed} relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white`}
         >
           <PublicHeroBackground />
-          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 mx-auto max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-6xl text-center">
               <HeroPill className="mb-6">
                 <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
@@ -193,7 +193,7 @@ function ShopContent() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <section className="mx-auto max-w-[var(--si-content-max)] px-4 py-12 sm:px-6 lg:px-8">
           <div className={heroStyles.toolbar}>
             <div className={heroStyles.searchRow}>
               <div className={heroStyles.searchField}>

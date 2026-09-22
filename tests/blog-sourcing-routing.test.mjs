@@ -3,6 +3,20 @@ import test from 'node:test';
 
 import { routeBlogSourcingLinks } from '../lib/blogSourcingRouting.ts';
 
+test('existing blog white-label project links use the catalogue while other routes stay intact', () => {
+  const html = routeBlogSourcingLinks({
+    slug: 'importing-guide',
+    title: 'Importing guide',
+    html: `<a href="https://linescout.sureimports.com/sourcing-project?source=blog&amp;route_type=white_label">Start white label</a>
+      <a href="https://linescout.sureimports.com/sourcing-project?route_type=machine_sourcing">Machines</a>
+      <a href="https://linescout.sureimports.com/white-label/product">Product idea</a>`,
+  });
+  assert.match(html, /href="https:\/\/linescout\.sureimports\.com\/white-label">Start white label/);
+  assert.doesNotMatch(html, /route_type=white_label/);
+  assert.match(html, /route_type=machine_sourcing/);
+  assert.match(html, /white-label\/product/);
+});
+
 test('product articles route corporate CTAs through their exact LineScout guide', () => {
   const html = routeBlogSourcingLinks({
     slug: 'building-a-high-profit-white-label-brand-with-luggage-straps-in-nigeria',
@@ -24,7 +38,7 @@ test('generic white-label articles route to the LineScout white-label flow', () 
     html: '<a href="https://www.sureimports.com/corporate-sourcing">Get help</a>',
   });
 
-  assert.match(html, /route_type=white_label/);
+  assert.match(html, /href="https:\/\/linescout\.sureimports\.com\/white-label"/);
 });
 
 test('machine articles preserve links explicitly intended for corporate organisations', () => {

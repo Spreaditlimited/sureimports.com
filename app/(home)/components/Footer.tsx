@@ -63,7 +63,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/import-from-china-to-nigeria"
+                  href="/import-hub"
                   className="transition-colors hover:text-white"
                 >
                   Import Hub

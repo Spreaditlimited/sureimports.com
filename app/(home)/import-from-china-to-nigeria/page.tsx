@@ -1,4 +1,5 @@
 import HeroPill from '@/components/home/HeroPill';
+import ImportMarkets from '@/components/home/ImportMarkets';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
@@ -260,6 +261,7 @@ export default async function ImportFromChinaHubPage() {
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
               Use this hub to learn the process, choose the right service, estimate costs, avoid supplier mistakes and move from research to a practical import plan.
             </p>
+            <ImportMarkets active="ng" />
             
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link

@@ -163,6 +163,9 @@ function normalizeUrl(value: unknown, baseUrl: string) {
   try {
     const parsed = new URL(raw);
     if (parsed.hostname === 'linescout.sureimports.com') {
+      if (parsed.pathname === '/sourcing-project' && parsed.searchParams.get('route_type') === 'white_label') {
+        return 'https://linescout.sureimports.com/white-label';
+      }
       const isAllowedPath =
         parsed.pathname === '/' ||
         parsed.pathname === '/white-label' ||
@@ -221,7 +224,9 @@ function getServiceCtaCopy(url: string) {
     const parsed = new URL(url);
     if (parsed.hostname === 'linescout.sureimports.com') {
       const routeType =
-        parsed.searchParams.get('route_type') || 'simple_sourcing';
+        parsed.pathname === '/white-label' || parsed.pathname.startsWith('/white-label/')
+          ? 'white_label'
+          : parsed.searchParams.get('route_type') || 'simple_sourcing';
       return lineScoutCtaCopy[routeType] || lineScoutCtaCopy.simple_sourcing;
     }
     return (
