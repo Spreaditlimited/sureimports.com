@@ -10,7 +10,6 @@ import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
 import { useSearchParams } from 'next/navigation';
 import { Search, ShieldCheck, Globe, Clock, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
@@ -38,6 +37,7 @@ function ShopContent() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [showCartSidebar, setShowCartSidebar] = useState(false);
   const categoryRowRef = useRef<HTMLDivElement | null>(null);
 
@@ -85,18 +85,24 @@ function ShopContent() {
           Array.isArray(json?.data?.products) ? json.data.products : [],
         );
         setTotalPages(json.data.pagination.totalPages);
+        setTotalCount(json.data.pagination.totalCount);
       } catch (error: unknown) {
         if (controller.signal.aborted) return;
         const message =
           error instanceof Error ? error.message : 'Failed to load products';
         toast.error(message);
         setProducts([]);
+        setTotalPages(0);
+        setTotalCount(0);
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
     };
-    loadProducts();
-    return () => controller.abort();
+    const timer = window.setTimeout(loadProducts, 250);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
   }, [searchQuery, activeCategory, page]);
 
   useEffect(() => {
@@ -188,24 +194,38 @@ function ShopContent() {
         </section>
 
         <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <div className="mb-10 flex min-w-0 flex-col gap-5">
-            <div className="relative w-full max-w-md">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-              <Input
-                placeholder="Search products, brands, or models..."
-                aria-label="Search products"
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  setPage(1);
-                }}
-                className="h-12 rounded-xl border-slate-200 bg-white pl-12 text-sm shadow-sm focus-visible:ring-indigo-600 dark:border-slate-800 dark:bg-slate-900"
-              />
+          <div className={heroStyles.toolbar}>
+            <div className={heroStyles.searchRow}>
+              <div className={heroStyles.searchField}>
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <Input
+                placeholder="Search products or models…"
+                  aria-label="Search products"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setPage(1);
+                  }}
+                  className={heroStyles.searchInput}
+                />
+              </div>
+              <button
+              type="button"
+              onClick={() => setShowCartSidebar(true)}
+              className={heroStyles.cartButton}
+              aria-label={`Open cart, ${cartCount} items`}
+              >
+                <ShoppingCart size={19} aria-hidden="true" />
+              <span className={heroStyles.cartLabel}>Cart</span>
+                <span className={heroStyles.cartCount}>{cartCount}</span>
+              </button>
             </div>
 
             <div
               ref={categoryRowRef}
-              className="hide-scrollbar flex w-full min-w-0 items-center gap-2 overflow-x-auto pb-2"
+              className={heroStyles.categories}
+              role="group"
+              aria-label="Product categories"
             >
               {categories.map((category) => (
                 <button
@@ -215,26 +235,30 @@ function ShopContent() {
                     setPage(1);
                   }}
                   aria-pressed={activeCategory === category}
-                  className={`whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-bold transition-colors ${
-                    activeCategory === category
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
-                  }`}
+                  className={heroStyles.categoryButton}
                 >
                   {category}
                 </button>
               ))}
-              <Button
-                onClick={() => setShowCartSidebar(true)}
-                className="relative ml-1 h-10 shrink-0 rounded-full bg-slate-900 px-4 text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
-              >
-                <ShoppingCart className="mr-2 h-4 w-4" /> Cart
-                {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
+            </div>
+            <div className={heroStyles.resultsRow}>
+              <p role="status" aria-live="polite">
+                {loading
+                  ? 'Finding products…'
+                  : `${totalCount} ${totalCount === 1 ? 'product' : 'products'}${searchQuery.trim() ? ` matching “${searchQuery.trim()}”` : ''}`}
+              </p>
+              {(searchQuery || activeCategory !== 'All Products') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setActiveCategory('All Products');
+                    setPage(1);
+                  }}
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
           </div>
 

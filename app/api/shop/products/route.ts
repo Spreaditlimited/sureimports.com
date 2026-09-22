@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
+import { shopSearchPatterns } from '@/lib/shop/search';
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,19 +23,22 @@ export async function GET(request: NextRequest) {
       productVisibility: true, // Only show visible products
     };
 
-    // Search filter (MySQL is case-insensitive by default)
-    if (search) {
-      where.OR = search
-        .split(' ')
-        .filter((term) => term.trim())
-        .map((term) => ({
-          OR: [
-            { productName: { contains: term } },
-            { productDescription: { contains: term } },
-            { productBrand: { contains: term } },
-            { productCategory: { contains: term } },
-          ],
-        }));
+    // Match every term against product identity, not generic warranty/marketing copy.
+    // Bound numeric terms so model 12 does not match storage 512GB.
+    const patterns = shopSearchPatterns(search);
+    if (patterns.length) {
+      const matches = await prisma.$queryRaw<{ id: number }[]>(Prisma.sql`
+        SELECT id FROM store WHERE productVisibility = true AND
+        ${Prisma.join(
+          patterns.map(
+            (pattern) => Prisma.sql`
+          LOWER(CONCAT_WS(' ', productName, productBrand, productCategory)) REGEXP ${pattern}
+        `,
+          ),
+          ' AND ',
+        )}
+      `);
+      where.id = { in: matches.map(({ id }) => id) };
     }
 
     // Category filter
