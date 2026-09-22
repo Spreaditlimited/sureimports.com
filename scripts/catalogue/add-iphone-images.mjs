@@ -29,9 +29,9 @@ const sources = [
   },
   ...Object.entries({
     Black: 'black',
-    White: 'silver',
-    Blue: 'glacier',
-    Red: 'burgundy',
+    Silver: 'silver',
+    Glacier: 'glacier',
+    Burgundy: 'burgundy',
   }).map(([label, finish]) => ({
     key: `iphone-18-pro-max-${finish}`,
     match: new RegExp(`^iPhone 18 Pro Max (256|512)GB — ${label} — Brand new$`),

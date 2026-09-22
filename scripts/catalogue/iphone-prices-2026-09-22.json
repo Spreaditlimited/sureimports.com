@@ -3,6 +3,7 @@
   "ngnPerRmb": 210,
   "refurbishedMarkupRmb": 500,
   "brandNewMarkupRmb": 1000,
+  "brandNewMarkupOverridesRmb": { "18 Pro": 800, "18 Pro Max": 800 },
   "refurbished": [
     ["12", 64, 1100],
     ["12", 128, 1200],
@@ -54,12 +55,12 @@
   "brandNew": [
     ["18 Pro", 256, 10250, ""],
     ["18 Pro Max", 256, 11750, "Black"],
-    ["18 Pro Max", 256, 11750, "White"],
-    ["18 Pro Max", 256, 11900, "Blue"],
-    ["18 Pro Max", 256, 11900, "Red"],
+    ["18 Pro Max", 256, 11750, "Silver"],
+    ["18 Pro Max", 256, 11900, "Glacier"],
+    ["18 Pro Max", 256, 11900, "Burgundy"],
     ["18 Pro Max", 512, 13480, "Black"],
-    ["18 Pro Max", 512, 13650, "White"],
-    ["18 Pro Max", 512, 13800, "Blue"],
-    ["18 Pro Max", 512, 13650, "Red"]
+    ["18 Pro Max", 512, 13650, "Silver"],
+    ["18 Pro Max", 512, 13800, "Glacier"],
+    ["18 Pro Max", 512, 13650, "Burgundy"]
   ]
 }

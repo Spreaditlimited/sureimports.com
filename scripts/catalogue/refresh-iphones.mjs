@@ -23,7 +23,9 @@ function identify(row) {
       : '');
   const colour =
     row.productCondition === 'BRAND_NEW'
-      ? name.match(/\b(Black|White|Blue|Red)\b/i)?.[1] || ''
+      ? name.match(
+          /\b(Black|Silver|Glacier|Burgundy|White|Blue|Red)\b/i,
+        )?.[1] || ''
       : '';
   return key(model, Number(s[1]), row.productCondition, colour);
 }
@@ -42,7 +44,8 @@ const entries = [
     rmb,
     colour,
     condition: 'BRAND_NEW',
-    markup: source.brandNewMarkupRmb,
+    markup:
+      source.brandNewMarkupOverridesRmb?.[model] ?? source.brandNewMarkupRmb,
   })),
 ];
 const warranty =

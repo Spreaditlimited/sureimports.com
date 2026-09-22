@@ -28,7 +28,11 @@ for (const [kind, markup] of [
     const name = `iPhone ${model} ${storage}GB${colour ? ' — ' + colour : ''} — ${kind === 'refurbished' ? 'Refurbished' : 'Brand new'}`;
     const row = iphones.find((r) => r.productName === name);
     assert.ok(row, `Missing ${name}`);
-    assert.equal(row.productPrice, (rmb + markup) * 210, name);
+    const effectiveMarkup =
+      kind === 'brandNew'
+        ? (source.brandNewMarkupOverridesRmb?.[model] ?? markup)
+        : markup;
+    assert.equal(row.productPrice, (rmb + effectiveMarkup) * 210, name);
     assert.equal(row.productCategory, 'phone');
     assert.equal(row.warrantyPeriod, 'MONTHS12');
     assert.ok(

@@ -82,7 +82,7 @@ for (const [index, page] of pages.entries()) {
     rows += text(
       1488,
       y,
-      `₦${((rmb + page.markup) * source.ngnPerRmb).toLocaleString('en-NG')}`,
+      `₦${((rmb + (page.subtitle === 'Brand-new collection' ? (source.brandNewMarkupOverridesRmb?.[model] ?? page.markup) : page.markup)) * source.ngnPerRmb).toLocaleString('en-NG')}`,
       32,
       '#48439b',
       650,
@@ -130,5 +130,11 @@ for (const [index, page] of pages.entries()) {
 await fs.writeFile(
   path.join(out, 'Sure-Imports-iPhone-Price-List.pdf'),
   Buffer.from(pdf.output('arraybuffer')),
+);
+const publicOut = path.resolve('public/downloads');
+await fs.mkdir(publicOut, { recursive: true });
+await fs.copyFile(
+  path.join(out, 'Sure-Imports-iPhone-Price-List.pdf'),
+  path.join(publicOut, 'sure-imports-iphone-price-list.pdf'),
 );
 console.log(`Created ${pages.length} shareable images and PDF in ${out}`);
