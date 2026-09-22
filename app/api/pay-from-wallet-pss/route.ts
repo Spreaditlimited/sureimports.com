@@ -1,3 +1,4 @@
+import { GET as getWalletCustomer } from '@/app/api/paystack/get-customer/[email]/route';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
@@ -93,12 +94,7 @@ export async function GET(request: NextRequest) {
       'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await getWalletCustomer(request, { params: Promise.resolve({ email }) });
 
     if (!response.ok) {
       console.error('Failed to fetch customer data:', response.statusText);

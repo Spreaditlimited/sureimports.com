@@ -20,6 +20,24 @@
   mix-blend-mode: normal;
   filter: none;
 }
+.uncropped {
+  position: absolute;
+  inset: 0;
+}
+.phoneFrame {
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+.phoneCrop {
+  position: relative;
+  width: min(100cqw, calc(100cqh * var(--phone-ratio)));
+  height: min(100cqh, calc(100cqw / var(--phone-ratio)));
+  overflow: hidden;
+}
+.phoneCrop .image {
+  object-fit: fill;
+}
 .detail .frame {
   inset: 16% 10% 10%;
 }

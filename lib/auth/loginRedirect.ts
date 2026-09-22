@@ -41,6 +41,7 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
     const isShopCheckoutResume =
       url.pathname === '/shop/checkout' &&
       url.searchParams.get('resumeCheckout') === '1';
+    const isShopConfirmation = url.pathname === '/shop/order-success' && Boolean(url.searchParams.get('ref') || url.searchParams.get('reference'));
     const isProcurementCheckoutResume =
       url.pathname === PROCUREMENT_RESUME_CHECKOUT_PATH;
     const isCorporateSourcingResume =
@@ -61,6 +62,7 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
     if (
       isDashboardPath ||
       isShopCheckoutResume ||
+      isShopConfirmation ||
       isProcurementCheckoutResume ||
       isCorporateSourcingResume ||
       isShippingCheckoutResume ||

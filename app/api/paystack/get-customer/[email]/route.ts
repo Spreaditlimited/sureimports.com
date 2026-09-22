@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { currentUser } from '@/lib/auth/current-user';
 import {
   dedupeWalletLedger,
   getWalletLedger,
@@ -8,13 +9,16 @@ import {
 
 import { NextResponse } from 'next/server';
 
-export async function GET(
+async function getCustomer(
   request: Request,
   { params }: { params: Promise<{ email: string }> },
 ) {
   try {
     const { email } = await params;
     const normalizedEmail = decodeURIComponent(email).trim().toLowerCase();
+    const session = await currentUser();
+    if (!session) return NextResponse.json({ statusx: 'FAILED', message: 'Please sign in to view your wallet.' }, { status: 401 });
+    if (normalizedEmail !== session.userEmail.toLowerCase()) return NextResponse.json({ statusx: 'FAILED', message: 'You cannot access this wallet.' }, { status: 403 });
 
     const user = await prisma.users.findFirst({
       where: {
@@ -128,4 +132,10 @@ export async function GET(
       { status: 500 },
     );
   }
+}
+
+export async function GET(request: Request, context: { params: Promise<{ email: string }> }) {
+  const response = await getCustomer(request, context);
+  response.headers.set('Cache-Control', 'private, no-store');
+  return response;
 }

@@ -1,4 +1,5 @@
 'use client';
+import { readShopCheckoutDraft, splitShopContactName, SHOP_CHECKOUT_RESUME } from '@/lib/shop/checkoutDraft';
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -151,6 +152,16 @@ export default function SignUpFormContainer() {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+
+  React.useEffect(() => {
+    if (nextParam !== SHOP_CHECKOUT_RESUME) return;
+    const draft = readShopCheckoutDraft();
+    if (!draft) return;
+    const { firstName, lastName } = splitShopContactName(draft.name);
+    if (!form.getValues('userFirstname')) form.setValue('userFirstname', firstName);
+    if (!form.getValues('userLastname')) form.setValue('userLastname', lastName);
+    if (!form.getValues('email')) form.setValue('email', draft.email);
+  }, [form, nextParam]);
 
   React.useEffect(() => {
     const currentAffRef = getAffiliateRef();

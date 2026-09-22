@@ -1,0 +1,17 @@
+[
+  {"key":"samsung-galaxy-s8","indices":[64],"url":"https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s8-.jpg"},
+  {"key":"samsung-galaxy-s8-plus","indices":[65],"url":"https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-s8-plus-.jpg"},
+  {"key":"samsung-galaxy-note9","indices":[79]},
+  {"key":"samsung-galaxy-a14-4g","indices":[96]},
+  {"key":"samsung-galaxy-s10","indices":[53]},
+  {"key":"samsung-galaxy-s20","indices":[99]},
+  {"key":"google-pixel-6-pro","indices":[78]},
+  {"key":"google-pixel-7","indices":[56,57],"url":"https://fdn2.gsmarena.com/vv/pics/google/google-pixel7-2.jpg"},
+  {"key":"google-pixel-10","indices":[87,88],"url":"https://fdn2.gsmarena.com/vv/pics/google/google-pixel-10-11.jpg"},
+  {"key":"apple-iphone-15-plus","indices":[134]},
+  {"key":"samsung-galaxy-z-flip5","indices":[20],"url":"https://fdn2.gsmarena.com/vv/pics/samsung/samsung-galaxy-z-flip5-5g-r1.jpg"},
+  {"key":"apple-iphone-16","indices":[38,133]},
+  {"key":"apple-iphone-16-pro","indices":[39,40]},
+  {"key":"apple-iphone-16-pro-max","indices":[36,37]},
+  {"key":"apple-iphone-14","indices":[9,10]}
+]

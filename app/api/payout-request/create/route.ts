@@ -1,11 +1,16 @@
+import { GET as getWalletCustomer } from '@/app/api/paystack/get-customer/[email]/route';
 import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import randomGenerator from '@/lib/helpers/randomGenerator';
+import { shopUser, shopFailure } from '@/lib/shop/auth';
+import { ShopError } from '@/lib/shop/policy';
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await shopUser(request, true);
     const body = await request.json();
     const { pidUser, amount } = body;
+    if (pidUser !== session.pidUser) throw new ShopError('You cannot access this wallet.', 403);
 
     // Validate required parameters
     if (!pidUser || !amount) {
@@ -161,12 +166,7 @@ export async function POST(request: NextRequest) {
       'http://localhost:3000';
     const apiUrl = `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(email)}`;
 
-    const response = await fetch(apiUrl, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await getWalletCustomer(request, { params: Promise.resolve({ email }) });
 
     if (!response.ok) {
       console.error(
@@ -305,6 +305,7 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
+    if (error instanceof ShopError) return shopFailure(error);
     console.error('Create payout request error:', error);
     return NextResponse.json(
       {

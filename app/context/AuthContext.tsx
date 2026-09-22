@@ -93,7 +93,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       pathname.startsWith('/intelligence') ||
       pathname.startsWith('/auth') ||
       pathname === '/login' ||
-      pathname.startsWith('/shop/checkout');
+      pathname.startsWith('/shop/checkout') ||
+      pathname.startsWith('/shop/order-success');
 
     if (!shouldHydrateAuth) {
       setUser(null);

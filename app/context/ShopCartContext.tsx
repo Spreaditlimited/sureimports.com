@@ -22,6 +22,8 @@ export interface CartItem {
 }
 
 export interface CartContextType {
+  hydrated: boolean;
+  replaceCart: (items: CartItem[]) => void;
   cart: CartItem[];
   cartCount: number;
   cartTotal: number;
@@ -42,13 +44,30 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
 
   // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('shopCart');
-    if (savedCart) {
-      try {
-        setCart(JSON.parse(savedCart));
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
+    try {
+      const savedCart = localStorage.getItem('shopCart');
+      if (savedCart) {
+        try {
+          const parsed = JSON.parse(savedCart);
+          if (Array.isArray(parsed))
+            setCart(
+              parsed.filter(
+                (item) =>
+                  typeof item?.pidProduct === 'string' &&
+                  typeof item?.productName === 'string' &&
+                  Number.isFinite(item?.productPrice) &&
+                  item.productPrice > 0 &&
+                  Number.isInteger(item.quantity) &&
+                  item.quantity > 0 &&
+                  item.quantity <= 999,
+              ),
+            );
+        } catch (error) {
+          console.error('Error loading cart from localStorage:', error);
+        }
       }
+    } catch {
+      /* Storage can be unavailable in private browsing. */
     }
     setIsInitialized(true);
   }, []);
@@ -56,7 +75,11 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
   // Save cart to localStorage whenever it changes
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem('shopCart', JSON.stringify(cart));
+      try {
+        localStorage.setItem('shopCart', JSON.stringify(cart));
+      } catch {
+        /* The current in-memory cart remains usable. */
+      }
       window.dispatchEvent(new Event('shop-cart-updated'));
     }
   }, [cart, isInitialized]);
@@ -114,7 +137,7 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
         showToast('success', `Updated quantity for ${item.productName}`);
         return prevCart.map((i) =>
           i.pidProduct === item.pidProduct
-            ? { ...i, quantity: newQuantity }
+            ? { ...i, ...item, quantity: newQuantity }
             : i,
         );
       } else {
@@ -175,6 +198,8 @@ export function ShopCartProvider({ children }: { children: ReactNode }) {
   };
 
   const value: CartContextType = {
+    hydrated: isInitialized,
+    replaceCart: setCart,
     cart,
     cartCount,
     cartTotal,

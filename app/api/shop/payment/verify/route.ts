@@ -1,383 +1,81 @@
-/**
- * ============================================================================
- * SHOP PAYMENT VERIFICATION API - PAYSTACK
- * ============================================================================
- *
- * Purpose: Verify Paystack payment and create order records
- *
- * Order Status Management:
- * - Initial Status: "PAID" (set after successful payment verification)
- * - Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
- * - Admin updates status through order management interface (to be implemented)
- *
- * Related Files:
- * - Database Schema: prisma/schema.prisma (store_sales model)
- * - Wallet Payment: app/api/shop/payment/wallet/route.ts
- * - My Orders Page: app/dashboard/orders/page.tsx
- *
- * Admin Integration:
- * - TODO: Create /api/admin/orders/update-status endpoint
- * - TODO: Create admin order management UI
- * ============================================================================
- */
-
+import { after, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { NextRequest, NextResponse } from 'next/server';
-import randomGenerator from '@/lib/helpers/randomGenerator';
-import xMail from '@/lib/email/xMail3';
-import {
-  AFFILIATE_SERVICE_KEYS,
-  recordAffiliateConversion,
-} from '@/lib/affiliate/commissions';
-
-export async function GET(request: NextRequest) {
+import { hasShopGuestAccess, shopFailure } from '@/lib/shop/auth';
+import { currentUser } from '@/lib/auth/current-user';
+import { ShopError } from '@/lib/shop/policy';
+import { verifyShopCheckout, processShopEffects } from '@/lib/shop/checkout';
+export async function GET(request: Request) {
   try {
-    const reference = request.nextUrl.searchParams.get('reference');
-
-    console.log('Shop payment verification started:', { reference });
-
-    if (!reference) {
-      return NextResponse.json(
-        {
-          statusx: 'FAILED',
-          message: 'Payment reference is required',
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY) {
-      console.error('PAYSTACK_SECRET_KEY is not defined');
-      return NextResponse.json(
-        {
-          statusx: 'FAILED',
-          message: 'Payment configuration error',
-        },
-        { status: 500 },
-      );
-    }
-
-    console.log('Verifying payment with Paystack...');
-    // Verify payment with Paystack
-    const paystackResponse = await fetch(
-      `https://api.paystack.co/transaction/verify/${reference}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY}`,
-        },
-      },
-    );
-
-    const paystackData = await paystackResponse.json();
-    console.log('Paystack verification response:', {
-      status: paystackData.status,
-      transactionStatus: paystackData.data?.status,
+    const user = await currentUser();
+    const reference = new URL(request.url).searchParams.get('reference') || '';
+    const owned = await prisma.shop_checkouts.findUnique({
+      where: { reference },
     });
-
-    if (!paystackData.status || paystackData.data.status !== 'success') {
-      return NextResponse.json(
-        {
-          statusx: 'FAILED',
-          message: 'Payment verification failed',
-          data: paystackData,
-        },
-        { status: 400 },
+    const guestAccess =
+      owned &&
+      hasShopGuestAccess(
+        owned.guestTokenHash,
+        request.headers.get('x-shop-checkout-token'),
       );
-    }
-
-    const transactionData = paystackData.data;
-    const metadata = transactionData.metadata;
-
-    // Extract cart items and user info from metadata
-    const pidUser = metadata.pidUser;
-    const cartItems = metadata.cart_items || [];
-    const amount = transactionData.amount / 100; // Convert from kobo to naira
-    const paymentCurrency = String(transactionData.currency || 'NGN').toUpperCase();
-    const shippingAddressSnapshot =
-      typeof metadata?.shipping_address === 'string'
-        ? metadata.shipping_address.trim()
-        : '';
-
-    // Get user details
-    const user: any = await prisma.users.findUnique({
-      where: {
-        pidUser: pidUser as string,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          statusx: 'FAILED',
-          message: 'User not found',
-        },
-        { status: 404 },
+    if (owned && !guestAccess && (!user || owned.pidUser !== user.pidUser))
+      throw new ShopError(
+        'Sign in to view this order, or return using the browser where you made payment.',
+        401,
       );
-    }
-
-    const productIds = cartItems
-      .map((item: any) => String(item?.pidProduct || '').trim())
-      .filter(Boolean);
-    const purchasedProducts = productIds.length
-      ? await prisma.store.findMany({
-          where: { pidProduct: { in: productIds } },
-          select: { productCategory: true },
-        })
-      : [];
-    const hasEligiblePhoneOrLaptop = purchasedProducts.some((product) =>
-      ['phone', 'laptop'].includes(
-        String(product.productCategory || '').trim().toLowerCase(),
-      ),
-    );
-
-    const existingPayment = await prisma.payments.findFirst({
-      where: { txRef: reference, paymentStatus: 'PAID', serviceName: 'SHOP' },
-    });
-    if (existingPayment) {
-      if (hasEligiblePhoneOrLaptop) {
-        await recordAffiliateConversion({
-          customerReference: String(pidUser),
-          serviceKey: AFFILIATE_SERVICE_KEYS.PHONES_AND_LAPTOPS,
-          externalOrderReference: `shop:${reference}`,
-          externalPaymentReference: `paystack:${reference}`,
-          paymentCurrency,
-          grossAmount: amount,
-          eligibleAmount: amount,
-        });
-      }
-      return NextResponse.json({
-        statusx: 'SUCCESS',
-        message: 'Payment already verified.',
-      });
-    }
-
-    const email = user.userEmail;
-    const first_name = user.userFirstname;
-    const last_name = user.userLastname;
-    const phone = user.phone;
-
-    // Generate IDs
-    const pidPayment = 'PAY' + randomGenerator(10);
-    const txID = 'SHOP' + randomGenerator(10);
-    const txREF = reference;
-    const serviceID = 'SHOP' + randomGenerator(10);
-
-    console.log('Creating database records...');
-    // Use Prisma transaction to ensure data consistency
-    const result = await prisma.$transaction(async (tx) => {
-      console.log('Creating payment record...');
-      // Create payment record
-      const create_payment = await tx.payments.create({
-        data: {
-          pidPayment: pidPayment,
-          pidUser: pidUser as any,
-          payerName: `${first_name} ${last_name}` || 'Unknown User',
-          payerEmail: email,
-          txID: txID,
-          txRef: txREF,
+    if (!owned) {
+      if (!user) throw new ShopError('Sign in to check your order.', 401);
+      const payment = await prisma.payments.findFirst({
+        where: {
+          txRef: reference,
+          pidUser: user.pidUser,
           paymentStatus: 'PAID',
-          paymentType: 'PAYSTACK',
-          currency: paymentCurrency,
-          amount: amount,
-          serviceID: serviceID,
-          serviceName: 'SHOP',
-          serviceDescription: 'Online Shop Purchase',
-          affiliatePayStatus: 'pending',
-          affiliateRefId: user.userAffiliateRef || 'NO_REF',
-          paymentExt1: shippingAddressSnapshot || null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          serviceName: { in: ['SHOP', 'SURESTORE'] },
         },
       });
-
-      console.log('Payment record created successfully');
-      console.log('Creating store_sales records for cart items...');
-
-      // Create store_sales records for each cart item
-      // Order Status Flow: PAID → PROCESSING → SHIPPED → DELIVERED → COMPLETED
-      // Initial status is PAID after successful payment
-      // Admin will update status through order management interface
-      const salesRecords = await Promise.all(
-        cartItems.map(async (item: any) => {
-          return tx.store_sales.create({
+      const orders =
+        payment &&
+        (await prisma.store_sales.count({
+          where: { ext1: reference, pidUser: user.pidUser },
+        }));
+      if (payment && orders)
+        return NextResponse.json(
+          {
+            statusx: 'SUCCESS',
             data: {
-              pidStore: `SALE${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-              pidProduct: item.pidProduct,
-              pidUser: pidUser as string,
-              product_name: item.productName,
-              unit_price: item.productPrice.toFixed(2),
-              total_price: (item.productPrice * item.quantity).toFixed(2),
-              quantity: item.quantity.toString(),
-              status: 'PAID', // Initial status after successful payment
-              ext1: txREF, // Transaction reference
-              ext2: 'PAYSTACK', // Payment method
-              createdAt: new Date(),
-              updatedAt: new Date(),
+              reference,
+              status: 'PAID',
+              amount: payment.amount,
+              shippingAddress: payment.paymentExt1,
             },
-          });
-        }),
+          },
+          { headers: { 'Cache-Control': 'no-store' } },
+        );
+      throw new ShopError(
+        'We could not find a confirmed order for this reference. If you paid, contact support with your payment reference.',
+        404,
       );
-
-      console.log(
-        `Created ${salesRecords.length} store_sales records successfully`,
-      );
-      return { create_payment, salesRecords };
-    });
-
-    console.log('Database records created successfully');
-
-    if (hasEligiblePhoneOrLaptop) {
-      await recordAffiliateConversion({
-        customerReference: String(pidUser),
-        serviceKey: AFFILIATE_SERVICE_KEYS.PHONES_AND_LAPTOPS,
-        externalOrderReference: `shop:${reference}`,
-        externalPaymentReference: `paystack:${reference}`,
-        paymentCurrency,
-        grossAmount: amount,
-        eligibleAmount: amount,
-      });
     }
-
-    // Send confirmation emails
-    console.log('Sending confirmation emails...');
-    if (result.create_payment) {
-      // Build cart items HTML for email
-      const cartItemsHTML = cartItems
-        .map(
-          (item: any) => `
-        <tr>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd;">${item.productName}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: center;">${item.quantity}</td>
-          <td style="padding: 8px; border-bottom: 1px solid #ddd; text-align: right;">₦${(item.productPrice * item.quantity).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td>
-        </tr>
-      `,
-        )
-        .join('');
-
-      ////////////////////// SEND CUSTOMER PAYMENT RECEIPT EMAIL //////////////////////
-      console.log('Sending customer email...');
-      try {
-        const xEmail_A = email;
-        const xTitle_A = `Payment Successful - Order Confirmation`;
-        const xBodyTitle_A = `Your Order was Successful!`;
-        const xBody_A = `Dear ${first_name}, <br />
-                              This is to confirm your successful payment on the <b>sureimports.com</b> shop.<br /><br />
-                              Here are the details of your order: <br />
-                              <h4>Transaction Reference: <b>${txREF}</b></h4><hr />
-                              <h4>Payment Method: <b>Paystack</b></h4><hr />
-                              <h4>Order type: <b>Shop Purchase</b></h4><hr />
-                              <h4>Items Purchased:</h4>
-                              <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                                <thead>
-                                  <tr style="background-color: #f5f5f5;">
-                                    <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Product</th>
-                                    <th style="padding: 8px; text-align: center; border-bottom: 2px solid #ddd;">Qty</th>
-                                    <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Total</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  ${cartItemsHTML}
-                                </tbody>
-                              </table>
-                              <hr />
-                              <h4>Total Amount: <b>₦${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> (NGN)</h4><hr />
-                              <h4>Name: <b>${first_name + ' ' + last_name}</b></h4><hr />
-                              <h4>Phone: <b>${phone || 'N/A'}</b></h4><hr />
-                              <h4>Email: <b>${email}</b></h4><hr />
-                              <b>Our address for pick up is:</b><br />
-                              Sure Imports, 5 Olutosin Ajayi (Martins Adegboyega) Street, Ajao Estate, Lagos, Nigeria. 0806 839 7263.<br /><br />
-                              We are open 9am to 5pm weekdays except for public holidays.<br />
-                              Thank you for choosing SureImports.<br /><br />
-                              Kind regards,<br />
-                              <b>Sure Imports Team</b>`;
-
-        await xMail({
-          xEmail: xEmail_A,
-          xTitle: xTitle_A,
-          xBodyTitle: xBodyTitle_A,
-          xBody: xBody_A,
-        });
-        console.log('Customer email sent successfully');
-      } catch (emailError) {
-        console.error('Error sending customer email:', emailError);
-        // Don't fail the entire verification if email fails
-      }
-
-      ////////////////////// SEND ADMIN PAYMENT EMAIL //////////////////////
-      console.log('Sending admin email...');
-      try {
-        const xEmail_B = 'hello@sureimports.com';
-        const xTitle_B = `New Shop Purchase - ${cartItems.length} item(s)`;
-        const xBodyTitle_B = `Shop Purchase Successful!`;
-        const xBody_B = `Hi Admin, <br />A shop purchase has been completed successfully on sureimports.com.<br /><br />
-                            Here are the details of the order: <br />
-                            <h4>Transaction Reference: <b>${txREF}</b></h4><hr />
-                            <h4>Payment Method: <b>Paystack</b></h4><hr />
-                            <h4>Customer name: <b>${first_name + ' ' + last_name}</b></h4><hr />
-                            <h4>Phone Number: <b>${phone || 'N/A'}</b></h4><hr />
-                            <h4>Items Purchased:</h4>
-                            <table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
-                              <thead>
-                                <tr style="background-color: #f5f5f5;">
-                                  <th style="padding: 8px; text-align: left; border-bottom: 2px solid #ddd;">Product</th>
-                                  <th style="padding: 8px; text-align: center; border-bottom: 2px solid #ddd;">Qty</th>
-                                  <th style="padding: 8px; text-align: right; border-bottom: 2px solid #ddd;">Total</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                ${cartItemsHTML}
-                              </tbody>
-                            </table>
-                            <hr />
-                            <h4>Total Amount: <b>₦${amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</b> (NGN)</h4><hr />
-                            <h4>Address: <b>${shippingAddressSnapshot || user?.userShippingAddress2 || user?.userShippingAddress || 'Not provided'}</b></h4><hr />
-                            Kind regards,<br />
-                            Sureimports.com Automated System`;
-
-        await xMail({
-          xEmail: xEmail_B,
-          xTitle: xTitle_B,
-          xBodyTitle: xBodyTitle_B,
-          xBody: xBody_B,
-        });
-        console.log('Admin email sent successfully');
-      } catch (emailError) {
-        console.error('Error sending admin email:', emailError);
-        // Don't fail the entire verification if email fails
-      }
-
-      console.log('Shop payment processed successfully:', txREF);
-    }
-
+    const row = await verifyShopCheckout(reference);
+    if (row.status === 'PAID') after(() => processShopEffects(reference));
     return NextResponse.json(
       {
-        statusx: 'SUCCESS',
-        message: 'Payment verified and order created successfully',
+        statusx: row.status === 'PAID' ? 'SUCCESS' : 'PENDING',
+        message:
+          row.status === 'PAID'
+            ? 'Order confirmed.'
+            : 'Payment has not been confirmed. Do not pay again if you have already been charged.',
         data: {
-          transactionRef: txREF,
-          amount: amount,
-          itemsCount: cartItems.length,
-          paymentStatus: 'PAID',
+          reference,
+          status: row.status,
+          amount: row.amountMinor / 100,
+          shippingAddress: row.shippingAddress,
+          items: row.items,
+          guestCheckout: Boolean(row.guestTokenHash),
         },
       },
-      { status: 200 },
+      { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
-    console.error('Payment verification error:', error);
-    console.error('Error details:', {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : String(error),
-      stack: error instanceof Error ? error.stack : undefined,
-    });
-
-    return NextResponse.json(
-      {
-        statusx: 'FAILED',
-        message: 'Internal server error occurred while verifying payment',
-        error: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
+    return shopFailure(error);
   }
 }

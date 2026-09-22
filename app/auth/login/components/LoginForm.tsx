@@ -1,4 +1,5 @@
 'use client';
+import { readShopCheckoutDraft, SHOP_CHECKOUT_RESUME } from '@/lib/shop/checkoutDraft';
 
 import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -55,6 +56,11 @@ export default function LoginForm() {
   const executeRecaptcha = useRecaptchaV3();
   const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const nextParam = searchParams.get('next');
+  useEffect(() => {
+    if (nextParam !== SHOP_CHECKOUT_RESUME) return;
+    const draft = readShopCheckoutDraft();
+    if (draft) setEmail((current) => current || draft.email);
+  }, [nextParam]);
   const signUpHref = nextParam
     ? `/auth/signup?next=${encodeURIComponent(nextParam)}`
     : '/auth/signup';

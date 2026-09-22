@@ -1,7 +1,15 @@
 'use client';
+import { useShopPayment } from '@/components/shop/useShopPayment';
 import HeroPill from '@/components/home/HeroPill';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  readShopCheckoutDraft,
+  saveShopCheckoutDraft,
+  SHOP_CHECKOUT_RESUME,
+} from '@/lib/shop/checkoutDraft';
+import { POST_AUTH_REDIRECT_KEY } from '@/lib/auth/loginRedirect';
+import { Input } from '@/components/ui/input';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { toast } from 'sonner';
@@ -23,19 +31,13 @@ import {
   ShoppingBag,
   Clock,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { useAuth } from '@/app/context/AuthContext';
 import Loading from '@/app/dashboard/loading';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
-
-declare global {
-  interface Window {
-    PaystackPop: any;
-  }
-}
 
 function CheckoutContent() {
   const router = useRouter();
@@ -45,36 +47,70 @@ function CheckoutContent() {
     cart,
     cartCount,
     cartTotal,
-    clearCart,
+    hydrated: cartHydrated,
     updateQuantity,
     removeFromCart,
   } = useShopCart();
 
-  const [loading, setLoading] = useState(false);
-  const [cartHydrated, setCartHydrated] = useState(false);
-  const [processingPayment, setProcessingPayment] = useState(false);
   const [walletBalance, setWalletBalance] = useState<number | null>(null);
   const [loadingWallet, setLoadingWallet] = useState(false);
   const [shippingAddress, setShippingAddress] = useState('');
   const [loadingAddress, setLoadingAddress] = useState(false);
   const [savingAddress, setSavingAddress] = useState(false);
   const [shippingAddressError, setShippingAddressError] = useState('');
+  const [guestName, setGuestName] = useState('');
+  const [guestEmail, setGuestEmail] = useState('');
+  const addressEdited = useRef(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const raw = localStorage.getItem('shopCart');
-        const parsed = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setCartHydrated(true);
-          return;
-        }
-      } catch {
-        // fall through to hydration check
-      }
-    }
-    setCartHydrated(true);
+    const draft = readShopCheckoutDraft();
+    if (!draft) return;
+    setGuestName(draft.name);
+    setGuestEmail(draft.email);
+    setShippingAddress(draft.address);
+    addressEdited.current = Boolean(draft.address);
   }, []);
+
+  function continueToAccount(action: 'login' | 'signup') {
+    if (
+      !guestName.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guestEmail.trim())
+    ) {
+      toast.error('Enter your name and a valid email address to continue.');
+      document
+        .getElementById(
+          !guestName.trim() ? 'shop-contact-name' : 'shop-contact-email',
+        )
+        ?.focus();
+      return;
+    }
+    if (shippingAddress.trim().length < 10) {
+      setShippingAddressError(
+        'Enter your complete delivery address before continuing.',
+      );
+      return;
+    }
+    if (
+      !saveShopCheckoutDraft({
+        name: guestName.trim(),
+        email: guestEmail.trim(),
+        address: shippingAddress.trim(),
+      })
+    ) {
+      toast.error(
+        'Please allow browser storage so we can keep your checkout details while you sign in.',
+      );
+      return;
+    }
+    try {
+      localStorage.setItem(POST_AUTH_REDIRECT_KEY, SHOP_CHECKOUT_RESUME);
+    } catch {
+      /* next also carries the return path. */
+    }
+    router.push(
+      `/auth/${action}?next=${encodeURIComponent(SHOP_CHECKOUT_RESUME)}`,
+    );
+  }
 
   useEffect(() => {
     if (cartHydrated && cart.length === 0) {
@@ -94,28 +130,24 @@ function CheckoutContent() {
   }, [user, searchParams]);
 
   useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.async = true;
-    document.body.appendChild(script);
-
     if (user?.userEmail) {
       fetchWalletBalance();
       fetchShippingAddress();
     }
-
-    return () => {
-      document.body.removeChild(script);
-    };
   }, [user]);
 
   const fetchWalletBalance = async () => {
     if (!user?.userEmail) return;
     setLoadingWallet(true);
     try {
-      const response = await fetch(`/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`);
+      const response = await fetch(
+        `/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`,
+      );
       const data = await response.json();
-      if (data.transactionDetails && typeof data.transactionDetails.totalAmount === 'number') {
+      if (
+        data.transactionDetails &&
+        typeof data.transactionDetails.totalAmount === 'number'
+      ) {
         setWalletBalance(data.transactionDetails.totalAmount);
       } else if (data.statusx === 'NO_ACCOUNT') {
         setWalletBalance(0);
@@ -133,10 +165,13 @@ function CheckoutContent() {
     if (!user?.pidUser || !user?.userEmail) return;
     setLoadingAddress(true);
     try {
-      const response = await fetch(`/api/user/update-shipping-address?pidUser=${encodeURIComponent(user.pidUser)}&userEmail=${encodeURIComponent(user.userEmail)}`);
+      const response = await fetch(
+        `/api/user/update-shipping-address?pidUser=${encodeURIComponent(user.pidUser)}&userEmail=${encodeURIComponent(user.userEmail)}`,
+      );
       const data = await response.json();
       if (data.statusx === 'SUCCESS' && data.data?.userShippingAddress2) {
-        setShippingAddress(data.data.userShippingAddress2);
+        if (!addressEdited.current)
+          setShippingAddress(data.data.userShippingAddress2);
       }
     } catch (error) {
       console.error(error);
@@ -148,7 +183,9 @@ function CheckoutContent() {
   const saveShippingAddress = async () => {
     if (!user?.pidUser || !user?.userEmail) return false;
     if (!shippingAddress || shippingAddress.trim().length < 10) {
-      setShippingAddressError('Shipping address must be at least 10 characters long');
+      setShippingAddressError(
+        'Shipping address must be at least 10 characters long',
+      );
       toast.error('Shipping address must be at least 10 characters long');
       return false;
     }
@@ -158,7 +195,11 @@ function CheckoutContent() {
       const response = await fetch('/api/user/update-shipping-address', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pidUser: user.pidUser, userEmail: user.userEmail, shippingAddress: shippingAddress.trim() }),
+        body: JSON.stringify({
+          pidUser: user.pidUser,
+          userEmail: user.userEmail,
+          shippingAddress: shippingAddress.trim(),
+        }),
       });
       const data = await response.json();
       if (data.statusx === 'SUCCESS') {
@@ -176,195 +217,29 @@ function CheckoutContent() {
     }
   };
 
-  const ensurePaystackReady = async () => {
-    if (typeof window !== 'undefined' && window.PaystackPop?.setup) {
-      return true;
-    }
+  const {
+    processingPayment,
+    paymentUnavailable,
+    checkingPrices,
+    quoteError,
+    pendingReference,
+    retryQuote,
+    handlePaystackPayment,
+    handleWalletPayment,
+  } = useShopPayment(user?.pidUser, shippingAddress, false, {
+    name: guestName,
+    email: guestEmail,
+  });
 
-    const existingScript = document.querySelector(
-      'script[src="https://js.paystack.co/v1/inline.js"]',
-    ) as HTMLScriptElement | null;
-
-    if (existingScript) {
-      await new Promise((resolve) => setTimeout(resolve, 250));
-      return Boolean(window.PaystackPop?.setup);
-    }
-
-    const script = document.createElement('script');
-    script.src = 'https://js.paystack.co/v1/inline.js';
-    script.async = true;
-
-    await new Promise<void>((resolve, reject) => {
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Failed to load Paystack script'));
-      document.body.appendChild(script);
-    });
-
-    return Boolean(window.PaystackPop?.setup);
-  };
-
-  const handlePaymentSuccess = (reference: string) => {
-    toast.info('Payment initiated successfully!');
-  };
-
-  const handlePaymentClose = () => {
-    toast.info('Payment window was closed');
-    setProcessingPayment(false);
-  };
-
-  const handleVerificationComplete = (success: boolean, data?: any) => {
-    if (success) {
-      toast.success('Payment verified successfully! Your order has been placed.');
-      clearCart();
-      router.push('/shop/order-success?ref=' + (data?.reference || ''));
-    } else {
-      const errorMessage = data?.message || data?.error || 'Payment verification failed';
-      toast.error(errorMessage);
-    }
-    setProcessingPayment(false);
-  };
-
-  const handlePaystackPayment = async () => {
-    if (processingPayment) return;
-    if (!user) {
-      router.push(
-        `/auth/login?next=${encodeURIComponent('/shop/checkout?resumeCheckout=1')}`,
-      );
-      return;
-    }
-    if (!shippingAddress || shippingAddress.trim().length < 10) {
-      setShippingAddressError('Please enter a valid shipping address before proceeding');
-      toast.error('Please enter a valid shipping address before proceeding'); return;
-    }
-    setShippingAddressError('');
-
-    let paystackReady = false;
-    try {
-      paystackReady = await ensurePaystackReady();
-    } catch (error) {
-      toast.error('Payment gateway failed to load. Please refresh and try again.');
-      return;
-    }
-    if (!paystackReady) {
-      toast.error('Payment gateway is not ready. Please refresh and try again.');
-      return;
-    }
-
-    setProcessingPayment(true);
-    const addressSaved = await saveShippingAddress();
-    if (!addressSaved) { setProcessingPayment(false); return; }
-
-    try {
-      const response = await fetch('/api/shop/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pidUser: user.pidUser, cartItems: cart, totalAmount: cartTotal,
-          paymentMethod: 'paystack', shippingAddress: shippingAddress.trim(),
-        }),
-      });
-
-      const data = await response.json();
-      if (data.statusx !== 'SUCCESS') {
-        toast.error(data.message || 'Failed to initialize payment');
-        setProcessingPayment(false); return;
-      }
-
-      const reference = data.data.reference;
-      const handler = window.PaystackPop.setup({
-        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-        email: user.userEmail,
-        amount: Math.round(cartTotal * 100),
-        currency: 'NGN',
-        ref: reference,
-        metadata: { pidUser: user.pidUser, cart_items: cart, shipping_address: shippingAddress.trim() },
-        onClose: function () { handlePaymentClose(); },
-        callback: function (response: any) {
-          handlePaymentSuccess(response.reference);
-          verifyPayment(response.reference);
-        },
-      });
-
-      handler.openIframe();
-    } catch (error) {
-      toast.error('Failed to initialize payment');
-      setProcessingPayment(false);
-    }
-  };
-
-  const verifyPayment = async (reference: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`/api/shop/payment/verify?reference=${reference}`);
-      const data = await response.json();
-      if (data.statusx === 'SUCCESS') handleVerificationComplete(true, { ...data, reference });
-      else handleVerificationComplete(false, data);
-    } catch (error) {
-      handleVerificationComplete(false, { message: 'Failed to verify payment', error: String(error) });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleWalletPayment = async () => {
-    if (!user) {
-      router.push(
-        `/auth/login?next=${encodeURIComponent('/shop/checkout?resumeCheckout=1')}`,
-      );
-      return;
-    }
-    if (!shippingAddress || shippingAddress.trim().length < 10) {
-      setShippingAddressError('Please enter a valid shipping address before proceeding');
-      toast.error('Please enter a valid shipping address before proceeding'); return;
-    }
-    setShippingAddressError('');
-    if (walletBalance === null) { toast.error('Loading wallet info. Please wait.'); return; }
-    if (walletBalance === 0 && !loadingWallet) { toast.warning('Wallet not activated.'); return; }
-    if (walletBalance < cartTotal) {
-      toast.error(`Insufficient balance. Required: ₦${cartTotal.toLocaleString()}`); return;
-    }
-
-    setProcessingPayment(true);
-    const addressSaved = await saveShippingAddress();
-    if (!addressSaved) { setProcessingPayment(false); return; }
-
-    toast.info('Processing wallet payment...');
-    try {
-      const response = await fetch('/api/shop/payment/wallet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pidUser: user.pidUser, cartItems: cart, totalAmount: cartTotal, shippingAddress: shippingAddress.trim(),
-        }),
-      });
-      const data = await response.json();
-
-      if (data.statusx === 'SUCCESS') {
-        toast.success('Payment successful! Your order has been placed.');
-        clearCart();
-        router.push(`/shop/order-success?ref=${data.data.transactionRef}`);
-      } else {
-        toast.error(data.message || 'Wallet payment failed');
-      }
-    } catch (error) {
-      toast.error('Failed to process wallet payment');
-    } finally {
-      setProcessingPayment(false);
-    }
-  };
-
-  if (loading) return <Loading />;
   if (!cartHydrated || cart.length === 0) return null;
 
   return (
     <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
       {/* Deep Slate Hero Header */}
       <div className="relative overflow-hidden bg-slate-900 pb-32 pt-12 text-white">
         <PublicHeroBackground />
         <div className="relative z-10 mx-auto max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
-          
-          <button 
+          <button
             onClick={() => router.push('/shop')}
             disabled={processingPayment}
             className="group mb-8 flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 transition hover:text-white disabled:opacity-50"
@@ -376,35 +251,60 @@ function CheckoutContent() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
               <div className="mb-3 flex items-center gap-2">
-                <HeroPill>
-                  Step 2 of 2
-                </HeroPill>
+                <HeroPill>Step 2 of 2</HeroPill>
               </div>
-              <h1 className="text-3xl font-black tracking-tight md:text-5xl">Checkout</h1>
+              <h1 className="text-3xl font-black tracking-tight md:text-5xl">
+                Checkout
+              </h1>
               <p className="mt-3 text-sm font-medium text-slate-300 md:text-base">
                 Review your order and securely complete your purchase.
               </p>
             </div>
-            
+
             <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
                 <Lock className="h-5 w-5 text-emerald-400" />
               </div>
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-white">Secure Checkout</p>
-                <p className="text-xs text-slate-400">AES-256 Encryption</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-white">
+                  Secure Checkout
+                </p>
+                <p className="text-xs text-slate-400">
+                  Secure payment processing
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-[var(--si-content-max)] px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="relative z-10 mx-auto -mt-16 max-w-[var(--si-content-max)] px-4 pb-20 sm:px-6 lg:px-8">
+        {quoteError && (
+          <div
+            role="alert"
+            className="mb-6 rounded-xl border border-red-300 p-4 text-red-600 dark:text-red-300"
+          >
+            <p>{quoteError}</p>
+            <button
+              type="button"
+              className="mt-3 underline"
+              onClick={retryQuote}
+            >
+              Check prices again
+            </button>
+          </div>
+        )}
+        {checkingPrices && (
+          <p
+            role="status"
+            className="mb-4 rounded-xl bg-white p-4 text-sm text-slate-600 dark:bg-slate-900 dark:text-slate-300"
+          >
+            Checking current prices…
+          </p>
+        )}
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          
           {/* LEFT COLUMN: Order Details & Address */}
           <div className="flex-1 space-y-8">
-            
             {/* Order Items Review */}
             <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
               <div className="mb-8 flex items-center justify-between border-b border-slate-100 pb-6 dark:border-slate-800">
@@ -421,12 +321,18 @@ function CheckoutContent() {
 
               <div className="flex flex-col gap-4">
                 {cart.map((item) => (
-                  <div key={item.pidProduct} className="group flex flex-col sm:flex-row gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:border-indigo-100 dark:border-slate-800/60 dark:bg-slate-800/30 dark:hover:border-slate-700">
+                  <div
+                    key={item.pidProduct}
+                    className="group flex flex-col gap-6 rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:border-indigo-100 dark:border-slate-800/60 dark:bg-slate-800/30 dark:hover:border-slate-700 sm:flex-row"
+                  >
                     <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-white shadow-sm dark:bg-slate-800">
                       <Image
-                        src={item.productImage}
+                        src={
+                          item.productImage || '/images/shop-placeholder.svg'
+                        }
                         alt={item.productName}
                         fill
+                        sizes="96px"
                         className="object-cover mix-blend-multiply dark:mix-blend-normal"
                       />
                     </div>
@@ -434,10 +340,15 @@ function CheckoutContent() {
                     <div className="flex flex-1 flex-col py-1">
                       <div className="flex items-start justify-between gap-4">
                         <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.productBrand || 'Product'}</p>
-                          <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white sm:text-base">{item.productName}</h4>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                            {item.productBrand || 'Product'}
+                          </p>
+                          <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white sm:text-base">
+                            {item.productName}
+                          </h4>
                         </div>
                         <button
+                          aria-label={`Remove ${item.productName}`}
                           onClick={() => removeFromCart(item.pidProduct)}
                           disabled={processingPayment}
                           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition hover:bg-rose-50 hover:text-rose-500 disabled:opacity-50 dark:hover:bg-rose-900/30"
@@ -448,13 +359,17 @@ function CheckoutContent() {
 
                       <div className="mt-auto flex items-center justify-between pt-4">
                         <span className="text-lg font-black text-indigo-600 dark:text-indigo-400">
-                          ₦{(item.productPrice * item.quantity).toLocaleString()}
+                          ₦
+                          {(item.productPrice * item.quantity).toLocaleString()}
                         </span>
-                        
+
                         <div className="flex items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
                           <button
                             className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity - 1)}
+                            aria-label={`Decrease quantity of ${item.productName}`}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity - 1)
+                            }
                             disabled={processingPayment || item.quantity <= 1}
                           >
                             <Minus className="h-3 w-3" />
@@ -464,7 +379,10 @@ function CheckoutContent() {
                           </span>
                           <button
                             className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 disabled:opacity-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                            onClick={() => updateQuantity(item.pidProduct, item.quantity + 1)}
+                            aria-label={`Increase quantity of ${item.productName}`}
+                            onClick={() =>
+                              updateQuantity(item.pidProduct, item.quantity + 1)
+                            }
                             disabled={processingPayment}
                           >
                             <Plus className="h-3 w-3" />
@@ -486,23 +404,87 @@ function CheckoutContent() {
                   </div>
                   Delivery Details
                 </h2>
-                
-                <div className="mb-8 space-y-3 text-sm">
-                  <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Contact Name</span>
-                    <span className="font-semibold text-slate-900 dark:text-white">{user?.userFirstname} {user?.userLastname}</span>
-                  </div>
-                  <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Email Address</span>
-                    <span className="font-semibold text-slate-900 dark:text-white">{user?.userEmail}</span>
-                  </div>
-                  {user?.phone && (
-                    <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Phone Number</span>
-                      <span className="font-semibold text-slate-900 dark:text-white">{user.phone}</span>
+
+                {!user ? (
+                  <div className="mb-8 space-y-4 text-sm">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="shop-contact-name"
+                        className="font-semibold"
+                      >
+                        Contact name
+                      </label>
+                      <Input
+                        id="shop-contact-name"
+                        autoComplete="name"
+                        value={guestName}
+                        onChange={(event) => setGuestName(event.target.value)}
+                        maxLength={240}
+                        placeholder="Your full name"
+                      />
                     </div>
-                  )}
-                </div>
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="shop-contact-email"
+                        className="font-semibold"
+                      >
+                        Email address
+                      </label>
+                      <Input
+                        id="shop-contact-email"
+                        type="email"
+                        autoComplete="email"
+                        value={guestEmail}
+                        onChange={(event) => setGuestEmail(event.target.value)}
+                        maxLength={254}
+                        placeholder="you@example.com"
+                      />
+                    </div>
+                    <p className="text-slate-500 dark:text-slate-400">
+                      Pay without signing up first. After payment, your order
+                      will be added to your Sure Imports account. If you are
+                      new, we will email you a secure account setup link.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="mb-8 space-y-3 text-sm">
+                    <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        Contact Name
+                      </span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {user?.userFirstname} {user?.userLastname}
+                      </span>
+                    </div>
+                    <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        Email Address
+                      </span>
+                      <span className="font-semibold text-slate-900 dark:text-white">
+                        {user?.userEmail}
+                      </span>
+                    </div>
+                    {user?.phone && (
+                      <div className="flex flex-col border-b border-slate-100 pb-3 dark:border-slate-800">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                          Phone Number
+                        </span>
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          {user.phone}
+                        </span>
+                      </div>
+                    )}
+                    {guestEmail &&
+                      guestEmail.trim().toLowerCase() !==
+                        user.userEmail?.trim().toLowerCase() && (
+                        <p className="text-slate-500 dark:text-slate-400">
+                          You signed in with {user.userEmail}. This account will
+                          receive the receipt and own the order. Your delivery
+                          address has been kept.
+                        </p>
+                      )}
+                  </div>
+                )}
 
                 <div className="space-y-3">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
@@ -518,7 +500,14 @@ function CheckoutContent() {
                       value={shippingAddress}
                       onChange={(e) => {
                         const value = e.target.value;
+                        addressEdited.current = true;
                         setShippingAddress(value);
+                        if (readShopCheckoutDraft())
+                          saveShopCheckoutDraft({
+                            name: guestName,
+                            email: guestEmail,
+                            address: value,
+                          });
                         if (value.trim().length >= 10) {
                           setShippingAddressError('');
                         }
@@ -536,14 +525,25 @@ function CheckoutContent() {
                       {shippingAddressError}
                     </p>
                   ) : null}
-                  {shippingAddress.trim().length > 0 && (
+                  {user && shippingAddress.trim().length > 0 && (
                     <Button
                       type="button"
                       onClick={saveShippingAddress}
-                      disabled={savingAddress || processingPayment || shippingAddress.trim().length < 10}
-                      className="w-full rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 font-bold text-xs h-10"
+                      disabled={
+                        savingAddress ||
+                        processingPayment ||
+                        shippingAddress.trim().length < 10
+                      }
+                      className="h-10 w-full rounded-xl bg-slate-100 text-xs font-bold text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                     >
-                      {savingAddress ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Saving...</> : 'Confirm Address'}
+                      {savingAddress ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />{' '}
+                          Saving...
+                        </>
+                      ) : (
+                        'Confirm Address'
+                      )}
                     </Button>
                   )}
                 </div>
@@ -559,12 +559,17 @@ function CheckoutContent() {
                 </h2>
                 <div className="rounded-2xl border border-purple-100 bg-purple-50/50 p-6 dark:border-purple-900/30 dark:bg-purple-900/10">
                   <p className="mb-6 text-sm leading-relaxed text-purple-800 dark:text-purple-300">
-                    Prefer to pick up your order in person? You can collect your items directly from our main office in Lagos.
+                    Prefer to pick up your order in person? You can collect your
+                    items directly from our main office in Lagos.
                   </p>
                   <div className="space-y-4 text-sm font-medium text-slate-700 dark:text-slate-300">
                     <div className="flex gap-3">
                       <MapPin className="h-5 w-5 shrink-0 text-slate-400" />
-                      <span>5 Olutosin Ajayi (Martins Adegboyega) Street,<br />Ajao Estate, Lagos</span>
+                      <span>
+                        5 Olutosin Ajayi (Martins Adegboyega) Street,
+                        <br />
+                        Ajao Estate, Lagos
+                      </span>
                     </div>
                     <div className="flex gap-3">
                       <Wallet className="h-5 w-5 shrink-0 text-slate-400" />
@@ -578,28 +583,37 @@ function CheckoutContent() {
                 </div>
               </div>
             </div>
-
           </div>
 
           {/* RIGHT COLUMN: Payment Summary */}
           <div className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[400px]">
             <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/20 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-8">
-              <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">Payment Summary</h2>
+              <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+                Payment Summary
+              </h2>
 
               <div className="mb-8 space-y-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-semibold text-slate-500">Subtotal ({cartCount})</span>
-                  <span className="font-bold text-slate-900 dark:text-white">₦{cartTotal.toLocaleString()}</span>
+                  <span className="font-semibold text-slate-500">
+                    Subtotal ({cartCount})
+                  </span>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    ₦{cartTotal.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-semibold text-slate-500">Shipping</span>
-                  <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">FREE</span>
+                  <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                    FREE
+                  </span>
                 </div>
-                
+
                 <div className="my-6 border-t border-dashed border-slate-200 dark:border-slate-800" />
-                
+
                 <div className="flex items-end justify-between">
-                  <span className="text-xs font-black uppercase tracking-widest text-slate-400">Total Due</span>
+                  <span className="text-xs font-black uppercase tracking-widest text-slate-400">
+                    Total Due
+                  </span>
                   <span className="text-4xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
                     ₦{cartTotal.toLocaleString()}
                   </span>
@@ -608,19 +622,28 @@ function CheckoutContent() {
 
               {/* Wallet Information - Designed as a premium card */}
               {walletBalance !== null && (
-                <div className={`mb-8 relative overflow-hidden rounded-2xl p-6 border ${walletBalance >= cartTotal ? 'bg-emerald-500 border-emerald-600 shadow-lg shadow-emerald-500/20' : 'bg-slate-900 border-slate-800 shadow-lg'}`}>
+                <div
+                  className={`relative mb-8 overflow-hidden rounded-2xl border p-6 ${walletBalance >= cartTotal ? 'border-emerald-600 bg-emerald-500 shadow-lg shadow-emerald-500/20' : 'border-slate-800 bg-slate-900 shadow-lg'}`}
+                >
                   {/* Decorative background shapes */}
                   <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
                   <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
-                  
-                  <div className="relative z-10 flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-white/70">Wallet Balance</span>
-                    {loadingWallet && <Loader2 className="h-4 w-4 animate-spin text-white/70" />}
+
+                  <div className="relative z-10 mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-white/70">
+                      Wallet Balance
+                    </span>
+                    {loadingWallet && (
+                      <Loader2 className="h-4 w-4 animate-spin text-white/70" />
+                    )}
                   </div>
                   <div className="relative z-10 text-3xl font-black text-white">
-                    ₦{walletBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    ₦
+                    {walletBalance.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                    })}
                   </div>
-                  
+
                   {walletBalance < cartTotal && walletBalance > 0 && (
                     <div className="relative z-10 mt-3 inline-flex items-center gap-1.5 rounded-lg bg-rose-500/20 px-3 py-1 text-xs font-bold text-rose-100 backdrop-blur-sm">
                       <AlertCircle className="h-3.5 w-3.5" />
@@ -636,35 +659,81 @@ function CheckoutContent() {
                 </div>
               )}
 
+              {pendingReference && (
+                <div className="mb-4 rounded-xl border border-slate-200 p-4 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                  <p>
+                    Already attempted payment? Check its status before paying
+                    again.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      router.push(
+                        `/shop/order-success?ref=${encodeURIComponent(pendingReference)}`,
+                      )
+                    }
+                    className="mt-3 font-semibold underline"
+                  >
+                    Check previous payment
+                  </button>
+                </div>
+              )}
               {/* Actions */}
               <div className="space-y-3">
-                {walletBalance !== null && walletBalance >= cartTotal && (
+                <>
+                  {walletBalance !== null && walletBalance >= cartTotal && (
+                    <Button
+                      onClick={handleWalletPayment}
+                      disabled={
+                        processingPayment || paymentUnavailable || loadingWallet
+                      }
+                      className="h-14 w-full rounded-2xl border-0 bg-emerald-600 text-base font-bold text-white shadow-xl shadow-emerald-600/20 transition-all hover:bg-emerald-500 active:scale-[0.98] disabled:opacity-50 dark:bg-emerald-500"
+                    >
+                      {processingPayment ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />{' '}
+                          Processing...
+                        </>
+                      ) : loadingWallet ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />{' '}
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <Wallet className="mr-2 h-5 w-5" /> Pay from Wallet
+                        </>
+                      )}
+                    </Button>
+                  )}
+
                   <Button
-                    onClick={handleWalletPayment}
-                    disabled={processingPayment || loadingWallet}
-                    className="h-14 w-full rounded-2xl bg-emerald-600 text-base font-bold text-white shadow-xl shadow-emerald-600/20 hover:bg-emerald-500 disabled:opacity-50 dark:bg-emerald-500 active:scale-[0.98] transition-all border-0"
+                    onClick={handlePaystackPayment}
+                    disabled={processingPayment || paymentUnavailable}
+                    className="h-14 w-full rounded-2xl border-0 bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-50"
                   >
                     {processingPayment ? (
-                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processing...</>
-                    ) : loadingWallet ? (
-                      <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Loading...</>
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />{' '}
+                        Processing...
+                      </>
                     ) : (
-                      <><Wallet className="mr-2 h-5 w-5" /> Pay from Wallet</>
+                      <>
+                        <CreditCard className="mr-2 h-5 w-5" /> Pay with Card or
+                        Bank
+                      </>
                     )}
                   </Button>
-                )}
-
-                <Button
-                  onClick={handlePaystackPayment}
-                  disabled={processingPayment}
-                  className="h-14 w-full rounded-2xl bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 hover:bg-brand-orange-600 disabled:opacity-50 active:scale-[0.98] transition-all border-0"
-                >
-                  {processingPayment ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processing...</>
-                  ) : (
-                    <><CreditCard className="mr-2 h-5 w-5" /> Pay with Card or Bank</>
+                  {!user && (
+                    <button
+                      type="button"
+                      onClick={() => continueToAccount('login')}
+                      className="w-full py-3 text-sm font-semibold underline"
+                    >
+                      Already have an account? Sign in to use your wallet
+                    </button>
                   )}
-                </Button>
+                </>
               </div>
 
               <div className="mt-8 flex items-center justify-center gap-2 text-xs font-bold text-slate-400">
@@ -673,7 +742,6 @@ function CheckoutContent() {
               </div>
             </div>
           </div>
-
         </div>
       </main>
     </div>

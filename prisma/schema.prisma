@@ -2475,6 +2475,39 @@ model Transaction {
 // - ext2: Stores payment method (PAYSTACK, WALLET)
 // ============================================================================
 
+model shop_checkouts {
+  guestTokenHash String? @db.VarChar(64)
+  affiliateReferralReference String? @db.VarChar(191)
+  accountSetupRequired Boolean @default(false)
+  accountSetupEmailSentAt DateTime? @db.DateTime(3)
+  reference String @id @db.VarChar(100)
+  pidUser String @db.VarChar(191)
+  requestKey String @db.VarChar(36)
+  requestHash String @db.VarChar(64)
+  provider String @db.VarChar(16)
+  status String @default("PENDING") @db.VarChar(24)
+  email String @db.VarChar(191)
+  customerName String @db.VarChar(191)
+  shippingAddress String @db.Text
+  items Json
+  amountMinor Float
+  authorizationUrl String? @db.Text
+  accessCode String? @db.VarChar(191)
+  initializationStartedAt DateTime? @db.DateTime(3)
+  paidAt DateTime? @db.DateTime(3)
+  affiliateDoneAt DateTime? @db.DateTime(3)
+  customerEmailSentAt DateTime? @db.DateTime(3)
+  adminEmailSentAt DateTime? @db.DateTime(3)
+  effectsLeaseUntil DateTime? @db.DateTime(3)
+  lastCheckedAt DateTime? @db.DateTime(3)
+  createdAt DateTime @default(now()) @db.DateTime(3)
+  updatedAt DateTime @updatedAt @db.DateTime(3)
+  @@unique([pidUser, requestKey], map: "shop_checkout_request")
+  @@index([status, lastCheckedAt], map: "shop_checkout_recovery")
+  @@index([pidUser, createdAt], map: "shop_checkout_customer")
+  @@unique([guestTokenHash, requestKey], map: "shop_guest_request")
+}
+
 model store_sales {
   id           String   @id @default(cuid())
   pidStore     String   @unique

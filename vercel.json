@@ -7,6 +7,10 @@
   },
   "crons": [
     {
+      "path": "/api/cron/shop-checkouts",
+      "schedule": "*/15 * * * *"
+    },
+    {
       "path": "/api/cron/special-sourcing",
       "schedule": "0 0 1,8,15,22,29 * *"
     },

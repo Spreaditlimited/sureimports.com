@@ -1,3 +1,4 @@
+import { GET as getWalletCustomer } from '@/app/api/paystack/get-customer/[email]/route';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -140,10 +141,7 @@ export async function POST(request: NextRequest) {
       'http://localhost:3000';
     let walletData: any = null;
     try {
-      const walletCheck = await fetch(
-        `${baseUrl}/api/paystack/get-customer/${encodeURIComponent(user.userEmail)}`,
-        { method: 'GET', headers: { 'Content-Type': 'application/json' } },
-      );
+      const walletCheck = await getWalletCustomer(request, { params: Promise.resolve({ email: user.userEmail }) });
       if (!walletCheck.ok) {
         return NextResponse.json(
           {

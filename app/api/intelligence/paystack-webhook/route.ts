@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import { finalizeShopCheckout, processShopEffects } from '@/lib/shop/checkout';
 import { after, NextResponse } from 'next/server';
 
 import { prisma } from '@/lib/prisma';
@@ -118,6 +119,16 @@ export async function POST(request: Request) {
 
   const payload = JSON.parse(rawBody);
   const event = String(payload?.event || '').trim();
+  if (event === 'charge.success' && String(payload?.data?.reference || '').startsWith('SHOP2_')) {
+    try {
+      const checkout = await finalizeShopCheckout(payload.data.reference, payload.data);
+      after(() => processShopEffects(checkout.reference));
+      return NextResponse.json({ received: true });
+    } catch (error) {
+      console.error('Shop webhook needs reconciliation', error);
+      return NextResponse.json({ message: 'Shop payment reconciliation requires retry.' }, { status: 503 });
+    }
+  }
 
   if (event.startsWith('transfer.')) {
     const data = payload?.data || {};
