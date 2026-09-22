@@ -17,6 +17,7 @@ import { JsonLdScript } from '@/components/seo/JsonLd';
 import { LINESCOUT_WHITE_LABEL_URL } from '@/lib/linescoutLinks';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import styles from '@/components/home/ImportGuide.module.css';
+import ImportReadingPath from '@/components/home/ImportReadingPath';
 
 const lineScout = 'https://linescout.sureimports.com';
 const sourcing = LINESCOUT_WHITE_LABEL_URL;
@@ -491,6 +492,8 @@ export default function ImportFromChinaToUKPage() {
               </Link>
             </div>
           </section>
+
+          <ImportReadingPath market="uk" />
 
           <section id="questions" className={styles.section}>
             <span className={styles.eyebrow}>A little more clarity</span>

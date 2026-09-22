@@ -5,6 +5,7 @@ import Footer from '@/app/(home)/components/Footer';
 import HeroPill from '@/components/home/HeroPill';
 import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import ImportMarkets from '@/components/home/ImportMarkets';
+import ImportReadingPath from '@/components/home/ImportReadingPath';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import styles from '@/components/home/ImportGuide.module.css';
 
@@ -59,6 +60,9 @@ export default function ImportHubPage() {
             .
           </p>
         </section>
+        <div className={styles.container}>
+          <ImportReadingPath />
+        </div>
       </main>
       <Footer />
     </>
