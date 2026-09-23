@@ -135,6 +135,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
 
   return (
     <div
+      data-whatsapp-placement="floating"
       className={`fixed ${positionClass()} z-20`}
       onMouseEnter={cancelClose}
       onMouseLeave={closeWithDelay}
@@ -165,6 +166,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
             {configuredContacts.map((contact) => (
               <a
                 key={contact.id}
+                data-whatsapp-contact="managed"
                 href={buildWhatsAppUrl(contact)}
                 target="_blank"
                 rel="noopener noreferrer"

@@ -177,6 +177,7 @@ export default function RootLayout({
             />
 
             <AffiliateTracker />
+            <Script src="/whatsapp-tracking.js" strategy="afterInteractive" />
             {children}
 
             <DeferredGlobalEnhancements />
