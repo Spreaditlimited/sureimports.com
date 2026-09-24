@@ -194,7 +194,9 @@ export default function ReportSearchExperience({
 
   return (
     <>
-      <section className={`${heroLayout.fixed} relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-24 md:pt-44`}>
+      <section
+        className={`${heroLayout.fixed} relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-24 md:pt-44`}
+      >
         <PublicHeroBackground />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
         <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">

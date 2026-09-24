@@ -6,7 +6,9 @@
   color: var(--si-on-primary);
   font-weight: 700;
 }
-.button.button:hover:not(:disabled) { filter: brightness(.95); }
+.button.button:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
 .button.button:disabled {
   background-color: var(--si-inset);
   /* Match the other disabled procurement payment labels (slate-400). */

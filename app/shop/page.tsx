@@ -199,7 +199,7 @@ function ShopContent() {
               <div className={heroStyles.searchField}>
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <Input
-                placeholder="Search products or models…"
+                  placeholder="Search products or models…"
                   aria-label="Search products"
                   value={searchQuery}
                   onChange={(e) => {
@@ -210,13 +210,13 @@ function ShopContent() {
                 />
               </div>
               <button
-              type="button"
-              onClick={() => setShowCartSidebar(true)}
-              className={heroStyles.cartButton}
-              aria-label={`Open cart, ${cartCount} items`}
+                type="button"
+                onClick={() => setShowCartSidebar(true)}
+                className={heroStyles.cartButton}
+                aria-label={`Open cart, ${cartCount} items`}
               >
                 <ShoppingCart size={19} aria-hidden="true" />
-              <span className={heroStyles.cartLabel}>Cart</span>
+                <span className={heroStyles.cartLabel}>Cart</span>
                 <span className={heroStyles.cartCount}>{cartCount}</span>
               </button>
             </div>

@@ -7,7 +7,8 @@ export async function verifyRecaptchaToken(
 ): Promise<boolean> {
   const secret = process.env.GOOGLE_CAPTCHA_SECRET_KEY;
 
-  if (request && shouldBypassLocalCaptcha(new URL(request.url).hostname)) return true;
+  if (request && shouldBypassLocalCaptcha(new URL(request.url).hostname))
+    return true;
 
   // If not configured, keep behavior unchanged.
   if (!secret) return true;

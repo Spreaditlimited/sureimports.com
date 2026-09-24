@@ -13,7 +13,10 @@ export async function assertRefundsReconciled(
       AND EXISTS (SELECT 1 FROM affiliate_payout_items i JOIN affiliate_payouts p ON p.id=i.payoutId WHERE i.conversionId=c.id AND p.status='PAID')
       AND NOT EXISTS (SELECT 1 FROM affiliate_refund_adjustments a WHERE a.conversionId=c.id AND a.refundId=CONCAT('FULL_REVERSAL:',c.id))
     LIMIT 1 FOR UPDATE`;
-  if (unpaidRecovery.length) throw new Error('A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.');
+  if (unpaidRecovery.length)
+    throw new Error(
+      'A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.',
+    );
   const unresolved = await tx.$queryRaw<{ pidRefund: string }[]>`
     SELECT r.pidRefund FROM refund_records r
     JOIN affiliate_conversions c ON c.externalOrderReference=CONCAT(IF(r.serviceType='SHIPPING_INVOICE','shipping-invoice:','procurement:'),r.pidOrder)
@@ -24,7 +27,9 @@ export async function assertRefundsReconciled(
       AND NOT EXISTS (SELECT 1 FROM refund_events e WHERE e.id=CONCAT('COMMISSION:',r.pidRefund))
     LIMIT 1 FOR UPDATE`;
   if (unresolved.length) {
-    throw new Error('A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.');
+    throw new Error(
+      'A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.',
+    );
   }
   const external = await tx.$queryRaw<{ id: string }[]>`
     SELECT e.id FROM refund_events e
@@ -39,7 +44,9 @@ export async function assertRefundsReconciled(
       AND NOT EXISTS (SELECT 1 FROM refund_events resolved WHERE resolved.id=CONCAT('RESOLVED:',e.id))
     LIMIT 1 FOR UPDATE`;
   if (external.length) {
-    throw new Error('A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.');
+    throw new Error(
+      'A customer refund is being reviewed against your earnings. Please try again once the review is complete, or contact support.',
+    );
   }
 }
 
@@ -57,6 +64,8 @@ export async function assertNoUnreservedRefundDeductions(
       AND a.payoutId IS NULL AND a.amount > 0
     LIMIT 1 FOR UPDATE`;
   if (deductions.length) {
-    throw new Error('Refund deductions were added after this payout was requested. Cancel this payout and ask the affiliate to request the updated balance.');
+    throw new Error(
+      'Refund deductions were added after this payout was requested. Cancel this payout and ask the affiliate to request the updated balance.',
+    );
   }
 }

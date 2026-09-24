@@ -465,7 +465,13 @@ export default function Navbar(_props: NavbarProps) {
                       width={140}
                       height={22}
                     />
-                    <Image className="dark:hidden" src="/images/svg-logo.svg" alt="Sure Imports" width={140} height={22} />
+                    <Image
+                      className="dark:hidden"
+                      src="/images/svg-logo.svg"
+                      alt="Sure Imports"
+                      width={140}
+                      height={22}
+                    />
                   </div>
 
                   <div className="flex flex-col gap-2">

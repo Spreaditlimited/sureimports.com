@@ -157,14 +157,28 @@ export async function customerFromAttributionSession(request: NextRequest) {
   if (!token || !secret) return null;
   let payload: CustomerToken;
   try {
-    payload = jwt.verify(token, secret, { algorithms: ['HS256'], ignoreExpiration: false }) as CustomerToken;
-  } catch { return null; }
-  if (!payload || typeof payload.pidUser !== 'string' || typeof payload.userEmail !== 'string') return null;
+    payload = jwt.verify(token, secret, {
+      algorithms: ['HS256'],
+      ignoreExpiration: false,
+    }) as CustomerToken;
+  } catch {
+    return null;
+  }
+  if (
+    !payload ||
+    typeof payload.pidUser !== 'string' ||
+    typeof payload.userEmail !== 'string'
+  )
+    return null;
   const customer = await prisma.users.findUnique({
-    where: { pidUser: payload.pidUser }, select: { pidUser: true, userEmail: true },
+    where: { pidUser: payload.pidUser },
+    select: { pidUser: true, userEmail: true },
   });
-  return customer && customer.userEmail.trim().toLowerCase() === payload.userEmail.trim().toLowerCase()
-    ? customer : null;
+  return customer &&
+    customer.userEmail.trim().toLowerCase() ===
+      payload.userEmail.trim().toLowerCase()
+    ? customer
+    : null;
 }
 
 export async function getAttributedReferral(request: NextRequest) {
@@ -212,8 +226,14 @@ export async function claimAffiliateAttribution(
   customerReference: string,
   customerEmail: string,
 ) {
-  const payload = parseAttributionValue(request.cookies.get(ATTRIBUTION_COOKIE)?.value);
-  return claimAffiliateReferralByReference(payload?.referral, customerReference, customerEmail);
+  const payload = parseAttributionValue(
+    request.cookies.get(ATTRIBUTION_COOKIE)?.value,
+  );
+  return claimAffiliateReferralByReference(
+    payload?.referral,
+    customerReference,
+    customerEmail,
+  );
 }
 
 export async function claimAffiliateReferralByReference(
@@ -269,7 +289,13 @@ export async function claimAffiliateReferralByReference(
   } catch (error) {
     // Another browser/tab may have established this customer's permanent owner.
     // The unique customerReference constraint is the final authority.
-    if (!error || typeof error !== 'object' || !('code' in error) || error.code !== 'P2002') throw error;
+    if (
+      !error ||
+      typeof error !== 'object' ||
+      !('code' in error) ||
+      error.code !== 'P2002'
+    )
+      throw error;
   }
   if (claimed.count === 1) {
     return {

@@ -48,7 +48,11 @@ function loadRecaptchaScript(configuredSiteKey: string): Promise<void> {
 
 export function useRecaptchaV3() {
   return useCallback(async (action: string): Promise<string | undefined> => {
-    if (typeof window === 'undefined' || shouldBypassLocalCaptcha(window.location.hostname) || !siteKey) {
+    if (
+      typeof window === 'undefined' ||
+      shouldBypassLocalCaptcha(window.location.hostname) ||
+      !siteKey
+    ) {
       return undefined;
     }
 

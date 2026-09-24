@@ -58,8 +58,13 @@ export async function requestOriginalPayPalRefund(
       throw new Error(
         'Mixed or unlinked payments require review before refunding.',
       );
-    const legacySettlements = await tx.$queryRaw<{pidRefund:string}[]>`SELECT r.pidRefund FROM refund_records r LEFT JOIN refund_settlements s ON s.refundId=r.pidRefund WHERE r.pidOrder=${refund.pidOrder} AND r.pidUser=${pidUser} AND r.pidRefund <> ${refundId} AND r.refundStatus IN ('paid','refunded','wallet-transferred','requested') AND (s.refundId IS NULL OR s.method <> 'PAYPAL') LIMIT 1`;
-    if (legacySettlements.length) throw new Error('Earlier bank or wallet refunds must be reconciled before an original-payment refund can be requested.');
+    const legacySettlements = await tx.$queryRaw<
+      { pidRefund: string }[]
+    >`SELECT r.pidRefund FROM refund_records r LEFT JOIN refund_settlements s ON s.refundId=r.pidRefund WHERE r.pidOrder=${refund.pidOrder} AND r.pidUser=${pidUser} AND r.pidRefund <> ${refundId} AND r.refundStatus IN ('paid','refunded','wallet-transferred','requested') AND (s.refundId IS NULL OR s.method <> 'PAYPAL') LIMIT 1`;
+    if (legacySettlements.length)
+      throw new Error(
+        'Earlier bank or wallet refunds must be reconciled before an original-payment refund can be requested.',
+      );
     const candidates = [];
     for (const payment of payments) {
       const [reserved] = await tx.$queryRaw<
@@ -94,12 +99,19 @@ export async function reconcileRefundLeg(leg: Leg, allowInitiation = false) {
   if (leg.status === 'SETTLED' || leg.status === 'SUPERSEDED') return;
   await prisma.$executeRaw`UPDATE refund_provider_legs SET checkedAt=NOW(3) WHERE id=${leg.id}`;
   if (!leg.providerReference && leg.firstAttemptAt) {
-    const payment = await prisma.payments.findUnique({ where: { pidPayment: leg.paymentId } });
+    const payment = await prisma.payments.findUnique({
+      where: { pidPayment: leg.paymentId },
+    });
     if (!payment) throw new Error('Original payment linkage is missing.');
     const order = await paypalRefundRequest(`/orders/${payment.txRef}`);
-    const matches = (order.purchase_units || []).flatMap((unit: any) => unit.payments?.refunds || []).filter((refund: any) => refund.invoice_id === leg.id);
+    const matches = (order.purchase_units || [])
+      .flatMap((unit: any) => unit.payments?.refunds || [])
+      .filter((refund: any) => refund.invoice_id === leg.id);
     if (matches.length === 1 && /^[A-Za-z0-9]+$/.test(String(matches[0].id))) {
-      return reconcileRefundLeg({ ...leg, providerReference: String(matches[0].id) }, false);
+      return reconcileRefundLeg(
+        { ...leg, providerReference: String(matches[0].id) },
+        false,
+      );
     }
     // No matching provider record is not proof of failure. Never reissue the charge.
     return;
@@ -116,7 +128,10 @@ export async function reconcileRefundLeg(leg: Leg, allowInitiation = false) {
         AND JSON_UNQUOTE(JSON_EXTRACT(e.detailsJson,'$.captureId'))=${leg.captureId}
         AND NOT EXISTS (SELECT 1 FROM refund_events resolved WHERE resolved.id=CONCAT('RESOLVED:',e.id))
       LIMIT 1`;
-    if (externalReviews.length) throw new Error('An earlier PayPal refund needs review before another refund can be sent.');
+    if (externalReviews.length)
+      throw new Error(
+        'An earlier PayPal refund needs review before another refund can be sent.',
+      );
     const capture = await paypalRefundRequest(`/captures/${leg.captureId}`);
     const payment = await prisma.payments.findUnique({
       where: { pidPayment: leg.paymentId },
@@ -141,7 +156,9 @@ export async function reconcileRefundLeg(leg: Leg, allowInitiation = false) {
       const prior = await prisma.$queryRaw<
         { providerReference: string; amount: string; currency: string }[]
       >`SELECT providerReference,amount,currency FROM refund_provider_legs WHERE captureId=${leg.captureId} AND status='SETTLED'`;
-      const returned = (unit.payments.refunds || []).filter((refund: any) => !['FAILED', 'CANCELLED'].includes(refund.status));
+      const returned = (unit.payments.refunds || []).filter(
+        (refund: any) => !['FAILED', 'CANCELLED'].includes(refund.status),
+      );
       if (
         !returned.length ||
         returned.length !== prior.length ||
@@ -178,7 +195,8 @@ export async function reconcileRefundLeg(leg: Leg, allowInitiation = false) {
     // Recovery can then GET the canonical refund without sending another POST.
     if (/^[A-Za-z0-9]+$/.test(String(provider.id || ''))) {
       await prisma.$executeRaw`UPDATE refund_provider_legs SET providerReference=${String(provider.id)},updatedAt=NOW(3) WHERE id=${leg.id} AND providerReference IS NULL`;
-      if (!provider.amount || !provider.invoice_id) provider = await paypalRefundRequest(`/refunds/${provider.id}`);
+      if (!provider.amount || !provider.invoice_id)
+        provider = await paypalRefundRequest(`/refunds/${provider.id}`);
     }
   }
   const status = validatedRefundStatus(provider, {
@@ -242,19 +260,33 @@ export async function checkOriginalPayPalRefund(
 ) {
   const [settlement] = await prisma.$queryRaw<{ method: string }[]>`
     SELECT method FROM refund_settlements WHERE refundId=${refundId}`;
-  if (settlement?.method !== 'PAYPAL') throw new Error('PayPal refund request not found.');
+  if (settlement?.method !== 'PAYPAL')
+    throw new Error('PayPal refund request not found.');
   const legs = await prisma.$queryRaw<Leg[]>`
     SELECT * FROM refund_provider_legs WHERE refundId=${refundId} ORDER BY id`;
-  if (!legs.length) throw new Error('This refund has no payment allocations. Review the request before proceeding.');
+  if (!legs.length)
+    throw new Error(
+      'This refund has no payment allocations. Review the request before proceeding.',
+    );
   if (recovery) {
-    const leg = legs.find(item => item.id === recovery.legId);
-    if (!leg || !leg.firstAttemptAt || leg.status === 'SETTLED' ||
+    const leg = legs.find((item) => item.id === recovery.legId);
+    if (
+      !leg ||
+      !leg.firstAttemptAt ||
+      leg.status === 'SETTLED' ||
       !/^[A-Za-z0-9]{5,80}$/.test(recovery.providerReference) ||
-      (leg.providerReference && leg.providerReference !== recovery.providerReference)) {
-      throw new Error('Select an attempted refund and its matching PayPal refund reference.');
+      (leg.providerReference &&
+        leg.providerReference !== recovery.providerReference)
+    ) {
+      throw new Error(
+        'Select an attempted refund and its matching PayPal refund reference.',
+      );
     }
     // The canonical response must match amount, currency, invoice ID and capture.
-    await reconcileRefundLeg({ ...leg, providerReference: recovery.providerReference }, false);
+    await reconcileRefundLeg(
+      { ...leg, providerReference: recovery.providerReference },
+      false,
+    );
   } else {
     for (const leg of legs) await reconcileRefundLeg(leg, false);
   }

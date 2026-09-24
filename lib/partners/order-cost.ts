@@ -65,7 +65,12 @@ export function priceCustomerOrder(
       meetsMinimum: false,
       minimumOrderNgn: config.minimumOrderNgn,
     };
-  const productValue = procurementProductValue(raw, input.currencyType, shipping.countryName, config);
+  const productValue = procurementProductValue(
+    raw,
+    input.currencyType,
+    shipping.countryName,
+    config,
+  );
   const measurement = input.products.reduce(
     (sum, p) => sum + p.shippingMeasurePerUnit * p.productQuantity,
     0,
@@ -89,7 +94,12 @@ export function priceCustomerOrder(
     serviceChargeBps: config.serviceChargeBps,
     partnerShareBps: config.partnerShareBps,
   });
-  const taxMinor = Number((BigInt(beforeTax.serviceChargeMinor) * BigInt(Math.round(config.vatPercent * 100)) + BigInt(5000)) / BigInt(10000));
+  const taxMinor = Number(
+    (BigInt(beforeTax.serviceChargeMinor) *
+      BigInt(Math.round(config.vatPercent * 100)) +
+      BigInt(5000)) /
+      BigInt(10000),
+  );
   const allocation = calculatePartnerPricing({ ...beforeTax, taxMinor });
   return {
     ...allocation,

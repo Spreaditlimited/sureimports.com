@@ -172,11 +172,18 @@ export async function customerOrderDetail(
       })
     : null;
   // Never expose partner earning allocations or internal receiving addresses to customers.
-  const [receipt] = await prisma.$queryRaw<Array<{ deliveryConfirmedAt: Date | null; state: string }>>`SELECT deliveryConfirmedAt,state FROM partner_wallet_credits WHERE orderId=${id}`;
+  const [receipt] = await prisma.$queryRaw<
+    Array<{ deliveryConfirmedAt: Date | null; state: string }>
+  >`SELECT deliveryConfirmedAt,state FROM partner_wallet_credits WHERE orderId=${id}`;
   return {
     id: row.id,
     receiptConfirmedAt: receipt?.deliveryConfirmedAt?.toISOString() || null,
-    canConfirmReceipt: Boolean(receipt?.state === 'PENDING' && !receipt.deliveryConfirmedAt && operational?.status === 'completed' && row.paymentStatus === 'PAID'),
+    canConfirmReceipt: Boolean(
+      receipt?.state === 'PENDING' &&
+        !receipt.deliveryConfirmedAt &&
+        operational?.status === 'completed' &&
+        row.paymentStatus === 'PAID',
+    ),
     revision: row.revision,
     status: operational?.status || row.status,
     paymentStatus: row.paymentStatus,
@@ -374,7 +381,14 @@ export async function initiateCustomerCheckout(
     await event(tx, row, customerPid, 'CHECKOUT_INITIALIZED');
     return { row, email: customer.userEmail, checkout };
   });
-  if (intent.checkout.settlementPolicy !== 'EARNINGS_WALLET' || intent.checkout.subaccount) throw new FlowError('This older checkout uses a different settlement arrangement. Contact support before making payment.', 409);
+  if (
+    intent.checkout.settlementPolicy !== 'EARNINGS_WALLET' ||
+    intent.checkout.subaccount
+  )
+    throw new FlowError(
+      'This older checkout uses a different settlement arrangement. Contact support before making payment.',
+      409,
+    );
   if (intent.checkout.url) return { url: intent.checkout.url };
   const checkout = intent.checkout;
   if (!checkout.callbackHost)
@@ -526,7 +540,13 @@ export async function commitVerifiedCustomerPayment(
       },
     });
     await tx.$executeRaw`UPDATE procurement_partner_customer_orders SET status = 'pending', paymentStatus = 'PAID', verifiedPaymentReference = ${reference}, paidRevision = revision, partnerReview = 'AWAITING_REVIEW', updatedAt = NOW(3) WHERE id = ${row.id}`;
-    if (checkout.settlementPolicy === 'EARNINGS_WALLET' && !checkout.subaccount) await creditWallet(tx, row.partnerId, row.id, checkout.cost.partnerEarningsMinor);
+    if (checkout.settlementPolicy === 'EARNINGS_WALLET' && !checkout.subaccount)
+      await creditWallet(
+        tx,
+        row.partnerId,
+        row.id,
+        checkout.cost.partnerEarningsMinor,
+      );
     await event(tx, row, 'PAYSTACK_VERIFIED', 'PAYMENT_CONFIRMED');
     return { id: row.id, duplicate: false };
   });

@@ -12,7 +12,7 @@ test('hero badges use block flex layout and a single headline gap', () => {
   assert.match(css, /display: flex/);
   assert.match(css, /margin-inline: auto/);
   assert.match(css, /margin-bottom: 24px/);
-  assert.match(css, /\+ h1 \{ margin-top: 0/);
+  assert.match(css, /\+ h1\s*\{\s*margin-top: 0/);
 });
 test('popular searches use solid semantic surfaces, including hover', () => {
   const css = readFileSync(new URL('../components/intelligence/ReportSearchExperience.module.css', import.meta.url), 'utf8');

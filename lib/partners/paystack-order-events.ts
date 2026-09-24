@@ -74,10 +74,21 @@ export async function handlePartnerPaystackEvent(
     // A dispute resolution is never automatic permission to release goods again.
     await prisma.$transaction(async (tx) => {
       const [row] = await tx.$queryRaw<
-        Array<{ id: string; partnerId: string; releasedOrderId: string | null; paymentStatus: string }>
+        Array<{
+          id: string;
+          partnerId: string;
+          releasedOrderId: string | null;
+          paymentStatus: string;
+        }>
       >`SELECT id, partnerId, releasedOrderId, paymentStatus FROM procurement_partner_customer_orders WHERE checkoutReference = ${reference} FOR UPDATE`;
       if (!row || row.paymentStatus === 'REVERSED') return;
-      await holdWalletCredit(tx, row.partnerId, row.id, event.event === 'refund.processed', 'PAYSTACK');
+      await holdWalletCredit(
+        tx,
+        row.partnerId,
+        row.id,
+        event.event === 'refund.processed',
+        'PAYSTACK',
+      );
       const status =
         event.event === 'refund.processed' ? 'REVERSED' : 'DISPUTED';
       await tx.$executeRaw`UPDATE procurement_partner_customer_orders SET paymentStatus = ${status}, partnerReview = 'REVIEW_REQUIRED', updatedAt = NOW(3) WHERE id = ${row.id}`;

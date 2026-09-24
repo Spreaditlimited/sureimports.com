@@ -49,7 +49,8 @@ test('the main services menu exposes Body Cam Solutions and links to LineScout h
 
   assert.match(navbar, /title: 'Body Cam Solutions'/);
   assert.match(navbar, /href: '\/body-camera-solutions'/);
-  assert.match(footer, />\s*Body Cam Solutions\s*</);
+  assert.match(footer, /<BrandFooter\s/);
+  assert.match(read('components/BrandFooter.tsx'), /\/import-hub/);
   assert.match(navbar, /href: 'https:\/\/linescout\.sureimports\.com\/'/);
   assert.doesNotMatch(navbar, /route_type=simple_sourcing/);
 });
