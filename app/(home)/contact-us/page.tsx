@@ -3,6 +3,7 @@ import { Mail, MessageCircle, PackageCheck, Phone, MapPin } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import HeroPill from '@/components/home/HeroPill';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { getCompanyContactSettings } from '@/lib/intelligence/companyContacts';
 import styles from './contact.module.css';
 
@@ -28,7 +29,7 @@ export default async function ContactPage() {
         <p>Starting with a product idea, planning a shipment, or checking an order? Here’s how to reach the right team.</p>
       </header>
       <section className={styles.channels} aria-label="Ways to contact us">
-        <article className={styles.card}><MessageCircle aria-hidden="true" /><h2>Chat with us</h2><p>Ask about buying from China, white labelling, shipping, or joining our partner programme.</p><a className={styles.primary} href="https://wa.me/447881194138?text=Hello%20Sure%20Imports%2C%20I%20have%20an%20enquiry." data-whatsapp-contact="managed">Chat on WhatsApp</a></article>
+        <article className={styles.card}><MessageCircle aria-hidden="true" /><h2>Chat with us</h2><p>Ask about buying from China, white labelling, shipping, or joining our partner programme.</p><WhatsAppButton waID="" variant="inline" triggerClassName={styles.primary} message="Hello Sure Imports, I have an enquiry." /></article>
         <article className={styles.card}><Mail aria-hidden="true" /><h2>Email our team</h2><p>For detailed enquiries, share your product links, quantities and destination. For an existing order, include your order reference.</p><a className={styles.action} href="mailto:hello@sureimports.com">hello@sureimports.com</a></article>
         <article className={styles.card}><PackageCheck aria-hidden="true" /><h2>Already placed an order?</h2><p>Sign in to see your order’s progress. Have a shipping reference? Check your shipment directly.</p><div className={styles.links}><a className={styles.action} href="/dashboard">Open my dashboard</a><a className={styles.textLink} href="/track">Track a shipment</a></div></article>
       </section>

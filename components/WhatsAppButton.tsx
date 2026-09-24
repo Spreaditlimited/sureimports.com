@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -14,6 +14,8 @@ interface WhatsAppButtonProps {
   message?: string;
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
   contacts?: WhatsAppContact[];
+  variant?: 'floating' | 'inline';
+  triggerClassName?: string;
 }
 
 const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
@@ -21,12 +23,37 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   message = 'Hello! I have a question from your website.',
   position = 'bottom-right',
   contacts,
+  variant = 'floating',
+  triggerClassName,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [managedContacts, setManagedContacts] = useState<WhatsAppContact[] | null>(
     null,
   );
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [trayPosition, setTrayPosition] = useState({ above: true, maxHeight: 420 });
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const dismissOutside = (event: PointerEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
+    const dismissEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('pointerdown', dismissOutside);
+    document.addEventListener('keydown', dismissEscape);
+    return () => {
+      document.removeEventListener('pointerdown', dismissOutside);
+      document.removeEventListener('keydown', dismissEscape);
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     let isMounted = true;
@@ -69,6 +96,37 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
       },
     ];
   }, [contacts, managedContacts, waID]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || variant !== 'inline') return;
+    const updatePosition = () => {
+      const button = triggerRef.current?.getBoundingClientRect();
+      const panel = panelRef.current;
+      if (!button || !panel) return;
+      const viewport = window.visualViewport;
+      // Leave room for the sticky navigation and the screen edges.
+      const top = (viewport?.offsetTop ?? 0) + 96;
+      const bottom = (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 16;
+      const aboveSpace = Math.max(0, button.top - top - 12);
+      const belowSpace = Math.max(0, bottom - button.bottom - 12);
+      const desiredHeight = Math.min(panel.scrollHeight, 420);
+      const above = aboveSpace >= desiredHeight || (belowSpace < desiredHeight && aboveSpace >= belowSpace);
+      const maxHeight = Math.min(420, above ? aboveSpace : belowSpace);
+      setTrayPosition(previous => previous.above === above && previous.maxHeight === maxHeight
+        ? previous : { above, maxHeight });
+    };
+    updatePosition();
+    window.addEventListener('scroll', updatePosition, { passive: true, capture: true });
+    window.addEventListener('resize', updatePosition);
+    window.visualViewport?.addEventListener('resize', updatePosition);
+    window.visualViewport?.addEventListener('scroll', updatePosition);
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      window.visualViewport?.removeEventListener('resize', updatePosition);
+      window.visualViewport?.removeEventListener('scroll', updatePosition);
+    };
+  }, [isOpen, variant, configuredContacts]);
 
   const positionClass = () => {
     switch (position) {
@@ -135,14 +193,35 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
 
   return (
     <div
-      data-whatsapp-placement="floating"
-      className={`fixed ${positionClass()} z-20`}
+      ref={containerRef}
+      data-whatsapp-placement={variant === 'inline' ? 'contact-page' : 'floating'}
+      className={variant === 'inline' ? 'relative' : `fixed ${positionClass()} z-20`}
       onMouseEnter={cancelClose}
-      onMouseLeave={closeWithDelay}
+      onMouseLeave={variant === 'floating' ? closeWithDelay : undefined}
     >
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className={variant === 'inline' ? triggerClassName : 'flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-lg shadow-green-900/20 transition hover:bg-green-600'}
+        aria-expanded={isOpen}
+        aria-label={variant === 'inline' ? 'Chat on WhatsApp' : 'Contact us on WhatsApp'}
+        title="Contact us on WhatsApp"
+      >
+        {variant === 'inline' ? 'Chat on WhatsApp' : <span className="relative flex items-center">
+          <FaWhatsapp size={28} />
+          <ChevronDown
+            size={14}
+            className={`absolute -bottom-2 -right-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </span>}
+      </button>
       {isOpen && (
         <div
-          className={`absolute ${panelVerticalClass()} ${panelPositionClass()} w-[min(calc(100vw-2rem),22rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15 dark:border-slate-800 dark:bg-slate-950`}
+          ref={panelRef}
+          data-whatsapp-tray={variant === 'inline' ? (trayPosition.above ? 'above' : 'below') : 'floating'}
+          style={variant === 'inline' ? { maxHeight: trayPosition.maxHeight, overflowY: 'auto' } : undefined}
+          className={`${variant === 'inline' ? `absolute left-0 z-40 w-full ${trayPosition.above ? 'bottom-full mb-3' : 'top-full mt-3'}` : `absolute ${panelVerticalClass()} ${panelPositionClass()} w-[min(calc(100vw-2rem),22rem)]`} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15 dark:border-slate-800 dark:bg-slate-950`}
         >
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
             <div>
@@ -191,23 +270,6 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
           </div>
         </div>
       )}
-
-      <button
-        type="button"
-        onClick={() => setIsOpen((value) => !value)}
-        className="flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-lg shadow-green-900/20 transition hover:bg-green-600"
-        aria-expanded={isOpen}
-        aria-label="Contact us on WhatsApp"
-        title="Contact us on WhatsApp"
-      >
-        <span className="relative flex items-center">
-          <FaWhatsapp size={28} />
-          <ChevronDown
-            size={14}
-            className={`absolute -bottom-2 -right-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          />
-        </span>
-      </button>
     </div>
   );
 };
