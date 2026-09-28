@@ -5,6 +5,7 @@ import {
   publicVehicle,
 } from '@/lib/vehicles/data';
 import Catalogue from './Catalogue';
+import { carsSocialImage } from '@/lib/vehicles/social';
 export const metadata: Metadata = {
   title: 'Electric Cars, Vans & Cargo Trucks in Nigeria',
   description:
@@ -16,6 +17,15 @@ export const metadata: Metadata = {
       'Compare vehicles, Naira import estimates and practical ownership guides.',
     url: 'https://www.sureimports.com/cars',
     type: 'website',
+    siteName: 'Sure Imports',
+    images: [carsSocialImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Electric Vehicles from China to Nigeria | Sure Imports',
+    description:
+      'Compare vehicles, Naira import estimates and practical ownership guides.',
+    images: [{ url: carsSocialImage.url, alt: carsSocialImage.alt }],
   },
 };
 export const dynamic = 'force-dynamic';

@@ -7,6 +7,7 @@ import {
 } from '@/lib/vehicles/data';
 import VehicleDetail from '../../VehicleDetail';
 import VehicleBuyingGuide from '../../VehicleBuyingGuide';
+import { carsSocialImage, vehicleSocialImage } from '@/lib/vehicles/social';
 export const dynamic = 'force-dynamic';
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,6 +22,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${model.name} in Nigeria: Specifications & Import Price`;
   const description = `Compare ${model.name} configurations, specifications and Naira import estimates. Order from China with shipping, clearing, duties and taxes included in shipping.`;
   const url = `https://www.sureimports.com/cars/models/${slug}`;
+  const photo = model.images.find((image) =>
+    image.startsWith('https://res.cloudinary.com/'),
+  );
+  const socialImage = photo
+    ? {
+        ...carsSocialImage,
+        url: vehicleSocialImage(photo),
+        alt: `${model.name} — Sure Imports vehicles from China to Nigeria`,
+      }
+    : carsSocialImage;
   return {
     title,
     description,
@@ -30,13 +41,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url,
       type: 'website',
-      images: model.images.slice(0, 1).map((url) => ({ url, alt: model.name })),
+      siteName: 'Sure Imports',
+      images: [socialImage],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
-      images: model.images.slice(0, 1),
+      images: [{ url: socialImage.url, alt: socialImage.alt }],
     },
   };
 }
