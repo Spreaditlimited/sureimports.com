@@ -96,9 +96,9 @@
 }
 .vehicle-hero-image > img {
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   -o-object-position: 50% 60%;
-     object-position: 50% 60%;
+  object-position: 50% 60%;
 }
 .vehicle-hero-image:after {
   content: '';
@@ -246,7 +246,7 @@
 }
 .vehicle-card-image img {
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
 }
 .vehicle-tag {
   display: flex;
@@ -388,7 +388,7 @@
 }
 .vehicle-detail-image img {
   -o-object-fit: contain;
-     object-fit: contain;
+  object-fit: contain;
 }
 .vehicle-thumbnails {
   display: flex;
@@ -409,7 +409,7 @@
 }
 .vehicle-thumbnails img {
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   height: 75px;
 }
 .vehicle-detail-intro h1 {
@@ -838,9 +838,9 @@
 }
 .vehicle-carousel-slide > img {
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
   -o-object-position: center;
-     object-position: center;
+  object-position: center;
 }
 .vehicle-carousel::after {
   display: none;
@@ -1051,7 +1051,7 @@
 }
 .vc-model-image img {
   -o-object-fit: cover;
-     object-fit: cover;
+  object-fit: cover;
 }
 .vc-model-image button {
   position: absolute;

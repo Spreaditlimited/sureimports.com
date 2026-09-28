@@ -40,7 +40,9 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
   try {
     const url = new URL(redirectCandidate, 'https://sureimports.local');
     const isDashboardPath = url.pathname.startsWith('/dashboard');
-    const isVehicleModel = /^\/cars\/models\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(url.pathname);
+    const isVehicleModel = /^\/cars\/models\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(
+      url.pathname,
+    );
     const isShopCheckoutResume =
       url.pathname === '/shop/checkout' &&
       url.searchParams.get('resumeCheckout') === '1';

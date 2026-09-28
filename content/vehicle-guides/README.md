@@ -3,6 +3,7 @@
 Nine original articles for the existing database-backed blog. HTML files are the reviewed publication source; after publication, normal editing is available in the central admin blog.
 
 Price sources verified 28 September 2026:
+
 - NERC IE September 2026 order, page 7, Table 3: A–Non-MD 209.50 NGN/kWh and B–Non-MD 62.48 NGN/kWh. End-user scope is IE yet-to-be-transitioned franchise area in Ogun, not all Lagos/Nigeria. Published energy rates used before separately applied billing taxes/charges.
 - NBS May 2026 PMS report and workbook: national average 1596.25 NGN/litre; Lagos 1561.22. Articles use national average.
 - NBS May 2026 AGO report and workbook: national average 3277.47 NGN/litre; Lagos 3150.45. Articles use national average.

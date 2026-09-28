@@ -574,7 +574,7 @@ export default function Navbar(_props: NavbarProps) {
                           <Button
                             type="button"
                             data-si-sign-out
-                  onClick={() => void logout()}
+                            onClick={() => void logout()}
                             className="w-full rounded-xl bg-slate-800 py-6 text-lg font-bold text-white hover:bg-slate-700"
                           >
                             Sign Out
