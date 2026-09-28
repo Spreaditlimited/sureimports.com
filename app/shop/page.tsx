@@ -1,5 +1,6 @@
 'use client';
 
+import PublicPageLoading from '@/components/PublicPageLoading';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
@@ -311,7 +312,7 @@ function ShopContent() {
 
 export default function ShopPage() {
   return (
-    <React.Suspense fallback={null}>
+    <React.Suspense fallback={<PublicPageLoading />}>
       <ShopContent />
     </React.Suspense>
   );

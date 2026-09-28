@@ -1,3 +1,4 @@
+import PublicPageLoading from '@/components/PublicPageLoading';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import './globals.css';
 import { ReactNode, Suspense } from 'react';
@@ -20,7 +21,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <div className="public-site-theme contents">
-      <Suspense fallback={null}>{children}</Suspense>
+      <Suspense fallback={<PublicPageLoading />}>{children}</Suspense>
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
         message="Hello! I'd like to ask about your services."

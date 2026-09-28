@@ -1,4 +1,5 @@
 'use client';
+import { createVehicleRequestKey } from '@/lib/vehicles/requestKey';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { VehicleBank } from '@/lib/vehicles/customer';
@@ -24,7 +25,7 @@ export default function PaymentProof({
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState('');
-  const [key, setKey] = useState(() => crypto.randomUUID());
+  const [key, setKey] = useState(() => createVehicleRequestKey());
   async function copy(text: string) {
     try {
       await navigator.clipboard.writeText(text);
@@ -48,7 +49,7 @@ export default function PaymentProof({
       const data = await r.json();
       if (!r.ok) throw new Error(data.message);
       setOpen(false);
-      setKey(crypto.randomUUID());
+      setKey(createVehicleRequestKey());
       router.refresh();
     } catch (e) {
       setError((e as Error).message);

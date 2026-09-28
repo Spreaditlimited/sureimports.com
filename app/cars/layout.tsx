@@ -22,7 +22,7 @@ export default function CarsLayout({
   return (
     <div className="public-site-theme">
       <Navbar />
-      <div className="vehicles-site pt-20">
+      <div className="vehicles-site min-h-screen pt-20">
         <div className="vehicle-subnav">
           <strong>Cars & commercial vehicles</strong>
           <nav aria-label="Vehicle navigation">

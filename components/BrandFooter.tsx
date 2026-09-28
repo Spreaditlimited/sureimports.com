@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './BrandFooter.module.css';
 
 type FooterLink = { label: string; href: string };
@@ -11,17 +12,17 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
     <div className={styles.container}>
       <div className={styles.grid}>
         <div className={styles.identity}>
-          <a href={home} aria-label={`Sure Imports ${brand} home`} className={styles.brand}>
+          <Link href={home} aria-label={`Sure Imports ${brand} home`} className={styles.brand}>
             <Image src={logo} alt="Sure Imports" width={200} height={32} unoptimized />
             {brand && <span>{brand}</span>}
-          </a>
+          </Link>
           <p>From finding the right products to bringing them home. Import from China with confidence.</p>
           <span className={styles.locations}>Nigeria · United Kingdom · China</span>
         </div>
         <nav aria-label="Explore Sure Imports">
           <h2>Explore</h2>
-          <a href={`${mainSite}/import-hub`}>Import Hub</a>
-          <a href={`${mainSite}/cars`}>Cars & commercial vehicles</a>
+          <Link href={`${mainSite}/import-hub`}>Import Hub</Link>
+          <Link href={`${mainSite}/cars`}>Cars & commercial vehicles</Link>
           <a href="https://linescout.sureimports.com/white-label">White label products</a>
           <a href="https://linescout.sureimports.com">LineScout sourcing</a>
           <a href="https://partner.sureimports.com/partners">Become a partner</a>
@@ -29,10 +30,10 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         </nav>
         <nav aria-label="Help and company">
           <h2>Here to help</h2>
-          <a href={`${mainSite}/contact-us`}>Contact us</a>
-          <a href={`${mainSite}/track`}>Track a shipment</a>
-          <a href={`${mainSite}/shipping-rate`}>Shipping rates</a>
-          <a href={`${mainSite}/about`}>About Sure Imports</a>
+          <Link href={`${mainSite}/contact-us`}>Contact us</Link>
+          <Link href={`${mainSite}/track`}>Track a shipment</Link>
+          <Link href={`${mainSite}/shipping-rate`}>Shipping rates</Link>
+          <Link href={`${mainSite}/about`}>About Sure Imports</Link>
           <a href="mailto:hello@sureimports.com">hello@sureimports.com</a>
         </nav>
         <div className={styles.lastColumn}>
@@ -48,11 +49,11 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
       <div className={styles.bottom}>
         <p>© {new Date().getFullYear()} Sure Importers Limited<span>Spreadit Sourcing Limited · United Kingdom</span></p>
         <nav aria-label="Legal policies">
-          <a href={`${mainSite}/privacy-policy`}>Privacy</a>
-          <a href={`${mainSite}/terms-and-conditions`}>Terms</a>
-          <a href={`${mainSite}/shipping-policy`}>Shipping</a>
-          <a href={`${mainSite}/warranty-policy`}>Warranty</a>
-          {brand === 'Affiliate' && <a href="/affiliate-terms">Affiliate terms</a>}
+          <Link href={`${mainSite}/privacy-policy`}>Privacy</Link>
+          <Link href={`${mainSite}/terms-and-conditions`}>Terms</Link>
+          <Link href={`${mainSite}/shipping-policy`}>Shipping</Link>
+          <Link href={`${mainSite}/warranty-policy`}>Warranty</Link>
+          {brand === 'Affiliate' && <Link href="/affiliate-terms">Affiliate terms</Link>}
           {settings}
         </nav>
       </div>

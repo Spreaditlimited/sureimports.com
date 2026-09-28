@@ -1,3 +1,4 @@
+import PublicPageLoading from '@/components/PublicPageLoading';
 import NavBar from '@/components/home/NavBar';
 import './globals.css';
 import { ReactNode, Suspense } from 'react';
@@ -27,7 +28,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <div className="public-site-theme relative">
         <Header />
         {/* <LiveChatWidgetComponent /> */}
-        <Suspense fallback={null}>{children}</Suspense>
+        <Suspense fallback={<PublicPageLoading />}>{children}</Suspense>
         <CookieConsent />
         {/* Add the WhatsApp button */}
         <WhatsAppButton

@@ -15,6 +15,9 @@
   text-decoration: none;
   color: inherit;
 }
+.vehicle-hero-surface {
+  background: var(--si-hero-surface);
+}
 .vehicle-hero {
   max-width: 1500px;
   margin: auto;
@@ -25,8 +28,11 @@
 .vehicle-hero-copy {
   padding: 90px 10% 60px;
 }
+.vehicle-hero-copy [data-hero-pill] {
+  margin-inline: 0;
+}
 .vehicle-eyebrow {
-  font-size: 10px !important;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -42,10 +48,12 @@
   background: #739e52;
 }
 .vehicle-hero h1 {
-  font-size: clamp(48px, 5.2vw, 78px);
-  letter-spacing: -4px;
-  line-height: 1.06;
-  margin: 26px 0;
+  font-size: clamp(48px, 5.2vw, 72px);
+  font-weight: 650;
+  letter-spacing: -0.055em;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin: 0;
 }
 .vehicle-hero h1 em {
   font-family: inherit;
@@ -54,11 +62,35 @@
   color: var(--si-accent);
 }
 .vehicle-hero-description {
-  font-size: 16px;
-  line-height: 1.85;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.625;
+  text-wrap: balance;
   max-width: 410px;
   color: var(--v-muted);
-  margin: 25px 0 32px;
+  margin: 24px 0 40px;
+}
+.vehicle-hero-copy .vehicle-button {
+  min-height: 56px;
+  padding: 16px 32px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 700;
+  gap: 8px;
+  box-shadow: 0 6px 18px rgb(24 24 40 / 10%);
+  transition:
+    background-color 150ms,
+    transform 150ms;
+}
+.vehicle-hero-copy .vehicle-button:active {
+  transform: scale(0.98);
+}
+@media (max-width: 639px) {
+  .vehicle-hero-copy .vehicle-button {
+    width: 100%;
+    height: 56px;
+    padding: 0 32px;
+  }
 }
 .vehicle-button {
   display: inline-flex;
@@ -264,7 +296,7 @@
   padding: 23px;
 }
 .vehicle-card-body .vehicle-eyebrow {
-  font-size: 9px !important;
+  font-size: 12px;
   margin: 0 0 9px;
   color: #768270;
 }
@@ -570,19 +602,41 @@
     height: 450px;
   }
 }
+@media (max-width: 767px) {
+  .vehicle-hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .vehicle-hero-copy {
+    text-align: center;
+  }
+  .vehicle-hero-copy [data-hero-pill] {
+    margin-inline: auto;
+  }
+  .vehicle-hero-copy .vehicle-eyebrow,
+  .vehicle-hero-note {
+    justify-content: center;
+  }
+  .vehicle-hero-description {
+    margin-inline: auto;
+  }
+  .vehicle-hero > .vehicle-hero-image {
+    display: none;
+  }
+}
 @media (max-width: 700px) {
   .vehicle-hero {
     grid-template-columns: 1fr;
   }
   .vehicle-hero-copy {
-    padding: 50px 6% 35px;
+    padding: 48px 24px;
   }
   .vehicle-hero h1 {
-    font-size: 55px;
-    letter-spacing: -3px;
+    font-size: clamp(2rem, 9.25vw, 2.5rem);
+    line-height: 1.12;
   }
   .vehicle-hero-description {
-    font-size: 14px;
+    font-size: 18px;
   }
   .vehicle-hero-image {
     height: 390px;
@@ -1607,4 +1661,176 @@
     padding: 24px 16px;
     margin: 32px auto;
   }
+}
+
+/* Catalogue typography follows the public site's section and card scale. */
+.vehicle-catalogue {
+  font-size: 16px;
+  line-height: 1.625;
+}
+.vehicle-catalogue :is(h2, h3) {
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-section-heading,
+    .vehicle-how,
+    .vehicle-guides,
+    .vehicle-faq-heading
+  )
+  h2 {
+  font-size: 48px;
+  line-height: 1.2;
+}
+.vehicle-catalogue :is(.vehicle-card h3, .vehicle-guide-grid h3) {
+  font-size: 24px;
+  line-height: 1.35;
+}
+.vehicle-catalogue :is(.vehicle-eyebrow, .vc-eyebrow) {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.vehicle-catalogue
+  :is(.vehicle-trust strong, .vehicle-how strong, .vehicle-faq-help h3) {
+  font-size: 20px;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-trust p,
+    .vehicle-how p,
+    .vehicle-guide-grid p,
+    .vehicle-faq-answer,
+    .vehicle-faq-help p,
+    .vehicle-faq-empty p
+  ) {
+  font-size: 16px;
+  line-height: 1.625;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-section-heading > p,
+    .vehicle-faq-heading > p,
+    .vehicle-guides > p:not(.vehicle-eyebrow)
+  ) {
+  font-size: 18px;
+  line-height: 1.625;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-tabs button,
+    .vehicle-result-count,
+    .vehicle-card-bottom label,
+    .vehicle-footnote,
+    .vehicle-faq-sidebar nav button,
+    .vehicle-faq-help a,
+    .vehicle-faq-results,
+    .vehicle-faq-answer a,
+    .vehicle-faq-empty button,
+    .vehicle-compare-bar,
+    .vc-toolbar,
+    .vc-table,
+    .vc-header div > p:last-child,
+    .vc-footer p,
+    .vc-footer > span,
+    .vc-intro p,
+    .vc-intro button,
+    .vc-table .vehicle-field,
+    .vc-table .vehicle-field button,
+    .vehicle-faq-note,
+    .vc-mobile-hint
+  ) {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-search input,
+    .vehicle-faq-search input,
+    .vehicle-faq-item summary
+  ) {
+  font-size: 16px;
+  line-height: 1.5;
+}
+.vehicle-catalogue
+  :is(
+    .vehicle-card-specs,
+    .vehicle-card-bottom small,
+    .vehicle-tag,
+    .vehicle-trust span,
+    .vehicle-hero-note,
+    .vehicle-faq-sidebar nav small,
+    .vehicle-image-caption span:first-child,
+    .vc-eyebrow,
+    .vc-model-category,
+    .vc-table small,
+    .vc-table .vc-section > *,
+    .vehicle-faq-topic
+  ) {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.vehicle-catalogue .vehicle-image-caption span:last-child {
+  font-size: 14px;
+}
+.vehicle-catalogue .vehicle-card-specs,
+.vehicle-catalogue .vehicle-card-bottom {
+  flex-wrap: wrap;
+}
+.vehicle-catalogue .vehicle-card-bottom strong {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+.vehicle-catalogue .vehicle-card-bottom > div {
+  min-width: 0;
+}
+.vehicle-catalogue .vehicle-card-bottom label {
+  min-height: 44px;
+  gap: 8px;
+}
+.vehicle-catalogue .vehicle-tabs button {
+  min-height: 44px;
+  font-weight: 600;
+}
+.vehicle-catalogue .vehicle-search input {
+  min-width: 0;
+  min-height: 26px;
+}
+.vehicle-catalogue .vehicle-hero-copy .vehicle-button {
+  font-size: 16px;
+}
+.vehicle-subnav {
+  font-size: 14px;
+}
+.vehicle-subnav strong {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+@media (max-width: 767px) {
+  .vehicle-catalogue
+    :is(
+      .vehicle-section-heading,
+      .vehicle-how,
+      .vehicle-guides,
+      .vehicle-faq-heading
+    )
+    h2 {
+    font-size: 30px;
+  }
+  .vehicle-catalogue .vehicle-guide-grid h3 {
+    font-size: 20px;
+  }
+  .vehicle-catalogue .vehicle-compare-bar {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+}
+
+.vehicle-catalogue .vehicle-button {
+  font-size: 14px;
 }

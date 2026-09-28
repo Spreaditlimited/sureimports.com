@@ -12,6 +12,7 @@ import {
   VEHICLE_RESUME_PATH,
 } from '@/lib/auth/loginRedirect';
 import { readVehicleDraft } from '@/lib/vehicles/requestDraft';
+import { createVehicleRequestKey } from '@/lib/vehicles/requestKey';
 import VehiclePicker from '@/components/vehicles/VehiclePicker';
 
 export default function VehicleDetail({
@@ -35,7 +36,7 @@ export default function VehicleDetail({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [video, setVideo] = useState<string | null>(null);
-  const [requestKey, setRequestKey] = useState(() => crypto.randomUUID());
+  const [requestKey, setRequestKey] = useState(() => createVehicleRequestKey());
   const formRef = useRef<HTMLFormElement>(null);
   useEffect(() => {
     try {

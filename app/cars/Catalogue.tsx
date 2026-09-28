@@ -10,6 +10,7 @@ import VehicleHeroCarousel from './VehicleHeroCarousel';
 import VehicleComparison from './VehicleComparison';
 import guides from '@/content/vehicle-guides/manifest.json';
 import VehicleFaqs from './VehicleFaqs';
+import HeroPill from '@/components/home/HeroPill';
 
 export default function Catalogue({ models }: { models: PublicVehicle[] }) {
   const params = useSearchParams();
@@ -35,29 +36,29 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
     [models, category, query],
   );
   return (
-    <main>
-      <section className="vehicle-hero">
-        <div className="vehicle-hero-copy">
-          <p className="vehicle-eyebrow">
-            <span /> THE NEXT MOVE FOR YOUR BUSINESS
-          </p>
-          <h1>
-            Electric ambition.
-            <br />
-            <em>Delivered.</em>
-          </h1>
-          <p className="vehicle-hero-description">
-            Discover electric vans, buses and trucks from China. Clear Naira
-            pricing. One team, from your first enquiry to arrival in Nigeria.
-          </p>
-          <a href="#range" className="vehicle-button">
-            Find your vehicle <ArrowUpRight size={18} />
-          </a>
-          <div className="vehicle-hero-note">
-            <Zap size={17} /> Introducing the Ruichi electric range
+    <main className="vehicle-catalogue">
+      <section className="vehicle-hero-surface">
+        <div className="vehicle-hero">
+          <div className="vehicle-hero-copy">
+            <HeroPill>The next move for your business</HeroPill>
+            <h1>
+              Electric ambition.
+              <br />
+              <em>Delivered.</em>
+            </h1>
+            <p className="vehicle-hero-description">
+              Discover electric vans, buses and trucks from China. Clear Naira
+              pricing. One team, from your first enquiry to arrival in Nigeria.
+            </p>
+            <a href="#range" className="vehicle-button">
+              Find your vehicle <ArrowUpRight size={18} />
+            </a>
+            <div className="vehicle-hero-note">
+              <Zap size={17} /> Introducing the Ruichi electric range
+            </div>
           </div>
+          <VehicleHeroCarousel models={models} />
         </div>
-        <VehicleHeroCarousel models={models} />
       </section>
       <section className="vehicle-trust" aria-label="Buying with Sure Imports">
         <div>
