@@ -6,7 +6,7 @@ Use `sureimports.com/cars`: the existing brand, navigation, footer, account and 
 
 The initial catalogue comes from `Downloads/瑞驰 Ruichi V2609`. Source references are retained privately in `lib/vehicles/catalogue.json` and `source-manifest.json`. Only selected optimised photographs are published. Manufacturer costs and source documents are excluded from public model data. YouTube links can be entered in admin; no manufacturer videos have been uploaded to a public service.
 
-Customers select a model/configuration/quantity, sign in and request a quotation. Staff confirm availability and commercial details, then issue a Naira invoice. The customer uses the existing active Nigerian NGN bank accounts and uploads transfer proof in their vehicle dashboard. Finance approves or rejects each claim through the existing invoice payment system. A fully paid invoice confirms the order. Subsequent movements appear in the dashboard and enqueue email plus WhatsApp when the customer opts in.
+Customers complete the public request form for a model/configuration/quantity, then sign in or create an account to save their quotation request. Staff confirm availability and commercial details, then issue a Naira invoice. The customer uses the existing active Nigerian NGN bank accounts and uploads transfer proof in their vehicle dashboard. Finance approves or rejects each claim through the existing invoice payment system. A fully paid invoice confirms the order. Subsequent movements appear in the dashboard and enqueue email plus WhatsApp when the customer opts in.
 
 ## Pricing
 
@@ -27,7 +27,7 @@ Proofs are private database attachments (JPEG/PNG/PDF, maximum 3 MB) accessible 
 
 1. Review both repositories together. They contain the identical migration `20260928120000_add_vehicle_commerce`. Apply it once to the shared database using the normal migration process. Do not execute duplicate SQL manually from both repositories. Generate each repository's Prisma client for its installed Prisma version.
 2. Deploy the public and admin code together. The public catalogue has a read-only seed fallback before migration; submitting orders requires the tables. Do not announce ordering until the complete flow has passed staging verification.
-3. In Vehicles in admin, import the starter catalogue. Import creates missing entries and preserves existing admin edits. Review each configuration and publish only the appropriate offerings. Local `/vehicles/` seed images are served by the public website; new admin image uploads use the existing Cloudinary integration.
+3. In Vehicles in admin, import the starter catalogue. Import creates missing entries and preserves existing admin edits. Review each configuration and publish only the appropriate offerings. All 37 starter images are hosted on Cloudinary under `sureimports/vehicles`; new admin image uploads use the same folder. Both catalogues contain verified HTTPS Cloudinary URLs, and `lib/vehicles/image-manifest.json` records the original filename-to-asset mapping. Catalogue edits accept only Cloudinary image URLs.
 4. Confirm the existing RMB and inclusive sea-CBM rates, active Nigerian NGN bank accounts, email transport and Cloudinary configuration.
 5. Configure admin `CRON_SECRET`, existing `N8N_WHATSAPP_WEBHOOK_URL` and optional `N8N_WHATSAPP_WEBHOOK_TOKEN`, plus `VEHICLE_WHATSAPP_TEMPLATE_KEY` for an approved vehicle-update template. The existing cron configuration calls `/api/cron/vehicle-notifications` every five minutes.
 6. Map the webhook payload (`templateKey`, `eventId`, `requestId`, `contactPersonFullName`, `whatsappNumber`, `status`, `message`, `orderUrl`) in n8n. Deduplicate by `eventId`/`Idempotency-Key`. Verify both delivery channels using designated staging recipients before launch.
@@ -40,7 +40,7 @@ Automated checks cover pricing, incomplete data, quantity limits, fulfilment tra
 
 The public catalogue has been browser-checked on desktop and mobile, in light/dark themes, including comparison, filtering, configuration selection and protected endpoints. Authenticated database-backed end-to-end verification is still required in staging: enquiry → quote → partial transfer proof → rejection/resubmission → approval → full payment → each fulfilment stage → customer timeline → email and WhatsApp. Also verify wrong-customer access, duplicate approvals, concurrent claims, quote expiry, failed notifications, receipts and cancellation rules.
 
-No production migration, deployment or live customer notification was performed as part of implementation. The manufacturer still needs to supply missing prices/details, and the exact configurations of the three ordered cargo buses must be confirmed before presenting stock or delivery commitments. This first release tracks each order as a whole and requires full payment before supplier ordering; per-VIN tracking, split fleet shipments and deposit/financing schedules are not implemented.
+The additive migration was applied to the shared database on 28 September 2026 and verified by checksum during recovery. Application deployment status is recorded below. The manufacturer still needs to supply missing prices/details, and the exact configurations of the three ordered cargo buses must be confirmed before presenting stock or delivery commitments. This first release tracks each order as a whole and requires full payment before supplier ordering; per-VIN tracking, split fleet shipments and deposit/financing schedules are not implemented.
 
 
 ### Ownership content and search visibility (28 September 2026)
@@ -65,3 +65,8 @@ Imported all 10 supplied models into the shared database using insert-only upser
 ### Local invoice proxy configuration
 
 The local customer site runs on port 3000 and the local admin on port 3001. `ADMIN_INVOICING_API_BASE_URL` in the customer site's `.env.local` must point to `http://localhost:3001`, not the customer site itself. All invoice/receipt proxy routes now reject self-routing (including localhost aliases). Verified the issued invoice loads through the customer endpoint after correcting this configuration. Invoice dashboard links are relative so local testing stays on the local application.
+
+
+### Recovery verification (28 September 2026)
+
+Recovered vehicle code from preserved source maps and recorded edits after an accidental reset. All nine local guide sources match their published database content, with the existing Tochukwu Nkwocha author profile. The migration checksum matches the applied shared-database migration; 10 catalogue models and the existing order remain intact. Both applications pass TypeScript and targeted lint; 13 public policy/invoice tests and 5 notification tests pass. The final payment-approval timeout fix and bounded admin customer-update history are present. Separate source archive and Git checkpoints were created before deployment.
