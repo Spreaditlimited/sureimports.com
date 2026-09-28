@@ -1,7 +1,6 @@
+import { getAdminInvoicingBaseUrl } from '@/lib/invoicing/upstream';
 import { NextRequest, NextResponse } from 'next/server';
 
-const ADMIN_BASE_URL =
-  process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com';
 
 export async function GET(
   _request: NextRequest,
@@ -10,7 +9,7 @@ export async function GET(
   try {
     const { accessToken } = await params;
     const upstream = await fetch(
-      `${ADMIN_BASE_URL}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}`,
+      `${getAdminInvoicingBaseUrl(_request.url)}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}`,
       {
         method: 'GET',
         cache: 'no-store',

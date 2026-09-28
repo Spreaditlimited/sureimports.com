@@ -21,6 +21,7 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         <nav aria-label="Explore Sure Imports">
           <h2>Explore</h2>
           <a href={`${mainSite}/import-hub`}>Import Hub</a>
+          <a href={`${mainSite}/cars`}>Cars & commercial vehicles</a>
           <a href="https://linescout.sureimports.com/white-label">White label products</a>
           <a href="https://linescout.sureimports.com">LineScout sourcing</a>
           <a href="https://partner.sureimports.com/partners">Become a partner</a>

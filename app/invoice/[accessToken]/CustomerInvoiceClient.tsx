@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import VehicleInvoiceSummary from '@/components/vehicles/VehicleInvoiceSummary';
 import { useEffect, useMemo, useState } from 'react';
 import InvoiceCardCheckout from './InvoiceCardCheckout';
 
@@ -112,6 +113,8 @@ export default function CustomerInvoiceClient({ accessToken }: { accessToken: st
     );
 
   if (!invoice) return <div className="p-8 text-slate-900">Invoice not found.</div>;
+
+  if (invoice.linkedRequestId?.startsWith('vehicle:')) return <VehicleInvoiceSummary invoice={invoice} accessToken={accessToken}/>;
 
   const getStatusColor = (status: string) => {
     switch (status.toUpperCase()) {

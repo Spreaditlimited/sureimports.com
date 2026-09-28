@@ -54,6 +54,7 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
+  { title: 'My Vehicle Orders', icon: Package, href: '/dashboard/vehicles', color: 'text-white' },
   {
     title: 'Corporate Sourcing',
     icon: Package2,
@@ -167,6 +168,7 @@ export const MobileNavItems: NavItem[] = [
     href: '/dashboard/procurement',
     color: 'text-white',
   },
+  { title: 'My Vehicle Orders', icon: Package, href: '/dashboard/vehicles', color: 'text-white' },
   {
     title: 'Corporate Sourcing',
     icon: Package2,

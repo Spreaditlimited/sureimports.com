@@ -17,12 +17,12 @@ datasource db {
 // applications, but the main storefront needs this projection to securely
 // record and resolve referral attribution.
 model affiliate_accounts {
-  id                   Int                             @id @default(autoincrement())
-  emailHash            String                          @unique @db.Char(64)
-  emailCiphertext      String                          @db.Text
-  firstNameCiphertext  String                          @db.Text
-  referralCode         String                          @unique @db.VarChar(24)
-  status               String                          @default("PENDING_VERIFICATION") @db.VarChar(32)
+  id                   Int                               @id @default(autoincrement())
+  emailHash            String                            @unique @db.Char(64)
+  emailCiphertext      String                            @db.Text
+  firstNameCiphertext  String                            @db.Text
+  referralCode         String                            @unique @db.VarChar(24)
+  status               String                            @default("PENDING_VERIFICATION") @db.VarChar(32)
   referrals            affiliate_referrals[]
   conversions          affiliate_conversions[]
   payouts              affiliate_payouts[]
@@ -58,19 +58,19 @@ model affiliate_program_services {
 }
 
 model affiliate_service_event_rules {
-  id                  Int                         @id @default(autoincrement())
-  pidEventRule        String                      @unique @db.VarChar(80)
+  id                  Int                        @id @default(autoincrement())
+  pidEventRule        String                     @unique @db.VarChar(80)
   serviceId           Int
-  eventKey            String                      @db.VarChar(80)
-  displayName         String                      @db.VarChar(140)
-  description         String?                     @db.Text
-  commissionType      String                      @default("PERCENTAGE") @db.VarChar(24)
-  percentageRate      Decimal?                    @db.Decimal(7, 4)
-  eligibleAmountBasis String                      @default("PRODUCT_OR_SERVICE_AMOUNT") @db.VarChar(40)
-  active              Boolean                     @default(true)
-  sortOrder           Int                         @default(0)
-  createdAt           DateTime                    @default(now())
-  updatedAt           DateTime                    @updatedAt
+  eventKey            String                     @db.VarChar(80)
+  displayName         String                     @db.VarChar(140)
+  description         String?                    @db.Text
+  commissionType      String                     @default("PERCENTAGE") @db.VarChar(24)
+  percentageRate      Decimal?                   @db.Decimal(7, 4)
+  eligibleAmountBasis String                     @default("PRODUCT_OR_SERVICE_AMOUNT") @db.VarChar(40)
+  active              Boolean                    @default(true)
+  sortOrder           Int                        @default(0)
+  createdAt           DateTime                   @default(now())
+  updatedAt           DateTime                   @updatedAt
   service             affiliate_program_services @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@unique([serviceId, eventKey], map: "affiliate_service_event_rule_key")
@@ -158,40 +158,40 @@ model affiliate_referrals {
 
 model affiliate_conversions {
   refundAdjustments        affiliate_refund_adjustments[]
-  id                       Int                        @id @default(autoincrement())
-  pidConversion            String                     @unique @db.VarChar(80)
+  id                       Int                            @id @default(autoincrement())
+  pidConversion            String                         @unique @db.VarChar(80)
   affiliateId              Int
   serviceId                Int
   referralId               Int?
-  externalOrderReference   String                     @db.VarChar(120)
-  externalPaymentReference String?                    @unique @db.VarChar(160)
-  paymentCurrency          String                     @db.Char(3)
-  grossAmount              Decimal                    @db.Decimal(18, 2)
-  eligibleAmount           Decimal                    @db.Decimal(18, 2)
-  commissionCurrency       String                     @db.Char(3)
-  commissionAmount         Decimal                    @db.Decimal(18, 2)
-  commissionBasisUnit      String?                    @db.VarChar(16)
-  commissionBasisQuantity  Decimal?                   @db.Decimal(18, 4)
-  commissionRate           Decimal?                   @db.Decimal(18, 4)
-  status                   String                     @default("PENDING") @db.VarChar(24)
-  releaseMode              String                     @default("MANUAL") @db.VarChar(24)
+  externalOrderReference   String                         @db.VarChar(120)
+  externalPaymentReference String?                        @unique @db.VarChar(160)
+  paymentCurrency          String                         @db.Char(3)
+  grossAmount              Decimal                        @db.Decimal(18, 2)
+  eligibleAmount           Decimal                        @db.Decimal(18, 2)
+  commissionCurrency       String                         @db.Char(3)
+  commissionAmount         Decimal                        @db.Decimal(18, 2)
+  commissionBasisUnit      String?                        @db.VarChar(16)
+  commissionBasisQuantity  Decimal?                       @db.Decimal(18, 4)
+  commissionRate           Decimal?                       @db.Decimal(18, 4)
+  status                   String                         @default("PENDING") @db.VarChar(24)
+  releaseMode              String                         @default("MANUAL") @db.VarChar(24)
   releaseAt                DateTime?
   approvedAt               DateTime?
   availableAt              DateTime?
   voidedAt                 DateTime?
-  reversedFromStatus       String?                    @db.VarChar(24)
-  reversalReason           String?                    @db.Text
-  reversalReference        String?                    @db.VarChar(160)
-  sourceSystem             String                     @default("SURE_IMPORTS") @db.VarChar(40)
-  sourceEventKey           String?                    @db.VarChar(80)
-  paymentLedgerEntryId     Int?                       @unique
-  createdAt                DateTime                   @default(now())
-  updatedAt                DateTime                   @updatedAt
-  affiliate                affiliate_accounts         @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
-  service                  affiliate_program_services @relation(fields: [serviceId], references: [id], onDelete: Restrict)
-  referral                 affiliate_referrals?       @relation(fields: [referralId], references: [id], onDelete: SetNull)
+  reversedFromStatus       String?                        @db.VarChar(24)
+  reversalReason           String?                        @db.Text
+  reversalReference        String?                        @db.VarChar(160)
+  sourceSystem             String                         @default("SURE_IMPORTS") @db.VarChar(40)
+  sourceEventKey           String?                        @db.VarChar(80)
+  paymentLedgerEntryId     Int?                           @unique
+  createdAt                DateTime                       @default(now())
+  updatedAt                DateTime                       @updatedAt
+  affiliate                affiliate_accounts             @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  service                  affiliate_program_services     @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+  referral                 affiliate_referrals?           @relation(fields: [referralId], references: [id], onDelete: SetNull)
   payoutItem               affiliate_payout_items?
-  paymentLedgerEntry       payment_ledger_entries?    @relation(fields: [paymentLedgerEntryId], references: [id], onDelete: SetNull)
+  paymentLedgerEntry       payment_ledger_entries?        @relation(fields: [paymentLedgerEntryId], references: [id], onDelete: SetNull)
 
   @@unique([externalOrderReference, serviceId])
   @@index([affiliateId, status, createdAt])
@@ -200,38 +200,38 @@ model affiliate_conversions {
 }
 
 model payment_ledger_entries {
-  id                       Int                    @id @default(autoincrement())
-  pidLedgerEntry           String                 @unique @db.VarChar(80)
-  sourceSystem             String                 @db.VarChar(40)
-  sourcePaymentType        String                 @db.VarChar(80)
-  sourcePaymentId          String                 @db.VarChar(160)
-  sourceOrderReference     String?                @db.VarChar(160)
-  customerReference        String?                @db.VarChar(191)
-  purpose                  String                 @db.VarChar(80)
-  provider                 String?                @db.VarChar(40)
-  providerReference        String?                @db.VarChar(191)
-  status                   String                 @db.VarChar(24)
-  originalCurrency         String                 @db.Char(3)
-  originalAmount           Decimal                @db.Decimal(18, 2)
-  eligibleAmount           Decimal                @db.Decimal(18, 2)
-  settlementCurrency       String?                @db.Char(3)
-  settlementAmount         Decimal?               @db.Decimal(18, 2)
-  fxRate                   Decimal?               @db.Decimal(18, 8)
-  fxSource                 String?                @db.VarChar(80)
-  fxCapturedAt             DateTime?
-  billingUnit              String?                @db.VarChar(16)
-  eligibleQuantity         Decimal?               @db.Decimal(18, 4)
-  destinationCountry       String?                @db.VarChar(100)
-  shippingMode             String?                @db.VarChar(24)
-  occurredAt               DateTime
-  metadataJson             String?                @db.LongText
-  processingStatus         String                 @default("PENDING") @db.VarChar(24)
-  processingError          String?                @db.VarChar(1000)
-  processedAt              DateTime?
-  createdAt                DateTime               @default(now())
-  updatedAt                DateTime               @updatedAt
-  events                   payment_ledger_events[]
-  conversion               affiliate_conversions?
+  id                   Int                     @id @default(autoincrement())
+  pidLedgerEntry       String                  @unique @db.VarChar(80)
+  sourceSystem         String                  @db.VarChar(40)
+  sourcePaymentType    String                  @db.VarChar(80)
+  sourcePaymentId      String                  @db.VarChar(160)
+  sourceOrderReference String?                 @db.VarChar(160)
+  customerReference    String?                 @db.VarChar(191)
+  purpose              String                  @db.VarChar(80)
+  provider             String?                 @db.VarChar(40)
+  providerReference    String?                 @db.VarChar(191)
+  status               String                  @db.VarChar(24)
+  originalCurrency     String                  @db.Char(3)
+  originalAmount       Decimal                 @db.Decimal(18, 2)
+  eligibleAmount       Decimal                 @db.Decimal(18, 2)
+  settlementCurrency   String?                 @db.Char(3)
+  settlementAmount     Decimal?                @db.Decimal(18, 2)
+  fxRate               Decimal?                @db.Decimal(18, 8)
+  fxSource             String?                 @db.VarChar(80)
+  fxCapturedAt         DateTime?
+  billingUnit          String?                 @db.VarChar(16)
+  eligibleQuantity     Decimal?                @db.Decimal(18, 4)
+  destinationCountry   String?                 @db.VarChar(100)
+  shippingMode         String?                 @db.VarChar(24)
+  occurredAt           DateTime
+  metadataJson         String?                 @db.LongText
+  processingStatus     String                  @default("PENDING") @db.VarChar(24)
+  processingError      String?                 @db.VarChar(1000)
+  processedAt          DateTime?
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
+  events               payment_ledger_events[]
+  conversion           affiliate_conversions?
 
   @@unique([sourceSystem, sourcePaymentType, sourcePaymentId], map: "payment_ledger_source_key")
   @@index([status, occurredAt])
@@ -320,17 +320,17 @@ model shipping_request_attributions {
 
 model affiliate_payouts {
   refundAdjustments affiliate_refund_adjustments[]
-  id                Int                      @id @default(autoincrement())
-  pidPayout         String                   @unique @db.VarChar(80)
+  id                Int                            @id @default(autoincrement())
+  pidPayout         String                         @unique @db.VarChar(80)
   affiliateId       Int
-  provider          String                   @db.VarChar(24)
-  currency          String                   @db.Char(3)
-  amount            Decimal                  @db.Decimal(18, 2)
-  status            String                   @default("REQUESTED") @db.VarChar(24)
-  externalReference String?                  @unique @db.VarChar(180)
-  providerStatus    String?                  @db.VarChar(80)
-  failureReason     String?                  @db.VarChar(500)
-  affiliate         affiliate_accounts       @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
+  provider          String                         @db.VarChar(24)
+  currency          String                         @db.Char(3)
+  amount            Decimal                        @db.Decimal(18, 2)
+  status            String                         @default("REQUESTED") @db.VarChar(24)
+  externalReference String?                        @unique @db.VarChar(180)
+  providerStatus    String?                        @db.VarChar(80)
+  failureReason     String?                        @db.VarChar(500)
+  affiliate         affiliate_accounts             @relation(fields: [affiliateId], references: [id], onDelete: Cascade)
   items             affiliate_payout_items[]
 }
 
@@ -345,14 +345,14 @@ model affiliate_payout_items {
 }
 
 model affiliate_refund_adjustments {
-  refundId     String   @db.VarChar(191)
+  refundId     String                @db.VarChar(191)
   conversionId Int
-  amount       Decimal  @db.Decimal(18, 2)
-  currency     String   @db.Char(3)
+  amount       Decimal               @db.Decimal(18, 2)
+  currency     String                @db.Char(3)
   payoutId     Int?
-  createdAt    DateTime @default(now()) @db.DateTime(3)
+  createdAt    DateTime              @default(now()) @db.DateTime(3)
   conversion   affiliate_conversions @relation(fields: [conversionId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "affiliate_refund_adjustments_conversion_fk")
-  payout       affiliate_payouts? @relation(fields: [payoutId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "affiliate_refund_adjustments_payout_fk")
+  payout       affiliate_payouts?    @relation(fields: [payoutId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "affiliate_refund_adjustments_payout_fk")
 
   @@id([refundId, conversionId])
   @@index([payoutId], map: "affiliate_refund_adjustments_payout")
@@ -897,35 +897,38 @@ model admin {
 }
 
 model procurement_storefront_customers {
-  id           String @id @default(cuid()) @db.VarChar(191)
-  partnerId    String @db.VarChar(191)
-  pidUser      String @db.VarChar(191)
-  email        String @db.VarChar(191)
-  firstName    String @db.VarChar(100)
-  passwordHash String @db.VarChar(191)
+  id           String    @id @default(cuid()) @db.VarChar(191)
+  partnerId    String    @db.VarChar(191)
+  pidUser      String    @db.VarChar(191)
+  email        String    @db.VarChar(191)
+  firstName    String    @db.VarChar(100)
+  passwordHash String    @db.VarChar(191)
   verifiedAt   DateTime?
-  version      Int @default(0)
-  createdAt    DateTime @default(now())
-  @@unique([partnerId,email])
-  @@unique([partnerId,pidUser])
+  version      Int       @default(0)
+  createdAt    DateTime  @default(now())
+
+  @@unique([partnerId, email])
+  @@unique([partnerId, pidUser])
 }
 
 model procurement_storefront_auth_tokens {
-  hash       String @id @db.Char(64)
-  customerId String @db.VarChar(191)
-  hostname   String @db.VarChar(191)
-  purpose    String @db.VarChar(16)
+  hash       String    @id @db.Char(64)
+  customerId String    @db.VarChar(191)
+  hostname   String    @db.VarChar(191)
+  purpose    String    @db.VarChar(16)
   expiresAt  DateTime
   usedAt     DateTime?
-  createdAt  DateTime @default(now())
-  @@index([customerId,purpose,createdAt], map:"storefront_auth_token_customer_purpose_idx")
+  createdAt  DateTime  @default(now())
+
+  @@index([customerId, purpose, createdAt], map: "storefront_auth_token_customer_purpose_idx")
   @@index([expiresAt])
 }
 
 model procurement_storefront_auth_limits {
-  key       String @id @db.Char(64)
-  count     Int @default(0)
+  key       String   @id @db.Char(64)
+  count     Int      @default(0)
   expiresAt DateTime
+
   @@index([expiresAt])
 }
 
@@ -995,13 +998,13 @@ model products {
   pidOrder               String
   pidUser                String?
   productName            String?
-  productLink            String? @db.Text
+  productLink            String?   @db.Text
   productCategory        String?
   productPrice           Float?
   productWeight          Float?
   shippingMeasurePerUnit Float?
   productQuantity        Float?
-  productInfo            String? @db.Text
+  productInfo            String?   @db.Text
   productStatus          String?
   pidAdmin               String?
   ext1                   String?
@@ -1061,8 +1064,8 @@ model paysmallsmall {
 
 model orders {
   partnerOwnership          procurement_partner_orders?
-  id                        Int        @id @default(autoincrement())
-  pidOrder                  String     @unique()
+  id                        Int                         @id @default(autoincrement())
+  pidOrder                  String                      @unique()
   pidUser                   String
   orderName                 String?
   destinationCountry        String?
@@ -1100,196 +1103,203 @@ model orders {
   additionalCostDescription String?
   pidAdmin                  String?
   pidAdminLast              String?
-  mergedIntoOrderId         String?    @db.VarChar(191)
+  mergedIntoOrderId         String?                     @db.VarChar(191)
   mergedAt                  DateTime?
-  assistanceRevision        Int        @default(0)
+  assistanceRevision        Int                         @default(0)
   status                    String?
   ext1                      String?
   ext2                      String?
   xStatus                   String?
-  createdAt                 DateTime?  @default(now())
+  createdAt                 DateTime?                   @default(now())
   updatedAt                 DateTime?
   products                  products[]
-  user                      users      @relation(fields: [pidUser], references: [pidUser])
+  user                      users                       @relation(fields: [pidUser], references: [pidUser])
 }
 
 // White-label procurement foundation. No live collection until approved.
 // Exclusive commercial membership keyed by affiliate-email-v1 HMAC.
 model commercial_program_memberships {
-  emailHash String @id @db.Char(64)
-  program String @db.VarChar(16)
-  subjectId String @db.VarChar(191)
+  emailHash String   @id @db.Char(64)
+  program   String   @db.VarChar(16)
+  subjectId String   @db.VarChar(191)
   createdAt DateTime @default(now())
+
   @@index([program, subjectId], map: "commercial_membership_subject_idx")
 }
 
 model procurement_partners {
-  id                       String @id @default(cuid()) @db.VarChar(191)
-  slug                     String @unique @db.VarChar(80)
-  legalName                String @db.VarChar(191)
-  registrationNumber       String @unique @db.VarChar(80)
-  businessType             String? @db.VarChar(32)
-  companyEra               String? @db.VarChar(16)
-  ownerPidUser             String @unique @db.VarChar(191)
-  status                   String @default("PENDING") @db.VarChar(32)
-  country                  String @default("NG") @db.Char(2)
-  settlementCurrency       String @default("NGN") @db.Char(3)
-  serviceChargeBps         Int @default(1500)
-  partnerShareBps          Int @default(500)
-  pricingRevision          Int @default(1)
-  liveCollectionEnabled    Boolean @default(false)
-  settlementPolicy         String @default("UNCONFIRMED") @db.VarChar(40)
-  paystackSubaccountCode   String? @unique @db.VarChar(80)
-  bankVerifiedAt           DateTime?
-  approvedAt               DateTime?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  storefront               procurement_partner_storefronts?
-  domains                  procurement_partner_domains[]
-  orders                   procurement_partner_orders[]
-  procurementRequests      procurement_partner_requests[]
-  customerOrders           procurement_partner_customer_orders[]
-  kyc                      procurement_partner_kyc?
-  earningsWallet           partner_wallet_accounts?
+  id                     String                                @id @default(cuid()) @db.VarChar(191)
+  slug                   String                                @unique @db.VarChar(80)
+  legalName              String                                @db.VarChar(191)
+  registrationNumber     String                                @unique @db.VarChar(80)
+  businessType           String?                               @db.VarChar(32)
+  companyEra             String?                               @db.VarChar(16)
+  ownerPidUser           String                                @unique @db.VarChar(191)
+  status                 String                                @default("PENDING") @db.VarChar(32)
+  country                String                                @default("NG") @db.Char(2)
+  settlementCurrency     String                                @default("NGN") @db.Char(3)
+  serviceChargeBps       Int                                   @default(1500)
+  partnerShareBps        Int                                   @default(500)
+  pricingRevision        Int                                   @default(1)
+  liveCollectionEnabled  Boolean                               @default(false)
+  settlementPolicy       String                                @default("UNCONFIRMED") @db.VarChar(40)
+  paystackSubaccountCode String?                               @unique @db.VarChar(80)
+  bankVerifiedAt         DateTime?
+  approvedAt             DateTime?
+  createdAt              DateTime                              @default(now())
+  updatedAt              DateTime                              @updatedAt
+  storefront             procurement_partner_storefronts?
+  domains                procurement_partner_domains[]
+  orders                 procurement_partner_orders[]
+  procurementRequests    procurement_partner_requests[]
+  customerOrders         procurement_partner_customer_orders[]
+  kyc                    procurement_partner_kyc?
+  earningsWallet         partner_wallet_accounts?
 }
 
 model procurement_partner_kyc {
-  partnerId         String @id @db.VarChar(191)
-  status            String @default("DRAFT") @db.VarChar(32)
-  revision          Int @default(0)
-  policyVersion     String @default("2026-09-11") @db.VarChar(24)
-  detailsCiphertext String? @db.LongText
-  reviewCiphertext  String? @db.LongText
+  partnerId         String                              @id @db.VarChar(191)
+  status            String                              @default("DRAFT") @db.VarChar(32)
+  revision          Int                                 @default(0)
+  policyVersion     String                              @default("2026-09-11") @db.VarChar(24)
+  detailsCiphertext String?                             @db.LongText
+  reviewCiphertext  String?                             @db.LongText
   submittedAt       DateTime?
-  updatedAt         DateTime @updatedAt
-  partner           procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  updatedAt         DateTime                            @updatedAt
+  partner           procurement_partners                @relation(fields: [partnerId], references: [id], onDelete: Restrict)
   documents         procurement_partner_kyc_documents[]
   events            procurement_partner_kyc_events[]
 }
 
 model procurement_partner_kyc_documents {
-  id                String @id @default(cuid()) @db.VarChar(191)
-  partnerId         String @db.VarChar(191)
-  slot              String @db.VarChar(191)
-  cloudinaryId      String @unique @db.VarChar(191)
-  mimeType          String @db.VarChar(40)
-  bytes             Int
-  sha256            String @db.Char(64)
-  status            String @default("UPLOADING") @db.VarChar(24)
-  createdAt         DateTime @default(now())
-  kyc               procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
+  id           String                  @id @default(cuid()) @db.VarChar(191)
+  partnerId    String                  @db.VarChar(191)
+  slot         String                  @db.VarChar(191)
+  cloudinaryId String                  @unique @db.VarChar(191)
+  mimeType     String                  @db.VarChar(40)
+  bytes        Int
+  sha256       String                  @db.Char(64)
+  status       String                  @default("UPLOADING") @db.VarChar(24)
+  createdAt    DateTime                @default(now())
+  kyc          procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
+
   @@index([partnerId, slot, status])
 }
 
 model procurement_partner_kyc_events {
-  id          String @id @default(cuid()) @db.VarChar(191)
-  partnerId   String @db.VarChar(191)
-  actorPid    String @db.VarChar(191)
-  action      String @db.VarChar(40)
-  documentId  String? @db.VarChar(191)
-  detailsCiphertext String? @db.LongText
-  createdAt   DateTime @default(now())
-  kyc         procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
-  emailStatus String @default("NONE") @db.VarChar(24)
-  emailAttempts Int @default(0)
-  emailLockedAt DateTime?
+  id                 String                  @id @default(cuid()) @db.VarChar(191)
+  partnerId          String                  @db.VarChar(191)
+  actorPid           String                  @db.VarChar(191)
+  action             String                  @db.VarChar(40)
+  documentId         String?                 @db.VarChar(191)
+  detailsCiphertext  String?                 @db.LongText
+  createdAt          DateTime                @default(now())
+  kyc                procurement_partner_kyc @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict)
+  emailStatus        String                  @default("NONE") @db.VarChar(24)
+  emailAttempts      Int                     @default(0)
+  emailLockedAt      DateTime?
   emailNextAttemptAt DateTime?
-  emailSentAt DateTime?
-  emailFailureCode String? @db.VarChar(40)
+  emailSentAt        DateTime?
+  emailFailureCode   String?                 @db.VarChar(40)
+
   @@index([partnerId, createdAt])
   @@index([emailStatus, emailNextAttemptAt], map: "partner_kyc_email_queue_idx")
 }
 
 model procurement_partner_storefronts {
-  partnerId        String @id @db.VarChar(191)
-  displayName      String @db.VarChar(191)
-  templateKey      String @default("procurement-v1") @db.VarChar(80)
+  partnerId        String               @id @db.VarChar(191)
+  displayName      String               @db.VarChar(191)
+  templateKey      String               @default("procurement-v1") @db.VarChar(80)
   content          Json?
   draftSettings    Json?
   previousSettings Json?
-  revision         Int @default(0)
-  logoUrl          String? @db.Text
-  primaryColor     String @default("#1d4ed8") @db.VarChar(7)
-  supportEmail     String @db.VarChar(191)
-  supportPhone     String @db.VarChar(32)
+  revision         Int                  @default(0)
+  logoUrl          String?              @db.Text
+  primaryColor     String               @default("#1d4ed8") @db.VarChar(7)
+  supportEmail     String               @db.VarChar(191)
+  supportPhone     String               @db.VarChar(32)
   // Partner receiving destination, never an end-customer delivery address.
-  receivingAddress String @db.Text
-  published        Boolean @default(false)
-  updatedAt        DateTime @updatedAt
+  receivingAddress String               @db.Text
+  published        Boolean              @default(false)
+  updatedAt        DateTime             @updatedAt
   partner          procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
 }
 
 model procurement_partner_domains {
-  id                    String @id @default(cuid()) @db.VarChar(191)
-  partnerId             String @db.VarChar(191)
-  hostname              String @unique @db.VarChar(191)
-  verificationTokenHash String @db.Char(64)
+  id                    String               @id @default(cuid()) @db.VarChar(191)
+  partnerId             String               @db.VarChar(191)
+  hostname              String               @unique @db.VarChar(191)
+  verificationTokenHash String               @db.Char(64)
   verifiedAt            DateTime?
   readyAt               DateTime?
-  status                String @default("OWNERSHIP_REQUIRED") @db.VarChar(40)
-  primary               Boolean @default(false)
+  status                String               @default("OWNERSHIP_REQUIRED") @db.VarChar(40)
+  primary               Boolean              @default(false)
   lastCheckedAt         DateTime?
-  lastError             String? @db.VarChar(500)
+  lastError             String?              @db.VarChar(500)
   dnsInstructions       Json?
   leaseUntil            DateTime?
-  leaseToken            String? @db.VarChar(80)
+  leaseToken            String?              @db.VarChar(80)
   disconnectedAt        DateTime?
   expiresAt             DateTime?
-  registrarReference    String? @db.VarChar(191)
-  createdAt             DateTime @default(now())
+  registrarReference    String?              @db.VarChar(191)
+  createdAt             DateTime             @default(now())
   partner               procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+
   @@index([partnerId])
 }
 
 model procurement_partner_domain_events {
-  id        String @id @default(cuid()) @db.VarChar(191)
-  domainId  String @db.VarChar(191)
-  partnerId String @db.VarChar(191)
-  action    String @db.VarChar(40)
-  message   String @db.VarChar(500)
+  id        String   @id @default(cuid()) @db.VarChar(191)
+  domainId  String   @db.VarChar(191)
+  partnerId String   @db.VarChar(191)
+  action    String   @db.VarChar(40)
+  message   String   @db.VarChar(500)
   createdAt DateTime @default(now())
+
   @@index([partnerId, createdAt])
   @@index([domainId, createdAt])
 }
 
 model procurement_partner_orders {
-  pidOrder                  String @id @db.VarChar(191)
-  partnerId                 String @db.VarChar(191)
-  source                    String @db.VarChar(24)
-  externalReference         String @db.VarChar(191)
-  currency                  String @default("NGN") @db.Char(3)
-  pricingRevision           Int
-  serviceChargeBps           Int
-  partnerShareBps            Int
-  productCostMinor          BigInt
-  serviceChargeMinor        BigInt
-  partnerEarningsMinor      BigInt
-  sureImportsServiceMinor   BigInt
-  shippingMinor             BigInt
-  taxMinor                  BigInt
-  otherChargesMinor         BigInt
+  pidOrder                String               @id @db.VarChar(191)
+  partnerId               String               @db.VarChar(191)
+  source                  String               @db.VarChar(24)
+  externalReference       String               @db.VarChar(191)
+  currency                String               @default("NGN") @db.Char(3)
+  pricingRevision         Int
+  serviceChargeBps        Int
+  partnerShareBps         Int
+  productCostMinor        BigInt
+  serviceChargeMinor      BigInt
+  partnerEarningsMinor    BigInt
+  sureImportsServiceMinor BigInt
+  shippingMinor           BigInt
+  taxMinor                BigInt
+  otherChargesMinor       BigInt
   // Excludes processing fees; the processor fee is reconciled at checkout.
-  orderTotalMinor           BigInt
-  partnerReceivingAddress   String @db.Text
-  lockedAt                  DateTime @default(now())
-  partner                   procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
-  order                     orders @relation(fields: [pidOrder], references: [pidOrder], onDelete: Restrict)
+  orderTotalMinor         BigInt
+  partnerReceivingAddress String               @db.Text
+  lockedAt                DateTime             @default(now())
+  partner                 procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  order                   orders               @relation(fields: [pidOrder], references: [pidOrder], onDelete: Restrict)
+
   @@unique([partnerId, externalReference])
   @@index([partnerId, lockedAt])
 }
 
 // Immutable intake, separate from payable orders and earnings until a verified quote is accepted.
 model procurement_partner_requests {
-  id                  String @id @db.VarChar(80)
-  partnerId           String @db.VarChar(191)
-  externalReference   String @db.VarChar(80)
-  idempotencyKey      String @db.VarChar(100)
-  payloadHash         String @db.Char(64)
-  detailsCiphertext   String @db.LongText
-  status              String @default("SUBMITTED") @db.VarChar(32)
-  actorPid            String @db.VarChar(191)
-  createdAt           DateTime @default(now())
-  partner             procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  id                String               @id @db.VarChar(80)
+  partnerId         String               @db.VarChar(191)
+  externalReference String               @db.VarChar(80)
+  idempotencyKey    String               @db.VarChar(100)
+  payloadHash       String               @db.Char(64)
+  detailsCiphertext String               @db.LongText
+  status            String               @default("SUBMITTED") @db.VarChar(32)
+  actorPid          String               @db.VarChar(191)
+  createdAt         DateTime             @default(now())
+  partner           procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+
   @@unique([partnerId, externalReference], map: "partner_request_reference_key")
   @@unique([partnerId, idempotencyKey], map: "partner_request_retry_key")
   @@index([partnerId, createdAt], map: "partner_request_owner_idx")
@@ -1298,97 +1308,102 @@ model procurement_partner_requests {
 
 // Customer drafts remain outside the SI operational orders table until paid and partner-approved.
 model procurement_partner_customer_orders {
-  adjustments partner_order_adjustments[]
-  paymentFees partner_order_payment_fees[]
+  adjustments              partner_order_adjustments[]
+  paymentFees              partner_order_payment_fees[]
   walletCredit             partner_wallet_credits?
-  id                       String @id @db.VarChar(80)
-  partnerId                String @db.VarChar(191)
-  customerPidUser          String @db.VarChar(191)
-  idempotencyKey           String @db.VarChar(100)
-  payloadHash              String @db.Char(64)
-  detailsCiphertext        String @db.LongText
-  status                   String @default("saved") @db.VarChar(32)
-  revision                 Int @default(1)
-  paymentStatus            String @default("UNPAID") @db.VarChar(24)
-  verifiedPaymentReference String? @unique(map: "partner_customer_payment_key") @db.VarChar(191)
+  id                       String                             @id @db.VarChar(80)
+  partnerId                String                             @db.VarChar(191)
+  customerPidUser          String                             @db.VarChar(191)
+  idempotencyKey           String                             @db.VarChar(100)
+  payloadHash              String                             @db.Char(64)
+  detailsCiphertext        String                             @db.LongText
+  status                   String                             @default("saved") @db.VarChar(32)
+  revision                 Int                                @default(1)
+  paymentStatus            String                             @default("UNPAID") @db.VarChar(24)
+  verifiedPaymentReference String?                            @unique(map: "partner_customer_payment_key") @db.VarChar(191)
   paidRevision             Int?
-  partnerReview            String @default("NOT_READY") @db.VarChar(24)
+  partnerReview            String                             @default("NOT_READY") @db.VarChar(24)
   approvedAt               DateTime?
-  releasedOrderId           String? @unique(map: "partner_customer_release_key") @db.VarChar(191)
-  checkoutReference        String? @unique(map: "partner_customer_checkout_key") @db.VarChar(100)
-  checkoutCiphertext       String? @db.LongText
+  releasedOrderId          String?                            @unique(map: "partner_customer_release_key") @db.VarChar(191)
+  checkoutReference        String?                            @unique(map: "partner_customer_checkout_key") @db.VarChar(100)
+  checkoutCiphertext       String?                            @db.LongText
   events                   procurement_partner_order_events[]
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
-  partner                  procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+  createdAt                DateTime                           @default(now())
+  updatedAt                DateTime                           @updatedAt
+  partner                  procurement_partners               @relation(fields: [partnerId], references: [id], onDelete: Restrict)
+
   @@unique([partnerId, customerPidUser, idempotencyKey], map: "partner_customer_retry_key")
   @@index([partnerId, customerPidUser, createdAt], map: "partner_customer_order_owner_idx")
   @@index([partnerId, paymentStatus, partnerReview], map: "partner_customer_review_idx")
 }
 
 model partner_wallet_accounts {
-  partnerId String @id @db.VarChar(191)
-  bankCiphertext String? @db.LongText
+  partnerId      String                       @id @db.VarChar(191)
+  bankCiphertext String?                      @db.LongText
   bankVerifiedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  partner procurement_partners @relation(fields: [partnerId], references: [id], onDelete: Restrict, map: "partner_wallet_owner_fk")
-  credits partner_wallet_credits[]
-  withdrawals partner_wallet_withdrawals[]
-  events partner_wallet_events[]
+  createdAt      DateTime                     @default(now())
+  updatedAt      DateTime                     @default(now())
+  partner        procurement_partners         @relation(fields: [partnerId], references: [id], onDelete: Restrict, map: "partner_wallet_owner_fk")
+  credits        partner_wallet_credits[]
+  withdrawals    partner_wallet_withdrawals[]
+  events         partner_wallet_events[]
 }
 
 model partner_wallet_credits {
-  orderId String @id @db.VarChar(80)
-  partnerId String @db.VarChar(191)
-  amountMinor BigInt
-  state String @default("PENDING") @db.VarChar(24)
+  orderId             String                              @id @db.VarChar(80)
+  partnerId           String                              @db.VarChar(191)
+  amountMinor         BigInt
+  state               String                              @default("PENDING") @db.VarChar(24)
   deliveryConfirmedAt DateTime?
-  deliveryMode String? @db.VarChar(24)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_credit_owner_fk")
-  order procurement_partner_customer_orders @relation(fields: [orderId], references: [id], onDelete: Restrict, map: "partner_wallet_credit_order_fk")
+  deliveryMode        String?                             @db.VarChar(24)
+  createdAt           DateTime                            @default(now())
+  updatedAt           DateTime                            @default(now())
+  wallet              partner_wallet_accounts             @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_credit_owner_fk")
+  order               procurement_partner_customer_orders @relation(fields: [orderId], references: [id], onDelete: Restrict, map: "partner_wallet_credit_order_fk")
+
   @@index([partnerId, state], map: "partner_wallet_credit_state_idx")
 }
 
 model partner_wallet_withdrawals {
-  id String @id @db.VarChar(80)
-  partnerId String @db.VarChar(191)
-  retryKey String @db.VarChar(100)
-  amountMinor BigInt
-  status String @default("REQUESTED") @db.VarChar(24)
-  destinationCiphertext String @db.LongText
-  transferCode String? @db.VarChar(100)
-  failureCode String? @db.VarChar(100)
-  processingAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_withdraw_owner_fk")
+  id                    String                  @id @db.VarChar(80)
+  partnerId             String                  @db.VarChar(191)
+  retryKey              String                  @db.VarChar(100)
+  amountMinor           BigInt
+  status                String                  @default("REQUESTED") @db.VarChar(24)
+  destinationCiphertext String                  @db.LongText
+  transferCode          String?                 @db.VarChar(100)
+  failureCode           String?                 @db.VarChar(100)
+  processingAt          DateTime?
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @default(now())
+  wallet                partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_withdraw_owner_fk")
+
   @@unique([partnerId, retryKey], map: "partner_wallet_withdraw_retry_key")
   @@index([partnerId, status], map: "partner_wallet_withdraw_status_idx")
 }
 
 model partner_wallet_events {
-  id String @id @db.VarChar(80)
-  partnerId String @db.VarChar(191)
-  subjectId String @db.VarChar(100)
-  actorPid String @db.VarChar(191)
-  action String @db.VarChar(40)
-  detailsCiphertext String? @db.LongText
-  createdAt DateTime @default(now())
-  wallet partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_event_owner_fk")
+  id                String                  @id @db.VarChar(80)
+  partnerId         String                  @db.VarChar(191)
+  subjectId         String                  @db.VarChar(100)
+  actorPid          String                  @db.VarChar(191)
+  action            String                  @db.VarChar(40)
+  detailsCiphertext String?                 @db.LongText
+  createdAt         DateTime                @default(now())
+  wallet            partner_wallet_accounts @relation(fields: [partnerId], references: [partnerId], onDelete: Restrict, map: "partner_wallet_event_owner_fk")
+
   @@index([partnerId, createdAt], map: "partner_wallet_audit_idx")
 }
 
 model procurement_partner_order_events {
-  id               String @id @db.VarChar(80)
-  customerOrderId  String @db.VarChar(80)
-  actorPid         String @db.VarChar(191)
-  action           String @db.VarChar(40)
-  detailsCiphertext String? @db.LongText
-  createdAt        DateTime @default(now())
-  order            procurement_partner_customer_orders @relation(fields: [customerOrderId], references: [id], onDelete: Restrict)
+  id                String                              @id @db.VarChar(80)
+  customerOrderId   String                              @db.VarChar(80)
+  actorPid          String                              @db.VarChar(191)
+  action            String                              @db.VarChar(40)
+  detailsCiphertext String?                             @db.LongText
+  createdAt         DateTime                            @default(now())
+  order             procurement_partner_customer_orders @relation(fields: [customerOrderId], references: [id], onDelete: Restrict)
+
   @@index([customerOrderId, createdAt], map: "partner_order_event_idx")
 }
 
@@ -1473,13 +1488,13 @@ model procurement_order_merge_sources {
 }
 
 model paypal_procurement_checkouts {
-  id                String @id @db.VarChar(64)
-  stageKey          String @unique(map: "paypal_procurement_stage_key") @db.VarChar(64)
+  id                String   @id @db.VarChar(64)
+  stageKey          String   @unique(map: "paypal_procurement_stage_key") @db.VarChar(64)
   pidOrder          String
   pidUser           String
-  providerReference String? @unique(map: "paypal_procurement_reference")
+  providerReference String?  @unique(map: "paypal_procurement_reference")
   captureReference  String?
-  status            String @default("PENDING") @db.VarChar(24)
+  status            String   @default("PENDING") @db.VarChar(24)
   amountMinor       Int
   context           Json
   createdAt         DateTime @default(now()) @db.DateTime(3)
@@ -1805,20 +1820,21 @@ model intelligence_report_order_events {
 }
 
 model intelligence_report_notifications {
-  notificationKey String @id @db.VarChar(64)
-  requestId String @db.VarChar(80)
-  reportSlug String @db.VarChar(180)
-  email String @db.VarChar(255)
-  query String @db.VarChar(180)
-  status String @default("pending") @db.VarChar(20)
-  attempts Int @default(0)
-  lockToken String? @db.VarChar(36)
-  lockedAt DateTime?
-  nextAttemptAt DateTime @default(now())
-  sentAt DateTime?
-  lastError String? @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  notificationKey String    @id @db.VarChar(64)
+  requestId       String    @db.VarChar(80)
+  reportSlug      String    @db.VarChar(180)
+  email           String    @db.VarChar(255)
+  query           String    @db.VarChar(180)
+  status          String    @default("pending") @db.VarChar(20)
+  attempts        Int       @default(0)
+  lockToken       String?   @db.VarChar(36)
+  lockedAt        DateTime?
+  nextAttemptAt   DateTime  @default(now())
+  sentAt          DateTime?
+  lastError       String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @default(now()) @updatedAt
+
   @@index([sentAt, nextAttemptAt], map: "report_notifications_due")
   @@index([requestId], map: "report_notifications_request")
 }
@@ -2092,21 +2108,21 @@ model refund_provider_legs {
 }
 
 model refund_settlements {
-  refundId              String   @id @db.VarChar(191)
-  pidUser               String   @db.VarChar(191)
-  sourceCurrency        String   @db.Char(3)
-  sourceAmount          Decimal  @db.Decimal(20, 2)
-  settlementCurrency    String   @db.Char(3)
-  settlementAmount      Decimal  @db.Decimal(20, 2)
-  exchangeRate          Decimal  @db.Decimal(20, 8)
-  method                String   @db.VarChar(32)
-  destinationCiphertext String   @db.Text
-  status                String   @default("REQUESTED") @db.VarChar(32)
-  reference             String?  @unique @db.VarChar(191)
-  approvedBy            String?  @db.VarChar(191)
+  refundId              String    @id @db.VarChar(191)
+  pidUser               String    @db.VarChar(191)
+  sourceCurrency        String    @db.Char(3)
+  sourceAmount          Decimal   @db.Decimal(20, 2)
+  settlementCurrency    String    @db.Char(3)
+  settlementAmount      Decimal   @db.Decimal(20, 2)
+  exchangeRate          Decimal   @db.Decimal(20, 8)
+  method                String    @db.VarChar(32)
+  destinationCiphertext String    @db.Text
+  status                String    @default("REQUESTED") @db.VarChar(32)
+  reference             String?   @unique @db.VarChar(191)
+  approvedBy            String?   @db.VarChar(191)
   settledAt             DateTime? @db.DateTime(3)
-  createdAt             DateTime @default(now()) @db.DateTime(3)
-  updatedAt             DateTime @default(now()) @db.DateTime(3)
+  createdAt             DateTime  @default(now()) @db.DateTime(3)
+  updatedAt             DateTime  @default(now()) @db.DateTime(3)
 
   @@index([pidUser, createdAt], map: "refund_settlements_owner")
 }
@@ -2202,8 +2218,8 @@ model exchange_rate {
   exNairaToYuan              String?
   quotationSeaRateNgnPerCbm  String?   @default("500000")
   procurementMinimumOrderNgn Int       @default(50000)
-  procurementVatForeign     String    @default("20")
-  exGbpPerUsd               String?
+  procurementVatForeign      String    @default("20")
+  exGbpPerUsd                String?
   status                     String
   ext1                       String?
   ext2                       String?
@@ -2476,36 +2492,37 @@ model Transaction {
 // ============================================================================
 
 model shop_checkouts {
-  guestTokenHash String? @db.VarChar(64)
-  affiliateReferralReference String? @db.VarChar(191)
-  accountSetupRequired Boolean @default(false)
-  accountSetupEmailSentAt DateTime? @db.DateTime(3)
-  reference String @id @db.VarChar(100)
-  pidUser String @db.VarChar(191)
-  requestKey String @db.VarChar(36)
-  requestHash String @db.VarChar(64)
-  provider String @db.VarChar(16)
-  status String @default("PENDING") @db.VarChar(24)
-  email String @db.VarChar(191)
-  customerName String @db.VarChar(191)
-  shippingAddress String @db.Text
-  items Json
-  amountMinor Float
-  authorizationUrl String? @db.Text
-  accessCode String? @db.VarChar(191)
-  initializationStartedAt DateTime? @db.DateTime(3)
-  paidAt DateTime? @db.DateTime(3)
-  affiliateDoneAt DateTime? @db.DateTime(3)
-  customerEmailSentAt DateTime? @db.DateTime(3)
-  adminEmailSentAt DateTime? @db.DateTime(3)
-  effectsLeaseUntil DateTime? @db.DateTime(3)
-  lastCheckedAt DateTime? @db.DateTime(3)
-  createdAt DateTime @default(now()) @db.DateTime(3)
-  updatedAt DateTime @updatedAt @db.DateTime(3)
+  guestTokenHash             String?   @db.VarChar(64)
+  affiliateReferralReference String?   @db.VarChar(191)
+  accountSetupRequired       Boolean   @default(false)
+  accountSetupEmailSentAt    DateTime? @db.DateTime(3)
+  reference                  String    @id @db.VarChar(100)
+  pidUser                    String    @db.VarChar(191)
+  requestKey                 String    @db.VarChar(36)
+  requestHash                String    @db.VarChar(64)
+  provider                   String    @db.VarChar(16)
+  status                     String    @default("PENDING") @db.VarChar(24)
+  email                      String    @db.VarChar(191)
+  customerName               String    @db.VarChar(191)
+  shippingAddress            String    @db.Text
+  items                      Json
+  amountMinor                Float
+  authorizationUrl           String?   @db.Text
+  accessCode                 String?   @db.VarChar(191)
+  initializationStartedAt    DateTime? @db.DateTime(3)
+  paidAt                     DateTime? @db.DateTime(3)
+  affiliateDoneAt            DateTime? @db.DateTime(3)
+  customerEmailSentAt        DateTime? @db.DateTime(3)
+  adminEmailSentAt           DateTime? @db.DateTime(3)
+  effectsLeaseUntil          DateTime? @db.DateTime(3)
+  lastCheckedAt              DateTime? @db.DateTime(3)
+  createdAt                  DateTime  @default(now()) @db.DateTime(3)
+  updatedAt                  DateTime  @updatedAt @db.DateTime(3)
+
   @@unique([pidUser, requestKey], map: "shop_checkout_request")
+  @@unique([guestTokenHash, requestKey], map: "shop_guest_request")
   @@index([status, lastCheckedAt], map: "shop_checkout_recovery")
   @@index([pidUser, createdAt], map: "shop_checkout_customer")
-  @@unique([guestTokenHash, requestKey], map: "shop_guest_request")
 }
 
 model store_sales {
@@ -2785,114 +2802,210 @@ model partner_application_country_policy {
 }
 
 model partner_order_adjustments {
-  id String @id @db.VarChar(80)
-  orderId String @db.VarChar(80)
-  revision Int
-  status String @default("AWAITING_PARTNER") @db.VarChar(32)
-  currency String @db.Char(3)
-  beforeJson String @db.LongText
-  afterJson String @db.LongText
+  id         String                              @id @db.VarChar(80)
+  orderId    String                              @db.VarChar(80)
+  revision   Int
+  status     String                              @default("AWAITING_PARTNER") @db.VarChar(32)
+  currency   String                              @db.Char(3)
+  beforeJson String                              @db.LongText
+  afterJson  String                              @db.LongText
   deltaMinor BigInt
-  reason String @db.VarChar(2000)
-  proposedBy String @db.VarChar(191)
-  reviewedBy String? @db.VarChar(191)
-  reviewNote String? @db.VarChar(2000)
+  reason     String                              @db.VarChar(2000)
+  proposedBy String                              @db.VarChar(191)
+  reviewedBy String?                             @db.VarChar(191)
+  reviewNote String?                             @db.VarChar(2000)
   reviewedAt DateTime?
-  settledAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  order procurement_partner_customer_orders @relation(fields:[orderId],references:[id],onDelete:Restrict,map:"partner_adjustment_order")
-  payment partner_adjustment_payments?
-  refunds partner_adjustment_refunds[]
-  @@unique([orderId,revision],map:"partner_adjustment_revision")
-  @@index([status,updatedAt],map:"partner_adjustment_status")
+  settledAt  DateTime?
+  createdAt  DateTime                            @default(now())
+  updatedAt  DateTime                            @default(now())
+  order      procurement_partner_customer_orders @relation(fields: [orderId], references: [id], onDelete: Restrict, map: "partner_adjustment_order")
+  payment    partner_adjustment_payments?
+  refunds    partner_adjustment_refunds[]
+
+  @@unique([orderId, revision], map: "partner_adjustment_revision")
+  @@index([status, updatedAt], map: "partner_adjustment_status")
 }
+
 model partner_adjustment_payments {
-  id String @id @db.VarChar(80)
-  adjustmentId String @unique(map:"partner_adjustment_checkout") @db.VarChar(80)
-  provider String @db.VarChar(16)
-  currency String @db.Char(3)
-  amountMinor BigInt
+  id                    String                    @id @db.VarChar(80)
+  adjustmentId          String                    @unique(map: "partner_adjustment_checkout") @db.VarChar(80)
+  provider              String                    @db.VarChar(16)
+  currency              String                    @db.Char(3)
+  amountMinor           BigInt
   settlementAmountMinor BigInt
-  status String @default("CREATED") @db.VarChar(32)
-  providerReference String? @db.VarChar(191)
-  captureReference String? @db.VarChar(191)
-  checkoutUrl String? @db.Text
-  attemptedAt DateTime?
-  feeMinor BigInt?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  adjustment partner_order_adjustments @relation(fields:[adjustmentId],references:[id],onDelete:Restrict,map:"partner_adjustment_payment_parent")
-  @@unique([provider,captureReference],map:"partner_adjustment_provider_capture")
+  status                String                    @default("CREATED") @db.VarChar(32)
+  providerReference     String?                   @db.VarChar(191)
+  captureReference      String?                   @db.VarChar(191)
+  checkoutUrl           String?                   @db.Text
+  attemptedAt           DateTime?
+  feeMinor              BigInt?
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @default(now())
+  adjustment            partner_order_adjustments @relation(fields: [adjustmentId], references: [id], onDelete: Restrict, map: "partner_adjustment_payment_parent")
+
+  @@unique([provider, captureReference], map: "partner_adjustment_provider_capture")
 }
+
 model partner_order_payment_fees {
-  paymentReference String @id @db.VarChar(191)
-  orderId String @db.VarChar(80)
-  currency String @db.Char(3)
-  feeMinor BigInt
-  customerFeeMinor BigInt @default(0)
-  createdAt DateTime @default(now())
-  order procurement_partner_customer_orders @relation(fields:[orderId],references:[id],onDelete:Restrict,map:"partner_fee_order")
-  @@index([orderId],map:"partner_order_fee_lookup")
+  paymentReference String                              @id @db.VarChar(191)
+  orderId          String                              @db.VarChar(80)
+  currency         String                              @db.Char(3)
+  feeMinor         BigInt
+  customerFeeMinor BigInt                              @default(0)
+  createdAt        DateTime                            @default(now())
+  order            procurement_partner_customer_orders @relation(fields: [orderId], references: [id], onDelete: Restrict, map: "partner_fee_order")
+
+  @@index([orderId], map: "partner_order_fee_lookup")
 }
+
 model partner_adjustment_refunds {
-  id String @id @db.VarChar(80)
-  adjustmentId String @db.VarChar(80)
-  paymentId String @db.VarChar(191)
-  provider String @db.VarChar(16)
-  captureReference String @db.VarChar(191)
-  currency String @db.Char(3)
-  amountMinor BigInt
+  id                    String                    @id @db.VarChar(80)
+  adjustmentId          String                    @db.VarChar(80)
+  paymentId             String                    @db.VarChar(191)
+  provider              String                    @db.VarChar(16)
+  captureReference      String                    @db.VarChar(191)
+  currency              String                    @db.Char(3)
+  amountMinor           BigInt
   settlementAmountMinor BigInt
-  status String @default("REQUESTED") @db.VarChar(32)
-  providerReference String? @db.VarChar(191)
-  attemptedAt DateTime?
-  checkedAt DateTime?
-  createdAt DateTime @default(now())
-  adjustment partner_order_adjustments @relation(fields:[adjustmentId],references:[id],onDelete:Restrict,map:"partner_adjustment_refund_parent_fk")
-  @@unique([provider,providerReference],map:"partner_adjustment_refund_provider")
-  @@index([adjustmentId,status],map:"partner_adjustment_refund_parent")
-  @@index([provider,captureReference],map:"partner_adjustment_refund_capture")
+  status                String                    @default("REQUESTED") @db.VarChar(32)
+  providerReference     String?                   @db.VarChar(191)
+  attemptedAt           DateTime?
+  checkedAt             DateTime?
+  createdAt             DateTime                  @default(now())
+  adjustment            partner_order_adjustments @relation(fields: [adjustmentId], references: [id], onDelete: Restrict, map: "partner_adjustment_refund_parent_fk")
+
+  @@unique([provider, providerReference], map: "partner_adjustment_refund_provider")
+  @@index([adjustmentId, status], map: "partner_adjustment_refund_parent")
+  @@index([provider, captureReference], map: "partner_adjustment_refund_capture")
 }
 
 model whatsapp_clicks {
-  id          String @id @db.VarChar(36)
-  site        String @db.VarChar(30)
-  path        String @db.VarChar(250)
-  destination String @db.VarChar(80)
-  placement   String @db.VarChar(20)
-  device      String @db.VarChar(10)
-  sessionId   String? @db.VarChar(36)
-  source      String @default("") @db.VarChar(80)
-  campaign    String @default("") @db.VarChar(80)
-  service     String @db.VarChar(50)
-  audience    String @db.VarChar(10)
-  createdAt   DateTime @default(now()) @db.DateTime(3)
+  id          String          @id @db.VarChar(36)
+  site        String          @db.VarChar(30)
+  path        String          @db.VarChar(250)
+  destination String          @db.VarChar(80)
+  placement   String          @db.VarChar(20)
+  device      String          @db.VarChar(10)
+  sessionId   String?         @db.VarChar(36)
+  source      String          @default("") @db.VarChar(80)
+  campaign    String          @default("") @db.VarChar(80)
+  service     String          @db.VarChar(50)
+  audience    String          @db.VarChar(10)
+  createdAt   DateTime        @default(now()) @db.DateTime(3)
   lead        whatsapp_leads?
+
   @@index([createdAt, site, audience], map: "whatsapp_click_period")
   @@index([sessionId, createdAt], map: "whatsapp_click_session")
 }
 
 model whatsapp_leads {
-  id          String @id @db.VarChar(36)
-  phone       String @db.VarChar(16)
-  name        String @db.VarChar(120)
-  site        String @db.VarChar(30)
-  status      String @default("NEW") @db.VarChar(20)
-  clickId     String? @unique(map: "whatsapp_lead_click") @db.VarChar(36)
-  click       whatsapp_clicks? @relation(fields: [clickId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "whatsapp_lead_click_fk")
-  notes       String @default("") @db.VarChar(1000)
-  receivedAt  DateTime @db.DateTime(3)
-  createdAt   DateTime @default(now()) @db.DateTime(3)
-  updatedAt   DateTime @default(now()) @db.DateTime(3)
-  createdBy   String @db.VarChar(191)
-  updatedBy   String @db.VarChar(191)
+  id         String           @id @db.VarChar(36)
+  phone      String           @db.VarChar(16)
+  name       String           @db.VarChar(120)
+  site       String           @db.VarChar(30)
+  status     String           @default("NEW") @db.VarChar(20)
+  clickId    String?          @unique(map: "whatsapp_lead_click") @db.VarChar(36)
+  click      whatsapp_clicks? @relation(fields: [clickId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "whatsapp_lead_click_fk")
+  notes      String           @default("") @db.VarChar(1000)
+  receivedAt DateTime         @db.DateTime(3)
+  createdAt  DateTime         @default(now()) @db.DateTime(3)
+  updatedAt  DateTime         @default(now()) @db.DateTime(3)
+  createdBy  String           @db.VarChar(191)
+  updatedBy  String           @db.VarChar(191)
+
   @@unique([site, phone], map: "whatsapp_lead_phone")
   @@index([receivedAt, site, status], map: "whatsapp_lead_period")
 }
 
 model whatsapp_rate_limits {
-  scopeHash   String @id @db.Char(64)
+  scopeHash   String   @id @db.Char(64)
   windowStart DateTime @db.DateTime(3)
-  attempts    Int @default(1)
+  attempts    Int      @default(1)
+}
+
+// Vehicle commerce: additive tables shared by the public site and central admin.
+model vehicle_models {
+  slug        String   @id @db.VarChar(100)
+  name        String   @db.VarChar(160)
+  category    String   @db.VarChar(60)
+  powertrain  String   @default("Electric") @db.VarChar(30)
+  description String   @db.Text
+  images      Json
+  youtubeUrls Json
+  variants    Json
+  published   Boolean  @default(false)
+  updatedBy   String?  @db.VarChar(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model vehicle_orders {
+  id              String                   @id @db.VarChar(50)
+  pidUser         String                   @db.VarChar(191)
+  requestKey      String                   @unique @db.VarChar(100)
+  modelSlug       String                   @db.VarChar(100)
+  variantId       String                   @db.VarChar(100)
+  vehicleName     String                   @db.VarChar(240)
+  quantity        Int
+  customerName    String                   @db.VarChar(160)
+  email           String                   @db.VarChar(191)
+  phone           String                   @db.VarChar(40)
+  whatsappConsent Boolean                  @default(false)
+  destination     String                   @db.VarChar(500)
+  notes           String?                  @db.Text
+  status          String                   @default("ENQUIRY") @db.VarChar(40)
+  priceSnapshot   Json?
+  pidInvoice      String?                  @unique @db.VarChar(191)
+  quoteExpiresAt  DateTime?
+  eta             String?                  @db.VarChar(160)
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  events          vehicle_events[]
+  proofs          vehicle_payment_proofs[]
+
+  @@index([pidUser, createdAt])
+  @@index([status, createdAt])
+}
+
+model vehicle_events {
+  id            String                  @id @db.VarChar(50)
+  orderId       String                  @db.VarChar(50)
+  type          String                  @db.VarChar(40)
+  message       String                  @db.Text
+  actor         String                  @db.VarChar(191)
+  createdAt     DateTime                @default(now())
+  order         vehicle_orders          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  notifications vehicle_notifications[]
+
+  @@index([orderId, createdAt])
+}
+
+model vehicle_payment_proofs {
+  id         String         @id @db.VarChar(50)
+  orderId    String         @db.VarChar(50)
+  claimId    String         @unique @db.VarChar(191)
+  requestKey String         @unique @db.VarChar(100)
+  filename   String         @db.VarChar(100)
+  mime       String         @db.VarChar(60)
+  content    Bytes          @db.LongBlob
+  createdAt  DateTime       @default(now())
+  order      vehicle_orders @relation(fields: [orderId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+}
+
+model vehicle_notifications {
+  id            String         @id @db.VarChar(50)
+  eventId       String         @db.VarChar(50)
+  channel       String         @db.VarChar(20)
+  status        String         @default("PENDING") @db.VarChar(20)
+  attempts      Int            @default(0)
+  nextAttemptAt DateTime       @default(now())
+  leaseUntil    DateTime?
+  lastError     String?        @db.Text
+  sentAt        DateTime?
+  event         vehicle_events @relation(fields: [eventId], references: [id], onDelete: Restrict)
+
+  @@unique([eventId, channel])
+  @@index([status, nextAttemptAt])
 }

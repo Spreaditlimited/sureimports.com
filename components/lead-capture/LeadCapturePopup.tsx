@@ -19,6 +19,7 @@ const SESSION_DISMISSED_KEY = 'sureimports_lead_dismissed_this_session';
 const LEAD_SEGMENT_ID = '67699403ee348d7f8cb68f3a';
 
 const excludedPathPrefixes = [
+  '/cars',
   '/auth',
   '/dashboard',
   '/login',

@@ -1,3 +1,5 @@
+export const PENDING_VEHICLE_REQUEST_KEY = 'sureimports:pendingVehicleRequest';
+export const VEHICLE_RESUME_PATH = '/checkout/resume-vehicle';
 export const DEFAULT_LOGIN_REDIRECT = '/dashboard/procurement';
 export const POST_AUTH_REDIRECT_KEY = 'sureimports:postAuthRedirect';
 export const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
@@ -38,12 +40,10 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
   try {
     const url = new URL(redirectCandidate, 'https://sureimports.local');
     const isDashboardPath = url.pathname.startsWith('/dashboard');
+    const isVehicleModel = /^\/cars\/models\/[a-z0-9]+(?:-[a-z0-9]+)*$/.test(url.pathname);
     const isShopCheckoutResume =
       url.pathname === '/shop/checkout' &&
       url.searchParams.get('resumeCheckout') === '1';
-    const isShopConfirmation =
-      url.pathname === '/shop/order-success' &&
-      Boolean(url.searchParams.get('ref') || url.searchParams.get('reference'));
     const isProcurementCheckoutResume =
       url.pathname === PROCUREMENT_RESUME_CHECKOUT_PATH;
     const isCorporateSourcingResume =
@@ -63,8 +63,9 @@ export function getSafeLoginRedirect(redirectCandidate: string | null): string {
 
     if (
       isDashboardPath ||
+      isVehicleModel ||
+      url.pathname === VEHICLE_RESUME_PATH ||
       isShopCheckoutResume ||
-      isShopConfirmation ||
       isProcurementCheckoutResume ||
       isCorporateSourcingResume ||
       isShippingCheckoutResume ||

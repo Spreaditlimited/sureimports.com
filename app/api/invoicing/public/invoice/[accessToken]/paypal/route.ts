@@ -1,3 +1,4 @@
+import { getAdminInvoicingBaseUrl } from '@/lib/invoicing/upstream';
 import { checkoutOriginIsAllowed } from '@/lib/intelligence/reportCheckoutSecurity';
 import { signPayPalCheckoutSession } from '@/lib/paypalCheckoutSession';
 import { getSureImportsPayPalEnvironment } from '@/lib/paypal';
@@ -8,7 +9,7 @@ export async function POST(request: Request, context: { params: Promise<{ access
   const body = await request.json().catch(() => null);
   if (!body || !['create', 'verify'].includes(body.action)) return Response.json({ message: 'Invalid checkout action.' }, { status: 400 });
   try {
-    const upstream = await fetch(`${process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com'}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}/paypal`, {
+    const upstream = await fetch(`${getAdminInvoicingBaseUrl(request.url)}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}/paypal`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), cache: 'no-store', signal: AbortSignal.timeout(55000),
     });
     const data = await upstream.json();

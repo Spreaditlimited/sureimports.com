@@ -20,7 +20,8 @@
     "test:gsc-import": "node --test tests/gsc-manual-import.test.mjs",
     "test:affiliate-reversals": "node --test --experimental-strip-types tests/affiliate-reversal-policy.test.mjs",
     "prettier": "prettier --no-error-on-unmatched-pattern --write */**/*.{js,jsx,json,ts,tsx,scss,css,md}",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test:vehicles": "node --test --experimental-strip-types tests/vehicle-commerce.test.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",

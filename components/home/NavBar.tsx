@@ -8,7 +8,6 @@ import { usePathname } from 'next/navigation';
 import {
   Menu,
   ShoppingCart,
-  LogOut,
   Ship,
   Gift,
   Sparkles,
@@ -202,6 +201,12 @@ const TOP_LEVEL_NAV = [
     type: 'link',
     title: 'Shop',
     href: '/shop',
+    match: 'prefix',
+  },
+  {
+    type: 'link',
+    title: 'Cars',
+    href: '/cars',
     match: 'prefix',
   },
   {
@@ -420,10 +425,10 @@ export default function Navbar(_props: NavbarProps) {
                 </Button>
                 <Button
                   type="button"
+                  data-si-sign-out
                   onClick={() => void logout()}
                   className="rounded-full border-0 bg-slate-800 px-6 py-5 text-sm font-bold text-white shadow-lg transition-all hover:bg-slate-700 active:scale-95"
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
               </>
@@ -568,10 +573,10 @@ export default function Navbar(_props: NavbarProps) {
                           </Button>
                           <Button
                             type="button"
-                            onClick={() => void logout()}
+                            data-si-sign-out
+                  onClick={() => void logout()}
                             className="w-full rounded-xl bg-slate-800 py-6 text-lg font-bold text-white hover:bg-slate-700"
                           >
-                            <LogOut className="mr-2 h-5 w-5" />
                             Sign Out
                           </Button>
                         </div>

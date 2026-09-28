@@ -90,6 +90,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const shouldHydrateAuth =
       pathname.startsWith('/dashboard') ||
+      pathname === '/cars' ||
+      pathname.startsWith('/cars/') ||
+      pathname.startsWith('/checkout/') ||
+      pathname.startsWith('/buy-from-chinese-websites') ||
+      pathname.startsWith('/ship-with-us') ||
       pathname.startsWith('/intelligence') ||
       pathname.startsWith('/auth') ||
       pathname === '/login' ||

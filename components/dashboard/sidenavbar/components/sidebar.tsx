@@ -82,9 +82,9 @@ export default function Sidebar({ className, items, brand }: SidebarProps) {
         </button>
       </div>
 
-      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-y-auto overflow-x-visible bg-slate-900 pb-24 pt-[25px] backdrop-blur-[151.85px]">
+      <div className="sidebar-scrollable h-[calc(100vh-90px)] space-y-4 overflow-y-auto overflow-x-visible bg-slate-900 pb-24 pt-3 backdrop-blur-[151.85px]">
         <div className="px-3">
-          <div className="mt-3 space-y-1">
+          <div className="space-y-1">
             <SideNav
               className="absolute text-background opacity-0"
               items={items ?? NavItems}

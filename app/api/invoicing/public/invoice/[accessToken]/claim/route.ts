@@ -1,7 +1,6 @@
+import { getAdminInvoicingBaseUrl } from '@/lib/invoicing/upstream';
 import { NextRequest, NextResponse } from 'next/server';
 
-const ADMIN_BASE_URL =
-  process.env.ADMIN_INVOICING_API_BASE_URL || 'https://admin.sureimports.com';
 
 export async function POST(
   request: NextRequest,
@@ -24,7 +23,7 @@ export async function POST(
     }
 
     const upstream = await fetch(
-      `${ADMIN_BASE_URL}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}/claim`,
+      `${getAdminInvoicingBaseUrl(request.url)}/api/invoicing/public/invoice/${encodeURIComponent(accessToken)}/claim`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

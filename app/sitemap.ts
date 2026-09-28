@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 import { isRedirectedBlogSlug } from '@/lib/blogRedirects';
+import { vehicleCatalogue } from '@/lib/vehicles/data';
 import {
   BODY_CAMERA_LAUNCH_READY,
   bodyCameraLaunchPaths,
@@ -256,5 +257,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
   }
 
-  return [...staticPages, ...blogPages, ...reportPages];
+  let vehiclePages: MetadataRoute.Sitemap = [{ url: `${baseUrl}/cars`, changeFrequency: 'weekly', priority: 0.9 }];
+  try {
+    vehiclePages = [...vehiclePages, ...(await vehicleCatalogue()).filter(m => m.published).map(m => ({ url: `${baseUrl}/cars/models/${m.slug}`, changeFrequency: 'weekly' as const, priority: 0.8 }))];
+  } catch (error) { console.error('Unable to load vehicle sitemap entries', error); }
+  return [...staticPages, ...blogPages, ...reportPages, ...vehiclePages];
 }
