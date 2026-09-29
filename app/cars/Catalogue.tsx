@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowUpRight, Search, Zap, X } from 'lucide-react';
+import { ArrowUpRight, Zap, X } from 'lucide-react';
 import type { PublicVehicle } from '@/lib/vehicles/data';
 import { naira } from '@/lib/vehicles/policy';
 import VehicleHeroCarousel from './VehicleHeroCarousel';
@@ -11,30 +11,39 @@ import VehicleComparison from './VehicleComparison';
 import guides from '@/content/vehicle-guides/manifest.json';
 import VehicleFaqs from './VehicleFaqs';
 import HeroPill from '@/components/home/HeroPill';
+import VehicleSearchFilters from './VehicleSearchFilters';
+import {
+  emptyFilters,
+  readVehicleFilters,
+  searchVehicles,
+  landedBounds,
+  type VehicleFilters,
+} from '@/lib/vehicles/search';
 
 export default function Catalogue({ models }: { models: PublicVehicle[] }) {
   const params = useSearchParams();
-  const [category, setCategory] = useState(
-    params.get('category') || 'All vehicles',
-  );
-  const [query, setQuery] = useState('');
+  const filters = useMemo(() => readVehicleFilters(params), [params]);
   const [compare, setCompare] = useState<string[]>([]);
   const [showCompare, setShowCompare] = useState(false);
-  const categories = [
-    'All vehicles',
-    ...new Set(models.map((m) => m.category)),
-  ];
+  const [compareVariants, setCompareVariants] = useState<
+    Record<string, string>
+  >({});
   const filtered = useMemo(
-    () =>
-      models.filter(
-        (m) =>
-          (category === 'All vehicles' || m.category === category) &&
-          `${m.name} ${m.description} ${m.powertrain}`
-            .toLowerCase()
-            .includes(query.toLowerCase()),
-      ),
-    [models, category, query],
+    () => searchVehicles(models, filters),
+    [models, filters],
   );
+  function changeFilters(patch: Partial<VehicleFilters>) {
+    const next = { ...filters, ...patch };
+    const search = new URLSearchParams();
+    for (const [key, value] of Object.entries(next))
+      if (value && !(key === 'sort' && value === 'relevance'))
+        search.set(key, value);
+    window.history.replaceState(
+      null,
+      '',
+      `${window.location.pathname}${search.size ? '?' + search.toString() : ''}${window.location.hash}`,
+    );
+  }
   return (
     <main className="vehicle-catalogue">
       <section className="vehicle-hero-surface">
@@ -90,123 +99,139 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
             to your next fleet expansion.
           </p>
         </div>
-        <div className="vehicle-filters">
-          <div className="vehicle-tabs" aria-label="Filter by vehicle type">
-            {categories.map((c) => (
-              <button
-                key={c}
-                aria-pressed={category === c}
-                className={category === c ? 'active' : ''}
-                onClick={() => setCategory(c)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-          <label className="vehicle-search">
-            <Search size={17} />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the range"
-              aria-label="Search vehicles"
-            />
-          </label>
-        </div>
-        <p className="vehicle-result-count" aria-live="polite">
-          {filtered.length} models · Choose a model to explore configurations
-        </p>
-        <div className="vehicle-grid">
-          {filtered.map((m) => {
-            const ranges = m.variants
-              .map((v) => v.rangeKm)
-              .filter((n): n is number => n !== null);
-            const prices = m.variants
-              .map((v) => v.price?.totalNgn)
-              .filter((n): n is number => n !== undefined);
-            return (
-              <article className="vehicle-card" key={m.slug}>
-                <Link
-                  href={`/cars/models/${m.slug}`}
-                  className="vehicle-card-image"
-                >
-                  {m.images[0] ? (
-                    <Image
-                      src={m.images[0]}
-                      alt={m.name}
-                      fill
-                      sizes="(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw"
-                    />
-                  ) : (
-                    <div className="vehicle-image-placeholder">{m.name}</div>
-                  )}
-                  <span className="vehicle-tag">
-                    <Zap size={12} />
-                    {m.powertrain}
-                  </span>
-                </Link>
-                <div className="vehicle-card-body">
-                  <p className="vehicle-eyebrow">{m.category}</p>
-                  <Link href={`/cars/models/${m.slug}`}>
-                    <h3>
-                      {m.name}
-                      <ArrowUpRight size={21} />
-                    </h3>
-                  </Link>
-                  <div className="vehicle-card-specs">
-                    <span>
-                      {ranges.length
-                        ? `Up to ${Math.max(...ranges)} km*`
-                        : 'Specifications on request'}
-                    </span>
-                    <span>{m.variants.length} configurations</span>
-                  </div>
-                  <div className="vehicle-card-bottom">
-                    <div>
-                      <small>
-                        {prices.length
-                          ? 'Estimated landed price from'
-                          : m.variants.some((v) => v.indicativePrice)
-                            ? 'Indicative landed price range'
-                            : 'Supplier pricing being confirmed'}
-                      </small>
-                      <strong>
-                        {prices.length
-                          ? naira(Math.min(...prices))
-                          : m.variants[0]?.indicativePrice?.landedMinNgn != null
-                            ? `${naira(m.variants[0].indicativePrice.landedMinNgn)} – ${naira(m.variants[0].indicativePrice.landedMaxNgn!)}`
-                            : 'Request a quotation'}
-                      </strong>
-                    </div>
-                    <label>
-                      <input
-                        type="checkbox"
-                        aria-label={`Compare ${m.name}`}
-                        checked={compare.includes(m.slug)}
-                        disabled={
-                          !compare.includes(m.slug) && compare.length === 3
-                        }
-                        onChange={(e) =>
-                          setCompare(
-                            e.target.checked
-                              ? [...compare, m.slug]
-                              : compare.filter((s) => s !== m.slug),
-                          )
-                        }
+        <VehicleSearchFilters
+          models={models}
+          filters={filters}
+          onChange={changeFilters}
+          count={filtered.length}
+        >
+          <div className="vehicle-grid">
+            {filtered.map(({ model: m, variants, budgetOverlap }) => {
+              const href = `/cars/models/${m.slug}?configuration=${encodeURIComponent(variants[0].id)}`;
+              const bounds = variants
+                .map(landedBounds)
+                .filter(
+                  (p): p is NonNullable<ReturnType<typeof landedBounds>> =>
+                    p !== null,
+                );
+              const indicative = bounds.some((p) => p.indicative);
+              const minimum = bounds.length
+                ? Math.min(...bounds.map((p) => p.min))
+                : null;
+              const maximum = bounds.length
+                ? Math.max(...bounds.map((p) => p.max))
+                : null;
+              const ranges = variants
+                .map((v) => v.rangeKm)
+                .filter((n): n is number => n !== null);
+              return (
+                <article className="vehicle-card" key={m.slug}>
+                  <Link href={href} className="vehicle-card-image">
+                    {m.images[0] ? (
+                      <Image
+                        src={m.images[0]}
+                        alt={m.name}
+                        fill
+                        sizes="(max-width: 650px) 100vw, (max-width: 1000px) 50vw, 33vw"
                       />
-                      Compare
-                    </label>
+                    ) : (
+                      <div className="vehicle-image-placeholder">{m.name}</div>
+                    )}
+                    <span className="vehicle-tag">
+                      <Zap size={12} />
+                      {m.powertrain}
+                    </span>
+                  </Link>
+                  <div className="vehicle-card-body">
+                    <p className="vehicle-eyebrow">{m.category}</p>
+                    <Link href={href}>
+                      <h3>
+                        {m.name}
+                        <ArrowUpRight size={21} />
+                      </h3>
+                    </Link>
+                    <div className="vehicle-card-specs">
+                      <span>
+                        {ranges.length
+                          ? `Up to ${Math.max(...ranges)} km*`
+                          : 'Specifications on request'}
+                      </span>
+                      <span>
+                        {variants.length}{' '}
+                        {variants.length === 1
+                          ? 'configuration'
+                          : 'configurations'}
+                        {variants.length < m.variants.length ? ' match' : ''}
+                      </span>
+                    </div>
+                    {budgetOverlap && (
+                      <p className="vehicle-budget-note">
+                        Lower estimate fits your budget; some configurations
+                        cost more.
+                      </p>
+                    )}
+                    <div className="vehicle-card-bottom">
+                      <div>
+                        <small>
+                          {minimum !== null
+                            ? indicative
+                              ? 'Indicative landed price range'
+                              : 'Estimated landed price from'
+                            : 'Supplier pricing being confirmed'}
+                        </small>
+                        <strong>
+                          {minimum !== null
+                            ? indicative && maximum !== null
+                              ? `${naira(minimum)} – ${naira(maximum)}`
+                              : naira(minimum)
+                            : 'Request a quotation'}
+                        </strong>
+                      </div>
+                      <label>
+                        <input
+                          type="checkbox"
+                          aria-label={`Compare ${m.name}`}
+                          checked={compare.includes(m.slug)}
+                          disabled={
+                            !compare.includes(m.slug) && compare.length === 3
+                          }
+                          onChange={(e) => {
+                            if (e.target.checked)
+                              setCompareVariants((current) => ({
+                                ...current,
+                                [m.slug]: variants[0].id,
+                              }));
+                            setCompare(
+                              e.target.checked
+                                ? [...compare, m.slug]
+                                : compare.filter((s) => s !== m.slug),
+                            );
+                          }}
+                        />
+                        Compare
+                      </label>
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-        {!filtered.length && (
-          <p className="vehicle-empty">
-            No vehicles match your search. Try another category or model name.
-          </p>
-        )}
+                </article>
+              );
+            })}
+          </div>
+          {!filtered.length && (
+            <div className="vehicle-empty">
+              <h3>No vehicles match these filters</h3>
+              <p>
+                Try a higher budget, fewer filters or another model name.
+                Unconfirmed specifications and prices may limit the results.
+              </p>
+              <button
+                className="vehicle-button"
+                onClick={() => changeFilters(emptyFilters)}
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </VehicleSearchFilters>
         <p className="vehicle-footnote">
           *Supplier-stated range varies by configuration and test cycle. Actual
           range depends on load, route and driving conditions. Photographs may
@@ -282,7 +307,16 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
         </div>
       )}
       <VehicleComparison
-        models={models.filter((model) => compare.includes(model.slug))}
+        models={models
+          .filter((model) => compare.includes(model.slug))
+          .map((model) => ({
+            ...model,
+            variants: [...model.variants].sort(
+              (a, b) =>
+                Number(b.id === compareVariants[model.slug]) -
+                Number(a.id === compareVariants[model.slug]),
+            ),
+          }))}
         open={showCompare}
         onClose={() => setShowCompare(false)}
         onRemove={(slug) => {

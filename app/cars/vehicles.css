@@ -1834,3 +1834,280 @@
 .vehicle-catalogue .vehicle-button {
   font-size: 14px;
 }
+
+/* Compact catalogue toolbar with desktop sidebar and mobile filter tray. */
+.vehicle-discovery {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+  scroll-margin-top: 100px;
+}
+.vehicle-filter-sidebar {
+  position: sticky;
+  top: 100px;
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: 20px;
+  border: 1px solid var(--si-border);
+  border-radius: 16px;
+  background: var(--si-surface);
+}
+.vehicle-sidebar-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.vehicle-sidebar-heading h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.vehicle-sidebar-heading button,
+.vehicle-tray-footer > button {
+  color: var(--si-primary);
+  font-size: 13px;
+  text-decoration: underline;
+}
+.vehicle-search-results {
+  min-width: 0;
+}
+.vehicle-discovery .vehicle-discovery-search {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--si-surface);
+  border-radius: 12px;
+}
+.vehicle-discovery-search input {
+  width: 100%;
+  min-width: 0;
+  min-height: 28px;
+  font-size: 16px;
+}
+.vehicle-discovery-help {
+  color: var(--si-muted);
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 14px 0 0;
+}
+.vehicle-discovery-primary,
+.vehicle-discovery-secondary {
+  display: grid;
+  gap: 18px;
+}
+:is(.vehicle-discovery, .vehicle-filter-tray) .vehicle-field {
+  min-width: 0;
+  margin: 0;
+  font-size: 13px;
+}
+:is(.vehicle-discovery, .vehicle-filter-tray) .vehicle-field > label {
+  display: block;
+  margin-bottom: 6px;
+}
+:is(.vehicle-discovery, .vehicle-filter-tray) .vehicle-field input {
+  width: 100%;
+  margin-top: 6px;
+  height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--si-border);
+  background: var(--si-surface);
+  color: var(--si-ink);
+  border-radius: 12px;
+  font-size: 16px;
+}
+:is(.vehicle-discovery, .vehicle-filter-tray) .vehicle-field button {
+  font-size: 13px;
+}
+.vehicle-discovery-more {
+  margin-top: 20px;
+  border-top: 1px solid var(--si-border);
+}
+.vehicle-discovery-more summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  min-height: 54px;
+  font-size: 13px;
+  font-weight: 600;
+  list-style: none;
+}
+.vehicle-discovery-more summary::-webkit-details-marker {
+  display: none;
+}
+.vehicle-discovery-more summary::after {
+  content: '+';
+  margin-left: auto;
+  font-size: 22px;
+}
+.vehicle-discovery-more[open] summary::after {
+  content: '−';
+}
+.vehicle-discovery-more summary span {
+  display: none;
+}
+.vehicle-discovery-secondary {
+  padding: 8px 0;
+}
+.vehicle-catalogue-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 20px;
+}
+.vehicle-catalogue-controls .vehicle-result-count {
+  margin: 0;
+  font-size: 13px;
+  color: var(--si-muted);
+}
+.vehicle-catalogue-controls .vehicle-field {
+  width: 220px;
+  margin-left: auto;
+}
+.vehicle-catalogue-controls .vehicle-field > label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.vehicle-mobile-filters {
+  display: none;
+}
+.vehicle-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 18px;
+}
+.vehicle-filter-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  min-height: 36px;
+  border: 1px solid var(--si-border);
+  background: var(--si-soft);
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+.vehicle-filter-chips button span {
+  overflow-wrap: anywhere;
+}
+.vehicle-filter-chips button svg {
+  flex-shrink: 0;
+}
+.vehicle-filter-chips .vehicle-clear-filters {
+  background: transparent;
+  border-color: transparent;
+  text-decoration: underline;
+  color: var(--si-primary);
+}
+.vehicle-search-interpretation,
+.vehicle-budget-note {
+  padding: 10px 12px;
+  background: var(--si-soft);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--si-muted);
+  margin: 12px 0;
+}
+.vehicle-empty .vehicle-button {
+  margin-top: 16px;
+}
+:is(.vehicle-discovery, .vehicle-filter-tray)
+  :is(button, summary, input):focus-visible {
+  outline: 2px solid var(--si-primary);
+  outline-offset: 3px;
+}
+.vehicle-filter-tray {
+  --v-primary: var(--si-primary);
+  display: flex;
+  flex-direction: column;
+  width: min(90vw, 380px);
+  max-width: 380px;
+  height: 100dvh;
+  padding: 0;
+  gap: 0;
+  color: var(--si-ink);
+  background: var(--si-surface);
+}
+.vehicle-tray-header {
+  padding: 24px 44px 20px 20px;
+  border-bottom: 1px solid var(--si-border);
+}
+.vehicle-tray-header h2 {
+  color: var(--si-ink);
+}
+.vehicle-tray-header p {
+  color: var(--si-muted);
+  margin-top: 6px;
+}
+.vehicle-tray-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+}
+.vehicle-tray-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px max(16px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--si-border);
+}
+.vehicle-tray-footer .vehicle-button {
+  display: inline-flex;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--si-primary);
+  color: white;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+@media (min-width: 1001px) and (max-width: 1200px) {
+  .vehicle-search-results .vehicle-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1000px) {
+  .vehicle-discovery {
+    display: block;
+  }
+  .vehicle-filter-sidebar {
+    display: none;
+  }
+  .vehicle-mobile-filters {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1px solid var(--si-border);
+    border-radius: 12px;
+    background: var(--si-surface);
+    font-size: 13px;
+  }
+  .vehicle-mobile-filters span {
+    color: var(--si-primary);
+    font-weight: 600;
+  }
+}
+@media (max-width: 600px) {
+  .vehicle-catalogue-controls {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .vehicle-catalogue-controls .vehicle-result-count {
+    order: 3;
+    width: 100%;
+  }
+  .vehicle-catalogue-controls .vehicle-field {
+    width: min(190px, 60%);
+  }
+}
