@@ -9,7 +9,7 @@ import { carsSocialImage } from '@/lib/vehicles/social';
 export const metadata: Metadata = {
   title: 'Electric Cars, Vans & Cargo Trucks in Nigeria',
   description:
-    'Import electric vehicles from China to Nigeria. Compare Ruichi vans, passenger vehicles and cargo trucks, Naira prices, specifications and landed-cost estimates.',
+    'Import electric vehicles from China to Nigeria. Compare electric cars, SUVs, vans and cargo trucks, Naira prices, specifications and landed-cost estimates.',
   alternates: { canonical: 'https://www.sureimports.com/cars' },
   openGraph: {
     title: 'Electric Vehicles from China to Nigeria | Sure Imports',

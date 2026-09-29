@@ -40,21 +40,22 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
       <section className="vehicle-hero-surface">
         <div className="vehicle-hero">
           <div className="vehicle-hero-copy">
-            <HeroPill>The next move for your business</HeroPill>
+            <HeroPill>Your next move, made electric</HeroPill>
             <h1>
               Electric ambition.
               <br />
               <em>Delivered.</em>
             </h1>
             <p className="vehicle-hero-description">
-              Discover electric vans, buses and trucks from China. Clear Naira
-              pricing. One team, from your first enquiry to arrival in Nigeria.
+              Discover electric cars, SUVs, vans and trucks from China. Clear
+              Naira pricing. One team, from your first enquiry to arrival in
+              Nigeria.
             </p>
             <a href="#range" className="vehicle-button">
               Find your vehicle <ArrowUpRight size={18} />
             </a>
             <div className="vehicle-hero-note">
-              <Zap size={17} /> Introducing the Ruichi electric range
+              <Zap size={17} /> Electric cars and commercial vehicles
             </div>
           </div>
           <VehicleHeroCarousel models={models} />
@@ -81,10 +82,10 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
         <div className="vehicle-section-heading">
           <div>
             <p className="vehicle-eyebrow">FIND YOUR FIT</p>
-            <h2>Different jobs. An electric answer.</h2>
+            <h2>Find your next electric vehicle.</h2>
           </div>
           <p>
-            From the daily delivery route
+            From your everyday commute
             <br />
             to your next fleet expansion.
           </p>
@@ -165,12 +166,16 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
                       <small>
                         {prices.length
                           ? 'Estimated landed price from'
-                          : 'Manufacturer pricing being confirmed'}
+                          : m.variants.some((v) => v.indicativePrice)
+                            ? 'Indicative landed price range'
+                            : 'Supplier pricing being confirmed'}
                       </small>
                       <strong>
                         {prices.length
                           ? naira(Math.min(...prices))
-                          : 'Request a quotation'}
+                          : m.variants[0]?.indicativePrice?.landedMinNgn != null
+                            ? `${naira(m.variants[0].indicativePrice.landedMinNgn)} – ${naira(m.variants[0].indicativePrice.landedMaxNgn!)}`
+                            : 'Request a quotation'}
                       </strong>
                     </div>
                     <label>

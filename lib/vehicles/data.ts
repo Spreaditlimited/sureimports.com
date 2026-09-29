@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import catalogue from './catalogue.json';
 import {
   canQuote,
+  referenceVehiclePrice,
   priceVehicle,
   type Rates,
   type VehicleModel,
@@ -27,18 +28,18 @@ export const vehicleCatalogue = cache(async function vehicleCatalogue() {
   }
 });
 export async function vehicleRates(): Promise<Rates> {
-  if (process.env.VEHICLE_CATALOGUE_PREVIEW === '1')
-    return { ngnPerRmb: 0, ngnPerCbm: 0 };
   const row = await prisma.exchange_rate.findUnique({
     where: { id: 1 },
     select: {
       exNairaToYuan: true,
+      exNairaToDollar: true,
       quotationSeaRateNgnPerCbm: true,
       vehicleMarkupPercent: true,
     },
   });
   return {
     markupPercent: Number(row?.vehicleMarkupPercent ?? 20),
+    ngnPerUsd: Number(row?.exNairaToDollar || 0),
     ngnPerRmb: Number(row?.exNairaToYuan || 0),
     ngnPerCbm: Number(row?.quotationSeaRateNgnPerCbm || 0),
   };
@@ -55,6 +56,9 @@ export function publicVehicle(model: VehicleModel, rates: Rates) {
     variants: model.variants.map((v) => {
       const {
         manufacturerRmb: _cost,
+        manufacturerUsd: _usdCost,
+        manufacturerUsdMax: _usdMax,
+        priceCurrency: _currency,
         source: _source,
         priceConfirmed: _price,
         specificationsConfirmed: _specs,
@@ -62,6 +66,7 @@ export function publicVehicle(model: VehicleModel, rates: Rates) {
       } = v;
       return {
         ...spec,
+        indicativePrice: referenceVehiclePrice(v, rates),
         price: canQuote(v, rates) ? priceVehicle(v, rates) : null,
       };
     }),

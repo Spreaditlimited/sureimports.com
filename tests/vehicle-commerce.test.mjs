@@ -59,7 +59,7 @@ test('YouTube embeds accept only known hosts and valid video IDs', () => {
 });
 test('supplied catalogue prices known configurations and preserves unknown prices', () => {
   const models = JSON.parse(readFileSync(new URL('../lib/vehicles/catalogue.json', import.meta.url), 'utf8'));
-  assert.equal(models.length, 10);
+  assert.equal(models.length, 20);
   assert.equal(new Set(models.map(m => m.slug)).size, models.length);
   for (const model of models) {
     assert.ok(model.variants.length);

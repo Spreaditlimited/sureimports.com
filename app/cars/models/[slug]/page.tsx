@@ -76,8 +76,10 @@ export default async function VehiclePage({ params, searchParams }: Props) {
         image: model.images,
         category: model.category,
         fuelType: model.powertrain,
-        ...(model.name.startsWith('Ruichi')
-          ? { brand: { '@type': 'Brand', name: 'Ruichi' } }
+        ...(['Ruichi', 'BYD', 'GAC', 'Changan', 'Chery', 'Avatr'].includes(
+          model.name.split(' ')[0],
+        )
+          ? { brand: { '@type': 'Brand', name: model.name.split(' ')[0] } }
           : {}),
       },
       {

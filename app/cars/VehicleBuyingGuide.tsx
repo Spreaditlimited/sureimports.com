@@ -34,11 +34,31 @@ export default function VehicleBuyingGuide({
           ))}
         </ul>
       )}
+      {model.variants.some((v) => v.dimensionsSource) && (
+        <p>
+          Shipping estimates use published model dimensions. The supplied model
+          year and body configuration will be checked before the final
+          quotation. Dimension references:{' '}
+          {model.variants
+            .filter((v) => v.dimensionsSource)
+            .map((v) => (
+              <a
+                key={v.id}
+                href={v.dimensionsSource}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {model.name} published specifications
+              </a>
+            ))}
+          .
+        </p>
+      )}
       <h3>Compare all {model.name} configurations</h3>
       <p>
-        Each row refers to a specific supplier configuration. Range is
-        manufacturer stated; unconfirmed information is shown explicitly. Prices
-        are estimates for one vehicle.
+        Rows show supplier configurations or explicitly labelled model-level
+        estimates. Range is supplier stated; unconfirmed information is shown
+        explicitly. Prices are estimates for one vehicle.
       </p>
       <div
         className="vehicle-config-table"
@@ -86,7 +106,11 @@ export default function VehicleBuyingGuide({
                     : 'To be confirmed'}
                 </td>
                 <td>
-                  {v.price ? naira(v.price.totalNgn) : 'Price on request'}
+                  {v.price
+                    ? naira(v.price.totalNgn)
+                    : v.indicativePrice?.landedMinNgn != null
+                      ? `${naira(v.indicativePrice.landedMinNgn)} – ${naira(v.indicativePrice.landedMaxNgn!)} (indicative)`
+                      : 'Price on request'}
                 </td>
               </tr>
             ))}

@@ -233,12 +233,16 @@ export default function VehicleComparison({
                   <strong>
                     {variant.price
                       ? naira(variant.price.totalNgn)
-                      : 'Price on request'}
+                      : variant.indicativePrice?.landedMinNgn != null
+                        ? `${naira(variant.indicativePrice.landedMinNgn)} – ${naira(variant.indicativePrice.landedMaxNgn!)}`
+                        : 'Price on request'}
                   </strong>
                   <small>
                     {variant.price
                       ? 'Estimated total in Nigeria'
-                      : 'Request a confirmed quotation'}
+                      : variant.indicativePrice
+                        ? 'Indicative range · exact trim price pending'
+                        : 'Request a confirmed quotation'}
                   </small>
                 </td>
               ))}
@@ -249,7 +253,9 @@ export default function VehicleComparison({
                 <td key={model.slug}>
                   {variant.price
                     ? naira(variant.price.vehicleNgn)
-                    : 'To be confirmed'}
+                    : variant.indicativePrice
+                      ? `${naira(variant.indicativePrice.minNgn)} – ${naira(variant.indicativePrice.maxNgn)}`
+                      : 'To be confirmed'}
                 </td>
               ))}
             </tr>
@@ -262,7 +268,9 @@ export default function VehicleComparison({
                 <td key={model.slug}>
                   {variant.price
                     ? naira(variant.price.shippingNgn)
-                    : 'To be confirmed'}
+                    : variant.indicativePrice?.shippingNgn != null
+                      ? naira(variant.indicativePrice.shippingNgn)
+                      : 'To be confirmed'}
                 </td>
               ))}
             </tr>

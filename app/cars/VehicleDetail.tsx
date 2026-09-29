@@ -224,6 +224,50 @@ export default function VehicleDetail({
                   </div>
                 </dl>
               </>
+            ) : v.indicativePrice ? (
+              <>
+                <small>
+                  Indicative{' '}
+                  {v.indicativePrice.landedMinNgn !== null
+                    ? 'landed'
+                    : 'vehicle'}{' '}
+                  price range · {quantity} vehicle{quantity > 1 ? 's' : ''}
+                </small>
+                <h2>
+                  {naira(
+                    (v.indicativePrice.landedMinNgn ??
+                      v.indicativePrice.minNgn) * quantity,
+                  )}{' '}
+                  –{' '}
+                  {naira(
+                    (v.indicativePrice.landedMaxNgn ??
+                      v.indicativePrice.maxNgn) * quantity,
+                  )}
+                </h2>
+                <dl>
+                  <div>
+                    <dt>Vehicle price range</dt>
+                    <dd>
+                      {naira(v.indicativePrice.minNgn * quantity)} –{' '}
+                      {naira(v.indicativePrice.maxNgn * quantity)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Estimated shipping</dt>
+                    <dd>
+                      {v.indicativePrice.shippingNgn !== null
+                        ? naira(v.indicativePrice.shippingNgn * quantity)
+                        : 'To be confirmed'}
+                    </dd>
+                  </div>
+                </dl>
+                <p>
+                  Budget estimate across the supplier’s model range. We confirm
+                  the model year, exact trim, battery, availability and final
+                  price before issuing your quotation.
+                </p>
+                <p>{v.dimensionsNote}</p>
+              </>
             ) : (
               <>
                 <small>PRICING UPDATE IN PROGRESS</small>
