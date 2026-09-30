@@ -57,7 +57,7 @@ export const vehicleFaqs: VehicleFaq[] = [
     question: 'Can I pay in separate transfers or use a deposit?',
     answer: [
       'You can submit separate transfers against the same invoice if your bank has a transfer limit. Upload a proof for each transfer and enter its actual amount; your dashboard shows approved payments and the remaining balance.',
-      'Separate transfers are not a financing or instalment plan. The current ordering flow requires the full invoice balance to be approved before your order is confirmed for supplier fulfilment. Do not assume a deposit reserves a vehicle.',
+      'Where Pay Small Small is available, you can request a payment plan. Your offer shows the minimum deposit, additional fee and payment period before you accept. Pay by bank transfer and submit proof in your dashboard. Only verified credits count toward your balance. Procurement begins only after the entire landed cost and fee are paid and approved; a deposit does not reserve a vehicle.',
     ],
   },
   {

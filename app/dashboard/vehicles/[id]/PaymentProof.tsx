@@ -11,12 +11,16 @@ export default function PaymentProof({
   balance,
   banks,
   expired,
+  plan = false,
+  nextAmount,
 }: {
   orderId: string;
   reference: string;
   balance: number;
   banks: VehicleBank[];
   expired: boolean;
+  plan?: boolean;
+  nextAmount?: number;
 }) {
   const router = useRouter();
   const [bankId, setBankId] = useState(banks[0]?.pidBankAccount || '');
@@ -68,8 +72,9 @@ export default function PaymentProof({
         </p>
       ) : (
         <p>
-          Transfer {naira(balance)} using the details below. You can submit
-          separate transfers if your bank has a daily limit.
+          {plan
+            ? `Your next scheduled amount is ${naira(nextAmount || balance)}. You can pay in smaller transfers or pay extra toward the ${naira(balance)} outstanding balance. Check pending proofs before paying again.`
+            : `Transfer ${naira(balance)} using the details below. You can submit separate transfers if your bank has a daily limit.`}
         </p>
       )}
       {banks.length ? (

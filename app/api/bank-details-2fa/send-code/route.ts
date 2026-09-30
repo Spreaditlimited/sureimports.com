@@ -1,122 +1,94 @@
-import { PrismaClient } from '@prisma/client';
-import { NextResponse } from 'next/server';
-import randomGenerator from '@/lib/helpers/randomGenerator';
+import { randomInt, randomUUID } from 'node:crypto';
+import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail';
-
-const prisma = new PrismaClient();
-
+import {
+  bankSession,
+  bankResponse,
+  submittedBank,
+} from '@/lib/banking/request';
+import {
+  codeDigest,
+  readChallenge,
+  type BankChallenge,
+} from '@/lib/banking/verification';
 export async function POST(request: Request) {
+  const user = await bankSession(request);
+  if (!user)
+    return bankResponse('Sign in and refresh this page.', 'UNAUTHORIZED', 401);
+  let saved: string | undefined;
   try {
-    // Get form data
-    const formData = await request.formData();
-    const pidUser = formData.get('pidUser') as string;
-    const email = formData.get('email') as string;
-
-    // Validate inputs
-    if (!pidUser || !email) {
-      return NextResponse.json(
-        {
-          responsex: {
-            message: 'User ID and email are required',
-            status: 'MISSING_PARAMETERS',
-          },
-          successx: false,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Check if user exists
-    const user = await prisma.users.findUnique({
-      where: {
-        pidUser: pidUser,
-        userEmail: email,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        {
-          responsex: {
-            message: 'User not found. Please re-login and try again.',
-            status: 'USER_NOT_FOUND',
-          },
-          successx: false,
-        },
-        { status: 404 },
-      );
-    }
-
-    // Generate 6-digit verification code
-    const verificationCode = randomGenerator(6);
-
-    // Store verification code in userExt2 field with timestamp
-    const codeData = JSON.stringify({
-      code: verificationCode,
-      timestamp: new Date().toISOString(),
-      purpose: 'bank_details_update',
-    });
-
-    await prisma.users.update({
-      where: { pidUser: pidUser },
-      data: {
-        userExt2: codeData,
-        updatedAt: new Date(),
-      },
-    });
-
-    // Send verification code via email
-    try {
-      const xEmail = email;
-      const xTitle = 'Bank Details Update - Verification Code';
-      const xBodyTitle = 'Bank Details Update Verification';
-      const xBody1 = `You have requested to update your bank details. Please use the verification code below to complete this action.`;
-      const xBody2 = `Your verification code is: <strong style="font-size: 24px; color: #2563eb;">${verificationCode}</strong><br/><br/>This code will expire in 10 minutes. If you did not request this change, please contact support immediately.`;
-      const xButtonTitle = 'Go to Dashboard';
-      const xButtonLink = process.env.ROOT_URL + '/dashboard';
-
-      console.log('Attempting to send verification email to:', xEmail);
-      console.log('Verification code:', verificationCode);
-
-      await xMail({
-        xEmail,
-        xTitle,
-        xBodyTitle,
-        xBody1,
-        xBody2,
-        xButtonTitle,
-        xButtonLink,
+    const { bankCode, accountNumber } = submittedBank(await request.formData());
+    const code = String(randomInt(100000, 1000000));
+    const outcome = await prisma.$transaction(async (tx) => {
+      const [row] = await tx.$queryRaw<
+        { userExt2: string | null }[]
+      >`SELECT userExt2 FROM users WHERE pidUser=${user.pidUser} FOR UPDATE`;
+      if (!row) throw new Error('Profile not found.');
+      const old = readChallenge(row.userExt2),
+        now = Date.now();
+      if (
+        old &&
+        (now - old.issuedAt < 60000 ||
+          (now - old.windowAt < 3600000 && old.sends >= 5))
+      )
+        return false;
+      const nonce = randomUUID();
+      const c: BankChallenge = {
+        purpose: 'bank_details_update',
+        version: 2,
+        nonce,
+        hash: codeDigest(user.pidUser, nonce, code),
+        issuedAt: now,
+        expiresAt: now + 600000,
+        attempts: 0,
+        bankCode,
+        accountNumber,
+        windowAt: old && now - old.windowAt < 3600000 ? old.windowAt : now,
+        sends: old && now - old.windowAt < 3600000 ? old.sends + 1 : 1,
+      };
+      saved = JSON.stringify(c);
+      await tx.users.update({
+        where: { pidUser: user.pidUser },
+        data: { userExt2: saved },
       });
-
-      console.log('Verification email sent successfully to:', xEmail);
-    } catch (emailError) {
-      console.error('Failed to send verification email:', emailError);
-      // Don't fail the request if email fails - code is already stored in DB
-      console.warn('Email failed but verification code is stored in database');
+      return true;
+    });
+    if (!outcome)
+      return bankResponse(
+        'Please wait before requesting another code. At most five codes may be requested per hour.',
+        'RATE_LIMITED',
+        429,
+      );
+    try {
+      await xMail({
+        xEmail: user.userEmail,
+        xTitle: 'Verify your bank details change',
+        xBody1: `Your verification code is <strong>${code}</strong>. It expires in 10 minutes.`,
+        xBody2: `This code authorises the account ending ${accountNumber.slice(-4)}. If you did not request this change, do not share this code.`,
+      });
+    } catch {
+      // Invalidate only this challenge; retain resend limits and never erase a newer one.
+      const failed = { ...readChallenge(saved!)!, attempts: 5 };
+      await prisma.users.updateMany({
+        where: { pidUser: user.pidUser, userExt2: saved },
+        data: { userExt2: JSON.stringify(failed) },
+      });
+      return bankResponse(
+        'We could not send the verification email. Please try again shortly.',
+        'EMAIL_FAILED',
+        503,
+      );
     }
-
-    // Return success response
-    return NextResponse.json(
-      {
-        responsex: {
-          message: 'Verification code has been sent to your email.',
-          status: 'CODE_SENT',
-        },
-        successx: true,
-      },
-      { status: 200 },
+    return bankResponse(
+      'Verification code sent to your profile email.',
+      'CODE_SENT',
+      200,
     );
-  } catch (error: any) {
-    console.error('Error in send-code endpoint:', error);
-    return NextResponse.json(
-      {
-        responsex: {
-          message: 'An error occurred. Please try again.',
-          status: 'SERVER_ERROR',
-        },
-        successx: false,
-      },
-      { status: 500 },
+  } catch {
+    return bankResponse(
+      'Unable to send a code. Check the bank details and try again.',
+      'CODE_FAILED',
+      400,
     );
   }
 }

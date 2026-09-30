@@ -13,13 +13,22 @@ import {
 } from '@/lib/auth/loginRedirect';
 import { readVehicleDraft } from '@/lib/vehicles/requestDraft';
 import { createVehicleRequestKey } from '@/lib/vehicles/requestKey';
+import VehiclePlanPreview from '@/components/vehicles/VehiclePlanPreview';
+import {
+  DEFAULT_PLAN_SETTINGS,
+  moneyDecimal,
+  moneyMinor,
+  type PlanSettings,
+} from '@/lib/vehicles/installments';
 import VehiclePicker from '@/components/vehicles/VehiclePicker';
 
 export default function VehicleDetail({
   model,
+  planSettings = DEFAULT_PLAN_SETTINGS,
   children,
 }: {
   model: PublicVehicle;
+  planSettings?: PlanSettings;
   children?: React.ReactNode;
 }) {
   const router = useRouter();
@@ -29,6 +38,7 @@ export default function VehicleDetail({
       ? search.get('configuration')!
       : model.variants[0].id,
   );
+  const [paymentOption, setPaymentOption] = useState('FULL');
   const [photo, setPhoto] = useState(0);
   const [quantity, setQuantity] = useState(
     Math.max(1, Math.min(100, Math.trunc(Number(search.get('quantity')) || 1))),
@@ -51,6 +61,9 @@ export default function VehicleDetail({
         return;
       setSelected(draft.variantId);
       setQuantity(draft.quantity);
+      setPaymentOption(
+        planSettings.enabled ? draft.paymentOption || 'FULL' : 'FULL',
+      );
       setRequestKey(draft.requestKey);
       for (const name of ['customerName', 'phone', 'notes'] as const) {
         const field = formRef.current?.elements.namedItem(name) as
@@ -66,7 +79,7 @@ export default function VehicleDetail({
     } catch {
       /* The public form remains usable if storage is unavailable. */
     }
-  }, [model.slug, model.variants]);
+  }, [model.slug, model.variants, planSettings.enabled]);
   const v = model.variants.find((v) => v.id === selected)!;
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -75,6 +88,7 @@ export default function VehicleDetail({
     const form = new FormData(e.currentTarget);
     try {
       const payload = {
+        paymentOption,
         customerName: String(form.get('customerName') || ''),
         phone: String(form.get('phone') || ''),
         notes: String(form.get('notes') || ''),
@@ -205,6 +219,16 @@ export default function VehicleDetail({
               }
             />
           </label>
+          <VehiclePlanPreview
+            settings={planSettings}
+            landed={
+              v.price
+                ? Number(moneyDecimal(moneyMinor(v.price.totalNgn) * quantity))
+                : null
+            }
+            option={paymentOption}
+            onChange={setPaymentOption}
+          />
           <div className="vehicle-price-box">
             {v.price ? (
               <>

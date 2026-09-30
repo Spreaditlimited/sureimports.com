@@ -1,3 +1,4 @@
+import { getPlanSettings } from '@/lib/vehicles/plans';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import {
@@ -111,6 +112,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
         }}
       />
       <VehicleDetail
+        planSettings={await getPlanSettings()}
         key={`${slug}:${query.configuration || ''}:${query.quantity || ''}`}
         model={vehicle}
       >

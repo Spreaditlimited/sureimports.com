@@ -1,3 +1,4 @@
+import { getVehiclePlans } from '@/lib/vehicles/plans';
 import { redirect } from 'next/navigation';
 import { checkAuth } from '@/lib/auth/checkAuth';
 import { prisma } from '@/lib/prisma';
@@ -19,5 +20,13 @@ export default async function VehicleOrdersPage() {
       destination: true,
     },
   });
-  return <VehicleOrdersView orders={orders} />;
+  const plans = await getVehiclePlans(orders.map((o) => o.id));
+  return (
+    <VehicleOrdersView
+      orders={orders.map((o) => ({
+        ...o,
+        paySmallSmall: plans.some((p) => p.orderId === o.id),
+      }))}
+    />
+  );
 }

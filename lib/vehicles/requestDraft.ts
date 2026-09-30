@@ -1,4 +1,5 @@
 export type VehicleRequestDraft = {
+  paymentOption?: 'FULL' | 'PAY_SMALL_SMALL';
   modelSlug: string;
   variantId: string;
   quantity: number;
@@ -34,6 +35,8 @@ export function readVehicleDraft(
       !Number.isInteger(value.quantity) ||
       value.quantity < 1 ||
       value.quantity > 100 ||
+      (value.paymentOption !== undefined &&
+        !['FULL', 'PAY_SMALL_SMALL'].includes(value.paymentOption)) ||
       typeof value.whatsappConsent !== 'boolean'
     )
       return null;

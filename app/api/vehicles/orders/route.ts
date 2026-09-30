@@ -1,3 +1,4 @@
+import { getPlanSettings } from '@/lib/vehicles/plans';
 import { createHash } from 'node:crypto';
 import { normalizeNigerianPhone } from '@/lib/wallet/phone';
 import { prisma } from '@/lib/prisma';
@@ -11,9 +12,16 @@ export async function POST(request: Request) {
   if (!auth)
     return Response.json({ message: 'Sign in to continue.' }, { status: 401 });
   let body;
+  let paySmallSmall = false;
   try {
     sameOrigin(request);
     const input = await request.json();
+    if (
+      input.paymentOption &&
+      !['FULL', 'PAY_SMALL_SMALL'].includes(input.paymentOption)
+    )
+      throw new Error('Choose a valid payment option.');
+    paySmallSmall = input.paymentOption === 'PAY_SMALL_SMALL';
     body = {
       modelSlug: inputText(input.modelSlug, 'model', 100),
       variantId: inputText(input.variantId, 'configuration', 100),
@@ -104,6 +112,10 @@ export async function POST(request: Request) {
       ) {
         throw new Error('This configuration is no longer available.');
       }
+      if (paySmallSmall && !(await getPlanSettings(tx)).enabled)
+        throw new Error(
+          'Pay Small Small is currently unavailable. Choose pay in full or contact us.',
+        );
       const row = await tx.vehicle_orders.create({
         data: {
           ...body,
@@ -113,6 +125,8 @@ export async function POST(request: Request) {
           vehicleName: `${model.name} — ${variant.name}`,
         },
       });
+      if (paySmallSmall)
+        await tx.$executeRaw`INSERT INTO vehicle_payment_plans (orderId) VALUES (${row.id})`;
       await vehicleEvent(
         tx,
         row.id,

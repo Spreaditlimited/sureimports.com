@@ -1,4 +1,5 @@
 import 'server-only';
+import { getVehiclePlan } from './plans';
 import { prisma } from '@/lib/prisma';
 export type VehicleInvoice = {
   pidInvoice: string;
@@ -28,6 +29,12 @@ export async function customerVehicleOrder(id: string, pidUser: string) {
     },
   });
   if (!order) return null;
+  const plan = await getVehiclePlan(id);
+  const reversals = plan
+    ? await prisma.$queryRaw<
+        { claimId: string }[]
+      >`SELECT claimId FROM vehicle_credit_reversals WHERE orderId=${id} AND status='CONFIRMED'`
+    : [];
   const invoice = order.pidInvoice
     ? (
         await prisma.$queryRaw<
@@ -63,6 +70,7 @@ export async function customerVehicleOrder(id: string, pidUser: string) {
   } | null;
   // Explicit projection: supplier cost and margin must never reach the customer.
   return {
+    plan,
     id: order.id,
     vehicleName: order.vehicleName,
     quantity: order.quantity,
@@ -75,7 +83,11 @@ export async function customerVehicleOrder(id: string, pidUser: string) {
     proofs: order.proofs,
     invoice,
     banks,
-    claims,
+    claims: claims.map((c) =>
+      reversals.some((r) => r.claimId === c.pidClaim)
+        ? { ...c, status: 'REVERSED' }
+        : c,
+    ),
     price: snapshot
       ? {
           vehicleNgn: snapshot.vehicleNgn,

@@ -2111,3 +2111,67 @@
     width: min(190px, 60%);
   }
 }
+.vehicle-plan-preview {
+  margin: 20px 0;
+}
+.vehicle-plan-panel progress {
+  width: 100%;
+  accent-color: var(--si-primary);
+  height: 12px;
+  margin: 20px 0 8px;
+}
+.vehicle-plan-schedule {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.vehicle-plan-schedule li {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--si-border);
+}
+.vehicle-plan-schedule li span {
+  display: block;
+  font-size: 13px;
+  color: var(--si-muted);
+  margin-top: 4px;
+}
+.vehicle-plan-schedule li > strong {
+  white-space: nowrap;
+}
+.vehicle-plan-panel details {
+  margin: 20px 0;
+}
+.vehicle-plan-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.vehicle-plan-panel form {
+  margin-top: 20px;
+}
+.vehicle-plan-panel .vehicle-button {
+  margin-top: 16px;
+}
+.vehicle-plan-text-button {
+  color: var(--si-primary);
+  text-decoration: underline;
+  margin-top: 20px;
+}
+.vehicle-plan-panel progress {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--si-soft);
+}
+.vehicle-plan-panel progress::-webkit-progress-bar {
+  background: var(--si-soft);
+}
+.vehicle-plan-panel progress::-webkit-progress-value {
+  background: var(--si-primary);
+}
+.vehicle-plan-panel progress::-moz-progress-bar {
+  background: var(--si-primary);
+}

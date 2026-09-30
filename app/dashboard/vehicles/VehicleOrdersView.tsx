@@ -20,6 +20,7 @@ import darkHeader from '@/components/dashboard/DarkHeader.module.css';
 import { STAGE_LABELS, VEHICLE_STAGES } from '@/lib/vehicles/policy';
 
 type Order = {
+  paySmallSmall?: boolean;
   id: string;
   vehicleName: string;
   quantity: number;
@@ -182,6 +183,11 @@ export default function VehicleOrdersView({ orders }: { orders: Order[] }) {
                       </div>
                       <h3 className="mt-1 break-words text-lg font-bold text-slate-900 transition-colors group-hover:text-blue-600 dark:text-white">
                         {order.vehicleName}
+                        {order.paySmallSmall && (
+                          <span className="ml-2 text-xs font-medium text-violet-600 dark:text-violet-300">
+                            Pay Small Small
+                          </span>
+                        )}
                       </h3>
                     </div>
                     <div className="grid min-w-0 flex-1 grid-cols-2 gap-4 border-slate-100 py-4 dark:border-slate-800 lg:grid-cols-3 lg:border-l lg:border-r lg:px-8">

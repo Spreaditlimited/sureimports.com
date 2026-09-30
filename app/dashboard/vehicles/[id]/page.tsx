@@ -1,3 +1,9 @@
+import VehiclePaymentPlan from './VehiclePaymentPlan';
+import {
+  moneyMinor,
+  planAllowsPayment,
+  planSchedule,
+} from '@/lib/vehicles/installments';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { checkAuth } from '@/lib/auth/checkAuth';
@@ -78,6 +84,21 @@ export default async function VehicleOrderPage({
           </section>
         </div>
         <div>
+          {order.plan && (
+            <VehiclePaymentPlan
+              plan={order.plan}
+              paidMinor={moneyMinor(String(order.invoice?.amountPaid || 0))}
+              pendingMinor={order.claims
+                .filter((c) => c.status === 'PENDING_CONFIRMATION')
+                .reduce(
+                  (sum, c) => sum + moneyMinor(String(c.claimedAmount)),
+                  0,
+                )}
+              canCancel={['ENQUIRY', 'QUOTED', 'ORDER_CONFIRMED'].includes(
+                order.status,
+              )}
+            />
+          )}
           {order.invoice ? (
             <section className="vehicle-order-panel">
               <h2>Price & payments</h2>
@@ -91,7 +112,11 @@ export default async function VehicleOrderPage({
                   <dd>{naira(Number(order.price?.shippingNgn || 0))}</dd>
                 </div>
                 <div>
-                  <dt>Estimated landed total</dt>
+                  <dt>
+                    {order.plan
+                      ? 'Total including Pay Small Small fee'
+                      : 'Estimated landed total'}
+                  </dt>
                   <dd>{naira(Number(order.invoice.grandTotal))}</dd>
                 </div>
                 <div>
@@ -111,13 +136,15 @@ export default async function VehicleOrderPage({
                   View invoice & receipts ↗
                 </Link>
               )}
-              <p className="vehicle-footnote">
-                Quote valid until{' '}
-                {order.quoteExpiresAt?.toLocaleString('en-GB', {
-                  timeZone: 'Africa/Lagos',
-                })}{' '}
-                WAT.
-              </p>
+              {!order.plan?.activatedAt && (
+                <p className="vehicle-footnote">
+                  Quote valid until{' '}
+                  {order.quoteExpiresAt?.toLocaleString('en-GB', {
+                    timeZone: 'Africa/Lagos',
+                  })}{' '}
+                  WAT.
+                </p>
+              )}
               <p style={{ whiteSpace: 'pre-wrap' }}>
                 {order.invoice.customerNotes}
               </p>
@@ -134,13 +161,32 @@ export default async function VehicleOrderPage({
           )}
           {order.invoice &&
             Number(order.invoice.balanceDue) > 0 &&
-            order.status === 'QUOTED' && (
+            (order.status === 'QUOTED' || !!order.plan?.terms) &&
+            planAllowsPayment(order.plan) && (
               <PaymentProof
                 orderId={order.id}
                 reference={order.invoice.invoiceNumber}
                 balance={Number(order.invoice.balanceDue)}
                 banks={order.banks}
-                expired={expired}
+                expired={
+                  order.plan
+                    ? order.plan.status === 'ACCEPTED' && expired
+                    : expired
+                }
+                plan={!!order.plan}
+                nextAmount={
+                  order.plan?.terms
+                    ? Math.max(
+                        0,
+                        (planSchedule(
+                          order.plan.terms,
+                          order.plan.activatedAt,
+                          moneyMinor(String(order.invoice.amountPaid)),
+                        ).find((r) => !r.paid)?.cumulativeMinor || 0) -
+                          moneyMinor(String(order.invoice.amountPaid)),
+                      ) / 100
+                    : undefined
+                }
               />
             )}
           {order.claims.length > 0 && (

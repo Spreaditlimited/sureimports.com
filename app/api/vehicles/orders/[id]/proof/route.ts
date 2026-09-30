@@ -1,3 +1,5 @@
+import { getVehiclePlan } from '@/lib/vehicles/plans';
+import { planAllowsPayment } from '@/lib/vehicles/installments';
 import { createHash } from 'node:crypto';
 import { prisma } from '@/lib/prisma';
 import { checkAuth } from '@/lib/auth/checkAuth';
@@ -57,9 +59,18 @@ export async function POST(
         where: { id, pidUser: auth.pidUser },
       });
       if (!order) throw new Error('Order not found.');
+      const plan = await getVehiclePlan(id, tx);
+      if (!planAllowsPayment(plan))
+        throw new Error(
+          'Accept the current plan before paying. Plans under cancellation or refund review cannot receive new payments. Contact finance to reconcile an existing transfer.',
+        );
       if (await tx.vehicle_payment_proofs.findUnique({ where: { requestKey } }))
         return;
-      if (!order.pidInvoice || order.status !== 'QUOTED')
+      if (
+        !order.pidInvoice ||
+        (order.status !== 'QUOTED' && !plan?.terms) ||
+        order.status === 'CANCELLED'
+      )
         throw new Error('This order is not awaiting payment.');
       const invoices = await tx.$queryRaw<
         { balanceDue: string; status: string }[]

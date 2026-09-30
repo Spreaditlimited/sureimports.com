@@ -241,6 +241,8 @@ export default function UpdateBankDetailsFrom() {
     const formData = new FormData();
     formData.append('pidUser', pidUser as string);
     formData.append('email', email as string);
+    formData.append('bank_code', bank_code);
+    formData.append('bank_account_number', bank_account_number);
 
     try {
       toast.info('Sending verification code to your email...');
