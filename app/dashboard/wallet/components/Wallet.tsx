@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Wallet as WalletIcon,
   ArrowUpRight,
@@ -42,40 +42,108 @@ export default function Wallet() {
     count: 0,
   });
 
-  // Logic: Keep all your existing fetch functions as they are
+  const [activating, setActivating] = useState(false);
+  const activationInFlight = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+  const [activationError, setActivationError] = useState<string | null>(null);
+
   const pidUser = user?.pidUser;
   const email = user?.userEmail;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!email) return;
-      try {
-        const [custRes, payoutRes, bankRes, debitRes] = await Promise.all([
-          fetch(`/api/paystack/get-customer/${email}`).then((r) => r.json()),
-          fetch(`/api/payout-request/get-pending?pidUser=${pidUser}`).then(
-            (r) => r.json(),
-          ),
-          fetch(`/api/user/check-bank-details?pidUser=${pidUser}`).then((r) =>
-            r.json(),
-          ),
-          fetch(`/api/wallet-debits?pidUser=${pidUser}`).then((r) => r.json()),
-        ]);
-
-        setStatus(custRes.statusx);
-        setCustomer(custRes.customerDetails);
-        setTransaction(custRes.transactionDetails);
-        if (payoutRes.statusx === 'SUCCESS') setPendingPayout(payoutRes.data);
-        if (bankRes.statusx === 'SUCCESS')
-          setHasBankDetails(bankRes.hasBankDetails);
-        if (debitRes.statusx === 'SUCCESS') setDebitsData(debitRes.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const fetchData = useCallback(async () => {
+    if (!email) return;
+    setError(null);
+    try {
+      const response = await fetch(
+        `/api/paystack/get-customer/${encodeURIComponent(email)}`,
+        { cache: 'no-store' },
+      );
+      const data = await response.json();
+      if (
+        !response.ok ||
+        !['WALLET_READY', 'NO_CUSTOMER', 'NO_ACCOUNT'].includes(data.statusx)
+      ) {
+        throw new Error(
+          data.message || 'Unable to load your wallet. Please try again.',
+        );
       }
-    };
-    fetchData();
-  }, [email, pidUser]);
+      setStatus(data.statusx);
+      setCustomer(data.customerDetails);
+      setTransaction(data.transactionDetails);
+      return data.statusx as string;
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to load your wallet. Please try again.',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [email]);
+
+  useEffect(() => {
+    void fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (!pidUser) return;
+    // Ancillary requests must not prevent loading or activating the wallet.
+    const requests = [
+      [
+        '/api/payout-request/get-pending',
+        (data: any) => setPendingPayout(data.data),
+      ],
+      [
+        '/api/user/check-bank-details',
+        (data: any) => setHasBankDetails(data.hasBankDetails),
+      ],
+      ['/api/wallet-debits', (data: any) => setDebitsData(data.data)],
+    ] as const;
+    for (const [url, apply] of requests) {
+      void fetch(`${url}?pidUser=${encodeURIComponent(pidUser)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.statusx === 'SUCCESS') apply(data);
+        })
+        .catch(() => {
+          /* Optional details can be retried on the next visit. */
+        });
+    }
+  }, [pidUser]);
+
+  async function activateWallet() {
+    if (activationInFlight.current) return;
+    activationInFlight.current = true;
+    setActivating(true);
+    setActivationError(null);
+    try {
+      const response = await fetch('/api/wallet/activate', { method: 'POST' });
+      const data = await response.json();
+      if (!response.ok || data.status !== 'READY') {
+        throw new Error(
+          data.message || 'Wallet activation failed. Please try again.',
+        );
+      }
+      const refreshedStatus = await fetchData();
+      if (refreshedStatus === 'WALLET_READY') {
+        toast.success('Your wallet is active. You can now fund your account.');
+      } else if (refreshedStatus) {
+        setActivationError(
+          'Your funding account is still being confirmed. Please try again shortly.',
+        );
+      }
+    } catch (err) {
+      setActivationError(
+        err instanceof Error
+          ? err.message
+          : 'Wallet activation failed. Please try again.',
+      );
+    } finally {
+      activationInFlight.current = false;
+      setActivating(false);
+    }
+  }
 
   const availableBalance = transactionsx?.totalAmount ?? 0;
 
@@ -105,6 +173,14 @@ export default function Wallet() {
 
   if (loading) return <Loading />;
 
+  if (error)
+    return (
+      <div className="mx-auto max-w-md space-y-4 p-8 text-center">
+        <p role="alert">{error}</p>
+        <Button onClick={() => void fetchData()}>Retry loading wallet</Button>
+      </div>
+    );
+
   // Activation Screen Redesign
   if (statusx === 'NO_CUSTOMER' || statusx === 'NO_ACCOUNT') {
     return (
@@ -121,13 +197,18 @@ export default function Wallet() {
             managing funds.
           </p>
           <button
-            onClick={() => {
-              /* Your existing walletActivation logic */
-            }}
+            onClick={activateWallet}
+            disabled={activating}
+            aria-busy={activating}
             className="mt-8 w-full rounded-2xl bg-blue-600 py-4 text-lg font-bold text-white shadow-xl transition hover:bg-blue-500"
           >
-            Activate Now
+            {activating ? 'Activating…' : 'Activate Now'}
           </button>
+          {activationError && (
+            <p role="alert" className="mt-4 text-sm text-red-600">
+              {activationError}
+            </p>
+          )}
           <div className="mt-6 flex items-start gap-2 rounded-xl bg-amber-50 p-4 text-left text-xs text-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <p>

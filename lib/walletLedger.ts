@@ -321,11 +321,9 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
   }
 
   if (!paystackSecretKey) {
-    return {
-      statusx: 'NO_ACCOUNT',
-      customerDetails: null,
-      paystackTransactions: [] as PaystackTransaction[],
-    };
+    throw new Error(
+      'Wallet service is temporarily unavailable. Please try again later.',
+    );
   }
 
   const customerResponse = await fetch(
@@ -337,10 +335,15 @@ export async function syncPaystackDedicatedNubanCredits(user: WalletUser) {
         'Content-Type': 'application/json',
       },
       cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
     },
   );
   const customerData = await customerResponse.json();
   const dedicatedAccounts = customerData?.data?.dedicated_accounts;
+
+  if (!customerResponse.ok && customerResponse.status !== 404) {
+    throw new Error('Unable to check your funding account. Please try again.');
+  }
 
   if (
     !customerResponse.ok ||

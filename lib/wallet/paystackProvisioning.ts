@@ -33,12 +33,14 @@ async function getPaystackCustomer(email: string, secretKey: string) {
     {
       headers: paystackHeaders(secretKey),
       cache: 'no-store',
+      signal: AbortSignal.timeout(15000),
     },
   );
   const body = await response.json();
 
   return {
-    ok: response.ok,
+    ok: response.ok && body?.status === true,
+    missing: response.status === 404,
     customer: (body?.data || null) as PaystackCustomer | null,
     message: String(body?.message || ''),
   };
@@ -60,7 +62,7 @@ export async function ensurePaystackWalletAccount(
     return {
       status: 'PROFILE_REQUIRED',
       message:
-        'Add a valid Nigerian phone number to your profile before moving this refund to your wallet.',
+        'Add a valid Nigerian phone number to your profile before activating your wallet.',
       actionHref: '/dashboard/profile-update',
       actionLabel: 'Update Profile',
     };
@@ -70,7 +72,7 @@ export async function ensurePaystackWalletAccount(
     return {
       status: 'PROFILE_REQUIRED',
       message:
-        'Complete your name, email, and Nigerian phone number in your profile before moving this refund to your wallet.',
+        'Complete your name, email, and Nigerian phone number in your profile before activating your wallet.',
       actionHref: '/dashboard/profile-update',
       actionLabel: 'Update Profile',
     };
@@ -97,11 +99,16 @@ export async function ensurePaystackWalletAccount(
       return { status: 'READY', created: false };
     }
 
+    if (!lookup.ok && !lookup.missing) {
+      throw new Error('Customer lookup unavailable');
+    }
+
     let customerCode = lookup.ok ? lookup.customer?.customer_code : undefined;
 
     if (!customerCode) {
       const createResponse = await fetch('https://api.paystack.co/customer', {
         method: 'POST',
+        signal: AbortSignal.timeout(15000),
         headers: paystackHeaders(secretKey),
         body: JSON.stringify({
           email,
@@ -128,10 +135,31 @@ export async function ensurePaystackWalletAccount(
       };
     }
 
+    // Refresh existing customers too: their saved phone/name may predate verification.
+    const updateResponse = await fetch(
+      `https://api.paystack.co/customer/${encodeURIComponent(customerCode)}`,
+      {
+        method: 'PUT',
+        signal: AbortSignal.timeout(15000),
+        headers: paystackHeaders(secretKey),
+        body: JSON.stringify({
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+        }),
+      },
+    );
+    const updateBody = await updateResponse.json();
+    if (!updateResponse.ok || updateBody?.status !== true) {
+      throw new Error('Customer update failed');
+    }
+
     const accountResponse = await fetch(
       'https://api.paystack.co/dedicated_account',
       {
         method: 'POST',
+        signal: AbortSignal.timeout(15000),
         headers: paystackHeaders(secretKey),
         body: JSON.stringify({
           customer: customerCode,
@@ -141,7 +169,11 @@ export async function ensurePaystackWalletAccount(
     );
     const accountBody = await accountResponse.json();
 
-    if (accountResponse.ok && accountBody?.status !== false) {
+    if (
+      accountResponse.ok &&
+      accountBody?.status === true &&
+      accountBody?.data?.account_number
+    ) {
       return { status: 'READY', created: true };
     }
 
