@@ -181,12 +181,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'yearly',
       priority: 0.3,
     },
-    {
-      url: `${baseUrl}/faya-warranty-policy`,
-      lastModified: currentDate,
-      changeFrequency: 'yearly',
-      priority: 0.3,
-    },
   ];
 
   if (BODY_CAMERA_LAUNCH_READY) {

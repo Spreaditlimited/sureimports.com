@@ -103,3 +103,24 @@ test('embedded data-image payloads are removed before article rendering', () => 
 
   assert.equal(html, '<p>Before</p><p>After</p>');
 });
+
+const render = html => routeBlogSourcingLinks({ slug: 'buyer-guide', title: 'Buyer guide', html });
+test('retired machine URL reaches the machine flow and retains attribution', () => {
+  assert.match(render('<a href="https://linescout.sureimports.com/machine-sourcing?utm_source=guide">Source a machine</a>'), /sourcing-project\?route_type=machine_sourcing&amp;utm_source=guide/);
+});
+test('legacy product link uses the actual service name', () => {
+  const result = render('<a class="cta" href="/source-products-from-china">Corporate Sourcing</a>');
+  assert.match(result, /route_type=simple_sourcing/);
+  assert.match(result, /product sourcing through LineScout/);
+  assert.match(result, /class="cta"/);
+});
+test('external lookalikes and distinct webinar URLs remain unchanged', () => {
+  for (const href of ['https://example.com/machine-sourcing', 'https://linescout.sureimports.com/machine-sourcing-webinar', 'https://example.com/source-products-from-china']) {
+    const source = `<a href="${href}">Read more</a>`;
+    assert.equal(render(source), source);
+  }
+});
+test('explicit corporate service stays corporate and old white-label links go direct', () => {
+  assert.equal(render('<a href="/corporate-sourcing">Corporate Sourcing</a>'), '<a href="/corporate-sourcing">Corporate Sourcing</a>');
+  assert.match(render('<a href="/blog/build-your-empire-the-ultimate-guide-to-white-labeling-products-from-china-for-the-nigerian-market#cost">Brand planning</a>'), /how-to-build-your-own-white-label-products-in-china-for-the-nigerian-market#cost/);
+});

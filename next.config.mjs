@@ -4,6 +4,11 @@ const nextConfig = {
     async redirects() {
       return [
         {
+          source: '/faya-warranty-policy',
+          destination: '/warranty-policy#faya-warranty',
+          permanent: true,
+        },
+        {
           source: '/partners/:path*',
           destination: `${process.env.NODE_ENV === 'development' ? 'http://localhost:3003' : 'https://partner.sureimports.com'}/partners/:path*`,
           permanent: false,

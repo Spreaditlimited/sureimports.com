@@ -21,6 +21,40 @@ const CORPORATE_PILLAR_SLUG =
 const CORPORATE_LINK =
   /<a\b([^>]*?)href=(["'])(?:https?:\/\/(?:www\.)?sureimports\.com)?\/corporate-sourcing(?:#[^"']*)?\2([^>]*)>([\s\S]*?)<\/a>/gi;
 
+function repairLegacyLinks(html: string) {
+  return html.replace(
+    /<a\b([^>]*?)href=(["'])([^"']+)\2([^>]*)>([\s\S]*?)<\/a>/gi,
+    (match, before, quote, href, after, label) => {
+      let url: URL;
+      try {
+        url = new URL(href.replace(/&amp;/gi, '&'), 'https://www.sureimports.com');
+      } catch {
+        return match;
+      }
+      const path = url.pathname.replace(/\/$/, '');
+      let destination: string | undefined;
+      if (url.hostname === 'linescout.sureimports.com' && path === '/machine-sourcing') {
+        destination = LINESCOUT_ROUTES.machine;
+      } else if (['sureimports.com', 'www.sureimports.com'].includes(url.hostname)) {
+        if (path === '/source-products-from-china') {
+          destination = LINESCOUT_ROUTES.bulk;
+          label = label.replace(/corporate sourcing/gi, 'product sourcing through LineScout');
+        } else if (path === '/blog/build-your-empire-the-ultimate-guide-to-white-labeling-products-from-china-for-the-nigerian-market') {
+          destination = '/blog/how-to-build-your-own-white-label-products-in-china-for-the-nigerian-market';
+        }
+      }
+      if (!destination) return match;
+      // Retain attribution and in-page anchors when replacing a legacy path.
+      const target = new URL(destination, 'https://www.sureimports.com');
+      url.searchParams.forEach((value, key) => {
+        if (!target.searchParams.has(key)) target.searchParams.append(key, value);
+      });
+      target.hash = url.hash;
+      return `<a${before}href=${quote}${target.toString().replace(/&/g, '&amp;')}${quote}${after}>${label}</a>`;
+    },
+  );
+}
+
 function routeCorporateLinks(
   html: string,
   destination: string,
@@ -47,7 +81,7 @@ export function routeBlogSourcingLinks(input: {
   html: string;
 }) {
   const { slug, title } = input;
-  const html = (input.html || '').replace(
+  const html = repairLegacyLinks(input.html || '').replace(
     /<img\b[^>]*\bsrc\s*=\s*(["'])data:[\s\S]*?\1[^>]*>/gi,
     '',
   ).replace(
