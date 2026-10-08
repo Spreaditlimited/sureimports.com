@@ -7,3 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Blog publishing
+
+- Before creating or publishing articles, read `HOW_TO_ADD_BLOGS.md`, `docs/SEO_AUTOPUBLISH_RULES.md`, and the current admin blog creation, image and publication-validation workflows in the sibling `admin.sureimports.com` repository. Current application code takes precedence over stale examples in the older guides.
+- Use the admin's `BLOG` + millisecond timestamp convention for new `pidBlog` values. Link an active existing publisher and category; keep `blogBy` and SEO category metadata consistent with those records.
+- Every new article must have at least 2,000 useful body words and an article-specific feature image generated according to the established blog image brief, uploaded through the Cloudinary blog-image workflow before publication. A generic social card is not a substitute. Preserve images the owner has already generated.
+- Validate publication eligibility, internal links, canonical, SEO and social metadata, image availability, and author/category records before publishing. Keep before/after records and reject concurrent edits. Preserve existing slugs when correcting technical fields, and migrate dependent references when changing a blog ID.

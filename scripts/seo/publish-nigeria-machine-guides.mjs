@@ -11,9 +11,18 @@ const manifestPath = path.join(out, 'new-machine-guides-release.json');
 const batch = 'nigeria-recovery-2026-10-new-machines';
 const words = html => html.replace(/<[^>]*>/g, ' ').replace(/&\w+;/g, ' ').trim().split(/\s+/).length;
 const specs = [
-  { pid: 'seo_ng_20261008_ice_block', file: 'ice-block.html', slug: 'ice-block-making-machine-price-nigeria', title: 'Ice Block Making Machines in Nigeria: Prices and Buying', description: 'Compare ice block machines by output, power requirements and total setup cost, with practical checks for buying locally or sourcing from China.', keyword: 'ice block making machine' },
-  { pid: 'seo_ng_20261008_industrial_sewing', file: 'sewing.html', slug: 'industrial-sewing-machine-price-nigeria', title: 'Industrial Sewing Machine Prices in Nigeria: Buyer’s Guide', description: 'Compare industrial sewing machines by stitch type, fabric, motor and total cost, including what to check when importing from China.', keyword: 'industrial sewing machine price in nigeria' },
+  { pid: 'BLOG1791491922704', image: 'admin-sureimports/blog/BLOG_GEN_ice-block-making-machine-price-nigeria_1791491661207', file: 'ice-block.html', slug: 'ice-block-making-machine-price-nigeria', title: 'Ice Block Making Machines in Nigeria: Prices and Buying', description: 'Compare ice block machines by output, power requirements and total setup cost, with practical checks for buying locally or sourcing from China.', keyword: 'ice block making machine' },
+  { pid: 'BLOG1791491922705', image: 'admin-sureimports/blog/BLOG_GEN_industrial-sewing-machine-price-nigeria_1791491548166', file: 'sewing.html', slug: 'industrial-sewing-machine-price-nigeria', title: 'Industrial Sewing Machine Prices in Nigeria: Buyer’s Guide', description: 'Compare industrial sewing machines by stitch type, fabric, motor and total cost, including what to check when importing from China.', keyword: 'industrial sewing machine price in nigeria' },
 ];
+async function validatePublishingIdentity(client, article) {
+  // Revalidate identity at application time so pre-correction manifests cannot publish.
+  assert(/^BLOG\d{13}$/.test(article.pidBlog), 'Use the admin BLOG + timestamp ID format');
+  assert(article.blogImage?.startsWith('admin-sureimports/blog/'), 'Generate and upload an article-specific image before publication');
+  const publisher = await client.blog_publisher.findUnique({ where: { pidPublisher: article.publisherId || '' } });
+  const category = await client.blog_category.findUnique({ where: { pidCategory: article.categoryId || '' } });
+  assert(publisher?.status === 'active' && publisher.publisherImage && publisher.publisherName === article.blogBy, 'Use an active existing publisher with an image');
+  assert(category?.status === 'active', 'Use an active existing blog category');
+}
 const snap = row => ({ pidBlog: row.pidBlog, blogSlug: row.blogSlug, blogTitle: row.blogTitle, blogContent: row.blogContent, blogExt2: row.blogExt2, updatedAt: row.updatedAt?.toISOString() ?? null });
 async function main() {
   await fs.mkdir(out, { recursive: true });
@@ -24,8 +33,13 @@ async function main() {
     for (const spec of specs) {
       const body = await fs.readFile(path.join(root, 'scripts/seo/content/nigeria-recovery-2026-10', spec.file), 'utf8');
       assert(words(body) >= 2000);assert(!/<h1\b|<script\b|javascript:/i.test(body));
-      additions.push({ pidBlog: spec.pid, blogSlug: spec.slug, blogTitle: spec.title, blogContent: body, blogPublished: true, xStaus: 'active', blogBy: 'Sure Imports Editorial Team', blogImage: 'https://www.sureimports.com/images/sure-imports-social-card.png', blogExt2: JSON.stringify({ metaTitle: spec.title, seoTitle: spec.title, metaDescription: spec.description, focusKeyword: spec.keyword, canonicalUrl: `https://www.sureimports.com/blog/${spec.slug}`, category: 'Machine Sourcing', tags: ['Nigeria', 'Machine Sourcing'], noIndex: false, noFollow: false }) });
+      additions.push({ pidBlog: spec.pid, blogSlug: spec.slug, blogTitle: spec.title, blogContent: body, blogPublished: true, xStaus: 'active', blogBy: 'Sure Imports Editorial', publisherId: 'PUB_SURE_IMPORTS_EDITORIAL', categoryId: 'CAT1766930711389', blogImage: spec.image, blogExt2: JSON.stringify({ metaTitle: spec.title, seoTitle: spec.title, metaDescription: spec.description, focusKeyword: spec.keyword, canonicalUrl: `https://www.sureimports.com/blog/${spec.slug}`, category: 'Import Guide', ogTitle: spec.title, ogDescription: spec.description, twitterTitle: spec.title, twitterDescription: spec.description, keywords: [spec.keyword], tags: ['Nigeria', 'Machine Sourcing'], noIndex: false, noFollow: false }) });
       await fs.writeFile(path.join(out, spec.slug+'.html'), `<!doctype html><meta charset="utf-8"><title>${spec.title}</title><main><h1>${spec.title}</h1>${body}</main>`);
+    }
+    for (const article of additions) {
+      await validatePublishingIdentity(prisma, article);
+      const image = await fetch(`https://res.cloudinary.com/djprcwnsz/image/upload/${article.blogImage}`, { method: 'HEAD' });
+      assert(image.ok && image.headers.get('content-type')?.startsWith('image/'), 'Feature image must be available before publishing');
     }
     const linkParagraph = '<p data-seo-module="nigeria-machine-guide-links-2026-10">For specific equipment comparisons, read the <a href="https://www.sureimports.com/blog/ice-block-making-machine-price-nigeria">ice block machine buying guide</a> for batch output, power and site planning, or the <a href="https://www.sureimports.com/blog/industrial-sewing-machine-price-nigeria">industrial sewing machine price and selection guide</a> for stitch types, fabric tests and complete-set costs.</p>';
     const updates = [];
@@ -43,6 +57,7 @@ async function main() {
   const receipt=[];
   await prisma.$transaction(async tx=>{
     for(const article of manifest.additions){
+      await validatePublishingIdentity(tx, article);
       assert(words(article.blogContent)>=2000);
       assert.equal(await tx.blog.count({where:{OR:[{blogSlug:article.blogSlug},{pidBlog:article.pidBlog}]}}),0,'Article already exists');
       const now=new Date();const data={...article,createdAt:now,updatedAt:now};
