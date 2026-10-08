@@ -16,6 +16,7 @@ const specs = [
 ];
 async function validatePublishingIdentity(client, article) {
   // Revalidate identity at application time so pre-correction manifests cannot publish.
+  assert(article.publisherId === 'PUB1767167254459' && article.blogBy === 'Tochukwu Nkwocha', 'All articles use Tochukwu Nkwocha as author');
   assert(/^BLOG\d{13}$/.test(article.pidBlog), 'Use the admin BLOG + timestamp ID format');
   assert(article.blogImage?.startsWith('admin-sureimports/blog/'), 'Generate and upload an article-specific image before publication');
   const publisher = await client.blog_publisher.findUnique({ where: { pidPublisher: article.publisherId || '' } });
@@ -33,7 +34,7 @@ async function main() {
     for (const spec of specs) {
       const body = await fs.readFile(path.join(root, 'scripts/seo/content/nigeria-recovery-2026-10', spec.file), 'utf8');
       assert(words(body) >= 2000);assert(!/<h1\b|<script\b|javascript:/i.test(body));
-      additions.push({ pidBlog: spec.pid, blogSlug: spec.slug, blogTitle: spec.title, blogContent: body, blogPublished: true, xStaus: 'active', blogBy: 'Sure Imports Editorial', publisherId: 'PUB_SURE_IMPORTS_EDITORIAL', categoryId: 'CAT1766930711389', blogImage: spec.image, blogExt2: JSON.stringify({ metaTitle: spec.title, seoTitle: spec.title, metaDescription: spec.description, focusKeyword: spec.keyword, canonicalUrl: `https://www.sureimports.com/blog/${spec.slug}`, category: 'Import Guide', ogTitle: spec.title, ogDescription: spec.description, twitterTitle: spec.title, twitterDescription: spec.description, keywords: [spec.keyword], tags: ['Nigeria', 'Machine Sourcing'], noIndex: false, noFollow: false }) });
+      additions.push({ pidBlog: spec.pid, blogSlug: spec.slug, blogTitle: spec.title, blogContent: body, blogPublished: true, xStaus: 'active', blogBy: 'Tochukwu Nkwocha', publisherId: 'PUB1767167254459', categoryId: 'CAT1766930711389', blogImage: spec.image, blogExt2: JSON.stringify({ metaTitle: spec.title, seoTitle: spec.title, metaDescription: spec.description, focusKeyword: spec.keyword, canonicalUrl: `https://www.sureimports.com/blog/${spec.slug}`, category: 'Import Guide', ogTitle: spec.title, ogDescription: spec.description, twitterTitle: spec.title, twitterDescription: spec.description, keywords: [spec.keyword], tags: ['Nigeria', 'Machine Sourcing'], noIndex: false, noFollow: false }) });
       await fs.writeFile(path.join(out, spec.slug+'.html'), `<!doctype html><meta charset="utf-8"><title>${spec.title}</title><main><h1>${spec.title}</h1>${body}</main>`);
     }
     for (const article of additions) {

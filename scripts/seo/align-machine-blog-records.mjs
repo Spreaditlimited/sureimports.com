@@ -13,7 +13,7 @@ const imageUrl = publicId => `https://res.cloudinary.com/djprcwnsz/image/upload/
 async function main() {
   await fs.mkdir(folder, { recursive: true });
   if (!process.argv.includes('--apply')) {
-    const publisher = await prisma.blog_publisher.findUnique({ where: { pidPublisher: 'PUB_SURE_IMPORTS_EDITORIAL' } });
+    const publisher = await prisma.blog_publisher.findUnique({ where: { pidPublisher: 'PUB1767167254459' } });
     const category = await prisma.blog_category.findUnique({ where: { pidCategory: 'CAT1766930711389' } });
     assert(publisher?.status === 'active' && publisher.publisherImage);
     assert(category?.status === 'active');
