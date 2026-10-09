@@ -1,0 +1,253 @@
+{
+  "updatedAt": "2026-10-09T10:40:43.324Z",
+  "mode": "Existing published articles only",
+  "newArticlesCreated": 0,
+  "articleCountBefore": 175,
+  "articleCountAfter": 175,
+  "author": "Tochukwu Nkwocha",
+  "preserved": [
+    "IDs",
+    "slugs",
+    "publication dates",
+    "images",
+    "embedded videos",
+    "useful original content"
+  ],
+  "articles": [
+    {
+      "key": "products50",
+      "slug": "top-50-fast-moving-mini-importation-products-nigerians-buy-every-day",
+      "pidBlog": "BLOG1767638116929",
+      "words": 2921,
+      "previousWords": 2302
+    },
+    {
+      "key": "core",
+      "slug": "how-to-import-from-china-to-nigeria-in-2026-the-complete-beginner-to-pro-guide",
+      "pidBlog": "BLOG1766680606203",
+      "words": 4915,
+      "previousWords": 4466
+    },
+    {
+      "key": "beginner",
+      "slug": "the-complete-beginner-s-guide-to-starting-a-mini-importation-business-in-nigeria-2026-edition",
+      "pidBlog": "BLOG1766955392651",
+      "words": 4791,
+      "previousWords": 4141
+    }
+  ],
+  "verification": {
+    "checkedAt": "2026-10-09T10:44:19.668Z",
+    "articles": [
+      {
+        "slug": "top-50-fast-moving-mini-importation-products-nigerians-buy-every-day",
+        "status": 200,
+        "words": 2921,
+        "pidBlog": "BLOG1767638116929",
+        "author": "Tochukwu Nkwocha",
+        "canonical": "https://www.sureimports.com/blog/top-50-fast-moving-mini-importation-products-nigerians-buy-every-day",
+        "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/v1779565775/sureimports/blog/BLOG1767638116929-blogImage-63d5be37d6.png",
+        "structuredData": true,
+        "descriptionLength": 132
+      },
+      {
+        "slug": "how-to-import-from-china-to-nigeria-in-2026-the-complete-beginner-to-pro-guide",
+        "status": 200,
+        "words": 4915,
+        "pidBlog": "BLOG1766680606203",
+        "author": "Tochukwu Nkwocha",
+        "canonical": "https://www.sureimports.com/blog/how-to-import-from-china-to-nigeria-in-2026-the-complete-beginner-to-pro-guide",
+        "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/v1779565755/admin-sureimports/blog/BLOG1766680606203-blogImage-24fc2fb819.png",
+        "structuredData": true,
+        "descriptionLength": 124
+      },
+      {
+        "slug": "the-complete-beginner-s-guide-to-starting-a-mini-importation-business-in-nigeria-2026-edition",
+        "status": 200,
+        "words": 4791,
+        "pidBlog": "BLOG1766955392651",
+        "author": "Tochukwu Nkwocha",
+        "canonical": "https://www.sureimports.com/blog/the-complete-beginner-s-guide-to-starting-a-mini-importation-business-in-nigeria-2026-edition",
+        "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/v1779565772/admin-sureimports/blog/BLOG1766955392651-blogImage-991fc9a7f5.png",
+        "structuredData": true,
+        "descriptionLength": 129
+      }
+    ],
+    "inboundPages": [],
+    "sitemap": true,
+    "appliedChangeLogs": 3
+  },
+  "queryEvidence": {
+    "recent": {
+      "products50": {
+        "impressions": 769,
+        "topQueries": [
+          {
+            "query": "50 hot selling products in nigeria",
+            "impressions": 62
+          },
+          {
+            "query": "top 10 daily income business in nigeria",
+            "impressions": 22
+          },
+          {
+            "query": "nigeria",
+            "impressions": 19
+          },
+          {
+            "query": "fast selling products in nigeria",
+            "impressions": 17
+          },
+          {
+            "query": "business ideas in nigeria",
+            "impressions": 15
+          }
+        ]
+      },
+      "core": {
+        "impressions": 1237,
+        "topQueries": [
+          {
+            "query": "how to order from china to nigeria",
+            "impressions": 197
+          },
+          {
+            "query": "how to order from china",
+            "impressions": 128
+          },
+          {
+            "query": "china importation",
+            "impressions": 123
+          },
+          {
+            "query": "how to import from china",
+            "impressions": 64
+          },
+          {
+            "query": "how to order goods from china to nigeria",
+            "impressions": 50
+          }
+        ]
+      },
+      "beginner": {
+        "impressions": 680,
+        "topQueries": [
+          {
+            "query": "mini importation",
+            "impressions": 71
+          },
+          {
+            "query": "mini importation business in nigeria",
+            "impressions": 57
+          },
+          {
+            "query": "how to start an import business in nigeria",
+            "impressions": 57
+          },
+          {
+            "query": "how to import goods from china to nigeria",
+            "impressions": 39
+          },
+          {
+            "query": "mini importation business",
+            "impressions": 37
+          }
+        ]
+      }
+    },
+    "previous": {
+      "products50": {
+        "impressions": 525,
+        "topQueries": [
+          {
+            "query": "50 hot selling products in nigeria",
+            "impressions": 86
+          },
+          {
+            "query": "fast selling products in nigeria",
+            "impressions": 22
+          },
+          {
+            "query": "fast moving imported items in nigeria",
+            "impressions": 17
+          },
+          {
+            "query": "hot selling products in nigeria",
+            "impressions": 16
+          },
+          {
+            "query": "list of daily consumable products in nigeria",
+            "impressions": 15
+          }
+        ]
+      },
+      "core": {
+        "impressions": 1101,
+        "topQueries": [
+          {
+            "query": "how to order from china to nigeria",
+            "impressions": 162
+          },
+          {
+            "query": "how to order from china",
+            "impressions": 98
+          },
+          {
+            "query": "how to import from china to nigeria",
+            "impressions": 87
+          },
+          {
+            "query": "china importation",
+            "impressions": 77
+          },
+          {
+            "query": "how to import from china",
+            "impressions": 67
+          }
+        ]
+      },
+      "beginner": {
+        "impressions": 744,
+        "topQueries": [
+          {
+            "query": "how to start an import business in nigeria",
+            "impressions": 75
+          },
+          {
+            "query": "mini importation",
+            "impressions": 70
+          },
+          {
+            "query": "china importation",
+            "impressions": 57
+          },
+          {
+            "query": "mini importation business in nigeria",
+            "impressions": 49
+          },
+          {
+            "query": "how to import goods from china to nigeria",
+            "impressions": 49
+          }
+        ]
+      }
+    }
+  },
+  "queryScope": "Existing exports; not asserted Nigeria-only",
+  "trigger": "Explicit user request to improve existing content using the ownership map; no new articles authorized",
+  "browserChecks": {
+    "desktop": "passed",
+    "mobileViewport": 390,
+    "mobileDocumentWidth": 390,
+    "visibleImages": "passed"
+  },
+  "editorialValidation": [
+    "Targeted additions, no full rewrite",
+    "Balanced HTML",
+    "External links retained or documented replacement",
+    "Existing internal routes and active link registry",
+    "Original publication dates retained",
+    "Live HTTP 200, canonical, metadata, author schema, image and sitemap checks passed"
+  ],
+  "recoveryClaim": "None; requires subsequent country-filtered GSC measurement."
+}

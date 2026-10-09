@@ -1,0 +1,189 @@
+{
+  "updatedAt": "2026-10-09",
+  "direction": "Improve already-published content using the keyword ownership map. No new articles.",
+  "completedMapItems": [
+    "beginner",
+    "cctv",
+    "core",
+    "flour",
+    "ice",
+    "laptops",
+    "machinehub",
+    "packaging",
+    "palm",
+    "products25",
+    "products50",
+    "salon",
+    "sewing",
+    "solargen",
+    "solarhub"
+  ],
+  "nextExistingPages": [
+    "pinduoduo",
+    "1688",
+    "agro",
+    "affiliate",
+    "affiliateintro",
+    "white"
+  ],
+  "held": [
+    "panels",
+    "airfryer",
+    "ev",
+    "lithium"
+  ],
+  "holdReason": "New article ideas paused by user. Scheduled battery article also held: scope change and first publication are outside current already-published-content work.",
+  "map": [
+    {
+      "id": "products25",
+      "url": "https://www.sureimports.com/blog/25-best-products-to-import-from-china-to-nigeria-in-2026-high-demand-opportunities",
+      "keyword": "best products to import from china to nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "products50",
+      "url": "https://www.sureimports.com/blog/top-50-fast-moving-mini-importation-products-nigerians-buy-every-day",
+      "keyword": "fast moving products in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "laptops",
+      "url": "https://www.sureimports.com/blog/how-to-import-laptops-from-china-to-nigeria-safely",
+      "keyword": "laptop price in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "machinehub",
+      "url": "https://www.sureimports.com/blog/machine-sourcing-from-china-for-nigeria-how-to-do-it-without-guessing",
+      "keyword": "machine sourcing from china",
+      "status": "completed"
+    },
+    {
+      "id": "solarhub",
+      "url": "https://www.sureimports.com/blog/how-to-import-solar-and-power-accessories-from-china-to-nigeria-carefully",
+      "keyword": "solar equipment importation nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "cctv",
+      "url": "https://www.sureimports.com/blog/how-to-import-cctv-and-security-gadgets-from-china-to-nigeria",
+      "keyword": "cctv camera price in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "packaging",
+      "url": "https://www.sureimports.com/blog/how-to-source-packaging-machines-from-china-for-nigerian-smes",
+      "keyword": "sealing machine price in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "salon",
+      "url": "https://www.sureimports.com/blog/how-to-import-salon-and-barbershop-equipment-from-china-to-nigeria",
+      "keyword": "beauty salon chair",
+      "status": "completed"
+    },
+    {
+      "id": "ice",
+      "url": "https://www.sureimports.com/blog/ice-block-making-machine-price-nigeria",
+      "keyword": "ice block making machine",
+      "status": "completed"
+    },
+    {
+      "id": "sewing",
+      "url": "https://www.sureimports.com/blog/industrial-sewing-machine-price-nigeria",
+      "keyword": "industrial sewing machine price in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "solargen",
+      "url": "https://www.sureimports.com/blog/solar-generator-price-nigeria",
+      "keyword": "solar generator price in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "flour",
+      "url": "https://www.sureimports.com/blog/flour-milling-machine-nigeria",
+      "keyword": "flour milling machine",
+      "status": "completed"
+    },
+    {
+      "id": "palm",
+      "url": "https://www.sureimports.com/blog/palm-oil-processing-machine-nigeria",
+      "keyword": "palm oil processing machine",
+      "status": "completed"
+    },
+    {
+      "id": "panels",
+      "url": "https://www.sureimports.com/blog/solar-panel-price-nigeria",
+      "keyword": "solar panel price in nigeria",
+      "status": "held"
+    },
+    {
+      "id": "lithium",
+      "url": "https://www.sureimports.com/blog/how-to-import-replacement-batteries-and-chargers-from-china-to-nigeria-carefully",
+      "keyword": "lithium battery price in nigeria",
+      "status": "held"
+    },
+    {
+      "id": "airfryer",
+      "url": "https://www.sureimports.com/blog/air-fryer-price-nigeria",
+      "keyword": "air fryer price in nigeria",
+      "status": "held"
+    },
+    {
+      "id": "core",
+      "url": "https://www.sureimports.com/blog/how-to-import-from-china-to-nigeria-in-2026-the-complete-beginner-to-pro-guide",
+      "keyword": "how to import from china to nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "beginner",
+      "url": "https://www.sureimports.com/blog/the-complete-beginner-s-guide-to-starting-a-mini-importation-business-in-nigeria-2026-edition",
+      "keyword": "mini importation business in nigeria",
+      "status": "completed"
+    },
+    {
+      "id": "pinduoduo",
+      "url": "https://www.sureimports.com/blog/pinduoduo-for-nigerian-importers-cheap-prices-real-risks-and-when-to-use-it",
+      "keyword": "pinduoduo nigeria",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "1688",
+      "url": "https://www.sureimports.com/blog/1688-buying-agent-in-nigeria-what-a-good-agent-should-actually-do",
+      "keyword": "1688 buying agent in nigeria",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "agro",
+      "url": "https://www.sureimports.com/blog/the-blueprint-for-industrial-success-how-to-source-agro-processing-machines-from-china-safely",
+      "keyword": "agro processing machines nigeria",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "affiliate",
+      "url": "https://www.sureimports.com/blog/sure-imports-affiliate-program-earn-from-import-and-shipping-referrals",
+      "keyword": "affiliate programs in nigeria",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "affiliateintro",
+      "url": "https://www.sureimports.com/blog/importation-affiliate-program-nigeria-earn-without-buying-stock",
+      "keyword": "affiliate marketing in nigeria",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "white",
+      "url": "https://www.sureimports.com/blog/how-to-build-your-own-white-label-products-in-china-for-the-nigerian-market",
+      "keyword": "white label products",
+      "status": "pending_existing_page_update"
+    },
+    {
+      "id": "ev",
+      "url": "https://www.sureimports.com/blog/electric-cars-nigeria-buying-guide",
+      "keyword": "electric cars in nigeria",
+      "status": "held"
+    }
+  ],
+  "measurement": "Use later Nigeria-filtered GSC comparisons after recrawling; no ranking recovery claim and no monitoring automation created."
+}

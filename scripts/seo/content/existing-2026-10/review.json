@@ -1,0 +1,64 @@
+{
+  "products50": {
+    "title": "50 Fast-Moving Products in Nigeria for Mini Importation",
+    "metaDescription": "Explore everyday products for small Nigerian resellers, with stocking decisions, sourcing checks and practical steps to test demand.",
+    "focusKeyword": "fast moving products in nigeria",
+    "keywords": [
+      "fast moving products in nigeria",
+      "fast selling products in nigeria",
+      "50 hot selling products in nigeria",
+      "mini importation products"
+    ],
+    "externalLinkChanges": [],
+    "editType": "Targeted editorial additions and corrections; preserved original article body, image and embedded media",
+    "ownership": "Small resale product selection and test demand"
+  },
+  "core": {
+    "title": "How to Order from China to Nigeria: Complete Import Guide",
+    "metaDescription": "Follow the complete China-to-Nigeria importing process, from choosing a supplier to payment, shipping and delivery planning.",
+    "focusKeyword": "how to import from china to nigeria",
+    "keywords": [
+      "how to import from china to nigeria",
+      "how to order from china to nigeria",
+      "china importation",
+      "how to order goods from china"
+    ],
+    "externalLinkChanges": [
+      {
+        "originalUrl": "https://customs.gov.ng/wp-content/uploads/2025/08/NCS-Restructured-SLA_Rev.docx.pdf",
+        "action": "replaced",
+        "replacementUrl": "https://www.customs.gov.ng/",
+        "reason": "Old PDF endpoint now returns an HTML placeholder rather than the cited procedure; replace unsupported attribution with current official enquiry route."
+      },
+      {
+        "originalUrl": "https://activity.alibaba.com/helpcenter/Trade_Assurance_Guide.html?tracelog=bao",
+        "action": "replaced",
+        "replacementUrl": "https://buyer.alibaba.com/page/HowItWorks/Page.html",
+        "reason": "Old helpcentre URL redirects to marketplace homepage; current official buyer sourcing guide explains order protection."
+      }
+    ],
+    "editType": "Targeted editorial additions and corrections; preserved original article body, image and embedded media",
+    "ownership": "Execution of a defined China-to-Nigeria import order"
+  },
+  "beginner": {
+    "title": "Mini Importation Business in Nigeria: Beginner\u2019s Guide",
+    "metaDescription": "Build a small import business with demand tests, realistic budgets, product selection and sales planning for the Nigerian market.",
+    "focusKeyword": "mini importation business in nigeria",
+    "keywords": [
+      "mini importation business in nigeria",
+      "how to start mini importation business in nigeria",
+      "mini importation budget",
+      "mini importation business plan"
+    ],
+    "externalLinkChanges": [
+      {
+        "originalUrl": "https://customs.gov.ng/wp-content/uploads/2026/06/REVISED-IMPORT-PROHIBITION-LIST.pdf",
+        "action": "replaced",
+        "replacementUrl": "https://www.customs.gov.ng/",
+        "reason": "The cited PDF path currently serves a placeholder. Direct readers to official Customs enquiries instead of presenting it as a working prohibition list."
+      }
+    ],
+    "editType": "Targeted editorial additions and corrections; preserved original article body, image and embedded media",
+    "ownership": "Small import business planning, cash flow, selling and reorders"
+  }
+}
