@@ -1,0 +1,46 @@
+{
+  "publishedAt": "2026-10-09T08:59:53.382Z",
+  "articles": [
+    {
+      "key": "solar",
+      "slug": "how-to-import-solar-and-power-accessories-from-china-to-nigeria-carefully",
+      "pidBlog": "BLOG1791536337883",
+      "words": 2991,
+      "image": "admin-sureimports/blog/BLOG_GEN_how-to-import-solar-and-power-accessories-from-china-to-nigeria-carefully_1788287954759",
+      "createdAt": "2026-08-31T08:00:00.000Z",
+      "pidChange": "seo_change_6c5716b2-ae60-4201-ad5a-add509df13f4"
+    },
+    {
+      "key": "cctv",
+      "slug": "how-to-import-cctv-and-security-gadgets-from-china-to-nigeria",
+      "pidBlog": "BLOG1791536337884",
+      "words": 2687,
+      "image": "admin-sureimports/blog/BLOG_GEN_how-to-import-cctv-and-security-gadgets-from-china-to-nigeria_1791535891105",
+      "createdAt": "2026-10-09T08:59:53.382Z",
+      "pidChange": "seo_change_0ad7797f-b02b-4d80-9fbb-c2b679710d91"
+    },
+    {
+      "key": "generator",
+      "slug": "solar-generator-price-nigeria",
+      "pidBlog": "BLOG1791536337885",
+      "words": 2972,
+      "image": "admin-sureimports/blog/BLOG_GEN_solar-generator-price-nigeria_1791535888626",
+      "createdAt": "2026-10-09T08:59:53.382Z",
+      "pidChange": "seo_change_7c995d12-78a3-4b79-936b-6f30f60ee283"
+    }
+  ],
+  "author": "Tochukwu Nkwocha",
+  "publisherId": "PUB1767167254459",
+  "policy": "docs/SEO_AUTOPUBLISH_RULES.md",
+  "researchModel": "gpt-5.6-sol",
+  "imageMode": "built-in imagegen; uploaded to established Cloudinary blog folder",
+  "changes": [
+    "Expanded existing solar component procurement guide while preserving URL and image.",
+    "Expanded scheduled CCTV article and brought publication forward from 21 October 2026.",
+    "Published dedicated portable solar-generator buying guide.",
+    "Aligned BLOG timestamp IDs and all database pidBlog references.",
+    "Registered reviewed exact editorial links, added contextual incoming links from product-opportunities guide."
+  ],
+  "validationArtifacts": "deliverables/seo-power-security-2026-10-09",
+  "remainingBacklog": "Wider keyword ownership map and editorial backlog remain ongoing; this release covers these three queue items."
+}

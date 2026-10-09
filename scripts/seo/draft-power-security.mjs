@@ -1,0 +1,41 @@
+import fs from 'node:fs/promises';
+import {loadEnvFile} from 'node:process';
+loadEnvFile('../admin.sureimports.com/.env.local');
+const out='deliverables/seo-power-security-2026-10-09';
+const originals=JSON.parse(await fs.readFile(`${out}/before.json`,'utf8'));
+const topics={
+ solar:{slug:'how-to-import-solar-and-power-accessories-from-china-to-nigeria-carefully',title:'Importing Solar Equipment to Nigeria: Buyer’s Checklist',brief:'Broad procurement hub for panels, inverters, batteries and balance-of-system accessories. Preserve broad import intent. Explain bill of materials, data sheets and model traceability, voltage/current/controller/inverter compatibility, installer-designed system specification without dangerous DIY instructions, manufacturer evidence vs logos, samples and inspection, packaging, landed-cost line items without invented rates, warranty support, staged procurement, quote template, FAQs. Do not target portable solar generator prices: link dedicated guide only briefly.'},
+ cctv:{slug:'how-to-import-cctv-and-security-gadgets-from-china-to-nigeria',title:'CCTV Camera Prices in Nigeria: Buying and Import Guide',brief:'Expand existing import article to satisfy cctv camera price in nigeria and solar CCTV searches. Explain camera-only vs complete installed-system prices, analogue/DVR vs IP/NVR, lens/identification/night sample footage, recorder/channel/codec/PoE power budgets, storage bitrate worked example explicit assumptions, wired vs wifi vs 4G recurring costs, solar/battery duty cycle and event vs continuous recording, cybersecurity configuration and support, sample tests, quote matrix, importer and single local buyer decision. Source 2 or 3 real dated Nigerian retailer listings with direct links, exact inclusions/stock ambiguity noted. Do not invent market ranges. Include actual prices near top. Treat marketplace titles as seller claims not authenticity proof.'},
+ generator:{slug:'solar-generator-price-nigeria',title:'Solar Generator Prices in Nigeria: Capacity and Buying Guide',brief:'NEW dedicated portable solar-generator guide targeting solar generator price in nigeria. Not a whole-house solar installation guide. Explain portable power station vs station plus solar panel bundle; 3 real current Nigeria retail examples from manufacturer Nigerian storefronts with NGN prices, capacity Wh, continuous W, panel inclusion and availability. Use at least two price sources/pages. W vs Wh vs boost/surge, realistic load budget and runtime example with explicit assumed usable efficiency not product promise, startup demand and fridge duty cycle, panel input voltage/current/connector compatibility, weather charging and no guaranteed solar hours, chemistry/cycle assumptions, repair/warranty region, local purchase versus importing batch, freight confirmation for batteries no invented policies, inspection/request-quote checklist, FAQs. Link broad solar-import hub as further reading.'}
+};
+const key=process.argv[2];if(!topics[key])throw Error('Choose solar, cctv or generator');
+const spec=topics[key];const original=originals.find(x=>x.blogSlug===spec.slug);
+const stateFile=`${out}/${key}-job.json`;
+let state;try{state=JSON.parse(await fs.readFile(stateFile,'utf8'));}catch{}
+const headers={Authorization:`Bearer ${process.env.OPENAI_API_KEY}`,'Content-Type':'application/json'};
+if(!state){
+ const prompt=`Write a complete publishable HTML article body, 2400–2900 useful words (hard minimum 2100), for Sure Imports Nigeria, author Tochukwu Nkwocha. Title ${spec.title}. Brief: ${spec.brief}.
+ Date checked: 9 October 2026. Research current primary sources using web search; link direct sources beside claims. No fabricated prices, service promises, case studies, tax or legal rules. No generic filler, keyword stuffing, repeated conclusions, H1, scripts, Markdown or citation tokens. Use p,h2,h3,ul,ol,li,strong,a,table,thead,tbody,tr,th,td only. Clear opening answer, practical tables, examples and concise FAQs. Nigeria-first but transferable explanation. At most 180 words derived from any single source and no direct quotes unless truly needed. Avoid regulatory instruction: ask reader to have the exact product assessed, without claiming blanket SONCAP/NAFDAC applicability. External links in ORIGINAL must be retained or deliberately replaced by a researched better relevant official source with recorded reason. For generic NAFDAC homepage this can be replaced with product-relevant SON official resource, explicitly avoiding NAFDAC relevance to ordinary electronics. Customs homepage may replace stale deep URL if needed. Never silently delete external sources.
+ One primary commercial intent: bulk product sourcing, with natural CTA to https://linescout.sureimports.com/sourcing-project?route_type=simple_sourcing . Up to 3 backup offers: /supplier-intelligence, /buy-from-chinese-websites, /ship-with-us only when relevant. Do not route ordinary small business buyers to corporate sourcing. No claims about availability, guarantees or fees of our services. Other internal links can use relevant ORIGINAL live article links, /tools/landed-cost-estimator, and /blog/how-to-import-solar-and-power-accessories-from-china-to-nigeria-carefully plus /blog/solar-generator-price-nigeria. Do not self-link, invent slugs, or add a giant related links dump. Target 5–9 useful links total including commercial and editorial. Do not link scheduled CCTV from other articles yet. Preserve original canonical/slug outside body. Explain offers naturally in the relevant section.
+ Research starting points: https://ng.ecoflow.com/products/river-2-portable-power-station (observed 256Wh/300W, ₦318270 station sold out; 110W panel bundle ₦377330 also sold out); https://ng.ecoflow.com/products/delta-2-portable-power-station ; https://www.jumia.com.ng/electronics-cameras-security-surveillance/hikvision/ . Verify exact current variants, quote sources explicitly. Do not imply these illustrative brands form a market survey or recommendation. Reference checked-date near price table.
+ Return JSON object with html, metaDescription (120–160 characters), focusKeyword, keywords (array), externalLinkChanges (array of {originalUrl,action:retained|replaced,replacementUrl,reason}), sources (array of {url,factsUsed}), appliedChanges(array). ORIGINAL: ${original?.blogContent||'None; new article.'}`;
+ await fs.writeFile(`${out}/${key}-prompt.txt`,prompt);
+ const model=process.env.SEO_CONTENT_REWRITE_MODEL||'gpt-5.6-sol';
+ const res=await fetch('https://api.openai.com/v1/responses',{method:'POST',headers:{...headers,'Idempotency-Key':`sureimports-power-security-20261009-${key}`},body:JSON.stringify({model,background:true,reasoning:{effort:'high'},tools:[{type:'web_search'}],max_tool_calls:6,max_output_tokens:24000,input:[{role:'system',content:'You are a meticulous research editor. Return a JSON object only. Article must exceed 2100 words; research and write the full body, not an outline.'},{role:'user',content:prompt}]}),signal:AbortSignal.timeout(30000)});
+ if(!res.ok)throw Error(`Generation start failed ${res.status}: ${(await res.text()).slice(0,500)}`);
+ const data=await res.json();state={id:data.id,model,status:data.status,startedAt:new Date().toISOString(),spec};
+ await fs.writeFile(stateFile,JSON.stringify(state,null,2),{flag:'wx'});
+ console.log(JSON.stringify(state));
+}else{
+ const res=await fetch(`https://api.openai.com/v1/responses/${state.id}`,{headers,signal:AbortSignal.timeout(30000)});
+ if(!res.ok)throw Error(`Poll failed ${res.status}`);const data=await res.json();
+ state.status=data.status;await fs.writeFile(stateFile,JSON.stringify(state,null,2));
+ if(data.status==='completed'){
+  await fs.writeFile(`${out}/${key}-response.json`,JSON.stringify(data,null,2));
+  const output=data.output.flatMap(x=>x.content||[]).map(x=>x.text||'').join('');
+  const draft=JSON.parse(output);await fs.writeFile(`${out}/${key}-draft.json`,JSON.stringify(draft,null,2));
+  await fs.mkdir('scripts/seo/content/power-security-2026-10',{recursive:true});
+  await fs.writeFile(`scripts/seo/content/power-security-2026-10/${key}.html`,draft.html);
+  console.log(JSON.stringify({key,status:data.status,words:draft.html.replace(/<[^>]*>/g,' ').trim().split(/\s+/).length,sources:draft.sources}));
+ }else console.log(JSON.stringify({key,status:data.status,error:data.error}));
+}
