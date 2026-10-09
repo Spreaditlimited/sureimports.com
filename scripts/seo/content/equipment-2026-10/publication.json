@@ -1,0 +1,157 @@
+{
+  "batch": "nigeria_equipment_20261009",
+  "publishedAt": "2026-10-09T09:52:02.524Z",
+  "author": "Tochukwu Nkwocha",
+  "articles": [
+    {
+      "slug": "how-to-source-packaging-machines-from-china-for-nigerian-smes",
+      "status": 200,
+      "words": 3050,
+      "pidBlog": "BLOG1791539479435",
+      "author": "Tochukwu Nkwocha",
+      "canonical": "https://www.sureimports.com/blog/how-to-source-packaging-machines-from-china-for-nigerian-smes",
+      "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/admin-sureimports/blog/BLOG_GEN_how-to-source-packaging-machines-from-china-for-nigerian-smes_1791539170119",
+      "structuredData": true,
+      "descriptionLength": 128
+    },
+    {
+      "slug": "how-to-import-salon-and-barbershop-equipment-from-china-to-nigeria",
+      "status": 200,
+      "words": 2667,
+      "pidBlog": "BLOG1791539479436",
+      "author": "Tochukwu Nkwocha",
+      "canonical": "https://www.sureimports.com/blog/how-to-import-salon-and-barbershop-equipment-from-china-to-nigeria",
+      "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/admin-sureimports/blog/BLOG_GEN_how-to-import-salon-and-barbershop-equipment-from-china-to-nigeria_1791539172748",
+      "structuredData": true,
+      "descriptionLength": 143
+    },
+    {
+      "slug": "flour-milling-machine-nigeria",
+      "status": 200,
+      "words": 2774,
+      "pidBlog": "BLOG1791539479437",
+      "author": "Tochukwu Nkwocha",
+      "canonical": "https://www.sureimports.com/blog/flour-milling-machine-nigeria",
+      "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/admin-sureimports/blog/BLOG_GEN_flour-milling-machine-nigeria_1791539175431",
+      "structuredData": true,
+      "descriptionLength": 132
+    },
+    {
+      "slug": "palm-oil-processing-machine-nigeria",
+      "status": 200,
+      "words": 2896,
+      "pidBlog": "BLOG1791539479438",
+      "author": "Tochukwu Nkwocha",
+      "canonical": "https://www.sureimports.com/blog/palm-oil-processing-machine-nigeria",
+      "featureImage": "https://res.cloudinary.com/djprcwnsz/image/upload/admin-sureimports/blog/BLOG_GEN_palm-oil-processing-machine-nigeria_1791539178297",
+      "structuredData": true,
+      "descriptionLength": 134
+    }
+  ],
+  "inboundPages": [
+    "25-best-products-to-import-from-china-to-nigeria-in-2026-high-demand-opportunities",
+    "machine-sourcing-from-china-for-nigeria-how-to-do-it-without-guessing",
+    "the-blueprint-for-industrial-success-how-to-source-agro-processing-machines-from-china-safely"
+  ],
+  "verification": {
+    "httpStatus": 200,
+    "databaseMatchesReviewedContent": true,
+    "canonicalAndMetadata": true,
+    "structuredAuthor": true,
+    "sitemap": true,
+    "appliedChangeLogs": 7,
+    "mobileDocumentWidth": 390
+  },
+  "trigger": "Explicit user-authorized editorial queue and Nigeria keyword research; not automatic GSC threshold selection",
+  "keywordPlanner": [
+    {
+      "keyword": "flour milling machine",
+      "averageMonthlySearches": "1600"
+    },
+    {
+      "keyword": "palm oil processing machine",
+      "averageMonthlySearches": "590"
+    },
+    {
+      "keyword": "sealing machine price in nigeria",
+      "averageMonthlySearches": "390"
+    },
+    {
+      "keyword": "beauty salon chair",
+      "averageMonthlySearches": "480"
+    }
+  ],
+  "editorialDecisions": [
+    "Existing packaging and salon URLs retained and scheduled dates brought forward.",
+    "New flour and palm guides have distinct equipment-buying intent; related process guides linked.",
+    "Seller prices are dated listing examples, not market-wide ranges or supplier endorsements.",
+    "Palm equipment is quote-required; no invented prices or extraction yields."
+  ],
+  "sourceLinkChanges": {
+    "packaging": [
+      {
+        "originalUrl": "https://customs.gov.ng/?page_id=3075",
+        "action": "replaced",
+        "replacementUrl": "https://customs.gov.ng/",
+        "reason": "Replaced the obsolete page-specific Customs URL with the current official homepage and avoided making a product classification or prohibition claim."
+      },
+      {
+        "originalUrl": "https://www.nafdac.gov.ng/",
+        "action": "replaced",
+        "replacementUrl": "https://son.gov.ng/contact-us/",
+        "reason": "The generic NAFDAC homepage did not establish legal applicability to sealing machinery; a relevant official SON enquiry channel is provided for exact-product questions without promising an outcome."
+      },
+      {
+        "originalUrl": "https://son.gov.ng/",
+        "action": "replaced",
+        "replacementUrl": "https://son.gov.ng/contact-us/",
+        "reason": "Use the verified official contact page for exact-product standards enquiries rather than the general homepage."
+      }
+    ],
+    "salon": [
+      {
+        "originalUrl": "https://customs.gov.ng/?page_id=3075",
+        "action": "replaced",
+        "replacementUrl": "https://customs.gov.ng/",
+        "reason": "The old page-specific Customs URL may be obsolete. The current official homepage is used only as a starting point for exact-product assessment, without prescribing tariffs or legal treatment."
+      },
+      {
+        "originalUrl": "https://www.nafdac.gov.ng/",
+        "action": "replaced",
+        "replacementUrl": "https://son.gov.ng/contact-us/",
+        "reason": "A generic NAFDAC link was not relevant to ordinary salon chairs and furniture. It was replaced with an official SON enquiry channel for product-specific questions, without claiming that a particular rule applies."
+      },
+      {
+        "originalUrl": "https://son.gov.ng/",
+        "action": "replaced",
+        "replacementUrl": "https://son.gov.ng/contact-us/",
+        "reason": "Use the verified official contact page for exact-product standards enquiries rather than the general homepage."
+      }
+    ],
+    "flour": [],
+    "palm": [
+      {
+        "originalUrl": "https://www.nifor.org/faq.html",
+        "action": "retained",
+        "replacementUrl": "https://www.nifor.org/faq.html",
+        "reason": "Current official NIFOR FAQ provides primary information on its small-scale palm oil processing equipment capacities and set contents."
+      },
+      {
+        "originalUrl": "https://www.fao.org/4/y4355e/y4355e04.htm",
+        "action": "retained",
+        "replacementUrl": "https://www.fao.org/4/y4355e/y4355e04.htm",
+        "reason": "Official FAO process reference remains useful for explaining unit operations, batch systems and plant sizing, with an explicit warning that the 2002 document is not current price or vendor evidence."
+      }
+    ]
+  },
+  "imagePrompts": {
+    "mode": "built-in imagegen",
+    "prompts": {
+      "packaging": "Premium photorealistic editorial landscape hero for Sure Imports article 'Sealing Machine Prices in Nigeria and Packaging Options'. A plausible compact stainless steel continuous band pouch sealer with a short green conveyor belt, beside a simple blue manual impulse heat sealer with its handle closed, two blank unprinted sealed pouches containing dry grain arranged in foreground. Clean small food-packing workshop, restrained navy slate and warm neutral palette, subtle orange accent, soft daylight, sharp machine detail and soft shelving background. Mechanically coherent shapes, guarded heater and belt areas; machines idle, no operation. High-end editorial still life, practical Nigerian SME procurement context. Landscape 3:2 safe central composition for crop16:10 with breathing room. No people, faces, hands, bodies, mannequins or human reflections. No text, letters, numbers, logos, brand marks, labels, watermarks, flags, currencies or graphic overlays. Displays blank/unlit. Distinct equipment illustration, not manufacturer-specific.",
+      "salon": "Premium photorealistic editorial feature photograph for Sure Imports article 'Salon Equipment in Nigeria: Chairs, Costs and Sourcing'. Show one elegant unbranded charcoal-black reclining barber chair as central subject with plausible chrome hydraulic pedestal, broad stable round base and metal footrest, a smaller ivory styling chair positioned behind to one side, a compact black wheeled salon trolley and an unbranded white ceramic washbasin further in background. Empty contemporary Nigerian salon showroom with warm textured neutral walls and subtle navy upholstery accents, restrained orange towel, soft natural side light. Focus on real furniture materials, adjustment mechanisms and careful procurement comparison, no luxury gimmicks. Eye-level three-quarter composition, landscape3:2 central safe crop16:10, plenty of space around chair, crisp foreground and gentle background blur. No people, no faces, hands, bodies, mannequin heads, wigs, portraits, human reflections. No mirrors showing people; avoid mirrors entirely. No text, labels, letters, numbers, logos, branding, watermark, flags or currency. Not an actual advertised brand model.",
+      "flour": "High-resolution premium editorial photorealistic landscape hero for Sure Imports article 'Flour Milling Machines in Nigeria: Prices and Selection'. Small commercial flour-milling workshop, one plausible unbranded stainless-steel compact hammer mill with angular grain feed hopper on top, fully enclosed milling chamber, guarded drive and simple discharge chute leading to a clean covered collection bin. Compact cyclone dust collector connected beside machine, clean food-workshop floor. In foreground on small inspection table, three shallow stainless trays holding whole maize kernels, clean dried root chips and finely ground cream flour, plus a loose circular mesh screen for illustrating product selection, no dust clouds. Machine stopped, professionally arranged coherent engineering. Three-quarter wide angle, warm daylight, clean whites, brushed steel, navy slate housing, restrained orange accent, strong central machinery silhouette, sharp foreground soft background. Landscape3:2 safe16:10 crop, no people, faces, hands, body parts, mannequins or human reflections. No words, letters, numbers, labels, logos, brand names, watermarks, currency or flags. Not a rice huller and not a kitchen blender. No exposed moving belts, no unsafe operation.",
+      "palm": "Premium photorealistic editorial landscape hero for Sure Imports article 'Palm Oil Processing Machines in Nigeria: Buyer\u2019s Guide'. A small professionally organised palm-FRUIT oil mill in an airy roofed tropical workshop. Central realistic compact palm-fruit screw press with large stainless feed hopper, horizontal guarded compression barrel on dark navy frame, electric motor with full protective coupling cover, shallow stainless oil collection tray below. Beside it a separate tall covered cylindrical fruit digester tank, connected as adjacent process equipment but no complicated invented piping. In foreground a crate holding a real textured orange-red oil palm fresh fruit bunch and a shallow tray of loose red-orange palm fruits; a small clear closed sample bottle with rich reddish palm oil. Must depict mesocarp palm fruit processing, not a kitchen seed oil extractor, no black loose kernels as subject. Clean maintained equipment, idle machine, contained products, no smoke steam splashes or oily mess. Warm natural daylight and realistic steel, navy slate, warm earth palette with orange fruit. Distinct three-quarter wide landscape3:2 composition safe16:10 crop, central equipment with space around edges, crisp foreground softer background. No people, hands, faces, body parts, mannequins or reflections of people. No words, letters, numbers, fake labels, logos, trademarks, watermark, flags or currency. Editorial equipment illustration not an exact manufacturer model."
+    },
+    "review": "All four generated images visually inspected: distinct subject, landscape, no readable branding/text or people. Illustrative equipment, not manufacturer-specific photographs."
+  }
+}

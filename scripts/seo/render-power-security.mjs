@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import {spawn} from 'node:child_process';
-const out='deliverables/seo-power-security-2026-10-09';
+const out=process.argv[2]||'deliverables/seo-power-security-2026-10-09';
 const m=JSON.parse(await fs.readFile(`${out}/release.json`,'utf8'));
 const profile=`/private/tmp/sureimports-cdp-${Date.now()}`;
 const child=spawn('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',['--headless','--disable-gpu','--no-first-run',`--user-data-dir=${profile}`,'--remote-debugging-port=0','about:blank'],{stdio:'ignore'});
@@ -20,6 +20,7 @@ try{
   for(let i=0;i<20;i++){await sleep(1000);const data=await send('Runtime.evaluate',{expression:'document.documentElement.outerHTML',returnByValue:true},sessionId);html=data.result.value||'';if(html.includes('id="article-jsonld"'))break;}
   await fs.writeFile(`${out}/${c.key}-rendered.html`,html);
   if(!html.includes('id="article-jsonld"'))throw Error(`${c.key}: article JSON-LD not rendered`);
+  await send('Runtime.evaluate',{expression:`Promise.all(Array.from(document.images).filter(img=>{const r=img.getBoundingClientRect();return r.width>0&&r.height>0&&r.top<innerHeight&&r.bottom>0;}).map(img=>img.complete?Promise.resolve(img.naturalWidth>0):new Promise(resolve=>{img.addEventListener('load',()=>resolve(true),{once:true});img.addEventListener('error',()=>resolve(false),{once:true});setTimeout(()=>resolve(false),15000);})))`,awaitPromise:true,returnByValue:true},sessionId).then(r=>{if(r.result.value?.some(v=>!v))throw Error(`${c.key}: visible image failed to load`);});
   const png=await send('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(`${out}/${c.key}-desktop.png`,Buffer.from(png.data,'base64'));
   await send('Runtime.evaluate',{expression:'document.querySelector("table")?.scrollIntoView(); window.scrollBy(0,-120);'},sessionId);
   const tablePng=await send('Page.captureScreenshot',{format:'png'},sessionId);await fs.writeFile(`${out}/${c.key}-table-desktop.png`,Buffer.from(tablePng.data,'base64'));

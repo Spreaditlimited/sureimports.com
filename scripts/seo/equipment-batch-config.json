@@ -1,0 +1,35 @@
+{
+  "out": "deliverables/seo-equipment-2026-10-09",
+  "contentFolder": "scripts/seo/content/equipment-2026-10",
+  "batch": "nigeria_equipment_20261009",
+  "topics": {
+    "packaging": {
+      "slug": "how-to-source-packaging-machines-from-china-for-nigerian-smes",
+      "title": "Sealing Machine Prices in Nigeria and Packaging Options",
+      "keyword": "sealing machine price in nigeria",
+      "route": "machine_sourcing",
+      "brief": "Expand the existing scheduled PACKAGING equipment hub. Cover impulse sealers, continuous band sealers, foot sealers, vacuum sealers and separate filling/dosing steps. Give 2–3 dated price examples from actual Nigerian seller pages, clear model/size/currency, package inclusions, availability uncertainty, standalone sealer vs production line. Use https://uniquemachines.com.ng/product-category/sealing-machine/ as a starting point, verify individual product pages. Explain pouch laminate compatibility and seal tests with real buyer samples; speed vs accepted packs/hour; conveyors/load support/coders, food-contact evidence no regulatory promises; power, compressor where applicable, consumables, spares, inspection, commissioning, landed cost and quote template. This is not the private-label PACKAGING MATERIALS article; link that only for choosing bags. No invented vendor quotes. Illustrative throughput arithmetic explicitly labelled. One primary CTA machine sourcing. Preserve existing slug."
+    },
+    "salon": {
+      "slug": "how-to-import-salon-and-barbershop-equipment-from-china-to-nigeria",
+      "title": "Salon Equipment in Nigeria: Chairs, Costs and Sourcing",
+      "keyword": "beauty salon chair",
+      "route": "simple_sourcing",
+      "brief": "Expand existing scheduled salon and barbershop EQUIPMENT guide. Distinguish styling chairs, reclining barber chairs, wash units and other salon equipment; do not become a skincare packaging article. Use Nigerian seller https://www.climaxng.com/product-category/beauty-shop-equipment/salon-chairs/ and direct product pages for 2–3 verified prices dated 9 October 2026. State listing examples not market range or endorsement; delivery/installation excluded unless source confirms. Hydraulic travel/locking stability/base/load-rated evidence, recline/footrest, upholstery and cleaning compatibility, spare pump availability, warranty return logistics, salon layout and access measurements, CBM volumetric freight hypothetical calculation, plug voltage and water/plumbing professional fitting, quote/sample/inspection checklist. Local single purchase vs bulk import economics. Main CTA bulk product sourcing; relevant natural article links."
+    },
+    "flour": {
+      "slug": "flour-milling-machine-nigeria",
+      "title": "Flour Milling Machines in Nigeria: Prices and Selection",
+      "keyword": "flour milling machine",
+      "route": "machine_sourcing",
+      "brief": "New dedicated flour MILL BUYING guide. Avoid duplicating plantain flour PROCESS, dryer comparison or rice milling line articles: link them instead. Grain vs dried-root chips and dried plantain suitability; moisture, feedstock preparation, screen/particle size, hammer vs plate/burr vs roller/sifting arrangements; why wet milling or rice dehusking is different. Research manufacturer and actual Nigeria seller listing evidence. Include only credible dated sample prices with exact machine scope and currency; if quote-only say quote required and give useful itemised cost sheet rather than fake market range. Output is tested saleable kg/h at specified fineness/moisture, not hopper volume or motor horsepower. Illustrative throughput and usable-yield calculation clearly hypothetical, dust collection and guards/no DIY dangerous construction; food contact cleaning/changeover, magnets/checks, motor starter/phase/voltage, sample acceptance, spares, commissioning, full line boundary, local vs imported supplier and supplier RFQ. Distinguish basic grinder from complete commercial flour plant. Main CTA machine sourcing."
+    },
+    "palm": {
+      "slug": "palm-oil-processing-machine-nigeria",
+      "title": "Palm Oil Processing Machines in Nigeria: Buyer’s Guide",
+      "keyword": "palm oil processing machine",
+      "route": "machine_sourcing",
+      "brief": "New dedicated PALM FRUIT OIL equipment buyer guide. Clearly distinguish mesocarp palm oil from palm KERNEL oil; a seed/oil expeller or kernel press is not a complete fresh-fruit-bunch processing line. Primary sources NIFOR https://www.nifor.org/faq.html and FAO small-scale palm oil processing https://www.fao.org/4/y4355e/y4355e04.htm; explain older FAO documents are process references not current price/capacity/vendor endorsements. Bunch handling, sterilisation, stripping, digestion, pressing, clarification/drying, storage, kernel recovery optional separate line; batch vs continuous and supplied feed state. Size line in FFB/h vs loose fruit/h vs oil/h and bottleneck example explicit assumptions not guaranteed extraction rate. Clarify complete line vs standalone press scope; actual prices only verifiable seller same process, otherwise transparent quote-required cost plan, site civil works/utilities/water/energy/effluent/spares/maintenance/commissioning. No invented yields, regulatory claims, process temperature/time instructions or investment returns. Seasonal supply, transport condition, local fabrication vs import service/support, material evidence, sample factory acceptance using representative fruit, cleaning/guarding/professional thermal-system installation, RFQ questions. Main CTA machine sourcing."
+    }
+  }
+}
