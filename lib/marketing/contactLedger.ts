@@ -123,7 +123,12 @@ export async function confirmMarketingOptIn(token: string) {
     await notifyMarketingConsentChange(contact.email);
     return 'CONFIRMED' as const;
   }
-  if (contact.bouncedAt || contact.complainedAt || contact.consentStatus !== 'PENDING_CONFIRMATION') return 'INVALID' as const;
+  if (
+    contact.bouncedAt ||
+    contact.complainedAt ||
+    contact.consentStatus !== 'PENDING_CONFIRMATION'
+  )
+    return 'INVALID' as const;
   if (contact.optInExpiresAt && contact.optInExpiresAt < new Date()) {
     await prisma.marketing_contacts.update({
       where: { id: contact.id },
