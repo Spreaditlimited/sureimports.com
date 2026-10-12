@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { readMarketingUnsubscribeToken } from '@/lib/marketing/unsubscribeToken';
 import { prisma } from '@/lib/prisma';
+import { notifyMarketingConsentChange } from '@/lib/marketing/brevoSync';
 
 async function unsubscribe(request: NextRequest) {
   const token = request.nextUrl.searchParams.get('token')?.trim() || '';
@@ -31,6 +32,7 @@ async function unsubscribe(request: NextRequest) {
       data: { status: 'CANCELLED', nextSendAt: null },
     }),
   ]);
+  await notifyMarketingConsentChange(contact.email);
   return true;
 }
 

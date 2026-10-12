@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 
 import xMail2 from '@/lib/email/xMail2';
 import { prisma } from '@/lib/prisma';
+import { notifyMarketingConsentChange } from './brevoSync';
 
 const OPT_IN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const OPT_IN_RESEND_COOLDOWN_MS = 60 * 1000;
@@ -118,6 +119,11 @@ export async function confirmMarketingOptIn(token: string) {
     where: { optInTokenHash: tokenHash(token) },
   });
   if (!contact) return 'INVALID' as const;
+  if (contact.consentStatus === 'OPTED_IN') {
+    await notifyMarketingConsentChange(contact.email);
+    return 'CONFIRMED' as const;
+  }
+  if (contact.bouncedAt || contact.complainedAt || contact.consentStatus !== 'PENDING_CONFIRMATION') return 'INVALID' as const;
   if (contact.optInExpiresAt && contact.optInExpiresAt < new Date()) {
     await prisma.marketing_contacts.update({
       where: { id: contact.id },
@@ -125,7 +131,6 @@ export async function confirmMarketingOptIn(token: string) {
     });
     return 'EXPIRED' as const;
   }
-  if (contact.consentStatus === 'OPTED_IN') return 'CONFIRMED' as const;
 
   await prisma.marketing_contacts.update({
     where: { id: contact.id },
@@ -136,6 +141,7 @@ export async function confirmMarketingOptIn(token: string) {
       unsubscribedAt: null,
     },
   });
+  await notifyMarketingConsentChange(contact.email);
   return 'CONFIRMED' as const;
 }
 
