@@ -1,3 +1,4 @@
+import { withCancellationDetails } from '@/lib/refunds/cancellation-details';
 import { prisma } from '@/lib/prisma';
 import { Metadata } from 'next';
 import { getUser } from '@/lib/auth/auth';
@@ -61,7 +62,7 @@ export default async function RefundRecordsPage() {
 
   return (
     <>
-      <RefundsPage records={records} />
+      <RefundsPage records={await withCancellationDetails(records, user.pidUser)} />
     </>
   );
 }

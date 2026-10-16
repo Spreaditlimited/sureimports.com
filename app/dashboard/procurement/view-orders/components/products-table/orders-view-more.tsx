@@ -1,5 +1,7 @@
 'use client';
 
+import CancellationPanel from '@/components/procurement/CancellationPanel';
+
 import React, { useEffect, useState, useRef } from 'react';
 import { 
   useParams, 
@@ -285,23 +287,6 @@ export default function MoreOrders({
       toast.error('An error occurred');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const cancelOrder = async () => {
-    try {
-      toast.loading('Cancelling Order...');
-      const res = await fetch(`/api/crud/procurement-cancel-order?pidUser=${user?.pidUser}&pidOrder=${pidOrder}`);
-      const data: ApiResponse = await res.json();
-
-      if (data.responsex.status === 'SUCCESS') {
-        toast.success(data.responsex.message);
-        navigateWithAlert('/dashboard/procurement/view-orders/cancelled', 'success', 'Order has been cancelled!');
-      } else {
-        toast.warning(data.responsex.message);
-      }
-    } catch (error) {
-      toast.error('Action failed');
     }
   };
 
@@ -918,30 +903,7 @@ export default function MoreOrders({
           </div>
         )}
 
-        {/* PENDING - Cancel Option */}
-        {status2 === 'pending' && (
-          <div className="border-t border-slate-100 bg-slate-50/50 p-6 dark:border-slate-800 dark:bg-slate-900/30">
-             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isDisabled2}
-                    onChange={(e) => setIsDisabled2(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-rose-600 focus:ring-rose-600"
-                  />
-                  <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Confirm cancellation intent</span>
-                </label>
-                <Button
-                  disabled={!isDisabled2}
-                  onClick={cancelOrder}
-                  variant="destructive"
-                  className="h-12 rounded-xl px-8 font-bold"
-                >
-                  Cancel Order
-                </Button>
-             </div>
-          </div>
-        )}
+        {status2 === 'pending' && <div className="p-6"><CancellationPanel pidOrder={pidOrder} /></div>}
 
         {/* ON-HOLD Logic (Zero Difference, Outstanding, or Refund) */}
         {status2 === 'on-hold' && (

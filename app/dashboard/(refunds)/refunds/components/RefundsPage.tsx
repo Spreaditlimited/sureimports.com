@@ -94,6 +94,10 @@ function StatusTag({ status }: { status: string }) {
   );
 }
 
+function CancellationFeeDetail({ details, currency }: { details: { feePercent: string; fee: string; gross: string }; currency?: string | null }) {
+  return <span className="mt-1 block text-xs font-normal text-muted-foreground">Cancellation fee: {details.feePercent}% ({currency} {details.fee}). Before fee: {currency} {details.gross}.</span>;
+}
+
 export default function RefundsPage({ records }: any) {
   const router = useRouter();
   const [refundData, setRefundData] = useState(records || []);
@@ -407,7 +411,7 @@ export default function RefundsPage({ records }: any) {
                         {item.pidRefund}
                       </td>
                       <td className="px-6 py-4 text-sm font-black text-slate-900 dark:text-white">
-                        {formatRefundAmount(item.amount, item.currency)}
+                        {formatRefundAmount(item.amount, item.currency)}{item.cancellation && <CancellationFeeDetail details={item.cancellation} currency={item.currency} />}
                       </td>
                       <td className="px-6 py-4 text-xs font-medium text-slate-500">
                         {item.serviceType}

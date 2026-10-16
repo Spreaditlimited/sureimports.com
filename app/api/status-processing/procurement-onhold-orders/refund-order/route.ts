@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
       String(lifecycle.order.serviceCharge || '0'),
       String(lifecycle.order.vat || '0'),
     );
-    const componentSnapshot = JSON.stringify({ version: 1, productRetentionRatio: productRetentionRatio(previousProductUsd, lifecycle.productsTotalUsd), previousProductUsd, productUsd: lifecycle.productsTotalUsd, refundBeforeFeeUsd });
+    const refundGross = procurementRefund(refundBeforeFeeUsd, lifecycle.destinationCountry, lifecycle.rates.ngnPerUsd, 0);
+    const componentSnapshot = JSON.stringify({ version: 1, refundGrossAmount: refundGross.amount, refundCurrency: refundGross.currency, productRetentionRatio: productRetentionRatio(previousProductUsd, lifecycle.productsTotalUsd), previousProductUsd, productUsd: lifecycle.productsTotalUsd, refundBeforeFeeUsd });
 
     await prisma.$transaction(async (tx) => {
       const updated = await tx.orders.updateMany({

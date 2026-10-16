@@ -1,3 +1,4 @@
+import { voidAffiliateConversions } from '@/lib/affiliate/commissions';
 import 'server-only';
 import { prisma } from '@/lib/prisma';
 import { commissionReduction } from './components';
@@ -6,6 +7,11 @@ import { reconcilePaidCommissionReversals } from './full-reversals';
 
 /** Separate debits preserve original commissions and already-completed payouts. */
 export async function reconcileRefundCommissions() {
+  // Cancellation credits are committed before affiliate notification work. Retry any unfinished reversal.
+  const cancellations = await prisma.$queryRaw<Array<{ pidOrder: string }>>`SELECT DISTINCT r.pidOrder FROM refund_records r WHERE r.ext1='PROCUREMENT_CANCELLATION' AND EXISTS (SELECT 1 FROM affiliate_conversions c WHERE c.externalOrderReference=CONCAT('procurement:',r.pidOrder) AND c.status<>'VOIDED') LIMIT 50`;
+  for (const row of cancellations) {
+    await voidAffiliateConversions({ externalOrderReference: `procurement:${row.pidOrder}`, reason: 'Order cancelled and refund balance credited.', reversalReference: `cancellation:${row.pidOrder}` });
+  }
   await reconcilePaidCommissionReversals();
   const rows = await prisma.$queryRaw<
     {
