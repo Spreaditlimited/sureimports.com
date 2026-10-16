@@ -903,7 +903,7 @@ export default function MoreOrders({
           </div>
         )}
 
-        {status2 === 'pending' && <div className="p-6"><CancellationPanel pidOrder={pidOrder} /></div>}
+        {status2 === 'pending' && <CancellationPanel pidOrder={pidOrder} />}
 
         {/* ON-HOLD Logic (Zero Difference, Outstanding, or Refund) */}
         {status2 === 'on-hold' && (
