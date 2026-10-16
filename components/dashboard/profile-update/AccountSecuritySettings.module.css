@@ -1,0 +1,7 @@
+.grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 24px; margin-block: 16px 24px; align-items: stretch; }
+.grid > div { min-width: 0; }
+.password { border: 1px solid var(--si-border,#d9dce5); border-radius: 14px; background: var(--si-surface,#fff); overflow: hidden; }
+.password > div { padding-bottom: 0; }
+.connections > section { height: 100%; margin-bottom: 0; }
+.grid .password input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']) { width: 100%; border: 1px solid color-mix(in srgb,var(--si-ink,#202333) 28%,var(--si-surface,#fff)); border-radius: 8px; background: var(--si-surface,#fff); }
+@media(min-width:1024px) { .grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }

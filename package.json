@@ -21,7 +21,8 @@
     "test:affiliate-reversals": "node --test --experimental-strip-types tests/affiliate-reversal-policy.test.mjs",
     "prettier": "prettier --no-error-on-unmatched-pattern --write */**/*.{js,jsx,json,ts,tsx,scss,css,md}",
     "prepare": "husky install",
-    "test:vehicles": "node --test --experimental-strip-types tests/vehicle-commerce.test.mjs"
+    "test:vehicles": "node --test --experimental-strip-types tests/vehicle-commerce.test.mjs",
+    "test:social-auth": "node --test tests/social-auth.test.mjs tests/auth-session-cookies.test.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
@@ -84,6 +85,7 @@
     "html2canvas": "^1.4.1",
     "husky": "^9.0.11",
     "input-otp": "^1.4.2",
+    "jose": "^6.2.12",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^4.2.1",
     "lint-staged": "^15.4.2",
@@ -91,6 +93,7 @@
     "next": "16.3.4",
     "next-themes": "^0.4.6",
     "nodemailer": "^10.0.3",
+    "openid-client": "^6.8.8",
     "prettier": "^3.3.2",
     "prettier-plugin-tailwindcss": "^0.6.3",
     "prisma": "^5.22.0",

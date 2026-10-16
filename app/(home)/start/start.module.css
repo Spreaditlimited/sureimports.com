@@ -1,0 +1,56 @@
+.page { min-height: 75vh; background: var(--si-canvas); color: var(--si-ink); padding: 128px 16px 80px; }
+.container { max-width: 1024px; margin: auto; }
+.hero { text-align: center; max-width: 672px; margin: 0 auto 32px; }
+.heroIcon { display: grid; place-items: center; width: 64px; height: 64px; margin: auto; border-radius: 16px; color: var(--si-accent); background: var(--si-soft); }
+.hero .eyebrow { margin: 24px 0 0; color: var(--si-accent); font-size: 12px; font-weight: 700; line-height: 1.5; letter-spacing: .24em; text-transform: uppercase; }
+.hero h1 { margin: 12px 0; font-size: 36px; line-height: 1.2; font-weight: 700; letter-spacing: -.035em; text-wrap: balance; }
+.hero > p:not(.eyebrow) { max-width: 576px; margin: auto; font-size: 14px; line-height: 24px; color: var(--si-muted); }
+.guide { max-width: 672px; margin: auto; padding: 28px; border: 1px solid var(--si-border); border-radius: 20px; background: var(--si-surface); box-shadow: var(--si-shadow); }
+.progress { display: flex; align-items: center; justify-content: space-between; color: var(--si-accent); font-size: 12px; font-weight: 600; margin-bottom: 24px; }
+.progress > div { display: flex; gap: 6px; }
+.progress i { width: 32px; height: 4px; background: var(--si-border); border-radius: 4px; }
+.progress i.active { background: var(--si-accent); }
+.back { display: flex; align-items: center; gap: 6px; min-height: 44px; margin: -12px 0 12px; color: var(--si-muted); font-size: 13px; }
+.question { margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25; letter-spacing: -.035em; text-wrap: balance; }
+.question:focus { outline: none; }
+.intro { color: var(--si-muted); font-size: 15px; line-height: 1.7; margin: 12px 0 24px; }
+.choices { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 16px; }
+.choices .choice { position: relative; display: flex; flex-direction: column; align-items: flex-start; text-align: left; padding: 22px; gap: 12px; border: 1px solid var(--si-border); border-radius: 14px; color: var(--si-ink); background: var(--si-surface); transition: border-color .15s, background .15s; }
+.choice:hover, .choice[aria-pressed='true'] { border-color: var(--si-accent); background: var(--si-soft); }
+.choice strong { font-size: 17px; line-height: 1.4; font-weight: 600; }
+.choice > span:not(.icon) { font-size: 14px; color: var(--si-muted); line-height: 1.6; }
+.icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; background: var(--si-soft); color: var(--si-accent); }
+.arrow { position: absolute; top: 34px; right: 22px; color: var(--si-accent); }
+.note { font-size: 12px; color: var(--si-muted); line-height: 1.6; margin: 22px 0 0; text-align: center; }
+.benefits { padding: 18px 20px; background: var(--si-soft); border-radius: 12px; margin-bottom: 24px; }
+.benefits p { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; margin: 0; }
+.benefits p + p { margin-top: 12px; }
+.benefits svg { flex-shrink: 0; margin-top: 3px; color: var(--si-accent); }
+.primary { display: flex; justify-content: center; align-items: center; gap: 10px; min-height: 52px; padding: 14px 18px; text-align: center; border-radius: 10px; background: var(--si-primary); color: var(--si-on-primary); font-size: 15px; font-weight: 600; line-height: 1.5; }
+.primary svg { flex-shrink: 0; }
+.primary:hover { opacity: .9; }
+.shortcuts { max-width: 672px; margin: 40px auto 0; }
+.shortcuts h2 { font-size: 15px; font-weight: 500; text-align: center; margin-bottom: 18px; color: var(--si-muted); }
+.shortcuts > div { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.shortcuts a { display: flex; align-items: center; gap: 12px; padding: 18px; border: 1px solid var(--si-border); border-radius: 12px; color: var(--si-accent); }
+.shortcuts a:hover { background: var(--si-soft); }
+.shortcuts svg { flex-shrink: 0; }
+.shortcuts a span { flex: 1; min-width: 0; }
+.shortcuts strong { display: block; color: var(--si-ink); font-size: 13px; font-weight: 600; line-height: 1.5; }
+.shortcuts small { display: block; margin-top: 4px; font-size: 12px; color: var(--si-muted); line-height: 1.6; }
+@media(max-width: 640px) {
+  .page { padding: 128px 16px 64px; }
+  .hero { margin-bottom: 28px; }
+  .hero h1 { font-size: 30px; }
+  
+  .guide { padding: 24px 20px; border-radius: 16px; }
+  .choices, .shortcuts > div { grid-template-columns: 1fr; }
+  .choices .choice { padding: 18px 18px 18px 76px; gap: 6px; min-height: 120px; }
+  .choice .icon { position: absolute; top: 18px; left: 16px; width: 42px; height: 42px; }
+  .choice .arrow { display: none; }
+  .choice strong { font-size: 16px; }
+  .question { font-size: 22px; }
+  .intro { font-size: 14px; }
+  .benefits { padding: 16px; }
+}
+@media(prefers-reduced-motion: reduce) { .choices .choice { transition: none; } }

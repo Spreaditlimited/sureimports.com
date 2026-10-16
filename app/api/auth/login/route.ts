@@ -1,3 +1,4 @@
+import { sessionCookieLifetime } from '@/lib/auth/session-policy.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { generateToken } from '@/lib/jwt';
@@ -7,7 +8,7 @@ import { prisma } from '@/lib/prisma';
 import { claimAffiliateAttribution } from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
-  const { userEmail, userPassword, recaptchaToken } = await request.json();
+  const { userEmail, userPassword, recaptchaToken, rememberMe } = await request.json();
 
   const isCaptchaValid = await verifyRecaptchaToken(
     recaptchaToken,
@@ -164,6 +165,9 @@ export async function POST(request: NextRequest) {
     });
 
     response.cookies.set('token', token, {
+      ...sessionCookieLifetime(rememberMe),
+      path: '/',
+      sameSite: 'lax',
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
     });

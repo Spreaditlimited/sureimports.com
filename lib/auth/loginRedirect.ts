@@ -28,6 +28,7 @@ export function getIntelligenceSubscriptionResumePath(plan: string) {
 }
 
 export function getSafeLoginRedirect(redirectCandidate: string | null): string {
+  if (redirectCandidate === '/connect-social') return '/connect-social';
   if (!redirectCandidate) return DEFAULT_LOGIN_REDIRECT;
   if (
     !redirectCandidate.startsWith('/') ||

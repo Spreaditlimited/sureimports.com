@@ -5,12 +5,14 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
 
 import React, { useState } from 'react';
 import CreateOrderForm from './create-order-form';
+import styles from './create-order.module.css';
 import { PackagePlus, X } from 'lucide-react';
 
 interface CreateOrderProps {
@@ -34,30 +36,21 @@ function CreateOrder({ className, renderForm }: CreateOrderProps) {
           Create Order
         </Button>
       </DialogTrigger>
-      <DialogContent className="flex max-h-[90dvh] max-h-[90vh] w-[calc(100vw-2rem)] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white p-0 shadow-2xl dark:border-slate-700 dark:bg-[#161629] lg:max-w-5xl [&>button]:hidden">
-        <div className="relative shrink-0 overflow-hidden border-b border-slate-100 bg-white px-5 py-5 dark:border-slate-800 dark:bg-[#161629] sm:px-8">
-          <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-r from-blue-600/10 via-indigo-500/5 to-transparent dark:from-blue-600/20 dark:via-indigo-500/10" />
-          <div className="relative flex items-center justify-between gap-4">
-            <div>
-              <span className="mb-2 inline-flex items-center rounded-lg bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
-                Procurement
-              </span>
-              <DialogTitle className="flex items-center gap-2 text-2xl font-black text-slate-900 dark:text-white">
-                <PackagePlus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-                Create New Order
-              </DialogTitle>
-            </div>
-
-            <DialogClose className="rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-500 shadow-sm transition hover:bg-slate-200 hover:text-slate-900 dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close create order modal</span>
-            </DialogClose>
+      <DialogContent className={styles.dialog}>
+        <div className={styles.header}>
+          <div className={styles.headingIcon}><PackagePlus size={22} aria-hidden="true" /></div>
+          <div className={styles.headingCopy}>
+            <p className={styles.eyebrow}>Procurement</p>
+            <DialogTitle className={styles.title}>Create an order</DialogTitle>
+            <DialogDescription className={styles.description}>Set up your shipment, then add your products.</DialogDescription>
           </div>
+          <DialogClose className={styles.close}>
+            <X size={20} aria-hidden="true" />
+            <span className="sr-only">Close create order</span>
+          </DialogClose>
         </div>
-
-        <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6 dark:bg-[#161629] sm:px-8">
+        <div className={styles.body}>
           {renderForm ? renderForm(() => handleOpenChange(false)) : <CreateOrderForm setIsOpen={setIsOpen} />}
-          {/* <CreateOrderForm /> */}
         </div>
       </DialogContent>
     </Dialog>

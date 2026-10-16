@@ -1,4 +1,8 @@
 'use client';
+import AuthFrame from '@/components/auth-ui/AuthFrame';
+import AuthHeading from '@/components/auth-ui/AuthHeading';
+import AuthDivider from '@/components/auth-ui/AuthDivider';
+import SocialButtons from '@/components/apple/SocialButtons';
 import { readShopCheckoutDraft, splitShopContactName, SHOP_CHECKOUT_RESUME } from '@/lib/shop/checkoutDraft';
 
 import * as React from 'react';
@@ -371,74 +375,8 @@ export default function SignUpFormContainer() {
   // Wait for a real auth check before rendering form to avoid stale-state redirect loops.
   if (!authChecked && !user?.userEmail) return null;
 
-  return (
-    <div className="flex min-h-screen w-full">
-      
-      {/* LEFT PANEL: Brand & Visuals (Hidden on Mobile) */}
-      <div className="relative hidden w-1/2 flex-col justify-between bg-slate-900 p-12 lg:flex xl:p-16">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero-background-1.png"
-            alt="Global Logistics Port"
-            fill
-            className="object-cover opacity-30 mix-blend-luminosity"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent" />
-        </div>
-
-        <div className="relative z-10">
-          <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
-            <Image
-              src="/images/svg-logo-white.svg"
-              alt="Sure Imports"
-              width={180}
-              height={40}
-              className="h-8 w-auto"
-            />
-          </Link>
-        </div>
-
-        <div className="relative z-10 mb-10 max-w-xl">
-          <h1 className="mb-6 text-4xl font-black tracking-tight text-white xl:text-5xl leading-[1.1]">
-            GLOBAL LOGISTICS, <span className="text-brand-orange-500">STREAMLINED.</span>
-          </h1>
-          <p className="text-lg font-medium text-slate-300 leading-relaxed">
-            Securely manage your global import network from one centralized platform. Source, track, and trade with absolute confidence.
-          </p>
-        </div>
-      </div>
-
-      {/* RIGHT PANEL: Registration Form */}
-      <div className="flex w-full items-center justify-center bg-[#fcfcfd] px-4 py-12 dark:bg-slate-950 sm:px-8 lg:w-1/2">
-        <div className="w-full max-w-[480px]">
-          
-          {/* Mobile Logo */}
-          <div className="mb-8 flex justify-center lg:hidden">
-            <Link href="/">
-              <Image
-                src="/images/svg-logo.svg"
-                alt="Sure Imports"
-                width={160}
-                height={36}
-                className="h-10 w-auto"
-              />
-            </Link>
-          </div>
-
-          <div className="si-auth-fields py-2 sm:px-2 lg:p-0">
-            
-            <div className="mb-8 text-center lg:text-left">
-              <p className="mb-2 text-sm font-bold uppercase tracking-widest text-brand-orange-500">
-                Join 40,000+ Customers
-              </p>
-              <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
-                Create a Free Account
-              </h2>
-            </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+  return <AuthFrame><AuthHeading title="Create your account" description="Enter your details to get started with Sure Imports." /><Form {...form}>
+              <SocialButtons /><AuthDivider /><form onSubmit={form.handleSubmit(onSubmit)} className="si-personal-details space-y-5">
                 
                 {/* Name Grid */}
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -447,11 +385,11 @@ export default function SignUpFormContainer() {
                     name="userFirstname"
                     render={({ field }) => (
                       <FormItem>
-                        <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
+                        <label htmlFor="signup-userFirstname" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                            <Input placeholder="John" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                            <Input id="signup-userFirstname" autoComplete="given-name" placeholder="John" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage className="text-[11px] font-bold text-rose-500" />
@@ -463,11 +401,11 @@ export default function SignUpFormContainer() {
                     name="userLastname"
                     render={({ field }) => (
                       <FormItem>
-                        <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
+                        <label htmlFor="signup-userLastname" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
                         <FormControl>
                           <div className="relative">
                             <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                            <Input placeholder="Doe" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                            <Input id="signup-userLastname" autoComplete="family-name" placeholder="Doe" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage className="text-[11px] font-bold text-rose-500" />
@@ -482,11 +420,11 @@ export default function SignUpFormContainer() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
+                      <label htmlFor="signup-email" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
                       <FormControl>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input type="email" placeholder="you@example.com" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                          <Input id="signup-email" autoComplete="email" type="email" placeholder="you@example.com" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
                         </div>
                       </FormControl>
                       <FormMessage className="text-[11px] font-bold text-rose-500" />
@@ -500,11 +438,11 @@ export default function SignUpFormContainer() {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
+                      <label htmlFor="signup-phone" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
                       <FormControl>
                         <div className="relative">
                           <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input type="tel" placeholder="+234 800 000 0000" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                          <Input id="signup-phone" autoComplete="tel" type="tel" placeholder="+234 800 000 0000" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
                         </div>
                       </FormControl>
                       <FormMessage className="text-[11px] font-bold text-rose-500" />
@@ -518,12 +456,12 @@ export default function SignUpFormContainer() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Password</label>
+                      <label htmlFor="signup-password" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Password</label>
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input type={showPassword ? 'text' : 'password'} placeholder="Create a secure password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                          <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                          <Input id="signup-password" autoComplete="new-password" type={showPassword ? 'text' : 'password'} placeholder="Create a secure password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                          <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                             {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                           </button>
                         </div>
@@ -538,11 +476,11 @@ export default function SignUpFormContainer() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Confirm Password</label>
+                      <label htmlFor="signup-confirmPassword" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Confirm Password</label>
                       <FormControl>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
+                          <Input id="signup-confirmPassword" autoComplete="new-password" type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
                           <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
                             {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                           </button>
@@ -573,9 +511,7 @@ export default function SignUpFormContainer() {
                   </Button>
                 </div>
               </form>
-            </Form>
-
-            <div className="mt-8 space-y-4 text-center">
+            </Form><div className="mt-8 space-y-4 text-center">
               <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
                 Already have an account?{' '}
                 <Link href={loginHref} className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
@@ -586,12 +522,5 @@ export default function SignUpFormContainer() {
               <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-500">
                 By signing up, you agree to our <Link href="/terms-and-conditions" className="text-indigo-600 hover:underline dark:text-indigo-400">Terms of Service</Link> and <Link href="/privacy-policy" className="text-indigo-600 hover:underline dark:text-indigo-400">Privacy Policy</Link>. This site is protected by reCAPTCHA.
               </div>
-            </div>
-            
-          </div>
-        </div>
-      </div>
-      
-    </div>
-  );
+            </div></AuthFrame>;
 }

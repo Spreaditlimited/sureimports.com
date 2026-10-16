@@ -33,6 +33,7 @@ interface AuthContextType {
     userEmail: string,
     userPassword: string,
     recaptchaToken?: string,
+    rememberMe?: boolean,
   ) => Promise<void>;
   loginWithGoogle: (credential: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -114,6 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     userEmail: string,
     userPassword: string,
     recaptchaToken?: string,
+    rememberMe?: boolean,
   ) => {
     const searchParams =
       typeof window !== 'undefined'
@@ -132,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail, userPassword, recaptchaToken }),
+      body: JSON.stringify({ userEmail, userPassword, recaptchaToken, rememberMe: rememberMe === true }),
     });
     const data = await res.json();
     if (res.ok) {

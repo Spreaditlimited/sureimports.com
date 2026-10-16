@@ -50,6 +50,7 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         <p>© {new Date().getFullYear()} Sure Importers Limited<span>Spreadit Sourcing Limited · United Kingdom</span></p>
         <nav aria-label="Legal policies">
           <Link href={`${mainSite}/privacy-policy`}>Privacy</Link>
+          <Link href={`${mainSite}/delete-account`}>Delete account</Link>
           <Link href={`${mainSite}/terms-and-conditions`}>Terms</Link>
           <Link href={`${mainSite}/shipping-policy`}>Shipping</Link>
           <Link href={`${mainSite}/warranty-policy`}>Warranty</Link>

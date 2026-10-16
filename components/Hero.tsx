@@ -69,7 +69,7 @@ export default function Hero({
               asChild
               className="h-14 w-full rounded-full border-0 bg-brand-orange-500 px-8 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 hover:shadow-brand-orange-500/40 active:scale-[0.98] sm:w-auto"
             >
-              <Link href="/auth/login">
+              <Link href="/start">
                 Start Sourcing Now
               </Link>
             </Button>

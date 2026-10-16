@@ -19,7 +19,7 @@ export function proxy(request: NextRequest) {
 
   if (
     (pathname === '/auth/login' || pathname === '/login') &&
-    isAuthenticated
+    isAuthenticated && request.nextUrl.searchParams.get('next') !== '/connect-social'
   ) {
     const nextParam = request.nextUrl.searchParams.get('next');
     const safeNextPath = getSafeLoginRedirect(nextParam);

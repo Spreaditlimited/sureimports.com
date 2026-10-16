@@ -19,6 +19,7 @@ import {
   MapPin, 
   CheckCircle2
 } from 'lucide-react';
+import styles from './create-order.module.css';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -178,30 +179,42 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   if (savedOrders.length > 0 && !allowSeparateOrder) {
     const first = savedOrders[0];
     return (
-      <div className="rounded-2xl border border-blue-200 bg-blue-50 p-5 dark:border-blue-900 dark:bg-blue-950/30 sm:p-7">
-        <div className="flex items-start gap-4">
-          <div className="rounded-xl bg-blue-600 p-3 text-white"><BoxIcon className="h-5 w-5" /></div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-black text-slate-900 dark:text-white">You already have {savedOrders.length === 1 ? 'a saved order' : `${savedOrders.length} saved orders`}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-300">Most products can be added to one order. Continue the saved order below to avoid paying for separate shipments.</p>
-            <div className="mt-4 rounded-xl border border-blue-200 bg-white p-4 dark:border-blue-900 dark:bg-slate-900">
-              <p className="font-bold text-slate-900 dark:text-white">{first.orderName || first.pidOrder}</p>
-              <p className="mt-1 text-xs text-slate-500">{first.productCount} product{first.productCount === 1 ? '' : 's'} · {first.pidOrder}</p>
-            </div>
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <Button type="button" onClick={() => router.push(`/dashboard/procurement/add-product/${first.pidOrder}`)} className="min-h-12 flex-1 bg-blue-600 font-bold hover:bg-blue-700">Continue saved order</Button>
-              <Button type="button" variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className="min-h-12 flex-1 font-bold">View or combine saved orders</Button>
-            </div>
-            <button type="button" onClick={() => setAllowSeparateOrder(true)} className="mt-5 min-h-11 w-full text-sm font-bold text-slate-600 underline underline-offset-4 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">This is a separate shipment — create another order</button>
+      <section className={styles.saved} aria-labelledby="saved-order-heading">
+        <div className={styles.savedIntro}>
+          <div className={styles.savedIcon}><BoxIcon size={22} aria-hidden="true" /></div>
+          <div>
+            <p className={styles.eyebrow}>Continue where you left off</p>
+            <h3 id="saved-order-heading" className={styles.savedTitle}>
+              {savedOrders.length === 1 ? 'You have a saved order' : `You have ${savedOrders.length} saved orders`}
+            </h3>
           </div>
         </div>
-      </div>
+        <p className={styles.savedDescription}>Add more products to your saved order to keep them in one shipment.</p>
+        <div className={styles.orderSummary}>
+          <div className={styles.orderSummaryTop}>
+            <p className={styles.orderName}>{first.orderName || 'Untitled order'}</p>
+            <span className={styles.status}>Draft</span>
+          </div>
+          <p className={styles.orderMeta}>
+            <span>{first.productCount} product{first.productCount === 1 ? '' : 's'}</span>
+            <span className={styles.orderId}>{first.pidOrder}</span>
+          </p>
+        </div>
+        <div className={styles.savedActions}>
+          <Button type="button" onClick={() => router.push(`/dashboard/procurement/add-product/${first.pidOrder}`)} className={styles.primaryAction}>Continue saved order</Button>
+          <Button type="button" variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className={styles.secondaryAction}>View or combine saved orders</Button>
+        </div>
+        <div className={styles.separate}>
+          <p>Need a separate shipment?</p>
+          <button type="button" onClick={() => setAllowSeparateOrder(true)} className={styles.separateAction}>Create a separate order</button>
+        </div>
+      </section>
     );
   }
 
   return (
     <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
         
         {/* Basic Info Section */}
         <div className="grid gap-6 md:grid-cols-2">
@@ -216,7 +229,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
               <Input
                 {...register('orderName')}
                 id="orderName"
-                placeholder="E.g., Summer Electronics Restock"
+                placeholder="E.g. Phone accessories"
                 className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
               />
             </div>
@@ -225,7 +238,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Order Category */}
           <div className="space-y-3">
-            <label className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label htmlFor="orderCategory" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Category
             </label>
             <div className="relative">
@@ -236,7 +249,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 defaultValue=""
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger id="orderCategory" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
                       <SelectValue placeholder="Select Goods Category" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
@@ -255,7 +268,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Country */}
           <div className="space-y-3">
-            <label className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label htmlFor="destinationCountry" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Destination Country
             </label>
             <div className="relative">
@@ -272,7 +285,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                     }}
                     value={field.value}
                   >
-                    <SelectTrigger className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger id="destinationCountry" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
                       <SelectValue placeholder="Select Destination" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
@@ -352,7 +365,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
           
           {/* Shipping Plan */}
           <div className="space-y-3 md:col-span-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label htmlFor="shippingPlan" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
               Shipping Plan
             </label>
             <div className="relative">
@@ -363,7 +376,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 defaultValue=""
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry}>
-                    <SelectTrigger className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger id="shippingPlan" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
                       <SelectValue placeholder={selectedCountry ? "Select Shipping Plan" : "Select Country First"} />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
@@ -438,7 +451,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
             {isSubmitting ? (
               <><Loader2 className="h-5 w-5 animate-spin" /> Processing...</>
             ) : (
-              <><CheckCircle2 className="h-5 w-5" /> Initialize Order</>
+              <><CheckCircle2 className="h-5 w-5" /> Create order</>
             )}
           </Button>
         </div>

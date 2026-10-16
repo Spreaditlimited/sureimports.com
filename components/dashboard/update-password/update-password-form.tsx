@@ -131,7 +131,7 @@ function UpdatePasswordForm() {
                       />
                       <Input
                         className="mb-[16px] mt-[10px] bg-slate-100 pl-12 dark:bg-slate-800 dark:text-white max-sm:w-full lg:h-[60px]"
-                        placeholder="Admin@spreaditglobal.com"
+                        placeholder="Your account email"
                         {...field}
                         disabled
                       />

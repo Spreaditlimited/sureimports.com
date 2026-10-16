@@ -188,3 +188,22 @@ body { background: var(--si-canvas); color: var(--si-ink); }
 /* Sign-out is a dark action surface in both navbar and portaled mobile menu. */
 :is(.si-navbar,.si-menu) button[data-si-sign-out] { color: #fff; background-color: #1e293b; }
 :is(.si-navbar,.si-menu) button[data-si-sign-out]:hover { color: #fff; background-color: #334155; }
+
+/* Personal details: visible field boundaries and Unsaidbox's form rhythm. */
+.si-auth form.si-personal-details input:not([type='checkbox']):not([type='radio']) { height: 50px; min-height: 50px; border: 1px solid var(--si-border); border-radius: 8px; background: var(--si-surface); color: var(--si-ink); font-size: 16px; font-weight: 400; }
+.si-auth .si-personal-details label { display: block; font-size: 13px; font-weight: 500; text-transform: none; letter-spacing: normal; }
+.si-auth .si-personal-details input:focus-visible { outline: none; border-color: var(--si-accent); box-shadow: 0 0 0 3px color-mix(in srgb,var(--si-accent) 15%,transparent); }
+.si-auth .si-personal-details button[type='button'] { min-width: 44px; min-height: 44px; right: 4px; display: grid; place-items: center; }
+
+/* Explicit boundaries for every auth field, including shared border-none inputs. */
+.si-auth form :is(input:not([type='checkbox']):not([type='radio']):not([type='hidden']),select,textarea) {
+  border: 1px solid color-mix(in srgb, var(--si-ink,#202333) 28%, var(--si-surface,#fff));
+  border-radius: 8px;
+  background: var(--si-surface,#fff);
+  color: var(--si-ink,#202333);
+  min-height: 50px;
+  font-size: 16px;
+  box-shadow: none;
+}
+.si-auth form.si-personal-details input:not([type='checkbox']):not([type='radio']) { border-color: color-mix(in srgb,var(--si-ink,#202333) 28%,var(--si-surface,#fff)); }
+.si-auth form :is(input,select,textarea):focus-visible { border-color: var(--si-accent,#48439b); outline: 0; box-shadow: 0 0 0 3px color-mix(in srgb,var(--si-accent,#48439b) 16%,transparent); }

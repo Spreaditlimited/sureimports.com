@@ -1,7 +1,7 @@
+import AccountSecuritySettings from '@/components/dashboard/profile-update/AccountSecuritySettings';
 import UpdateBankDetailsFrom from '@/components/dashboard/profile-update/bank-detail-form';
 import ProfileUpdateForm from '@/components/dashboard/profile-update/profile-update-form';
 import React from 'react';
-import UpdatePassword from '../update-password/UpdatePassword';
 import DeleteAccountForm from '@/components/dashboard/delete-account/detele-account';
 import type { Metadata } from 'next';
 
@@ -30,9 +30,7 @@ function ProfileUpdate() {
     <div className="min-h-screen bg-slate-50 dark:bg-black">
       <ProfileUpdateForm />
       <div className="px-4 py-4">
-        <div className="mb-4 rounded-xl bg-white dark:bg-black">
-          <UpdatePassword />
-        </div>
+        <AccountSecuritySettings />
         <div className="mb-4 rounded-xl bg-white dark:bg-black">
           <UpdateBankDetailsFrom />
         </div>

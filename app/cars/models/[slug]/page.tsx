@@ -1,3 +1,4 @@
+import { vehicleEntitySchema } from '@/lib/vehicles/schema';
 import { getPlanSettings } from '@/lib/vehicles/plans';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -67,22 +68,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
   const schema = {
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'Vehicle',
-        '@id': `${url}#vehicle`,
-        name: model.name,
-        model: model.name,
-        description: model.description,
-        url,
-        image: model.images,
-        category: model.category,
-        fuelType: model.powertrain,
-        ...(['Ruichi', 'BYD', 'GAC', 'Changan', 'Chery', 'Avatr'].includes(
-          model.name.split(' ')[0],
-        )
-          ? { brand: { '@type': 'Brand', name: model.name.split(' ')[0] } }
-          : {}),
-      },
+      vehicleEntitySchema(vehicle),
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
