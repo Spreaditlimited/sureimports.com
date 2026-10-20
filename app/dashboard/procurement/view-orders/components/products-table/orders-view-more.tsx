@@ -1,7 +1,9 @@
 'use client';
 
+import { procurementStatusLabel } from '@/app/dashboard/procurement/constants/order-statuses';
 import CancellationPanel from '@/components/procurement/CancellationPanel';
 
+import DeviceShippingSummary, { type DeviceShippingSummaryData } from '@/components/DeviceShippingSummary';
 import React, { useEffect, useState, useRef } from 'react';
 import { 
   useParams, 
@@ -94,6 +96,7 @@ export default function MoreOrders({
     'completed',
   ].includes(status);
 
+  const [deviceShipping, setDeviceShipping] = useState<DeviceShippingSummaryData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isDisabled2, setIsDisabled2] = useState(false);
@@ -183,6 +186,7 @@ export default function MoreOrders({
 
       if (data.productsGetAll && data.productsGetAll.length > 0) {
         setGetAllProducts(data.productsGetAll);
+        setDeviceShipping(data.deviceShipping || null);
         setProductsTotalPrice(replaceNullWithZero(data.productsTotalPrice) as number);
         initialTotalCostOrder(replaceNullWithZero(data.initialTotalCost) as number);
         setProductsTotalCount(replaceNullWithZero(data.productsTotalCount) as number);
@@ -552,7 +556,7 @@ export default function MoreOrders({
           </div>
           <div className="text-right">
              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Status</p>
-             <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase">{status}</p>
+             <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 ">{procurementStatusLabel(status)}</p>
           </div>
         </div>
 
@@ -565,6 +569,7 @@ export default function MoreOrders({
             <p className="mt-1 text-sm leading-6 text-indigo-900 dark:text-indigo-200">
               The actual {shippingPlanUnit === 'CBM' ? 'volume' : 'weight'} and shipping cost will be determined when your products arrive at our warehouse in Guangzhou, China.
             </p>
+            <DeviceShippingSummary value={deviceShipping} embedded />
           </div>
         </div>
 
@@ -830,7 +835,7 @@ export default function MoreOrders({
         {/* SAVED - Initial Payment */}
         {status === 'saved' && (
           <div className="border-t border-slate-100 bg-indigo-50/50 p-6 dark:border-slate-800 dark:bg-indigo-900/10">
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div className="flex flex-col gap-6">
               <div className="flex-1">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
@@ -845,7 +850,7 @@ export default function MoreOrders({
                   </div>
                 </label>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className={styles.paymentActions}>
                 <PaystackProcurementPaymentButton
                   amount={paymentDueUsd}
                   amountNaira={paymentDueNaira}
@@ -860,7 +865,7 @@ export default function MoreOrders({
                   service_id={pidOrder}
                   service_name={'PROCUREMENT'}
                   description={'General Procurement & Shipping Service'}
-                  isDisabled={isDisabled}
+                  isDisabled={isDisabled && !deviceShipping?.unclassified}
                   nextStatus="pending"
                   enforceMinimumOrderRules
                   minimumOrderNgn={minimumOrderNgn}
@@ -870,7 +875,7 @@ export default function MoreOrders({
                     : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                 />
                 <Button
-                  disabled={!isDisabled}
+                  disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                   className={bankDepositStyles.button}
                   onClick={() => {
                     goToBankPayment({
@@ -887,7 +892,7 @@ export default function MoreOrders({
                 </Button>
                 {isWalletEligibleForOrder && (
                   <Button
-                    disabled={!isDisabled}
+                    disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                     className={isDisabled
                       ? "h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
                       : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -917,9 +922,9 @@ export default function MoreOrders({
                    <p className="text-xs text-slate-500">Your order is protected end-to-end.</p>
                  </div>
                </div>
-               <div className="flex w-full md:w-auto items-center gap-2 rounded-xl border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+               <div className={`${styles.promoCodeField} flex w-full md:w-auto items-center gap-2 rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900`}>
                   <div className="pl-3"><Ticket className="h-4 w-4 text-slate-400" /></div>
-                  <input type="text" placeholder="Promo code" className="h-10 w-full bg-transparent px-2 text-sm focus:outline-none dark:text-white" />
+                  <input data-si-unstyled type="text" aria-label="Promo code" placeholder="Promo code" className="h-10 min-w-0 w-full border-0 bg-transparent px-2 text-sm shadow-none focus:outline-none focus:ring-0 dark:text-white" />
                   <Button className="h-10 rounded-lg bg-slate-900 px-6 text-xs font-bold text-white hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500">Apply</Button>
                </div>
             </div>
@@ -963,7 +968,7 @@ export default function MoreOrders({
                 )}
 
                 {onHoldDifference > 0 && (
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className={styles.paymentActions}>
                     <PaystackProcurementPaymentButton
                       amount={paymentDueUsd}
                       amountNaira={paymentDueNaira}
@@ -978,14 +983,14 @@ export default function MoreOrders({
                       service_id={pidOrder}
                       service_name={'PROCUREMENT'}
                       description={'General Procurement & Shipping Service'}
-                      isDisabled={isDisabled}
+                      isDisabled={isDisabled && !deviceShipping?.unclassified}
                       nextStatus="pending"
                       className={isDisabled 
                         ? "flex h-12 flex-1 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                         : "flex h-12 flex-1 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                     />
                 <Button
-                      disabled={!isDisabled}
+                      disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                       className={`${bankDepositStyles.button} flex-1`}
                       onClick={() => {
                         goToBankPayment({
@@ -1002,7 +1007,7 @@ export default function MoreOrders({
                     </Button>
                     {isWalletEligibleForOrder && (
                       <Button
-                        disabled={!isDisabled}
+                        disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                         className={isDisabled
                           ? "h-12 flex-1 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
                           : "h-12 flex-1 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -1053,7 +1058,7 @@ export default function MoreOrders({
                     <p className="text-sm font-bold text-slate-900 dark:text-white">Accept Terms & Conditions</p>
                   </div>
                 </label>
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className={styles.paymentActions}>
                   <PaystackProcurementPaymentButton
                     amount={paymentDueUsd}
                     amountNaira={paymentDueNaira}
@@ -1068,14 +1073,14 @@ export default function MoreOrders({
                     service_id={pidOrder}
                     service_name={'PROCUREMENT'}
                     description={'General Procurement & Shipping Service'}
-                    isDisabled={isDisabled}
+                    isDisabled={isDisabled && !deviceShipping?.unclassified}
                     nextStatus="in-transit"
                     className={isDisabled 
                       ? "flex h-12 items-center justify-center rounded-xl bg-indigo-600 px-6 font-bold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500" 
                       : "flex h-12 items-center justify-center rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
                   />
                   <Button
-                    disabled={!isDisabled}
+                    disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                     className={bankDepositStyles.button}
                     onClick={() => {
                       goToBankPayment({
@@ -1094,7 +1099,7 @@ export default function MoreOrders({
                   </Button>
                   {isWalletEligibleForOrder && (
                     <Button
-                      disabled={!isDisabled}
+                      disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                       className={isDisabled
                         ? "h-12 rounded-xl bg-emerald-600 px-6 font-bold text-white shadow-md transition hover:bg-emerald-500"
                         : "h-12 rounded-xl bg-slate-200 px-6 font-bold text-slate-400 cursor-not-allowed dark:bg-slate-800"}
@@ -1132,7 +1137,7 @@ export default function MoreOrders({
                 </label>
                 <Button 
                   type="submit"
-                  disabled={!isDisabled}
+                  disabled={!isDisabled || Boolean(deviceShipping?.unclassified)}
                   onClick={() => setActionType('in-transit')}
                   className="h-12 rounded-xl bg-indigo-600 px-8 font-bold text-white shadow-lg transition hover:bg-indigo-500"
                 >

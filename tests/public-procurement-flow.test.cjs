@@ -41,7 +41,7 @@ test('shipping changes need measurement review and optional notes can be empty',
   assert.match(draft.productProblem({ ...product(), productQuantity: '1.5' }, '1688', 'CNY'), /whole-number/);
 });
 test('draft schema round trips multiple products and unfinished input without losing review flags', () => {
-  const value = { version: 1, draftId: 'draft-1234567890123456', shop: '1688', currency: 'CNY', destinationCountry: 'NG', shippingPlan: 'AIR', products: [product(), { ...product(), id: 'two', review: true }], current: { ...draft.emptyProduct(), productLink: 'unfinished' } };
+  const value = { version: 1, draftId: 'draft-1234567890123456', shop: '1688', currency: 'CNY', destinationCountry: 'NG', shippingPlan: 'AIR', orderCategory: 'Other Goods', products: [product(), { ...product(), id: 'two', review: true }], current: { ...draft.emptyProduct(), productLink: 'unfinished' } };
   const restored = draft.publicDraftSchema.parse(JSON.parse(JSON.stringify(value)));
   assert.equal(JSON.stringify(restored), JSON.stringify(value));
   assert.equal(draft.publicDraftSchema.safeParse({ version: 7 }).success, false);
@@ -88,7 +88,8 @@ test('delivery update enforces ownership, saved status and optimistic concurrenc
   let captured;
   let changed = 1;
   const route = load('app/api/procurement/delivery/route.ts', {
-    '@/lib/prisma': { prisma: { orders: { updateMany: async args => { captured = args; return { count: changed }; } } } },
+    '@/lib/procurement/shippingPricing': { resolveNewProcurementShippingPricing: async () => ({ version: 2, measurementUnit: 'KG', rate: 10, rateCurrency: 'USD' }) },
+    '@/lib/prisma': { prisma: { orders: { findFirst: async () => ({ destinationCountry: 'NG', shippingPlan: 'AIR', shippingPricingVersion: 2, shippingMeasurementUnit: 'KG' }), updateMany: async args => { captured = args; return { count: changed }; } } } },
     '@/lib/procurement/assistance': { requireProcurementUser: async () => ({ pidUser: 'owner' }) },
     '@/lib/refunds/request-auth': { sameOriginMutation: () => true },
   });
@@ -103,7 +104,7 @@ test('saved order cannot be paid before its delivery address is supplied', async
   const order = { pidOrder: 'order', status: 'saved', currencyType: 'CNY', destinationCountry: 'NG', shippingPlan: 'AIR', shippingPricingVersion: 2, shippingMeasurementUnit: 'KG', shippingRateSnapshot: 10, shippingRateCurrency: 'USD', shippingAddress: '' };
   const lifecycle = load('lib/procurement/orderLifecycle.ts', {
     '@/lib/prisma': { prisma: {
-      orders: { findFirst: async () => order }, products: { findMany: async () => [{ productPrice: 100, productQuantity: 10, shippingMeasurePerUnit: 1 }] },
+      orders: { findFirst: async () => order }, products: { findMany: async () => [{ productCategory: 'OTHER', productPrice: 100, productQuantity: 10, shippingMeasurePerUnit: 1 }] },
       country: { findUnique: async () => ({ countryName: 'Nigeria' }) }, shippingplan: { findUnique: async () => ({ shippingPlanName: 'AIR_SHIPPING', shippingPlanRate: 10, shippingPlanUnit: 'KG' }) },
       exchange_rate: { findUnique: async () => ({ exNairaToDollar: '1500', exYuanToDollar: '7', exNairaToYuan: '220', serviceCharge: '10', vat: '7.5' }) }, $queryRaw: async () => [],
     } },
@@ -111,4 +112,57 @@ test('saved order cannot be paid before its delivery address is supplied', async
   assert.equal((await lifecycle.getProcurementOrderLifecycle('order')).payment.isPayable, false);
   order.shippingAddress = '12 Test Street, Lagos';
   assert.equal((await lifecycle.getProcurementOrderLifecycle('order')).payment.isPayable, true);
+});
+
+test('older browser drafts default goods category without losing products',()=>{const value={version:1,draftId:'old',shop:'1688',currency:'CNY',destinationCountry:'NG',shippingPlan:'AIR',products:[product()],current:draft.emptyProduct()};const restored=draft.publicDraftSchema.parse(value);assert.equal(restored.orderCategory,'Other Goods');assert.equal(restored.products[0].id,'one');});
+test('saved-order category edits reject Normal shipping and accept a compatible replacement', async () => {
+  let captured;
+  const existing = { destinationCountry: 'UK', shippingPlan: 'normal', shippingPricingVersion: 2, shippingMeasurementUnit: 'KG' };
+  const route = load('app/api/procurement/delivery/route.ts', {
+    '@/lib/prisma': { prisma: {
+      orders: { findFirst: async () => existing, updateMany: async args => { captured = args; return { count: 1 }; } },
+      country: { findUnique: async ({ select }) => ({ countryName: 'United Kingdom', shippingPlans: [{ shippingPlanName: select.shippingPlans.where.pidShippingPlan === 'normal' ? 'NORMAL_SHIPPING' : 'SPECIAL_SHIPPING', shippingPlanRate: 12 }] }) },
+    } },
+    '@/lib/procurement/assistance': { requireProcurementUser: async () => ({ pidUser: 'owner' }) },
+    '@/lib/refunds/request-auth': { sameOriginMutation: () => true },
+  });
+  const body = { pidOrder: 'order', orderName: 'Battery order', shippingAddress: '12 Test Street, London', orderCategory: 'Goods with Battery', updatedAt: '2026-10-17T10:00:00.000Z' };
+  assert.equal((await route.PATCH({ json: async () => body })).status, 400);
+  assert.equal(captured, undefined);
+  assert.equal((await route.PATCH({ json: async () => ({ ...body, shippingPlan: 'special' }) })).status, 200);
+  assert.equal(captured.data.shippingPlan, 'special');
+  assert.equal(captured.data.shippingRateSnapshot, 12);
+  assert.equal(captured.data.orderCategory, 'Goods with Battery');
+});
+test('Nigeria phones and laptops need no measurement; other destinations and accessories still do', () => {
+  for (const productCategory of ['PHONE', 'LAPTOP']) {
+    const item = { ...product(), productCategory, productWeight: '', measurementReview: true };
+    assert.equal(draft.productProblem(item, '1688', 'CNY', 'Nigeria'), null);
+    assert.match(draft.productProblem(item, '1688', 'CNY', 'United Kingdom'), /measurement/);
+    assert.match(draft.productProblem({ ...item, productCategory: 'OTHER' }, '1688', 'CNY', 'Nigeria'), /measurement/);
+  }
+});
+test('add-product API waives measurement only for Nigeria devices and stores zero', async () => {
+  let country = 'Nigeria', saved;
+  const db = {
+    orders: { findFirst: async () => ({ destinationCountry: 'country', status: 'saved', shippingPricingVersion: 2 }) },
+    country: { findUnique: async () => ({ countryName: country }) },
+    products: { create: async ({ data }) => { saved = data; return data; } },
+  };
+  const route = load('app/api/crud/procurement-add-product/route.ts', {
+    '@prisma/client': { PrismaClient: function () { return db; } },
+    '@/lib/procurement/assistance': { requireProcurementUser: async () => ({ pidUser: 'owner' }) },
+  });
+  const body = { ...product(), pidProduct: 'product', pidOrder: 'order', productCategory: 'PHONE', productWeight: '' };
+  let result = await route.POST({ json: async () => body });
+  assert.equal((await result.json()).responsex.status, 'SUCCESS');
+  assert.equal(saved.shippingMeasurePerUnit, 0);
+  saved = undefined;
+  country = 'United Kingdom';
+  result = await route.POST({ json: async () => body });
+  assert.equal(result.status, 400);
+  assert.equal(saved, undefined);
+  country = 'Nigeria';
+  result = await route.POST({ json: async () => ({ ...body, productCategory: 'OTHER' }) });
+  assert.equal(result.status, 400);
 });

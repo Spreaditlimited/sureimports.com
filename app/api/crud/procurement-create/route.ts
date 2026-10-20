@@ -4,7 +4,7 @@ import { resolveNewProcurementShippingPricing } from '@/lib/procurement/shipping
 import { prisma } from '@/lib/prisma';
 import { requireProcurementUser } from '@/lib/procurement/assistance';
 
-export async function POST(request: Request) {
+async function createOrder(request: Request) {
   const {
     pidOrder,
     pidUser,
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       shippingPricing = await resolveNewProcurementShippingPricing(
         destinationCountry,
         shippingPlan,
+        orderCategory,
       );
     } catch (error) {
       const responsex = {
@@ -63,6 +64,8 @@ export async function POST(request: Request) {
         shippingPlan,
         orderCategory,
         shippingAddress,
+        devicePhoneRateNgn: shippingPricing.devicePhoneRateNgn,
+        deviceLaptopRateNgn: shippingPricing.deviceLaptopRateNgn,
         shippingPricingVersion: shippingPricing.version,
         shippingMeasurementUnit: shippingPricing.measurementUnit,
         shippingRateSnapshot: shippingPricing.rate,
@@ -111,4 +114,16 @@ export async function POST(request: Request) {
   }
 
   //END
+}
+
+export async function POST(request: Request) {
+  try {
+    return await createOrder(request);
+  } catch (error) {
+    console.error('Procurement order creation failed', {
+      name: error instanceof Error ? error.name : 'UnknownError',
+      code: typeof error === 'object' && error && 'code' in error ? error.code : undefined,
+    });
+    return NextResponse.json({ responsex: { status: 'FAILED', message: 'We could not save your order. Your form details are still here. Please try again shortly.' }, successx: false }, { status: 500 });
+  }
 }

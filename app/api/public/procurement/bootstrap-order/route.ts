@@ -1,3 +1,4 @@
+import { validDeviceType, usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import {
@@ -19,6 +20,7 @@ type ProductInput = {
   productName: string;
   productLink: string;
   productPrice: number;
+  productCategory?: string;
   productWeight: number;
   productQuantity: number;
   productInfo?: string;
@@ -120,8 +122,7 @@ export async function POST(request: NextRequest) {
         !item.productLink ||
         !Number.isFinite(Number(item.productPrice)) ||
         Number(item.productPrice) < 0.01 ||
-        !Number.isFinite(Number(item.productWeight)) ||
-        Number(item.productWeight) <= 0 ||
+        !validDeviceType(item.productCategory ?? 'OTHER') ||
         !Number.isSafeInteger(Number(item.productQuantity)) ||
         Number(item.productQuantity) < 1,
     );
@@ -176,6 +177,7 @@ export async function POST(request: NextRequest) {
       shippingPricing = await resolveNewProcurementShippingPricing(
         destinationCountry,
         shippingPlan,
+        orderCategory,
       );
     } catch (error) {
       return NextResponse.json(
@@ -188,6 +190,11 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 },
       );
+    }
+
+    for (const item of normalizedProducts) {
+      if (usesDeviceFlatFee(shippingPricing.countryName, item.productCategory)) item.productWeight = 0;
+      else if (!Number.isFinite(Number(item.productWeight)) || Number(item.productWeight) <= 0) return NextResponse.json({ statusx: 'FAILED_VALIDATION', message: 'Enter a per-item weight or volume greater than zero for products without a flat device fee.' }, { status: 400 });
     }
 
     const token = request.cookies.get('token')?.value;
@@ -283,7 +290,9 @@ export async function POST(request: NextRequest) {
             shippingPlan,
             orderCategory,
             shippingAddress,
-            shippingPricingVersion: shippingPricing.version,
+            devicePhoneRateNgn: shippingPricing.devicePhoneRateNgn,
+        deviceLaptopRateNgn: shippingPricing.deviceLaptopRateNgn,
+        shippingPricingVersion: shippingPricing.version,
             shippingMeasurementUnit: shippingPricing.measurementUnit,
             shippingRateSnapshot: shippingPricing.rate,
             shippingRateCurrency: shippingPricing.rateCurrency,
@@ -301,6 +310,7 @@ export async function POST(request: NextRequest) {
             productName: normalize(item.productName),
             productLink: item.productLink!,
             productPrice: Number(item.productPrice),
+            productCategory: item.productCategory ?? 'OTHER',
             shippingMeasurePerUnit: Number(item.productWeight),
             productQuantity: Number(item.productQuantity),
             productInfo: normalize(item.productInfo),

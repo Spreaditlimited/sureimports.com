@@ -1,3 +1,4 @@
+import { validDeviceType, usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import { random } from 'lodash';
@@ -30,14 +31,15 @@ export async function POST(request: Request) {
     emailUser,
     productName,
     productLink,
-    //productCategory,
+    productCategory = 'OTHER',
     productPrice,
     productWeight,
     productQuantity,
     productInfo,
   } = await request.json();
+  if (!validDeviceType(productCategory)) return NextResponse.json({ responsex: { status: 'INVALID_PRODUCT', message: 'Choose Phone, Laptop or Other goods.' }, successx: false }, { status: 400 });
   const normalizedProductLink = normalizeProductUrl(productLink);
-  const measurementValue = Number(productWeight);
+  let measurementValue = Number(productWeight);
   const quantityValue = Number(productQuantity);
 
   if (!normalizedProductLink) {
@@ -51,9 +53,7 @@ export async function POST(request: Request) {
     );
   }
   if (
-    !Number.isFinite(measurementValue) ||
-    measurementValue <= 0 ||
-    !Number.isFinite(quantityValue) ||
+    (!Number.isFinite(quantityValue) || (productCategory !== 'OTHER' && !Number.isSafeInteger(quantityValue))) ||
     quantityValue < 1
   ) {
     const responsex = {
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     const existingProduct = await prisma.products.findFirst({
       where: { pidUser: user.pidUser, pidProduct },
       select: {
-        orders: { select: { shippingPricingVersion: true, status: true, orderType: true } },
+        orders: { select: { devicePhoneRateNgn: true, deviceLaptopRateNgn: true, destinationCountry: true, shippingPricingVersion: true, status: true, orderType: true } },
       },
     });
     if (!existingProduct) {
@@ -120,6 +120,9 @@ export async function POST(request: Request) {
         { status: 409 },
       );
     }
+    const destination = existingProduct.orders.destinationCountry ? await prisma.country.findUnique({ where: { pidCountry: existingProduct.orders.destinationCountry }, select: { countryName: true } }) : null;
+    if ((existingProduct.orders.status === 'saved' || (existingProduct.orders.devicePhoneRateNgn != null && existingProduct.orders.deviceLaptopRateNgn != null)) && usesDeviceFlatFee(destination?.countryName, productCategory)) measurementValue = 0;
+    else if (!Number.isFinite(measurementValue) || measurementValue <= 0) return NextResponse.json({ responsex: { status: 'INVALID_MEASUREMENT', message: 'Enter a per-item weight or volume greater than zero.' }, successx: false }, { status: 400 });
     const usesMeasurementPricing =
       existingProduct.orders.shippingPricingVersion === 2;
 
@@ -128,7 +131,8 @@ export async function POST(request: Request) {
       data: {
         productName,
         productLink: normalizedProductLink,
-        //productCategory,
+
+        productCategory,
         productPrice: parseFloat(productPrice),
         productWeight: usesMeasurementPricing ? undefined : measurementValue,
         shippingMeasurePerUnit: usesMeasurementPricing

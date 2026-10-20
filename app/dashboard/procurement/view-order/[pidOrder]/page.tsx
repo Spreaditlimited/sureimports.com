@@ -78,18 +78,20 @@ export default function ViewOrderPage() {
 
   return (
     <div className={`${styles.detail} space-y-5`}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
       <Button
         variant="outline"
-        className="rounded-xl"
+        className="min-h-11 w-full rounded-xl sm:w-auto"
         onClick={() =>
           router.push(`/dashboard/procurement/view-orders/${returnStatus}`)
         }
       >
         <ArrowLeft className="mr-2 h-4 w-4" /> Back to Orders
       </Button>
+      {supportEnabled && !loading && !error && <Button asChild variant="outline" className="min-h-11 w-full rounded-xl sm:w-auto"><Link href={`/dashboard/support?order=${encodeURIComponent(pidOrder)}`}>Get help with this order</Link></Button>}
+      </div>
 
       {loading ? <div className={styles.feedback} role="status">Loading order details…</div> : error ? <div className={styles.feedback} role="alert">Unable to load this order.<br /><button onClick={() => setRetry(value => value + 1)}>Try again</button></div> : <>
-      {supportEnabled && <Button asChild variant="outline"><Link href={`/dashboard/support?order=${encodeURIComponent(pidOrder)}`}>Get help with this order</Link></Button>}
       <DeliveryDetails pidOrder={pidOrder} onReady={setDeliveryReady} />
       {deliveryReady && (
         <MoreOrders products={products || []} statusOverride={returnStatus} />

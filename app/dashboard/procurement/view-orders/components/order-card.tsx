@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
@@ -19,6 +20,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
+  Pencil,
   PackageSearch,
   Trash2,
   PlusCircle,
@@ -154,7 +156,8 @@ export default function OrderCard({ id, order, onDelete, partner }: OrderCardPro
             </div>
 
             {/* Right Action Section */}
-            <div className="flex items-center gap-2 sm:shrink-0">
+            <div className="flex flex-wrap items-center gap-2 sm:shrink-0">
+              {!partner && order.status === 'saved' && <Link href={`/dashboard/procurement/view-order/${encodeURIComponent(order.pidOrder)}?statusx=saved#order-details`} className="inline-flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 px-4 text-xs font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-200"><Pencil className="h-4 w-4" aria-hidden="true" />Edit order</Link>}
               {/* Add Product Button */}
               {(partner ? Boolean(partner.onAddProduct) : order.status === 'saved' || order.status === 'on-hold') && (
                 <button

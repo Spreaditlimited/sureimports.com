@@ -135,6 +135,7 @@ async function currentCost(row: Row) {
     resolveNewProcurementShippingPricing(
       input.destinationCountry,
       input.shippingPlan,
+      input.orderCategory,
     ),
     prisma.exchange_rate.findUnique({ where: { id: 1 } }),
     prisma.procurement_partners.findUnique({ where: { id: row.partnerId } }),
@@ -234,6 +235,7 @@ export async function editCustomerOrder(
   const shipping = await resolveNewProcurementShippingPricing(
     parsed.data.destinationCountry,
     parsed.data.shippingPlan,
+    parsed.data.orderCategory,
   );
   if (shipping.countryName.toLowerCase() !== 'nigeria')
     throw new FlowError('Nigeria only.', 422);

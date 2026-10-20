@@ -1,3 +1,4 @@
+import { validDeviceType, usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import { random } from 'lodash';
@@ -23,14 +24,15 @@ export async function POST(request: Request) {
     emailUser,
     productName,
     productLink,
-    //productCategory,
+    productCategory = 'OTHER',
     productPrice,
     productWeight,
     productQuantity,
     productInfo,
   } = await request.json();
+  if (!validDeviceType(productCategory)) return NextResponse.json({ responsex: { status: 'INVALID_PRODUCT', message: 'Choose Phone, Laptop or Other goods.' }, successx: false }, { status: 400 });
   const normalizedProductLink = normalizeProductUrl(productLink);
-  const measurementValue = Number(productWeight);
+  let measurementValue = Number(productWeight);
   const quantityValue = Number(productQuantity);
 
   console.log('JESUS IS KING');
@@ -40,11 +42,8 @@ export async function POST(request: Request) {
     !normalizedProductLink ||
     //productCategory === '' ||
     productPrice === '' ||
-    productWeight === '' ||
     productQuantity === '' ||
-    !Number.isFinite(measurementValue) ||
-    measurementValue <= 0 ||
-    !Number.isFinite(quantityValue) ||
+    (!Number.isFinite(quantityValue) || (productCategory !== 'OTHER' && !Number.isSafeInteger(quantityValue))) ||
     quantityValue < 1
   ) {
     const responsex = {
@@ -66,7 +65,7 @@ export async function POST(request: Request) {
 
     const order = await prisma.orders.findFirst({
       where: { pidOrder, pidUser: user.pidUser },
-      select: { shippingPricingVersion: true, status: true, orderType: true },
+      select: { devicePhoneRateNgn: true, deviceLaptopRateNgn: true, destinationCountry: true, shippingPricingVersion: true, status: true, orderType: true },
     });
     if (!order) {
       const responsex = { message: 'Order not found.', status: 'ORDER_NOT_FOUND' };
@@ -85,6 +84,9 @@ export async function POST(request: Request) {
         { status: 409 },
       );
     }
+    const destination = order.destinationCountry ? await prisma.country.findUnique({ where: { pidCountry: order.destinationCountry }, select: { countryName: true } }) : null;
+    if ((order.status === 'saved' || (order.devicePhoneRateNgn != null && order.deviceLaptopRateNgn != null)) && usesDeviceFlatFee(destination?.countryName, productCategory)) measurementValue = 0;
+    else if (!Number.isFinite(measurementValue) || measurementValue <= 0) return NextResponse.json({ responsex: { status: 'INVALID_MEASUREMENT', message: 'Enter a per-item weight or volume greater than zero.' }, successx: false }, { status: 400 });
     const usesMeasurementPricing = order.shippingPricingVersion === 2;
 
     const createx = await prisma.products.create({
@@ -94,6 +96,7 @@ export async function POST(request: Request) {
         pidUser: user.pidUser,
         productName,
         productLink: normalizedProductLink,
+        productCategory,
         productPrice: parseFloat(productPrice),
         productWeight: usesMeasurementPricing ? null : measurementValue,
         shippingMeasurePerUnit: usesMeasurementPricing

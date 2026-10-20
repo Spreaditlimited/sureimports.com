@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  isShippingPlanAllowed,
+  requiresSpecialHandling,
+  shippingEligibilityMessage,
+} from '@/lib/procurement/shippingEligibility';
 import React, { Suspense, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
@@ -7,17 +12,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
 
-import { 
-  User, 
-  Globe, 
-  CreditCard, 
-  ShipIcon, 
-  BoxIcon, 
-  AlertCircle, 
-  Info, 
-  Loader2, 
-  MapPin, 
-  CheckCircle2
+import {
+  User,
+  Globe,
+  CreditCard,
+  ShipIcon,
+  BoxIcon,
+  AlertCircle,
+  Info,
+  Loader2,
+  MapPin,
+  CheckCircle2,
 } from 'lucide-react';
 import styles from './create-order.module.css';
 import { Button } from '@/components/ui/button';
@@ -76,7 +81,10 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface ReportFormProps {
   setIsOpen: React.Dispatch<React.SetStateAction<{ isOpen: boolean }>>;
-  partner?: { countries: Country[]; onSubmit: (values: FormValues) => Promise<void> };
+  partner?: {
+    countries: Country[];
+    onSubmit: (values: FormValues) => Promise<void>;
+  };
 }
 
 const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
@@ -93,7 +101,9 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
-  const [savedOrders, setSavedOrders] = useState<Array<{ pidOrder: string; orderName: string | null; productCount: number }>>([]);
+  const [savedOrders, setSavedOrders] = useState<
+    Array<{ pidOrder: string; orderName: string | null; productCount: number }>
+  >([]);
   const [checkingDrafts, setCheckingDrafts] = useState(true);
   const [allowSeparateOrder, setAllowSeparateOrder] = useState(false);
 
@@ -109,19 +119,23 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   });
 
   useEffect(() => {
-    if (partner) { setCountries(partner.countries); setCheckingDrafts(false); return; }
+    if (partner) {
+      setCountries(partner.countries);
+      setCheckingDrafts(false);
+      return;
+    }
     const fetchCountries = async () => {
       try {
         const response = await fetch('/api/get-data/countries-shipping-plan');
         const data = await response.json();
         setCountries(data);
       } catch (error) {
-        console.error("Failed to load countries", error);
+        console.error('Failed to load countries', error);
       }
     };
     fetchCountries();
     fetch('/api/procurement/drafts', { cache: 'no-store' })
-      .then((response) => response.ok ? response.json() : { orders: [] })
+      .then((response) => (response.ok ? response.json() : { orders: [] }))
       .then((data) => setSavedOrders(data.orders || []))
       .finally(() => setCheckingDrafts(false));
   }, [partner]);
@@ -131,6 +145,24 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
     setSelectedCountry(country);
     setValue('shippingPlan', '');
   };
+  const category = watch('orderCategory');
+  const shippingPlanId = watch('shippingPlan');
+  const availablePlans =
+    selectedCountry?.shippingPlans.filter((plan) =>
+      isShippingPlanAllowed(category, plan.shippingPlanName),
+    ) || [];
+  useEffect(() => {
+    if (
+      shippingPlanId &&
+      selectedCountry &&
+      !selectedCountry.shippingPlans.some(
+        (plan) =>
+          plan.pidShippingPlan === shippingPlanId &&
+          isShippingPlanAllowed(category, plan.shippingPlanName),
+      )
+    )
+      setValue('shippingPlan', '');
+  }, [category, shippingPlanId, selectedCountry, setValue]);
   const selectedShippingPlan = selectedCountry?.shippingPlans.find(
     (plan) => plan.pidShippingPlan === watch('shippingPlan'),
   );
@@ -138,11 +170,23 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
     if (partner) {
-      try { await partner.onSubmit(formData); setIsOpen({ isOpen: false }); }
-      catch (error) { toast.error(error instanceof Error ? error.message : 'Unable to save order.'); }
+      try {
+        await partner.onSubmit(formData);
+        setIsOpen({ isOpen: false });
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : 'Unable to save order.',
+        );
+      }
       return;
     }
-    const submissionData = { ...formData, pidOrder, pidUser, emailUser, allowSeparateOrder };
+    const submissionData = {
+      ...formData,
+      pidOrder,
+      pidUser,
+      emailUser,
+      allowSeparateOrder,
+    };
 
     try {
       const response = await fetch('/api/crud/procurement-create', {
@@ -151,29 +195,38 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
         body: JSON.stringify(submissionData),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
+      if (!data?.responsex) {
+        throw new Error('The server could not save your order. Your form details are still here. Please try again shortly.');
+      }
 
       if (data.responsex.status === 'SUCCESS') {
         setIsOpen({ isOpen: false });
         navigateWithAlert(
           '/dashboard/procurement/add-product/' + data.responsex.pidOrder,
           'success',
-          'Your request has been submitted!'
+          'Your request has been submitted!',
         );
         router.refresh();
       } else if (data.responsex.status === 'EXISTING_SAVED_ORDERS') {
         setSavedOrders(data.responsex.drafts || []);
         setAllowSeparateOrder(false);
       } else {
-        toast.warning(data.responsex.message || 'Action failed. Please try again.');
+        toast.warning(
+          data.responsex.message || 'Action failed. Please try again.',
+        );
       }
-    } catch (error: any) {
-      toast.error('An error occurred. Please check your connection.');
+    } catch (error: unknown) {
+      toast.error(error instanceof TypeError ? 'Unable to reach the server. Your form details are still here. Please try again.' : error instanceof Error ? error.message : 'Unable to save your order. Please try again.');
     }
   };
 
   if (checkingDrafts) {
-    return <div className="flex min-h-48 items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>;
+    return (
+      <div className="flex min-h-48 items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+      </div>
+    );
   }
 
   if (savedOrders.length > 0 && !allowSeparateOrder) {
@@ -181,46 +234,79 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
     return (
       <section className={styles.saved} aria-labelledby="saved-order-heading">
         <div className={styles.savedIntro}>
-          <div className={styles.savedIcon}><BoxIcon size={22} aria-hidden="true" /></div>
+          <div className={styles.savedIcon}>
+            <BoxIcon size={22} aria-hidden="true" />
+          </div>
           <div>
             <p className={styles.eyebrow}>Continue where you left off</p>
             <h3 id="saved-order-heading" className={styles.savedTitle}>
-              {savedOrders.length === 1 ? 'You have a saved order' : `You have ${savedOrders.length} saved orders`}
+              {savedOrders.length === 1
+                ? 'You have a saved order'
+                : `You have ${savedOrders.length} saved orders`}
             </h3>
           </div>
         </div>
-        <p className={styles.savedDescription}>Go to Saved Orders to open an order and choose what you want to do next.</p>
+        <p className={styles.savedDescription}>
+          Go to Saved Orders to open an order and choose what you want to do
+          next.
+        </p>
         <div className={styles.orderSummary}>
           <div className={styles.orderSummaryTop}>
-            <p className={styles.orderName}>{first.orderName || 'Untitled order'}</p>
+            <p className={styles.orderName}>
+              {first.orderName || 'Untitled order'}
+            </p>
             <span className={styles.status}>Draft</span>
           </div>
           <p className={styles.orderMeta}>
-            <span>{first.productCount} product{first.productCount === 1 ? '' : 's'}</span>
+            <span>
+              {first.productCount} product{first.productCount === 1 ? '' : 's'}
+            </span>
             <span className={styles.orderId}>{first.pidOrder}</span>
           </p>
         </div>
         <div className={styles.savedActions}>
-          <Button type="button" onClick={() => { setIsOpen({ isOpen: false }); router.push('/dashboard/procurement/view-orders/saved'); }} className={styles.primaryAction}>Continue with saved orders</Button>
+          <Button
+            type="button"
+            onClick={() => {
+              setIsOpen({ isOpen: false });
+              router.push('/dashboard/procurement/view-orders/saved');
+            }}
+            className={styles.primaryAction}
+          >
+            Continue with saved orders
+          </Button>
         </div>
         <div className={styles.separate}>
           <p>Need a separate shipment?</p>
-          <button type="button" onClick={() => setAllowSeparateOrder(true)} className={styles.separateAction}>Create a separate order</button>
+          <button
+            type="button"
+            onClick={() => setAllowSeparateOrder(true)}
+            className={styles.separateAction}
+          >
+            Create a separate order
+          </button>
         </div>
       </section>
     );
   }
 
   return (
-    <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>
+    <Suspense
+      fallback={
+        <div className="flex justify-center p-8">
+          <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+        </div>
+      }
+    >
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-
         {/* Basic Info Section */}
         <div className="grid gap-6 md:grid-cols-2">
-
           {/* Order Name */}
           <div className="space-y-3">
-            <label htmlFor="orderName" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="orderName"
+              className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               Order Name
             </label>
             <div className="relative">
@@ -232,12 +318,19 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
               />
             </div>
-            {errors.orderName && <p className="text-xs font-bold text-rose-500">{errors.orderName.message}</p>}
+            {errors.orderName && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.orderName.message}
+              </p>
+            )}
           </div>
 
           {/* Order Category */}
           <div className="space-y-3">
-            <label htmlFor="orderCategory" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="orderCategory"
+              className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               Category
             </label>
             <div className="relative">
@@ -248,7 +341,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 defaultValue=""
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger id="orderCategory" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger
+                      id="orderCategory"
+                      className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    >
                       <SelectValue placeholder="Select Goods Category" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
@@ -262,12 +358,19 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 )}
               />
             </div>
-            {errors.orderCategory && <p className="text-xs font-bold text-rose-500">{errors.orderCategory.message}</p>}
+            {errors.orderCategory && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.orderCategory.message}
+              </p>
+            )}
           </div>
 
           {/* Country */}
           <div className="space-y-3">
-            <label htmlFor="destinationCountry" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="destinationCountry"
+              className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               Destination Country
             </label>
             <div className="relative">
@@ -284,12 +387,18 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                     }}
                     value={field.value}
                   >
-                    <SelectTrigger id="destinationCountry" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger
+                      id="destinationCountry"
+                      className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    >
                       <SelectValue placeholder="Select Destination" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
                       {countries.map((country) => (
-                        <SelectItem key={country.pidCountry} value={country.pidCountry}>
+                        <SelectItem
+                          key={country.pidCountry}
+                          value={country.pidCountry}
+                        >
                           {country.countryName}
                         </SelectItem>
                       ))}
@@ -298,13 +407,20 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 )}
               />
             </div>
-            {errors.destinationCountry && <p className="text-xs font-bold text-rose-500">{errors.destinationCountry.message}</p>}
+            {errors.destinationCountry && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.destinationCountry.message}
+              </p>
+            )}
           </div>
 
           {/* Currency */}
           <div className="space-y-3">
             <div className="relative flex h-8 items-center gap-1">
-              <label htmlFor={currencyFieldId} className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <label
+                htmlFor={currencyFieldId}
+                className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+              >
                 Shop Currency
               </label>
               <button
@@ -317,8 +433,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 onFocus={() => setShowCurrencyHelp(true)}
                 onClick={() => setShowCurrencyHelp(true)}
                 onBlur={() => setShowCurrencyHelp(false)}
-                onKeyDown={(event) => { if (event.key === 'Escape') setShowCurrencyHelp(false); }}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center !border-0 !bg-transparent !shadow-none text-xs font-semibold text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-slate-200"
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') setShowCurrencyHelp(false);
+                }}
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center !border-0 !bg-transparent text-xs font-semibold text-slate-600 !shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-slate-200"
               >
                 ?
               </button>
@@ -328,7 +446,8 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 hidden={!showCurrencyHelp}
                 className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700 shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
               >
-                If buying from 1688, Taobao, Pinduoduo, shop currency is CNY or Yuan or RMB. If buying from Alibaba, please, use USD
+                If buying from 1688, Taobao, Pinduoduo, shop currency is CNY or
+                Yuan or RMB. If buying from Alibaba, please, use USD
               </p>
             </div>
             <div className="relative">
@@ -339,7 +458,13 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 defaultValue=""
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger id={currencyFieldId} aria-describedby={showCurrencyHelp ? currencyHelpId : undefined} className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
+                    <SelectTrigger
+                      id={currencyFieldId}
+                      aria-describedby={
+                        showCurrencyHelp ? currencyHelpId : undefined
+                      }
+                      className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    >
                       <SelectValue placeholder="Select Shop Currency" />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
@@ -353,7 +478,11 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 )}
               />
             </div>
-            {errors.currencyType && <p className="text-xs font-bold text-rose-500">{errors.currencyType.message}</p>}
+            {errors.currencyType && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.currencyType.message}
+              </p>
+            )}
           </div>
         </div>
 
@@ -361,10 +490,12 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
         {/* Logistics Section */}
         <div className="grid gap-6 md:grid-cols-2">
-
           {/* Shipping Plan */}
           <div className="space-y-3 md:col-span-2">
-            <label htmlFor="shippingPlan" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="shippingPlan"
+              className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               Shipping Plan
             </label>
             <div className="relative">
@@ -374,14 +505,33 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCountry}>
-                    <SelectTrigger id="shippingPlan" className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white">
-                      <SelectValue placeholder={selectedCountry ? "Select Shipping Plan" : "Select Country First"} />
+                  <Select
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    disabled={!selectedCountry}
+                  >
+                    <SelectTrigger
+                      id="shippingPlan"
+                      className="h-12 w-full rounded-xl border-slate-200 bg-slate-50 pl-11 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                    >
+                      <SelectValue
+                        placeholder={
+                          selectedCountry
+                            ? 'Select Shipping Plan'
+                            : 'Select Country First'
+                        }
+                      />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">
-                      {selectedCountry?.shippingPlans.map((plan) => (
-                        <SelectItem key={plan.pidShippingPlan} value={plan.pidShippingPlan}>
-                          {convertToTitleCase(plan.shippingPlanName)} - {plan.shippingPlanCurrency === 'NGN' ? '₦' : '$'}{Number(plan.shippingPlanRate).toLocaleString()}/{plan.shippingPlanUnit === 'CBM' ? 'CBM' : 'kg'}
+                      {availablePlans.map((plan) => (
+                        <SelectItem
+                          key={plan.pidShippingPlan}
+                          value={plan.pidShippingPlan}
+                        >
+                          {convertToTitleCase(plan.shippingPlanName)} -{' '}
+                          {plan.shippingPlanCurrency === 'NGN' ? '₦' : '$'}
+                          {Number(plan.shippingPlanRate).toLocaleString()}/
+                          {plan.shippingPlanUnit === 'CBM' ? 'CBM' : 'kg'}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -389,22 +539,41 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 )}
               />
             </div>
-            {errors.shippingPlan && <p className="text-xs font-bold text-rose-500">{errors.shippingPlan.message}</p>}
+            {requiresSpecialHandling(category) && (
+              <p className="text-sm text-slate-500">
+                {shippingEligibilityMessage}
+              </p>
+            )}
+            {errors.shippingPlan && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.shippingPlan.message}
+              </p>
+            )}
           </div>
 
           {/* Shipping Weight Notice */}
-          <div className="md:col-span-2 rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/30 dark:bg-amber-900/10">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/30 dark:bg-amber-900/10 md:col-span-2">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
               <div>
                 <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
-                  {usesCbm ? 'Shipping Volume Notice' : 'Shipping Weight Notice'}
+                  {usesCbm
+                    ? 'Shipping Volume Notice'
+                    : 'Shipping Weight Notice'}
                 </h3>
                 <p className="mt-1 text-xs leading-relaxed text-amber-700 dark:text-amber-400/90">
                   {usesCbm ? (
-                    <>For this Nigeria sea-shipping order, each product must include its estimated <strong>CBM per item</strong>. You will see a worked example when adding each product.</>
+                    <>
+                      For this Nigeria sea-shipping order, each product must
+                      include its estimated <strong>CBM per item</strong>. You
+                      will see a worked example when adding each product.
+                    </>
                   ) : (
-                    <>Kindly note that for orders weighing less than <strong>10kg</strong>, we must use Air Shipping, even if Sea Shipping is selected.</>
+                    <>
+                      Kindly note that for orders weighing less than{' '}
+                      <strong>10kg</strong>, we must use Air Shipping, even if
+                      Sea Shipping is selected.
+                    </>
                   )}
                 </p>
               </div>
@@ -413,7 +582,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Shipping Address */}
           <div className="space-y-3 md:col-span-2">
-            <label htmlFor="shippingAddress" className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="shippingAddress"
+              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
+            >
               <MapPin className="h-3 w-3" /> Final Delivery Address
             </label>
             <Textarea
@@ -422,39 +594,49 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
               placeholder="Enter complete address including ZIP/Postal code..."
               className="min-h-[120px] w-full resize-none rounded-xl border-slate-200 bg-slate-50 p-4 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
             />
-            {errors.shippingAddress && <p className="text-xs font-bold text-rose-500">{errors.shippingAddress.message}</p>}
+            {errors.shippingAddress && (
+              <p className="text-xs font-bold text-rose-500">
+                {errors.shippingAddress.message}
+              </p>
+            )}
           </div>
 
           {/* Delivery Info Notice */}
-          <div className="md:col-span-2 rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-900/10">
+          <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-900/10 md:col-span-2">
             <div className="flex items-start gap-3">
               <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
               <div>
-                <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">Delivery Logistics</h3>
+                <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">
+                  Delivery Logistics
+                </h3>
                 <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300/80">
-                  {partner ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.' : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, etc are fulfilled by any of our partners - DHL, UPS, Royal Mail, DPD, etc. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
+                  {partner
+                    ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.'
+                    : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, etc are fulfilled by any of our partners - DHL, UPS, Royal Mail, DPD, etc. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
                 </p>
               </div>
             </div>
           </div>
-
         </div>
 
         {/* Form Actions */}
         <div className="pt-4">
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={isSubmitting}
             className="group flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-[0.99] disabled:opacity-70 sm:w-auto sm:px-10"
           >
             {isSubmitting ? (
-              <><Loader2 className="h-5 w-5 animate-spin" /> Processing...</>
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" /> Processing...
+              </>
             ) : (
-              <><CheckCircle2 className="h-5 w-5" /> Create order</>
+              <>
+                <CheckCircle2 className="h-5 w-5" /> Create order
+              </>
             )}
           </Button>
         </div>
-
       </form>
     </Suspense>
   );

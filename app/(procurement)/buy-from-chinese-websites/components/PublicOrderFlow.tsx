@@ -1,5 +1,13 @@
 'use client';
 
+import DeviceProductShippingNote from '@/components/DeviceProductShippingNote';
+import { usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
+import {
+  goodsCategories,
+  isShippingPlanAllowed,
+  requiresSpecialHandling,
+  shippingEligibilityMessage,
+} from '@/lib/procurement/shippingEligibility';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -41,6 +49,7 @@ import {
 type Country = {
   pidCountry: string;
   countryName: string;
+  deviceRates?: { phoneNgn: number; laptopNgn: number } | null;
   shippingPlans: {
     pidShippingPlan: string;
     shippingPlanName: string;
@@ -89,6 +98,7 @@ const initial: PublicDraft = {
   currency: 'CNY',
   destinationCountry: '',
   shippingPlan: '',
+  orderCategory: 'Other Goods',
   products: [],
   current: emptyProduct(),
 };
@@ -148,11 +158,16 @@ export default function PublicOrderFlow() {
   const country = countries.find(
     (c) => c.pidCountry === draft.destinationCountry,
   );
-  const plan = country?.shippingPlans.find(
+  const availablePlans =
+    country?.shippingPlans.filter((p) =>
+      isShippingPlanAllowed(draft.orderCategory, p.shippingPlanName),
+    ) || [];
+  const plan = availablePlans.find(
     (p) => p.pidShippingPlan === draft.shippingPlan,
   );
   const unit = plan?.shippingPlanUnit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
   const current = draft.current;
+  const flatFee = usesDeviceFlatFee(country?.countryName, current.productCategory);
   const link = inspectProductLink(current.productLink);
   const needsConfirmation = Boolean(
     current.productLink &&
@@ -207,7 +222,7 @@ export default function PublicOrderFlow() {
       review: false,
       measurementReview: false,
     };
-    const problem = productProblem(product, draft.shop, draft.currency);
+    const problem = productProblem(product, draft.shop, draft.currency, country?.countryName);
     if (problem) {
       toast.error(problem);
       return;
@@ -237,7 +252,7 @@ export default function PublicOrderFlow() {
       return;
     }
     const problem = draft.products
-      .map((p) => productProblem(p, draft.shop, draft.currency))
+      .map((p) => productProblem(p, draft.shop, draft.currency, country?.countryName))
       .find(Boolean);
     if (problem) {
       toast.error(problem);
@@ -250,7 +265,7 @@ export default function PublicOrderFlow() {
         destinationCountry: draft.destinationCountry,
         shippingPlan: draft.shippingPlan,
         currencyType: draft.currency,
-        orderCategory: 'Other Goods',
+        orderCategory: draft.orderCategory,
       },
       products: draft.products,
       allowSeparateOrder,
@@ -367,6 +382,41 @@ export default function PublicOrderFlow() {
             </select>
           </label>
           <label>
+            Goods category
+            <select
+              className={selectClass}
+              value={draft.orderCategory}
+              onChange={(e) => {
+                const orderCategory = e.target
+                  .value as PublicDraft['orderCategory'];
+                const compatible = isShippingPlanAllowed(
+                  orderCategory,
+                  plan?.shippingPlanName,
+                );
+                setDraft((d) => ({
+                  ...d,
+                  orderCategory,
+                  shippingPlan: compatible ? d.shippingPlan : '',
+                  products: compatible
+                    ? d.products
+                    : d.products.map((p) => ({
+                        ...p,
+                        measurementReview: true,
+                      })),
+                  current: compatible
+                    ? d.current
+                    : { ...d.current, measurementReview: hasUnfinished },
+                }));
+              }}
+            >
+              {goodsCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category === 'Other Goods' ? 'Non Battery/liquid' : category}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
             Shipping method
             <select
               className={selectClass}
@@ -384,7 +434,7 @@ export default function PublicOrderFlow() {
               <option value="">
                 {country ? 'Select shipping method' : 'Choose country first'}
               </option>
-              {country?.shippingPlans.map((p) => (
+              {availablePlans.map((p) => (
                 <option key={p.pidShippingPlan} value={p.pidShippingPlan}>
                   {shippingMethodGuide[p.shippingPlanName.trim().toUpperCase()]
                     ?.label ||
@@ -416,13 +466,18 @@ export default function PublicOrderFlow() {
             </select>
           </label>
         </div>
-        {country && country.shippingPlans.length > 0 && (
+        {requiresSpecialHandling(draft.orderCategory) && (
+          <p className="mt-3 text-sm text-slate-500">
+            {shippingEligibilityMessage}
+          </p>
+        )}
+        {country && availablePlans.length > 0 && (
           <div id="shipping-method-guide" className={styles.shippingGuide}>
             <p className={styles.shippingGuideTitle}>
               Shipping methods available for {country.countryName}
             </p>
             <dl>
-              {country?.shippingPlans.map((shipping) => {
+              {availablePlans.map((shipping) => {
                 const guide = shippingMethodGuide[
                   shipping.shippingPlanName.trim().toUpperCase()
                 ] || {
@@ -565,6 +620,38 @@ export default function PublicOrderFlow() {
                 onChange={(e) => updateCurrent({ productName: e.target.value })}
               />
             </label>
+            {country?.deviceRates && (
+              <p className="text-sm">
+                Nigeria shipping: ₦
+                {country.deviceRates.phoneNgn.toLocaleString()} per phone and ₦
+                {country.deviceRates.laptopNgn.toLocaleString()} per laptop,
+                instead of weight-based freight. Other goods use the selected
+                shipping rate.
+              </p>
+            )}
+            {country?.countryName.trim().toLowerCase() === 'nigeria' && (
+              <label>
+                Product type
+                <select
+                  className="mt-2 w-full px-4"
+                  value={current.productCategory || 'OTHER'}
+                  onChange={(e) =>
+                    updateCurrent({
+                      productCategory: e.target.value as
+                        | 'OTHER'
+                        | 'PHONE'
+                        | 'LAPTOP',
+                    })
+                  }
+                >
+                  <option value="OTHER">
+                    Other goods (including accessories)
+                  </option>
+                  <option value="PHONE">Phone</option>
+                  <option value="LAPTOP">Laptop</option>
+                </select>
+              </label>
+            )}
             <div className={styles.priceFields}>
               <label>
                 Unit price ({draft.currency})
@@ -595,7 +682,7 @@ export default function PublicOrderFlow() {
                   }
                 />
               </label>
-              <label>
+              {!flatFee && <label>
                 {unit === 'CBM'
                   ? 'Volume per item (CBM)'
                   : 'Weight per item (kg)'}
@@ -610,15 +697,15 @@ export default function PublicOrderFlow() {
                     updateCurrent({ productWeight: e.target.value })
                   }
                 />
-              </label>
+              </label>}
             </div>
-            <p className="text-xs text-slate-500">
+            {flatFee ? <DeviceProductShippingNote rates={country?.deviceRates || null} productType={current.productCategory} quantity={current.productQuantity} /> : <p className="text-xs text-slate-500">
               Enter the measurement for one item. Divide a whole shipment’s
               measurement by its quantity.{' '}
               {unit === 'CBM'
                 ? 'Sea volume is measured in cubic metres (CBM), not kilograms.'
                 : ''}
-            </p>
+            </p>}
             <label className="block">
               Variants and notes (optional)
               <Textarea

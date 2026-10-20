@@ -1,5 +1,7 @@
 'use client';
 
+import DeviceProductShippingNote from '@/components/DeviceProductShippingNote';
+import type { DeviceRates } from '@/lib/procurement/deviceShipping';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -53,8 +55,9 @@ const formSchema = z.object({
   productLink: z
     .string()
     .min(10, { message: 'Please enter a valid product link' }),
+  productCategory: z.enum(['OTHER', 'PHONE', 'LAPTOP']),
   productPrice: z.string().min(1, { message: 'Please enter product price' }),
-  productWeight: z.string().min(1, { message: 'Please enter product weight' }),
+  productWeight: z.string(),
   productQuantity: z
     .string()
     .min(1, { message: 'Please enter product quantity' }),
@@ -95,13 +98,18 @@ export default function EditProductForm({
   const { user } = useAuth();
 
   const pidOrderx = params?.pidOrder as string;
+  const [isNigeria, setIsNigeria] = useState(false);
+  const [deviceRates, setDeviceRates] = useState<DeviceRates | null>(null);
+  const [deviceFeesEnabled, setDeviceFeesEnabled] = useState(false);
   const [currency, setCurrencyType] = useState<string>('USD');
   const [measurementUnit, setMeasurementUnit] = useState<'KG' | 'CBM'>('KG');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form with existing product data
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema.superRefine((values, ctx) => {
+      if (!(isNigeria && deviceFeesEnabled && values.productCategory !== 'OTHER') && (!Number.isFinite(Number(values.productWeight)) || Number(values.productWeight) <= 0)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['productWeight'], message: 'Enter a per-item weight or volume greater than zero.' });
+    })),
     defaultValues: {
       pidUser: user?.pidUser || '',
       pidProduct: product?.pidProduct || productIDx || '',
@@ -113,6 +121,11 @@ export default function EditProductForm({
       productWeight: toMeasurementValue(
         product?.shippingMeasurePerUnit ?? product?.productWeight,
       ),
+      productCategory: ['PHONE', 'LAPTOP'].includes(
+        product?.productCategory || '',
+      )
+        ? (product?.productCategory as 'PHONE' | 'LAPTOP')
+        : 'OTHER',
       productQuantity: product?.productQuantity?.toString() || '1',
       productInfo: product?.productInfo || '',
     },
@@ -127,6 +140,11 @@ export default function EditProductForm({
           `/api/get-data/order-one?pidOrder=${orderIdToFetch}`,
         );
         const data = await res.json();
+        setDeviceRates(data.deviceRates || null);
+        setDeviceFeesEnabled(data.getOneRecord?.status === 'saved' || (data.getOneRecord?.devicePhoneRateNgn != null && data.getOneRecord?.deviceLaptopRateNgn != null));
+        setIsNigeria(
+          data.destinationCountryName?.trim().toLowerCase() === 'nigeria',
+        );
         setCurrencyType(data.getOneRecord?.currencyType || 'USD');
         setMeasurementUnit(
           data.getOneRecord?.shippingMeasurementUnit === 'CBM' ? 'CBM' : 'KG',
@@ -183,6 +201,7 @@ export default function EditProductForm({
   };
 
   const quantity = Number(form.watch('productQuantity') || 0);
+  const flatFee = isNigeria && deviceFeesEnabled && form.watch('productCategory') !== 'OTHER';
   const perItemMeasurement = Number(form.watch('productWeight') || 0);
   const lineMeasurement = quantity * perItemMeasurement;
   const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
@@ -482,10 +501,35 @@ export default function EditProductForm({
 
           <hr className="my-4 border-slate-100 dark:border-slate-800" />
 
+          {isNigeria && (
+            <FormField
+              control={form.control}
+              name="productCategory"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Product type</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pr-10 text-base"
+                    >
+                      <option value="OTHER">
+                        Other goods (including accessories)
+                      </option>
+                      <option value="PHONE">Phone</option>
+                      <option value="LAPTOP">Laptop</option>
+                    </select>
+                  </FormControl>
+                  {flatFee ? <DeviceProductShippingNote rates={deviceRates} productType={form.watch('productCategory')} quantity={form.watch('productQuantity')} /> : <p className="text-sm leading-relaxed text-slate-500">For Nigeria, phones and laptops are charged per device instead of by weight. Your order summary shows the applicable rates.</p>}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           {/* Weight & Information Section */}
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:items-start">
+          <div className={`grid grid-cols-1 gap-6 lg:items-start ${flatFee ? '' : 'md:grid-cols-2'}`}>
             {/* Weight Input */}
-            <div className="space-y-6">
+            {!flatFee && <div className="space-y-6">
               <FormField
                 control={form.control}
                 name="productWeight"
@@ -556,7 +600,7 @@ export default function EditProductForm({
                   </div>
                 </div>
               </div>
-            </div>
+            </div>}
 
             {/* Product Variants/Info */}
             <FormField

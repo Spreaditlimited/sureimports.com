@@ -1,3 +1,4 @@
+import { usesDeviceFlatFee } from './deviceShipping';
 import { z } from 'zod';
 import { normalizeProductUrl } from '../productUrl';
 
@@ -34,6 +35,7 @@ export function inspectProductLink(link: string) {
 }
 export const productDraftSchema = z.object({
   id: z.string(),
+  productCategory: z.enum(['OTHER', 'PHONE', 'LAPTOP']).default('OTHER'),
   productName: z.string(),
   productLink: z.string(),
   productPrice: z.string(),
@@ -48,6 +50,7 @@ export const productDraftSchema = z.object({
 export type ProductDraft = z.infer<typeof productDraftSchema>;
 export const emptyProduct = (): ProductDraft => ({
   id: '',
+  productCategory: 'OTHER',
   productName: '',
   productLink: '',
   productPrice: '',
@@ -66,6 +69,14 @@ export const publicDraftSchema = z.object({
   currency: z.enum(['CNY', 'USD']),
   destinationCountry: z.string(),
   shippingPlan: z.string(),
+  orderCategory: z
+    .enum([
+      'Other Goods',
+      'Goods with Battery',
+      'Raw Batteries',
+      'Liquids, Gases, Powder',
+    ])
+    .default('Other Goods'),
   products: z.array(productDraftSchema),
   current: productDraftSchema,
 });
@@ -74,6 +85,7 @@ export function productProblem(
   product: ProductDraft,
   shopId: string,
   currency: string,
+  countryName?: string,
 ) {
   const link = inspectProductLink(product.productLink);
   if (!link.url) return 'Please enter a valid product web link.';
@@ -91,8 +103,8 @@ export function productProblem(
   )
     return 'Please enter a valid unit price.';
   if (
-    !Number.isFinite(Number(product.productWeight)) ||
-    Number(product.productWeight) <= 0
+    !usesDeviceFlatFee(countryName, product.productCategory) && (!Number.isFinite(Number(product.productWeight)) ||
+    Number(product.productWeight) <= 0)
   )
     return 'Please enter a valid per-item measurement.';
   if (
@@ -102,7 +114,7 @@ export function productProblem(
     return 'Please enter a whole-number quantity of at least one.';
   if (product.review || product.currency !== currency)
     return 'Please review and confirm this product’s link and price.';
-  if (product.measurementReview)
+  if (product.measurementReview && !usesDeviceFlatFee(countryName, product.productCategory))
     return 'Please review this product’s measurement for the selected shipping method.';
   return null;
 }

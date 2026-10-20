@@ -1,119 +1,25 @@
-// app/api/upload/route.ts
-import { PrismaClient } from '@prisma/client';
-import { random } from 'lodash';
-import getFileExt from '@/app/utils/fileExt';
-import fileFilter from '@/utils/fileFilter';
-import randomGenerator from '@/lib/helpers/randomGenerator';
 import { NextRequest, NextResponse } from 'next/server';
-import { generateSlug } from '@/utils/slugGenerator';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { requireProcurementUser } from '@/lib/procurement/assistance';
+import { PROCUREMENT_STATUS_ITEMS } from '@/app/dashboard/procurement/constants/order-statuses';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ pidUser: string; statusx: string }> },
 ) {
+  const user = await requireProcurementUser();
+  if (!user) return NextResponse.json({ message: 'Please sign in.' }, { status: 401 });
+  const { pidUser } = await params;
+  if (pidUser !== user.pidUser) return NextResponse.json({ message: 'Access denied.' }, { status: 403 });
   try {
-    const { pidUser, statusx } = await params;
-    const savedOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'saved',
-      },
+    const groups = await prisma.orders.groupBy({
+      by: ['status'],
+      where: { pidUser: user.pidUser },
+      _count: { _all: true },
     });
-
-    const pendingOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'pending',
-      },
-    });
-
-    const approvedOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'approved',
-      },
-    });
-
-    const payForShippingOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'pay-for-shipping',
-      },
-    });
-
-    const inTransitOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'in-transit',
-      },
-    });
-
-    const readyForPickupOrderCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'ready-for-pickup',
-      },
-    });
-
-    const completedOrdersCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'completed',
-      },
-    });
-
-    const onHoldOrdersCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'on-hold',
-      },
-    });
-
-    const bankPendingSavedOrdersCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'bank-pending-saved-orders',
-      },
-    });
-
-    const bankPendingShippingOrdersCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'bank-pending-shipping-orders',
-      },
-    });
-
-    const cancelledOrdersCount: number = await prisma.orders.count({
-      where: {
-        pidUser: pidUser,
-        status: 'cancelled',
-      },
-    });
-
-    return NextResponse.json(
-      {
-        savedOrderCount: savedOrderCount,
-        pendingOrderCount: pendingOrderCount,
-        approvedOrderCount: approvedOrderCount,
-        payForShippingOrderCount: payForShippingOrderCount,
-        inTransitOrderCount: inTransitOrderCount,
-        readyForPickupOrderCount: readyForPickupOrderCount,
-        completedOrdersCount: completedOrdersCount,
-        onHoldOrdersCount: onHoldOrdersCount,
-        bankPendingSavedOrdersCount: bankPendingSavedOrdersCount,
-        bankPendingShippingOrdersCount: bankPendingShippingOrdersCount,
-        cancelledOrdersCount: cancelledOrdersCount,
-      },
-      { status: 200 },
-    );
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch user' },
-      { status: 500 },
-    );
-  } finally {
-    await prisma.$disconnect();
+    const counts = new Map(groups.map(group => [group.status, group._count._all]));
+    return NextResponse.json(Object.fromEntries(PROCUREMENT_STATUS_ITEMS.map(item => [item.countKey, counts.get(item.value) || 0])), { headers: { 'Cache-Control': 'private, no-store' } });
+  } catch {
+    return NextResponse.json({ message: 'Unable to load order counts.' }, { status: 500 });
   }
 }

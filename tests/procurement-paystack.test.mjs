@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { registerHooks } from 'node:module';
 process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY='sk_test_synthetic';
 const fixture={payments:[],updates:[],conversions:[],mails:[],verifiedAmount:25000000};
-fixture.lifecycle={productsTotalUsd:100,rates:{ngnPerUsd:1500},order:{status:'saved'},payment:{isPayable:true,due:250000,currency:'NGN',minimumOrderNgn:1000,nextStatus:'pending'},snapshot:{orderTotalCost:'166.666666',exchangeRate1:'1500',exchangeRate2:'7',exchangeRate3:'225',productPricingVersion:2}};
+fixture.lifecycle={deviceShipping:{unclassified:0},productsTotalUsd:100,rates:{ngnPerUsd:1500},order:{status:'saved'},payment:{isPayable:true,due:250000,currency:'NGN',minimumOrderNgn:1000,nextStatus:'pending'},snapshot:{devicePhoneRateNgn:25000,deviceLaptopRateNgn:50000,orderTotalCost:'166.666666',exchangeRate1:'1500',exchangeRate2:'7',exchangeRate3:'225',productPricingVersion:2}};
 fixture.db={payments:{findFirst:async()=>fixture.payments[0],create:async({data})=>fixture.payments.push(data)},users:{findUnique:async()=>({userFirstname:'Synthetic',userEmail:'synthetic@example.test'})},orders:{updateMany:async({data})=>{fixture.updates.push(data);return {count:1}}},$transaction:async fn=>fn(fixture.db)};
 globalThis.__procPay=fixture;
 const inline=s=>({url:'data:text/javascript,'+encodeURIComponent(s),shortCircuit:true});
@@ -24,7 +24,7 @@ test('ordinary Sure Imports procurement verifies, records payment, freezes prici
  fixture.verifiedAmount=100;assert.equal((await pay()).status,400);assert.equal(fixture.payments.length,0);
  fixture.verifiedAmount=25000000;assert.equal((await pay()).status,200);
  assert.equal(fixture.payments.length,1);assert.equal(fixture.payments[0].amount,250000);assert.equal(fixture.payments[0].paymentStatus,'PAID');
- assert.equal(fixture.updates[0].status,'pending');assert.equal(fixture.updates[0].productPricingVersion,2);
+ assert.equal(fixture.updates[0].status,'pending');assert.equal(fixture.updates[0].productPricingVersion,2);assert.equal(fixture.updates[0].devicePhoneRateNgn,25000);assert.equal(fixture.updates[0].deviceLaptopRateNgn,50000);
  assert.equal(fixture.conversions[0].eligibleAmount,150000);assert.equal(fixture.mails.length,2);
  assert.equal((await pay()).status,200);assert.equal(fixture.payments.length,1);assert.equal(fixture.updates.length,1);
 });

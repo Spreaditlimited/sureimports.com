@@ -66,6 +66,7 @@ export async function POST(request: Request) {
       );
     }
 
+    if (lifecycle.deviceShipping.unclassified > 0) return NextResponse.json({ statusx: 'ACTION_FAILED', message: 'Edit each product and confirm Phone, Laptop or Other goods before paying.' }, { status: 400 });
     if (!lifecycle.payment.isPayable) {
       return NextResponse.json(
         { statusx: 'ACTION_FAILED', message: 'This order has no payment due.' },
@@ -191,6 +192,8 @@ export async function POST(request: Request) {
           exchangeRate3: shouldFreezeEstimate
             ? lifecycle.snapshot.exchangeRate3
             : undefined,
+          devicePhoneRateNgn: shouldFreezeEstimate ? lifecycle.snapshot.devicePhoneRateNgn : undefined,
+          deviceLaptopRateNgn: shouldFreezeEstimate ? lifecycle.snapshot.deviceLaptopRateNgn : undefined,
           productPricingVersion: shouldFreezeEstimate ? lifecycle.snapshot.productPricingVersion : undefined,
           status: pendingStatus,
           updatedAt: new Date(),

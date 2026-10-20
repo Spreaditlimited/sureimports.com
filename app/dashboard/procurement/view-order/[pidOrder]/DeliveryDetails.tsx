@@ -1,4 +1,8 @@
 'use client';
+import {
+  isShippingPlanAllowed,
+  shippingEligibilityMessage,
+} from '@/lib/procurement/shippingEligibility';
 import { useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -6,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
 type Details = {
+  shippingPlan: string;
+  shippingPlans: Array<{ pidShippingPlan: string; shippingPlanName: string }>;
   orderName: string;
   shippingAddress: string;
   orderCategory: string;
@@ -71,15 +77,14 @@ export default function DeliveryDetails({
     return <p role="status">{message || 'Loading delivery details…'}</p>;
   const editable = details.status === 'saved' && !details.mergedIntoOrderId;
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
+    <section id="order-details" className="scroll-mt-24 space-y-4 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
       <h1 className="text-xl font-bold">
         {details.shippingAddress
-          ? 'Order and delivery details'
+          ? 'Edit order details'
           : 'Your order is saved. Where should we deliver it?'}
       </h1>
       <p className="text-sm text-slate-500">
-        You can edit the name and delivery address while this order is saved,
-        before payment.
+        Edit the order name, delivery address, goods category and compatible shipping plan before payment.
       </p>
       <label className="block">
         Order name
@@ -114,7 +119,18 @@ export default function DeliveryDetails({
             disabled={!editable}
             value={details.orderCategory || 'Other Goods'}
             onChange={(e) =>
-              setDetails({ ...details, orderCategory: e.target.value })
+              setDetails({
+                ...details,
+                orderCategory: e.target.value,
+                shippingPlan: isShippingPlanAllowed(
+                  e.target.value,
+                  details.shippingPlans.find(
+                    (p) => p.pidShippingPlan === details.shippingPlan,
+                  )?.shippingPlanName,
+                )
+                  ? details.shippingPlan
+                  : '',
+              })
             }
           >
             {[
@@ -136,8 +152,49 @@ export default function DeliveryDetails({
         </span>
       </label>
       {editable && (
-        <Button disabled={busy} onClick={() => void save()}>
-          {busy ? 'Saving…' : 'Save delivery details'}
+        <label className="block">
+          Shipping plan
+          <span className="relative mt-2 block">
+            <select
+              className="block w-full appearance-none rounded-xl border bg-transparent py-3 pl-3 pr-12"
+              value={details.shippingPlan || ''}
+              onChange={(e) =>
+                setDetails({ ...details, shippingPlan: e.target.value })
+              }
+            >
+              <option value="">Select a compatible shipping plan</option>
+              {details.shippingPlans
+                .filter((p) =>
+                  isShippingPlanAllowed(
+                    details.orderCategory,
+                    p.shippingPlanName,
+                  ),
+                )
+                .map((p) => (
+                  <option key={p.pidShippingPlan} value={p.pidShippingPlan}>
+                    {p.shippingPlanName.replaceAll('_', ' ')}
+                  </option>
+                ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              size={18}
+              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+            />
+          </span>
+          {!details.shippingPlan && (
+            <span className="mt-2 block text-sm text-amber-700">
+              {shippingEligibilityMessage}
+            </span>
+          )}
+        </label>
+      )}
+      {editable && (
+        <Button
+          disabled={busy || !details.shippingPlan}
+          onClick={() => void save()}
+        >
+          {busy ? 'Saving…' : 'Save order changes'}
         </Button>
       )}
       {message && <p role="alert">{message}</p>}

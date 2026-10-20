@@ -1,7 +1,9 @@
+import { isShippingPlanAllowed } from './shippingEligibility';
+import { getDeviceShippingSettings } from './deviceShippingSettings';
+import { orderDeviceRates, deviceShippingBreakdown } from './deviceShipping';
 import { prisma } from '@/lib/prisma';
 import {
   finiteNumber,
-  perItemMeasurementForOrder,
   paymentDueInUsd,
   procurementEstimateInUsd,
   shippingCostInUsd,
@@ -93,17 +95,17 @@ export async function getProcurementOrderLifecycle(
     productPricingVersion,
   );
   const productsTotalUsd = productValue.usd;
-  const totalMeasurement = products.reduce(
-    (total, product) =>
-      total +
-      finiteNumber(product.productQuantity) *
-        perItemMeasurementForOrder(
-          order.shippingPricingVersion,
-          product.productWeight,
-          product.shippingMeasurePerUnit,
-        ),
-    0,
+  const deviceRates =
+    order.status === 'saved' &&
+    country?.countryName?.trim().toLowerCase() === 'nigeria'
+      ? await getDeviceShippingSettings()
+      : orderDeviceRates(order, country?.countryName || '');
+  const deviceShipping = deviceShippingBreakdown(
+    products,
+    deviceRates,
+    order.shippingPricingVersion,
   );
+  const totalMeasurement = deviceShipping.measurement;
 
   const shippingRate = usesMeasurementPricing
     ? finiteNumber(order.shippingRateSnapshot)
@@ -122,12 +124,14 @@ export async function getProcurementOrderLifecycle(
     : 'USD';
 
   const domesticShippingCostUsd = 5;
-  const internationalShippingCostUsd = shippingCostInUsd(
-    totalMeasurement,
-    shippingRate,
-    shippingRateCurrency,
-    ngnPerUsd,
-  );
+  const internationalShippingCostUsd =
+    deviceShipping.totalNgn / ngnPerUsd +
+    shippingCostInUsd(
+      totalMeasurement,
+      shippingRate,
+      shippingRateCurrency,
+      ngnPerUsd,
+    );
   const dynamicEstimatedShippingCostUsd =
     domesticShippingCostUsd + internationalShippingCostUsd;
   const serviceChargePercent = useLatestEstimate
@@ -165,12 +169,16 @@ export async function getProcurementOrderLifecycle(
   const actualMeasurement = finiteNumber(order.orderWeight);
   const actualDomesticShippingCostUsd =
     finiteNumber(order.shippingCost1) / cnyPerUsd;
-  const actualInternationalShippingCostUsd = shippingCostInUsd(
-    actualMeasurement,
-    shippingRate,
-    shippingRateCurrency,
-    ngnPerUsd,
-  );
+  const actualInternationalShippingCostUsd =
+    deviceShipping.totalNgn / ngnPerUsd +
+    shippingCostInUsd(
+      deviceShipping.enabled && deviceShipping.otherLines === 0
+        ? 0
+        : actualMeasurement,
+      shippingRate,
+      shippingRateCurrency,
+      ngnPerUsd,
+    );
   const actualTotalShippingCostUsd =
     actualDomesticShippingCostUsd + actualInternationalShippingCostUsd;
 
@@ -203,6 +211,7 @@ export async function getProcurementOrderLifecycle(
 
   return {
     order,
+    deviceShipping,
     products,
     destinationCountry,
     shippingPlanName: plan?.shippingPlanName || '',
@@ -238,18 +247,26 @@ export async function getProcurementOrderLifecycle(
       cnyPerUsd,
       ngnPerCny,
     },
+    shippingPlanEligible:
+      order.status !== 'saved' ||
+      isShippingPlanAllowed(order.orderCategory, plan?.shippingPlanName),
     payment: {
       dueUsd: money(paymentDueUsd),
       due: paymentDue,
       currency: paymentCurrency,
       nextStatus: nextPaidStatus,
       isPayable:
+        (order.status !== 'saved' ||
+          isShippingPlanAllowed(order.orderCategory, plan?.shippingPlanName)) &&
+        deviceShipping.unclassified === 0 &&
         paymentDue > 0 &&
         Boolean(nextPaidStatus) &&
         Boolean(order.shippingAddress?.trim()),
       minimumOrderNgn,
     },
     snapshot: {
+      devicePhoneRateNgn: deviceRates?.phoneNgn ?? null,
+      deviceLaptopRateNgn: deviceRates?.laptopNgn ?? null,
       productPricingVersion,
       orderTotalCost: String(dynamicGrandTotalUsd),
       orderWeight: String(totalMeasurement),

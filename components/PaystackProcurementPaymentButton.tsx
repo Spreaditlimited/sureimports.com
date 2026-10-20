@@ -129,7 +129,7 @@ export default function PaystackProcurementPaymentButton({
   };
 
   const handlePayment = async () => {
-    if (!isDisabled) return;
+    if (!isDisabled || isLoading) return;
 
     const amountNairax = Number(amountNaira || 0);
     const totalWeightx = Number(totalWeight || 0);
@@ -204,6 +204,16 @@ export default function PaystackProcurementPaymentButton({
       return;
     }
     const quote = await quoteResponse.json();
+    if (quote.shippingPlanEligible === false) {
+      setIsLoading(false);
+      alert('Update the shipping plan in your order details to Special, Express or Sea before paying.');
+      return;
+    }
+    if (quote.deviceShipping?.unclassified > 0) {
+      setIsLoading(false);
+      alert('Edit each product and confirm Phone, Laptop or Other goods before paying.');
+      return;
+    }
     const payCurrency = quote.paymentDueCurrency === 'NGN' ? 'NGN' : 'USD';
     const payAmount = Number(quote.paymentDue || 0);
     const displayedAmount = isNigeria ? amountNairax : amount;
@@ -322,7 +332,14 @@ export default function PaystackProcurementPaymentButton({
     <>
       <Button
         onClick={handlePayment}
-        disabled={isLoading}
+        disabled={!isDisabled || isLoading}
+        style={!isDisabled || isLoading ? {
+          background: 'var(--si-inset, #e2e8f0)',
+          color: 'var(--si-muted, #64748b)',
+          borderColor: 'var(--si-border, #cbd5e1)',
+          boxShadow: 'none',
+          opacity: 1,
+        } : undefined}
         className={className}
       >
         <CreditCard />

@@ -1,3 +1,4 @@
+import { getDeviceShippingSettings } from '@/lib/procurement/deviceShippingSettings';
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
@@ -24,9 +25,11 @@ export async function GET() {
       }),
     ]);
 
+    const deviceRates = await getDeviceShippingSettings();
     const nigeriaSeaRate = Number(financial?.quotationSeaRateNgnPerCbm);
     const response = countries.map((country) => ({
       ...country,
+      deviceRates: country.countryName?.trim().toLowerCase() === 'nigeria' ? deviceRates : null,
       shippingPlans: country.shippingPlans.map((plan) => {
         const isNigeriaSea =
           country.countryName?.trim().toLowerCase() === 'nigeria' &&

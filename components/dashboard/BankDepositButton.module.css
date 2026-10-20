@@ -10,13 +10,10 @@
   filter: brightness(0.95);
 }
 .button.button:disabled {
-  background-color: var(--si-inset);
-  /* Match the other disabled procurement payment labels (slate-400). */
-  color: #94a3b8;
-  border: 0;
+  background: var(--si-inset, #e2e8f0);
+  color: var(--si-muted, #64748b);
+  border-color: var(--si-border, #cbd5e1);
+  box-shadow: none;
   opacity: 1;
   cursor: not-allowed;
-}
-:global(.dark) .button.button:disabled {
-  background-color: var(--si-raised);
 }

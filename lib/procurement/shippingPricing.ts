@@ -1,3 +1,9 @@
+import {
+  goodsCategories,
+  isShippingPlanAllowed,
+  shippingEligibilityMessage,
+} from './shippingEligibility';
+import { getDeviceShippingSettings } from './deviceShippingSettings';
 import { prisma } from '@/lib/prisma';
 import {
   isNigeriaSeaShipping,
@@ -13,6 +19,8 @@ export type {
 export const PROCUREMENT_SHIPPING_PRICING_VERSION = 2;
 
 export type ProcurementShippingPricing = {
+  devicePhoneRateNgn: number | null;
+  deviceLaptopRateNgn: number | null;
   version: number;
   measurementUnit: ShippingMeasurementUnit;
   rate: number;
@@ -32,7 +40,13 @@ function positiveNumber(value: unknown, label: string) {
 export async function resolveNewProcurementShippingPricing(
   destinationCountryId: string,
   shippingPlanId: string,
+  orderCategory?: string,
 ): Promise<ProcurementShippingPricing> {
+  if (
+    orderCategory !== undefined &&
+    !goodsCategories.some((category) => category === orderCategory)
+  )
+    throw new Error('Choose a valid goods category.');
   const country = await prisma.country.findUnique({
     where: { pidCountry: destinationCountryId },
     select: {
@@ -55,6 +69,18 @@ export async function resolveNewProcurementShippingPricing(
     );
   }
 
+  if (!isShippingPlanAllowed(orderCategory, plan.shippingPlanName))
+    throw new Error(shippingEligibilityMessage);
+
+  const deviceRates =
+    country.countryName.trim().toLowerCase() === 'nigeria'
+      ? await getDeviceShippingSettings()
+      : null;
+  const deviceSnapshot = {
+    devicePhoneRateNgn: deviceRates?.phoneNgn ?? null,
+    deviceLaptopRateNgn: deviceRates?.laptopNgn ?? null,
+  };
+
   if (isNigeriaSeaShipping(country.countryName, plan.shippingPlanName)) {
     const financial = await prisma.exchange_rate.findUnique({
       where: { id: 1 },
@@ -62,6 +88,7 @@ export async function resolveNewProcurementShippingPricing(
     });
 
     return {
+      ...deviceSnapshot,
       version: PROCUREMENT_SHIPPING_PRICING_VERSION,
       measurementUnit: 'CBM',
       rate: positiveNumber(
@@ -75,6 +102,7 @@ export async function resolveNewProcurementShippingPricing(
   }
 
   return {
+    ...deviceSnapshot,
     version: PROCUREMENT_SHIPPING_PRICING_VERSION,
     measurementUnit: 'KG',
     rate: positiveNumber(plan.shippingPlanRate, 'Shipping-plan rate'),

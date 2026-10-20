@@ -46,8 +46,21 @@ export function ViewOrders({ params }: orderStatus) {
   const [orderData, setOrderData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState('');
   const [refresh, setRefresh] = useState(0);
+  const [counts, setCounts] = useState<Record<string, number>>();
+  useEffect(() => {
+    if (!pidUser) return;
+    const controller = new AbortController();
+    setCounts(undefined);
+    fetch(`/api/get-data/procurement-count/${pidUser}/saved`, { signal: controller.signal, cache: 'no-store' })
+      .then(async response => { if (!response.ok) throw new Error('Counts unavailable'); return response.json(); })
+      .then(data => { if (!controller.signal.aborted) setCounts(data); })
+      .catch(() => { /* Orders remain accessible if counts are unavailable. */ });
+    return () => controller.abort();
+  }, [pidUser, normalizedStatus, refresh]);
+
+  const [error, setError] = useState('');
+
 
   useEffect(() => {
     if (!pidUser) return;
@@ -77,7 +90,7 @@ export function ViewOrders({ params }: orderStatus) {
     router.push(`/dashboard/procurement/view-orders/${newStatus}`);
   };
 
-  return <ProcurementTrackerFrame status={normalizedStatus} onStatusChange={handleStatusChange} count={countRecords.length} createControl={<CreateOrder className="h-12 rounded-xl bg-[#2E62D9] px-6 text-sm font-semibold text-white" />}>
+  return <ProcurementTrackerFrame status={normalizedStatus} onStatusChange={handleStatusChange} count={countRecords.length} counts={counts} loading={loading} createControl={<CreateOrder className="h-12 rounded-xl bg-[#2E62D9] px-6 text-sm font-semibold text-white" />}>
         {loading ? <div className={styles.feedback} role="status">Loading your orders…</div> : error ? <div className={styles.feedback} role="alert">{error}<br /><button onClick={() => setRefresh(value => value + 1)}>Try again</button></div> : <>
 
 

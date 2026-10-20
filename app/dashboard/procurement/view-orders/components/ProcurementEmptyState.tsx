@@ -1,4 +1,5 @@
 'use client';
+import { procurementStatusLabel } from '@/app/dashboard/procurement/constants/order-statuses';
 import { Search } from 'lucide-react';
 /** Shared with the original Sure Imports order tracker. */
 export default function ProcurementEmptyState({
@@ -14,10 +15,10 @@ export default function ProcurementEmptyState({
         <Search className="h-10 w-10 text-slate-400 dark:text-slate-500" />
       </div>
       <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-        No {status.replaceAll('-', ' ')} Orders
+        No orders here yet
       </h3>
       <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-        You currently don&apos;t have any procurement requests in this state.
+        You have no orders marked “{procurementStatusLabel(status)}”.
       </p>
       <div className="mt-8">{action}</div>
     </div>
