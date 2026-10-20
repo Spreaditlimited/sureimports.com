@@ -1,9 +1,8 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight,
   BadgeCheck,
   BatteryCharging,
   BriefcaseBusiness,
@@ -20,14 +19,12 @@ import {
   Users,
   Wrench,
   ChevronDown,
-  Info
+  Info,
 } from 'lucide-react';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
 import { JsonLdScript } from '@/components/seo/JsonLd';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
-import heroStyles from './Hero.module.css';
 import workflowStyles from '@/components/home/Workflow.module.css';
 import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
@@ -199,60 +196,64 @@ export default function LaptopsForBusinessPage() {
     <>
       <JsonLdScript data={[serviceSchema, faqSchema]} />
       <Header />
-      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
-        
+      <main className={pageStyles.page} data-si-page-theme="service">
         {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-32 md:pt-44`}>
-          <PublicHeroBackground />
-          
-          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex w-full max-w-7xl flex-col items-center">
-<HeroPill className="mb-6">
-                <Laptop className="h-4 w-4" />
-                Enterprise Hardware Sourcing
-              </HeroPill>
-              <h1 className={`${heroStyles.headline} text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}>
-                Business laptops from China, <span className={`${heroStyles.ending} text-white`}>verified before shipping</span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Sure Imports helps Nigerian businesses, schools, and resellers source bulk laptops from China. We handle supplier verification, strict technical inspections, and end-to-door delivery.
-              </p>
-              
-              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-                <Link
-                  href={LINESCOUT_BULK_SOURCING_URL}
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Request a Business Quote <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-                <Link
-                  href="/shop"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
-                >
-                  Browse Available Stock
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ServiceHero
+          eyebrow="Laptops for business"
+          title="Equip your team with laptops from China."
+          description="Source bulk laptops for your business, school or resale operation in Nigeria, with supplier verification, technical inspections and delivery support."
+          summaryTitle="The right specification matters."
+          primary={{
+            href: LINESCOUT_BULK_SOURCING_URL,
+            label: 'Request a business quote',
+          }}
+          secondary={{ href: '/shop', label: 'Browse available stock' }}
+          steps={[
+            {
+              title: 'Share your laptop requirements',
+              description:
+                'Tell us the quantity, specification, budget and intended use.',
+            },
+            {
+              title: 'Verify before shipping',
+              description: 'Check suppliers and arrange technical inspections.',
+            },
+            {
+              title: 'Plan delivery',
+              description:
+                'Coordinate the shipment and delivery of your approved order.',
+            },
+          ]}
+        />
 
         <TrustedOrganizations />
 
         {/* --- TRUST BAR --- */}
-        <section className="border-b border-slate-200 bg-white py-10 dark:border-slate-800/50 dark:bg-slate-900/50">
+        <section className="border-b border-slate-200 bg-[var(--si-surface)] py-10 dark:border-slate-800/50">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 md:grid-cols-3 lg:px-8">
             {[
-              { stat: 'Since 2018', desc: 'Import operations built around Nigerian buyers' },
-              { stat: 'Bulk Ready', desc: 'Laptop batches for teams, schools and resellers' },
-              { stat: 'Inspection Led', desc: 'Strict technical checks before China dispatch' },
+              {
+                stat: 'Since 2018',
+                desc: 'Import operations built around Nigerian buyers',
+              },
+              {
+                stat: 'Bulk Ready',
+                desc: 'Laptop batches for teams, schools and resellers',
+              },
+              {
+                stat: 'Inspection Led',
+                desc: 'Strict technical checks before China dispatch',
+              },
             ].map((item) => (
               <div key={item.stat} className="flex items-center gap-4">
                 <div className="h-10 w-1 rounded-full bg-brand-orange-500" />
                 <div>
-                  <p className="text-xl font-black text-slate-950 dark:text-white">{item.stat}</p>
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{item.desc}</p>
+                  <p className="text-xl font-medium text-slate-950 dark:text-white">
+                    {item.stat}
+                  </p>
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             ))}
@@ -263,16 +264,17 @@ export default function LaptopsForBusinessPage() {
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Built for procurement
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Source laptops by specification, not by random supplier photos.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Buying laptops from China for a Nigerian business requires exactness. You need consistent
-                model grades, verified battery health, standard keyboard layouts, and a landed
-                cost that protects your bottom line.
+                Buying laptops from China for a Nigerian business requires
+                exactness. You need consistent model grades, verified battery
+                health, standard keyboard layouts, and a landed cost that
+                protects your bottom line.
               </p>
             </div>
 
@@ -280,11 +282,11 @@ export default function LaptopsForBusinessPage() {
               {audiences.map((audience) => (
                 <div
                   key={audience.title}
-                  className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 hover:-translate-y-1"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm transition-all hover:shadow-none dark:border-slate-800"
                 >
                   <div className="absolute right-0 top-0 -mr-4 -mt-4 h-24 w-24 rounded-full bg-brand-orange-500/5 transition-transform group-hover:scale-150" />
                   <audience.icon className="relative h-8 w-8 text-brand-orange-500" />
-                  <h3 className="relative mt-6 text-xl font-black text-slate-950 dark:text-white">
+                  <h3 className="relative mt-6 text-xl font-medium text-slate-950 dark:text-white">
                     {audience.title}
                   </h3>
                   <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
@@ -297,33 +299,50 @@ export default function LaptopsForBusinessPage() {
         </section>
 
         {/* --- WORKFLOW TIMELINE --- */}
-        <section className={`${workflowStyles.workflow} py-20 md:py-28 relative overflow-hidden`}>
-          
+        <section
+          className={`${workflowStyles.workflow} relative overflow-hidden py-20 md:py-28`}
+        >
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className={`${workflowStyles.accent} text-xs font-black uppercase tracking-widest`}>
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <span
+                className={`${workflowStyles.accent} text-xs font-medium uppercase tracking-widest`}
+              >
                 Procurement workflow
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                 A clear process before money leaves your account.
               </h2>
-              <p className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}>
-                The safest business laptop procurement starts with a written requirement. We help you
-                define the brief, compare realistic supply options, and inspect the batch before shipping.
+              <p
+                className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}
+              >
+                The safest business laptop procurement starts with a written
+                requirement. We help you define the brief, compare realistic
+                supply options, and inspect the batch before shipping.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {process.map((item, index) => (
-                <div key={item.title} className={`${workflowStyles.card} relative rounded-3xl border p-8`}>
-                  <div className={`${workflowStyles.icon} mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border`}>
+                <div
+                  key={item.title}
+                  className={`${workflowStyles.card} relative rounded-2xl border p-8`}
+                >
+                  <div
+                    className={`${workflowStyles.icon} mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border`}
+                  >
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <span className={`${workflowStyles.number} absolute top-8 right-8 text-6xl font-black pointer-events-none`}>
+                  <span
+                    className={`${workflowStyles.number} pointer-events-none absolute right-8 top-8 text-6xl font-medium`}
+                  >
                     {index + 1}
                   </span>
-                  <h3 className="text-xl font-bold">{item.title}</h3>
-                  <p className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}>{item.text}</p>
+                  <h3 className="text-xl font-medium">{item.title}</h3>
+                  <p
+                    className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}
+                  >
+                    {item.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -333,46 +352,59 @@ export default function LaptopsForBusinessPage() {
         {/* --- CAPABILITIES (Split Cards) --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-brand-orange-500 mb-6">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--si-surface)] text-brand-orange-500">
                   <Cpu className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Brands & Models we source
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
                   We support business laptop sourcing for teams that need
-                  consistent specifications and resellers that need sellable grades.
+                  consistent specifications and resellers that need sellable
+                  grades.
                 </p>
               </div>
               <ul className="space-y-4">
                 {laptopTypes.map((type) => (
-                  <li key={type} className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                  <li
+                    key={type}
+                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50"
+                  >
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{type}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {type}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-slate-900 text-brand-orange-500 mb-6 border border-slate-200 dark:border-slate-700">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-[var(--si-surface)] text-brand-orange-500 dark:border-slate-700">
                   <BatteryCharging className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Our Inspection Protocol
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Laptop sourcing fails when buyers only check the brand name. We check the parts that affect resale value and staff productivity.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Laptop sourcing fails when buyers only check the brand name.
+                  We check the parts that affect resale value and staff
+                  productivity.
                 </p>
               </div>
               <ul className="space-y-4">
                 {inspectionChecks.map((check) => (
-                  <li key={check} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+                  <li
+                    key={check}
+                    className="flex items-start gap-3 rounded-xl border border-slate-200 bg-[var(--si-surface)] p-4 shadow-sm dark:border-slate-700"
+                  >
                     <PackageCheck className="h-5 w-5 shrink-0 text-brand-orange-500" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{check}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {check}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -381,31 +413,32 @@ export default function LaptopsForBusinessPage() {
         </section>
 
         {/* --- BUYING GUIDE BENTO --- */}
-        <section className="bg-slate-50 py-20 dark:bg-slate-900/50 md:py-28">
+        <section className="bg-[var(--si-surface)] py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
               <div>
-                <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500 flex items-center gap-2 mb-4">
+                <span className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                   <Info className="h-4 w-4" /> Business buying guide
                 </span>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+                <h2 className="text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                   How to buy laptops from China for a Nigerian business.
                 </h2>
                 <div className="mt-6 space-y-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
                   <p>
-                    Start with the workload. A school may need durable, affordable
-                    Windows laptops. A design agency may need MacBook Pros. A reseller may need a mixed batch with
-                    reliable grades and fast-moving models.
+                    Start with the workload. A school may need durable,
+                    affordable Windows laptops. A design agency may need MacBook
+                    Pros. A reseller may need a mixed batch with reliable grades
+                    and fast-moving models.
                   </p>
                   <p>
-                    After the workload is clear, define the processor generation,
-                    RAM, storage, screen size, keyboard layout, and delivery
-                    deadline. This protects you from supplier quotes that look
-                    cheap but hide old processors or weak batteries.
+                    After the workload is clear, define the processor
+                    generation, RAM, storage, screen size, keyboard layout, and
+                    delivery deadline. This protects you from supplier quotes
+                    that look cheap but hide old processors or weak batteries.
                   </p>
                 </div>
               </div>
-              
+
               <div className="grid gap-4 sm:grid-cols-2">
                 {[
                   {
@@ -427,9 +460,9 @@ export default function LaptopsForBusinessPage() {
                 ].map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                    className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6 shadow-sm dark:border-slate-800"
                   >
-                    <h3 className="text-base font-bold text-slate-950 dark:text-white mb-2">
+                    <h3 className="mb-2 text-base font-medium text-slate-950 dark:text-white">
                       {item.title}
                     </h3>
                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
@@ -441,40 +474,51 @@ export default function LaptopsForBusinessPage() {
             </div>
 
             {/* Related Resources */}
-            <div className="mt-16 rounded-[2rem] bg-slate-950 p-8 text-white md:p-12 relative overflow-hidden">
-              <div className="absolute right-0 top-0 h-64 w-64 bg-brand-orange-500/20 blur-[100px] pointer-events-none" />
-              <div className="relative grid gap-10 lg:grid-cols-[0.8fr_1.2fr] items-center">
+            <div className="si-dark-surface relative mt-16 overflow-hidden rounded-2xl bg-[#15171c] p-8 text-white md:p-12">
+              <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 bg-brand-orange-500/20 blur-[100px]" />
+              <div className="relative grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
                 <div>
-                  <BadgeCheck className="h-10 w-10 text-brand-orange-400 mb-6" />
-                  <h3 className="text-3xl font-black tracking-tight">
+                  <BadgeCheck className="mb-6 h-10 w-10 text-brand-orange-400" />
+                  <h3 className="text-3xl font-medium tracking-tight">
                     Laptop Import Resources
                   </h3>
-                  <p className="mt-4 text-slate-400">Read our detailed guides on how to safely navigate Chinese electronics markets.</p>
+                  <p className="mt-4 text-slate-400">
+                    Read our detailed guides on how to safely navigate Chinese
+                    electronics markets.
+                  </p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Link
                     href="/blog/how-to-import-laptops-from-china-to-nigeria-safely"
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 hover:border-brand-orange-500/50"
+                    className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] p-5 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                   >
-                    <p className="font-bold text-slate-200 group-hover:text-brand-orange-300 transition-colors">Importing safely to Nigeria</p>
+                    <p className="font-medium text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                      Importing safely to Nigeria
+                    </p>
                   </Link>
                   <Link
                     href="/blog/how-to-safely-source-second-hand-iphones-and-laptops-from-china-without-losing-money-or-sleep"
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 hover:border-brand-orange-500/50"
+                    className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] p-5 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                   >
-                    <p className="font-bold text-slate-200 group-hover:text-brand-orange-300 transition-colors">Used iPhones & Laptops Guide</p>
+                    <p className="font-medium text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                      Used iPhones & Laptops Guide
+                    </p>
                   </Link>
                   <Link
                     href="/blog/nigeria-customs-duty-on-goods-from-china-how-to-estimate-your-import-cost-in-2026"
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 hover:border-brand-orange-500/50"
+                    className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] p-5 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                   >
-                    <p className="font-bold text-slate-200 group-hover:text-brand-orange-300 transition-colors">Estimating Customs Duty</p>
+                    <p className="font-medium text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                      Estimating Customs Duty
+                    </p>
                   </Link>
                   <Link
                     href="/blog/how-to-calculate-landed-cost-before-importing-from-china-to-nigeria"
-                    className="group rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10 hover:border-brand-orange-500/50"
+                    className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] p-5 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                   >
-                    <p className="font-bold text-slate-200 group-hover:text-brand-orange-300 transition-colors">Calculating Landed Cost</p>
+                    <p className="font-medium text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                      Calculating Landed Cost
+                    </p>
                   </Link>
                 </div>
               </div>
@@ -485,45 +529,48 @@ export default function LaptopsForBusinessPage() {
         {/* --- CTAS --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-3xl text-center mb-16">
-              <Wrench className="mx-auto h-12 w-12 text-brand-orange-500 mb-6" />
-              <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <Wrench className="mx-auto mb-6 h-12 w-12 text-brand-orange-500" />
+              <h2 className="text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Two ways to buy laptops through Sure Imports.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
                 Use the shop for ready-to-ship available products. Use corporate
-                sourcing when you need a specific batch, strict specifications, or a procurement quote for your team.
+                sourcing when you need a specific batch, strict specifications,
+                or a procurement quote for your team.
               </p>
             </div>
-            
+
             <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
               <Link
                 href="/shop"
-                className="group flex flex-col items-center text-center rounded-[2.5rem] border border-slate-200 bg-white p-10 shadow-sm transition-all hover:border-brand-orange-400 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+                className="group flex flex-col items-center rounded-[2.5rem] border border-slate-200 bg-[var(--si-surface)] p-10 text-center shadow-sm transition-all hover:border-brand-orange-400 hover:shadow-none dark:border-slate-800"
               >
-                <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--si-surface)] transition-transform group-hover:scale-110">
                   <Laptop className="h-8 w-8 text-brand-orange-500" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-950 dark:text-white">
+                <h3 className="text-2xl font-medium text-slate-950 dark:text-white">
                   Browse the shop
                 </h3>
                 <p className="mt-4 text-slate-600 dark:text-slate-400">
-                  Check available laptops, phones and gadgets already listed and ready for purchase.
+                  Check available laptops, phones and gadgets already listed and
+                  ready for purchase.
                 </p>
               </Link>
-              
+
               <Link
                 href={LINESCOUT_BULK_SOURCING_URL}
-                className="group flex flex-col items-center text-center rounded-[2.5rem] border-2 border-brand-orange-500 bg-brand-orange-50/50 p-10 shadow-md transition-all hover:bg-brand-orange-50 dark:border-brand-orange-500/50 dark:bg-brand-orange-500/5 dark:hover:bg-brand-orange-500/10"
+                className="group flex flex-col items-center rounded-[2.5rem] border-2 border-brand-orange-500 bg-brand-orange-50/50 p-10 text-center shadow-md transition-all hover:bg-brand-orange-50 dark:border-brand-orange-500/50 dark:bg-brand-orange-500/5 dark:hover:bg-brand-orange-500/10"
               >
-                <div className="h-16 w-16 rounded-2xl bg-brand-orange-100 dark:bg-brand-orange-500/20 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-orange-100 transition-transform group-hover:scale-110 dark:bg-brand-orange-500/20">
                   <BriefcaseBusiness className="h-8 w-8 text-brand-orange-500" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-950 dark:text-white">
+                <h3 className="text-2xl font-medium text-slate-950 dark:text-white">
                   Request bulk sourcing
                 </h3>
                 <p className="mt-4 text-slate-600 dark:text-slate-400">
-                  Start a LineScout project for a custom laptop requirement for your company, school or reseller pipeline.
+                  Start a LineScout project for a custom laptop requirement for
+                  your company, school or reseller pipeline.
                 </p>
               </Link>
             </div>
@@ -531,24 +578,24 @@ export default function LaptopsForBusinessPage() {
         </section>
 
         {/* --- NATIVE ACCORDION FAQS --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28">
+        <section className="si-dark-surface bg-[#15171c] py-20 text-white md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-center text-3xl font-black tracking-tight md:text-5xl mb-12">
+            <h2 className="mb-12 text-center text-3xl font-medium tracking-tight md:text-4xl">
               Business laptop FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <details 
-                  key={faq.question} 
-                  className="group rounded-2xl border border-white/10 bg-white/5 [&_summary::-webkit-details-marker]:hidden"
+                <details
+                  key={faq.question}
+                  className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold outline-none transition hover:text-brand-orange-300">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium outline-none transition hover:text-brand-orange-300">
                     {faq.question}
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 transition group-open:rotate-180">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--si-surface)] transition group-open:rotate-180">
                       <ChevronDown className="h-4 w-4" />
                     </span>
                   </summary>
-                  <div className="px-6 pb-6 text-slate-400 leading-relaxed">
+                  <div className="px-6 pb-6 leading-relaxed text-slate-400">
                     <p>{faq.answer}</p>
                   </div>
                 </details>

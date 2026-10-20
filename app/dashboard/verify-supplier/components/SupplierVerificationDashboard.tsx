@@ -1,6 +1,6 @@
 'use client';
 
-import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+import darkHeader from '@/components/dashboard/WorkspaceHeader.module.css';
 
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -295,8 +295,8 @@ export default function SupplierVerificationDashboard({
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-black">
-      <header className="bg-slate-900 pb-32 pt-12 text-white dark:bg-[#0b0c16]">
+    <div className="si-workspace">
+      <header className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {mode === 'create' ? (
             <div className="flex flex-col items-start">
@@ -390,7 +390,7 @@ export default function SupplierVerificationDashboard({
         </div>
       </header>
 
-      <main className="mx-auto -mt-16 max-w-7xl space-y-6 px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body space-y-6">
         {mode === 'create' ? (
           <form
             onSubmit={submit}

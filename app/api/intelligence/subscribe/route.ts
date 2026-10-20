@@ -1,3 +1,6 @@
+import { getActiveIntelligenceSubscription } from '@/lib/intelligence/access';
+import { getAccountCountry } from '@/lib/features/server';
+import { POST as paypalCheckout } from '@/app/api/intelligence/paypal/route';
 import { NextRequest, NextResponse } from 'next/server';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -25,18 +28,18 @@ function absoluteUrl(path: string) {
 }
 
 export async function POST(request: NextRequest) {
-  if (!PAYSTACK_SECRET_KEY) {
-    return NextResponse.json(
-      { message: 'Paystack secret key is not configured.' },
-      { status: 500 },
-    );
-  }
-
   const body = await request.json().catch(() => ({}));
+  const authUser = await checkAuth();
+  const country = authUser?.pidUser ? await getAccountCountry(authUser.pidUser) : String(body.billingCountry || 'Nigeria');
+  if (country !== 'Nigeria') {
+    if (!authUser?.pidUser) return NextResponse.json({ statusx: 'ACCOUNT_EXISTS_LOGIN_REQUIRED', message: 'Sign in or create an account to pay with PayPal.', loginPath: '/auth/login?next=%2Fdashboard%2Fintelligence' }, { status: 409 });
+    return paypalCheckout(new Request(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ ...body, action: 'subscription' }) }));
+  }
+  if (authUser?.pidUser && (await getActiveIntelligenceSubscription(authUser.pidUser))?.currency === 'USD') return NextResponse.json({message:'Manage your existing PayPal subscription before starting another plan.'},{status:409});
+  if (!PAYSTACK_SECRET_KEY) return NextResponse.json({ message: 'Paystack is not configured.' }, { status: 503 });
   const planKey = body.plan === 'pro' ? 'pro' : 'starter';
   const plan = await getConfiguredIntelligencePlan(planKey);
   const paystackPlanCode = await getPaystackPlanCode(plan.key);
-  const authUser = await checkAuth();
   const email = String(body.email || authUser?.userEmail || '')
     .trim()
     .toLowerCase();

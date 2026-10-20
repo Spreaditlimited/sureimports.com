@@ -92,7 +92,7 @@ function ShippingOnlyForm() {
   const navigateWithAlert = useNavigationWithAlert();
   const { user } = useAuth();
   
-  const [pidUser] = useState(user?.pidUser || '');
+  const pidUser = user?.pidUser || '';
   const [pidShippingOnly] = useState(productID);
   const [email] = useState(user?.userEmail || '');
   const [countries, setCountries] = useState<CountryOption[]>([]);

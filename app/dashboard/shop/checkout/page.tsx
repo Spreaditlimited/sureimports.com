@@ -159,9 +159,9 @@ function CheckoutContent() {
   if (!cartHydrated || cart.length === 0) return null;
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Deep Slate Hero Header */}
-      <div className="bg-slate-900 pb-32 pt-8 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <button
             onClick={() => router.back()}
@@ -199,7 +199,7 @@ function CheckoutContent() {
         </div>
       </div>
 
-      <main className="relative z-10 mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {quoteError && (
           <div
             role="alert"

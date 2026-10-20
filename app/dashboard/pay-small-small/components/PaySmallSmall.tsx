@@ -177,8 +177,8 @@ export default function App({
   );
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const [pidUser] = useState(user?.pidUser);
-  const [email] = useState(user?.userEmail);
+  const pidUser = user?.pidUser;
+  const email = user?.userEmail;
 
   const [customer, setCustomer] = useState<any | null>(null);
   const [transactions, setTransaction] = useState<any | null>(null);
@@ -356,9 +356,9 @@ export default function App({
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Hero Header */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-3 flex items-center gap-2">
             <span className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-400">
@@ -374,7 +374,7 @@ export default function App({
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Account & Wallet Cards */}
         <div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Virtual Account Card */}

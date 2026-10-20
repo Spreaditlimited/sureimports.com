@@ -1,9 +1,8 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight,
   BadgeCheck,
   Briefcase,
   CalendarClock,
@@ -14,17 +13,13 @@ import {
   Factory,
   FileSearch,
   Gift,
-  Globe,
   Laptop,
-  MessageSquare,
   Package,
-  PackageCheck,
   PenTool,
   ShieldCheck,
   ShoppingCart,
   Truck,
-  UploadCloud,
-  Info
+  Info,
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/app/(home)/components/Footer';
@@ -35,7 +30,6 @@ import {
   DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
   DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
 } from '@/lib/corporateSourcing/pricing';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import workflowStyles from '@/components/home/Workflow.module.css';
 import {
   LINESCOUT_BASE_URL,
@@ -46,7 +40,8 @@ const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/corporate-sourcing`;
 
 export const metadata: Metadata = {
-  title: 'Corporate Procurement from China for Nigerian Organisations | Sure Imports',
+  title:
+    'Corporate Procurement from China for Nigerian Organisations | Sure Imports',
   description:
     'Structured China procurement for banks, large companies, institutions, government bodies and NGOs. Sure Imports handles supplier search, verification, inspection, shipping and delivery to Nigeria.',
   keywords: [
@@ -201,7 +196,7 @@ const faqs = [
   {
     question: 'Can Sure Imports source machines and equipment for my business?',
     answer:
-      'Yes. We can source production, packaging, processing, agricultural and other commercial machinery from China. Share the machine\'s intended use, required capacity, power or voltage, preferred model and delivery location so we can compare suitable suppliers and configurations.',
+      "Yes. We can source production, packaging, processing, agricultural and other commercial machinery from China. Share the machine's intended use, required capacity, power or voltage, preferred model and delivery location so we can compare suitable suppliers and configurations.",
   },
   {
     question: 'Can Sure Imports source branded corporate gifts from China?',
@@ -267,75 +262,76 @@ export default function CorporateGiftsPage() {
     <>
       <JsonLdScript data={[serviceSchema, faqSchema]} />
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 antialiased dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
-        
+      <main className={pageStyles.page} data-si-page-theme="service">
         {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
-          <PublicHeroBackground />
-          <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
-          
-          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center">
-<HeroPill className="mb-6">
-                <Briefcase className="h-4 w-4" />
-                Corporate Sourcing
-              </HeroPill>
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                <span className="block">China procurement</span>
-                <span className="mt-2 block text-[0.78em] leading-[1.05] text-white">
-                  built for established organisations
-                </span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Sure Imports supports banks, large companies, institutions, government bodies and NGOs with structured supplier search, specifications, approvals, inspection, shipping and delivery.
-              </p>
-              
-              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-                <a
-                  href="#corporate-sourcing-form"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start a Sourcing Request <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </a>
-                <Link
-                  href={LINESCOUT_BASE_URL}
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
-                >
-                  Small business? Use LineScout
-                </Link>
-              </div>
-            </div>
-          </div>
-
-        </section>
+        <ServiceHero
+          eyebrow="Corporate sourcing"
+          title="China procurement for your organisation."
+          description="Structured sourcing for banks, companies, institutions, government bodies and NGOs. Bring specifications, approvals, inspection and delivery into one coordinated process."
+          summaryTitle="Built around your procurement brief."
+          primary={{
+            href: '#corporate-sourcing-form',
+            label: 'Start a sourcing request',
+          }}
+          secondary={{
+            href: LINESCOUT_BASE_URL,
+            label: 'Small business? Use LineScout',
+          }}
+          steps={[
+            {
+              title: 'Define your requirements',
+              description:
+                'Share specifications, quantities, budget and delivery needs.',
+            },
+            {
+              title: 'Review your options',
+              description:
+                'Work through supplier selection, samples and approvals.',
+            },
+            {
+              title: 'Coordinate fulfilment',
+              description:
+                'Arrange inspection, shipping and delivery with our team.',
+            },
+          ]}
+        />
 
         <TrustedOrganizations />
 
         {/* --- CATEGORIES BENTO --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mb-16">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <div className="mb-16 max-w-3xl">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Built for business buying
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Procurement that can stand up to organisational scrutiny.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Institutional procurement can involve technical specifications, production capacity, exact quantities, firm deadlines, customization, internal approvals and several stakeholders. We keep the supplier and order process clear enough for your team to review and act on.
+                Institutional procurement can involve technical specifications,
+                production capacity, exact quantities, firm deadlines,
+                customization, internal approvals and several stakeholders. We
+                keep the supplier and order process clear enough for your team
+                to review and act on.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {productCategories.map((item) => (
-                <div key={item.title} className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 hover:-translate-y-1">
-                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500">
+                <div
+                  key={item.title}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm transition-all hover:shadow-none dark:border-slate-800"
+                >
+                  <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-950 dark:text-white">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.text}</p>
+                  <h3 className="text-xl font-medium text-slate-950 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    {item.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -343,32 +339,50 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- WORKFLOW TIMELINE --- */}
-        <section className={`${workflowStyles.workflow} py-20 md:py-28 relative overflow-hidden`}>
-          
+        <section
+          className={`${workflowStyles.workflow} relative overflow-hidden py-20 md:py-28`}
+        >
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-              <span className={`${workflowStyles.accent} text-xs font-black uppercase tracking-widest`}>
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <span
+                className={`${workflowStyles.accent} text-xs font-medium uppercase tracking-widest`}
+              >
                 How it works
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                 A sourcing workflow your team can actually follow.
               </h2>
-              <p className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}>
-                The goal isn't just a low price. It is the right product or machine, correct specifications and quantity, and a clear landed cost before a single Naira is committed.
+              <p
+                className={`${workflowStyles.copy} mt-6 text-lg leading-relaxed`}
+              >
+                The goal isn't just a low price. It is the right product or
+                machine, correct specifications and quantity, and a clear landed
+                cost before a single Naira is committed.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {workflow.map((step, index) => (
-                <div key={step.title} className={`${workflowStyles.card} relative rounded-3xl border p-8`}>
-                  <span className={`${workflowStyles.number} absolute top-6 right-6 text-6xl font-black pointer-events-none`}>
+                <div
+                  key={step.title}
+                  className={`${workflowStyles.card} relative rounded-2xl border p-8`}
+                >
+                  <span
+                    className={`${workflowStyles.number} pointer-events-none absolute right-6 top-6 text-6xl font-medium`}
+                  >
                     {index + 1}
                   </span>
-                  <div className={`${workflowStyles.icon} mb-6 flex h-12 w-12 items-center justify-center rounded-xl border`}>
+                  <div
+                    className={`${workflowStyles.icon} mb-6 flex h-12 w-12 items-center justify-center rounded-xl border`}
+                  >
                     <step.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="text-xl font-bold">{step.title}</h3>
-                  <p className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}>{step.text}</p>
+                  <h3 className="text-xl font-medium">{step.title}</h3>
+                  <p
+                    className={`${workflowStyles.copy} mt-3 text-sm leading-relaxed`}
+                  >
+                    {step.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -378,94 +392,116 @@ export default function CorporateGiftsPage() {
         {/* --- CHECKS & PLANNING BENTO --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            
             {/* Checklist Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 dark:bg-slate-800 text-brand-orange-500 mb-6">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-slate-800">
                   <CheckCircle2 className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   What to prepare before requesting a quote
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Clear briefs produce accurate quotes. Send context so we compare suppliers based on what you actually need, not just vague estimates.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Clear briefs produce accurate quotes. Send context so we
+                  compare suppliers based on what you actually need, not just
+                  vague estimates.
                 </p>
               </div>
               <ul className="space-y-4">
                 {buyerChecks.map((check) => (
-                  <li key={check} className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                  <li
+                    key={check}
+                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50"
+                  >
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{check}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {check}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Timeline Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-slate-900 text-brand-orange-500 mb-6 border border-slate-200 dark:border-slate-700">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-[var(--si-surface)] text-brand-orange-500 dark:border-slate-700">
                   <CalendarClock className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Start early for machinery, campaigns and custom orders.
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Corporate orders may involve technical confirmation, supplier checks, samples or testing, production and shipping. Starting early protects your operational or campaign timeline.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Corporate orders may involve technical confirmation, supplier
+                  checks, samples or testing, production and shipping. Starting
+                  early protects your operational or campaign timeline.
                 </p>
               </div>
-              
+
               <div className="space-y-6">
-                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-bold leading-relaxed text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
-                  <Info className="inline-block h-4 w-4 mr-2 mb-1" />
-                  Allow at least 8 to 12 weeks; complex or made-to-order machines may require longer.
+                <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-medium leading-relaxed text-amber-800 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-200">
+                  <Info className="mb-1 mr-2 inline-block h-4 w-4" />
+                  Allow at least 8 to 12 weeks; complex or made-to-order
+                  machines may require longer.
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {['Machine specifications', 'Custom packaging', 'Production proofing', 'Export inspection'].map((item) => (
-                    <div key={item} className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-bold text-center text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                  {[
+                    'Machine specifications',
+                    'Custom packaging',
+                    'Production proofing',
+                    'Export inspection',
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-xl border border-slate-200 bg-[var(--si-surface)] p-4 text-center text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-300"
+                    >
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-
           </div>
         </section>
 
         {/* --- FORM SECTION --- */}
-        <section id="corporate-sourcing-form" className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/50 md:py-28">
+        <section
+          id="corporate-sourcing-form"
+          className="border-y border-slate-200 bg-[var(--si-surface)] py-20 dark:border-slate-800 md:py-28"
+        >
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-             <div className="text-center mb-12">
-               <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
-                 Request a quote
-               </span>
-               <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                 Submit your organisation&apos;s procurement brief.
-               </h2>
-               <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
-                 Share the organisation name, product or equipment details,
-                 specifications, quantity, approval timeline and any customization
-                 requirements. This route is intended for established organisations
-                 with formal procurement needs. Please note that a{' '}
-                 <strong className="font-bold text-slate-900 dark:text-white">
-                   ₦50,000 or $50 research fee
-                 </strong>{' '}
-                 is required before we begin identifying the most suitable
-                 manufacturer. This fee is{' '}
-                 <strong className="font-bold text-slate-900 dark:text-white">
-                   fully credited toward your procurement
-                 </strong>{' '}
-                 if you proceed with your order.
-               </p>
-             </div>
-             <div className="mx-auto max-w-4xl">
-               <CorporateGiftsClient researchFee={{
-                 priceNaira: DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
-                 priceUsdCents: DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
-               }} />
-             </div>
+            <div className="mb-12 text-center">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
+                Request a quote
+              </span>
+              <h2 className="mt-4 text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
+                Submit your organisation&apos;s procurement brief.
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400">
+                Share the organisation name, product or equipment details,
+                specifications, quantity, approval timeline and any
+                customization requirements. This route is intended for
+                established organisations with formal procurement needs. Please
+                note that a{' '}
+                <strong className="font-medium text-slate-900 dark:text-white">
+                  ₦50,000 or $50 research fee
+                </strong>{' '}
+                is required before we begin identifying the most suitable
+                manufacturer. This fee is{' '}
+                <strong className="font-medium text-slate-900 dark:text-white">
+                  fully credited toward your procurement
+                </strong>{' '}
+                if you proceed with your order.
+              </p>
+            </div>
+            <div className="mx-auto max-w-4xl">
+              <CorporateGiftsClient
+                researchFee={{
+                  priceNaira: DEFAULT_CORPORATE_SOURCING_PRICE_NAIRA,
+                  priceUsdCents: DEFAULT_CORPORATE_SOURCING_PRICE_USD_CENTS,
+                }}
+              />
+            </div>
           </div>
         </section>
 
@@ -473,14 +509,17 @@ export default function CorporateGiftsPage() {
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 max-w-3xl">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Related services
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Choose the right route for your order.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Corporate Sourcing is for established organisations with formal procurement requirements. Individuals and small businesses sourcing white-label products, wholesale stock or machines should manage those projects in LineScout.
+                Corporate Sourcing is for established organisations with formal
+                procurement requirements. Individuals and small businesses
+                sourcing white-label products, wholesale stock or machines
+                should manage those projects in LineScout.
               </p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -488,13 +527,17 @@ export default function CorporateGiftsPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group rounded-3xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-orange-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900"
+                  className="group rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6 transition-all hover:border-brand-orange-300 hover:shadow-lg dark:border-slate-800"
                 >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-50 text-brand-orange-500 group-hover:bg-brand-orange-50 dark:bg-slate-800 dark:group-hover:bg-brand-orange-500/10">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--si-surface)] text-brand-orange-500 group-hover:bg-brand-orange-50 dark:group-hover:bg-brand-orange-500/10">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-black text-slate-950 dark:text-white">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.text}</p>
+                  <h3 className="text-lg font-medium text-slate-950 dark:text-white">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    {item.text}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -502,24 +545,24 @@ export default function CorporateGiftsPage() {
         </section>
 
         {/* --- NATIVE ACCORDION FAQS --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28">
+        <section className="si-dark-surface bg-[#15171c] py-20 text-white md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-center text-3xl font-black tracking-tight md:text-5xl mb-12">
+            <h2 className="mb-12 text-center text-3xl font-medium tracking-tight md:text-4xl">
               Corporate sourcing FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
-                <details 
-                  key={faq.question} 
-                  className="group rounded-2xl border border-white/10 bg-white/5 [&_summary::-webkit-details-marker]:hidden"
+                <details
+                  key={faq.question}
+                  className="group rounded-2xl border border-white/10 bg-[var(--si-surface)] [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold outline-none transition hover:text-brand-orange-400">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium outline-none transition hover:text-brand-orange-400">
                     {faq.question}
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 transition group-open:rotate-180">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--si-surface)] transition group-open:rotate-180">
                       <ChevronDown className="h-4 w-4" />
                     </span>
                   </summary>
-                  <div className="px-6 pb-6 text-slate-400 leading-relaxed">
+                  <div className="px-6 pb-6 leading-relaxed text-slate-400">
                     <p>{faq.answer}</p>
                   </div>
                 </details>
@@ -527,7 +570,6 @@ export default function CorporateGiftsPage() {
             </div>
           </div>
         </section>
-
       </main>
       <Footer />
     </>

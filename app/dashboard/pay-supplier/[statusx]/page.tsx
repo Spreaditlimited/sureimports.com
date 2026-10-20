@@ -73,41 +73,24 @@ export function OrderList({ params }: orderStatus) {
 
   const [productData, setProductData] = useState<ProductData>(); //DATA FROM API CALL
   const [productCount, setProductCount] = useState<ProductCount>(); //DATA FROM API CALL
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-
-  const fetchProduct = async (pidUser: string, statusx: string) => {
-    try {
-      //request for users
-      const res = await fetch(
-        `/api/get-data/pay-supplier/${pidUser}/${statusx}`,
-      );
-
-      //check if request was successful
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch user');
-      }
-
-      //fetch json records into userData
-      const data: ProductData = await res.json();
-
-      //update user records variables
-      setProductData(data);
-      //setPidUser(data.pidUser);
-    } catch (err: any) {
-      //setError(err.message || 'An error occurred');
-    } finally {
-      //setLoading(false);
-    }
-  };
-
-  //run fetchUser function to get user records
+  const pidUser = user?.pidUser;
+  const [loadError, setLoadError] = useState(false);
+  const [retry, setRetry] = useState(0);
   useEffect(() => {
-    if (pidUser) {
-      fetchProduct(pidUser, statusx);
-      //fetchProductCount(pidUser, status);
+    if (!pidUser) return;
+    const controller = new AbortController();
+    setProductData(undefined); setLoadError(false);
+    async function load() {
+      try {
+        const response = await fetch(`/api/get-data/pay-supplier/${pidUser}/${statusx}`, { signal: controller.signal });
+        if (!response.ok) throw Error('Unable to load requests');
+        const data = await response.json();
+        if (!controller.signal.aborted) setProductData(data);
+      } catch { if (!controller.signal.aborted) setLoadError(true); }
     }
-  }, [pidUser]);
+    void load();
+    return () => controller.abort();
+  }, [pidUser, statusx, retry]);
 
   //const product: ProductData[] = productData; //ARRAY FORMAT
   //const jsonData = JSON.stringify(productData, null, 2); //JSON FORMAT
@@ -121,6 +104,7 @@ export function OrderList({ params }: orderStatus) {
     }
   }
 
+  if (loadError) return <div role="alert" className="rounded-xl border border-slate-200 p-6 dark:border-slate-700"><h2 className="font-semibold">We couldn’t load your supplier payments</h2><p className="mt-2 text-sm">Your requests haven’t changed. Try loading them again.</p><button type="button" onClick={() => setRetry(value => value + 1)} className="mt-4 min-h-11 rounded-lg bg-[var(--si-primary)] px-5 py-3 text-[var(--si-on-primary)]">Try again</button></div>;
   if (!productData) return <Loader />;
   if (countRecords.length == 0)
     return (

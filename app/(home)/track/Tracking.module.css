@@ -1,0 +1,8 @@
+.page { min-height:75vh; padding:155px var(--si-gutter) 80px; background:var(--si-canvas); color:var(--si-ink); }
+.intro { text-align:center; }
+.intro h1 { font-size:clamp(40px,4.7vw,68px); font-weight:var(--si-headline-weight); letter-spacing:var(--si-headline-tracking); line-height:1.08; margin:22px auto 0; }
+.intro > p:last-child { font-size:18px; line-height:1.8; margin:24px auto 0; color:var(--si-muted); }
+.form { display:flex; gap:12px; max-width:720px; margin:32px auto 0; padding:16px; border:1px solid var(--si-border); border-radius:16px; background:var(--si-surface); }
+.submit { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:12px 22px; min-height:48px; border-radius:10px; background:var(--si-primary); color:var(--si-on-primary); font-size:15px; font-weight:500; }
+.submit:hover { filter:brightness(.94); }
+@media(max-width:640px) { .page { padding-top:125px; } .intro h1 { font-size:clamp(32px,8vw,42px); } .intro > p:last-child { font-size:16px; } .form { flex-direction:column; padding:16px; } .form input { width:100%; } }

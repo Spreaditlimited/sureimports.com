@@ -109,9 +109,9 @@ export default function MyInvoicesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-        <div className="h-64 bg-slate-900 pb-32 pt-12 text-white"></div>
-        <div className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <div className="si-workspace">
+        <div className="si-workspace-header"><div><h1>My Invoices</h1><p className="mt-2 text-slate-500" role="status">Loading invoices…</p></div></div>
+        <div className="si-workspace-body">
           <div className="flex h-96 items-center justify-center rounded-[32px] border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
           </div>
@@ -121,9 +121,9 @@ export default function MyInvoicesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Deep Slate Hero Section */}
-      <div className="bg-slate-900 pb-40 pt-12 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
@@ -140,7 +140,7 @@ export default function MyInvoicesPage() {
               </p>
             </div>
 
-            {/* Hero Stats */}
+
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20">
@@ -174,7 +174,7 @@ export default function MyInvoicesPage() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-24 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Toolbar */}
         <div className="mb-6 flex items-center justify-between">
           <p className="text-sm font-bold text-slate-900 dark:text-white">
@@ -196,7 +196,8 @@ export default function MyInvoicesPage() {
 
         {/* Invoices Table Container */}
         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-          <div className="overflow-x-auto">
+          <p className="px-5 py-3 text-xs text-slate-500 md:hidden">Swipe across to see invoice totals and payment actions.</p>
+          <div role="region" aria-label="Your invoices" tabIndex={0} className="overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-sm">
               <thead>
                 <tr className="border-b border-slate-100 bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:border-slate-800 dark:bg-slate-800/30">

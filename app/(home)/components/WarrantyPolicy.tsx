@@ -1,8 +1,7 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import React, { useEffect, useState } from 'react';
 import {
   Smartphone,
@@ -107,11 +106,11 @@ export default function WarrantyPolicy() {
   ];
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950">
-      
+    <div className={styles.page}>
+
       {/* Premium Page Header */}
-<div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
-        <PublicHeroBackground darkOnly priority={false} />
+<div className={styles.hero}>
+
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
 <HeroPill className="mb-6">
@@ -130,7 +129,7 @@ export default function WarrantyPolicy() {
 
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
-          
+
           {/* LEFT: Sticky Table of Contents */}
           <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
             <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
@@ -161,7 +160,7 @@ export default function WarrantyPolicy() {
 
           {/* RIGHT: Document Content */}
           <div className="flex-1 space-y-16 lg:max-w-3xl">
-            
+
             {/* Phones & Tablets */}
             <section id="phones-tablets" className="scroll-mt-32">
               <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
@@ -170,7 +169,7 @@ export default function WarrantyPolicy() {
               </h2>
               <div className="mb-6 grid gap-4 sm:grid-cols-3">
                 {phoneFeatures.map((f, i) => (
-                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5  dark:border-slate-800 dark:bg-slate-900">
                     <h4 className="mb-1 text-sm font-bold text-slate-900 dark:text-white">{f.title}</h4>
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{f.desc}</p>
                   </div>
@@ -206,7 +205,7 @@ export default function WarrantyPolicy() {
               </h2>
               <div className="mb-6 grid gap-4 sm:grid-cols-3">
                 {laptopFeatures.map((f, i) => (
-                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                  <div key={i} className="rounded-2xl border border-slate-200 bg-white p-5  dark:border-slate-800 dark:bg-slate-900">
                     <h4 className="mb-1 text-sm font-bold text-slate-900 dark:text-white">{f.title}</h4>
                     <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{f.desc}</p>
                   </div>
@@ -248,7 +247,7 @@ export default function WarrantyPolicy() {
                   </li>
                 ))}
               </ul>
-              
+
               <div className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/30 dark:bg-amber-900/10">
                 <h4 className="mb-2 font-bold text-amber-900 dark:text-amber-200">Note on Screens & External Damage</h4>
                 <p className="text-sm font-medium leading-relaxed text-amber-800 dark:text-amber-300">
@@ -274,8 +273,8 @@ export default function WarrantyPolicy() {
                   <strong className="text-slate-900 dark:text-white">3. Resolution:</strong> After verification, we will repair the device at no cost, offer a replacement, or (in rare cases) refund the value.
                 </p>
               </div>
-              
-              <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+
+              <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                 <h4 className="mb-4 font-bold text-slate-900 dark:text-white">Required for Claims</h4>
                 <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400">
                   <li className="flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-500" /> Sufficient proof of purchase (Order # or Sales Invoice)</li>
@@ -322,7 +321,7 @@ export default function WarrantyPolicy() {
                   'Returning defective items via international shipping',
                   'Costs associated with unauthorized returns'
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                  <li key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4  dark:border-slate-800 dark:bg-slate-900">
                     <Truck className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item}</span>
                   </li>
@@ -347,7 +346,7 @@ export default function WarrantyPolicy() {
             </section>
 
             {/* Footer Agreement */}
-            <div className="mt-16 rounded-[24px] bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
+            <div className="mt-16 rounded-2xl bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
               <p className="text-sm font-medium leading-relaxed text-slate-300">
                 This limited warranty provided by the manufacturer in no way affects a potential statutory warranty provided by law.
               </p>

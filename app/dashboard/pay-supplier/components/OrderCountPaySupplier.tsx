@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { useRecord } from '@/app/context/RecordCountPaySupplierContext';
 
@@ -14,6 +14,7 @@ interface ProductStatus {
 
 const OrderCount: React.FC<ProductStatus> = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { recordx } = useRecord();
 
   const cards = [
@@ -44,17 +45,18 @@ const OrderCount: React.FC<ProductStatus> = () => {
   ];
 
   return (
-    <div className="mt-10 grid w-full gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="si-workspace-statuses mt-6 grid w-full grid-cols-2 gap-3 xl:grid-cols-4">
       {cards.map((card) => (
         <button
           key={card.href}
           type="button"
+          aria-current={pathname === card.href ? 'page' : undefined}
           className="flex items-center gap-4 rounded-xl border border-slate-700 bg-slate-800/50 p-5 text-left backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-slate-800/70 dark:border-slate-700 dark:bg-[#161629]/70 dark:hover:bg-[#1d1f36]"
           onClick={() => {
             router.push(card.href);
           }}
         >
-          <div className="rounded-lg bg-slate-800 p-3 dark:bg-[#0f1020]">
+          <div className="rounded-lg bg-slate-100 p-3">
             <Image src={card.image} alt={card.title} width={26} height={26} />
           </div>
           <div>

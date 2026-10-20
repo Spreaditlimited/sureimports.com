@@ -1,0 +1,56 @@
+.page {
+  background: var(--si-canvas);
+  color: var(--si-ink);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+.container {
+  max-width: 1440px;
+  margin-inline: auto;
+  padding: 155px var(--si-gutter) 0;
+}
+.header {
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto 48px;
+}
+.header h1 {
+  font-size: clamp(40px, 4.7vw, 68px);
+  font-weight: var(--si-headline-weight);
+  letter-spacing: var(--si-headline-tracking);
+  line-height: 1.08;
+  margin: 22px auto 24px;
+}
+.header h1 span {
+  background: none;
+  color: var(--si-accent);
+}
+.header > p {
+  max-width: 720px;
+  margin-inline: auto;
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--si-muted);
+  font-weight: 400;
+}
+.page :is(h2, h3, h4) {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.page label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+@media (max-width: 640px) {
+  .container {
+    padding-top: 129px;
+  }
+  .header h1 {
+    font-size: clamp(32px, 8vw, 42px);
+  }
+  .header > p {
+    font-size: 16px;
+  }
+}

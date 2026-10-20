@@ -1,0 +1,36 @@
+.page { color: var(--si-ink); }
+.form { display: grid; gap: 24px; align-items: start; }
+.identity, .fields { min-width: 0; }
+.identity { display: grid; gap: 16px; }
+.identity :is(h2,p) { overflow-wrap: anywhere; }
+.section { padding: 24px; }
+.profile .fields :is(input,select,textarea) { min-width: 0; max-width: 100%; font-size: 16px; }
+.profile .fields :is(input,textarea) { padding-left: 12px; }
+.profile .fields input { min-height: 48px; }
+.profile .fields label { display: block; margin-bottom: 8px; color: var(--si-muted); }
+.footer { padding: 20px 24px; border-top: 1px solid var(--si-border); background: var(--si-soft); }
+.actions { display: flex; flex-direction: column; align-items: stretch; gap: 16px; }
+.actions p { line-height: 1.6; }
+.save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; width: 100%; padding: 12px 24px; border-radius: 10px; background: var(--si-primary); color: var(--si-on-primary); font-size: 14px; font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+.save:hover { filter: brightness(.95); }
+.save:focus-visible { outline: 2px solid var(--si-primary); outline-offset: 3px; }
+.save:disabled { cursor: not-allowed; opacity: .7; }
+.save svg { flex-shrink: 0; }
+.panel { min-width: 0; border: 1px solid var(--si-border); border-radius: 14px; background: var(--si-surface); overflow: hidden; }
+.panel :is(input:not([type='checkbox']):not([type='radio']),select) { min-width: 0; max-width: 100%; min-height: 48px; font-size: 16px; }
+.panel button { min-height: 44px; }
+@media (min-width: 640px) {
+  .section { padding: 28px; }
+  .actions { flex-direction: row; align-items: center; justify-content: space-between; }
+  .save { width: auto; }
+}
+@media (min-width: 1200px) {
+  .form { grid-template-columns: 280px minmax(0,1fr); gap: 28px; }
+}
+@media (max-width: 639px) {
+  .section, .footer { padding: 20px; }
+  .panel :global(.p-7) { padding: 16px; }
+  .panel :global(.p-6) { padding: 16px; }
+  .panel :global(.p-2) { padding: 8px; }
+  .panel form button[type='submit'] { width: 100%; white-space: normal; }
+}

@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { generateSlug } from '@/utils/slugGenerator';
 import r2ImageUpload from '@/lib/helpers/r2ImageUpload';
 import { uploadBufferToCloudinary } from '@/lib/cloudinary/upload';
+import { normalizeAccountCountry } from '@/lib/features/country';
 import { currentUser } from '@/lib/auth/current-user';
 
 const prisma = new PrismaClient();
@@ -29,7 +30,8 @@ export async function POST(request: Request) {
   const gender = formData.get('gender') as string;
   const dob = formData.get('dob') as string;
   const phone = formData.get('phone') as string;
-  const country = formData.get('country') as string;
+  const country = normalizeAccountCountry(formData.get('country'));
+  if (!country) return denied('Select a valid country of residence.', 400);
   const address = formData.get('address') as string;
   const businessName = String(formData.get('businessName') || '').trim();
 

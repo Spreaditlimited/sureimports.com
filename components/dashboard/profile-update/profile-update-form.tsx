@@ -1,11 +1,11 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
 import { toast } from 'sonner';
 import { 
-  User, Mail, Phone, Globe, CalendarDays, Tag, 
-  Camera, ShieldCheck, MapPin, Loader2, Check
+  User, Camera, MapPin, Loader2, Check
 } from 'lucide-react';
 
 import Loader from '@/components/uix/Loader';
@@ -16,12 +16,14 @@ import RadSelectGender from '@/components/uix/xForm/RadSelectGender';
 import RadSelectOption from '@/components/uix/xForm/RadSelectOption';
 import RadDateSelector from '@/components/uix/xForm/RadDateSelector';
 import countries from '@/lib/data/countries';
+import styles from './Profile.module.css';
 
 export default function ProfileUpdateForm() {
   const { user } = useAuth();
-  
+  const router = useRouter();
+
   const [userData, setUserData] = useState<any>(null);
-  const [pidUser, setPidUser] = useState(user?.pidUser);
+  const pidUser = user?.pidUser;
   const [isLoading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -82,6 +84,7 @@ export default function ProfileUpdateForm() {
           await fetchUser(pidUser);
         }
         toast.success('Profile updated successfully');
+        router.refresh();
       } else {
         toast.warning(data.responsex.message);
       }
@@ -95,10 +98,10 @@ export default function ProfileUpdateForm() {
   if (!userData || isLoading) return <Loader />;
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Restored Deep Slate Hero Pattern */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className={`si-profile-section ${styles.profile}`}>
+
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
@@ -110,33 +113,25 @@ export default function ProfileUpdateForm() {
               <h1 className="text-3xl font-bold tracking-tight md:text-4xl">My Profile</h1>
               <p className="mt-2 text-slate-400">Manage your identity, contact details, and account security.</p>
             </div>
-            
-            <div className="hidden sm:flex items-center gap-3 rounded-2xl bg-white/5 p-4 backdrop-blur-md border border-white/10 shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-                <ShieldCheck className="h-5 w-5 text-emerald-400" />
-              </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-wider text-white">Verified Account</p>
-                <p className="text-xs text-slate-400">Protected by AES-256</p>
-              </div>
-            </div>
+
+
           </div>
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
-        <form onSubmit={submitForm} className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          
+      <main className="si-workspace-body">
+        <form onSubmit={submitForm} className={styles.form}>
+
           {/* LEFT COLUMN: Identity Anchor */}
-          <div className="w-full shrink-0 space-y-6 lg:sticky lg:top-8 lg:w-80">
-            
+          <div className={styles.identity}>
+
             {/* Image & Identity Card */}
             <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
               <div className="flex flex-col items-center text-center">
-                
+
                 {/* The Precision Image Picker */}
-                <div className="relative mb-6">
-                  <div className="h-36 w-36 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-1 ring-slate-200 dark:border-slate-800 dark:bg-slate-800 dark:ring-slate-700">
+                <div className="relative mb-4">
+                  <div className="h-24 w-24 sm:h-28 sm:w-28 overflow-hidden rounded-full border-4 border-white bg-slate-100 shadow-md ring-1 ring-slate-200 dark:border-slate-800 dark:bg-slate-800 dark:ring-slate-700">
                     <div className="h-full w-full object-cover">
                       <ImageBox 
                         onImageChange={(f: File) => setFile(f)} 
@@ -145,8 +140,8 @@ export default function ProfileUpdateForm() {
                       />
                     </div>
                   </div>
-                  
-                  <div className="absolute bottom-2 right-2 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-sm transition-transform hover:scale-105 hover:bg-blue-500 dark:border-slate-900">
+
+                  <div aria-hidden="true" className="pointer-events-none absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white bg-blue-600 text-white shadow-sm transition-transform hover:scale-105 hover:bg-blue-500 dark:border-slate-900">
                     <Camera className="h-4 w-4" />
                   </div>
                 </div>
@@ -181,19 +176,19 @@ export default function ProfileUpdateForm() {
           </div>
 
           {/* RIGHT COLUMN: Data Entry Form */}
-          <div className="flex-1 space-y-6">
+          <div className={styles.fields}>
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              
+
               {/* Section 1: Basic Information */}
-              <div className="border-b border-slate-100 p-6 sm:p-8 dark:border-slate-800">
+              <div className={`${styles.section} border-b border-slate-100 dark:border-slate-800`}>
                 <div className="mb-6 flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
                     <User className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                   </div>
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Personal Information</h3>
                 </div>
-                
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
+                <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
                   <RadText 
                     label="Full Legal Name" 
                     id="fullname"
@@ -233,7 +228,7 @@ export default function ProfileUpdateForm() {
               </div>
 
               {/* Section 2: Contact & Location */}
-              <div className="p-6 sm:p-8">
+              <div className={styles.section}>
                 <div className="mb-6 flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800">
                     <MapPin className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -241,7 +236,7 @@ export default function ProfileUpdateForm() {
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Contact & Delivery</h3>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-x-6 gap-y-2 sm:grid-cols-2">
                   <RadText 
                     label="Primary Phone Number" 
                     id="phone"
@@ -271,19 +266,19 @@ export default function ProfileUpdateForm() {
               </div>
 
               {/* Action Footer */}
-              <div className="border-t border-slate-100 bg-slate-50/50 px-6 py-5 sm:px-8 dark:border-slate-800 dark:bg-slate-900/50">
-                <div className="flex items-center justify-between">
+              <div className={styles.footer}>
+                <div className={styles.actions}>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
                     Last updated:{' '}
                     {userData.updatedAt
                       ? new Date(userData.updatedAt).toLocaleString()
                       : 'Never'}
                   </p>
-                  
+
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 text-sm font-semibold text-white transition-all hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 dark:focus:ring-offset-slate-900"
+                    className={styles.save} aria-busy={isSaving}
                   >
                     {isSaving ? (
                       <>

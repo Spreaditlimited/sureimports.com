@@ -113,9 +113,9 @@ function ProductDetailsContent({ params }: { params: { productId: string } }) {
   const cartItem = getCartItem(product.pidProduct);
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+    <div className="si-workspace">
       {/* Minimalist Top Navigation */}
-      <div className="sticky top-0 z-30 border-b border-slate-200/60 bg-white/80 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/80">
+      <div className="sticky top-[72px] z-[5] border-b border-slate-200/60 bg-white dark:border-slate-800/60 dark:bg-slate-950">
         <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
           <button
             onClick={() => router.back()}
@@ -127,7 +127,7 @@ function ProductDetailsContent({ params }: { params: { productId: string } }) {
         </div>
       </div>
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12">
+      <main className="si-workspace-body pt-6">
         <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-16">
           {/* Left: Product Image Showcase (Sticky) */}
           <div className="w-full lg:sticky lg:top-24 lg:w-1/2">
@@ -164,7 +164,7 @@ function ProductDetailsContent({ params }: { params: { productId: string } }) {
           <div className="flex w-full flex-col lg:w-1/2">
             {/* Header Info */}
             <div className="mb-8">
-              <h1 className="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white sm:text-4xl md:text-5xl">
+              <h1 className="text-2xl font-semibold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-3xl">
                 {product.productName}
               </h1>
               {product.productBrand && (

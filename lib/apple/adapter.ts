@@ -1,4 +1,5 @@
 import { sessionCookieLifetime } from '@/lib/auth/session-policy.mjs';
+import { DEFAULT_LOGIN_REDIRECT } from '@/lib/auth/loginRedirect';
 import { socialCookiePolicy } from './policy.mjs';
 import 'server-only';
 import type { Prisma } from '@prisma/client';
@@ -69,7 +70,7 @@ export const adapter: Adapter = {
   namespace: 'sure_customer',
   origin: 'https://www.sureimports.com',
   login: '/auth/login',
-  home: '/dashboard/procurement',
+  home: DEFAULT_LOGIN_REDIRECT,
   brand: 'Sure Imports',
   terms: 'https://www.sureimports.com/terms-and-conditions',
   transaction: (fn) =>

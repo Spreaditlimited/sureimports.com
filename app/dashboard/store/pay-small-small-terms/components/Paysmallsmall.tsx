@@ -70,12 +70,12 @@ export default function PaySmallSmallApp({ product }: any) {
     return basePrice + basePrice * 0.05;
   };
 
-  const [pidUser] = useState(user?.pidUser);
-  const [email] = useState(user?.userEmail);
+  const pidUser = user?.pidUser;
+  const email = user?.userEmail;
   const [pidProduct] = useState(product?.pidProduct);
   const [amount] = useState(calculateAmount());
   const [quantity] = useState(1);
-  
+
   const [phone, setPhoneNumber] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -138,12 +138,12 @@ export default function PaySmallSmallApp({ product }: any) {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Deep Slate Hero Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className="si-workspace">
+
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          
+
           <button 
             onClick={() => router.back()} 
             className="group mb-8 flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 transition hover:text-white"
@@ -166,7 +166,7 @@ export default function PaySmallSmallApp({ product }: any) {
                 Lock in your purchase today and pay at your own pace over the next 6 months. No hidden pressure.
               </p>
             </div>
-            
+
             <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md shrink-0">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20">
                 <Wallet className="h-5 w-5 text-indigo-400" />
@@ -180,13 +180,13 @@ export default function PaySmallSmallApp({ product }: any) {
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:gap-12">
-          
+
           {/* LEFT: Product Showcase (Sticky on Desktop) */}
           <div className="w-full lg:sticky lg:top-24 lg:w-[400px] shrink-0">
             <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-              
+
               <div className="relative aspect-square w-full bg-slate-50 dark:bg-slate-800/50 p-8">
                 <Image
                   src={productImageUrl}
@@ -204,7 +204,7 @@ export default function PaySmallSmallApp({ product }: any) {
                 <h2 className="mb-6 text-xl font-bold leading-tight text-slate-900 dark:text-white line-clamp-2">
                   {product?.productName}
                 </h2>
-                
+
                 <div className="rounded-2xl bg-slate-50 p-5 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Total Plan Value</p>
                   <div className="flex items-end gap-2">
@@ -218,13 +218,13 @@ export default function PaySmallSmallApp({ product }: any) {
                   </div>
                 </div>
               </div>
-              
+
             </div>
           </div>
 
           {/* RIGHT: Terms & Form */}
           <div className="flex-1 space-y-8">
-            
+
             {/* Terms Content */}
             <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-10">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">How it works</h2>

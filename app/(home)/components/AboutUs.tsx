@@ -1,8 +1,4 @@
-'use client';
-
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
 import Image from 'next/image';
 import { 
   Users, 
@@ -11,7 +7,6 @@ import {
   TrendingUp, 
   Zap, 
   Code, 
-  Heart, 
   Target,
   MapPin,
   Building2,
@@ -71,30 +66,21 @@ export default function AboutUs() {
   ];
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950">
+    <div className="bg-[var(--si-canvas)]">
       
-      {/* Premium Hero Section */}
-<div className={`${heroLayout.fixed} relative overflow-hidden border-b border-slate-200 bg-slate-50 pt-32 pb-20 dark:border-slate-800 dark:bg-slate-900`}>
-        <PublicHeroBackground darkOnly priority={false} />
-        <div className="absolute inset-0 z-0">
-          <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
-        </div>
-        
-        <div className="relative z-10 mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 text-center">
-<HeroPill className="mb-6">
-            <Heart className="h-3.5 w-3.5" /> Our Story
-          </HeroPill>
-          <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-6xl">
-            Transforming Global <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">
-              Procurement.
-            </span>
-          </h1>
-          <p className="mx-auto max-w-3xl text-lg font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-            We connect businesses with verified Chinese suppliers and manufacturers, ensuring quality, reliability, and seamless international trade.
-          </p>
-        </div>
-      </div>
+      <ServiceHero
+        eyebrow="Our story"
+        title="Your team for buying from China."
+        description="We bring sourcing, purchasing and shipping together, helping you turn product ideas into orders you can follow."
+        primary={{ href: '/buy-from-chinese-websites', label: 'Start your order' }}
+        secondary={{ href: '/contact-us', label: 'Talk to our team' }}
+        summaryTitle="Support from first idea to delivery."
+        steps={[
+          { title: 'Find the right products', description: 'Get help with sourcing and checking suppliers in China.' },
+          { title: 'Buy with a clear plan', description: 'Keep product details, purchasing and order updates together.' },
+          { title: 'Bring your goods home', description: 'Coordinate warehouse intake, consolidation and shipping.' },
+        ]}
+      />
 
       <div className="mx-auto max-w-[1440px] px-4 py-20 sm:px-6 lg:px-8 space-y-24">
         
@@ -102,12 +88,12 @@ export default function AboutUs() {
         <section>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {achievements.map((stat, idx) => (
-              <div key={idx} className="group rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+              <div key={idx} className="group rounded-2xl border border-slate-200 bg-white p-8  transition-all hover:border-indigo-200  dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
                 <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${stat.bg} ${stat.color}`}>
                   <stat.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mb-1 text-3xl font-black text-slate-900 dark:text-white">{stat.number}</h3>
-                <p className="mb-3 text-sm font-bold uppercase tracking-widest text-slate-400">{stat.label}</p>
+                <h3 className="mb-1 text-3xl font-medium text-slate-900 dark:text-white">{stat.number}</h3>
+                <p className="mb-3 text-sm font-medium uppercase tracking-widest text-slate-400">{stat.label}</p>
                 <p className="text-sm font-medium text-slate-500">{stat.description}</p>
               </div>
             ))}
@@ -116,8 +102,8 @@ export default function AboutUs() {
 
         {/* Mission & Story Bento */}
         <section className="grid gap-6 lg:grid-cols-5">
-          <div className="lg:col-span-3 rounded-[32px] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-12">
-            <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">Our Journey</h2>
+          <div className="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-8  dark:border-slate-800 dark:bg-slate-900 sm:p-12">
+            <h2 className="mb-6 text-2xl font-medium text-slate-900 dark:text-white">Our Journey</h2>
             <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
               <p>
                 Since 2018, Sure Importers Limited has revolutionized the way businesses source products from China. What started as a vision to bridge the gap between African entrepreneurs and Chinese manufacturers has grown into a thriving global procurement platform.
@@ -128,10 +114,10 @@ export default function AboutUs() {
             </div>
           </div>
           
-          <div className="lg:col-span-2 rounded-[32px] border border-brand-orange-500/20 bg-brand-orange-500/10 p-8 shadow-sm sm:p-12">
+          <div className="lg:col-span-2 rounded-2xl border border-brand-orange-500/20 bg-brand-orange-500/10 p-8  sm:p-12">
             <Target className="mb-6 h-10 w-10 text-brand-orange-500" />
-            <h2 className="mb-4 text-2xl font-bold text-brand-orange-900 dark:text-brand-orange-100">Our Mission</h2>
-            <p className="text-base leading-relaxed text-brand-orange-800 dark:text-brand-orange-200">
+            <h2 className="mb-4 text-2xl font-medium text-[var(--si-ink)]">Our Mission</h2>
+            <p className="text-base leading-relaxed text-[var(--si-muted)]">
               To democratize global trade by providing businesses of all sizes with access to high-quality Chinese products, reliable suppliers, and exceptional service that drives their success in the global marketplace.
             </p>
           </div>
@@ -139,13 +125,13 @@ export default function AboutUs() {
 
         {/* Meet the Founder */}
         <section>
-          <div className="rounded-[40px] border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
+          <div className="rounded-2xl border border-slate-200 bg-white  dark:border-slate-800 dark:bg-slate-900 overflow-hidden">
             <div className="grid lg:grid-cols-2">
               
               {/* Image Side */}
               <div className="relative min-h-[400px] w-full bg-slate-100 dark:bg-slate-800 lg:min-h-full p-8 sm:p-12 flex items-center justify-center">
                 <div className="absolute inset-0 z-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10" />
-                <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-[32px] shadow-2xl shadow-slate-900/20 ring-1 ring-slate-900/5 dark:ring-white/10 aspect-[3/4]">
+                <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-2xl  ring-1 ring-slate-900/5 dark:ring-white/10 aspect-[3/4]">
                   <Image
                     src="/images/new/images/sureimports-ceo.JPG"
                     alt="Tochukwu Nkwocha - Founder & CEO"
@@ -158,11 +144,11 @@ export default function AboutUs() {
 
               {/* Content Side */}
               <div className="p-8 sm:p-12 lg:p-16 flex flex-col justify-center">
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-[10px] font-medium uppercase tracking-widest text-indigo-600 dark:border-indigo-900/30 dark:bg-indigo-900/20 dark:text-indigo-400">
                   Leadership
                 </div>
-                <h2 className="mb-2 text-3xl font-black text-slate-900 dark:text-white">Tochukwu Nkwocha</h2>
-                <p className="mb-8 font-bold text-indigo-600 dark:text-indigo-400">Founder & Chief Executive Officer</p>
+                <h2 className="mb-2 text-3xl font-medium text-slate-900 dark:text-white">Tochukwu Nkwocha</h2>
+                <p className="mb-8 font-medium text-indigo-600 dark:text-indigo-400">Founder & Chief Executive Officer</p>
 
                 <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400 mb-10">
                   <p>
@@ -174,12 +160,12 @@ export default function AboutUs() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                  <h4 className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-slate-900 dark:text-white">
                     <Code className="h-4 w-4 text-indigo-500" /> Expertise & Skills
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {founderSkills.map((skill, index) => (
-                      <span key={index} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                      <span key={index} className="rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                         {skill}
                       </span>
                     ))}
@@ -187,7 +173,7 @@ export default function AboutUs() {
                 </div>
 
                 <div className="mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10">
-                  <div className="mb-2 flex items-center gap-2 font-bold text-blue-900 dark:text-blue-200">
+                  <div className="mb-2 flex items-center gap-2 font-medium text-blue-900 dark:text-blue-200">
                     <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" /> Digital & AI Influence
                   </div>
                   <p className="text-sm font-medium leading-relaxed text-blue-800 dark:text-blue-300">
@@ -203,7 +189,7 @@ export default function AboutUs() {
         {/* Global Presence */}
         <section>
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">Global Presence</h2>
+            <h2 className="mb-4 text-3xl font-medium text-slate-900 dark:text-white">Global Presence</h2>
             <p className="text-lg font-medium text-slate-500 dark:text-slate-400">Strategically positioned across key markets for optimal service delivery.</p>
           </div>
 
@@ -211,12 +197,12 @@ export default function AboutUs() {
             {globalPresence.map((loc, idx) => {
               const Icon = loc.icon;
               return (
-                <div key={idx} className="rounded-[24px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="mb-1 text-xl font-bold text-slate-900 dark:text-white">{loc.country}</h3>
-                  <p className="mb-3 text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">{loc.role}</p>
+                  <h3 className="mb-1 text-xl font-medium text-slate-900 dark:text-white">{loc.country}</h3>
+                  <p className="mb-3 text-xs font-medium uppercase tracking-widest text-indigo-600 dark:text-indigo-400">{loc.role}</p>
                   <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{loc.location}</p>
                 </div>
               );
@@ -226,14 +212,14 @@ export default function AboutUs() {
 
         {/* Vision Statement */}
         <section>
-          <div className="rounded-[40px] bg-indigo-950 p-12 text-center shadow-2xl sm:p-20 relative overflow-hidden">
+          <div className="rounded-2xl bg-indigo-950 p-12 text-center shadow-2xl sm:p-20 relative overflow-hidden">
             <div className="absolute inset-0 z-0 opacity-20">
               <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-brand-orange-500 blur-[100px]" />
               <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-indigo-500 blur-[100px]" />
             </div>
             
             <div className="relative z-10 mx-auto max-w-4xl">
-              <h2 className="mb-6 text-3xl font-black tracking-tight text-white sm:text-4xl">
+              <h2 className="mb-6 text-3xl font-medium tracking-tight text-white sm:text-4xl">
                 Our Vision for the Future
               </h2>
               <p className="text-lg font-medium leading-relaxed text-indigo-200 sm:text-xl">

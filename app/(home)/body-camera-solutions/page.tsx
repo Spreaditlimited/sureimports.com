@@ -1,4 +1,4 @@
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import styles from './Solutions.module.css';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
@@ -212,14 +212,13 @@ const sectionEyebrow =
 
 export default function BodyCameraSolutionsPage() {
   return (
-    <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
+    <main className={`${styles.page} overflow-hidden`} data-si-page-theme="service">
       <JsonLdScript data={schema} />
 
-<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 lg:px-8 sm:pb-20 sm:pt-16 lg:pb-24`}>
-        <PublicHeroBackground darkOnly priority={false} />
-        <div className="pointer-events-none absolute inset-x-0 top-0 -z-0 h-[620px] bg-[radial-gradient(circle_at_72%_18%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.055)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+<section className={`${heroLayout.flow} ${styles.hero} si-body-hero relative px-4 pb-16 pt-12 sm:px-6 lg:px-8 sm:pb-20 sm:pt-16 lg:pb-24`}>
+
         <div className="relative mx-auto grid si-public-inner items-center gap-x-14 gap-y-8 lg:grid-cols-[0.92fr_1.08fr]">
-          <div className="min-w-0 max-w-2xl">
+          <div className={`${styles.copy} min-w-0 max-w-2xl`}>
 <HeroPill>
               <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
               Enterprise evidence technology
@@ -250,7 +249,7 @@ export default function BodyCameraSolutionsPage() {
             className="order-3 lg:col-start-2 lg:row-span-2 lg:row-start-1"
           />
 
-          <div className="order-2 max-w-2xl lg:col-start-1 lg:row-start-2">
+          <div className={`${styles.actions} order-2 max-w-2xl lg:col-start-1 lg:row-start-2`}>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="#assessment"
@@ -289,7 +288,7 @@ export default function BodyCameraSolutionsPage() {
         </div>
       </section>
 
-      <section className="bg-[#07111f] px-4 py-16 text-white sm:px-6 lg:px-8 sm:py-20">
+      <section className="si-dark-surface bg-[#07111f] px-4 py-16 text-white sm:px-6 lg:px-8 sm:py-20">
         <div className="mx-auto si-public-inner">
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-300">
             The complete evidence lifecycle
@@ -367,7 +366,7 @@ export default function BodyCameraSolutionsPage() {
             ].map((solution) => (
               <div
                 key={solution.name}
-                className="group overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_28px_70px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-slate-900"
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white  transition duration-300   dark:border-white/10 dark:bg-slate-900"
               >
                 <TechnologyStage
                   image={solution.image}
@@ -449,7 +448,7 @@ export default function BodyCameraSolutionsPage() {
         </section>
 
         <section className="py-8 sm:py-12">
-          <div className="relative overflow-hidden rounded-[2rem] bg-[#0b1930] p-7 text-white sm:p-10 lg:p-12">
+          <div className="relative overflow-hidden rounded-2xl si-dark-surface bg-[#0b1930] p-7 text-white sm:p-10 lg:p-12">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_10%,rgba(34,211,238,0.12),transparent_30%),linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:auto,48px_48px,48px_48px]" />
             <div className="relative">
               <div className="grid gap-7 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">

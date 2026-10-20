@@ -34,7 +34,7 @@ export default function ShippingOnlyForm() {
   const { user } = useAuth();
   const { isModalOpen, openModal, closeModal } = useModal();
   
-  const [pidUser] = useState(user?.pidUser || '');
+  const pidUser = user?.pidUser || '';
   const [pidPaySupplier] = useState(productID);
 
   const [supplierName, setSupplierName] = useState('');

@@ -3,7 +3,7 @@ import React from 'react';
 
 function BankPayment() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
+    <div className="si-workspace-plain">
       <div className="pl-[25px] pt-[25px] text-[28px] font-bold text-slate-800 dark:text-white">
         Bank Payment{' '}
       </div>

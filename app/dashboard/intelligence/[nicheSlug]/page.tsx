@@ -91,8 +91,8 @@ export default async function DashboardIntelligenceNichePage({
   if (!niche) notFound();
 
   return (
-    <main className="min-h-screen bg-slate-50/50 px-4 py-8 text-slate-950 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+    <main className="si-workspace-plain">
+      <div className="si-workspace-inner">
         {/* --- Top Navigation --- */}
         <div className="mb-8">
           <Link

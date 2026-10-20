@@ -28,8 +28,8 @@ export const metadata: Metadata = {
 
 export default function CreateShippingOnlyPage() {
   return (
-    <div className="min-h-screen bg-[#fcfcfd] pb-12 dark:bg-black sm:pb-16">
-      <div className="mx-auto w-full max-w-7xl px-4 pt-4 sm:px-6 sm:pt-6 lg:px-8">
+    <div className="si-workspace-plain">
+      <div className="si-workspace-inner">
         <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-900/20">

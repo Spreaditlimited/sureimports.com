@@ -1,12 +1,12 @@
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { 
-  ArrowRight, 
   CalendarClock, 
   CheckCircle2, 
-  PhoneCall, 
   ShieldCheck, 
   Video
 } from 'lucide-react';
@@ -32,7 +32,7 @@ const benefits = [
   {
     step: '01',
     title: 'Schedule & Pay',
-    description: 'Select an available time slot below and complete the secure Paystack payment to confirm your booking.',
+    description: 'Select an available time slot below and complete the secure Paystack or PayPal payment to confirm your booking.',
     icon: CalendarClock,
   },
   {
@@ -153,49 +153,24 @@ export default async function BookConsultationPage({
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950 antialiased selection:bg-brand-orange-500/30">
+    <main className={pageStyles.page} data-si-page-theme="service">
       <Navigation />
 
-      {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 px-4 pb-16 pt-32 text-center text-white sm:px-6 sm:pb-24 sm:pt-44 lg:px-8`}>
-        <PublicHeroBackground />
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-brand-orange-500/15 blur-[100px] sm:h-[600px] sm:w-[800px]" />
-        
-        <div className="relative mx-auto max-w-5xl">
-<HeroPill className="mb-6">
-            <PhoneCall className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            1-on-1 Strategy Call
-          </HeroPill>
-          
-          <h1 className="text-[clamp(2.25rem,6.4vw,4.5rem)] font-black leading-[1.08] tracking-tight">
-            <span className="md:block md:whitespace-nowrap">
-              Get clear direction before you
-            </span>{" "}
-            <span className="md:block md:whitespace-nowrap">
-              send money to China
-            </span>
-          </h1>
-          
-          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg">
-            Book a focused call with Sure Imports to review your import plan, vet a supplier concern, or calculate your true landed costs.
-          </p>
-          
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4">
-            <a
-              href="#booking"
-              className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 sm:w-auto sm:rounded-full"
-            >
-              Choose a slot <ArrowRight className="h-4 w-4" />
-            </a>
-            <Link
-              href="/supplier-intelligence"
-              className="inline-flex h-14 w-full items-center justify-center rounded-xl border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-sm transition-all hover:bg-white/10 sm:w-auto sm:rounded-full"
-            >
-              Supplier Intelligence
-            </Link>
-          </div>
-        </div>
-      </section>
+      <ServiceHero
+        eyebrow="Private import consultation"
+        title="Get clarity before you send money to China."
+        description="Book a focused call to review your import plan, discuss supplier concerns and understand your landed costs."
+        primary={{ href: '#booking', label: 'Choose a time' }}
+        secondary={{ href: '/supplier-intelligence', label: 'Explore supplier research' }}
+        summaryTitle="A focused conversation. A clearer next step."
+        steps={[
+          { title: 'Choose your time', description: 'Select an available slot and pay to confirm your booking.' },
+          { title: 'Bring your questions', description: 'Have product links, supplier conversations and quantities ready.' },
+          { title: 'Talk through your plan', description: 'Discuss risks, costs and practical next steps with our team.' },
+        ]}
+      >
+        <p>Consultation fee: USD 50 · Nigeria: {formatMoney(amountKobo)}</p>
+      </ServiceHero>
 
       {/* --- HOW IT WORKS SECTION --- */}
       <section className="border-b border-slate-200 bg-white py-16 sm:py-24">
@@ -257,23 +232,11 @@ export default async function BookConsultationPage({
             </p>
           </header>
 
-          {amountKobo > 0 ? (
-            <ConsultationBookingForm amountKobo={amountKobo} />
-          ) : (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-amber-200 bg-white px-4 py-10 text-center shadow-xl shadow-slate-200/50 sm:p-12">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
-                <CalendarClock className="h-7 w-7" />
-              </div>
-              <h3 className="text-lg font-bold text-amber-900">Booking Offline</h3>
-              <p className="mt-2 max-w-md text-sm leading-relaxed text-amber-800">
-                Consultation booking is currently offline while we update our schedule. Please check back later.
-              </p>
-            </div>
-          )}
+          <ConsultationBookingForm amountKobo={amountKobo} />
 
           <p className="mt-6 flex items-center justify-center gap-2 text-center text-xs font-medium text-slate-500">
             <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
-            Encrypted payment processed securely by Paystack
+            Secure checkout through Paystack in Nigeria or PayPal internationally
           </p>
         </div>
       </section>

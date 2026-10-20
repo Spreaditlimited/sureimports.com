@@ -243,7 +243,10 @@ export async function getProcurementOrderLifecycle(
       due: paymentDue,
       currency: paymentCurrency,
       nextStatus: nextPaidStatus,
-      isPayable: paymentDue > 0 && Boolean(nextPaidStatus),
+      isPayable:
+        paymentDue > 0 &&
+        Boolean(nextPaidStatus) &&
+        Boolean(order.shippingAddress?.trim()),
       minimumOrderNgn,
     },
     snapshot: {

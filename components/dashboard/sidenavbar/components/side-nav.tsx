@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useFeatureVisibility } from '@/components/dashboard/features/FeatureAvailability';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { LogOut } from 'lucide-react';
@@ -17,6 +18,7 @@ interface SideNavProps {
 
 export function SideNav({ items, setOpen }: SideNavProps) {
   const { logout } = useAuth();
+  const visible = useFeatureVisibility();
   const path = usePathname();
   const { isOpen, toggle } = useSidebar();
   const expanded = Boolean(setOpen) || isOpen;
@@ -33,7 +35,7 @@ export function SideNav({ items, setOpen }: SideNavProps) {
     }
   }, [expanded, openItem]);
 
-  const active = (href: string) => href.startsWith('/') && (path === href || (href !== '/' && path.startsWith(href + '/')));
+  const active = (href: string) => href.startsWith('/') && (path === href || (href !== '/' && href !== '/dashboard' && path.startsWith(href + '/')));
   const renderLink = (item: NavItem) => (
     <Link key={item.title} href={item.href} target={item.target} rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
       className="si-nav-item" aria-label={item.title} title={!expanded ? item.title : undefined}
@@ -44,7 +46,7 @@ export function SideNav({ items, setOpen }: SideNavProps) {
   );
 
   return <nav className="si-side-nav" aria-label="Dashboard navigation" data-expanded={expanded}>
-    {items.map(item => item.isChidren ? (
+    {items.filter(item => visible(item.href)).map(item => item.isChidren ? (
       <Accordion key={item.title} type="single" collapsible value={openItem} onValueChange={value => {
         if (!expanded) toggle();
         setOpenItem(value);

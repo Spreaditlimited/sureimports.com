@@ -27,6 +27,8 @@ export async function POST() {
     );
   }
 
+  if (subscription.currency === 'USD') return NextResponse.json({ manageLink: 'https://www.paypal.com/myaccount/autopay/' });
+
   let subscriptionCode = subscription.paystackSubscriptionCode;
 
   if (!subscriptionCode && subscription.paystackReference) {

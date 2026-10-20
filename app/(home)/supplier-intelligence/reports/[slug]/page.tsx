@@ -1,3 +1,4 @@
+import styles from '@/components/intelligence/ReportSearchExperience.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -140,7 +141,7 @@ export default async function SupplierReportPage({
     : null;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
+    <main className={styles.page}>
       {schema ? (
         <script
           type="application/ld+json"
@@ -167,10 +168,10 @@ export default async function SupplierReportPage({
               />
             </div>
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-brand-orange-600">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-orange-600">
                 Supplier Intelligence Report
               </p>
-              <h1 className="mt-4 text-4xl font-black leading-tight tracking-tight sm:text-5xl">
+              <h1 className="mt-4 text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
                 {report.title}
               </h1>
               <p className="mt-5 text-lg leading-relaxed text-slate-600">
@@ -186,7 +187,7 @@ export default async function SupplierReportPage({
                     key={label}
                     className="rounded-2xl border border-slate-200 bg-white p-4"
                   >
-                    <p className="text-lg font-black">{value}</p>
+                    <p className="text-lg font-semibold">{value}</p>
                     <p className="mt-1 text-xs font-bold uppercase tracking-wider text-slate-500">
                       {label}
                     </p>
@@ -199,7 +200,7 @@ export default async function SupplierReportPage({
                     <p className="text-sm font-semibold text-slate-500">
                       Nigeria · Paystack
                     </p>
-                    <p className="mt-1 text-3xl font-black">
+                    <p className="mt-1 text-3xl font-semibold">
                       {formatReportPrice(report.priceNaira, 'NGN')}
                     </p>
                   </div>
@@ -207,7 +208,7 @@ export default async function SupplierReportPage({
                     <p className="text-sm font-semibold text-slate-500">
                       International · PayPal
                     </p>
-                    <p className="mt-1 text-3xl font-black">
+                    <p className="mt-1 text-3xl font-semibold">
                       {formatReportPrice(report.priceUsdCents, 'USD')}
                     </p>
                   </div>
@@ -224,10 +225,10 @@ export default async function SupplierReportPage({
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
               <div>
-                <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange-600">
                   Before you contact a factory
                 </p>
-                <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                   {seo.heading}
                 </h2>
                 <p className="mt-5 text-base leading-8 text-slate-600">
@@ -235,7 +236,7 @@ export default async function SupplierReportPage({
                 </p>
               </div>
               <div className="rounded-3xl bg-slate-950 p-7 text-white sm:p-8">
-                <p className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange-400">
                   Product coverage
                 </p>
                 <ul className="mt-5 space-y-4">
@@ -259,10 +260,10 @@ export default async function SupplierReportPage({
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-2">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange-600">
                 Inside the report
               </p>
-              <h2 className="mt-3 text-3xl font-black">
+              <h2 className="mt-3 text-3xl font-semibold">
                 More than a contact list
               </h2>
               <p className="mt-4 text-base leading-relaxed text-slate-600">
@@ -298,10 +299,10 @@ export default async function SupplierReportPage({
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid gap-8 lg:grid-cols-2">
               <div className="rounded-3xl border border-slate-200 p-7 sm:p-8">
-                <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange-600">
                   Important buying checks
                 </p>
-                <h2 className="mt-3 text-2xl font-black">
+                <h2 className="mt-3 text-2xl font-semibold">
                   Questions worth resolving before production
                 </h2>
                 <ul className="mt-6 space-y-4">
@@ -317,10 +318,10 @@ export default async function SupplierReportPage({
                 </ul>
               </div>
               <div className="rounded-3xl border border-slate-200 p-7 sm:p-8">
-                <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+                <p className="text-xs font-semibold uppercase tracking-widest text-brand-orange-600">
                   Who this report is for
                 </p>
-                <h2 className="mt-3 text-2xl font-black">
+                <h2 className="mt-3 text-2xl font-semibold">
                   Built for commercial buyers
                 </h2>
                 <ul className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -362,7 +363,7 @@ export default async function SupplierReportPage({
               className="rounded-2xl border border-white/10 bg-white/5 p-6"
             >
               <Icon className="h-6 w-6 text-brand-orange-400" />
-              <h2 className="mt-4 text-lg font-black">{title}</h2>
+              <h2 className="mt-4 text-lg font-semibold">{title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-slate-300">
                 {text}
               </p>
@@ -373,10 +374,10 @@ export default async function SupplierReportPage({
       {seo ? (
         <section className="bg-slate-50 py-20">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-xs font-black uppercase tracking-widest text-brand-orange-600">
+            <p className="text-center text-xs font-semibold uppercase tracking-widest text-brand-orange-600">
               Frequently asked questions
             </p>
-            <h2 className="mt-3 text-center text-3xl font-black">
+            <h2 className="mt-3 text-center text-3xl font-semibold">
               Before you buy the report
             </h2>
             <div className="mt-10 space-y-4">
@@ -385,7 +386,7 @@ export default async function SupplierReportPage({
                   key={faq.question}
                   className="rounded-2xl border border-slate-200 bg-white p-6"
                 >
-                  <h3 className="text-lg font-black">{faq.question}</h3>
+                  <h3 className="text-lg font-semibold">{faq.question}</h3>
                   <p className="mt-3 text-sm leading-7 text-slate-600">
                     {faq.answer}
                   </p>

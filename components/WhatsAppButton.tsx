@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useSupportEnabled } from './support/SupportProvider';
 import { ChevronDown, X } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -16,15 +17,17 @@ interface WhatsAppButtonProps {
   contacts?: WhatsAppContact[];
   variant?: 'floating' | 'inline';
   triggerClassName?: string;
+  triggerLabel?: string;
 }
 
-const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
+const LegacyWhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   waID,
   message = 'Hello! I have a question from your website.',
   position = 'bottom-right',
   contacts,
   variant = 'floating',
   triggerClassName,
+  triggerLabel = 'Chat on WhatsApp',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [managedContacts, setManagedContacts] = useState<WhatsAppContact[] | null>(
@@ -194,7 +197,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   return (
     <div
       ref={containerRef}
-      data-whatsapp-placement={variant === 'inline' ? 'contact-page' : 'floating'}
+      data-whatsapp-placement={variant === 'inline' ? 'page' : 'floating'}
       className={variant === 'inline' ? 'relative' : `fixed ${positionClass()} z-20`}
       onMouseEnter={cancelClose}
       onMouseLeave={variant === 'floating' ? closeWithDelay : undefined}
@@ -205,10 +208,10 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
         onClick={() => setIsOpen((value) => !value)}
         className={variant === 'inline' ? triggerClassName : 'flex h-16 w-16 items-center justify-center rounded-full bg-green-500 text-white shadow-lg shadow-green-900/20 transition hover:bg-green-600'}
         aria-expanded={isOpen}
-        aria-label={variant === 'inline' ? 'Chat on WhatsApp' : 'Contact us on WhatsApp'}
+        aria-label={variant === 'inline' ? triggerLabel : 'Contact us on WhatsApp'}
         title="Contact us on WhatsApp"
       >
-        {variant === 'inline' ? 'Chat on WhatsApp' : <span className="relative flex items-center">
+        {variant === 'inline' ? triggerLabel : <span className="relative flex items-center">
           <FaWhatsapp size={28} />
           <ChevronDown
             size={14}
@@ -274,4 +277,8 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   );
 };
 
-export default WhatsAppButton;
+export default function WhatsAppButton(props: WhatsAppButtonProps) {
+ const supportEnabled = useSupportEnabled();
+ if (supportEnabled && (props.variant || 'floating') === 'floating') return null;
+ return <LegacyWhatsAppButton {...props}/>;
+}

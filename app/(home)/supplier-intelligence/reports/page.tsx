@@ -1,3 +1,4 @@
+import styles from '@/components/intelligence/ReportSearchExperience.module.css';
 import type { Metadata } from 'next';
 
 import Footer from '@/app/(home)/components/Footer';
@@ -58,7 +59,7 @@ export default async function SupplierIntelligenceReportsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-950">
+    <main className={styles.page}>
       <Navigation />
       <ReportSearchExperience reports={searchReports} />
       <Footer />

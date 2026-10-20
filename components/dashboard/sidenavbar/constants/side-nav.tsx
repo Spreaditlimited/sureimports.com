@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  LayoutDashboard,
   HandCoins,
   Landmark,
   Package,
@@ -13,11 +14,13 @@ import {
   Database,
   FileText,
   ShieldCheck,
+  Download,
 } from 'lucide-react';
 import { type NavItem } from '../types';
 import { BsTiktok, BsYoutube } from 'react-icons/bs';
 
 export const NavItems: NavItem[] = [
+  { title: 'Overview', icon: LayoutDashboard, href: '/dashboard', color: 'text-white' },
   {
     title: 'Videos',
     icon: Video,
@@ -128,11 +131,13 @@ export const NavItems: NavItem[] = [
     href: '/dashboard/pay-small-small?status=SAVED',
     color: 'text-white',
   },
+  { title: 'Install Sure Imports', icon: Download, href: '/install', color: 'text-white' },
 ];
 
 //MOBILE MENU
 
 export const MobileNavItems: NavItem[] = [
+  { title: 'Overview', icon: LayoutDashboard, href: '/dashboard', color: 'text-white' },
   {
     title: 'Videos',
     icon: Video,
@@ -241,4 +246,5 @@ export const MobileNavItems: NavItem[] = [
     href: '/dashboard/pay-small-small?status=SAVED',
     color: 'text-white',
   },
+  { title: 'Install Sure Imports', icon: Download, href: '/install', color: 'text-white' },
 ];

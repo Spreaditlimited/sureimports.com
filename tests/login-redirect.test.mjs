@@ -11,6 +11,23 @@ import {
   SHIPPING_ONLY_RESUME_PATH,
 } from '../lib/auth/loginRedirect.ts';
 
+test('ordinary sign-in defaults to the dashboard overview', () => {
+  assert.equal(DEFAULT_LOGIN_REDIRECT, '/dashboard');
+  assert.equal(getSafeLoginRedirect(null), '/dashboard');
+  assert.equal(getSafeLoginRedirect(''), '/dashboard');
+});
+
+test('explicit transaction destinations retain their query and fragment', () => {
+  for (const path of [
+    '/dashboard/procurement/view-order/DR123?statusx=saved#products',
+    '/checkout/resume-vehicle',
+    '/checkout/resume-supplier-verification',
+    '/shop/checkout?resumeCheckout=1',
+  ]) {
+    assert.equal(getSafeLoginRedirect(path), path);
+  }
+});
+
 test('allows the exact public procurement checkout resume route', () => {
   assert.equal(
     getSafeLoginRedirect(PROCUREMENT_RESUME_CHECKOUT_PATH),

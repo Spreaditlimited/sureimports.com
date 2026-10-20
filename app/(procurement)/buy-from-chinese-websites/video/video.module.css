@@ -1,0 +1,257 @@
+.page {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding: 120px 24px 80px;
+  color: var(--si-ink);
+}
+.breadcrumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+  color: var(--si-muted);
+}
+.breadcrumbs li + li::before {
+  content: '/';
+  margin-right: 8px;
+  opacity: 0.6;
+}
+.breadcrumbs a:hover {
+  color: var(--si-accent);
+}
+.header {
+  text-align: center;
+  max-width: 900px;
+  margin: 32px auto 28px;
+}
+.page .eyebrow {
+  color: var(--si-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+.header h1 {
+  margin: 14px 0 16px;
+  font-size: clamp(30px, 3.5vw, 48px);
+  line-height: 1.13;
+  font-weight: var(--si-headline-weight);
+  letter-spacing: var(--si-headline-tracking);
+  text-wrap: balance;
+}
+.intro {
+  max-width: 60ch;
+  margin: auto;
+  color: var(--si-muted);
+  font-size: 17px;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+.metadata {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  color: var(--si-muted);
+  font-size: 12px;
+}
+.watch {
+  border: 1px solid var(--si-border);
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--si-surface);
+}
+.player {
+  aspect-ratio: 16 / 9;
+  background: #08090c;
+}
+.player iframe {
+  display: block;
+  border: 0;
+  width: 100%;
+  height: 100%;
+}
+.videoFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--si-muted);
+}
+.videoFooter a {
+  color: var(--si-accent);
+  font-weight: 600;
+  flex-shrink: 0;
+  padding-block: 6px;
+}
+.prepare {
+  margin-top: 64px;
+}
+.sectionHeading {
+  max-width: 640px;
+}
+.page h2 {
+  font-size: clamp(24px, 2.5vw, 32px);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+.sectionHeading h2 {
+  margin: 12px 0;
+}
+.sectionHeading > p:last-child,
+.cta p {
+  color: var(--si-muted);
+  line-height: 1.7;
+  font-size: 15px;
+}
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  padding: 0;
+  list-style: none;
+  margin: 32px 0;
+}
+.steps li {
+  border-top: 1px solid var(--si-border);
+  padding-top: 20px;
+}
+.number {
+  font-size: 12px;
+  color: var(--si-accent);
+  font-variant-numeric: tabular-nums;
+}
+.page h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+.steps h3 {
+  margin: 12px 0 10px;
+}
+.steps p,
+.guides p {
+  color: var(--si-muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.note {
+  border-left: 3px solid var(--si-accent);
+  background: var(--si-soft);
+  padding: 18px 22px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--si-muted);
+  border-radius: 0 12px 12px 0;
+}
+.note strong {
+  color: var(--si-ink);
+}
+.cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: 32px;
+  margin: 40px 0 64px;
+  border: 1px solid var(--si-border);
+  border-radius: 16px;
+  background: var(--si-surface);
+}
+.cta p {
+  margin-top: 10px;
+}
+.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 50px;
+  flex-shrink: 0;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: var(--si-primary);
+  color: var(--si-on-primary);
+  font-size: 14px;
+  font-weight: 600;
+}
+.primary:hover {
+  filter: brightness(0.94);
+}
+.guides {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+.guides a {
+  border-top: 1px solid var(--si-border);
+  padding-block: 20px;
+}
+.guides h3 {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.guides p {
+  margin-top: 8px;
+}
+.guides a:hover h3 {
+  color: var(--si-accent);
+}
+.page a:focus-visible {
+  outline: 2px solid var(--si-accent);
+  outline-offset: 5px;
+}
+@media (max-width: 640px) {
+  .page {
+    padding: 100px 20px 48px;
+  }
+  .header {
+    margin-top: 28px;
+  }
+  .intro {
+    font-size: 15px;
+  }
+  .watch {
+    border-radius: 12px;
+  }
+  .videoFooter {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 12px 16px;
+    gap: 4px;
+  }
+  .prepare {
+    margin-top: 40px;
+  }
+  .steps,
+  .guides {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .steps li {
+    padding-block: 18px;
+  }
+  .steps h3 {
+    margin-top: 8px;
+  }
+  .cta {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px;
+    margin-bottom: 40px;
+  }
+  .primary {
+    width: 100%;
+  }
+}

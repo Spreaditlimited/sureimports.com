@@ -149,7 +149,7 @@ export default function ShopComponent() {
       <div className="mx-auto w-full max-w-7xl">
         
         {/* Floating Action Bar */}
-        <div className="sticky top-4 z-40 mb-8 rounded-2xl border border-slate-200/60 bg-white/80 p-3 shadow-lg shadow-slate-200/20 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-900/80 dark:shadow-none">
+        <div className="sticky top-[88px] z-[5] mb-8 rounded-2xl border border-slate-200/60 bg-white p-3 shadow-lg shadow-slate-200/20  dark:border-slate-800/60 dark:bg-slate-900 dark:shadow-none">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             
             {/* Search Input */}
@@ -158,6 +158,7 @@ export default function ShopComponent() {
                 <SearchIcon className="h-4 w-4 text-slate-400" />
               </div>
               <Input
+                aria-label="Search products"
                 value={searchQuery}
                 placeholder="Search premium devices..."
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -166,6 +167,7 @@ export default function ShopComponent() {
               />
               {searchQuery && (
                 <button
+                  aria-label="Clear product search"
                   onClick={clearSearch}
                   className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                 >
@@ -177,7 +179,7 @@ export default function ShopComponent() {
             {/* Controls */}
             <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 lg:pb-0">
               <Select value={sortBy} onValueChange={(value) => { setSortBy(value); setCurrentPage(1); }}>
-                <SelectTrigger className="h-11 w-[160px] rounded-xl border-slate-200 bg-slate-50 text-xs font-bold dark:border-slate-800 dark:bg-slate-950 shrink-0">
+                <SelectTrigger aria-label="Sort products" className="h-11 w-[160px] rounded-xl border-slate-200 bg-slate-50 text-xs font-bold dark:border-slate-800 dark:bg-slate-950 shrink-0">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent className="rounded-xl border-slate-200 dark:border-slate-800">

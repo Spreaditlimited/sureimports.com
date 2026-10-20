@@ -1,4 +1,5 @@
 'use client';
+import { formatIntelligencePrice } from '@/lib/intelligence/formatPrice';
 
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -130,25 +131,27 @@ function ConfirmSearchButton() {
 }
 
 function BuyCreditsPanel({
-  extraCreditPriceNaira,
+  extraCreditPrice,
+  currency = 'NGN',
 }: {
-  extraCreditPriceNaira: number;
+  extraCreditPrice: number;
+  currency?: 'NGN' | 'USD';
 }) {
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const total = quantity * extraCreditPriceNaira;
+  const total = quantity * extraCreditPrice;
 
   async function handleCheckout() {
     setIsLoading(true);
     setError('');
 
     try {
-      const response = await fetch('/api/intelligence/credits/checkout', {
+      const response = await fetch(currency === 'USD' ? '/api/intelligence/paypal' : '/api/intelligence/credits/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ quantity }),
+        body: JSON.stringify({ quantity, action: 'credits' }),
       });
 
       if (response.status === 401) {
@@ -180,7 +183,7 @@ function BuyCreditsPanel({
             Buy extra credits
           </p>
           <p className="mt-1 text-sm font-semibold leading-relaxed text-slate-700">
-            ₦{extraCreditPriceNaira.toLocaleString('en-NG')} per supplier search
+            {formatIntelligencePrice(extraCreditPrice, currency)} per supplier search
             credit.
           </p>
         </div>
@@ -206,7 +209,7 @@ function BuyCreditsPanel({
           <button
             type="button"
             onClick={handleCheckout}
-            disabled={isLoading}
+            disabled={isLoading || extraCreditPrice <= 0}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isLoading ? (
@@ -216,7 +219,7 @@ function BuyCreditsPanel({
             )}
             {isLoading
               ? 'Starting checkout...'
-              : `Pay ₦${total.toLocaleString('en-NG')}`}
+              : extraCreditPrice > 0 ? `Pay ${formatIntelligencePrice(total, currency)}${currency === 'USD' ? ' with PayPal' : ''}` : 'USD pricing coming soon'}
           </button>
         </div>
       </div>
@@ -235,7 +238,8 @@ export default function SearchCreditRequestForm({
   requests,
   starterMonthlyCredits,
   proMonthlyCredits,
-  extraCreditPriceNaira,
+  extraCreditPrice,
+  currency = 'NGN',
   canOpenCategories,
   compact = false,
 }: {
@@ -243,7 +247,8 @@ export default function SearchCreditRequestForm({
   requests: IntelligenceSearchRequest[];
   starterMonthlyCredits: number;
   proMonthlyCredits: number;
-  extraCreditPriceNaira: number;
+  extraCreditPrice: number;
+  currency?: 'NGN' | 'USD';
   canOpenCategories: boolean;
   compact?: boolean;
 }) {
@@ -334,7 +339,7 @@ export default function SearchCreditRequestForm({
             {starterMonthlyCredits === 1 ? 'credit' : 'credits'}; Pro includes{' '}
             {proMonthlyCredits} monthly supplier search{' '}
             {proMonthlyCredits === 1 ? 'credit' : 'credits'}. Extra credits are
-            priced at ₦{extraCreditPriceNaira.toLocaleString('en-NG')} each.
+            priced at {formatIntelligencePrice(extraCreditPrice, currency)} each.
           </p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
@@ -346,7 +351,7 @@ export default function SearchCreditRequestForm({
       </div>
 
       <div className="mt-5">
-        <BuyCreditsPanel extraCreditPriceNaira={extraCreditPriceNaira} />
+        <BuyCreditsPanel extraCreditPrice={extraCreditPrice} currency={currency} />
       </div>
 
       <form ref={formRef} action={formAction} className="mt-6 grid gap-4">

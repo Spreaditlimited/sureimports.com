@@ -1,3 +1,4 @@
+import { featureRequestAccess } from '@/lib/features/request-access';
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
@@ -6,10 +7,12 @@ import xMail from '@/lib/email/xMail2';
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
+  const access = await featureRequestAccess('pay_supplier');
+  if (access.response) return access.response;
   //GET FORM DATA
   const formData = await request.formData();
-  const pidUser = formData.get('pidUser') as string;
-  const email = formData.get('userEmail') as string;
+  const pidUser = access.user.pidUser;
+  const email = access.user.userEmail;
   const pidBankPayment = formData.get('pidBankPayment') as string;
   const amount = formData.get('amount') as string;
   const currencyType = formData.get('currencyType') as string;

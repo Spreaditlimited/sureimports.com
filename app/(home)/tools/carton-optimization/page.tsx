@@ -1,17 +1,16 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '../Tools.module.css';
 import { useMemo, useState } from 'react';
-import { 
-  Box, 
-  Layers, 
-  Maximize, 
-  Minimize, 
-  Calculator, 
-  AlertCircle, 
-  ChevronRight, 
+import {
+  Box,
+  Layers,
+  Maximize,
+  Minimize,
+  Calculator,
+  AlertCircle,
+  ChevronRight,
   TrendingDown,
   Info,
   Package
@@ -128,17 +127,17 @@ export default function CartonOptimizationTool() {
   }, [canCalc, productDims, cartonDims, q, e]);
 
   return (
-    <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
-<div className={`${heroLayout.fixed} max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8`}>
-        
+    <main className={styles.page} data-si-page-theme="service">
+<div className={styles.container}>
+
         {/* Header Section */}
-        <header className="mb-12">
-        <PublicHeroBackground darkOnly priority={false} />
+        <header className={styles.header}>
+
 <HeroPill className="mb-6">
             <Maximize className="w-3.5 h-3.5" />
             Space Optimization
           </HeroPill>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6">
             Carton <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">Optimization Tool</span>
           </h1>
           <p className="text-lg font-medium text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
@@ -147,11 +146,11 @@ export default function CartonOptimizationTool() {
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* Input Panel */}
           <section className="lg:col-span-7 space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10  dark:border-slate-800 dark:bg-slate-900">
+
               {/* Product Dims */}
               <div className="mb-10">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
@@ -160,8 +159,8 @@ export default function CartonOptimizationTool() {
                 <div className="grid grid-cols-3 gap-4">
                   {[['L', pL, setPL], ['W', pW, setPW], ['H', pH, setPH]].map(([label, val, setter]: any) => (
                     <div key={label} className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">{label}</label>
-                      <input
+                      <label htmlFor={`carton-optimization-field-1-${label}`} className="text-[10px] font-bold text-slate-500 uppercase ml-1">{label}</label>
+                      <input id={`carton-optimization-field-1-${label}`}
                         value={val}
                         onChange={(e) => setter(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600"
@@ -181,8 +180,8 @@ export default function CartonOptimizationTool() {
                 <div className="grid grid-cols-3 gap-4">
                   {[['L', cL, setCL], ['W', cW, setCW], ['H', cH, setCH]].map(([label, val, setter]: any) => (
                     <div key={label} className="space-y-2">
-                      <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">{label}</label>
-                      <input
+                      <label htmlFor={`carton-optimization-field-2-${label}`} className="text-[10px] font-bold text-slate-500 uppercase ml-1">{label}</label>
+                      <input id={`carton-optimization-field-2-${label}`}
                         value={val}
                         onChange={(e) => setter(e.target.value)}
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-orange-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600"
@@ -197,8 +196,8 @@ export default function CartonOptimizationTool() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Quantity</label>
-                  <input
+                  <label htmlFor="carton-optimization-field-3" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Quantity</label>
+                  <input id="carton-optimization-field-3"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
                     inputMode="decimal"
@@ -206,8 +205,8 @@ export default function CartonOptimizationTool() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Efficiency (%)</label>
-                  <input
+                  <label htmlFor="carton-optimization-field-4" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Efficiency (%)</label>
+                  <input id="carton-optimization-field-4"
                     value={eff}
                     onChange={(e) => setEff(e.target.value)}
                     inputMode="decimal"
@@ -229,13 +228,13 @@ export default function CartonOptimizationTool() {
           {/* Results Panel */}
           <section className="lg:col-span-5 lg:sticky lg:top-8">
             {!result ? (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
                 <Calculator className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-600" />
                 <p className="font-bold text-slate-600 dark:text-slate-400">Analysis Pending</p>
                 <p className="text-sm font-medium mt-2 leading-relaxed text-slate-500 dark:text-slate-500">Enter your dimensions to find the <br/> most efficient stacking layout.</p>
               </div>
             ) : !result.fits ? (
-              <div className="rounded-[32px] border border-rose-200 bg-rose-50 p-8 text-center dark:border-rose-900/30 dark:bg-rose-900/10">
+              <div className="rounded-2xl border border-rose-200 bg-rose-50 p-8 text-center dark:border-rose-900/30 dark:bg-rose-900/10">
                 <AlertCircle className="w-10 h-10 text-rose-500 mx-auto mb-4" />
                 <h4 className="text-rose-900 font-bold mb-2 dark:text-rose-200">Item Doesn't Fit</h4>
                 <p className="text-sm font-medium text-rose-800 dark:text-rose-300">Your product dimensions exceed the carton size in all orientations.</p>
@@ -243,27 +242,27 @@ export default function CartonOptimizationTool() {
             ) : (
               <div className="space-y-4">
                 {/* Result Card */}
-                <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8   relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
                   <div className="absolute top-0 right-0 p-6 opacity-10">
                     <Layers className="w-12 h-12 text-slate-900 dark:text-white" />
                   </div>
-                  
-                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Optimization Result</h3>
-                  
+
+                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">Optimization Result</h3>
+
                   <div className="space-y-6 mb-8">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-bold dark:text-slate-400">Units Per Carton</span>
-                      <span className="text-2xl font-black text-slate-900 dark:text-white">
+                      <span className="text-2xl font-semibold text-slate-900 dark:text-white">
                         {result.perCarton} <span className="text-xs font-bold text-slate-400 dark:text-slate-500">({result.layout})</span>
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-bold dark:text-slate-400">Cartons Needed</span>
-                      <span className="text-2xl font-black text-indigo-600 dark:text-indigo-400">{result.cartonsNeeded}</span>
+                      <span className="text-2xl font-semibold text-indigo-600 dark:text-indigo-400">{result.cartonsNeeded}</span>
                     </div>
                     <div className="pt-6 border-t border-slate-100 flex justify-between items-center dark:border-slate-800">
-                      <span className="text-slate-400 font-black uppercase text-[10px] tracking-widest">Total Volume</span>
-                      <span className="text-slate-900 font-black text-2xl dark:text-white">{nf2.format(result.totalCbm)} m³</span>
+                      <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-widest">Total Volume</span>
+                      <span className="text-slate-900 font-semibold text-2xl dark:text-white">{nf2.format(result.totalCbm)} m³</span>
                     </div>
                   </div>
 
@@ -271,8 +270,8 @@ export default function CartonOptimizationTool() {
                     <div className="flex gap-3">
                       <TrendingDown className={`w-5 h-5 shrink-0 ${result.wastePct < 15 ? 'text-emerald-500 dark:text-emerald-400' : 'text-amber-500 dark:text-amber-400'}`} />
                       <div>
-                        <p className={`text-[11px] font-black uppercase tracking-widest mb-1 ${result.wastePct < 15 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>Wasted Space Estimate</p>
-                        <p className={`text-xl font-black ${result.wastePct < 15 ? 'text-emerald-600 dark:text-emerald-300' : 'text-amber-600 dark:text-amber-300'}`}>
+                        <p className={`text-[11px] font-semibold uppercase tracking-widest mb-1 ${result.wastePct < 15 ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400'}`}>Wasted Space Estimate</p>
+                        <p className={`text-xl font-semibold ${result.wastePct < 15 ? 'text-emerald-600 dark:text-emerald-300' : 'text-amber-600 dark:text-amber-300'}`}>
                           {nf2.format(result.wastePct)}%
                         </p>
                       </div>
@@ -285,10 +284,10 @@ export default function CartonOptimizationTool() {
                     { label: 'Landed Cost Estimator', href: '/tools/landed-cost-estimator' },
                     { label: 'Air vs Sea Calculator', href: '/tools/air-vs-sea-calculator' }
                   ].map((tool) => (
-                    <a 
+                    <a
                       key={tool.label}
-                      href={tool.href} 
-                      className="group flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 shadow-sm"
+                      href={tool.href}
+                      className="group flex items-center justify-between p-5 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 "
                     >
                       <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{tool.label}</span>
                       <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
@@ -303,11 +302,11 @@ export default function CartonOptimizationTool() {
         {/* Educational Content Section */}
         <section className="mt-32 border-t border-slate-200 pt-20 dark:border-slate-800">
           <div className="max-w-4xl">
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">Why Carton Optimization Matters</h2>
-            
+            <h2 className="text-3xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">Why Carton Optimization Matters</h2>
+
             <div className="space-y-8 text-slate-600 dark:text-slate-400 leading-relaxed text-lg">
               <p>
-                Every cubic centimeter of "air" in your shipping container is money wasted. Carton optimization ensures you are utilizing 
+                Every cubic centimeter of "air" in your shipping container is money wasted. Carton optimization ensures you are utilizing
                 the maximum volume of your shipping boxes, which directly reduces your total CBM (Cubic Meters) and freight costs.
               </p>
 
@@ -326,7 +325,7 @@ export default function CartonOptimizationTool() {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-black text-slate-900 pt-8 mb-6 dark:text-white">Carton Optimization FAQ</h3>
+              <h3 className="text-2xl font-semibold text-slate-900 pt-8 mb-6 dark:text-white">Carton Optimization FAQ</h3>
               <div className="grid grid-cols-1 gap-4">
                 {[
                   {
@@ -342,9 +341,9 @@ export default function CartonOptimizationTool() {
                     a: 'This factor accounts for cardboard thickness, bubble wrap, and stacking errors. A value of 90% is a safe industry standard for planning.',
                   }
                 ].map((item, i) => (
-                  <div key={i} className="group p-6 rounded-2xl border border-slate-200 bg-white hover:border-indigo-200 hover:shadow-md transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
+                  <div key={i} className="group p-6 rounded-2xl border border-slate-200 bg-white hover:border-indigo-200  transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
                     <div className="flex gap-4">
-                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-black text-indigo-600 border border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30">
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-600 border border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30">
                         Q
                       </div>
                       <div>

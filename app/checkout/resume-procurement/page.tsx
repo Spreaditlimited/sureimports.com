@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { PUBLIC_DRAFT_KEY } from '@/lib/procurement/publicDraft';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Loader2 } from 'lucide-react';
@@ -15,6 +16,7 @@ export default function ResumeProcurementCheckoutPage() {
   const router = useRouter();
   const attemptedRef = useRef(false);
   const [error, setError] = useState('');
+  const [duplicate, setDuplicate] = useState(false);
 
   useEffect(() => {
     if (attemptedRef.current) return;
@@ -35,7 +37,9 @@ export default function ResumeProcurementCheckoutPage() {
       } catch {
         window.localStorage.removeItem(PENDING_PROCUREMENT_CHECKOUT_KEY);
         window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
-        setError('Your saved order draft could not be read. Please recreate it.');
+        setError(
+          'Your saved order draft could not be read. Please recreate it.',
+        );
         return;
       }
 
@@ -52,11 +56,14 @@ export default function ResumeProcurementCheckoutPage() {
           return;
         }
 
-        const response = await fetch('/api/public/procurement/bootstrap-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(pendingPayload),
-        });
+        const response = await fetch(
+          '/api/public/procurement/bootstrap-order',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(pendingPayload),
+          },
+        );
         const data = (await response.json()) as {
           statusx?: string;
           message?: string;
@@ -64,6 +71,7 @@ export default function ResumeProcurementCheckoutPage() {
         };
 
         if (response.ok && data.statusx === 'SUCCESS' && data.redirectTo) {
+          window.localStorage.removeItem(PUBLIC_DRAFT_KEY);
           window.localStorage.removeItem(PENDING_PROCUREMENT_CHECKOUT_KEY);
           window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
           router.replace(data.redirectTo);
@@ -81,7 +89,10 @@ export default function ResumeProcurementCheckoutPage() {
           return;
         }
 
-        setError(data.message || 'We could not save your order. Please try again.');
+        if (data.statusx === 'EXISTING_SAVED_ORDERS') setDuplicate(true);
+        setError(
+          data.message || 'We could not save your order. Please try again.',
+        );
       } catch {
         setError('We could not save your order right now. Please try again.');
       }
@@ -97,6 +108,31 @@ export default function ResumeProcurementCheckoutPage() {
           <>
             <h1 className="text-2xl font-bold">Order handoff paused</h1>
             <p className="mt-3 text-sm leading-6 text-slate-300">{error}</p>
+            {duplicate && (
+              <button
+                className="mt-5 rounded-xl bg-brand-orange-500 p-3"
+                onClick={() => {
+                  try {
+                    const pending = JSON.parse(
+                      localStorage.getItem(PENDING_PROCUREMENT_CHECKOUT_KEY) ||
+                        '{}',
+                    );
+                    pending.allowSeparateOrder = true;
+                    localStorage.setItem(
+                      PENDING_PROCUREMENT_CHECKOUT_KEY,
+                      JSON.stringify(pending),
+                    );
+                    window.location.reload();
+                  } catch {
+                    setError(
+                      'Unable to read your draft. Return to your order to try again.',
+                    );
+                  }
+                }}
+              >
+                Save these products as a separate order
+              </button>
+            )}
             <Link
               href="/buy-from-chinese-websites#start-order"
               className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-brand-orange-500 px-5 font-semibold text-white hover:bg-brand-orange-600"

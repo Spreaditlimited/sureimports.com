@@ -1,3 +1,5 @@
+import { getIntelligenceBilling } from '@/lib/intelligence/billing';
+import { formatIntelligencePrice } from '@/lib/intelligence/formatPrice';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import {
@@ -30,6 +32,7 @@ import SearchCreditRequestForm from '@/components/intelligence/SearchCreditReque
 
 export default async function DashboardIntelligencePage() {
   const user = await checkAuth();
+  const billing = await getIntelligenceBilling(user?.pidUser);
   const subscription = await getActiveIntelligenceSubscription(user?.pidUser);
   const niches = await getPassingNichesWithDb();
   const companyContacts = await getCompanyContactSettings();
@@ -52,10 +55,10 @@ export default async function DashboardIntelligencePage() {
   // ---------------------------------------------------------------------------
   if (!subscription) {
     return (
-      <main className="min-h-screen bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
+      <main className="si-workspace-plain">
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/50 sm:p-10 lg:p-12">
           {/* Subtle Ambient Glow */}
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px]" />
+
 
           <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
@@ -74,7 +77,8 @@ export default async function DashboardIntelligencePage() {
                 full supplier details.
               </p>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <a href="#supplier-search" className="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-semibold text-white">Find suppliers</a>
+              <div className="mt-6 hidden gap-3 sm:grid sm:grid-cols-3">
                 {[
                   {
                     icon: Search,
@@ -130,7 +134,7 @@ export default async function DashboardIntelligencePage() {
                 {[
                   { label: 'Categories', value: niches.length },
                   { label: 'Supplier leads', value: availableSupplierCount },
-                  { label: 'Free credit', value: creditAccount?.balance || 1 },
+                  { label: 'Free credit', value: creditAccount?.balance ?? 0 },
                 ].map((stat) => (
                   <div
                     key={stat.label}
@@ -149,17 +153,15 @@ export default async function DashboardIntelligencePage() {
           </div>
 
           {user?.pidUser ? (
-            <div className="relative mt-10">
-              <SearchCreditRequestForm
+            <div id="supplier-search" className="relative mt-8 scroll-mt-24">
+              <SearchCreditRequestForm currency={billing.currency}
                 account={creditAccount}
                 requests={searchRequests}
                 starterMonthlyCredits={
                   intelligencePlans.starter.monthlySearchCredits
                 }
                 proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
-                extraCreditPriceNaira={
-                  intelligencePlans.pro.extraCreditPriceNaira
-                }
+                extraCreditPrice={billing.creditPrice('pro', intelligencePlans.pro.extraCreditPriceNaira)}
                 canOpenCategories={false}
                 compact
               />
@@ -229,14 +231,14 @@ export default async function DashboardIntelligencePage() {
           </div>
 
           <div className="relative mt-10 grid gap-5 lg:grid-cols-2">
-            <LockedPlanCard
+            <LockedPlanCard currency={billing.currency}
               title={intelligencePlans.starter.name}
-              price={intelligencePlans.starter.priceNaira}
+              price={billing.planPrice('starter', intelligencePlans.starter.priceNaira)}
               description="For importers who want database access plus one monthly supplier search credit."
               features={intelligencePlans.starter.features}
               action={
-                <SubscribeButton
-                  plan="starter"
+                <SubscribeButton currency={billing.currency}
+                  plan="starter" available={billing.planPrice('starter', intelligencePlans.starter.priceNaira) > 0}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3.5 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 hover:text-slate-900"
                 >
                   Subscribe to Starter
@@ -244,15 +246,15 @@ export default async function DashboardIntelligencePage() {
               }
             />
 
-            <LockedPlanCard
+            <LockedPlanCard currency={billing.currency}
               title={intelligencePlans.pro.name}
-              price={intelligencePlans.pro.priceNaira}
+              price={billing.planPrice('pro', intelligencePlans.pro.priceNaira)}
               description="For importers who want Sure Imports to review suppliers, quotes and payment details before they pay."
               features={intelligencePlans.pro.features}
               highlighted
               action={
-                <SubscribeButton
-                  plan="pro"
+                <SubscribeButton currency={billing.currency}
+                  plan="pro" available={billing.planPrice('pro', intelligencePlans.pro.priceNaira) > 0}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600"
                 >
                   Subscribe to Pro <Sparkles className="h-4 w-4" />
@@ -269,8 +271,8 @@ export default async function DashboardIntelligencePage() {
   // STATE 2: ACTIVE / SUBSCRIBED
   // ---------------------------------------------------------------------------
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
+    <main className="si-workspace-plain">
+      <div className="si-workspace-inner">
         {/* --- HEADER --- */}
         <div className="flex flex-col gap-6 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
           <div>
@@ -375,8 +377,8 @@ export default async function DashboardIntelligencePage() {
                   templates, and quote comparison support.
                 </p>
               </div>
-              <SubscribeButton
-                plan="pro"
+              <SubscribeButton currency={billing.currency}
+                plan="pro" available={billing.planPrice('pro', intelligencePlans.pro.priceNaira) > 0}
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand-orange-500 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-brand-orange-500/20 transition hover:bg-brand-orange-600"
               >
                 Upgrade to Pro <Sparkles className="h-4 w-4" />
@@ -386,17 +388,14 @@ export default async function DashboardIntelligencePage() {
         )}
 
         <div className="mt-8">
-          <SearchCreditRequestForm
+          <SearchCreditRequestForm currency={billing.currency}
             account={creditAccount}
             requests={searchRequests}
             starterMonthlyCredits={
               intelligencePlans.starter.monthlySearchCredits
             }
             proMonthlyCredits={intelligencePlans.pro.monthlySearchCredits}
-            extraCreditPriceNaira={
-              currentPlan?.extraCreditPriceNaira ||
-              intelligencePlans.pro.extraCreditPriceNaira
-            }
+            extraCreditPrice={billing.creditPrice(subscription.plan === 'starter' ? 'starter' : 'pro', currentPlan?.extraCreditPriceNaira || intelligencePlans.pro.extraCreditPriceNaira)}
             canOpenCategories={true}
           />
         </div>
@@ -500,6 +499,7 @@ export default async function DashboardIntelligencePage() {
 function LockedPlanCard({
   title,
   price,
+  currency,
   description,
   features,
   action,
@@ -507,6 +507,7 @@ function LockedPlanCard({
 }: {
   title: string;
   price: number;
+  currency: 'NGN' | 'USD';
   description: string;
   features: string[];
   action: ReactNode;
@@ -535,7 +536,7 @@ function LockedPlanCard({
           ) : null}
         </div>
         <p className="mt-6 text-3xl font-black text-slate-900">
-          ₦{price.toLocaleString('en-NG')}
+          {formatIntelligencePrice(price, currency)}
           <span className="text-sm font-bold text-slate-500"> / month</span>
         </p>
       </div>

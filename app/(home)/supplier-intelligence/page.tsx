@@ -1,5 +1,7 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import { getIntelligenceUsdPricing } from '@/lib/intelligence/usdPricing';
+import { formatIntelligencePrice } from '@/lib/intelligence/formatPrice';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -13,7 +15,6 @@ import {
   Factory,
   FileCheck2,
   FileSearch,
-  LockKeyhole,
   MessageSquareText,
   Search,
   ShieldCheck,
@@ -27,7 +28,8 @@ import IntelligenceSignupForm from '@/components/intelligence/IntelligenceSignup
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { getPassingNichesWithDb } from '@/lib/intelligence/data';
 import { getIntelligencePlans } from '@/lib/intelligence/plans';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+
+export const dynamic = 'force-dynamic';
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = 'https://www.sureimports.com/supplier-intelligence';
@@ -227,74 +229,62 @@ const faqSchema = {
 export default async function SupplierIntelligencePage() {
   const passingNiches = await getPassingNichesWithDb();
   const intelligencePlans = await getIntelligencePlans();
+  const usdPricing = await getIntelligenceUsdPricing();
 
   return (
-    <main className="min-h-screen bg-[#fcfcfd] text-slate-950 antialiased selection:bg-brand-orange-500/30">
+    <main className={pageStyles.page} data-si-page-theme="service">
       <JsonLdScript data={[serviceSchema, faqSchema]} />
       <Navigation />
 
       {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-[#020617] pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
-        <PublicHeroBackground />
-        {/* Subtle Ambient Glow */}
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
-
-        <div className="relative mx-auto flex max-w-[1440px] flex-col items-center px-4 text-center sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-4xl">
-<HeroPill>
-              <LockKeyhole className="h-3.5 w-3.5" />
-              China supplier intelligence for global buyers
-            </HeroPill>
-            <h1 className="mt-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-              Stop guessing where to find{' '}
-              <span className="text-white">China suppliers</span>
-            </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-              Access researched supplier leads by product category. If you
-              choose Pro, Sure Imports can also review supplier details, quotes,
-              invoices and payment information before you send money.
-            </p>
-
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-              <Link
-                href="/supplier-intelligence/reports"
-                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
-              >
-                Browse Supplier Reports
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link
-                href="#pricing"
-                className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
-              >
-                Explore Membership
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ServiceHero
+        eyebrow="Supplier intelligence"
+        title="Find China suppliers with clearer information."
+        description="Explore researched supplier leads by product category. With Pro, get help reviewing supplier details, quotes, invoices and payment information."
+        summaryTitle="Start your research here."
+        primary={{
+          href: '/supplier-intelligence/reports',
+          label: 'Browse supplier reports',
+        }}
+        secondary={{ href: '#pricing', label: 'Explore membership' }}
+        steps={[
+          {
+            title: 'Explore your product category',
+            description:
+              'Browse the available supplier reports for your niche.',
+          },
+          {
+            title: 'Review potential suppliers',
+            description: 'Use researched leads to build your shortlist.',
+          },
+          {
+            title: 'Get additional support',
+            description: 'Choose Pro for reviews before you send money.',
+          },
+        ]}
+      />
 
       {/* --- STATUS BAR --- */}
-      <section className="border-b border-slate-200 bg-white py-8">
+      <section className="border-b border-slate-200 bg-[var(--si-surface)] py-8">
         <div className="mx-auto grid max-w-[1440px] gap-6 px-4 sm:grid-cols-3 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-3xl font-black tracking-tight text-slate-900">
+          <div className="rounded-2xl border border-slate-100 bg-[var(--si-surface)] p-5">
+            <p className="text-3xl font-medium tracking-tight text-slate-900">
               {passingNiches.length}
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">
               product categories available now
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-3xl font-black tracking-tight text-slate-900">
+          <div className="rounded-2xl border border-slate-100 bg-[var(--si-surface)] p-5">
+            <p className="text-3xl font-medium tracking-tight text-slate-900">
               10
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">
               data points reviewed per supplier
             </p>
           </div>
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5">
-            <p className="text-3xl font-black tracking-tight text-slate-900">
+          <div className="rounded-2xl border border-slate-100 bg-[var(--si-surface)] p-5">
+            <p className="text-3xl font-medium tracking-tight text-slate-900">
               Pro
             </p>
             <p className="mt-1 text-sm font-semibold text-slate-500">
@@ -304,13 +294,13 @@ export default async function SupplierIntelligencePage() {
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white py-20">
+      <section className="border-b border-slate-200 bg-[var(--si-surface)] py-20">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-600">
               Choose your access
             </p>
-            <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
               One category now, or ongoing intelligence
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-600">
@@ -319,11 +309,11 @@ export default async function SupplierIntelligencePage() {
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            <article className="rounded-3xl border border-brand-orange-200 bg-brand-orange-50/50 p-7 sm:p-9">
-              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-600">
+            <article className="rounded-2xl border border-brand-orange-200 bg-brand-orange-50/50 p-7 sm:p-9">
+              <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-600">
                 Pay once
               </p>
-              <h3 className="mt-3 text-2xl font-black">
+              <h3 className="mt-3 text-2xl font-medium">
                 Buy a category report
               </h3>
               <p className="mt-4 text-sm leading-relaxed text-slate-600">
@@ -333,16 +323,16 @@ export default async function SupplierIntelligencePage() {
               </p>
               <Link
                 href="/supplier-intelligence/reports"
-                className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-5 py-3 text-sm font-black text-white"
+                className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-5 py-3 text-sm font-medium text-white"
               >
                 Browse reports <ArrowRight className="h-4 w-4" />
               </Link>
             </article>
-            <article className="rounded-3xl border border-slate-200 bg-slate-950 p-7 text-white sm:p-9">
-              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+            <article className="si-dark-surface rounded-2xl border border-slate-200 bg-[#15171c] p-7 text-white sm:p-9">
+              <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-400">
                 Ongoing access
               </p>
-              <h3 className="mt-3 text-2xl font-black">
+              <h3 className="mt-3 text-2xl font-medium">
                 Use the intelligence platform
               </h3>
               <p className="mt-4 text-sm leading-relaxed text-slate-300">
@@ -351,7 +341,7 @@ export default async function SupplierIntelligencePage() {
               </p>
               <Link
                 href="#pricing"
-                className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-black text-white"
+                className="mt-7 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-3 text-sm font-medium text-white"
               >
                 Compare plans <ArrowRight className="h-4 w-4" />
               </Link>
@@ -364,10 +354,10 @@ export default async function SupplierIntelligencePage() {
       <section className="py-20 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mb-14 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Why this matters
             </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 md:text-4xl">
               The wrong supplier decision is expensive.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-600">
@@ -383,7 +373,7 @@ export default async function SupplierIntelligencePage() {
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 transition-colors group-hover:bg-brand-orange-100">
                   <item.icon className="h-6 w-6" />
                 </div>
-                <h2 className="text-lg font-bold tracking-tight text-slate-900">
+                <h2 className="text-lg font-medium tracking-tight text-slate-900">
                   {item.title}
                 </h2>
                 <p className="mt-3 text-balance text-sm leading-relaxed text-slate-600">
@@ -396,13 +386,13 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       {/* --- PAIN POINTS --- */}
-      <section className="border-y border-slate-100 bg-white py-20 md:py-28">
+      <section className="border-y border-slate-100 bg-[var(--si-surface)] py-20 md:py-28">
         <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
           <div>
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Common importer problem
             </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 md:text-4xl">
               Searching online is not the same as knowing who to contact.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-600">
@@ -416,7 +406,7 @@ export default async function SupplierIntelligencePage() {
             {buyerProblems.map((problem) => (
               <div
                 key={problem}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-5"
+                className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-5"
               >
                 <AlertTriangle className="h-5 w-5 text-brand-orange-500" />
                 <p className="mt-4 text-sm font-semibold leading-relaxed text-slate-700">
@@ -432,10 +422,10 @@ export default async function SupplierIntelligencePage() {
       <section className="py-20 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-14 max-w-3xl text-center">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               How it works
             </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 md:text-4xl">
               Start with research. Use Pro before payment.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-slate-600">
@@ -448,15 +438,15 @@ export default async function SupplierIntelligencePage() {
             {workflow.map((step, index) => (
               <div
                 key={step.title}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
+                className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6 shadow-sm"
               >
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500">
                   <step.icon className="h-6 w-6" />
                 </div>
-                <p className="mt-5 text-xs font-black uppercase tracking-widest text-slate-400">
+                <p className="mt-5 text-xs font-medium uppercase tracking-widest text-slate-400">
                   Step {index + 1}
                 </p>
-                <h3 className="mt-2 text-lg font-black text-slate-950">
+                <h3 className="mt-2 text-lg font-medium text-slate-950">
                   {step.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-slate-600">
@@ -469,14 +459,14 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       {/* --- PRO REVIEWS --- */}
-      <section className="bg-slate-950 py-20 text-white md:py-28">
+      <section className="si-dark-surface bg-[#15171c] py-20 text-white md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+              <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-400">
                 Pro support before payment
               </p>
-              <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                 When money is about to leave your account, get another layer of
                 review.
               </h2>
@@ -487,7 +477,7 @@ export default async function SupplierIntelligencePage() {
               </p>
               <Link
                 href="#pricing"
-                className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-6 text-sm font-bold text-white transition hover:bg-brand-orange-600"
+                className="mt-8 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-6 text-sm font-medium text-white transition hover:bg-brand-orange-600"
               >
                 Compare Starter and Pro
                 <ArrowRight className="h-4 w-4" />
@@ -501,7 +491,7 @@ export default async function SupplierIntelligencePage() {
                   className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
                 >
                   <ClipboardCheck className="h-5 w-5 text-brand-orange-400" />
-                  <h3 className="mt-4 text-lg font-black text-white">
+                  <h3 className="mt-4 text-lg font-medium text-white">
                     {item.title}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-300">
@@ -515,11 +505,11 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       {/* --- NICHE EXAMPLES --- */}
-      <section className="border-y border-slate-100 bg-slate-50/50 py-20 lg:py-32">
+      <section className="border-y border-slate-100 bg-[var(--si-surface)] py-20 lg:py-32">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
+              <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Published only when ready
               </p>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -536,10 +526,10 @@ export default async function SupplierIntelligencePage() {
             {passingNiches.map((niche) => (
               <div
                 key={niche.slug}
-                className="group flex items-center justify-between rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm transition-all hover:border-brand-orange-200 hover:shadow-md"
+                className="group flex items-center justify-between rounded-2xl border border-slate-200/60 bg-[var(--si-surface)] p-5 shadow-sm transition-all hover:border-brand-orange-200 hover:shadow-md"
               >
                 <div>
-                  <p className="font-bold text-slate-900">{niche.name}</p>
+                  <p className="font-medium text-slate-900">{niche.name}</p>
                   <p className="mt-1 text-xs font-medium text-slate-500">
                     {niche.suppliers.length} checked supplier contacts
                   </p>
@@ -552,13 +542,13 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       {/* --- WHO IT IS FOR --- */}
-      <section className="bg-white py-20 md:py-28">
+      <section className="bg-[var(--si-surface)] py-20 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mb-14 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Who should use it
             </p>
-            <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 md:text-4xl">
               Built for people buying from China with real money at risk.
             </h2>
           </div>
@@ -566,10 +556,10 @@ export default async function SupplierIntelligencePage() {
             {whoFor.map((item) => (
               <div
                 key={item.title}
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-6"
+                className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6"
               >
                 <Users className="h-5 w-5 text-brand-orange-500" />
-                <h3 className="mt-4 text-lg font-black text-slate-950">
+                <h3 className="mt-4 text-lg font-medium text-slate-950">
                   {item.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-600">
@@ -585,7 +575,7 @@ export default async function SupplierIntelligencePage() {
       <section id="pricing" className="py-20 lg:py-32">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-2xl text-center md:mx-0 md:text-left">
-            <p className="text-xs font-bold uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Plans
             </p>
             <h2 className="mt-3 text-balance text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
@@ -601,11 +591,11 @@ export default async function SupplierIntelligencePage() {
           </div>
 
           <div className="mt-12 grid gap-8 lg:grid-cols-3">
-            <div className="flex flex-col rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/50 sm:p-10">
+            <div className="flex flex-col rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-none sm:p-10">
               <div className="border-b border-slate-100 pb-8">
                 <div className="min-h-[58px]">
                   <div>
-                    <h3 className="text-2xl font-bold text-slate-900">
+                    <h3 className="text-2xl font-medium text-slate-900">
                       Free Search
                     </h3>
                     <p className="mt-2 text-sm font-medium text-slate-500">
@@ -614,10 +604,10 @@ export default async function SupplierIntelligencePage() {
                   </div>
                 </div>
                 <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
-                  <p className="text-4xl font-black tracking-tight text-slate-900">
-                    ₦0
+                  <p className="text-4xl font-medium tracking-tight text-slate-900">
+                    Free
                   </p>
-                  <p className="pb-1 text-sm font-bold text-slate-500">
+                  <p className="pb-1 text-sm font-medium text-slate-500">
                     one free search
                   </p>
                 </div>
@@ -652,7 +642,7 @@ export default async function SupplierIntelligencePage() {
               return (
                 <div
                   key={plan.key}
-                  className={`relative flex flex-col rounded-[2rem] border p-8 shadow-xl sm:p-10 ${
+                  className={`relative flex flex-col rounded-2xl border p-8 shadow-none sm:p-10 ${
                     isPro
                       ? 'border-brand-orange-300 bg-brand-orange-50/40 shadow-brand-orange-100/70'
                       : 'border-slate-200 bg-white shadow-slate-200/50'
@@ -665,7 +655,7 @@ export default async function SupplierIntelligencePage() {
                   >
                     <div className="flex min-h-[58px] items-start justify-between gap-4">
                       <div>
-                        <h3 className="text-2xl font-bold text-slate-900">
+                        <h3 className="text-2xl font-medium text-slate-900">
                           {plan.name}
                         </h3>
                         <p className="mt-2 text-sm font-medium text-slate-500">
@@ -674,23 +664,34 @@ export default async function SupplierIntelligencePage() {
                       </div>
 
                       {isPro ? (
-                        <span className="shrink-0 rounded-full bg-brand-orange-500 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-brand-orange-500/20">
+                        <span className="shrink-0 rounded-full bg-brand-orange-500 px-3 py-1 text-[10px] font-medium uppercase tracking-widest text-white shadow-lg shadow-brand-orange-500/20">
                           Best Value
                         </span>
                       ) : null}
                     </div>
 
                     <div className="mt-6 flex flex-wrap items-end gap-x-2 gap-y-1">
-                      <p className="text-4xl font-black tracking-tight text-slate-900">
-                        <span className="mr-1 text-2xl font-bold text-slate-400">
+                      <p className="text-4xl font-medium tracking-tight text-slate-900">
+                        <span className="mr-1 text-2xl font-medium text-slate-400">
                           ₦
                         </span>
                         {plan.priceNaira.toLocaleString()}
                       </p>
-                      <p className="pb-1 text-sm font-bold text-slate-500">
+                      <p className="pb-1 text-sm font-medium text-slate-500">
                         / month
                       </p>
                     </div>
+                    <p className="mt-3 text-sm text-slate-600">
+                      International:{' '}
+                      {formatIntelligencePrice(
+                        usdPricing[plan.key].priceUsdCents / 100,
+                        'USD',
+                      )}
+                      {usdPricing[plan.key].priceUsdCents > 0
+                        ? ' / month via PayPal'
+                        : ''}
+                      . Renews automatically; cancel renewal anytime.
+                    </p>
                   </div>
 
                   <ul className="my-8 flex-1 space-y-4 text-sm leading-relaxed text-slate-700">
@@ -703,7 +704,10 @@ export default async function SupplierIntelligencePage() {
                   </ul>
 
                   <div className="mt-auto min-h-[316px] pt-4">
-                    <IntelligenceSignupForm plan={plan.key} />
+                    <IntelligenceSignupForm
+                      plan={plan.key}
+                      usdAvailable={usdPricing[plan.key].priceUsdCents > 0}
+                    />
                   </div>
                 </div>
               );
@@ -713,20 +717,20 @@ export default async function SupplierIntelligencePage() {
       </section>
 
       {/* --- FAQ --- */}
-      <section className="border-t border-slate-100 bg-white py-20 md:py-28">
+      <section className="border-t border-slate-100 bg-[var(--si-surface)] py-20 md:py-28">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <p className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Questions
             </p>
-            <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 md:text-5xl">
+            <h2 className="mt-4 text-3xl font-medium tracking-tight text-slate-950 md:text-4xl">
               Supplier Intelligence FAQs
             </h2>
           </div>
-          <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+          <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-[var(--si-surface)]">
             {faqs.map((faq) => (
               <details key={faq.question} className="group p-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-black text-slate-950">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left text-base font-medium text-slate-950">
                   {faq.question}
                   <ChevronDown className="h-5 w-5 shrink-0 text-slate-400 transition group-open:rotate-180" />
                 </summary>

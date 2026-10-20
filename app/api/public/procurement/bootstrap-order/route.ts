@@ -1,4 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
+import {
+  productDraftSchema,
+  productProblem,
+  shops,
+  inspectProductLink,
+} from '@/lib/procurement/publicDraft';
 import { prisma } from '@/lib/prisma';
 import randomGenerator from '@/lib/helpers/randomGenerator';
 import { generateToken, verifyToken } from '@/lib/jwt';
@@ -18,6 +25,8 @@ type ProductInput = {
 };
 
 type Payload = {
+  draftId?: string;
+  shop?: string;
   account?: {
     firstName?: string;
     lastName?: string;
@@ -74,8 +83,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const pidOrder = `DR${Date.now()}`;
-    const orderName = normalize(body.order.orderName);
+    let pidOrder = `DR${Date.now()}`;
+    const orderName =
+      normalize(body.order.orderName) ||
+      `China order — ${new Date().toISOString().slice(0, 10)}`;
     const destinationCountry = normalize(body.order.destinationCountry);
     const currencyType = normalize(body.order.currencyType);
     const shippingPlan = normalize(body.order.shippingPlan);
@@ -85,13 +96,15 @@ export async function POST(request: NextRequest) {
     if (
       !orderName ||
       !destinationCountry ||
-      !currencyType ||
+      !['CNY', 'USD'].includes(currencyType) ||
       !shippingPlan ||
-      !orderCategory ||
-      !shippingAddress
+      !orderCategory
     ) {
       return NextResponse.json(
-        { statusx: 'FAILED_VALIDATION', message: 'Please complete all order fields.' },
+        {
+          statusx: 'FAILED_VALIDATION',
+          message: 'Please complete all order fields.',
+        },
         { status: 400 },
       );
     }
@@ -105,13 +118,12 @@ export async function POST(request: NextRequest) {
       (item) =>
         !normalize(item.productName) ||
         !item.productLink ||
-        Number.isNaN(Number(item.productPrice)) ||
+        !Number.isFinite(Number(item.productPrice)) ||
         Number(item.productPrice) < 0.01 ||
-        Number.isNaN(Number(item.productWeight)) ||
+        !Number.isFinite(Number(item.productWeight)) ||
         Number(item.productWeight) <= 0 ||
-        Number.isNaN(Number(item.productQuantity)) ||
-        Number(item.productQuantity) < 1 ||
-        !normalize(item.productInfo),
+        !Number.isSafeInteger(Number(item.productQuantity)) ||
+        Number(item.productQuantity) < 1,
     );
 
     if (invalidProduct) {
@@ -119,10 +131,44 @@ export async function POST(request: NextRequest) {
         {
           statusx: 'FAILED_VALIDATION',
           message:
-            'Each product requires a valid web link, name, info, and valid price/weight/quantity values.',
+            'Each product requires a valid web link, name, and valid price/weight/quantity values.',
         },
         { status: 400 },
       );
+    }
+
+    for (const item of normalizedProducts) {
+      const detected = inspectProductLink(item.productLink || '').shop;
+      if (detected && detected.currency !== currencyType)
+        return NextResponse.json(
+          {
+            message:
+              'Please keep products in one currency. Create a separate order for products priced in another currency.',
+          },
+          { status: 400 },
+        );
+    }
+
+    if (body.draftId) {
+      if (!/^[a-zA-Z0-9-]{16,80}$/.test(body.draftId))
+        return NextResponse.json(
+          { message: 'Invalid draft identifier.' },
+          { status: 400 },
+        );
+      const shop = shops.find((s) => s.id === body.shop);
+      if (!shop || (shop.currency && shop.currency !== currencyType))
+        return NextResponse.json(
+          { message: 'Please check your website and currency selection.' },
+          { status: 400 },
+        );
+      for (const item of products) {
+        const parsed = productDraftSchema.safeParse(item);
+        const problem = parsed.success
+          ? productProblem(parsed.data, shop.id, currencyType)
+          : 'Please review your product details.';
+        if (problem)
+          return NextResponse.json({ message: problem }, { status: 400 });
+      }
     }
 
     let shippingPricing;
@@ -136,7 +182,9 @@ export async function POST(request: NextRequest) {
         {
           statusx: 'INVALID_SHIPPING_SELECTION',
           message:
-            error instanceof Error ? error.message : 'Invalid shipping selection.',
+            error instanceof Error
+              ? error.message
+              : 'Invalid shipping selection.',
         },
         { status: 400 },
       );
@@ -186,16 +234,36 @@ export async function POST(request: NextRequest) {
     }
     const { user, createdNewAccount } = account;
 
+    if (body.draftId) {
+      pidOrder = `DR${createHash('sha256').update(`${user.pidUser}:${body.draftId}`).digest('hex').slice(0, 24)}`;
+      const previous = await prisma.orders.findUnique({ where: { pidOrder } });
+      if (previous)
+        return NextResponse.json({
+          statusx: 'SUCCESS',
+          redirectTo: `/dashboard/procurement/view-order/${pidOrder}?statusx=saved`,
+        });
+    }
+
     const existingDraft = await prisma.orders.findFirst({
-      where: { pidUser: user.pidUser, status: 'saved', mergedIntoOrderId: null },
+      where: {
+        pidUser: user.pidUser,
+        status: 'saved',
+        mergedIntoOrderId: null,
+      },
       orderBy: { updatedAt: 'desc' },
       select: { pidOrder: true, orderName: true },
     });
+    if (body.draftId && existingDraft?.pidOrder === pidOrder)
+      return NextResponse.json({
+        statusx: 'SUCCESS',
+        redirectTo: `/dashboard/procurement/view-order/${pidOrder}?statusx=saved`,
+      });
     if (existingDraft && body.allowSeparateOrder !== true) {
       return NextResponse.json(
         {
           statusx: 'EXISTING_SAVED_ORDERS',
-          message: 'You already have a saved order. Continue it from your dashboard, or explicitly choose a separate shipment.',
+          message:
+            'You already have a saved order. Continue it from your dashboard, or explicitly choose a separate shipment.',
           existingDraft,
           continuePath: `/dashboard/procurement/add-product/${existingDraft.pidOrder}`,
         },
@@ -203,43 +271,55 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.orders.create({
-        data: {
-          pidOrder,
-          pidUser: user.pidUser,
-          orderName,
-          destinationCountry,
-          currencyType,
-          shippingPlan,
-          orderCategory,
-          shippingAddress,
-          shippingPricingVersion: shippingPricing.version,
-          shippingMeasurementUnit: shippingPricing.measurementUnit,
-          shippingRateSnapshot: shippingPricing.rate,
-          shippingRateCurrency: shippingPricing.rateCurrency,
-          status: 'saved',
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      });
+    try {
+      await prisma.$transaction(async (tx) => {
+        await tx.orders.create({
+          data: {
+            pidOrder,
+            pidUser: user.pidUser,
+            orderName,
+            destinationCountry,
+            currencyType,
+            shippingPlan,
+            orderCategory,
+            shippingAddress,
+            shippingPricingVersion: shippingPricing.version,
+            shippingMeasurementUnit: shippingPricing.measurementUnit,
+            shippingRateSnapshot: shippingPricing.rate,
+            shippingRateCurrency: shippingPricing.rateCurrency,
+            status: 'saved',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
 
-      await tx.products.createMany({
-        data: normalizedProducts.map((item) => ({
-          pidProduct: `PRD${Date.now()}${randomGenerator(5)}`,
-          pidOrder,
-          pidUser: user.pidUser,
-          productName: normalize(item.productName),
-          productLink: item.productLink!,
-          productPrice: Number(item.productPrice),
-          shippingMeasurePerUnit: Number(item.productWeight),
-          productQuantity: Number(item.productQuantity),
-          productInfo: normalize(item.productInfo),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        })),
+        await tx.products.createMany({
+          data: normalizedProducts.map((item) => ({
+            pidProduct: `PRD${Date.now()}${randomGenerator(5)}`,
+            pidOrder,
+            pidUser: user.pidUser,
+            productName: normalize(item.productName),
+            productLink: item.productLink!,
+            productPrice: Number(item.productPrice),
+            shippingMeasurePerUnit: Number(item.productWeight),
+            productQuantity: Number(item.productQuantity),
+            productInfo: normalize(item.productInfo),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })),
+        });
       });
-    });
+    } catch (error) {
+      // The unique deterministic order ID makes concurrent retries safe.
+      const previous = body.draftId
+        ? await prisma.orders.findUnique({ where: { pidOrder } })
+        : null;
+      if (!previous || previous.pidUser !== user.pidUser) throw error;
+      return NextResponse.json({
+        statusx: 'SUCCESS',
+        redirectTo: `/dashboard/procurement/view-order/${pidOrder}?statusx=saved`,
+      });
+    }
 
     // Non-blocking CAPI lead event for public procurement submissions.
     try {
@@ -247,7 +327,8 @@ export async function POST(request: NextRequest) {
       const accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
       if (pixelId && accessToken && body.fbEventId) {
         const estimatedValue = products.reduce(
-          (sum, item) => sum + Number(item.productPrice) * Number(item.productQuantity),
+          (sum, item) =>
+            sum + Number(item.productPrice) * Number(item.productQuantity),
           0,
         );
         await sendFacebookLeadCapiEvent({

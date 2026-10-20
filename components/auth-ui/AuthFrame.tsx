@@ -31,7 +31,6 @@ export default function AuthFrame({ children }: { children: ReactNode }) {
             height={32}
             priority
           />
-          <span>{authBrand.name}</span>
         </Link>
         <div className={styles.storyCopy}>
           <h2>

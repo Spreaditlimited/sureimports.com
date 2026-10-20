@@ -1,0 +1,17 @@
+.card { padding:clamp(20px,3vw,32px); color:var(--si-ink); }
+.card h2 { font-size:20px; font-weight:600; }
+.card p { color:var(--si-muted); line-height:1.6; margin:12px 0; }
+.card form { display:grid; gap:12px; margin-top:24px; max-width:700px; }
+.card label { font-size:14px; font-weight:500; }
+.card :is(input:not([type='checkbox']),select) { width:100%; min-height:48px; min-width:0; padding:12px; border:1px solid var(--si-border); border-radius:8px; background:var(--si-surface); color:var(--si-ink); font-size:16px; }
+.card select { padding-right:40px; }
+.card button { min-height:48px; padding:12px 20px; border-radius:10px; background:var(--si-primary); color:var(--si-on-primary); font-weight:600; }
+.card button:disabled { opacity:.6; }
+.card small { color:var(--si-muted); }
+.saved { margin-top:20px; padding:20px; border-radius:10px; background:var(--si-soft); overflow-wrap:anywhere; }
+.fields { display:grid; gap:16px; }
+.fields label { display:grid; gap:8px; }
+.check { display:flex; align-items:flex-start; gap:10px; padding:12px 0; line-height:24px; cursor:pointer; }
+.check input { flex:0 0 18px; width:18px; height:18px; min-height:18px; margin:3px 0 0; accent-color:var(--si-primary); cursor:pointer; }
+.check span { min-width:0; }
+@media(min-width:640px) { .fields { grid-template-columns:1fr 1fr; } }

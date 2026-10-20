@@ -1,21 +1,17 @@
+import ServiceHero from '@/components/home/ServiceHero';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ShoppingCart,
   PackageCheck,
   Factory,
-  MapPin,
-  ShieldCheck,
   ChevronDown,
 } from 'lucide-react';
 import Navigation from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
-import HeroPill from '@/components/home/HeroPill';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import ImportMarkets from '@/components/home/ImportMarkets';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { LINESCOUT_WHITE_LABEL_URL } from '@/lib/linescoutLinks';
-import heroLayout from '@/components/home/HeroLayout.module.css';
 import styles from '@/components/home/ImportGuide.module.css';
 import ImportReadingPath from '@/components/home/ImportReadingPath';
 
@@ -134,7 +130,7 @@ export default function ImportFromChinaToUKPage() {
   return (
     <>
       <Navigation />
-      <main className={styles.page}>
+      <main className={styles.page} data-si-page-theme="service">
         <JsonLdScript
           data={[
             {
@@ -175,46 +171,21 @@ export default function ImportFromChinaToUKPage() {
             },
           ]}
         />
-        <section className={`${heroLayout.fixed} ${styles.hero}`}>
-          <PublicHeroBackground />
-          <div className={`${styles.container} ${styles.heroContent}`}>
-            <HeroPill>
-              <span aria-hidden="true">🇬🇧</span> China to the United Kingdom
-            </HeroPill>
-            <h1>
-              Import from China to the UK.
-              <br />
-              <span>Build something of your own.</span>
-            </h1>
-            <p className={styles.intro}>
-              Buy the products you have found, source stock for your business,
-              or put your brand on a product. Sure Imports connects the buying,
-              sourcing and shipping, with a team in China and a UK point of
-              contact.
-            </p>
-            <div className={styles.actions}>
-              <Link href="#choose-your-route" className={styles.primary}>
-                Find your starting point
-              </Link>
-              <a href={LINESCOUT_WHITE_LABEL_URL} className={styles.secondary}>
-                Explore white-label ideas
-              </a>
-            </div>
-            <div className={styles.trust}>
-              <span>
-                <MapPin aria-hidden="true" /> UK contact, China sourcing team
-              </span>
-              <span>
-                <ShieldCheck aria-hidden="true" /> Operating since 2018
-              </span>
-              <span>
-                <PackageCheck aria-hidden="true" /> Buying, branding and
-                shipping
-              </span>
-            </div>
-            <ImportMarkets active="uk" />
-          </div>
-        </section>
+        <ServiceHero
+          eyebrow="China to the United Kingdom"
+          title="Import from China. Build your UK business."
+          description="Buy products you have found, source stock for your business, or put your brand on a product—with a team in China and a UK point of contact."
+          primary={{ href: "#choose-your-route", label: "Find your starting point" }}
+          secondary={{ href: LINESCOUT_WHITE_LABEL_URL, label: "Explore white-label ideas" }}
+          summaryTitle="Buying, branding and shipping, connected."
+          steps={[
+            { title: "Start with what you have", description: "Bring a product link, an idea or goods waiting to ship." },
+            { title: "Plan for your market", description: "Work through the UK checklist and understand your costs." },
+            { title: "Choose your route", description: "Get sourcing, purchasing and shipping support for your order." },
+          ]}
+        >
+          <ImportMarkets active="uk" />
+        </ServiceHero>
         <div className={styles.container}>
           <nav className={styles.jumpLinks} aria-label="On this page">
             <a href="#choose-your-route">Where to start</a>

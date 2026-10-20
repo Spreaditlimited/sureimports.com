@@ -1,13 +1,12 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Info, PackageCheck, Search, Ship } from 'lucide-react';
+import { ArrowRight, Info, PackageCheck, Ship } from 'lucide-react';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { prisma } from '@/lib/prisma';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import ShippingRatesTable, { type ShippingRateRow } from './ShippingRatesTable';
 
 export const dynamic = 'force-dynamic';
@@ -128,63 +127,35 @@ export default async function ShippingRatePage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white">
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 px-4 pb-16 pt-48 text-white sm:px-6 lg:px-8`}>
-          <PublicHeroBackground />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(249,115,22,0.22),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%)]" />
-          <div className="relative mx-auto max-w-[1440px]">
-            <div className="max-w-3xl">
-<HeroPill className="mb-6">
-                <Ship className="h-3.5 w-3.5" />
-                Live Shipping Estimates
-              </HeroPill>
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                Shipping Rates
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-                Compare available Sure Imports shipping routes by country and
-                method before creating your shipping request.
-              </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/ship-with-us"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 text-base font-bold text-white transition hover:bg-orange-600"
-                >
-                  Ship with us
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-                <Link
-                  href="#shipping-rates"
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-6 text-base font-bold text-white transition hover:bg-white/10"
-                >
-                  Shipping Rates
-                  <Search className="h-4 w-4" />
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-12 grid gap-4 sm:grid-cols-3">
-              <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-                <p className="text-3xl font-black">{rates.length}</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">
-                  Listed Countries
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-                <p className="text-3xl font-black">{totalRateCount}</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">
-                  Active Rates
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-white/5 p-5">
-                <p className="text-3xl font-black">Air / Sea</p>
-                <p className="mt-1 text-xs font-bold uppercase tracking-widest text-slate-400">
-                  Available Methods
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
+      <main className={pageStyles.page} data-si-page-theme="service">
+        <ServiceHero
+          eyebrow="Shipping rates"
+          title="Plan your shipping with clearer costs."
+          description="Compare available routes by country and shipping method. Rates cover freight, customs clearance and taxes; your final shipping cost depends on the goods received at our Guangzhou warehouse."
+          summaryTitle="Find the route for your goods."
+          primary={{ href: '/ship-with-us', label: 'Arrange shipping' }}
+          secondary={{ href: '#shipping-rates', label: 'Compare rates' }}
+          steps={[
+            {
+              title: 'Choose your destination',
+              description:
+                'See the shipping methods available for that country.',
+            },
+            {
+              title: 'Compare the available rates',
+              description: 'Check the rate and unit for each shipping method.',
+            },
+            {
+              title: 'Confirm after warehouse intake',
+              description:
+                'Actual weight and shipping cost are determined when goods arrive.',
+            },
+          ]}
+        >
+          <p>
+            {rates.length} countries · {totalRateCount} active rates
+          </p>
+        </ServiceHero>
 
         <section className="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <div className="mx-auto max-w-[1440px]">
@@ -200,14 +171,14 @@ export default async function ShippingRatePage() {
                   </p>
                 </div>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="rounded-xl border border-slate-200 bg-[var(--si-surface)] p-5 shadow-sm dark:border-slate-800">
                 <div className="flex gap-3">
                   <PackageCheck className="mt-1 h-5 w-5 shrink-0 text-emerald-600" />
                   <p className="text-sm leading-7 text-slate-600 dark:text-slate-300">
                     Consult our{' '}
                     <Link
                       href="/shipping-policy"
-                      className="font-bold text-slate-950 underline underline-offset-4 hover:text-orange-600 dark:text-white"
+                      className="font-medium text-slate-950 underline underline-offset-4 hover:text-orange-600 dark:text-white"
                     >
                       shipping policy
                     </Link>{' '}
@@ -219,9 +190,9 @@ export default async function ShippingRatePage() {
 
             <ShippingRatesTable rates={rates} />
 
-            <div className="mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl bg-slate-950 p-6 text-white sm:flex-row sm:items-center">
+            <div className="si-dark-surface mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#15171c] p-6 text-white sm:flex-row sm:items-center">
               <div>
-                <h2 className="text-xl font-black">Ready to ship?</h2>
+                <h2 className="text-xl font-medium">Ready to ship?</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300">
                   Create a shipping-only request and send your goods to our
                   China warehouse for handling and onward delivery.
@@ -229,7 +200,7 @@ export default async function ShippingRatePage() {
               </div>
               <Link
                 href="/ship-with-us"
-                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-500 px-6 text-sm font-black text-white transition hover:bg-orange-600"
+                className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-[var(--si-primary)] px-6 text-sm font-medium text-[var(--si-on-primary)] transition hover:brightness-95"
               >
                 Ship with us
                 <ArrowRight className="h-4 w-4" />

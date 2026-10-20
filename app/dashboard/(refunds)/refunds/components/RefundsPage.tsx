@@ -291,9 +291,9 @@ export default function RefundsPage({ records }: any) {
   );
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Hero Header */}
-      <div className="bg-slate-900 pb-24 pt-12 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
@@ -337,7 +337,7 @@ export default function RefundsPage({ records }: any) {
         </div>
       </div>
 
-      <main className="mx-auto -mt-10 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
           {/* Table Toolbar */}
           <div className="flex flex-col gap-4 border-b border-slate-100 p-6 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">

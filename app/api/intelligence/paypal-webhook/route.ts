@@ -1,3 +1,5 @@
+import { handleConsultationPayPalEvent } from '@/lib/consultationPayPal';
+import { handleIntelligencePayPalEvent, handleIntelligencePayPalCreditEvent } from '@/lib/intelligence/paypalSettlement';
 import { after, NextResponse } from 'next/server';
 import { handleOriginalPayPalRefundEvent } from '@/lib/refunds/paypal-settlement';
 import { recordExternalPayPalRefund } from '@/lib/refunds/external-paypal';
@@ -85,6 +87,17 @@ export async function POST(request: Request) {
   }
 
   const event = String(body?.event_type || '').toUpperCase();
+  if (event.startsWith('BILLING.SUBSCRIPTION.') || event.startsWith('PAYMENT.SALE.')) {
+    try {
+      await handleIntelligencePayPalEvent(body);
+      return NextResponse.json({ received: true });
+    } catch { return NextResponse.json({ message: 'Subscription processing will be retried.' }, { status: 503 }); }
+  }
+  if (['PAYMENT.CAPTURE.REFUNDED','PAYMENT.CAPTURE.REVERSED','PAYMENT.CAPTURE.COMPLETED','CHECKOUT.ORDER.APPROVED','CUSTOMER.DISPUTE.CREATED','CUSTOMER.DISPUTE.UPDATED'].includes(event)) {
+    try { if (await handleConsultationPayPalEvent(body, paypalCaptureReference(event, body.resource || {}))) return NextResponse.json({ received: true });
+      if (await handleIntelligencePayPalCreditEvent(body, paypalCaptureReference(event, body.resource || {}))) return NextResponse.json({ received: true }); }
+    catch { return NextResponse.json({ message: 'Credit payment processing will be retried.' }, { status: 503 }); }
+  }
   if (event === 'PAYMENT.CAPTURE.REFUNDED' && await handleOriginalPayPalRefundEvent(body?.resource)) return NextResponse.json({ received: true });
   if (
     event.startsWith('PAYMENT.PAYOUTSBATCH.') ||

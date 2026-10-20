@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 export default function CustomerPage() {
   return (
     <div>
-      <div className="container mx-auto py-8">
+      <div className="si-workspace-plain">
         <h1 className="mb-6 text-2xl font-bold">Create Profile</h1>
         <CustomerForm />
       </div>

@@ -1,8 +1,7 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import React, { useEffect, useState } from 'react';
 import {
   Truck,
@@ -99,11 +98,11 @@ export default function ShippingPolicy() {
   ];
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950">
-      
+    <div className={styles.page}>
+
       {/* Premium Page Header */}
-<div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
-        <PublicHeroBackground darkOnly priority={false} />
+<div className={styles.hero}>
+
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
 <HeroPill className="mb-6">
@@ -122,7 +121,7 @@ export default function ShippingPolicy() {
 
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
-          
+
           {/* LEFT: Sticky Table of Contents */}
           <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
             <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
@@ -153,7 +152,7 @@ export default function ShippingPolicy() {
 
           {/* RIGHT: Document Content */}
           <div className="flex-1 space-y-16 lg:max-w-3xl">
-            
+
             {/* Company Info */}
             <section id="company-info" className="scroll-mt-32">
               <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
@@ -164,7 +163,7 @@ export default function ShippingPolicy() {
                 Sure Importers Limited is a product sourcing company registered in Nigeria with an operational office in Guangzhou, China.
               </p>
               <div className="grid gap-6 sm:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                   <h4 className="mb-3 font-bold text-slate-900 dark:text-white">Nigeria Office</h4>
                   <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     Sure Importers Limited<br />
@@ -172,7 +171,7 @@ export default function ShippingPolicy() {
                     Ajao Estate Lagos, Nigeria
                   </p>
                 </div>
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                   <h4 className="mb-3 font-bold text-slate-900 dark:text-white">China Office</h4>
                   <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     Guangzhou baiyun area NO.111<br />
@@ -196,7 +195,7 @@ export default function ShippingPolicy() {
                 {shippingMethods.map((method, idx) => {
                   const Icon = method.icon;
                   return (
-                    <div key={idx} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-start">
+                    <div key={idx} className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900 sm:flex-row sm:items-start">
                       <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${method.color}`}>
                         <Icon className="h-6 w-6" />
                       </div>
@@ -254,7 +253,7 @@ export default function ShippingPolicy() {
                 <AlertCircle className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Important Notes
               </h2>
-              
+
               <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/30 dark:bg-amber-900/10">
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
@@ -272,7 +271,7 @@ export default function ShippingPolicy() {
                 </ul>
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                 <h4 className="mb-2 font-bold text-slate-900 dark:text-white">
                   Sea Shipping to USA, UK, Europe, Australia, & SA (Phones only)
                 </h4>
@@ -313,10 +312,10 @@ export default function ShippingPolicy() {
                 <Store className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Online Store Gadgets Shipping
               </h2>
-              
-              <div className="rounded-[24px] border border-brand-orange-500/20 bg-brand-orange-500/10 p-8 shadow-sm">
+
+              <div className="rounded-2xl border border-brand-orange-500/20 bg-brand-orange-500/10 p-8 ">
                 <p className="mb-4 text-lg font-bold text-brand-orange-800 dark:text-brand-orange-200">
-                  Items ordered on the Sure Imports online store have a standard shipping timeline of 10 business days from order to arrival at our Lagos office. 
+                  Items ordered on the Sure Imports online store have a standard shipping timeline of 10 business days from order to arrival at our Lagos office.
                 </p>
                 <p className="text-base text-brand-orange-700 dark:text-brand-orange-300/80">
                   We maintain the same timeline for gadgets going to Ghana, Cameroon, and other eligible countries.
@@ -335,13 +334,13 @@ export default function ShippingPolicy() {
                 Support & Disclaimer
               </h2>
               <div className="space-y-6">
-                <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900">
                   <h4 className="mb-2 font-bold text-slate-900 dark:text-white">Customer Support</h4>
                   <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                     For any questions regarding your shipment, please contact our support team through our website or via the contact information provided for our office locations.
                   </p>
                 </div>
-                
+
                 <div className="rounded-2xl bg-slate-100 p-6 dark:bg-slate-900/50">
                   <h4 className="mb-2 font-bold text-slate-900 dark:text-white">Disclaimer</h4>
                   <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">

@@ -1,6 +1,6 @@
 'use client';
 
-import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+import darkHeader from '@/components/dashboard/WorkspaceHeader.module.css';
 
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/app/context/AuthContext';
@@ -348,7 +348,7 @@ export default function CorporateGiftsDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-black">
+    <div className="si-workspace">
       {showOfflineModal ? (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="w-full max-w-md rounded-2xl border border-blue-100 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
@@ -383,8 +383,8 @@ export default function CorporateGiftsDashboardPage() {
           </div>
         </div>
       ) : null}
-      {/* Hero Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white dark:bg-[#0b0c16]">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
@@ -426,7 +426,7 @@ export default function CorporateGiftsDashboardPage() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Form Modal/Overlay Style */}
         {showForm && (
           <div className="mb-12 rounded-2xl border border-slate-200 bg-white shadow-2xl transition-all dark:border-slate-700 dark:bg-[#161629]">
@@ -441,7 +441,7 @@ export default function CorporateGiftsDashboardPage() {
                   <div className="space-y-3">
                     <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Business Name" value={form.businessName} onChange={(e) => setForm(p => ({ ...p, businessName: e.target.value }))} required />
                     <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Contact Person" value={form.contactPersonFullName} onChange={(e) => setForm(p => ({ ...p, contactPersonFullName: e.target.value }))} required />
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                       <input type="email" className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="Email" value={form.contactEmail} onChange={(e) => setForm(p => ({ ...p, contactEmail: e.target.value }))} required />
                       <input className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-900 focus:ring-2 focus:ring-blue-500 outline-none dark:border-slate-700 dark:bg-[#0f1020] dark:text-slate-100 dark:placeholder:text-slate-400" placeholder="WhatsApp" value={form.whatsappNumber} onChange={(e) => setForm(p => ({ ...p, whatsappNumber: e.target.value }))} required />
                     </div>

@@ -125,7 +125,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedNextPath =
       typeof window !== 'undefined'
         ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
-          window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) ||
           ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
@@ -134,7 +133,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail, userPassword, recaptchaToken, rememberMe: rememberMe === true }),
+      body: JSON.stringify({
+        userEmail,
+        userPassword,
+        recaptchaToken,
+        rememberMe: rememberMe === true,
+      }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -175,7 +179,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedNextPath =
       typeof window !== 'undefined'
         ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
-          window.localStorage.getItem(POST_LOGOUT_REDIRECT_KEY) ||
           ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
@@ -202,18 +205,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   /////////////////////////////////// LOGOUT
   const logout = async () => {
-    const currentPath =
-      typeof window !== 'undefined'
-        ? `${window.location.pathname}${window.location.search}`
-        : '';
-    const safeCurrentPath = getSafeLoginRedirect(currentPath);
-
     await fetch('/api/auth/logout', { method: 'POST' });
     setUser(null);
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(POST_LOGOUT_REDIRECT_KEY, safeCurrentPath);
+      window.localStorage.removeItem(POST_LOGOUT_REDIRECT_KEY);
+      window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
     }
-    router.push(`/auth/login?next=${encodeURIComponent(safeCurrentPath)}`);
+    router.push('/auth/login');
   };
 
   /////////////////////////////////// REGISTRATION

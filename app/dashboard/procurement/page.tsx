@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import ProfileReminder from '@/components/dashboard/profile-reminder/ProfileReminder';
 
-let titlex = 'Login Page';
+let titlex = 'Buy From Chinese Websites';
 let descriptionx =
   'Import from China. We guarantee the quality and accuracy of every product we source for you from China.';
 export const metadata: Metadata = {

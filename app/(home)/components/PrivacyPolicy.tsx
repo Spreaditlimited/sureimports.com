@@ -1,8 +1,7 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import React, { useEffect, useState } from 'react';
 import {
   Shield,
@@ -66,11 +65,11 @@ export default function PrivacyPolicy() {
   ];
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950">
-      
+    <div className={styles.page}>
+
       {/* Premium Page Header */}
-<div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
-        <PublicHeroBackground darkOnly priority={false} />
+<div className={styles.hero}>
+
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
 <HeroPill className="mb-6">
@@ -89,7 +88,7 @@ export default function PrivacyPolicy() {
 
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
-          
+
           {/* LEFT: Sticky Table of Contents */}
           <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
             <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
@@ -120,7 +119,7 @@ export default function PrivacyPolicy() {
 
           {/* RIGHT: Document Content */}
           <div className="flex-1 space-y-16 lg:max-w-3xl">
-            
+
             {/* Our Commitment */}
             <section id="commitment" className="scroll-mt-32">
               <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
@@ -152,7 +151,7 @@ export default function PrivacyPolicy() {
                     'Order details and preferences',
                     'Communications and correspondence with us'
                   ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                    <div key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4  dark:border-slate-800 dark:bg-slate-900">
                       <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item}</span>
                     </div>
@@ -214,7 +213,7 @@ export default function PrivacyPolicy() {
                 <Share2 className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Data Sharing and Disclosure
               </h2>
-              
+
               {/* Highlight Box */}
               <div className="mb-6 rounded-2xl border border-brand-orange-500/20 bg-brand-orange-500/10 p-6">
                 <p className="text-base font-bold text-brand-orange-800 dark:text-brand-orange-200">
@@ -236,7 +235,7 @@ export default function PrivacyPolicy() {
               <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 We use cookies and similar tracking technologies to enhance your browsing experience, analyze website traffic, and gather information about how you interact with our website.
               </p>
-              <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="rounded-xl border border-slate-200 bg-white p-5  dark:border-slate-800 dark:bg-slate-900">
                 <p className="text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
                   You can choose to disable cookies through your browser settings; however, please note that some features of our website may not function properly if cookies are disabled.
                 </p>
@@ -305,7 +304,7 @@ export default function PrivacyPolicy() {
                 <Mail className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Contact Us
               </h2>
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900 sm:p-8">
                 <p className="mb-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                   If you have any questions, comments, or concerns about our Privacy Policy or our practices regarding your personal information, please contact us at:
                 </p>
@@ -319,7 +318,7 @@ export default function PrivacyPolicy() {
             </section>
 
             {/* Footer Agreement */}
-            <div className="mt-16 rounded-[24px] bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
+            <div className="mt-16 rounded-2xl bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
               <p className="text-sm font-medium leading-relaxed text-slate-300">
                 By using our website and services, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy.
               </p>

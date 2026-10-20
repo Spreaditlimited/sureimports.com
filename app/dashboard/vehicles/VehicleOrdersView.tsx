@@ -16,7 +16,7 @@ import {
   ChevronUp,
   ArrowUpRight,
 } from 'lucide-react';
-import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+import darkHeader from '@/components/dashboard/WorkspaceHeader.module.css';
 import { STAGE_LABELS, VEHICLE_STAGES } from '@/lib/vehicles/policy';
 
 type Order = {
@@ -57,8 +57,8 @@ export default function VehicleOrdersView({ orders }: { orders: Order[] }) {
     },
   ];
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-black">
-      <div className="bg-slate-900 pb-32 pt-12 text-white dark:bg-[#0b0c16]">
+    <div className="si-workspace">
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
             <div>
@@ -114,7 +114,7 @@ export default function VehicleOrdersView({ orders }: { orders: Order[] }) {
         </div>
       </div>
       <section
-        className={`${darkHeader.overlap} mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8`}
+        className={`${darkHeader.overlap} si-workspace-body`}
         aria-label="Vehicle orders"
       >
         <div className="space-y-6">

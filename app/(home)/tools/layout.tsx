@@ -24,7 +24,7 @@ export default function ToolsLayout({
   return (
     <div className="flex min-h-screen flex-col bg-[#fcfcfd] dark:bg-slate-950">
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <div className="flex-1">{children}</div>
       <Footer />
     </div>
   );

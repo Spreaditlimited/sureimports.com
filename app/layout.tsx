@@ -5,9 +5,13 @@ import './globals.css';
 import './design-system.css';
 import './public-refinements.css';
 import './dashboard-refinements.css';
+import '../design-system/tokens.css';
+import '../design-system/components.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from 'sonner';
 import { AuthProvider } from '@/app/context/AuthContext';
+import SupportProvider from '@/components/support/SupportProvider';
+import InstallProvider from '@/components/install/InstallProvider';
 import DeferredGlobalEnhancements from '@/components/DeferredGlobalEnhancements';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import SiteThemeProvider from '@/components/theme/SiteThemeProvider';
@@ -26,6 +30,8 @@ const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-998486805';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
+  appleWebApp: { capable: true, title: 'Sure Imports', statusBarStyle: 'default' },
+  icons: { apple: '/app-icons/icon-180.png' },
   title: {
     default: 'Sure Imports - Import from China with Confidence',
     template: '%s | Sure Imports',
@@ -123,7 +129,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html data-si-foundation="1" lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/favico.png" />
       </head>
@@ -178,9 +184,9 @@ export default function RootLayout({
 
             <AffiliateTracker />
             <Script src="/whatsapp-tracking.js" strategy="afterInteractive" />
-            {children}
+            <InstallProvider><SupportProvider enabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}>{children}</SupportProvider></InstallProvider>
 
-            <DeferredGlobalEnhancements />
+            <DeferredGlobalEnhancements supportEnabled={process.env.SUPPORT_CHAT_ENABLED === 'true'} />
             <Script
               src="https://checkout.flutterwave.com/v3.js"
               strategy="lazyOnload"

@@ -42,7 +42,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
       {/* Cart Sidebar */}
       <div className="fixed right-0 top-0 z-50 flex h-full w-[420px] max-w-[90vw] flex-col border-l border-slate-200 bg-white shadow-2xl transition-transform duration-300 ease-in-out dark:border-slate-800 dark:bg-slate-950">
-        
+
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800">
           <div className="flex items-center gap-3">
@@ -59,6 +59,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             )}
           </div>
           <button
+            aria-label="Close cart"
             onClick={onClose}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-50 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:bg-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
           >
@@ -88,7 +89,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
           ) : (
             <div className="flex flex-col gap-6">
-              
+
               {/* Clear Cart Header */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-widest text-slate-400">
@@ -121,7 +122,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     </div>
 
                     {/* Product Info */}
-                    <div className="flex flex-1 flex-col py-1">
+                    <div className="flex min-w-0 flex-1 flex-col py-1">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
@@ -132,14 +133,15 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                           </h4>
                         </div>
                         <button
+                          aria-label={`Remove ${item.productName} from cart`}
                           onClick={() => removeFromCart(item.pidProduct)}
-                          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 opacity-0 transition-all hover:bg-rose-50 hover:text-rose-500 group-hover:opacity-100 dark:bg-slate-800 dark:hover:bg-rose-900/30"
+                          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-50 text-slate-400 transition-all hover:bg-rose-50 hover:text-rose-500 dark:bg-slate-800 dark:hover:bg-rose-900/30"
                         >
                           <X className="h-3 w-3" />
                         </button>
                       </div>
 
-                      <div className="mt-auto flex items-center justify-between pt-3">
+                      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
                         <span className="text-sm font-black tracking-tight text-blue-600 dark:text-blue-400">
                           ₦{(item.productPrice * item.quantity).toLocaleString()}
                         </span>
@@ -148,6 +150,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                         <div className="flex items-center rounded-lg border border-slate-200 bg-slate-50 p-1 dark:border-slate-700 dark:bg-slate-800">
                           <button
                             className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm transition hover:text-slate-900 dark:bg-slate-700 dark:text-slate-300 dark:hover:text-white"
+                            aria-label={`Decrease quantity of ${item.productName}`}
                             onClick={() => updateQuantity(item.pidProduct, item.quantity - 1)}
                           >
                             <Minus className="h-3 w-3" />
@@ -157,6 +160,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                           </span>
                           <button
                             className="flex h-6 w-6 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm transition hover:text-slate-900 dark:bg-slate-700 dark:text-slate-300 dark:hover:text-white"
+                            aria-label={`Increase quantity of ${item.productName}`}
                             onClick={() => updateQuantity(item.pidProduct, item.quantity + 1)}
                           >
                             <Plus className="h-3 w-3" />
@@ -185,9 +189,9 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 <span className="font-medium text-slate-500 dark:text-slate-400">Shipping</span>
                 <span className="rounded bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">FREE</span>
               </div>
-              
+
               <div className="my-2 border-t border-slate-200 border-dashed dark:border-slate-700" />
-              
+
               <div className="flex items-center justify-between">
                 <span className="text-base font-bold text-slate-900 dark:text-white">Total</span>
                 <span className="text-2xl font-black text-blue-600 dark:text-blue-400">

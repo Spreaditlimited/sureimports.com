@@ -9,7 +9,6 @@ import {
 } from 'react';
 
 import { useAuth } from '@/app/context/AuthContext';
-import Loader from '@/components/uix/Loader';
 
 interface Record {
   savedOrderCount: number;
@@ -49,43 +48,37 @@ export const RecordCountProcurementProvider = ({
 }) => {
   const { user } = useAuth();
   const pidUser = user?.pidUser;
-  const statusx = 'saved';
   const [recordx, setRecord] = useState<Record | null>(null);
   const cacheKey = pidUser ? `procurement-count:${pidUser}` : null;
 
   useEffect(() => {
+    setRecord(null);
     if (tenantScoped || !pidUser) return;
+    const controller = new AbortController();
+    // Browser storage is only a convenience; blocked storage must not block navigation.
+    try {
+      const cached = cacheKey && sessionStorage.getItem(cacheKey);
+      if (cached) setRecord(JSON.parse(cached));
+    } catch { /* Fetch fresh counts when the cache is unavailable. */ }
 
-    if (cacheKey) {
-      const cached = sessionStorage.getItem(cacheKey);
-      if (cached) {
+    async function fetchRecord() {
+      try {
+        const response = await fetch(`/api/get-data/procurement-count/${pidUser}/saved`, {
+          signal: controller.signal,
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        if (controller.signal.aborted) return;
+        setRecord(data);
         try {
-          setRecord(JSON.parse(cached));
-        } catch {
-          sessionStorage.removeItem(cacheKey);
-        }
-      }
+          if (cacheKey) sessionStorage.setItem(cacheKey, JSON.stringify(data));
+        } catch { /* Counts remain usable without a cache. */ }
+      } catch { /* Retain cached counts during a temporary network failure. */ }
     }
-
-    const fetchRecord = async () => {
-      const res = await fetch(
-        `/api/get-data/procurement-count/${pidUser}/${statusx}`,
-      );
-      const data = await res.json();
-      setRecord(data);
-      if (cacheKey) {
-        sessionStorage.setItem(cacheKey, JSON.stringify(data));
-      }
-    };
-    fetchRecord();
+    void fetchRecord();
+    return () => controller.abort();
   }, [pidUser, cacheKey, tenantScoped]);
 
-  //alert(pidUser)
-  if (!tenantScoped && !user?.pidUser) {
-    return <Loader />;
-  }
-
-  //alert(JSON.stringify(recordx))
   return (
     <RecordContext.Provider value={{ recordx, setRecord }}>
       {children}

@@ -1,3 +1,5 @@
+import { getAccountCountry } from '@/lib/features/server';
+import { POST as paypalCheckout } from '@/app/api/intelligence/paypal/route';
 import { NextResponse } from 'next/server';
 
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -20,6 +22,11 @@ export async function POST(request: Request) {
   const user = await checkAuth();
   if (!user?.pidUser || !user.userEmail) {
     return NextResponse.json({ message: 'Login required.' }, { status: 401 });
+  }
+
+  if (await getAccountCountry(user.pidUser) !== 'Nigeria') {
+    const body = await request.json().catch(() => ({}));
+    return paypalCheckout(new Request(request.url, { method: 'POST', headers: request.headers, body: JSON.stringify({ ...body, action: 'credits' }) }));
   }
 
   if (!PAYSTACK_SECRET_KEY) {

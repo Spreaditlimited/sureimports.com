@@ -8,11 +8,9 @@ import { Button } from '@/components/ui/button';
 function MessageBox() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-800">
-      <div className="flex justify-between px-4 pt-[25px] max-sm:flex-col">
-        <div className="text-[28px] font-bold text-slate-800 dark:text-slate-200 max-sm:pb-4">
-          Message Box
-        </div>
+    <div className="si-workspace-plain">
+      <div className="mb-6 flex justify-between gap-4 max-sm:flex-col">
+        <h1>Messages</h1>
         <Button
           className="font-medium xl:h-[49px] xl:w-[255px]"
           onClick={() => {

@@ -143,9 +143,9 @@ export default function MyOrdersPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Hero Header */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
             <div>
@@ -158,7 +158,7 @@ export default function MyOrdersPage() {
               <p className="mt-2 text-slate-400">Track and manage your products purchased from our store.</p>
             </div>
 
-            {/* Quick Stats Overlay */}
+
             <div className="flex items-center gap-6 rounded-3xl bg-white/5 p-6 backdrop-blur-md border border-white/10 shrink-0">
                <div className="flex flex-col border-r border-white/10 pr-6">
                 <span className="text-[10px] font-bold uppercase text-slate-500 mb-1">In Transit</span>
@@ -176,7 +176,7 @@ export default function MyOrdersPage() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-8 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Navigation Tabs */}
         <div className="mb-10 flex items-center gap-2 overflow-x-auto no-scrollbar rounded-2xl bg-white p-2 shadow-lg shadow-slate-200/40 border border-slate-200 dark:bg-slate-900 dark:border-slate-800 dark:shadow-none">
           {[
@@ -186,6 +186,7 @@ export default function MyOrdersPage() {
           ].map((tab) => (
             <button
               key={tab.id}
+              aria-pressed={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`flex flex-1 min-w-[120px] items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-all ${
                 activeTab === tab.id
@@ -242,7 +243,7 @@ export default function MyOrdersPage() {
                           </span>
                         </div>
                       </div>
-                      
+
                       {/* Tracking Progress */}
                       {order.status !== 'CANCELLED' && (
                         <div className="mt-8">
@@ -263,7 +264,7 @@ export default function MyOrdersPage() {
                         <Layers className="h-4 w-4 text-slate-400" />
                         <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Order Items ({order.products.length})</span>
                       </div>
-                      
+
                       <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 no-scrollbar">
                         {order.products.map((product) => (
                           <div key={product.id} className="flex items-start justify-between rounded-2xl bg-slate-50/50 p-4 dark:bg-slate-800/30">

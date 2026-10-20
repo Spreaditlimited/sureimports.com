@@ -1,9 +1,8 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight,
   BadgeCheck,
   Building2,
   CheckCircle2,
@@ -21,7 +20,6 @@ import {
 
 import Footer from '@/app/(home)/components/Footer';
 import Navbar from '@/components/Navbar';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicSupplierVerificationFlow from './components/PublicSupplierVerificationFlow';
 import {
@@ -197,59 +195,44 @@ export default async function SupplierVerificationPage() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfcfd] text-slate-950 selection:bg-brand-orange-500/30 dark:bg-slate-950 dark:text-white">
+    <div className="flex min-h-screen flex-col bg-[var(--si-surface)] text-slate-950 selection:bg-brand-orange-500/30 dark:text-white">
       <JsonLdScript data={schemas} />
       <Navbar />
 
-      <main className="flex-1">
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
-          <PublicHeroBackground />
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
-
-          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center">
-<HeroPill className="mb-6">
-                <ShieldCheck className="h-4 w-4" />
-                China supplier due diligence
-              </HeroPill>
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                Verify a Chinese supplier{' '}
-                <span className="text-white">before you pay</span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Choose documented online checks or an on-site visit in China. We
-                compare the company identity, registration, address, contacts
-                and transaction details, then provide an evidence-led report.
-              </p>
-
-              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-                <Link
-                  href={startHref}
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start a Verification
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-                <Link
-                  href="#how-it-works"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
-                >
-                  See How It Works
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+      <main className={pageStyles.page} data-si-page-theme="service">
+        <ServiceHero
+          eyebrow="Supplier verification"
+          title="Know your supplier before you pay."
+          description="Choose documented online checks or an on-site visit in China. Review the company identity, registration, address and transaction details with an evidence-led report."
+          summaryTitle="Make a more informed decision."
+          primary={{ href: startHref, label: 'Start a verification' }}
+          secondary={{ href: '#how-it-works', label: 'See how it works' }}
+          steps={[
+            {
+              title: 'Share the supplier details',
+              description:
+                'Send the company information, links and transaction context.',
+            },
+            {
+              title: 'Choose the depth of checks',
+              description:
+                'Select online verification or an on-site visit in China.',
+            },
+            {
+              title: 'Review the evidence',
+              description:
+                'Use the findings to assess your supplier before committing.',
+            },
+          ]}
+        />
 
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-16 max-w-3xl">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Choose your verification level
               </span>
-              <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 dark:text-white md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Check the business online or send our China team in person.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -260,14 +243,14 @@ export default async function SupplierVerificationPage() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-2">
-              <article className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 md:p-10">
+              <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm transition-all hover:shadow-none dark:border-slate-800 md:p-10">
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                   <ClipboardCheck className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-950 dark:text-white">
+                <h3 className="text-2xl font-medium text-slate-950 dark:text-white">
                   Online supplier checks
                 </h3>
-                <p className="mt-3 text-xl font-black text-brand-orange-600 dark:text-brand-orange-400">
+                <p className="mt-3 text-xl font-medium text-brand-orange-600 dark:text-brand-orange-400">
                   ₦{feeNaira.toLocaleString()} or ${feeUsd.toFixed(2)}
                 </p>
                 <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">
@@ -278,14 +261,14 @@ export default async function SupplierVerificationPage() {
                 </p>
               </article>
 
-              <article className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 md:p-10">
+              <article className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm transition-all hover:shadow-none dark:border-slate-800 md:p-10">
                 <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                   <MapPin className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-black text-slate-950 dark:text-white">
+                <h3 className="text-2xl font-medium text-slate-950 dark:text-white">
                   Physical supplier visit
                 </h3>
-                <p className="mt-3 text-xl font-black text-brand-orange-600 dark:text-brand-orange-400">
+                <p className="mt-3 text-xl font-medium text-brand-orange-600 dark:text-brand-orange-400">
                   Standard fee first · visit quoted separately
                 </p>
                 <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">
@@ -303,14 +286,14 @@ export default async function SupplierVerificationPage() {
 
         <section
           id="how-it-works"
-          className="relative overflow-hidden border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28"
+          className="relative overflow-hidden border-y border-slate-200 bg-[var(--si-surface)] py-20 dark:border-slate-800 md:py-28"
         >
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mx-auto mb-16 max-w-3xl text-center">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 How it works
               </span>
-              <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                 One accountable workflow from request to report.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -323,15 +306,15 @@ export default async function SupplierVerificationPage() {
               {workflow.map((step, index) => (
                 <article
                   key={step.title}
-                  className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-7 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950/60"
+                  className="relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-7 shadow-sm transition-all hover:shadow-md dark:border-slate-800"
                 >
-                  <span className="pointer-events-none absolute right-4 top-2 text-5xl font-black text-slate-100 dark:text-white/[0.03]">
+                  <span className="pointer-events-none absolute right-4 top-2 text-5xl font-medium text-slate-100 dark:text-white/[0.03]">
                     {index + 1}
                   </span>
                   <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                     <step.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="relative text-lg font-black text-slate-950 dark:text-white">
+                  <h3 className="relative text-lg font-medium text-slate-950 dark:text-white">
                     {step.title}
                   </h3>
                   <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
@@ -345,11 +328,11 @@ export default async function SupplierVerificationPage() {
 
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
+            <div className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-slate-800">
                 <FileSearch className="h-6 w-6" />
               </div>
-              <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+              <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                 What we examine
               </h2>
               <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -371,12 +354,12 @@ export default async function SupplierVerificationPage() {
               </ul>
             </div>
 
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-orange-500 dark:border-slate-700 dark:bg-slate-900">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-[var(--si-surface)] text-brand-orange-500 dark:border-slate-700">
                   <BadgeCheck className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Better supplier details produce a stronger review.
                 </h2>
                 <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -395,7 +378,7 @@ export default async function SupplierVerificationPage() {
                 ].map((item) => (
                   <div
                     key={item}
-                    className="rounded-xl border border-slate-200 bg-white p-4 text-center text-sm font-bold text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                    className="rounded-xl border border-slate-200 bg-[var(--si-surface)] p-4 text-center text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-300"
                   >
                     {item}
                   </div>
@@ -407,21 +390,21 @@ export default async function SupplierVerificationPage() {
 
         <section
           id="start-verification"
-          className="relative scroll-mt-24 overflow-hidden border-y border-slate-200 bg-slate-50 py-24 dark:border-slate-800 dark:bg-[#080b14]"
+          className="relative scroll-mt-24 overflow-hidden border-y border-slate-200 bg-[var(--si-surface)] py-24 dark:border-slate-800"
         >
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
           <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[120px]" />
 
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-5xl overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/90 shadow-2xl shadow-slate-200/60 backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/70 dark:shadow-none">
-              <div className="border-b border-slate-200/80 bg-slate-100/60 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
+            <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl border border-slate-200/80 bg-[var(--si-surface)] shadow-none backdrop-blur-xl dark:border-slate-700/50 dark:shadow-none">
+              <div className="border-b border-slate-200/80 bg-[var(--si-surface)] px-6 py-4 dark:border-slate-800/50">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
                     <span className="h-3 w-3 rounded-full bg-red-300 dark:bg-red-500/70" />
                     <span className="h-3 w-3 rounded-full bg-amber-300 dark:bg-amber-500/70" />
                     <span className="h-3 w-3 rounded-full bg-emerald-300 dark:bg-emerald-500/70" />
                   </div>
-                  <div className="inline-flex min-w-0 items-center gap-2 rounded-lg bg-white/90 px-4 py-1.5 font-mono text-xs font-medium text-slate-500 shadow-sm dark:bg-slate-800/80 dark:text-slate-400">
+                  <div className="inline-flex min-w-0 items-center gap-2 rounded-lg bg-[var(--si-surface)] px-4 py-1.5 font-mono text-xs font-medium text-slate-500 shadow-sm dark:text-slate-400">
                     <Lock className="h-3 w-3 shrink-0 text-emerald-500" />
                     <span className="truncate">
                       sureimports.com/supplier-verification
@@ -439,8 +422,8 @@ export default async function SupplierVerificationPage() {
                 />
               </div>
 
-              <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
-                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+              <div className="border-t border-slate-200/80 bg-[var(--si-surface)] px-6 py-4 dark:border-slate-800/50">
+                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400">
                   <span className="flex items-center gap-2">
                     <Lock className="h-4 w-4 text-emerald-500" /> Secure payment
                   </span>
@@ -458,13 +441,13 @@ export default async function SupplierVerificationPage() {
           </div>
         </section>
 
-        <section className="bg-slate-950 py-20 text-white md:py-28">
+        <section className="si-dark-surface bg-[#15171c] py-20 text-white md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 max-w-3xl">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-400">
                 Related services
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
                 Choose the right Sure Imports route.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-400">
@@ -478,12 +461,12 @@ export default async function SupplierVerificationPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group rounded-3xl border border-white/10 bg-white/[0.04] p-6 transition hover:border-brand-orange-500/50 hover:bg-white/[0.08]"
+                  className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition hover:border-brand-orange-500/50 hover:bg-white/[0.08]"
                 >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-brand-orange-300 group-hover:bg-brand-orange-500 group-hover:text-white">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--si-surface)] text-brand-orange-300 group-hover:bg-brand-orange-500 group-hover:text-white">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-black">{item.title}</h3>
+                  <h3 className="text-lg font-medium">{item.title}</h3>
                   <p className="mt-3 text-sm leading-relaxed text-slate-400">
                     {item.text}
                   </p>
@@ -495,18 +478,18 @@ export default async function SupplierVerificationPage() {
 
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="mb-12 text-center text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+            <h2 className="mb-12 text-center text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
               Supplier Verification FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
                 <details
                   key={faq.question}
-                  className="group rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
+                  className="group rounded-2xl border border-slate-200 bg-[var(--si-surface)] shadow-sm dark:border-slate-800 [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
                     <span>{faq.question}</span>
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 transition group-open:rotate-180 dark:bg-slate-800">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--si-surface)] transition group-open:rotate-180">
                       <ChevronDown className="h-4 w-4 text-slate-500" />
                     </span>
                   </summary>

@@ -23,7 +23,10 @@ export default function SocialComplete({
   const [connectedNext, setConnectedNext] = useState<string | null>(null);
   useEffect(() => {
     if (!connectedNext) return;
-    const timer = window.setTimeout(() => window.location.replace(connectedNext), 1600);
+    const timer = window.setTimeout(
+      () => window.location.replace(connectedNext),
+      1600,
+    );
     return () => window.clearTimeout(timer);
   }, [connectedNext]);
   const [status, setStatus] = useState<Status | null>(null);
@@ -65,19 +68,25 @@ export default function SocialComplete({
     }
   }
   const provider = status?.provider === 'apple' ? 'Apple' : 'Google';
-  if (connectedNext) return (
-    <SocialShell>
-      <section className={styles.content} aria-labelledby="connection-success-title">
-        <p className={styles.brand}>{status?.brand || 'Sure Imports'}</p>
-        <div role="status">
-          <h1 id="connection-success-title">{provider} connected</h1>
-          <p>You can now sign in to your existing account with {provider}.</p>
-          <p>Taking you to your dashboard…</p>
-        </div>
-        <a className={styles.primaryLink} href={connectedNext}>Continue to dashboard</a>
-      </section>
-    </SocialShell>
-  );
+  if (connectedNext)
+    return (
+      <SocialShell>
+        <section
+          className={styles.content}
+          aria-labelledby="connection-success-title"
+        >
+          <p className={styles.brand}>{status?.brand || 'Sure Imports'}</p>
+          <div role="status">
+            <h1 id="connection-success-title">{provider} connected</h1>
+            <p>You can now sign in to your existing account with {provider}.</p>
+            <p>Taking you to your dashboard…</p>
+          </div>
+          <a className={styles.primaryLink} href={connectedNext}>
+            Continue to dashboard
+          </a>
+        </section>
+      </SocialShell>
+    );
   return (
     <SocialShell>
       <section className={styles.content}>
@@ -114,8 +123,8 @@ export default function SocialComplete({
             ) : (
               <>
                 <p>
-                  Sign in with your current email and password first. We’ll bring
-                  you back here to choose Apple or Google.
+                  Sign in with your current email and password first. We’ll
+                  bring you back here to choose Apple or Google.
                 </p>
                 <a
                   className={styles.primaryLink}
@@ -146,14 +155,42 @@ export default function SocialComplete({
                 <label className={styles.consentCard}>
                   <input name="consent" type="checkbox" required />
                   <span>
-                    <strong>Connect {provider} to my existing account</strong><small>Select this checkbox to confirm, then use the button below.</small>
+                    <strong>Connect {provider} to my existing account</strong>
+                    <small>
+                      Select this checkbox to confirm, then use the button
+                      below.
+                    </small>
                   </span>
                 </label>
               ) : (
                 <>
                   <div className={styles.fieldGrid}>
-                    <label>First name<div className={styles.inputWrap}><input name="firstName" autoComplete="given-name" placeholder="First name" required minLength={2} maxLength={60} /></div></label>
-                    <label>Last name<div className={styles.inputWrap}><input name="lastName" autoComplete="family-name" placeholder="Last name" required minLength={2} maxLength={60} /></div></label>
+                    <label>
+                      First name
+                      <div className={styles.inputWrap}>
+                        <input
+                          name="firstName"
+                          autoComplete="given-name"
+                          placeholder="First name"
+                          required
+                          minLength={2}
+                          maxLength={60}
+                        />
+                      </div>
+                    </label>
+                    <label>
+                      Last name
+                      <div className={styles.inputWrap}>
+                        <input
+                          name="lastName"
+                          autoComplete="family-name"
+                          placeholder="Last name"
+                          required
+                          minLength={2}
+                          maxLength={60}
+                        />
+                      </div>
+                    </label>
                   </div>
                   {status.affiliate ? (
                     <>

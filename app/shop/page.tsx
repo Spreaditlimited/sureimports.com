@@ -1,8 +1,6 @@
 'use client';
 
 import PublicPageLoading from '@/components/PublicPageLoading';
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -14,8 +12,8 @@ import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import heroStyles from './ShopHero.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
 
 type StoreProduct = {
   pidProduct: string;
@@ -145,56 +143,22 @@ function ShopContent() {
   return (
     <>
       <Navbar />
-      <main className={`${heroStyles.shop} min-h-screen`}>
-        <section
-          className={`${heroLayout.fixed} relative overflow-hidden bg-slate-900 pb-20 pt-48 text-white`}
-        >
-          <PublicHeroBackground />
-          <div className="relative z-10 mx-auto max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl text-center">
-              <HeroPill className="mb-6">
-                <Globe className="h-3.5 w-3.5" /> Guangzhou to Lagos
-              </HeroPill>
-              <h1
-                className={`${heroStyles.headline} mb-6 text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl`}
-              >
-                Premium Tech & Gadgets,{' '}
-                <span className={`${heroStyles.headlineEnding} text-white`}>
-                  Sourced Direct
-                </span>
-              </h1>
-              <p className="mx-auto mb-8 max-w-3xl text-lg text-slate-300">
-                Discover phones, laptops and everyday tech sourced from China.
-                Shop with clear pricing and delivery to your doorstep in
-                Nigeria.
-              </p>
-            </div>
+      <main className={`${heroStyles.shop} min-h-screen`} data-si-page-theme="service">
+        <ServiceHero
+          eyebrow="Guangzhou to Lagos"
+          title="Your next phone, laptop or everyday upgrade."
+          description="Explore technology sourced from China, with clear pricing, order tracking and delivery to your doorstep in Nigeria."
+          primary={{ href: '#shop-products', label: 'Browse products' }}
+          secondary={{ href: '/contact-us', label: 'Get help choosing' }}
+          summaryTitle="Choose your tech. We’ll handle the order."
+          steps={[
+            { title: 'Find your fit', description: 'Search products and compare the available specifications.' },
+            { title: 'Keep track of your order', description: 'Follow progress through your Sure Imports account.' },
+            { title: 'Get local support', description: 'A team with operations in Lagos and China, serving buyers since 2018.' },
+          ]}
+        />
 
-            <div className={heroStyles.assurances}>
-              <div
-                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
-              >
-                <ShieldCheck className="h-5 w-5" /> Since 2018
-              </div>
-              <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div
-                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
-              >
-                <Clock className={`${heroStyles.accent} h-5 w-5`} /> Order
-                tracking
-              </div>
-              <div className="hidden h-1.5 w-1.5 rounded-full bg-slate-700 sm:block" />
-              <div
-                className={`${heroStyles.trust} flex items-center gap-3 text-sm font-semibold`}
-              >
-                <Globe className="h-5 w-5 text-brand-orange-400" /> Offices in
-                Lagos & China
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-[var(--si-content-max)] px-4 py-12 sm:px-6 lg:px-8">
+        <section id="shop-products" className="mx-auto max-w-[1440px] scroll-mt-28 px-4 py-12 sm:px-6 lg:px-8">
           <div className={heroStyles.toolbar}>
             <div className={heroStyles.searchRow}>
               <div className={heroStyles.searchField}>

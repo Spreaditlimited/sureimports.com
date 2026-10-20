@@ -116,12 +116,12 @@ export default async function BankPayment(
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
-      {/* Deep Slate Hero Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className="si-workspace">
+
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-          
+
           <Link 
             href={backHref}
             className="group mb-8 flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-widest text-slate-400 transition hover:text-white"
@@ -144,7 +144,7 @@ export default async function BankPayment(
                 Send funds directly to any of our official bank accounts, then upload your receipt below to begin processing.
               </p>
             </div>
-            
+
             <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20">
                 <Building2 className="h-5 w-5 text-blue-400" />
@@ -158,13 +158,13 @@ export default async function BankPayment(
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-5xl px-4 pb-20 sm:px-6 lg:px-8">
-        
+      <main className="si-workspace-body">
+
         {/* Main Content Card Container */}
         <div className="overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-xl shadow-slate-200/20 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
-          
+
           <div className="p-6 sm:p-10">
-            
+
             {/* Premium Alert Notice */}
             <div className="mb-10 flex items-start gap-4 rounded-2xl border border-blue-100 bg-blue-50/50 p-6 dark:border-blue-900/30 dark:bg-blue-900/10">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/50">
@@ -217,7 +217,7 @@ export default async function BankPayment(
                             <p className="font-medium text-slate-900 dark:text-white">{channel.accountName}</p>
                           </div>
                         )}
-                        
+
                         {channel.accountNumber && (
                           <div>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Account Number</p>
@@ -231,7 +231,7 @@ export default async function BankPayment(
                             <p className="font-medium text-slate-900 dark:text-white">{channel.sortCode}</p>
                           </div>
                         )}
-                        
+
                         {channel.country && (
                           <div>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Country</p>
@@ -260,13 +260,13 @@ export default async function BankPayment(
             </div>
 
           </div>
-          
+
           {/* Minimalist Trust Footer */}
           <div className="flex items-center justify-center gap-2 border-t border-slate-100 bg-slate-50/50 p-6 text-xs font-medium text-slate-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400">
             <ShieldCheck className="h-4 w-4 text-emerald-500 shrink-0" />
             Your payment details will be manually verified by our team within 24 hours.
           </div>
-          
+
         </div>
       </main>
     </div>

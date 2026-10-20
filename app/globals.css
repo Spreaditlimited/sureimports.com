@@ -184,7 +184,7 @@
  * normalizes the colour beneath them; nested cards keep their own surfaces.
  */
 .dark .public-site-theme > section,
-.dark .public-site-theme main > section {
+.dark .public-site-theme main:not([data-si-page-theme]) > section {
   background-color: rgb(var(--public-section-dark)) !important;
 }
 

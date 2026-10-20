@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const LeadCapturePopup = dynamic(
@@ -19,7 +20,8 @@ const Analytics = dynamic(
   { ssr: false },
 );
 
-export default function DeferredGlobalEnhancements() {
+export default function DeferredGlobalEnhancements({supportEnabled = false}: {supportEnabled?: boolean}) {
+  const pathname = usePathname();
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
@@ -34,12 +36,12 @@ export default function DeferredGlobalEnhancements() {
     return () => globalThis.clearTimeout(timeoutId);
   }, []);
 
-  if (!isReady) return null;
+  if (!isReady || pathname === '/support/embed') return null;
 
   return (
     <>
-      <LeadCapturePopup />
-      <LiveChat />
+      {pathname !== '/install' && <LeadCapturePopup />}
+      {!supportEnabled && <LiveChat />}
       <FacebookPixel />
       <Analytics />
     </>

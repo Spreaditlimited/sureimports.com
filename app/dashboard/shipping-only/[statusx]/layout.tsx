@@ -1,6 +1,6 @@
 'use client';
 
-import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+import darkHeader from '@/components/dashboard/WorkspaceHeader.module.css';
 
 import React from 'react';
 import Link from 'next/link';
@@ -96,9 +96,9 @@ export default function ShippingOnlyLayout({ children }: ShippingOnlyLayoutProps
   const isCreatePage = path.includes('/create');
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-black">
+    <div className="si-workspace">
       <RecordCountShippingOnlyProvider>
-        <div className="bg-slate-900 pb-24 pt-8 sm:pt-12 text-white dark:bg-[#0b0c16]">
+        <div className="si-workspace-header">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             {!isCreatePage ? (
               <ShippingOnlyTopHeader />
@@ -120,7 +120,7 @@ export default function ShippingOnlyLayout({ children }: ShippingOnlyLayoutProps
         </div>
 
         {/* Main Content Area */}
-        <main className={`${darkHeader.overlap} mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8`}>
+        <main className={`${darkHeader.overlap} si-workspace-body`}>
           {/* This renders the page.tsx below */}
           {children}
         </main>

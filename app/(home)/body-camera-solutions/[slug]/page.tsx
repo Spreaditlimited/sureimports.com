@@ -1,4 +1,4 @@
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
+import styles from '../Solutions.module.css';
 import HeroPill from '@/components/home/HeroPill';
 import heroLayout from '@/components/home/HeroLayout.module.css';
 import type { Metadata } from 'next';
@@ -185,12 +185,11 @@ export default async function SolutionDetailPage({ params }: PageProps) {
   };
 
   return (
-    <main className="overflow-hidden bg-[#f8fafc] text-slate-950 dark:bg-slate-950 dark:text-white">
+    <main className={`${styles.page} overflow-hidden`} data-si-page-theme="service">
       <JsonLdScript data={schema} />
 
-<section className={`${heroLayout.flow} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 lg:px-8 sm:pb-20 sm:pt-10 lg:pb-24`}>
-        <PublicHeroBackground darkOnly priority={false} />
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-[680px] bg-[radial-gradient(circle_at_75%_20%,rgba(31,94,178,0.12),transparent_34%),linear-gradient(rgba(26,55,91,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(26,55,91,0.05)_1px,transparent_1px)] bg-[size:auto,64px_64px,64px_64px] [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+<section className={`${heroLayout.flow} ${styles.hero} si-body-hero relative px-4 pb-16 pt-8 sm:px-6 lg:px-8 sm:pb-20 sm:pt-10 lg:pb-24`}>
+
         <div className="relative mx-auto si-public-inner">
           <nav
             className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400"
@@ -210,7 +209,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
           </nav>
 
           <header className="mt-10 grid items-center gap-x-14 gap-y-8 lg:mt-14 lg:grid-cols-[0.92fr_1.08fr]">
-            <div className="min-w-0 max-w-2xl">
+            <div className={`${styles.copy} min-w-0 max-w-2xl`}>
 <HeroPill>
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Professional evidence systems
@@ -232,7 +231,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
               />
             ) : null}
 
-            <div className="order-2 max-w-2xl lg:col-start-1 lg:row-start-2">
+            <div className={`${styles.actions} order-2 max-w-2xl lg:col-start-1 lg:row-start-2`}>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href="#assessment"
@@ -262,7 +261,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
       </section>
 
       <article className="mx-auto mb-16 max-w-[var(--si-content-max)] px-4 sm:px-6 lg:px-8">
-        <section className="grid overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-slate-900 sm:grid-cols-3">
+        <section className="grid overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white  dark:border-white/10 dark:bg-slate-900 sm:grid-cols-3">
           {[
             { label: 'Best suited to', value: page.audience },
             {
@@ -321,7 +320,7 @@ export default async function SolutionDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="relative overflow-hidden rounded-[2rem] bg-[#07111f] px-7 py-12 text-white sm:px-10 sm:py-16 lg:px-14">
+        <section className="relative overflow-hidden rounded-2xl si-dark-surface bg-[#07111f] px-7 py-12 text-white sm:px-10 sm:py-16 lg:px-14">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_85%_8%,rgba(34,211,238,0.13),transparent_28%),linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:auto,48px_48px,48px_48px]" />
           <div className="relative grid gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
             <div>

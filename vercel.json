@@ -33,6 +33,14 @@
     {
       "path": "/api/cron/linescout-affiliate-ledger",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/support-notifications",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/support-attachments",
+      "schedule": "0 * * * *"
     }
   ]
 }

@@ -1,608 +1,857 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   ArrowRight,
-  Loader2,
-  PackagePlus,
-  ShoppingCart,
-  Trash2,
-  User,
-  MapPin,
+  CheckCircle2,
+  Globe2,
+  Link2,
   Package,
-  FileText,
-  Globe,
-  HelpCircle,
+  PackagePlus,
+  Pencil,
+  Plus,
+  ShieldCheck,
+  ShoppingBag,
+  Trash2,
 } from 'lucide-react';
+import styles from './PublicOrderFlow.module.css';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { convertToTitleCase } from '@/app/utils/stringUtils';
-import {
-  buildFacebookLeadMeta,
-  trackBrowserLeadEvent,
-} from '@/lib/marketing/facebookLeadMeta';
 import {
   PENDING_PROCUREMENT_CHECKOUT_KEY,
   POST_AUTH_REDIRECT_KEY,
   PROCUREMENT_RESUME_CHECKOUT_PATH,
 } from '@/lib/auth/loginRedirect';
-
-type ShippingPlan = {
-  pidShippingPlan: string;
-  shippingPlanName: string;
-  shippingPlanRate: number;
-  shippingPlanUnit?: string | null;
-  shippingPlanCurrency?: 'USD' | 'NGN';
-};
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
+import { createBrowserDraftId } from '@/lib/procurement/browserDraftId';
+import {
+  emptyProduct,
+  inspectProductLink,
+  productProblem,
+  PUBLIC_DRAFT_KEY,
+  publicDraftSchema,
+  shops,
+  type PublicDraft,
+  type ProductDraft,
+} from '@/lib/procurement/publicDraft';
 
 type Country = {
   pidCountry: string;
   countryName: string;
-  shippingPlans: ShippingPlan[];
+  shippingPlans: {
+    pidShippingPlan: string;
+    shippingPlanName: string;
+    shippingPlanUnit?: string;
+    shippingPlanRate?: number | string | null;
+    shippingPlanCurrency?: string;
+  }[];
 };
-
-type ProductDraft = {
-  productName: string;
-  productLink: string;
-  productPrice: string;
-  productWeight: string;
-  productQuantity: string;
-  productInfo: string;
+function shippingRateLabel(plan: Country['shippingPlans'][number]) {
+  const rate = Number(plan.shippingPlanRate);
+  const currency = plan.shippingPlanCurrency;
+  const unit = plan.shippingPlanUnit?.toUpperCase();
+  if (
+    !Number.isFinite(rate) ||
+    rate <= 0 ||
+    !currency ||
+    !['KG', 'CBM'].includes(unit || '')
+  )
+    return 'Rate unavailable';
+  return `${currency} ${rate.toLocaleString('en-GB', { maximumFractionDigits: 4 })} / ${unit === 'CBM' ? 'CBM' : 'kg'}`;
+}
+const shippingMethodGuide: Record<
+  string,
+  { label: string; description: string }
+> = {
+  NORMAL_SHIPPING: {
+    label: 'Normal',
+    description:
+      'Cargo air shipping for products without batteries or liquids.',
+  },
+  EXPRESS_SHIPPING: {
+    label: 'Express',
+    description: 'For phones, laptops and urgent products.',
+  },
+  SPECIAL_SHIPPING: {
+    label: 'Special',
+    description:
+      'Cargo air shipping for products containing batteries or liquids.',
+  },
+  SEA_SHIPPING: { label: 'Sea', description: 'For bulk and heavy cargo.' },
 };
-
-const initialProduct: ProductDraft = {
-  productName: '',
-  productLink: '',
-  productPrice: '',
-  productWeight: '',
-  productQuantity: '1',
-  productInfo: '',
+const initial: PublicDraft = {
+  version: 1,
+  draftId: '',
+  shop: '',
+  currency: 'CNY',
+  destinationCountry: '',
+  shippingPlan: '',
+  products: [],
+  current: emptyProduct(),
 };
+const panel = styles.panel;
+const selectClass =
+  'mt-2 h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm dark:border-slate-600 dark:bg-slate-800';
 
 export default function PublicOrderFlow() {
   const router = useRouter();
+  const [draft, setDraft] = useState<PublicDraft>(initial);
+  const [ready, setReady] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [countries, setCountries] = useState<Country[]>([]);
-  const [countriesLoading, setCountriesLoading] = useState(true);
-
-  const [account, setAccount] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-  });
-  const [order, setOrder] = useState({
-    orderName: '',
-    destinationCountry: '',
-    currencyType: 'USD',
-    shippingPlan: '',
-    orderCategory: 'Other Goods',
-    shippingAddress: '',
-  });
-  const [productDraft, setProductDraft] = useState<ProductDraft>(initialProduct);
-  const [products, setProducts] = useState<ProductDraft[]>([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [showMeasurementHelp, setShowMeasurementHelp] = useState(false);
-  const [duplicateDraft, setDuplicateDraft] = useState<{ pidOrder: string; orderName?: string } | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
+  const [duplicate, setDuplicate] = useState(false);
+  const sending = useRef(false);
+  const editor = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let cancelled = false;
-
-    const loadCountries = async () => {
-      try {
-        const response = await fetch('/api/get-data/countries-shipping-plan', {
-          cache: 'no-store',
-        });
-        if (!response.ok) throw new Error('Failed to fetch countries');
-        const data = (await response.json()) as Country[];
-        if (!cancelled) {
-          setCountries(Array.isArray(data) ? data : []);
-        }
-      } catch {
-        if (!cancelled) {
-          toast.error('Unable to load destination countries right now.');
-        }
-      } finally {
-        if (!cancelled) {
-          setCountriesLoading(false);
-        }
-      }
-    };
-
-    loadCountries();
-
-    return () => {
-      cancelled = true;
-    };
+    try {
+      const raw = localStorage.getItem(PUBLIC_DRAFT_KEY);
+      const parsed = raw ? publicDraftSchema.safeParse(JSON.parse(raw)) : null;
+      if (parsed?.success) setDraft(parsed.data);
+      else setDraft({ ...initial, draftId: createBrowserDraftId() });
+      if (raw && !parsed?.success)
+        toast.error(
+          'Your saved draft could not be read. Please check your products before continuing.',
+        );
+    } catch {
+      setDraft({ ...initial, draftId: createBrowserDraftId() });
+    }
+    setReady(true);
+    void fetch('/api/get-data/countries-shipping-plan')
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
+      .then(setCountries)
+      .catch(() => setLoadError(true));
+    void fetch('/api/auth/me')
+      .then((r) => setSignedIn(r.ok))
+      .catch(() => {});
   }, []);
 
-  const formatPlanUnit = (unit?: string | null) =>
-    unit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
-
-  const selectedCountry = useMemo(
-    () => countries.find((country) => country.pidCountry === order.destinationCountry),
-    [countries, order.destinationCountry],
-  );
-  const selectedPlan = useMemo(
-    () =>
-      selectedCountry?.shippingPlans.find(
-        (plan) => plan.pidShippingPlan === order.shippingPlan,
-      ),
-    [selectedCountry, order.shippingPlan],
-  );
-  const measurementUnit = formatPlanUnit(selectedPlan?.shippingPlanUnit);
-  const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
-  const lineMeasurement =
-    Number(productDraft.productQuantity || 0) *
-    Number(productDraft.productWeight || 0);
-
-  const totalEstimatedValue = useMemo(() => {
-    return products.reduce((total, p) => total + (Number(p.productPrice) * Number(p.productQuantity)), 0);
-  }, [products]);
-
-  const currencySymbol = useMemo(() => {
-    if (order.currencyType === 'CNY') return '¥';
-    if (order.currencyType === 'USD') return '$';
-    return order.currencyType;
-  }, [order.currencyType]);
-
-  const addProduct = () => {
-    if (
-      !productDraft.productName.trim() ||
-      !productDraft.productLink.trim() ||
-      !productDraft.productPrice ||
-      !productDraft.productWeight ||
-      !productDraft.productQuantity
-    ) {
-      toast.error(
-        `Complete product name, link, price, ${measurementName} and quantity.`,
-      );
-      return;
-    }
-
-    if (
-      Number(productDraft.productPrice) <= 0 ||
-      Number(productDraft.productWeight) <= 0 ||
-      Number(productDraft.productQuantity) <= 0
-    ) {
-      toast.error(
-        `Price, ${measurementName} and quantity must be greater than zero.`,
-      );
-      return;
-    }
-
-    setProducts((prev) => [...prev, productDraft]);
-    setProductDraft(initialProduct);
-    toast.success('Product added to order summary.');
-  };
-
-  const removeProduct = (index: number) => {
-    setProducts((prev) => prev.filter((_, i) => i !== index));
-  };
-
-  const proceedToPayment = async (allowSeparateOrder = false) => {
-    if (!order.orderName.trim() || !order.destinationCountry || !order.shippingPlan || !order.shippingAddress.trim()) {
-      toast.error('Complete order name, destination, shipping plan and address.');
-      return;
-    }
-
-    if (!account.email.trim()) {
-      toast.error('Email is required to continue.');
-      return;
-    }
-
-    if (products.length === 0) {
-      toast.error('Add at least one product before continuing.');
-      return;
-    }
-
-    const leadMeta = buildFacebookLeadMeta();
-    const payload = {
-      account,
-      order,
-      products: products.map((item) => ({
-        ...item,
-        productPrice: Number(item.productPrice),
-        productWeight: Number(item.productWeight),
-        productQuantity: Number(item.productQuantity),
-      })),
-      ...leadMeta,
-      allowSeparateOrder,
-    };
-
-    setSubmitting(true);
+  useEffect(() => {
+    if (!ready) return;
     try {
-      const authResponse = await fetch('/api/auth/me', { cache: 'no-store' });
-      if (!authResponse.ok) {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(
-            PENDING_PROCUREMENT_CHECKOUT_KEY,
-            JSON.stringify(payload),
-          );
-          window.localStorage.setItem(
-            POST_AUTH_REDIRECT_KEY,
-            PROCUREMENT_RESUME_CHECKOUT_PATH,
-          );
-        }
-        toast.info('Please sign in or create an account to save your order.');
+      localStorage.setItem(PUBLIC_DRAFT_KEY, JSON.stringify(draft));
+      setSaved(true);
+    } catch {
+      setSaved(false);
+    }
+  }, [draft, ready]);
+
+  const country = countries.find(
+    (c) => c.pidCountry === draft.destinationCountry,
+  );
+  const plan = country?.shippingPlans.find(
+    (p) => p.pidShippingPlan === draft.shippingPlan,
+  );
+  const unit = plan?.shippingPlanUnit?.toUpperCase() === 'CBM' ? 'CBM' : 'kg';
+  const current = draft.current;
+  const link = inspectProductLink(current.productLink);
+  const needsConfirmation = Boolean(
+    current.productLink &&
+      (!link.shop || (draft.shop !== 'other' && link.shop.id !== draft.shop)),
+  );
+  const total = draft.products.reduce(
+    (sum, p) => sum + Number(p.productPrice) * Number(p.productQuantity),
+    0,
+  );
+  const hasUnfinished = Boolean(
+    current.productName ||
+      current.productLink ||
+      current.productPrice ||
+      current.productWeight ||
+      current.productInfo,
+  );
+  const updateCurrent = (patch: Partial<ProductDraft>) =>
+    setDraft((d) => ({ ...d, current: { ...d.current, ...patch } }));
+
+  function changeShop(shop: string, currency: 'CNY' | 'USD') {
+    setDraft((d) => ({
+      ...d,
+      shop,
+      currency,
+      products: d.products.map((p) => ({
+        ...p,
+        review: true,
+        linkConfirmed: false,
+      })),
+      current: { ...d.current, review: hasUnfinished, linkConfirmed: false },
+    }));
+  }
+  function changeShipping(destinationCountry: string, shippingPlan: string) {
+    setDraft((d) => ({
+      ...d,
+      destinationCountry,
+      shippingPlan,
+      products: d.products.map((p) => ({ ...p, measurementReview: true })),
+      current: { ...d.current, measurementReview: hasUnfinished },
+    }));
+  }
+  function addProduct() {
+    if (!plan || !draft.shop) {
+      toast.error(
+        'Choose your destination, shipping method and website first.',
+      );
+      return;
+    }
+    const product = {
+      ...current,
+      currency: draft.currency,
+      review: false,
+      measurementReview: false,
+    };
+    const problem = productProblem(product, draft.shop, draft.currency);
+    if (problem) {
+      toast.error(problem);
+      return;
+    }
+    setDraft((d) => ({
+      ...d,
+      products: current.id
+        ? d.products.map((p) => (p.id === current.id ? product : p))
+        : [...d.products, { ...product, id: createBrowserDraftId() }],
+      current: emptyProduct(),
+    }));
+    toast.success(
+      current.id
+        ? 'Product reviewed and updated.'
+        : 'Product added. You can add another to the same order.',
+    );
+  }
+  async function proceed(allowSeparateOrder = false) {
+    if (sending.current) return;
+    if (!plan || !draft.shop || !draft.products.length) {
+      toast.error('Choose your shipping details and add at least one product.');
+      return;
+    }
+    if (hasUnfinished) {
+      toast.error('Save the product you are editing before continuing.');
+      editor.current?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    const problem = draft.products
+      .map((p) => productProblem(p, draft.shop, draft.currency))
+      .find(Boolean);
+    if (problem) {
+      toast.error(problem);
+      return;
+    }
+    const payload = {
+      draftId: draft.draftId,
+      shop: draft.shop,
+      order: {
+        destinationCountry: draft.destinationCountry,
+        shippingPlan: draft.shippingPlan,
+        currencyType: draft.currency,
+        orderCategory: 'Other Goods',
+      },
+      products: draft.products,
+      allowSeparateOrder,
+      ...buildFacebookLeadMeta(),
+    };
+    sending.current = true;
+    setBusy(true);
+    try {
+      localStorage.setItem(
+        PENDING_PROCUREMENT_CHECKOUT_KEY,
+        JSON.stringify(payload),
+      );
+      localStorage.setItem(
+        POST_AUTH_REDIRECT_KEY,
+        PROCUREMENT_RESUME_CHECKOUT_PATH,
+      );
+      const auth = await fetch('/api/auth/me', { cache: 'no-store' });
+      if (!auth.ok) {
         router.push(
           `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
         );
         return;
       }
-
       const response = await fetch('/api/public/procurement/bootstrap-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
       const data = await response.json();
-
-      if (data?.statusx === 'SUCCESS') {
-        trackBrowserLeadEvent({
-          eventId: leadMeta.fbEventId,
-          contentName: 'Buy From Chinese Websites Submission',
-          contentCategory: 'Procurement',
-          numItems: payload.products.length,
-          value: totalEstimatedValue,
-          currency: order.currencyType || 'USD',
-        });
-        if (typeof window !== 'undefined') {
-          window.localStorage.removeItem(PENDING_PROCUREMENT_CHECKOUT_KEY);
-          window.localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
-        }
-        toast.success('Order created. Redirecting to your dashboard...');
+      if (data.statusx === 'SUCCESS') {
+        localStorage.removeItem(PUBLIC_DRAFT_KEY);
+        localStorage.removeItem(PENDING_PROCUREMENT_CHECKOUT_KEY);
+        localStorage.removeItem(POST_AUTH_REDIRECT_KEY);
         router.push(data.redirectTo);
-        return;
-      }
-
-      if (data?.statusx === 'EXISTING_SAVED_ORDERS' && data.existingDraft) {
-        setDuplicateDraft(data.existingDraft);
-        return;
-      }
-
-      if (
-        data?.statusx === 'AUTH_REQUIRED' ||
-        data?.statusx === 'ACCOUNT_EXISTS_LOGIN_REQUIRED'
-      ) {
-        if (typeof window !== 'undefined') {
-          window.localStorage.setItem(
-            PENDING_PROCUREMENT_CHECKOUT_KEY,
-            JSON.stringify(payload),
-          );
-          window.localStorage.setItem(
-            POST_AUTH_REDIRECT_KEY,
-            PROCUREMENT_RESUME_CHECKOUT_PATH,
-          );
-        }
-        toast.info('Please sign in or create an account to continue.');
-        router.push(
-          `/auth/login?next=${encodeURIComponent(PROCUREMENT_RESUME_CHECKOUT_PATH)}`,
-        );
-        return;
-      }
-
-      toast.error(data?.message || 'Unable to continue right now.');
-    } catch {
-      toast.error('Network error. Please try again.');
+      } else if (data.statusx === 'EXISTING_SAVED_ORDERS') setDuplicate(true);
+      else throw new Error(data.message || 'Unable to save your order.');
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : 'Unable to continue. Your draft is still here.',
+      );
     } finally {
-      setSubmitting(false);
+      sending.current = false;
+      setBusy(false);
     }
-  };
+  }
 
+  if (!ready) return <p role="status">Loading your saved products…</p>;
   return (
-    <div className="si-public-form bg-transparent">
-      {duplicateDraft && <div role="alertdialog" aria-modal="true" aria-labelledby="duplicate-order-title" className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm"><div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-700 dark:bg-slate-900 sm:p-8"><h2 id="duplicate-order-title" className="text-2xl font-black text-slate-900 dark:text-white">You already have a saved order</h2><p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">Add these products to <b>{duplicateDraft.orderName || duplicateDraft.pidOrder}</b> to avoid duplicate shipments and charges. Only create another order if this must ship separately.</p><div className="mt-6 flex flex-col gap-3"><Button onClick={() => router.push(`/dashboard/procurement/add-product/${duplicateDraft.pidOrder}`)} className="min-h-12 bg-indigo-600 font-bold hover:bg-indigo-700">Continue saved order</Button><Button variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className="min-h-12 font-bold">Review or merge saved orders</Button><button type="button" onClick={() => { setDuplicateDraft(null); void proceedToPayment(true); }} className="min-h-11 text-sm font-bold text-slate-600 underline underline-offset-4 dark:text-slate-300">This is a separate shipment — create it</button><button type="button" onClick={() => setDuplicateDraft(null)} className="min-h-11 text-sm text-slate-500">Go back</button></div></div></div>}
-      {/* Main Flow Content */}
-      <section className="w-full">
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,380px)] 2xl:grid-cols-[minmax(0,1fr)_400px] xl:items-start">
-          
-          {/* LEFT COLUMN: Data Entry */}
-          <div className="space-y-6">
-            
-            {/* Step 1: Account Details */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-              <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                  <User className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">1. Contact Information</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Where should we send your order updates?</p>
-                </div>
-              </div>
-              
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-1" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
-                  <Input id="procurement-field-1" placeholder="John" value={account.firstName} onChange={(e) => setAccount((prev) => ({ ...prev, firstName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-2" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
-                  <Input id="procurement-field-2" placeholder="Doe" value={account.lastName} onChange={(e) => setAccount((prev) => ({ ...prev, lastName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-3" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
-                  <Input id="procurement-field-3" type="email" placeholder="john@example.com" value={account.email} onChange={(e) => setAccount((prev) => ({ ...prev, email: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-4" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
-                  <Input id="procurement-field-4" placeholder="+234 801 234 5678" value={account.phone} onChange={(e) => setAccount((prev) => ({ ...prev, phone: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
-                </div>
-              </div>
-            </div>
-
-            {/* Step 2: Shipping Details */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-              <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                  <Globe className="h-5 w-5" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">2. Shipping Logistics</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Tell us about the shipment destination.</p>
-                </div>
-              </div>
-
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-5" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Order Reference Name</label>
-                  <Input id="procurement-field-5" placeholder="e.g., Summer Inventory 2026" value={order.orderName} onChange={(e) => setOrder((prev) => ({ ...prev, orderName: e.target.value }))} className="h-12 rounded-xl dark:bg-slate-800/50" />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-6" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Destination Country</label>
-                  <select id="procurement-field-6"
-                    className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
-                    value={order.destinationCountry}
-                    onChange={(e) => {
-                      setOrder((prev) => ({ ...prev, destinationCountry: e.target.value, shippingPlan: '' }));
-                      setProductDraft((prev) => ({ ...prev, productWeight: '' }));
-                      setProducts([]);
-                    }}
-                  >
-                    <option value="" className="dark:bg-slate-900">Select destination country</option>
-                    {countriesLoading ? (
-                      <option className="dark:bg-slate-900">Loading countries...</option>
-                    ) : (
-                      countries.map((country) => (
-                        <option key={country.pidCountry} value={country.pidCountry} className="dark:bg-slate-900">
-                          {country.countryName}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-7" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Shipping Plan</label>
-                  <select id="procurement-field-7"
-                    className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
-                    value={order.shippingPlan}
-                    onChange={(e) => {
-                      setOrder((prev) => ({ ...prev, shippingPlan: e.target.value }));
-                      setProductDraft((prev) => ({ ...prev, productWeight: '' }));
-                      setProducts([]);
-                    }}
-                    disabled={!selectedCountry}
-                  >
-                    <option value="" className="dark:bg-slate-900">
-                      {selectedCountry ? 'Select shipping plan' : 'Choose country first'}
-                    </option>
-                    {selectedCountry?.shippingPlans.map((plan) => (
-                      <option key={plan.pidShippingPlan} value={plan.pidShippingPlan} className="dark:bg-slate-900">
-                        {convertToTitleCase(plan.shippingPlanName)} ({plan.shippingPlanCurrency === 'NGN' ? '₦' : '$'}{Number(plan.shippingPlanRate).toLocaleString()}/{formatPlanUnit(plan.shippingPlanUnit)})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-8" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">China Shop Currency</label>
-                  <select id="procurement-field-8"
-                    className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
-                    value={order.currencyType}
-                    onChange={(e) => setOrder((prev) => ({ ...prev, currencyType: e.target.value }))}
-                  >
-                    <option value="USD" className="dark:bg-slate-900">USD</option>
-                    <option value="CNY" className="dark:bg-slate-900">CNY</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label htmlFor="procurement-field-9" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Category</label>
-                  <select id="procurement-field-9"
-                    className="flex h-12 w-full items-center justify-between rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-800/50 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 dark:focus:ring-slate-300"
-                    value={order.orderCategory}
-                    onChange={(e) => setOrder((prev) => ({ ...prev, orderCategory: e.target.value }))}
-                  >
-                    <option value="Goods with Battery" className="dark:bg-slate-900">Goods with Battery</option>
-                    <option value="Raw Batteries" className="dark:bg-slate-900">Raw Batteries</option>
-                    <option value="Liquids, Gases, Powder" className="dark:bg-slate-900">Liquids, Gases, Powder</option>
-                    <option value="Other Goods" className="dark:bg-slate-900">Other Goods</option>
-                  </select>
-                </div>
-                <div className="space-y-1.5 sm:col-span-2">
-                  <label htmlFor="procurement-field-10" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Delivery Address</label>
-                  <Textarea id="procurement-field-10"
-                    placeholder="Enter the full delivery address"
-                    value={order.shippingAddress}
-                    onChange={(e) => setOrder((prev) => ({ ...prev, shippingAddress: e.target.value }))}
-                    className="min-h-[100px] rounded-xl dark:bg-slate-800/50"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Step 3: Add Products */}
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
-              <div className="mb-6 flex items-center gap-3 border-b border-slate-100 pb-4 dark:border-slate-800">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
-                  <Package className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">3. Add Sourcing Items</h2>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Add the links and details for the products you want.</p>
-                </div>
-              </div>
-
-              <div className="space-y-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50 sm:p-6">
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-11" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Name</label>
-                  <Input id="procurement-field-11" placeholder="e.g., Wireless Bluetooth Earbuds" value={productDraft.productName} onChange={(e) => setProductDraft((prev) => ({ ...prev, productName: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
-                </div>
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-12" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Product Link</label>
-                  <Input id="procurement-field-12" placeholder="https://1688.com/..." value={productDraft.productLink} onChange={(e) => setProductDraft((prev) => ({ ...prev, productLink: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
-                </div>
-                
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <label htmlFor="procurement-field-13" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Unit Price</label>
-                    <Input id="procurement-field-13" placeholder="0.00" type="number" value={productDraft.productPrice} onChange={(e) => setProductDraft((prev) => ({ ...prev, productPrice: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2">
-                      <label htmlFor="procurement-field-14" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">
-                        {measurementUnit === 'CBM' ? 'CBM per item' : 'Weight per item (kg)'}
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowMeasurementHelp((current) => !current)}
-                        className="text-indigo-600 hover:text-indigo-800"
-                        aria-label={`Explain per-item ${measurementName}`}
-                      >
-                        <HelpCircle className="h-4 w-4" />
-                      </button>
-                    </div>
-                    <Input
-                      placeholder={measurementUnit === 'CBM' ? 'e.g., 0.1' : 'e.g., 0.5'}
-                      type="number"
-                      min="0.0001"
-                      step="any"
-                      disabled={!selectedPlan}
-                      value={productDraft.productWeight}
-                      onChange={(e) => setProductDraft((prev) => ({ ...prev, productWeight: e.target.value }))}
-                      className="h-12 rounded-xl bg-white dark:bg-slate-900"
-                    />
-                    {selectedPlan && productDraft.productWeight && Number(productDraft.productQuantity) > 0 && (
-                      <p className="text-xs font-medium text-indigo-700 dark:text-indigo-300">
-                        {productDraft.productQuantity} item{Number(productDraft.productQuantity) === 1 ? '' : 's'} × {productDraft.productWeight} {measurementUnit} = {Number(lineMeasurement.toFixed(4))} {measurementUnit} total.
-                      </p>
-                    )}
-                    {showMeasurementHelp && (
-                      <p className="rounded-lg bg-indigo-50 p-3 text-xs leading-relaxed text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-200">
-                        Enter the {measurementName} of one item, not the whole product line. If your supplier gave you a total for all items, divide that total by the quantity. For example, 10 CBM for 100 items means 0.1 CBM per item.
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Quantity</label>
-                    <Input id="procurement-field-14" placeholder="1" type="number" value={productDraft.productQuantity} onChange={(e) => setProductDraft((prev) => ({ ...prev, productQuantity: e.target.value }))} className="h-12 rounded-xl bg-white dark:bg-slate-900" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label htmlFor="procurement-field-15" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Variants & Notes (Optional)</label>
-                  <Textarea id="procurement-field-15" placeholder="e.g., 50 Red, 50 Blue, US Plug" value={productDraft.productInfo} onChange={(e) => setProductDraft((prev) => ({ ...prev, productInfo: e.target.value }))} className="min-h-[80px] rounded-xl bg-white dark:bg-slate-900" />
-                </div>
-                
-                <Button type="button" variant="outline" className="h-12 w-full rounded-xl border-dashed border-indigo-300 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400 dark:hover:bg-indigo-900/40" onClick={addProduct}>
-                  <PackagePlus className="mr-2 h-5 w-5" />
-                  Add to Order Summary
-                </Button>
-              </div>
-            </div>
-
-          </div>
-
-          {/* RIGHT COLUMN: Order Summary */}
-          <div className="space-y-6 xl:sticky xl:top-28">
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none sm:p-6">
-              
-              <h3 className="mb-6 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-                <FileText className="h-5 w-5 text-brand-orange-500" /> Order Summary
-              </h3>
-
-              {products.length === 0 ? (
-                <div className="flex min-h-[200px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center dark:border-slate-800 dark:bg-slate-800/50">
-                  <ShoppingCart className="mb-3 h-8 w-8 text-slate-300 dark:text-slate-600" />
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Your cart is empty.</p>
-                  <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Add products using the form to see them here.</p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                  {products.map((product, index) => (
-                    <div key={`${product.productLink}-${index}`} className="group relative rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-all hover:border-slate-200 dark:border-slate-800 dark:bg-slate-800/50 dark:hover:border-slate-700">
-                      <div className="pr-8">
-                        <p className="font-bold text-slate-900 dark:text-white line-clamp-1" title={product.productName}>{product.productName}</p>
-                        <p className="mt-1 text-xs text-indigo-600 dark:text-indigo-400 line-clamp-1" title={product.productLink}>{product.productLink}</p>
-                        <div className="mt-3 flex items-center gap-3 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                          <span className="flex items-center gap-1 rounded-md bg-white px-2 py-1 shadow-sm dark:bg-slate-900">
-                            <span className="text-[11px] font-bold">{currencySymbol}</span> {product.productPrice}
-                          </span>
-                          <span className="flex items-center gap-1 rounded-md bg-white px-2 py-1 shadow-sm dark:bg-slate-900">
-                            Qty: {product.productQuantity}
-                          </span>
-                          <span className="flex items-center gap-1 rounded-md bg-white px-2 py-1 shadow-sm dark:bg-slate-900">
-                            {product.productWeight} {measurementUnit}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        className="absolute right-3 top-3 rounded-full bg-white p-2 text-slate-400 opacity-100 shadow-sm transition-all hover:bg-rose-50 hover:text-rose-600 dark:bg-slate-900 dark:text-slate-500 dark:hover:bg-rose-900/30 dark:hover:text-rose-400 lg:opacity-0 lg:group-hover:opacity-100"
-                        onClick={() => removeProduct(index)}
-                        aria-label="Remove product"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Dynamic Totals */}
-              {products.length > 0 && (
-                <div className="mt-6 border-t border-slate-100 pt-6 dark:border-slate-800">
-                  <div className="flex items-center justify-between text-sm font-semibold text-slate-500 dark:text-slate-400">
-                    <span>Total Items</span>
-                    <span>{products.length} unique</span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between text-lg font-black text-slate-900 dark:text-white">
-                    <span>Est. Goods Value</span>
-                    <span>{order.currencyType} {totalEstimatedValue.toFixed(2)}</span>
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-400">*Shipping costs and local currency equivalent will be calculated before you pay.</p>
-                </div>
-              )}
-
-              <div className="mt-8">
-                <Button
-                  type="button"
-                  className="h-14 w-full rounded-xl bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-70 border-0"
-                  onClick={() => void proceedToPayment()}
-                  disabled={submitting}
-                >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    <>Proceed to Checkout <ArrowRight className="ml-2 h-5 w-5" /></>
-                  )}
-                </Button>
-                <p className="mt-4 text-center text-xs text-slate-500 dark:text-slate-400">
-                  By continuing, you agree to our terms of service and shipping policies.
-                </p>
-              </div>
-
-            </div>
-          </div>
-
+    <div className={`si-public-form ${styles.flow}`}>
+      <header className={styles.intro}>
+        <div>
+          <span className={styles.eyebrow}>YOUR NEXT SHIPMENT STARTS HERE</span>
+          <h2>Let’s build your order.</h2>
+          <p>One order. All your product links. We’ll take it from there.</p>
         </div>
+        <div
+          className={`${styles.saveStatus} ${!saved ? styles.saveWarning : ''}`}
+          role="status"
+        >
+          <ShieldCheck size={17} aria-hidden="true" />
+          <span>
+            {saved
+              ? 'Draft saved on this browser'
+              : 'Keep this page open — saving unavailable'}
+          </span>
+        </div>
+      </header>
+      <ol className={styles.steps} aria-label="Order steps">
+        <li className={styles.activeStep}>
+          <span>1</span>Choose shipping
+        </li>
+        <li>
+          <span>2</span>Add your products
+        </li>
+        <li>
+          <span>3</span>Sign in & finish
+        </li>
+      </ol>
+      <section className={panel}>
+        <div className={styles.sectionHeading}>
+          <span className={styles.sectionIcon}>
+            <Globe2 size={22} aria-hidden="true" />
+          </span>
+          <div>
+            <h3>Where are we shipping?</h3>
+            <p>
+              Choose your destination, delivery method and shopping website.
+            </p>
+          </div>
+          <span className={styles.stepLabel}>STEP 01</span>
+        </div>
+        {loadError && (
+          <p role="alert">
+            Shipping options could not load. Please refresh to try again; your
+            products are saved if browser saving is available.
+          </p>
+        )}
+        <div className={styles.shippingFields}>
+          <label>
+            Destination country
+            <select
+              className={selectClass}
+              value={draft.destinationCountry}
+              onChange={(e) => changeShipping(e.target.value, '')}
+            >
+              <option value="">Select country</option>
+              {countries.map((c) => (
+                <option key={c.pidCountry} value={c.pidCountry}>
+                  {c.countryName}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Shipping method
+            <select
+              className={selectClass}
+              disabled={!country}
+              aria-describedby={
+                country?.shippingPlans.length
+                  ? 'shipping-method-guide'
+                  : undefined
+              }
+              value={draft.shippingPlan}
+              onChange={(e) =>
+                changeShipping(draft.destinationCountry, e.target.value)
+              }
+            >
+              <option value="">
+                {country ? 'Select shipping method' : 'Choose country first'}
+              </option>
+              {country?.shippingPlans.map((p) => (
+                <option key={p.pidShippingPlan} value={p.pidShippingPlan}>
+                  {shippingMethodGuide[p.shippingPlanName.trim().toUpperCase()]
+                    ?.label ||
+                    p.shippingPlanName.replaceAll('_', ' ').toLowerCase()}{' '}
+                  · {shippingRateLabel(p)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Shopping website
+            <select
+              className={selectClass}
+              value={draft.shop}
+              onChange={(e) =>
+                changeShop(
+                  e.target.value,
+                  (shops.find((s) => s.id === e.target.value)?.currency ||
+                    draft.currency) as 'CNY' | 'USD',
+                )
+              }
+            >
+              <option value="">Select website</option>
+              {shops.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {country && country.shippingPlans.length > 0 && (
+          <div id="shipping-method-guide" className={styles.shippingGuide}>
+            <p className={styles.shippingGuideTitle}>
+              Shipping methods available for {country.countryName}
+            </p>
+            <dl>
+              {country?.shippingPlans.map((shipping) => {
+                const guide = shippingMethodGuide[
+                  shipping.shippingPlanName.trim().toUpperCase()
+                ] || {
+                  label: shipping.shippingPlanName.replaceAll('_', ' '),
+                  description: 'Available for this destination.',
+                };
+                return (
+                  <div
+                    key={shipping.pidShippingPlan}
+                    className={
+                      draft.shippingPlan === shipping.pidShippingPlan
+                        ? styles.selectedShippingGuide
+                        : undefined
+                    }
+                  >
+                    <dt>
+                      {guide.label}
+                      {draft.shippingPlan === shipping.pidShippingPlan && (
+                        <CheckCircle2 size={14} aria-label="Selected" />
+                      )}
+                    </dt>
+                    <dd className={styles.shippingRate}>
+                      {shippingRateLabel(shipping)}
+                    </dd>
+                    <dd>{guide.description}</dd>
+                  </div>
+                );
+              })}
+            </dl>
+            <p className={styles.shippingRateNote}>
+              Rates include freight, customs clearance and taxes. Product prices
+              are separate. Your shipping estimate is calculated from the weight
+              or volume before payment.
+            </p>
+          </div>
+        )}
+        {draft.shop === 'other' && (
+          <label className="mt-4 block">
+            Supplier’s quoted currency
+            <select
+              className={selectClass}
+              value={draft.currency}
+              onChange={(e) =>
+                changeShop('other', e.target.value as 'CNY' | 'USD')
+              }
+            >
+              <option value="CNY">RMB / Yuan (CNY)</option>
+              <option value="USD">US dollars (USD)</option>
+            </select>
+          </label>
+        )}
+        {draft.shop && (
+          <p className={styles.currencyNote}>
+            <CheckCircle2 size={17} aria-hidden="true" /> Prices for this order
+            are in{' '}
+            <strong>
+              {draft.currency === 'CNY'
+                ? 'RMB / Yuan (CNY)'
+                : 'US dollars (USD)'}
+            </strong>
+            . RMB and Yuan refer to China’s currency. 1688, Taobao and Chinese
+            domestic shops generally quote in Yuan; Alibaba orders here use USD.
+          </p>
+        )}
+        <p className={styles.currencyHelp}>
+          Please keep products in this order in the same currency. Buying
+          products priced in another currency? Simply create a separate order
+          for those items.
+        </p>
       </section>
-      
+      {draft.products.some((p) => p.review) && (
+        <p role="alert" className="rounded-xl bg-amber-50 p-4 text-amber-950">
+          You’ve changed the shopping website. Please review each product’s link
+          and price to make sure they match your selection. Your products are
+          still saved.
+        </p>
+      )}
+      <div className={styles.workspace}>
+        <section ref={editor} className={panel}>
+          <div className={styles.sectionHeading}>
+            <span className={styles.sectionIcon}>
+              <PackagePlus size={22} aria-hidden="true" />
+            </span>
+            <div>
+              <h3>{current.id ? 'Review your product' : 'Add a product'}</h3>
+              <p>Found something you like? Paste its link below.</p>
+            </div>
+            <span className={styles.stepLabel}>STEP 02</span>
+          </div>
+          <div className={styles.productForm}>
+            <label className="block">
+              <span className={styles.fieldTitle}>
+                <Link2 size={15} aria-hidden="true" />
+                Product link
+              </span>
+              <Input
+                className="mt-2"
+                value={current.productLink}
+                placeholder="https://detail.1688.com/offer/…"
+                onChange={(e) =>
+                  updateCurrent({
+                    productLink: e.target.value,
+                    linkConfirmed: false,
+                  })
+                }
+              />
+            </label>
+            {current.productLink && (
+              <p className={styles.linkStatus} role="status">
+                {link.shop
+                  ? `Detected ${link.shop.name} · expected currency ${link.shop.currency}.`
+                  : 'We cannot identify this website from the link. Paste the full product URL if this is a shortened link.'}{' '}
+                Website detection does not verify a supplier’s quoted price.
+              </p>
+            )}
+            {link.shop && link.shop.currency !== draft.currency && (
+              <p role="alert" className="text-red-600">
+                This link uses a different currency. Please use a separate
+                order.
+              </p>
+            )}
+            {needsConfirmation && (
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={current.linkConfirmed}
+                  onChange={(e) =>
+                    updateCurrent({ linkConfirmed: e.target.checked })
+                  }
+                />
+                I have checked this link’s website and confirm the supplier’s
+                price is in {draft.currency}.
+              </label>
+            )}
+            <label className="block">
+              Product name
+              <Input
+                className="mt-2"
+                value={current.productName}
+                onChange={(e) => updateCurrent({ productName: e.target.value })}
+              />
+            </label>
+            <div className={styles.priceFields}>
+              <label>
+                Unit price ({draft.currency})
+                <Input
+                  className="mt-2"
+                  type="number"
+                  min="0.01"
+                  step="any"
+                  value={current.productPrice}
+                  onChange={(e) =>
+                    updateCurrent({
+                      productPrice: e.target.value,
+                      currency: draft.currency,
+                    })
+                  }
+                />
+              </label>
+              <label>
+                Quantity
+                <Input
+                  className="mt-2"
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={current.productQuantity}
+                  onChange={(e) =>
+                    updateCurrent({ productQuantity: e.target.value })
+                  }
+                />
+              </label>
+              <label>
+                {unit === 'CBM'
+                  ? 'Volume per item (CBM)'
+                  : 'Weight per item (kg)'}
+                <Input
+                  className="mt-2"
+                  disabled={!plan}
+                  type="number"
+                  min="0.0001"
+                  step="any"
+                  value={current.productWeight}
+                  onChange={(e) =>
+                    updateCurrent({ productWeight: e.target.value })
+                  }
+                />
+              </label>
+            </div>
+            <p className="text-xs text-slate-500">
+              Enter the measurement for one item. Divide a whole shipment’s
+              measurement by its quantity.{' '}
+              {unit === 'CBM'
+                ? 'Sea volume is measured in cubic metres (CBM), not kilograms.'
+                : ''}
+            </p>
+            <label className="block">
+              Variants and notes (optional)
+              <Textarea
+                className="mt-2"
+                value={current.productInfo}
+                placeholder="Colour, size, model or other instructions"
+                onChange={(e) => updateCurrent({ productInfo: e.target.value })}
+              />
+            </label>
+            {(current.review || current.measurementReview) && (
+              <p className="text-amber-700">
+                The entered price was {current.currency || draft.currency}{' '}
+                {current.productPrice || '—'}. Check the link, confirm or
+                correct the price in {draft.currency}, and review the
+                measurement in {unit}. Saving confirms these details for your
+                current selections.
+              </p>
+            )}
+            <Button className={styles.addButton} onClick={addProduct}>
+              <Plus size={18} aria-hidden="true" />
+              {current.id
+                ? 'Confirm details and save product'
+                : 'Add product to this order'}
+            </Button>
+            {current.id && (
+              <Button
+                variant="outline"
+                onClick={() => updateCurrent(emptyProduct())}
+              >
+                Cancel editing
+              </Button>
+            )}
+          </div>
+        </section>
+        <section className={`${panel} ${styles.summary}`}>
+          <div className={styles.summaryHeading}>
+            <span className={styles.summaryIcon}>
+              <ShoppingBag size={22} aria-hidden="true" />
+            </span>
+            <div>
+              <h3>Products in this order</h3>
+              <p>One shipment, everything together.</p>
+            </div>
+            <span className={styles.count}>{draft.products.length}</span>
+          </div>
+          {!draft.products.length && (
+            <div className={styles.emptyState}>
+              <span>
+                <Package size={30} strokeWidth={1.5} aria-hidden="true" />
+              </span>
+              <h4>Your next find goes here</h4>
+              <p>
+                Add your first product, then keep adding.
+                <br />
+                They’ll all be part of this order.
+              </p>
+              <div className={styles.emptyHint}>
+                <Plus size={14} aria-hidden="true" /> Start with a product link
+              </div>
+            </div>
+          )}
+          <ol className={styles.productList}>
+            {draft.products.map((p, index) => (
+              <li
+                key={p.id}
+                className={`${styles.productCard} ${p.review || p.measurementReview ? styles.needsReview : ''}`}
+              >
+                <div className={styles.productCardTop}>
+                  <span className={styles.productNumber}>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div className={styles.productIdentity}>
+                    <strong>{p.productName}</strong>
+                    <p title={p.productLink}>
+                      <Link2 size={12} aria-hidden="true" />
+                      {p.productLink}
+                    </p>
+                  </div>
+                  {!p.review && !p.measurementReview && (
+                    <CheckCircle2
+                      size={17}
+                      className={styles.productCheck}
+                      aria-label="Product details complete"
+                    />
+                  )}
+                </div>
+                <div className={styles.productMetrics}>
+                  <div>
+                    <span>UNIT PRICE</span>
+                    <strong>
+                      {p.currency || draft.currency}{' '}
+                      {Number(p.productPrice).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </strong>
+                  </div>
+                  <div>
+                    <span>QUANTITY</span>
+                    <strong>
+                      {p.productQuantity} <small>items</small>
+                    </strong>
+                  </div>
+                  <div>
+                    <span>LINE TOTAL</span>
+                    <strong>
+                      {p.review
+                        ? 'Review price'
+                        : `${p.currency || draft.currency} ${(Number(p.productPrice) * Number(p.productQuantity)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    </strong>
+                  </div>
+                </div>
+                {p.review && (
+                  <p className="text-sm text-amber-700">
+                    Link and price need review
+                  </p>
+                )}
+                {p.measurementReview && (
+                  <p className="text-sm text-amber-700">
+                    Shipping measurement needs review
+                  </p>
+                )}
+                <div className={styles.cardActions}>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      if (hasUnfinished) {
+                        toast.error(
+                          'Save or cancel your current product first.',
+                        );
+                        return;
+                      }
+                      updateCurrent(p);
+                      editor.current?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                  >
+                    <Pencil size={14} aria-hidden="true" />
+                    {p.review || p.measurementReview
+                      ? 'Review product'
+                      : 'Edit details'}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      setDraft((d) => ({
+                        ...d,
+                        products: d.products.filter((item) => item.id !== p.id),
+                        current:
+                          d.current.id === p.id ? emptyProduct() : d.current,
+                      }))
+                    }
+                  >
+                    <Trash2 size={14} aria-hidden="true" />
+                    Remove
+                  </Button>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <Button
+            variant="outline"
+            className={styles.anotherButton}
+            onClick={() => {
+              editor.current?.scrollIntoView({ behavior: 'smooth' });
+              editor.current?.querySelector('input')?.focus();
+            }}
+          >
+            <Plus size={17} aria-hidden="true" /> Add another product
+          </Button>
+          {draft.products.length > 0 &&
+            !draft.products.some((p) => p.review) && (
+              <div className={styles.total}>
+                <div>
+                  <span>Estimated goods value</span>
+                  <small>
+                    {draft.products.length} product
+                    {draft.products.length === 1 ? '' : 's'} in your order
+                  </small>
+                </div>
+                <strong>
+                  <small>{draft.currency}</small>{' '}
+                  {total.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </strong>
+              </div>
+            )}
+          <p className={styles.feeNote}>
+            Shipping and fees are calculated before payment.
+          </p>
+          <Button
+            className={styles.checkoutButton}
+            disabled={busy}
+            onClick={() => void proceed()}
+          >
+            {busy
+              ? 'Saving…'
+              : signedIn
+                ? 'Save order & continue'
+                : 'Sign in to save your order'}
+            <ArrowRight size={18} aria-hidden="true" />
+          </Button>
+          <p className={styles.nextStep}>
+            {!signedIn && 'New here? You can create an account next. '}Then add
+            your delivery address and review your order.
+          </p>
+          <div className={styles.summaryFooter}>
+            <ShieldCheck size={15} aria-hidden="true" /> Your products stay
+            saved while you sign in
+          </div>
+          {duplicate && (
+            <div role="alert" className="mt-5 space-y-3">
+              <p>
+                You already have a saved order. Your new products are safely
+                kept here. You can save these as a separate order and review or
+                merge compatible orders in your dashboard.
+              </p>
+              <Button disabled={busy} onClick={() => void proceed(true)}>
+                Save these as a separate order
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  router.push('/dashboard/procurement/view-orders/saved')
+                }
+              >
+                Review saved orders
+              </Button>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

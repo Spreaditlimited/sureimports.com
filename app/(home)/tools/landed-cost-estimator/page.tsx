@@ -1,17 +1,16 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { 
-  Globe, 
-  Truck, 
-  DollarSign, 
-  Layers, 
-  Clipboard, 
-  ChevronDown, 
-  Info, 
+import styles from '../Tools.module.css';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  Globe,
+  Truck,
+  DollarSign,
+  Layers,
+  Clipboard,
+  ChevronDown,
+  Info,
   Calculator,
   ArrowRight
 } from 'lucide-react';
@@ -94,6 +93,7 @@ function Select<T extends string>({
   icon: any;
 }) {
   const [open, setOpen] = useState(false);
+  const selectId = useId();
   const wrapRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(wrapRef, () => setOpen(false));
 
@@ -101,12 +101,15 @@ function Select<T extends string>({
 
   return (
     <div className="flex flex-col gap-2 relative" ref={wrapRef}>
-      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+      <label htmlFor={selectId} className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
         <Icon className="w-3 h-3 text-indigo-500" /> {label}
       </label>
 
       <button
         type="button"
+        id={selectId}
+        aria-expanded={open}
+        aria-label={`${label}: ${selected?.label ?? 'Select'}`}
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-semibold text-sm transition-all focus:ring-2 focus:ring-indigo-500/50 outline-none dark:border-slate-800 dark:bg-slate-950/50 dark:text-white"
       >
@@ -115,15 +118,15 @@ function Select<T extends string>({
       </button>
 
       {open && (
-        <div className="absolute top-[calc(100%+8px)] left-0 right-0 rounded-2xl bg-white border border-slate-200 overflow-hidden z-[9999] shadow-xl dark:border-slate-800 dark:bg-slate-900">
+        <div className="absolute top-[calc(100%+8px)] left-0 right-0 rounded-2xl bg-white border border-slate-200 overflow-hidden z-[9999]  dark:border-slate-800 dark:bg-slate-900">
           {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => { onChange(opt.value); setOpen(false); }}
               className={`w-full px-4 py-3 text-left text-sm font-medium transition-all hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-900/20 dark:hover:text-indigo-400 ${
-                opt.value === value 
-                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' 
+                opt.value === value
+                  ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400'
                   : 'text-slate-600 dark:text-slate-300'
               }`}
             >
@@ -240,30 +243,30 @@ export default function LandedCostEstimatorPage() {
   }, [canCalculate, selectedShipping, u, q, kg, m3]);
 
   return (
-    <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
-<div className={`${heroLayout.fixed} max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8`}>
-        
+    <main className={styles.page} data-si-page-theme="service">
+<div className={styles.container}>
+
         {/* Header */}
-        <header className="mb-12">
-        <PublicHeroBackground darkOnly priority={false} />
+        <header className={styles.header}>
+
 <HeroPill className="mb-6">
             <Calculator className="w-3.5 h-3.5" /> Profitability Planning
           </HeroPill>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6">
             Landed Cost <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">Estimator</span>
           </h1>
           <p className="text-lg font-medium text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-            Predict your total import costs including shipping, duties, and taxes. 
+            Predict your total import costs including shipping, duties, and taxes.
             Know your margin before you pay your supplier.
           </p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* Input Panel */}
           <section className="lg:col-span-7 space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-              
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10  dark:border-slate-800 dark:bg-slate-900">
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <Select
                   label="Destination"
@@ -283,10 +286,10 @@ export default function LandedCostEstimatorPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <label htmlFor="landed-cost-estimator-field-1" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                     <DollarSign className="w-3 h-3 text-emerald-500" /> Unit Price (USD)
                   </label>
-                  <input
+                  <input id="landed-cost-estimator-field-1"
                     value={unitPrice}
                     onChange={(e) => setUnitPrice(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600"
@@ -295,10 +298,10 @@ export default function LandedCostEstimatorPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <label htmlFor="landed-cost-estimator-field-2" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 flex items-center gap-2">
                     <Layers className="w-3 h-3 text-brand-orange-500" /> Quantity
                   </label>
-                  <input
+                  <input id="landed-cost-estimator-field-2"
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600"
@@ -309,10 +312,10 @@ export default function LandedCostEstimatorPage() {
               </div>
 
               <div className="space-y-2 border-t border-slate-100 pt-8 dark:border-slate-800">
-                <label className="text-[11px] font-bold text-slate-700 uppercase tracking-widest ml-1 dark:text-slate-300">
+                <label htmlFor="landed-cost-estimator-field-3" className="text-[11px] font-bold text-slate-700 uppercase tracking-widest ml-1 dark:text-slate-300">
                   {selectedShipping.basis === 'perKg' ? 'Total Chargeable Weight (kg)' : 'Total CBM (m³)'}
                 </label>
-                <input
+                <input id="landed-cost-estimator-field-3"
                   value={selectedShipping.basis === 'perKg' ? chargeableKg : cbm}
                   onChange={(e) => selectedShipping.basis === 'perKg' ? setChargeableKg(e.target.value) : setCbm(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all dark:bg-slate-950/50 dark:border-slate-800 dark:text-white dark:placeholder:text-slate-600"
@@ -320,7 +323,7 @@ export default function LandedCostEstimatorPage() {
                   inputMode="decimal"
                 />
                 <p className="text-[11px] font-medium text-slate-500 italic mt-2 ml-1">
-                  {selectedShipping.basis === 'perKg' 
+                  {selectedShipping.basis === 'perKg'
                     ? 'Note: Chargeable weight is the higher of actual vs volumetric weight.'
                     : 'CBM is based on the total space occupied by your cartons.'}
                 </p>
@@ -336,17 +339,17 @@ export default function LandedCostEstimatorPage() {
           {/* Results Side Panel */}
           <section className="lg:col-span-5 lg:sticky lg:top-8">
             {!result ? (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
                 <Calculator className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-600" />
                 <p className="font-bold text-slate-600 dark:text-slate-400">Awaiting Inputs</p>
                 <p className="text-sm font-medium mt-2 leading-relaxed text-slate-500">Enter your product and shipping details <br/> to generate an all-in estimate.</p>
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8   relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
                   <div className="absolute top-0 right-0 p-6 opacity-10"><Calculator className="w-12 h-12 text-slate-900 dark:text-white" /></div>
-                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Landed Estimate</h3>
-                  
+                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">Landed Estimate</h3>
+
                   <div className="space-y-6 mb-8">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-bold dark:text-slate-400">Product Cost</span>
@@ -357,17 +360,17 @@ export default function LandedCostEstimatorPage() {
                       <span className="text-xl font-bold text-slate-900 dark:text-white">${nf2.format(result.shippingCost)}</span>
                     </div>
                     <div className="pt-6 border-t border-slate-100 flex justify-between items-center dark:border-slate-800">
-                      <span className="text-indigo-600 font-black uppercase text-[10px] tracking-widest dark:text-indigo-400">Total Landed Cost</span>
-                      <span className="text-indigo-600 font-black text-3xl dark:text-indigo-400">${nf2.format(result.landed)}</span>
+                      <span className="text-indigo-600 font-semibold uppercase text-[10px] tracking-widest dark:text-indigo-400">Total Landed Cost</span>
+                      <span className="text-indigo-600 font-semibold text-3xl dark:text-indigo-400">${nf2.format(result.landed)}</span>
                     </div>
                   </div>
 
                   <div className="p-6 rounded-2xl bg-brand-orange-50 border border-brand-orange-200 mb-6 dark:bg-brand-orange-900/10 dark:border-brand-orange-900/30">
-                    <p className="text-[10px] font-black text-brand-orange-600 uppercase tracking-widest mb-1 dark:text-brand-orange-500">Estimated Cost Per Unit</p>
-                    <p className="text-4xl font-black text-brand-orange-600 dark:text-brand-orange-500">${nf2.format(result.perUnit)}</p>
+                    <p className="text-[10px] font-semibold text-brand-orange-600 uppercase tracking-widest mb-1 dark:text-brand-orange-500">Estimated Cost Per Unit</p>
+                    <p className="text-4xl font-semibold text-brand-orange-600 dark:text-brand-orange-500">${nf2.format(result.perUnit)}</p>
                   </div>
 
-                  <button 
+                  <button
                     onClick={() => alert("Estimate copied to clipboard")}
                     className="w-full py-4 rounded-xl bg-slate-50 border border-slate-200 font-bold text-sm text-slate-700 hover:bg-slate-100 hover:text-indigo-600 transition-all flex items-center justify-center gap-2 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-indigo-400"
                   >
@@ -382,7 +385,7 @@ export default function LandedCostEstimatorPage() {
         {/* FAQ Section */}
         <section className="mt-24 border-t border-slate-200 pt-16 dark:border-slate-800">
           <div className="max-w-4xl">
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">Understanding Landed Cost</h2>
+            <h2 className="text-3xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">Understanding Landed Cost</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[
                 {
@@ -396,7 +399,7 @@ export default function LandedCostEstimatorPage() {
                   a: 'Yes. The rates used in this calculator are "all-in" rates, meaning customs duties, taxes, and clearing fees are already built into the per-kg or per-cbm price.',
                 }
               ].map((faq) => (
-                <div key={faq.id} className="p-6 rounded-3xl border border-slate-200 bg-white shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                <div key={faq.id} className="p-6 rounded-2xl border border-slate-200 bg-white  dark:bg-slate-900 dark:border-slate-800">
                   <h4 className="font-bold text-slate-900 text-base mb-3 flex items-start gap-3 dark:text-white">
                     <ArrowRight className="mt-1 w-4 h-4 shrink-0 text-indigo-500" /> {faq.q}
                   </h4>

@@ -55,9 +55,11 @@ const pages = [
   "app/(faya)/components/home/Hero.tsx"
 ];
 for (const page of pages) {
-  test(`shared hero pill: ${page}`, () => {
+  test(`consistent hero introduction: ${page}`, () => {
     const source = readFileSync(new URL(`../${page}`, import.meta.url), 'utf8');
-    assert.ok(source.includes("import HeroPill from '@/components/home/HeroPill'"));
-    assert.ok(source.includes('<HeroPill'));
+    const heroSource = source.includes('<ServiceHero')
+      ? readFileSync(new URL('../components/home/ServiceHero.tsx', import.meta.url), 'utf8')
+      : source;
+    assert.ok(heroSource.includes('<HeroPill') || heroSource.includes('className={styles.eyebrow}'), page);
   });
 }

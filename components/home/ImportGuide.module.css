@@ -1,12 +1,13 @@
+.page [id] { scroll-margin-top: 100px; }
 .page {
   background: var(--si-canvas);
   color: var(--si-ink);
 }
 .container {
   width: 100%;
-  max-width: var(--si-content-max);
+  max-width: 1440px;
   margin-inline: auto;
-  padding-inline: var(--si-content-gutter);
+  padding-inline: var(--si-gutter);
 }
 .hero {
   position: relative;
@@ -22,7 +23,7 @@
   max-width: 1060px;
   margin: 0 auto;
   font-size: clamp(42px, 5.8vw, 76px);
-  font-weight: 750;
+  font-weight: var(--si-headline-weight);
   letter-spacing: -0.045em;
   line-height: 1.08;
   text-wrap: balance;
@@ -61,12 +62,12 @@
   text-align: center;
 }
 .primary {
-  background: #48439b;
-  color: #fff;
-  border: 1px solid #48439b;
+  background: var(--si-primary);
+  color: var(--si-on-primary);
+  border: 1px solid var(--si-primary);
 }
 .primary:hover {
-  background: #3d3888;
+  filter: brightness(.94);
 }
 .secondary {
   background: var(--si-surface);
@@ -174,14 +175,14 @@
   margin-bottom: 16px;
   color: var(--si-accent);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
 .heading {
   max-width: 790px;
   font-size: clamp(30px, 3.4vw, 44px);
-  font-weight: 700;
+  font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.035em;
   text-wrap: balance;
@@ -204,7 +205,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 30px;
-  border-radius: 18px;
+  border-radius: 16px;
   background: var(--si-surface);
   border: 1px solid var(--si-border);
 }
@@ -216,7 +217,7 @@
 }
 .card h3 {
   font-size: 22px;
-  font-weight: 650;
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .card p {
@@ -263,11 +264,11 @@
   border-radius: 10px;
   font-size: 13px;
   color: var(--si-accent);
-  font-weight: 650;
+  font-weight: 500;
 }
 .steps h3 {
   font-size: 18px;
-  font-weight: 650;
+  font-weight: 500;
 }
 .steps p {
   margin-top: 8px;
@@ -285,12 +286,12 @@
 .costs {
   background: var(--si-surface);
   border: 1px solid var(--si-border);
-  border-radius: 18px;
+  border-radius: 16px;
   padding: 30px;
 }
 .costs h3 {
   font-size: 20px;
-  font-weight: 650;
+  font-weight: 500;
   margin-bottom: 24px;
 }
 .costs dl {
@@ -358,7 +359,7 @@
 }
 .readingPath h3 {
   font-size: 22px;
-  font-weight: 650;
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .readingPath p {
@@ -413,7 +414,7 @@
 }
 .contact {
   padding: 36px;
-  border-radius: 18px;
+  border-radius: 16px;
   border: 1px solid var(--si-border);
   background: var(--si-surface);
 }

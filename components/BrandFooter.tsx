@@ -31,6 +31,7 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         <nav aria-label="Help and company">
           <h2>Here to help</h2>
           <Link href={`${mainSite}/contact-us`}>Contact us</Link>
+          <Link href={`${mainSite}/install`}>Install Sure Imports</Link>
           <Link href={`${mainSite}/track`}>Track a shipment</Link>
           <Link href={`${mainSite}/shipping-rate`}>Shipping rates</Link>
           <Link href={`${mainSite}/about`}>About Sure Imports</Link>

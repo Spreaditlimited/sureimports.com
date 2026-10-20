@@ -40,10 +40,12 @@ const RadTextArea: React.FC<Props> = ({
     <>
       {/* TEXT AREA INPUT */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-slate-400">
+        <label htmlFor={id} className="block text-sm font-medium text-slate-400">
           {label}
         </label>
         <textarea
+          aria-invalid={Boolean(errorx)}
+          aria-describedby={errorx ? `${id}-error` : undefined}
           id={id}
           name={name}
           rows={rows}
@@ -55,7 +57,7 @@ const RadTextArea: React.FC<Props> = ({
           className="max-sm:w-340px flex min-h-[80px] w-full rounded-md border border-input bg-background bg-slate-200 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-slate-800 lg:h-32 lg:w-full"
         />
         <p className="mt-3 text-sm leading-6 text-gray-600">{hint}</p>
-        <div id="answer-error" aria-live="polite" aria-atomic="true">
+        <div id={`${id}-error`} aria-live="polite" aria-atomic="true">
           <p className="mt-2 text-sm text-red-500">{errorx}</p>
         </div>
       </div>

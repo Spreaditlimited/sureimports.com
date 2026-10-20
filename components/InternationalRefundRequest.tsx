@@ -26,6 +26,8 @@ export default function InternationalRefundRequest({
   }, [open]);
   const [busy, setBusy] = useState(false);
   const [quote, setQuote] = useState<Quote | null>(null);
+  const [savedPayout, setSavedPayout] = useState<{ revision: number; method: string; summary: string } | null>(null);
+  const [useSaved, setUseSaved] = useState(false);
   const [token, setToken] = useState('');
   const [notice, setNotice] = useState('');
   const [success, setSuccess] = useState(false);
@@ -38,6 +40,7 @@ export default function InternationalRefundRequest({
     setBusy(true);
     setNotice('');
     setQuote(null);
+    setSavedPayout(null); setUseSaved(false);
     setSuccess(false);
     setOriginalPayment(null);
     try {
@@ -62,6 +65,8 @@ export default function InternationalRefundRequest({
         return;
       }
       if (data.message && !data.quote) { setNotice(data.message); setSuccess(true); return; }
+      setSavedPayout(data.savedPayout || null);
+      setUseSaved(Boolean(data.savedPayout));
       setQuote(data.quote);
       setToken(data.quoteToken);
     } catch {
@@ -113,6 +118,9 @@ export default function InternationalRefundRequest({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             quoteToken: token,
+            useSavedPayout: useSaved,
+            profileRevision: savedPayout?.revision,
+            confirmedOwnAccount: form.get('confirmedOwnAccount') === 'on',
             destination: {
               accountName: form.get('accountName'),
               bankName: form.get('bankName'),
@@ -200,7 +208,7 @@ export default function InternationalRefundRequest({
                 </strong>
               </p>
               <p>
-                Amount to your bank:{' '}
+                Amount to receive:{' '}
                 <strong>
                   {quote.settlementCurrency} {quote.settlementAmount}
                 </strong>
@@ -212,7 +220,8 @@ export default function InternationalRefundRequest({
                 This quote is valid for 30 minutes. The rate and amount are
                 locked when your request is accepted.
               </p>
-              <div className={styles.fields}>
+              {savedPayout && <label className={styles.confirm}><input type="checkbox" checked={useSaved} onChange={e => setUseSaved(e.target.checked)} />Use saved payout details: {savedPayout.summary}</label>}
+              {!useSaved && <div className={styles.fields}>
                 <label>
                   Account holder name
                   <input
@@ -264,19 +273,19 @@ export default function InternationalRefundRequest({
                     />
                   </label>
                 )}
-              </div>
+              </div>}
               <label className={styles.confirm}>
                 <input name="confirmedOwnAccount" type="checkbox" required />{' '}
                 This account is in my name and accepts{' '}
                 {quote.settlementCurrency} transfers.
               </label>
               <p>
-                Bank details are reviewed before payment. If your original
+                Payout details are reviewed before manual payment. If your original
                 payment needs to be returned through its payment provider, our
                 team will confirm this before settlement.
               </p>
               <button className={styles.trigger} disabled={busy} type="submit">
-                {busy ? 'Submitting…' : 'Request bank refund'}
+                {busy ? 'Submitting…' : useSaved && savedPayout?.method === 'PAYPAL_MANUAL' ? 'Request manual PayPal payout' : 'Request bank refund'}
               </button>
             </form>
           )}

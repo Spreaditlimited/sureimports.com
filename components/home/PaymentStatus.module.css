@@ -1,0 +1,6 @@
+.page.page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:48px 20px; background:var(--si-canvas); color:var(--si-ink); }
+.card.card { width:100%; max-width:512px; border:1px solid var(--si-border); border-radius:16px; padding:clamp(24px,5vw,40px); background:var(--si-surface); text-align:center; box-shadow:0 8px 24px rgb(0 0 0 / .04); }
+.card h1 { font-size:28px; font-weight:var(--si-headline-weight); letter-spacing:var(--si-headline-tracking); color:var(--si-ink); }
+.card > p { color:var(--si-muted); line-height:1.7; }
+.card a { min-height:48px; align-items:center; justify-content:center; border-radius:10px; }
+.card a:only-of-type { background:var(--si-primary); color:var(--si-on-primary); }

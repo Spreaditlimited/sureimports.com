@@ -41,7 +41,7 @@ const RadText: React.FC<Props> = ({
     <>
       {/* TEXT INPUT */}
       <div className="">
-        <label className="block text-sm font-medium text-slate-400">
+        <label htmlFor={id} className="block text-sm font-medium text-slate-400">
           {label}
         </label>
         <div className="relative">
@@ -51,6 +51,8 @@ const RadText: React.FC<Props> = ({
           <input
             type="text"
             name={name}
+            aria-invalid={Boolean(errorx)}
+            aria-describedby={errorx ? `${id}-error` : undefined}
             id={id}
             defaultValue={defaultValue}
             autoComplete={autoComplete}
@@ -64,7 +66,7 @@ const RadText: React.FC<Props> = ({
             {...props}
           />
         </div>
-        <div id="question-error" aria-live="polite" aria-atomic="true">
+        <div id={`${id}-error`} aria-live="polite" aria-atomic="true">
           <p className="mt-2 text-sm text-red-500">{errorx}</p>
         </div>
       </div>

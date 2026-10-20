@@ -11,7 +11,11 @@ import {
 } from '@/components/ui/dialog';
 
 import React, { useState } from 'react';
-import CreateOrderForm from './create-order-form';
+import dynamic from 'next/dynamic';
+
+const CreateOrderForm = dynamic(() => import('./create-order-form'), {
+  loading: () => <p role="status" className="p-6 text-sm">Loading order options…</p>,
+});
 import styles from './create-order.module.css';
 import { PackagePlus, X } from 'lucide-react';
 
@@ -50,7 +54,7 @@ function CreateOrder({ className, renderForm }: CreateOrderProps) {
           </DialogClose>
         </div>
         <div className={styles.body}>
-          {renderForm ? renderForm(() => handleOpenChange(false)) : <CreateOrderForm setIsOpen={setIsOpen} />}
+          {isOpen.isOpen && (renderForm ? renderForm(() => handleOpenChange(false)) : <CreateOrderForm setIsOpen={setIsOpen} />)}
         </div>
       </DialogContent>
     </Dialog>

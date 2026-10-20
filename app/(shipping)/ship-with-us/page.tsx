@@ -1,17 +1,15 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
-  ArrowRight,
   BadgeCheck,
   CheckCircle2,
   ChevronDown,
   ClipboardCheck,
   CreditCard,
   FileSearch,
-  Globe2,
   PackageCheck,
   Route,
   ShieldCheck,
@@ -20,16 +18,14 @@ import {
   Truck,
   Warehouse,
   Weight,
-  Info,
   Lock,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from 'lucide-react';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import PublicShippingOnlyFlow from './components/PublicShippingOnlyFlow';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import { LINESCOUT_BULK_SOURCING_URL } from '@/lib/linescoutLinks';
 
 const baseUrl = 'https://www.sureimports.com';
@@ -221,69 +217,72 @@ const inlineLinkClass =
 
 export default function ShipWithUsPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#fcfcfd] text-slate-950 dark:bg-slate-950 dark:text-white selection:bg-brand-orange-500/30">
+    <div className="flex min-h-screen flex-col bg-[var(--si-surface)] text-slate-950 selection:bg-brand-orange-500/30 dark:text-white">
       <JsonLdScript data={[serviceSchema, faqSchema]} />
       <Navbar />
-      <main className="flex-1">
-        
+      <main className={pageStyles.page} data-si-page-theme="service">
         {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
-          <PublicHeroBackground />
-          <div className="absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px] pointer-events-none" />
-          
-          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center">
-<HeroPill className="mb-6">
-                <Ship className="h-4 w-4" />
-                Shipping-only logistics
-              </HeroPill>
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight sm:text-6xl md:text-7xl">
-                Ship goods from China to Nigeria <span className="text-white">after buying</span>
-              </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-                Already bought goods from 1688, Alibaba, Taobao or a private Chinese supplier? Send them to our China warehouse and let Sure Imports handle shipping, consolidation, and delivery.
-              </p>
-              
-              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-                <a
-                  href="#start-shipment"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white transition-all hover:bg-brand-orange-600 hover:scale-[1.02] shadow-[0_0_30px_rgba(249,115,22,0.3)]"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start Shipment Request <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </a>
-                <Link
-                  href="/tools/air-vs-sea-calculator"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:bg-white/10 hover:border-white/30"
-                >
-                  Compare Air vs Sea
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ServiceHero
+          eyebrow="Shipping & consolidation"
+          title="Your goods. Our route from China."
+          description="Already bought goods from a Chinese website or supplier? Arrange warehouse intake, consolidation and delivery to Nigeria."
+          summaryTitle="From supplier to destination."
+          primary={{ href: '#start-shipment', label: 'Start a shipment' }}
+          secondary={{
+            href: '/tools/air-vs-sea-calculator',
+            label: 'Compare air and sea',
+          }}
+          steps={[
+            {
+              title: 'Tell us what you’re shipping',
+              description:
+                'Share your goods, quantities and shipping requirements.',
+            },
+            {
+              title: 'Send goods to our warehouse',
+              description:
+                'We coordinate intake and consolidation in Guangzhou.',
+            },
+            {
+              title: 'Confirm your shipment',
+              description:
+                'Review the measured weight and shipping cost before dispatch.',
+            },
+          ]}
+        />
 
         {/* --- WHY USE THIS SERVICE --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mb-16">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <div className="mb-16 max-w-3xl">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 For self-procured goods
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Use Ship With Us when sourcing is already handled.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Ship With Us is for importers who already have goods with a Chinese supplier and need the logistics handled properly. It is not a product sourcing request, and it is not a shopping service. Your supplier sends the goods to our China warehouse, then we help move the shipment.
+                Ship With Us is for importers who already have goods with a
+                Chinese supplier and need the logistics handled properly. It is
+                not a product sourcing request, and it is not a shopping
+                service. Your supplier sends the goods to our China warehouse,
+                then we help move the shipment.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                If you still need Sure Imports to buy from a Chinese website, use{' '}
-                <Link href="/buy-from-chinese-websites" className={inlineLinkClass}>
+                If you still need Sure Imports to buy from a Chinese website,
+                use{' '}
+                <Link
+                  href="/buy-from-chinese-websites"
+                  className={inlineLinkClass}
+                >
                   Buy From Chinese Websites
                 </Link>
-                . If you still need a supplier for white-label products, wholesale stock or machines, use{' '}
-                <Link href={LINESCOUT_BULK_SOURCING_URL} className={inlineLinkClass}>
+                . If you still need a supplier for white-label products,
+                wholesale stock or machines, use{' '}
+                <Link
+                  href={LINESCOUT_BULK_SOURCING_URL}
+                  className={inlineLinkClass}
+                >
                   LineScout
                 </Link>
                 . If you need payment support, use{' '}
@@ -296,12 +295,17 @@ export default function ShipWithUsPage() {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {bestFor.map((item) => (
-                <div key={item} className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 hover:-translate-y-1">
+                <div
+                  key={item}
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6 shadow-sm transition-all hover:shadow-none dark:border-slate-800"
+                >
                   <div className="flex items-start gap-4">
-                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500">
-                        <CheckCircle2 className="h-5 w-5" />
-                     </div>
-                     <p className="text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300 pt-2">{item}</p>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
+                      <CheckCircle2 className="h-5 w-5" />
+                    </div>
+                    <p className="pt-2 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                      {item}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -310,31 +314,41 @@ export default function ShipWithUsPage() {
         </section>
 
         {/* --- WORKFLOW TIMELINE --- */}
-        <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
+        <section className="border-y border-slate-200 bg-[var(--si-surface)] py-20 dark:border-slate-800 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="mb-16 max-w-3xl mx-auto text-center">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+            <div className="mx-auto mb-16 max-w-3xl text-center">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Shipping workflow
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl leading-tight">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                 From supplier dispatch to delivery support.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Good shipping starts before the supplier dispatches. The shipment name, tracking details, product category and weight estimate help prevent warehouse matching problems and routing delays.
+                Good shipping starts before the supplier dispatches. The
+                shipment name, tracking details, product category and weight
+                estimate help prevent warehouse matching problems and routing
+                delays.
               </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
               {workflow.map((step, index) => (
-                <div key={step.title} className="relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-950/60">
-                  <span className="absolute right-4 top-2 text-5xl font-black text-slate-100 dark:text-white/[0.03] pointer-events-none">
+                <div
+                  key={step.title}
+                  className="relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-6 shadow-sm transition-all hover:shadow-md dark:border-slate-800"
+                >
+                  <span className="pointer-events-none absolute right-4 top-2 text-5xl font-medium text-slate-100 dark:text-white/[0.03]">
                     {index + 1}
                   </span>
                   <div className="relative mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                     <step.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="relative text-base font-black text-slate-950 dark:text-white">{step.title}</h3>
-                  <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{step.text}</p>
+                  <h3 className="relative text-base font-medium text-slate-950 dark:text-white">
+                    {step.title}
+                  </h3>
+                  <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    {step.text}
+                  </p>
                 </div>
               ))}
             </div>
@@ -344,115 +358,132 @@ export default function ShipWithUsPage() {
         {/* --- CHECKS & PLANNING BENTO --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-            
             {/* Checklist Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 dark:bg-slate-800 text-brand-orange-500 mb-6">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-slate-800">
                   <FileSearch className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Details to confirm before shipping.
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  The most common shipping problems start with unclear shipment identity. Confirm the basics before goods leave your supplier.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  The most common shipping problems start with unclear shipment
+                  identity. Confirm the basics before goods leave your supplier.
                 </p>
               </div>
               <ul className="space-y-4">
                 {checks.map((check) => (
-                  <li key={check} className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50">
+                  <li
+                    key={check}
+                    className="flex items-start gap-3 rounded-xl border border-slate-100 p-4 dark:border-slate-800 dark:bg-slate-950/50"
+                  >
                     <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{check}</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      {check}
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
 
             {/* Warnings Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white dark:bg-slate-900 text-brand-orange-500 mb-6 border border-slate-200 dark:border-slate-700">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-[var(--si-surface)] text-brand-orange-500 dark:border-slate-700">
                   <Weight className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Weight, category and route affect the final process.
                 </h2>
-                <p className="mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400 mb-8">
-                  Goods with batteries, liquids, powders, fragile parts or unusually large dimensions may require extra handling. Clear notes help avoid delayed warehouse decisions.
+                <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Goods with batteries, liquids, powders, fragile parts or
+                  unusually large dimensions may require extra handling. Clear
+                  notes help avoid delayed warehouse decisions.
                 </p>
               </div>
-              
+
               <div className="space-y-6">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  {['Batteries included', 'Liquids or Creams', 'Powders', 'Fragile goods'].map((item) => (
-                    <div key={item} className="rounded-xl border border-slate-200 bg-white p-4 text-sm font-bold text-center text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+                  {[
+                    'Batteries included',
+                    'Liquids or Creams',
+                    'Powders',
+                    'Fragile goods',
+                  ].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-xl border border-slate-200 bg-[var(--si-surface)] p-4 text-center text-sm font-medium text-slate-700 dark:border-slate-700 dark:text-slate-300"
+                    >
                       {item}
                     </div>
                   ))}
                 </div>
                 <Link
                   href="/tools/air-vs-sea-calculator"
-                  className="inline-flex h-14 w-full items-center justify-center rounded-2xl bg-slate-950 px-6 text-sm font-bold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+                  className="inline-flex h-14 w-full items-center justify-center rounded-2xl bg-[#15171c] px-6 text-sm font-medium text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
                 >
                   Estimate Air vs Sea Route
                 </Link>
               </div>
             </div>
-
           </div>
         </section>
 
         {/* --- APP-LIKE ORDER FORM WIDGET --- */}
         <section
           id="start-shipment"
-          className="relative overflow-hidden border-y border-slate-200 bg-slate-50 py-24 dark:border-slate-800 dark:bg-[#080b14]"
+          className="relative overflow-hidden border-y border-slate-200 bg-[var(--si-surface)] py-24 dark:border-slate-800"
         >
           {/* Subtle Grid Background */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-          <div className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[120px] pointer-events-none" />
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[120px]" />
 
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-               <div>
-                 <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
-                    <LinkIcon className="h-4 w-4" />
-                    Logistics Portal
-                 </div>
-                 <h2 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                   Submit your shipping request.
-                 </h2>
-                 <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                   Add your contact details, shipment name, destination, estimated weight and shipment notes. If you already have supplier tracking, include it now.
-                 </p>
-               </div>
+              <div>
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
+                  <LinkIcon className="h-4 w-4" />
+                  Logistics Portal
+                </div>
+                <h2 className="max-w-3xl text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
+                  Submit your shipping request.
+                </h2>
+                <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                  Add your contact details, shipment name, destination,
+                  estimated weight and shipment notes. If you already have
+                  supplier tracking, include it now.
+                </p>
+              </div>
 
-               <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                      <Lock className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-black text-slate-950 dark:text-white">
-                        Secure shipment handoff
-                      </p>
-                      <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                        Your request creates a dashboard shipment record before payment and delivery updates.
-                      </p>
-                    </div>
+              <div className="rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-5 shadow-sm dark:border-slate-800 sm:p-6">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
+                    <Lock className="h-5 w-5" />
                   </div>
-               </div>
+                  <div>
+                    <p className="text-sm font-medium text-slate-950 dark:text-white">
+                      Secure shipment handoff
+                    </p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      Your request creates a dashboard shipment record before
+                      payment and delivery updates.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Secure App Wrapper */}
-            <div className="mx-auto overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/80 shadow-2xl shadow-slate-200/60 backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/60 dark:shadow-none">
-              <div className="border-b border-slate-200/80 bg-slate-100/60 px-5 py-4 dark:border-slate-800/50 dark:bg-slate-950/50 sm:px-8">
+            <div className="mx-auto overflow-hidden rounded-2xl border border-slate-200/80 bg-[var(--si-surface)] shadow-none backdrop-blur-xl dark:border-slate-700/50 dark:shadow-none">
+              <div className="border-b border-slate-200/80 bg-[var(--si-surface)] px-5 py-4 dark:border-slate-800/50 sm:px-8">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-2">
                     <span className="h-3 w-3 rounded-full bg-red-300 dark:bg-red-500/70" />
                     <span className="h-3 w-3 rounded-full bg-amber-300 dark:bg-amber-500/70" />
                     <span className="h-3 w-3 rounded-full bg-emerald-300 dark:bg-emerald-500/70" />
                   </div>
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-white/90 px-4 py-1.5 text-xs font-mono font-medium text-slate-500 shadow-sm dark:bg-slate-800/80 dark:text-slate-400">
+                  <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-[var(--si-surface)] px-4 py-1.5 font-mono text-xs font-medium text-slate-500 shadow-sm dark:text-slate-400">
                     <Lock className="h-3 w-3 shrink-0 text-emerald-500" />
                     <span className="truncate">my.sureimports.com/ship</span>
                   </div>
@@ -464,12 +495,21 @@ export default function ShipWithUsPage() {
                   <PublicShippingOnlyFlow />
                 </Suspense>
               </div>
-              
-              <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
-                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center gap-2"><Warehouse className="h-4 w-4 text-emerald-500"/> China Warehouse Intake</span>
-                  <span className="flex items-center gap-2"><PackageCheck className="h-4 w-4 text-blue-500"/> Optional Verification</span>
-                  <span className="flex items-center gap-2"><Route className="h-4 w-4 text-brand-orange-500"/> Global Routing</span>
+
+              <div className="border-t border-slate-200/80 bg-[var(--si-surface)] px-6 py-4 dark:border-slate-800/50">
+                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  <span className="flex items-center gap-2">
+                    <Warehouse className="h-4 w-4 text-emerald-500" /> China
+                    Warehouse Intake
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <PackageCheck className="h-4 w-4 text-blue-500" /> Optional
+                    Verification
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <Route className="h-4 w-4 text-brand-orange-500" /> Global
+                    Routing
+                  </span>
                 </div>
               </div>
             </div>
@@ -477,17 +517,19 @@ export default function ShipWithUsPage() {
         </section>
 
         {/* --- RELATED SERVICES --- */}
-        <section className="bg-slate-950 py-20 text-white md:py-28">
+        <section className="si-dark-surface bg-[#15171c] py-20 text-white md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 max-w-3xl">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-400">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-400">
                 Related services
               </span>
-              <h2 className="mt-4 text-3xl font-black tracking-tight md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
                 Choose the right Sure Imports route.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-400">
-                Ship With Us is best when the goods are already purchased. Use a different route if you still need help buying, sourcing, paying a supplier or choosing ready products.
+                Ship With Us is best when the goods are already purchased. Use a
+                different route if you still need help buying, sourcing, paying
+                a supplier or choosing ready products.
               </p>
             </div>
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -495,13 +537,15 @@ export default function ShipWithUsPage() {
                 <Link
                   key={item.title}
                   href={item.href}
-                  className="group rounded-3xl border border-white/10 bg-white/[0.04] p-6 transition hover:border-brand-orange-500/50 hover:bg-white/[0.08]"
+                  className="group rounded-2xl border border-white/10 bg-white/[0.04] p-6 transition hover:border-brand-orange-500/50 hover:bg-white/[0.08]"
                 >
-                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-brand-orange-300 group-hover:bg-brand-orange-500 group-hover:text-white">
+                  <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--si-surface)] text-brand-orange-300 group-hover:bg-brand-orange-500 group-hover:text-white">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-lg font-black">{item.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-400">{item.text}</p>
+                  <h3 className="text-lg font-medium">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-slate-400">
+                    {item.text}
+                  </p>
                 </Link>
               ))}
             </div>
@@ -511,18 +555,18 @@ export default function ShipWithUsPage() {
         {/* --- NATIVE ACCORDION FAQS --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="mb-12 text-center text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+            <h2 className="mb-12 text-center text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
               Ship With Us FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
                 <details
                   key={faq.question}
-                  className="group rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
+                  className="group rounded-2xl border border-slate-200 bg-[var(--si-surface)] shadow-sm dark:border-slate-800 [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold text-slate-950 dark:text-white outline-none transition hover:text-brand-orange-500 dark:hover:text-brand-orange-400">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
                     <span>{faq.question}</span>
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 transition group-open:rotate-180 dark:bg-slate-800">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--si-surface)] transition group-open:rotate-180">
                       <ChevronDown className="h-4 w-4 text-slate-500" />
                     </span>
                   </summary>

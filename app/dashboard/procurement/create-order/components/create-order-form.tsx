@@ -60,7 +60,7 @@ const orderCategoryArray = [
   { label: 'Goods with Battery', value: 'Goods with Battery' },
   { label: 'Raw Batteries', value: 'Raw Batteries' },
   { label: 'Liquids, Gases, Powder', value: 'Liquids, Gases, Powder' },
-  { label: 'Other Goods', value: 'Other Goods' },
+  { label: 'Non Battery/liquid', value: 'Other Goods' },
 ] as const;
 
 const formSchema = z.object({
@@ -86,11 +86,11 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   const router = useRouter();
   const navigateWithAlert = useNavigationWithAlert();
   const { user } = useAuth();
-  
-  const [pidUser] = useState(user?.pidUser);
+
+  const pidUser = user?.pidUser;
   const [emailUser] = useState(user?.userEmail);
   const [pidOrder] = useState('DR' + new Date().getTime().toString());
-  
+
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
   const [savedOrders, setSavedOrders] = useState<Array<{ pidOrder: string; orderName: string | null; productCount: number }>>([]);
@@ -189,7 +189,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
             </h3>
           </div>
         </div>
-        <p className={styles.savedDescription}>Add more products to your saved order to keep them in one shipment.</p>
+        <p className={styles.savedDescription}>Go to Saved Orders to open an order and choose what you want to do next.</p>
         <div className={styles.orderSummary}>
           <div className={styles.orderSummaryTop}>
             <p className={styles.orderName}>{first.orderName || 'Untitled order'}</p>
@@ -201,8 +201,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
           </p>
         </div>
         <div className={styles.savedActions}>
-          <Button type="button" onClick={() => router.push(`/dashboard/procurement/add-product/${first.pidOrder}`)} className={styles.primaryAction}>Continue saved order</Button>
-          <Button type="button" variant="outline" onClick={() => router.push('/dashboard/procurement/view-orders/saved')} className={styles.secondaryAction}>View or combine saved orders</Button>
+          <Button type="button" onClick={() => { setIsOpen({ isOpen: false }); router.push('/dashboard/procurement/view-orders/saved'); }} className={styles.primaryAction}>Continue with saved orders</Button>
         </div>
         <div className={styles.separate}>
           <p>Need a separate shipment?</p>
@@ -215,10 +214,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   return (
     <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-6 w-6 animate-spin text-blue-600" /></div>}>
       <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-        
+
         {/* Basic Info Section */}
         <div className="grid gap-6 md:grid-cols-2">
-          
+
           {/* Order Name */}
           <div className="space-y-3">
             <label htmlFor="orderName" className="flex h-8 items-center text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
@@ -362,7 +361,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
         {/* Logistics Section */}
         <div className="grid gap-6 md:grid-cols-2">
-          
+
           {/* Shipping Plan */}
           <div className="space-y-3 md:col-span-2">
             <label htmlFor="shippingPlan" className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">

@@ -1,3 +1,6 @@
+import { normalizeAccountCountry } from '@/lib/features/country';
+import { savedPayoutProfile } from '@/lib/payouts/saved-profile';
+import { maskedPayout } from '@/lib/payouts/profile';
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
@@ -96,7 +99,7 @@ export async function GET(_request: NextRequest, context: Context) {
       where: { pidUser },
       select: { userCountry: true, country: true },
     });
-    const country = String(user?.userCountry || user?.country || '').trim();
+    const country = String(user?.country || user?.userCountry || '').trim();
     if (!country)
       return NextResponse.json(
         {
@@ -122,7 +125,7 @@ export async function GET(_request: NextRequest, context: Context) {
       expiresIn: '30m',
     });
     return NextResponse.json(
-      { quote, quoteToken },
+      { quote, quoteToken, savedPayout: await savedPayoutProfile(pidUser).then(saved => saved ? { revision: saved.revision, method: saved.profile.method, summary: maskedPayout(saved.profile) } : null) },
       { headers: { 'Cache-Control': 'no-store' } },
     );
   } catch (error) {
@@ -163,7 +166,10 @@ export async function POST(request: NextRequest, context: Context) {
           'Your refund request has been received. It will return through PayPal, and we will notify you when it has been processed.',
       });
     }
-    const destination = destinationSchema.parse(body.destination);
+    const saved = body.useSavedPayout === true ? await savedPayoutProfile(pidUser) : null;
+    if (body.useSavedPayout === true && (!saved || body.profileRevision !== saved.revision || body.confirmedOwnAccount !== true)) throw Error('Saved payout details changed');
+    const destination = saved ? (saved.profile.method === 'PAYPAL_MANUAL' ? saved.profile : { ...saved.profile, bankCountry: 'GB' }) : destinationSchema.parse(body.destination);
+    const method = saved?.profile.method === 'PAYPAL_MANUAL' ? 'PAYPAL_MANUAL' : 'BANK';
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new Error('Unavailable');
     const quote = jwt.verify(body.quoteToken, secret, {
@@ -178,10 +184,10 @@ export async function POST(request: NextRequest, context: Context) {
     )
       throw new Error('Invalid quote');
     if (
-      quote.settlementCurrency === 'GBP' &&
-      (destination.bankCountry !== 'GB' ||
-        !/^\d{8}$/.test(destination.accountNumber) ||
-        !/^\d{6}$/.test(destination.bankCode.replace(/[- ]/g, '')))
+      method === 'BANK' && quote.settlementCurrency === 'GBP' &&
+      (!('bankCountry' in destination) || destination.bankCountry !== 'GB' ||
+        !('accountNumber' in destination) || !/^\d{8}$/.test(destination.accountNumber) ||
+        !('bankCode' in destination) || !/^\d{6}$/.test(destination.bankCode.replace(/[- ]/g, '')))
     )
       return NextResponse.json(
         {
@@ -192,6 +198,11 @@ export async function POST(request: NextRequest, context: Context) {
       );
     const ciphertext = protectRefundDestination(destination, refundId);
     await prisma.$transaction(async (tx) => {
+      if (saved) {
+        const [owner] = await tx.$queryRaw<{ country: string }[]>`SELECT country FROM users WHERE pidUser=${pidUser} FOR UPDATE`;
+        const [profile] = await tx.$queryRaw<{ revision: number; country: string }[]>`SELECT revision,country FROM customer_payout_profiles WHERE pidUser=${pidUser} FOR UPDATE`;
+        if (!profile || profile.revision !== saved.revision || profile.country !== saved.country || normalizeAccountCountry(owner?.country) !== saved.country) throw Error('Payout details changed');
+      }
       const [refund] = await tx.$queryRaw<
         { amount: string; currency: string; refundStatus: string }[]
       >`SELECT amount,currency,refundStatus FROM refund_records WHERE pidRefund=${refundId} AND pidUser=${pidUser} FOR UPDATE`;
@@ -202,7 +213,7 @@ export async function POST(request: NextRequest, context: Context) {
         Number(refund.amount).toFixed(2) !== quote.sourceAmount
       )
         throw new Error('Refund changed');
-      await tx.$executeRaw`INSERT INTO refund_settlements (refundId,pidUser,sourceCurrency,sourceAmount,settlementCurrency,settlementAmount,exchangeRate,method,destinationCiphertext) VALUES (${refundId},${pidUser},${quote.sourceCurrency},${quote.sourceAmount},${quote.settlementCurrency},${quote.settlementAmount},${quote.exchangeRate},'BANK',${ciphertext})`;
+      await tx.$executeRaw`INSERT INTO refund_settlements (refundId,pidUser,sourceCurrency,sourceAmount,settlementCurrency,settlementAmount,exchangeRate,method,destinationCiphertext) VALUES (${refundId},${pidUser},${quote.sourceCurrency},${quote.sourceAmount},${quote.settlementCurrency},${quote.settlementAmount},${quote.exchangeRate},${method},${ciphertext})`;
       await tx.refund_records.update({
         where: { pidRefund: refundId },
         data: { refundStatus: 'requested', updatedAt: new Date() },
@@ -210,7 +221,7 @@ export async function POST(request: NextRequest, context: Context) {
     });
     return NextResponse.json({
       message:
-        'Refund requested. Your bank details will be reviewed before payment. No transfer has been made yet.',
+        'Refund requested. Your payout details will be reviewed before manual payment. No transfer has been made yet.',
     });
   } catch (error) {
     const message =

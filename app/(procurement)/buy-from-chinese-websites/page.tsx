@@ -1,5 +1,5 @@
-import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import ServiceHero from '@/components/home/ServiceHero';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -11,19 +11,15 @@ import {
   FileSearch,
   Globe2,
   ShieldCheck,
-  ShoppingCart,
   Truck,
   ChevronDown,
   Info,
   CheckCircle2,
-  Link as LinkIcon,
-  Lock,
 } from 'lucide-react';
 import PublicOrderFlow from './components/PublicOrderFlow';
 import Header from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import YouTubeFrame from '@/components/uix/YouTubeFrame';
 import {
   LINESCOUT_BULK_SOURCING_URL,
@@ -32,10 +28,10 @@ import {
 
 const baseUrl = 'https://www.sureimports.com';
 const pageUrl = `${baseUrl}/buy-from-chinese-websites`;
-const explainerVideoId = 'HJVlH0XT0ok';
-const explainerVideoUrl = `https://www.youtube.com/watch?v=${explainerVideoId}`;
-const explainerPosterUrl = `https://i.ytimg.com/vi/${explainerVideoId}/maxresdefault.jpg`;
-const explainerEmbedUrl = `https://www.youtube-nocookie.com/embed/${explainerVideoId}`;
+import { procurementVideo } from '@/lib/website-videos/public';
+import { videoSchema } from '@/lib/website-videos/policy';
+
+export const revalidate = 60;
 
 const platforms = [
   '1688',
@@ -95,7 +91,7 @@ const checks = [
   'Supplier price, currency and product category',
   'Estimated unit weight and shipping method',
   'Battery, liquid, powder or restricted-item warning signs',
-  'Shipping plan, destination and delivery address',
+  'Destination, shipping method and shopping website',
   'Order record before payment and dashboard tracking',
 ];
 
@@ -113,7 +109,7 @@ const faqs = [
   {
     question: 'What details do I need before submitting an order?',
     answer:
-      'You should provide product name, link, unit price, estimated weight, quantity, variants or notes, destination country, shipping plan and delivery address.',
+      'Choose a destination, shipping method and shopping website, then add product links, names, unit prices, quantities and per-item weight or volume. You can add multiple products in one currency. Sign in when you are ready to save your order and add your delivery address.',
   },
   {
     question: 'Is this the same as Pay Supplier?',
@@ -159,18 +155,6 @@ const faqSchema = {
   })),
 };
 
-const videoSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'VideoObject',
-  name: 'How Buy From Chinese Websites Works at Sure Imports',
-  description:
-    'A guided walkthrough showing how to submit Chinese product links, create or access a Sure Imports account, and continue the saved order through the customer dashboard.',
-  thumbnailUrl: [explainerPosterUrl],
-  uploadDate: '2026-09-04T05:31:28-07:00',
-  duration: 'PT18M53S',
-  contentUrl: explainerVideoUrl,
-  embedUrl: explainerEmbedUrl,
-};
 
 const paySupplierHref = '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate';
 const inlineServiceLinkClass =
@@ -239,67 +223,53 @@ function renderFaqAnswer(question: string, answer: string) {
   return answer;
 }
 
-export default function BuyFromChineseWebsitesPage() {
+export default async function BuyFromChineseWebsitesPage() {
+  const video = await procurementVideo();
+  const currentVideoId = video.videoId;
+  const currentVideoSchema = videoSchema(video);
   return (
     <>
-      <JsonLdScript data={[serviceSchema, faqSchema, videoSchema]} />
+      <JsonLdScript data={[serviceSchema, faqSchema, currentVideoSchema]} />
       <Header />
-      <main className="min-h-screen bg-[#fcfcfd] text-slate-950 selection:bg-brand-orange-500/30 dark:bg-slate-950 dark:text-white">
+      <main className={pageStyles.page} data-si-page-theme="service">
         {/* --- HERO SECTION --- */}
-<section className={`${heroLayout.fixed} relative overflow-hidden bg-slate-950 pb-20 pt-36 text-white md:pb-28 md:pt-44`}>
-          <PublicHeroBackground />
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[1000px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[120px]" />
-
-          <div className="relative mx-auto flex max-w-[1440px] items-center justify-center px-4 text-center sm:px-6 lg:px-8">
-            <div className="mx-auto flex max-w-4xl flex-col items-center">
-<HeroPill className="mb-6">
-                <ShoppingCart className="h-4 w-4" />
-                Trusted China buying support
-              </HeroPill>
-
-              <h1 className="text-5xl font-black leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
-                Buy from Chinese websites with{' '}
-                <span className="text-white">confidence</span>
-              </h1>
-
-              <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-slate-300">
-                Paste links from 1688, Alibaba, Taobao, and Pinduoduo. We handle
-                the checkout, RMB supplier payments, shipping routes, and
-                door-to-door delivery.
-              </p>
-
-              <div className="mt-10 flex w-full flex-col justify-center gap-4 sm:w-auto sm:flex-row">
-                <a
-                  href="#start-order"
-                  className="group relative inline-flex h-14 items-center justify-center overflow-hidden rounded-full bg-brand-orange-500 px-8 text-base font-bold text-white shadow-[0_0_30px_rgba(249,115,22,0.3)] transition-all hover:scale-[1.02] hover:bg-brand-orange-600"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start Your Order{' '}
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </a>
-                <a
-                  href="#how-it-works"
-                  className="inline-flex h-14 items-center justify-center rounded-full border border-white/20 bg-white/5 px-8 text-base font-bold text-white backdrop-blur-md transition-all hover:border-white/30 hover:bg-white/10"
-                >
-                  Learn How it Works
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ServiceHero
+          eyebrow="Buying from China"
+          title="Buy from Chinese websites with confidence."
+          description="Paste product links from 1688, Taobao, Alibaba and other Chinese shops. Build one order, then let us handle purchasing and shipping."
+          summaryTitle="Many products. One order."
+          primary={{ href: '#start-order', label: 'Start your order' }}
+          secondary={{ href: '#how-it-works', label: 'See how it works' }}
+          steps={[
+            {
+              title: 'Choose your route',
+              description:
+                'Select your destination and an available shipping method.',
+            },
+            {
+              title: 'Add your products',
+              description:
+                'Choose a shop, paste links and add the details you have.',
+            },
+            {
+              title: 'Continue when you’re ready',
+              description:
+                'Your draft stays in this browser. Sign in to create your order.',
+            },
+          ]}
+        />
 
         {/* --- SUPPORTED PLATFORMS BAR --- */}
-        <section className="overflow-hidden bg-white py-8 dark:bg-slate-900/50">
+        <section className="overflow-hidden bg-[var(--si-surface)] py-8">
           <div className="mx-auto flex max-w-[1440px] flex-col items-center gap-6 px-4 text-center sm:px-6 lg:px-8">
-            <p className="shrink-0 text-xs font-black uppercase tracking-widest text-slate-400">
+            <p className="shrink-0 text-xs font-medium uppercase tracking-widest text-slate-400">
               Supported Websites:
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               {platforms.map((platform) => (
                 <span
                   key={platform}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-bold text-slate-700 transition-colors hover:border-brand-orange-400 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
+                  className="rounded-lg border border-slate-200 bg-[var(--si-surface)] px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-brand-orange-400 dark:border-slate-800 dark:text-slate-300"
                 >
                   {platform}
                 </span>
@@ -311,21 +281,22 @@ export default function BuyFromChineseWebsitesPage() {
         {/* --- VIDEO WALKTHROUGH --- */}
         <section
           id="how-it-works"
-          className="scroll-mt-24 overflow-hidden bg-white py-14 dark:bg-slate-950 md:py-20"
+          className="scroll-mt-24 overflow-hidden bg-[var(--si-surface)] py-14 md:py-20"
         >
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-6xl">
-              <h2 className="mb-6 text-center text-xs font-black uppercase tracking-[0.2em] text-brand-orange-400 sm:text-sm">
+              <h2 className="mb-6 text-center text-xs font-medium uppercase tracking-[0.2em] text-brand-orange-400 sm:text-sm">
                 Step by Step Video Guide
               </h2>
-              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-950/10 dark:border-slate-800 dark:bg-slate-900">
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] shadow-none dark:border-slate-800">
                 <YouTubeFrame
-                  videoId={explainerVideoId}
-                  title="How Buy From Chinese Websites works at Sure Imports"
-                  thumbnailQuality="maxresdefault"
+                  videoId={currentVideoId}
+                  title={video.title}
+                  thumbnailQuality="hqdefault"
                   loadImmediately
                 />
               </div>
+              <p className="mt-4 text-center"><Link href="/buy-from-chinese-websites/video" className="font-medium text-[var(--si-accent)] underline underline-offset-4">Watch the full buying guide</Link></p>
             </div>
           </div>
         </section>
@@ -334,14 +305,14 @@ export default function BuyFromChineseWebsitesPage() {
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mx-auto mb-16 max-w-3xl text-center">
-              <span className="text-xs font-black uppercase tracking-widest text-brand-orange-500">
+              <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Sourcing made clearer
               </span>
-              <h2 className="mt-4 text-3xl font-black leading-tight tracking-tight text-slate-950 dark:text-white md:text-5xl">
+              <h2 className="mt-4 text-3xl font-medium leading-tight tracking-tight text-slate-950 dark:text-white md:text-4xl">
                 Stop guessing your way through Chinese shopping websites.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Chinese websites have the best prices, but Nigerian buyers face
+                Chinese websites have the best prices, but non Chinese buyers face
                 language barriers, RMB payment blocks, and complex logistics. We
                 give you a structured way to submit order details, checkout, and
                 keep everything tied to a trackable record.
@@ -353,15 +324,15 @@ export default function BuyFromChineseWebsitesPage() {
               {process.map((item, index) => (
                 <div
                   key={item.title}
-                  className="group relative overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50"
+                  className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm transition-all hover:shadow-none dark:border-slate-800"
                 >
-                  <span className="pointer-events-none absolute -right-4 -top-4 text-8xl font-black text-slate-100 transition-transform group-hover:scale-110 dark:text-white/[0.02]">
+                  <span className="pointer-events-none absolute -right-4 -top-4 text-8xl font-medium text-slate-100 transition-transform group-hover:scale-110 dark:text-white/[0.02]">
                     {index + 1}
                   </span>
                   <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
                     <item.icon className="h-6 w-6" />
                   </div>
-                  <h3 className="relative text-xl font-bold text-slate-950 dark:text-white">
+                  <h3 className="relative text-xl font-medium text-slate-950 dark:text-white">
                     {item.title}
                   </h3>
                   <p className="relative mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
@@ -373,87 +344,17 @@ export default function BuyFromChineseWebsitesPage() {
           </div>
         </section>
 
-        {/* --- APP-LIKE ORDER FORM WIDGET --- */}
+        {/* Order builder */}
         <section
           id="start-order"
-          className="relative overflow-hidden border-y border-slate-200 bg-slate-50 py-24 dark:border-slate-800 dark:bg-[#080b14]"
+          className="relative overflow-hidden border-y border-slate-200 bg-[var(--si-canvas)] py-12 dark:border-slate-800 md:py-20"
         >
-          {/* Subtle Grid Background */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-brand-orange-500/5 blur-[120px]" />
-
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-              <div>
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-brand-orange-600 dark:text-brand-orange-400">
-                  <LinkIcon className="h-4 w-4" />
-                  Secure Submission Portal
-                </div>
-                <h2 className="max-w-3xl text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
-                  Paste your product links here.
-                </h2>
-                <p className="mt-4 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                  Drop your links from 1688, Alibaba, or Taobao below. We'll
-                  verify the products, calculate shipping, and handle the RMB
-                  payments.
-                </p>
-              </div>
-
-              <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/70 sm:p-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    <Lock className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-black text-slate-950 dark:text-white">
-                      Secure checkout handoff
-                    </p>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                      Your submitted links move into a dashboard order record
-                      before payment.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Secure App Wrapper */}
-            <div className="mx-auto overflow-hidden rounded-[2rem] border border-slate-200/80 bg-white/80 shadow-2xl shadow-slate-200/60 backdrop-blur-xl dark:border-slate-700/50 dark:bg-slate-900/60 dark:shadow-none">
-              <div className="border-b border-slate-200/80 bg-slate-100/60 px-5 py-4 dark:border-slate-800/50 dark:bg-slate-950/50 sm:px-8">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-3 w-3 rounded-full bg-red-300 dark:bg-red-500/70" />
-                    <span className="h-3 w-3 rounded-full bg-amber-300 dark:bg-amber-500/70" />
-                    <span className="h-3 w-3 rounded-full bg-emerald-300 dark:bg-emerald-500/70" />
-                  </div>
-                  <div className="inline-flex max-w-full items-center gap-2 rounded-lg bg-white/90 px-4 py-1.5 font-mono text-xs font-medium text-slate-500 shadow-sm dark:bg-slate-800/80 dark:text-slate-400">
-                    <Lock className="h-3 w-3 shrink-0 text-emerald-500" />
-                    <span className="truncate">my.sureimports.com/order</span>
-                  </div>
-                </div>
-              </div>
-
+            <div className={pageStyles.formFrame}>
               <div className="p-4 sm:p-6 lg:p-8">
                 <Suspense fallback={null}>
                   <PublicOrderFlow />
                 </Suspense>
-              </div>
-
-              <div className="border-t border-slate-200/80 bg-slate-50/70 px-6 py-4 dark:border-slate-800/50 dark:bg-slate-950/50">
-                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                  <span className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4 text-emerald-500" />{' '}
-                    Verified Suppliers
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4 text-blue-500" /> Secure NGN
-                    Payment
-                  </span>
-                  <span className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-brand-orange-500" />{' '}
-                    End-to-End Tracking
-                  </span>
-                </div>
               </div>
             </div>
           </div>
@@ -463,12 +364,12 @@ export default function BuyFromChineseWebsitesPage() {
         <section className="py-20 md:py-28">
           <div className="mx-auto grid max-w-[1440px] gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
             {/* Checklist Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
                 <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-slate-800">
                   <ShieldCheck className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   What to confirm before submitting
                 </h2>
                 <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -493,12 +394,12 @@ export default function BuyFromChineseWebsitesPage() {
             </div>
 
             {/* Use Cases Box */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-slate-200 bg-slate-50 p-8 shadow-sm dark:border-slate-800 dark:bg-slate-800/30 md:p-12">
+            <div className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-[var(--si-surface)] p-8 shadow-sm dark:border-slate-800 md:p-12">
               <div>
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white text-brand-orange-500 dark:border-slate-700 dark:bg-slate-900">
+                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-[var(--si-surface)] text-brand-orange-500 dark:border-slate-700">
                   <ClipboardCheck className="h-6 w-6" />
                 </div>
-                <h2 className="text-3xl font-black tracking-tight text-slate-950 dark:text-white">
+                <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white">
                   Best use cases for this service
                 </h2>
                 <p className="mb-8 mt-4 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -518,9 +419,9 @@ export default function BuyFromChineseWebsitesPage() {
                 {useCases.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                    className="rounded-xl border border-slate-200 bg-[var(--si-surface)] p-5 shadow-sm dark:border-slate-700"
                   >
-                    <h3 className="mb-2 text-sm font-bold text-slate-950 dark:text-white">
+                    <h3 className="mb-2 text-sm font-medium text-slate-950 dark:text-white">
                       {item.title === 'Phones, laptops and gadgets' ? (
                         <Link
                           href="/shop"
@@ -557,16 +458,16 @@ export default function BuyFromChineseWebsitesPage() {
         </section>
 
         {/* --- EDUCATION & BLOG LINKS --- */}
-        <section className="relative overflow-hidden bg-slate-950 py-20 text-white md:py-28">
+        <section className="si-dark-surface relative overflow-hidden bg-[#15171c] py-20 text-white md:py-28">
           <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 bg-brand-orange-500/20 blur-[100px]" />
 
           <div className="relative mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
               <div>
-                <span className="mb-4 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-orange-500">
+                <span className="mb-4 flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                   <Info className="h-4 w-4" /> Buyer Education
                 </span>
-                <h2 className="text-3xl font-black leading-tight tracking-tight md:text-5xl">
+                <h2 className="text-3xl font-medium leading-tight tracking-tight md:text-4xl">
                   1688, Alibaba and Taobao are not the same experience.
                 </h2>
                 <div className="mt-6 space-y-6 text-lg leading-relaxed text-slate-400">
@@ -584,9 +485,9 @@ export default function BuyFromChineseWebsitesPage() {
                 </div>
               </div>
 
-              <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 backdrop-blur-sm md:p-10">
+              <div className="rounded-2xl border border-white/10 bg-[var(--si-surface)] p-8 backdrop-blur-sm md:p-10">
                 <BadgeCheck className="mb-6 h-10 w-10 text-brand-orange-400" />
-                <h3 className="mb-6 text-2xl font-black">
+                <h3 className="mb-6 text-2xl font-medium">
                   Useful guides before you buy
                 </h3>
                 <div className="grid gap-4">
@@ -615,9 +516,9 @@ export default function BuyFromChineseWebsitesPage() {
                     <Link
                       key={href}
                       href={href}
-                      className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/5 p-4 transition hover:border-brand-orange-500/50 hover:bg-white/10"
+                      className="group flex items-center justify-between rounded-xl border border-white/10 bg-[var(--si-surface)] p-4 transition hover:border-brand-orange-500/50 hover:bg-white/10"
                     >
-                      <span className="font-bold text-slate-200 transition-colors group-hover:text-brand-orange-300">
+                      <span className="font-medium text-slate-200 transition-colors group-hover:text-brand-orange-300">
                         {title}
                       </span>
                       <ArrowRight className="h-4 w-4 text-slate-500 transition-transform group-hover:translate-x-1 group-hover:text-brand-orange-400" />
@@ -632,18 +533,18 @@ export default function BuyFromChineseWebsitesPage() {
         {/* --- NATIVE ACCORDION FAQS --- */}
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-            <h2 className="mb-12 text-center text-3xl font-black tracking-tight text-slate-950 dark:text-white md:text-5xl">
+            <h2 className="mb-12 text-center text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-4xl">
               Buying from China FAQs
             </h2>
             <div className="space-y-4">
               {faqs.map((faq) => (
                 <details
                   key={faq.question}
-                  className="group rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
+                  className="group rounded-2xl border border-slate-200 bg-[var(--si-surface)] shadow-sm dark:border-slate-800 [&_summary::-webkit-details-marker]:hidden"
                 >
-                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-bold text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
+                  <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
                     <span>{renderFaqQuestion(faq.question)}</span>
-                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 transition group-open:rotate-180 dark:bg-slate-800">
+                    <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--si-surface)] transition group-open:rotate-180">
                       <ChevronDown className="h-4 w-4 text-slate-500" />
                     </span>
                   </summary>

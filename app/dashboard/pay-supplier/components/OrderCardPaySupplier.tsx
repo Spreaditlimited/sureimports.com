@@ -171,7 +171,7 @@ const OrderCard: React.FC<ProductsProps> = ({
   const navigateWithAlert = useNavigationWithAlert();
   const { user, logout } = useAuth(); //DATA FROM SESSION
   //const [userData, setUserData] = useState<userData>(); //DATA FROM API CALL
-  const [pidUserx, setPidUser] = useState(user?.pidUser);
+  const pidUserx = user?.pidUser;
   const { isModalOpen, openModal, closeModal } = useModal();
 
   const handleCurrencyChange = (

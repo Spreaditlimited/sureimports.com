@@ -63,8 +63,8 @@ interface PaystackBank {
 export default function UpdateBankDetailsFrom() {
   const { user } = useAuth(); //DATA FROM SESSION
   const [userData, setUserData] = useState<userData>(); //DATA FROM API CALL
-  const [pidUser] = useState(user?.pidUser);
-  const [email] = useState(user?.userEmail);
+  const pidUser = user?.pidUser;
+  const email = user?.userEmail;
   //user bank details
   const [bank_name, setBankName] = useState('');
   const [bank_code, setBankCode] = useState('');
@@ -501,8 +501,8 @@ export default function UpdateBankDetailsFrom() {
                   <label className="mb-2 block text-sm font-medium text-gray-400">
                     Bank Account Number* (10 digits)
                   </label>
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <div className="relative min-w-0 flex-1">
                       <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-xl text-[#404040]">
                         <FileDigit className="text-gray-400" />
                       </span>
@@ -692,7 +692,7 @@ export default function UpdateBankDetailsFrom() {
               </div>
             </div>
 
-            <div className="flex justify-between gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:justify-between">
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/1 w-full p-2">
                   <Button

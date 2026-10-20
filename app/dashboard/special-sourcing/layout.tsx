@@ -22,11 +22,11 @@ function PaySupplier(props: UserLayoutProps) {
   const path = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black">
-      <div className="p-4 dark:bg-black">
+    <div className="si-workspace-plain">
+      <div className="mb-6">
         <div className="flex justify-between max-sm:flex-col">
           <div
-            className="text-[28px] font-bold text-slate-800 dark:text-slate-200 max-sm:pb-4"
+            className="text-[28px] font-semibold text-slate-800 dark:text-slate-200 max-sm:pb-4"
             onClick={() => {
               router.push('/dashboard/special-sourcing/create');
             }}

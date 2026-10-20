@@ -36,9 +36,9 @@ export default function ShopPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      {/* Deep Slate Hero Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+    <div className="si-workspace">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
             <div className="max-w-2xl">
@@ -51,7 +51,7 @@ export default function ShopPage() {
                 Sure Imports Shop
               </h1>
               <p className="mt-4 text-lg text-slate-400">
-                Premium authentic devices. Hand-selected, verified, and delivered directly to your door with full warranty protection.
+                Browse products, compare options and add items to your cart.
               </p>
 
               {/* Trust Indicators - Minimalist Row */}
@@ -71,33 +71,22 @@ export default function ShopPage() {
               </div>
             </div>
 
-            {/* Visual Categories Strip */}
-            <div className="hidden grid-cols-3 gap-3 sm:grid lg:grid-cols-5">
-              {[
-                { icon: Smartphone, label: 'Phones' },
-                { icon: Laptop, label: 'Laptops' },
-                { icon: Watch, label: 'Watches' },
-                { icon: Tablet, label: 'Tablets' },
-                { icon: Headphones, label: 'Audio' },
-              ].map((category, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border border-white/5 bg-white/5 p-4 text-slate-400 backdrop-blur-sm transition hover:bg-white/10 hover:text-white"
-                >
-                  <category.icon className="h-5 w-5" />
-                  <span className="text-[10px] font-bold uppercase tracking-wider">{category.label}</span>
-                </div>
-              ))}
-            </div>
+
           </div>
         </div>
       </div>
 
-      <main className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-        
-        {/* Overlapping Info Cards */}
+      <main className="si-workspace-body">
+
+        {/* Shop Component Wrapper */}
+        <div className="rounded-3xl">
+          <ShopComponent />
+        </div>
+        <details className="si-workspace-help">
+          <summary>Product condition and warranty</summary>
+
         <div className="mb-12 grid gap-6 md:grid-cols-2">
-          
+
           {/* Phones Policy */}
           <div className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900 sm:p-8">
             <div className="flex items-start gap-4">
@@ -127,13 +116,10 @@ export default function ShopPage() {
               </div>
             </div>
           </div>
-          
+
         </div>
 
-        {/* Shop Component Wrapper */}
-        <div className="rounded-3xl">
-          <ShopComponent />
-        </div>
+        </details>
       </main>
     </div>
   );

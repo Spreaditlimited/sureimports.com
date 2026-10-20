@@ -5,10 +5,12 @@ import { ExternalLink, Loader2 } from 'lucide-react';
 
 type ManagePaystackButtonProps = {
   className?: string;
+  provider?: 'PayPal' | 'Paystack';
 };
 
 export default function ManagePaystackButton({
   className = '',
+  provider = 'Paystack',
 }: ManagePaystackButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -61,7 +63,7 @@ export default function ManagePaystackButton({
         {isLoading ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Opening Paystack...
+            Opening {provider}...
           </>
         ) : (
           <>
@@ -77,7 +79,7 @@ export default function ManagePaystackButton({
       ) : null}
       {opened ? (
         <p className="w-full max-w-2xl rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold leading-relaxed text-emerald-700">
-          Paystack opened in a new tab. This dashboard will stay here so you can
+          {provider} opened in a new tab. This dashboard will stay here so you can
           return after managing your billing.
         </p>
       ) : null}

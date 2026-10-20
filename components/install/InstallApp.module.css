@@ -1,0 +1,18 @@
+.page { padding: 140px 20px 80px; background: var(--si-bg); color: var(--si-ink); }
+.card { max-width: 680px; margin: auto; text-align: center; }
+.icon { margin: 0 auto 24px; border-radius: 20px; border: 1px solid var(--si-border); }
+.eyebrow { color: var(--si-accent); font-size: 12px; font-weight: 600; letter-spacing: .1em; margin-bottom: 16px; }
+.card h1 { font-size: clamp(32px, 5vw, 52px); line-height: 1.12; letter-spacing: -.035em; font-weight: 750; text-wrap: balance; }
+.intro { max-width: 550px; margin: 20px auto 32px; font-size: 18px; line-height: 1.65; color: var(--si-muted); }
+.setup { padding: clamp(20px, 4vw, 32px); text-align: left; border: 1px solid var(--si-border); border-radius: 20px; background: var(--si-surface); }
+.setup h2 { display: flex; align-items: center; gap: 10px; font-size: 19px; font-weight: 600; margin-bottom: 18px; }
+.setup h2 svg { flex-shrink: 0; color: var(--si-accent); }
+.setup p, .setup li { font-size: 15px; line-height: 1.7; color: var(--si-muted); }
+.setup p + p { margin-top: 12px; }
+.setup ol { list-style: decimal; padding-left: 24px; }
+.setup li { padding-left: 4px; margin-bottom: 12px; }
+.action.action { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 48px; padding: 12px 20px; margin: 20px 0; border: 0; border-radius: 10px; background: var(--si-primary); color: var(--si-on-primary); font-size: 16px; font-weight: 600; }
+.action:disabled { opacity: .65; cursor: wait; }
+.note { margin: 24px auto 16px; font-size: 13px; line-height: 1.6; color: var(--si-muted); }
+.browser { display: inline-block; padding: 12px; color: var(--si-accent); font-weight: 600; font-size: 14px; }
+@media(max-width: 480px) { .page { padding: 112px 16px 48px; } }

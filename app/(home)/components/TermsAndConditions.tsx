@@ -1,8 +1,7 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import React, { useEffect, useState } from 'react';
 import {
   Scale,
@@ -84,11 +83,11 @@ export default function TermsAndConditions() {
   ];
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950">
-      
+    <div className={styles.page}>
+
       {/* Premium Page Header */}
-<div className={`${heroLayout.fixed} border-b border-slate-200 bg-slate-50 pt-48 pb-16 dark:border-slate-800 dark:bg-slate-900`}>
-        <PublicHeroBackground darkOnly priority={false} />
+<div className={styles.hero}>
+
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
 <HeroPill className="mb-6">
@@ -107,7 +106,7 @@ export default function TermsAndConditions() {
 
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
-          
+
           {/* LEFT: Sticky Table of Contents */}
           <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
             <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
@@ -138,7 +137,7 @@ export default function TermsAndConditions() {
 
           {/* RIGHT: Document Content */}
           <div className="flex-1 space-y-16 lg:max-w-3xl">
-            
+
             {/* Introduction */}
             <section id="introduction" className="scroll-mt-32">
               <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
@@ -147,7 +146,7 @@ export default function TermsAndConditions() {
               </h2>
               <div className="prose prose-slate dark:prose-invert max-w-none text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 <p>
-                  Welcome to Sure Importers Limited's website, sureimports.com. These terms and conditions ("Terms") govern your use of our website and services provided by Sure Importers Limited. 
+                  Welcome to Sure Importers Limited's website, sureimports.com. These terms and conditions ("Terms") govern your use of our website and services provided by Sure Importers Limited.
                 </p>
                 <p>
                   By accessing or using our website and services, you agree to be bound by these Terms. If you do not agree to these Terms, please refrain from using our website and services.
@@ -163,7 +162,7 @@ export default function TermsAndConditions() {
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 {definitions.map((item, idx) => (
-                  <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+                  <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-5  dark:border-slate-800 dark:bg-slate-900">
                     <h4 className="mb-2 font-bold text-indigo-900 dark:text-indigo-300">{item.term}</h4>
                     <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.def}</p>
                   </div>
@@ -286,8 +285,8 @@ export default function TermsAndConditions() {
                 <MapPin className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Contact Information
               </h2>
-              
-              <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+
+              <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900 sm:p-8">
                 <p className="mb-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                   If you have any questions or concerns about these Terms, please contact us at:
                 </p>
@@ -318,7 +317,7 @@ export default function TermsAndConditions() {
             </section>
 
             {/* Footer Agreement */}
-            <div className="mt-16 rounded-[24px] bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
+            <div className="mt-16 rounded-2xl bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
               <p className="text-sm font-medium leading-relaxed text-slate-300">
                 By using our website and services, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions.
               </p>

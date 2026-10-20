@@ -7,16 +7,18 @@ import { useRouter } from 'next/navigation';
 function Message() {
   const router = useRouter();
   return (
-    <div className="bg-slate-50 dark:bg-gray-800">
-      <div
-        className="pl-[25px] pt-[25px] text-[28px] font-bold text-slate-800 dark:text-slate-100"
+    <div className="si-workspace-plain">
+      <button
+        type="button"
+        className="mb-6 text-sm font-medium text-slate-600 dark:text-slate-300"
         onClick={() => {
           router.push(`/dashboard/message/message-box`);
         }}
       >
-        Message Box
-      </div>
-      <div className="m-4 rounded-xl bg-white dark:bg-[#161629]">
+        ← Message history
+      </button>
+      <h1 className="mb-6">Compose a message</h1>
+      <div className="rounded-xl bg-white dark:bg-[#161629]">
         <MessageForm />
       </div>
     </div>

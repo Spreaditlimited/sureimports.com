@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 function BuyPhone() {
   return (
-    <div className="bg-slate-50 px-4 py-[25px] text-slate-800 dark:bg-slate-900 dark:text-white">
+    <div className="si-workspace-plain">
       <div className="flex justify-between max-sm:flex-col">
         <div className="text-[28px] font-bold text-slate-800 dark:text-slate-200 max-sm:pb-4">
           Buy Phones

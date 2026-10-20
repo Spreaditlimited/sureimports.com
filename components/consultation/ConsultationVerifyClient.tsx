@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import styles from '@/components/home/PaymentStatus.module.css';
 import { AlertCircle, CheckCircle2, Loader2, XCircle } from 'lucide-react';
 
 type Status = 'loading' | 'success' | 'review' | 'error';
@@ -74,7 +75,7 @@ export default function ConsultationVerifyClient({
   }, [reference]);
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+    <div className={`${styles.card} mx-auto flex flex-col items-center`}>
       <div
         className={`flex h-16 w-16 items-center justify-center rounded-full ${
           status === 'success'
@@ -94,7 +95,7 @@ export default function ConsultationVerifyClient({
         {status === 'error' ? <XCircle className="h-8 w-8" /> : null}
       </div>
 
-      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-slate-950">
+      <h1 className="mt-6 text-3xl font-extrabold tracking-tight text-[var(--si-ink)]">
         {status === 'success'
           ? 'Consultation booked'
           : status === 'review'
@@ -103,12 +104,12 @@ export default function ConsultationVerifyClient({
               ? 'Could not finish booking'
               : 'Confirming booking'}
       </h1>
-      <p className="mt-3 text-sm leading-6 text-slate-600">{message}</p>
+      <p className="mt-3 text-sm leading-6 text-[var(--si-muted)]">{message}</p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
           href="/book-consultation"
-          className="inline-flex h-11 items-center justify-center rounded-xl border border-slate-200 px-5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+          className="inline-flex h-11 items-center justify-center rounded-xl border border-[var(--si-border)] px-5 text-sm font-bold text-[var(--si-ink)] transition hover:bg-[var(--si-surface-soft)]"
         >
           Back to booking
         </Link>

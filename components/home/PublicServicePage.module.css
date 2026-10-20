@@ -1,0 +1,21 @@
+.page.page {
+  background: var(--si-canvas);
+  color: var(--si-ink);
+  min-height: 100vh;
+}
+.page section[id] {
+  scroll-margin-top: 100px;
+}
+.page.page :is(h2, h3) {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.page.page h2 {
+  line-height: 1.2;
+}
+.formFrame {
+  border: 1px solid var(--si-border);
+  background: var(--si-surface);
+  border-radius: 16px;
+  overflow: hidden;
+}

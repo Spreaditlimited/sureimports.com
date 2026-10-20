@@ -1,16 +1,15 @@
 'use client';
 
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '../Tools.module.css';
 import { useMemo, useState } from 'react';
-import { 
-  Plane, 
-  Ship, 
-  AlertCircle, 
-  ArrowRightLeft, 
-  Zap, 
-  Clock, 
+import {
+  Plane,
+  Ship,
+  AlertCircle,
+  ArrowRightLeft,
+  Zap,
+  Clock,
   Calculator,
   ChevronRight,
   Info,
@@ -58,8 +57,8 @@ export default function AirVsSeaCalculator() {
     let recommendation = '';
     if (cheaper === 'equal') recommendation = 'Air and Sea are identical in cost based on your inputs.';
     if (cheaper === 'air') {
-      recommendation = urgent === 'yes' 
-        ? 'Air is cheaper and also faster. Air makes sense for this shipment.' 
+      recommendation = urgent === 'yes'
+        ? 'Air is cheaper and also faster. Air makes sense for this shipment.'
         : 'Air is cheaper based on cost. If you are not shipping very bulky cartons, air can make sense.';
     }
     if (cheaper === 'sea') {
@@ -75,34 +74,34 @@ export default function AirVsSeaCalculator() {
   }, [canCalc, air, sea, w, v, urgent]);
 
   return (
-    <main className="min-h-screen bg-[#fcfcfd] text-slate-600 dark:bg-slate-950 dark:text-slate-400 pb-24">
-<div className={`${heroLayout.fixed} max-w-[1440px] mx-auto px-4 pt-48 sm:px-6 lg:px-8`}>
-        
+    <main className={styles.page} data-si-page-theme="service">
+<div className={styles.container}>
+
         {/* Header Section */}
-        <header className="mb-12">
-        <PublicHeroBackground darkOnly priority={false} />
+        <header className={styles.header}>
+
 <HeroPill className="mb-6">
             <ArrowRightLeft className="w-3.5 h-3.5" />
             Logistics Tool
           </HeroPill>
-          <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-5xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6">
             Air vs Sea <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">Shipping Calculator</span>
           </h1>
           <p className="text-lg font-medium text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-            Compare estimated air and sea shipping costs to determine the most cost-effective 
+            Compare estimated air and sea shipping costs to determine the most cost-effective
             method for your inventory based on weight, volume, and urgency.
           </p>
         </header>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
+
           {/* Input Panel */}
           <section className="lg:col-span-7 space-y-6">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 sm:p-10 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-10  dark:border-slate-800 dark:bg-slate-900">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Weight (kg)</label>
-                  <input
+                  <label htmlFor="air-vs-sea-calculator-field-1" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Weight (kg)</label>
+                  <input id="air-vs-sea-calculator-field-1"
                     value={kg}
                     onChange={(e) => setKg(e.target.value)}
                     inputMode="decimal"
@@ -111,8 +110,8 @@ export default function AirVsSeaCalculator() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Volume (CBM)</label>
-                  <input
+                  <label htmlFor="air-vs-sea-calculator-field-2" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Total Volume (CBM)</label>
+                  <input id="air-vs-sea-calculator-field-2"
                     value={cbm}
                     onChange={(e) => setCbm(e.target.value)}
                     inputMode="decimal"
@@ -121,8 +120,8 @@ export default function AirVsSeaCalculator() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Air Rate ($/kg)</label>
-                  <input
+                  <label htmlFor="air-vs-sea-calculator-field-3" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Air Rate ($/kg)</label>
+                  <input id="air-vs-sea-calculator-field-3"
                     value={airRate}
                     onChange={(e) => setAirRate(e.target.value)}
                     inputMode="decimal"
@@ -130,8 +129,8 @@ export default function AirVsSeaCalculator() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sea Rate ($/CBM)</label>
-                  <input
+                  <label htmlFor="air-vs-sea-calculator-field-4" className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Sea Rate ($/CBM)</label>
+                  <input id="air-vs-sea-calculator-field-4"
                     value={seaRate}
                     onChange={(e) => setSeaRate(e.target.value)}
                     inputMode="decimal"
@@ -144,20 +143,22 @@ export default function AirVsSeaCalculator() {
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest ml-1">Is this shipment urgent?</label>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <button
+                    aria-pressed={urgent === 'no'}
                     onClick={() => setUrgent('no')}
                     className={`flex-1 py-4 rounded-xl font-bold text-sm transition-all border ${
-                      urgent === 'no' 
-                        ? 'bg-slate-900 border-slate-900 text-white shadow-lg dark:bg-slate-800 dark:border-slate-700' 
+                      urgent === 'no'
+                        ? 'bg-slate-900 border-slate-900 text-white  dark:bg-slate-800 dark:border-slate-700'
                         : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 dark:bg-transparent dark:border-slate-800 dark:hover:bg-slate-800/50'
                     }`}
                   >
                     <Clock className="w-4 h-4 inline mr-2" /> No, I can wait
                   </button>
                   <button
+                    aria-pressed={urgent === 'yes'}
                     onClick={() => setUrgent('yes')}
                     className={`flex-1 py-4 rounded-xl font-bold text-sm transition-all border ${
-                      urgent === 'yes' 
-                        ? 'bg-brand-orange-500 border-brand-orange-500 text-white shadow-lg shadow-brand-orange-500/20' 
+                      urgent === 'yes'
+                        ? 'bg-brand-orange-500 border-brand-orange-500 text-white  shadow-brand-orange-500/20'
                         : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50 dark:bg-transparent dark:border-slate-800 dark:hover:bg-slate-800/50'
                     }`}
                   >
@@ -182,7 +183,7 @@ export default function AirVsSeaCalculator() {
           {/* Results Side Panel */}
           <section className="lg:col-span-5 lg:sticky lg:top-8">
             {!result ? (
-              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-[32px] border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="h-full min-h-[400px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 p-8 text-center dark:border-slate-800 dark:bg-slate-900/50">
                 <Calculator className="w-12 h-12 mb-4 text-slate-300 dark:text-slate-600" />
                 <p className="font-bold text-slate-600 dark:text-slate-400">Ready to Compare</p>
                 <p className="text-sm font-medium mt-2 leading-relaxed text-slate-500 dark:text-slate-500">Enter weight, CBM, and both rates to see the <br/> estimated cost difference.</p>
@@ -190,19 +191,19 @@ export default function AirVsSeaCalculator() {
             ) : (
               <div className="space-y-4">
                 {/* Main Result Card */}
-                <div className="rounded-[32px] border border-slate-200 bg-white p-8 shadow-xl shadow-slate-200/40 relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8   relative overflow-hidden dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
                   <div className="absolute top-0 right-0 p-6">
                     {result.cheaper === 'air' ? <Plane className="w-12 h-12 text-indigo-500/10" /> : <Ship className="w-12 h-12 text-blue-500/10" />}
                   </div>
-                  
-                  <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-8">Estimated Costs</h3>
-                  
+
+                  <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">Estimated Costs</h3>
+
                   <div className="space-y-6 mb-8">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 font-bold flex items-center gap-2 dark:text-slate-400">
                         <Plane className="w-4 h-4 text-slate-400" /> Air Cost
                       </span>
-                      <span className={`text-2xl font-black ${result.cheaper === 'air' ? 'text-emerald-600 underline underline-offset-8 decoration-emerald-200 dark:text-emerald-400 dark:decoration-emerald-400/30' : 'text-slate-900 dark:text-white'}`}>
+                      <span className={`text-2xl font-semibold ${result.cheaper === 'air' ? 'text-emerald-600 underline underline-offset-8 decoration-emerald-200 dark:text-emerald-400 dark:decoration-emerald-400/30' : 'text-slate-900 dark:text-white'}`}>
                         ${nf2.format(result.airCost)}
                       </span>
                     </div>
@@ -210,18 +211,18 @@ export default function AirVsSeaCalculator() {
                       <span className="text-slate-500 font-bold flex items-center gap-2 dark:text-slate-400">
                         <Ship className="w-4 h-4 text-slate-400" /> Sea Cost
                       </span>
-                      <span className={`text-2xl font-black ${result.cheaper === 'sea' ? 'text-emerald-600 underline underline-offset-8 decoration-emerald-200 dark:text-emerald-400 dark:decoration-emerald-400/30' : 'text-slate-900 dark:text-white'}`}>
+                      <span className={`text-2xl font-semibold ${result.cheaper === 'sea' ? 'text-emerald-600 underline underline-offset-8 decoration-emerald-200 dark:text-emerald-400 dark:decoration-emerald-400/30' : 'text-slate-900 dark:text-white'}`}>
                         ${nf2.format(result.seaCost)}
                       </span>
                     </div>
                     <div className="pt-6 border-t border-slate-100 flex justify-between items-center dark:border-slate-800">
                       <div>
-                         <p className="text-slate-400 font-black uppercase text-[10px] tracking-widest">Savings Difference</p>
+                         <p className="text-slate-400 font-semibold uppercase text-[10px] tracking-widest">Savings Difference</p>
                          <p className="text-indigo-600 text-xs font-bold uppercase mt-1 dark:text-indigo-400">
                            {result.cheaper === 'equal' ? 'Costs are equal' : `${result.cheaper} is cheaper`}
                          </p>
                       </div>
-                      <span className="text-indigo-600 font-black text-3xl dark:text-indigo-400">${nf2.format(result.diff)}</span>
+                      <span className="text-indigo-600 font-semibold text-3xl dark:text-indigo-400">${nf2.format(result.diff)}</span>
                     </div>
                   </div>
 
@@ -229,22 +230,22 @@ export default function AirVsSeaCalculator() {
                     <div className="flex gap-3">
                       <AlertCircle className="w-5 h-5 text-indigo-500 shrink-0" />
                       <div>
-                        <p className="text-[11px] font-black text-indigo-600 mb-1 uppercase tracking-widest dark:text-indigo-400">Recommendation</p>
+                        <p className="text-[11px] font-semibold text-indigo-600 mb-1 uppercase tracking-widest dark:text-indigo-400">Recommendation</p>
                         <p className="text-sm text-indigo-900 leading-relaxed font-semibold dark:text-indigo-200">"{result.recommendation}"</p>
                       </div>
                     </div>
                   </div>
-                  
+
                   {result.closeCall && (
                     <div className="mt-4 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs leading-relaxed font-medium dark:bg-amber-900/10 dark:border-amber-900/30 dark:text-amber-200">
-                      <b className="font-black">Close call:</b> Costs are within ~10%. Delivery time, damage risk, and cashflow may matter more than price here.
+                      <b className="font-semibold">Close call:</b> Costs are within ~10%. Delivery time, damage risk, and cashflow may matter more than price here.
                     </div>
                   )}
                 </div>
 
-                <a 
-                  href="/tools/cbm-volumetric-weight-calculator" 
-                  className="group flex items-center justify-between p-6 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 shadow-sm"
+                <a
+                  href="/tools/cbm-volumetric-weight-calculator"
+                  className="group flex items-center justify-between p-6 rounded-2xl border border-slate-200 bg-white hover:bg-slate-50 transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 "
                 >
                   <div className="flex items-center gap-3">
                     <div className="p-2 rounded-xl bg-slate-100 text-slate-500 group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-all dark:bg-slate-800 dark:text-slate-400 dark:group-hover:text-indigo-400 dark:group-hover:bg-indigo-900/30">
@@ -262,8 +263,8 @@ export default function AirVsSeaCalculator() {
         {/* Educational Content Section */}
         <section className="mt-32 border-t border-slate-200 pt-20 dark:border-slate-800">
           <div className="max-w-4xl">
-            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-8 tracking-tight">When Should You Ship by Air vs Sea?</h2>
-            
+            <h2 className="text-3xl font-semibold text-slate-900 dark:text-white mb-8 tracking-tight">When Should You Ship by Air vs Sea?</h2>
+
             <div className="space-y-8 text-slate-600 dark:text-slate-400 leading-relaxed text-lg">
               <p>
                 The best shipping method depends on two things: how bulky your cartons are and how fast you need delivery. Air freight is usually priced by <strong className="text-slate-900 dark:text-white">chargeable weight (kg)</strong>, while sea freight is often priced by <strong className="text-slate-900 dark:text-white">volume (CBM)</strong>.
@@ -278,7 +279,7 @@ export default function AirVsSeaCalculator() {
                   { title: "Bulkiness", text: "If the cartons are bulky and you can wait, sea usually wins on cost." },
                   { title: "The 10% Rule", text: "If costs are within 10%, choose based on speed and reliability." }
                 ].map(rule => (
-                  <div key={rule.title} className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm dark:bg-slate-900 dark:border-slate-800">
+                  <div key={rule.title} className="p-6 rounded-2xl bg-white border border-slate-200  dark:bg-slate-900 dark:border-slate-800">
                     <CheckCircle2 className="w-6 h-6 text-indigo-500 mb-4" />
                     <h4 className="text-slate-900 font-bold text-base mb-2 dark:text-white">{rule.title}</h4>
                     <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">{rule.text}</p>
@@ -286,7 +287,7 @@ export default function AirVsSeaCalculator() {
                 ))}
               </div>
 
-              <h3 className="text-2xl font-black text-slate-900 pt-8 mb-6 dark:text-white">Air vs Sea FAQ</h3>
+              <h3 className="text-2xl font-semibold text-slate-900 pt-8 mb-6 dark:text-white">Air vs Sea FAQ</h3>
               <div className="grid grid-cols-1 gap-4">
                 {[
                   {
@@ -306,9 +307,9 @@ export default function AirVsSeaCalculator() {
                     a: 'Not always. If you need the goods urgently or the shipment is small and time sensitive, air may still be the right move.',
                   },
                 ].map((item, i) => (
-                  <div key={i} className="group p-6 rounded-2xl border border-slate-200 bg-white hover:border-indigo-200 hover:shadow-md transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
+                  <div key={i} className="group p-6 rounded-2xl border border-slate-200 bg-white hover:border-indigo-200  transition-all dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700">
                     <div className="flex gap-4">
-                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-black text-indigo-600 border border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30">
+                      <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-600 border border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-900/30">
                         Q
                       </div>
                       <div>

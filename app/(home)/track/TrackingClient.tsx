@@ -1,5 +1,6 @@
 'use client';
 
+import styles from './Tracking.module.css';
 import { FormEvent, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -57,10 +58,10 @@ export default function TrackingClient({
   };
 
   return (
-    <main className="min-h-[75vh] bg-slate-50 px-4 pb-20 pt-32 text-slate-950">
+    <main className={styles.page} data-si-page-theme="service">
       <div className="mx-auto max-w-5xl">
-        <div className="text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-300">
+        <div className={styles.intro}>
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--si-soft)] text-[var(--si-accent)]">
             <PackageSearch className="h-8 w-8" />
           </div>
           <p className="mt-6 text-xs font-bold uppercase tracking-[0.24em] text-brand-orange-600">
@@ -76,7 +77,7 @@ export default function TrackingClient({
 
         <form
           onSubmit={submit}
-          className="mx-auto mt-8 flex max-w-2xl gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg shadow-slate-200/50"
+          className={styles.form}
         >
           <input
             value={trackingId}
@@ -85,7 +86,7 @@ export default function TrackingClient({
             placeholder="Enter your tracking ID"
             className="min-w-0 flex-1 rounded-xl bg-slate-50 px-4 py-3 font-mono text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
           />
-          <button className="inline-flex items-center gap-2 rounded-xl bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-blue-800">
+          <button className={styles.submit}>
             <Search className="h-4 w-4" /> Track
           </button>
         </form>
@@ -106,8 +107,8 @@ export default function TrackingClient({
         )}
 
         {shipment && !loading && (
-          <section className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg shadow-slate-200/40">
-            <header className="border-b border-slate-200 bg-slate-950 p-6 text-white md:p-8">
+          <section className="mt-10 overflow-hidden rounded-2xl border border-slate-200 bg-white ">
+            <header className="si-dark-surface border-b border-slate-200 p-6 text-white md:p-8">
               <div className="flex flex-wrap items-start justify-between gap-5">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-widest text-slate-400">

@@ -228,9 +228,9 @@ export default function Wallet() {
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+    <div className="si-workspace">
       {/* Header Section */}
-      <div className="bg-slate-900 pb-32 pt-12 text-white">
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
@@ -262,6 +262,7 @@ export default function Wallet() {
               </div>
               <div className="hidden h-12 w-px bg-white/10 sm:block"></div>
               <button
+                aria-label="Top up wallet"
                 onClick={() => setShowTopUpDialog(true)}
                 className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-500"
               >
@@ -272,7 +273,7 @@ export default function Wallet() {
         </div>
       </div>
 
-      <main className="mx-auto -mt-12 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Quick Actions Row */}
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <button
@@ -313,7 +314,8 @@ export default function Wallet() {
           </button>
 
           <button
-            onClick={() => setShowTopUpDialog(true)}
+            aria-label="Top up wallet"
+                onClick={() => setShowTopUpDialog(true)}
             className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-5 transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900"
           >
             <div className="flex items-center gap-4">
@@ -407,7 +409,8 @@ export default function Wallet() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          <p className="px-5 py-3 text-xs text-slate-500 md:hidden">Swipe across to see all transaction details.</p>
+          <div role="region" aria-label="Wallet transactions" tabIndex={0} className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:bg-slate-800/50">

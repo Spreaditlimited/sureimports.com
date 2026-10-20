@@ -1,0 +1,5 @@
+'use client';
+import Link from 'next/link';
+export default function DashboardError({ retry }: { error: Error & { digest?: string }; retry: () => void }) {
+  return <section className="si-workspace-plain" aria-labelledby="dashboard-error-heading"><div className="max-w-xl rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"><h1 id="dashboard-error-heading">We couldn’t load this page</h1><p className="mt-3 text-sm text-slate-600 dark:text-slate-300">Try loading it again. If you were submitting an order or payment, check its status before trying that action again.</p><div className="mt-6 flex flex-col gap-3 sm:flex-row"><button type="button" onClick={retry} className="min-h-12 rounded-lg bg-[var(--si-primary)] px-5 py-3 font-semibold text-[var(--si-on-primary)]">Try again</button><Link href="/dashboard" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-slate-300 px-5 py-3 dark:border-slate-600">Back to overview</Link></div></div></section>;
+}

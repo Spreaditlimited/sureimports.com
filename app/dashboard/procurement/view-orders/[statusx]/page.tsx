@@ -8,16 +8,8 @@ import ProcurementEmptyState from '../components/ProcurementEmptyState';
 import OrderSection from '../../view-orders/components/order-section';
 import ProcurementDraftTools from '../../view-orders/components/ProcurementDraftTools';
 import CreateOrder from '../../create-order/components/createOrder';
-import Loader from '@/components/uix/Loader';
-import { Search, LayoutList } from 'lucide-react';
 import { PROCUREMENT_STATUS_ITEMS } from '@/app/dashboard/procurement/constants/order-statuses';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import styles from '../components/Orders.module.css';
 
 interface OrderData {
   id: any;
@@ -40,7 +32,7 @@ interface orderStatus {
 export function ViewOrders({ params }: orderStatus) {
   const router = useRouter();
   const { user } = useAuth();
-  
+
   const { statusx } = use(params);
   const currentStatus = statusx ? statusx.toLowerCase() : 'saved';
   const validStatusValues = new Set(
@@ -49,34 +41,35 @@ export function ViewOrders({ params }: orderStatus) {
   const normalizedStatus = validStatusValues.has(currentStatus)
     ? currentStatus
     : 'saved';
-  
-  const [pidUser] = useState(user?.pidUser);
+
+  const pidUser = user?.pidUser;
   const [orderData, setOrderData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchOrder = async (userId: string, status: string) => {
-    try {
-      const res = await fetch(`/api/get-data/procurement/${userId}/${status}`);
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || 'Failed to fetch orders');
-      }
-      const data = await res.json();
-      setOrderData(data);
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [error, setError] = useState('');
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
-    if (pidUser) {
-      fetchOrder(pidUser, normalizedStatus);
-    } else if (!pidUser) {
-      setLoading(true);
+    if (!pidUser) return;
+    const controller = new AbortController();
+    setLoading(true);
+    setError('');
+    setOrderData(null);
+    async function load() {
+      try {
+        const res = await fetch(`/api/get-data/procurement/${pidUser}/${normalizedStatus}`, { signal: controller.signal });
+        if (!res.ok) throw new Error('Unable to load your orders. Please try again.');
+        const data = await res.json();
+        if (!controller.signal.aborted) setOrderData(data);
+      } catch (error) {
+        if (!controller.signal.aborted) setError(error instanceof Error ? error.message : 'Unable to load your orders.');
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
     }
-  }, [pidUser, normalizedStatus]);
+    void load();
+    return () => controller.abort();
+  }, [pidUser, normalizedStatus, refresh]);
 
   const countRecords: OrderData[] = orderData ? Object.values(orderData) : [];
 
@@ -84,30 +77,30 @@ export function ViewOrders({ params }: orderStatus) {
     router.push(`/dashboard/procurement/view-orders/${newStatus}`);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-        <div className="h-64 bg-slate-900 pb-32 pt-12 text-white"></div>
-        <div className="mx-auto -mt-16 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
-          <div className="flex h-96 items-center justify-center rounded-[32px] border border-slate-200 bg-white shadow-xl dark:border-slate-800 dark:bg-slate-900">
-            <Loader />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return <ProcurementTrackerFrame status={normalizedStatus} onStatusChange={handleStatusChange} count={countRecords.length} createControl={<CreateOrder className="h-12 rounded-xl bg-[#2E62D9] px-6 text-sm font-semibold text-white" />}>
-        {normalizedStatus === 'saved' && <ProcurementDraftTools onChanged={() => fetchOrder(pidUser!, normalizedStatus)} />}
-        
+        {loading ? <div className={styles.feedback} role="status">Loading your orders…</div> : error ? <div className={styles.feedback} role="alert">{error}<br /><button onClick={() => setRefresh(value => value + 1)}>Try again</button></div> : <>
+
+
         {countRecords.length === 0 ? (
           <ProcurementEmptyState status={normalizedStatus} action={<button onClick={() => router.push('/dashboard/procurement/create-order')} className="rounded-xl bg-[#2E62D9] px-8 py-4 text-sm font-bold text-white shadow-lg shadow-[#2E62D9]/30 transition hover:bg-[#2754BC]">Create New Order</button>} />
         ) : (
           /* Order Section Wrapper */
           <div className="rounded-[32px] bg-transparent">
-            <OrderSection initialOrders={orderData} />
+            <OrderSection initialOrders={orderData} onChanged={() => setRefresh(value => value + 1)} />
           </div>
         )}
+        {normalizedStatus === 'saved' && (
+          <details className={styles.help}>
+            <summary>
+              <span className={styles.helpTitle}>Order help</span>
+              <span className={styles.helpDescription}>Get admin assistance or combine your saved orders.</span>
+            </summary>
+            <div className={styles.helpContent}>
+              <ProcurementDraftTools onChanged={() => setRefresh(value => value + 1)} />
+            </div>
+          </details>
+        )}
+        </>}
   </ProcurementTrackerFrame>;
 }
 

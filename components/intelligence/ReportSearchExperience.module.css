@@ -20,3 +20,17 @@
   outline: 2px solid var(--si-accent);
   outline-offset: 3px;
 }
+.page { min-height:100vh; background:var(--si-canvas); color:var(--si-ink); }
+.hero { padding:155px var(--si-gutter) 64px; background:var(--si-canvas); color:var(--si-ink); border-bottom:1px solid var(--si-border); }
+.eyebrow { display:flex; align-items:center; justify-content:center; gap:8px; color:var(--si-accent); font-size:12px; font-weight:500; letter-spacing:.04em; }
+.headline { max-width:20ch; margin:22px auto 0; font-size:clamp(40px,4.7vw,68px); font-weight:var(--si-headline-weight); letter-spacing:var(--si-headline-tracking); line-height:1.08; text-wrap:balance; }
+.description { max-width:56ch; margin:26px auto 0; font-size:18px; line-height:1.8; color:var(--si-muted); }
+.searchForm { display:flex; gap:12px; max-width:880px; margin:32px auto 0; padding:8px; border:1px solid var(--si-border); border-radius:14px; background:var(--si-surface); box-shadow:0 8px 24px rgb(0 0 0 / .04); }
+.searchInput { width:100%; min-width:0; height:56px; padding:12px 48px 12px 52px; border-radius:8px; font-size:16px; background:var(--si-surface); color:var(--si-ink); }
+.searchButton, .openReport { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; gap:8px; min-height:44px; padding:12px 20px; border-radius:10px; background:var(--si-primary); color:var(--si-on-primary); font-size:14px; font-weight:600; }
+.searchButton:hover, .openReport:hover { filter:brightness(.95); }
+.reportCard { min-width:0; padding:16px; border:1px solid var(--si-border); border-radius:16px; background:var(--si-surface); transition:border-color .15s ease; }
+.reportCard:hover { border-color:var(--si-accent); }
+.page h2, .page h3 { letter-spacing:-.025em; text-wrap:balance; }
+.page h1 { font-weight:var(--si-headline-weight); letter-spacing:var(--si-headline-tracking); text-wrap:balance; }
+@media(max-width:639px) { .hero { padding-top:120px; padding-bottom:40px; } .description { font-size:16px; } .searchForm { flex-direction:column; } .searchButton { min-height:48px; } }

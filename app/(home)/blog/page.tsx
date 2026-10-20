@@ -95,7 +95,7 @@ export default async function BlogPage({ searchParams }: PageProps) {
     <>
       <JsonLdScript data={blogBreadcrumbSchema} />
       <Navbar />
-      <main className="min-h-screen bg-slate-900">
+      <main className="min-h-screen bg-[var(--si-canvas)]" data-si-page-theme="editorial">
         <BlogList
           blogPosts={posts}
           featuredPosts={featuredPosts}

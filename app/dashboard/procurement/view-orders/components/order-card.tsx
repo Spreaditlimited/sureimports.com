@@ -28,7 +28,10 @@ import {
 } from 'lucide-react';
 
 import { getSavedOrderCountdown } from '@/lib/procurement/savedOrderExpiry';
-import MoreOrders from './products-table/orders-view-more';
+import dynamic from 'next/dynamic';
+import styles from './Orders.module.css';
+
+const MoreOrders = dynamic(() => import('./products-table/orders-view-more'), { loading: () => <p className="p-6 text-sm" role="status">Loading order details…</p> });
 
 interface Order {
   id: any;
@@ -52,26 +55,33 @@ export default function OrderCard({ id, order, onDelete, partner }: OrderCardPro
 
   const [isOpen, setIsOpen] = useState(false);
   const [productData, setProductData] = useState<any>(null);
-  const [pidUser] = useState(user?.pidUser);
+  const pidUser = user?.pidUser;
+  const [expanded, setExpanded] = useState(false);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
   const [loading, setLoading] = useState(false);
   const [countdownNow, setCountdownNow] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      if (partner || !pidUser || !order.pidOrder) return;
+    if (partner || !expanded || productData || !pidUser || !order.pidOrder) return;
+    const controller = new AbortController();
+    setLoading(true);
+    setError(false);
+    async function fetchProducts() {
       try {
-        const res = await fetch(
-          `/api/get-data/procurement-order-products/${pidUser}/${order.pidOrder}`,
-        );
+        const res = await fetch(`/api/get-data/procurement-order-products/${pidUser}/${order.pidOrder}`, { signal: controller.signal });
         if (!res.ok) throw new Error('Failed to fetch products');
         const data = await res.json();
-        setProductData(data);
-      } catch (err) {
-        console.error(err);
+        if (!controller.signal.aborted) setProductData(data);
+      } catch {
+        if (!controller.signal.aborted) setError(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
       }
-    };
-    fetchProducts();
-  }, [pidUser, order.pidOrder, Boolean(partner)]);
+    }
+    void fetchProducts();
+    return () => controller.abort();
+  }, [pidUser, order.pidOrder, Boolean(partner), expanded, productData, retry]);
 
   useEffect(() => {
     if (partner || order.status !== 'saved') return;
@@ -107,28 +117,23 @@ export default function OrderCard({ id, order, onDelete, partner }: OrderCardPro
     router.push(`/dashboard/procurement/add-product/${order.pidOrder}`);
   };
 
-  if (!productData && !partner) {
-    return (
-      <div className="h-24 w-full animate-pulse rounded-[24px] bg-slate-50 dark:bg-slate-800/50" />
-    );
-  }
 
   return (
-    <div className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
-      <Accordion type="single" collapsible className="w-full border-none" onValueChange={value => { if (value) partner?.onExpand(); }}>
+    <div className={styles.card}>
+      <Accordion type="single" collapsible className="w-full border-none" onValueChange={value => { setExpanded(Boolean(value)); if (value) partner?.onExpand(); }}>
         <AccordionItem value={`item-${order.pidOrder}`} className="border-none">
           {/* Card Header (Always Visible) */}
           <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
             {/* Left Info Section */}
-            <div className="flex items-center gap-4">
+            <div className="flex min-w-0 items-center gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400">
                 <PackageSearch className="h-6 w-6" />
               </div>
-              <div className="flex flex-col">
+              <div className="flex min-w-0 flex-col">
                 <h3 className="line-clamp-1 text-lg font-bold text-slate-900 dark:text-white">
                   {order.orderName}
                 </h3>
-                <div className="mt-0.5 flex items-center gap-2">
+                <div className="mt-0.5 flex min-w-0 items-center gap-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
                     Ref:
                   </span>
@@ -165,6 +170,7 @@ export default function OrderCard({ id, order, onDelete, partner }: OrderCardPro
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                   <DialogTrigger asChild>
                     <button
+                      aria-label={`Delete order ${order.orderName}`}
                       onClick={(e) => e.stopPropagation()}
                       className="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-500 transition hover:bg-rose-100 hover:text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40"
                     >
@@ -219,7 +225,7 @@ export default function OrderCard({ id, order, onDelete, partner }: OrderCardPro
 
           {/* Expandable Content (Products Table) */}
           <AccordionContent className="border-t border-slate-100 bg-slate-50/50 p-0 dark:border-slate-800 dark:bg-slate-900/30">
-            {partner ? partner.content : <MoreOrders products={productData as any} />}
+            {partner ? partner.content : expanded && (error ? <div className="p-6 text-sm" role="alert">Unable to load products. <button className="underline" onClick={() => setRetry(value => value + 1)}>Try again</button></div> : loading || !productData ? <p className="p-6 text-sm" role="status">Loading products…</p> : <MoreOrders products={productData as any} />)}
           </AccordionContent>
         </AccordionItem>
       </Accordion>

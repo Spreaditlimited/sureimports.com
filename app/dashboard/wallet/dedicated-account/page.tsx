@@ -13,7 +13,7 @@ const DashBoard = () => {
 
   return (
     <div>
-      <div className="container mx-auto py-8">
+      <div className="si-workspace-plain">
         <h1 className="mb-6 text-2xl font-bold">
           Create Paystack Dedicated Account
         </h1>

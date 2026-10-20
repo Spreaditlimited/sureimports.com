@@ -51,8 +51,8 @@ function DeleteAccountForm() {
   const [isLoading, setLoading] = React.useState(false);
   const [message, setMessage] = React.useState('');
 
-  const [pidUser, setPidUser] = useState(user?.pidUser);
-  const [userEmail, setUserEmail] = useState(user?.userEmail);
+  const pidUser = user?.pidUser;
+  const userEmail = user?.userEmail;
   const router = useRouter();
   const [isOpen, setIsOpen] = useState<{ isOpen: boolean }>({ isOpen: false });
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);

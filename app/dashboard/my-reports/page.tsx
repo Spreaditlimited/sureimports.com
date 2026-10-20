@@ -27,8 +27,8 @@ export default async function MySupplierReportsPage() {
   });
 
   return (
-    <main className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-5xl">
+    <main className="si-workspace-plain">
+      <div className="si-workspace-inner">
         <Link
           href="/dashboard"
           className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-slate-900"

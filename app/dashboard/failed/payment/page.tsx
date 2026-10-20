@@ -10,15 +10,7 @@ import BackButton from '@/components/uix/BackButton';
 const Page: React.FC = () => {
   const router = useRouter();
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-white">
-      <Image
-        loading="lazy"
-        src="/images/background.png"
-        alt=""
-        layout="fill"
-        objectFit="cover"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+    <div className="si-workspace-plain flex flex-col items-center justify-center">
       <div className="relative flex w-full max-w-full flex-col items-center px-2 sm:px-16">
         <Card className="relative mx-auto my-5 flex max-w-[485px] flex-col justify-center rounded-3xl bg-white p-8 shadow-2xl max-md:px-5">
           <CardContent className="flex flex-col max-md:max-w-full">

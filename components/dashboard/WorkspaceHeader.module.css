@@ -1,0 +1,7 @@
+/* Controls shared by the compact, theme-aware dashboard headers. */
+.sync.sync { color:var(--si-ink) !important; background:var(--si-surface) !important; border:1px solid var(--si-border); min-height:44px; }
+.sync.sync:hover { background:var(--si-inset) !important; }
+.heading.heading { color:var(--si-ink) !important; }
+.copy.copy { color:var(--si-muted) !important; }
+.tile.tile { background:var(--si-soft) !important; color:var(--si-accent); }
+.overlap { position:relative; }

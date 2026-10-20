@@ -1,0 +1,56 @@
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const ts=require('typescript');
+const {PrismaClient}=require('@prisma/client');
+const {randomBytes}=require('node:crypto');
+function load(path,deps={}) {const m={exports:{}};new Function('require','module','exports',ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText)(id=>id==='server-only'?{}:id in deps?deps[id]:require(id),m,m.exports);return m.exports;}
+test('guest sessions, ownership, claiming, order context and notification outbox', {skip:!process.env.SUPPORT_TEST_DATABASE_URL}, async()=>{
+ const url=new URL(process.env.SUPPORT_TEST_DATABASE_URL);assert.equal(url.hostname,'127.0.0.1');assert.equal(url.port,'13317');assert.equal(url.pathname,'/support_pilot');
+ const db=new PrismaClient({datasources:{db:{url:url.toString()}}});
+ const policy=load('lib/support/policy.ts');const store=load('lib/support/store.ts',{'./policy':policy}).supportStore(db);
+ const jar=new Map();let options;
+ const cookies={get:k=>jar.has(k)?{value:jar.get(k)}:undefined,set:(k,v,o)=>{jar.set(k,v);options=o;},delete:k=>jar.delete(k)};
+ const guest=load('lib/support/guest.ts',{'next/headers':{cookies:async()=>cookies},'@/lib/prisma':{prisma:db},'./policy':policy});
+ const notices=load('lib/support/notifications.ts');
+ const suffix=randomBytes(8).toString('hex');const customer={kind:'CUSTOMER',id:'account-'+suffix,brand:'SURE_IMPORTS'};const agent={kind:'AGENT',id:'agent-'+suffix,brand:'SUPPORT_TEAM'};
+ try {
+  await db.$executeRawUnsafe('CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY,pidUser VARCHAR(191) UNIQUE,userEmail VARCHAR(191),userCid VARCHAR(191),userStatus VARCHAR(191),loginStatus VARCHAR(191))');
+  await db.$executeRawUnsafe('CREATE TABLE IF NOT EXISTS orders (id INT AUTO_INCREMENT PRIMARY KEY,pidOrder VARCHAR(191) UNIQUE,pidUser VARCHAR(191),orderName VARCHAR(191),orderStatus VARCHAR(191))');
+  await db.$executeRaw`INSERT INTO users (pidUser,userEmail,userCid,userStatus) VALUES (${customer.id},'verified@example.test','VERIFIED','AL1')`;
+  const reference='order-'+suffix;await db.$executeRaw`INSERT INTO orders (pidOrder,pidUser,orderName,orderStatus) VALUES (${reference},${customer.id},'Local QA order','SAVED')`;
+  assert.equal(await guest.guestIdentity(),null);await guest.createGuest();const identity=await guest.guestIdentity();assert.equal(identity.actor.kind,'GUEST');assert.equal(options.httpOnly,true);assert.equal(options.sameSite,'lax');
+  const credential=[...jar.entries()][0];await guest.createGuest();assert.deepEqual([...jar.entries()][0],credential);
+  const create={requestKey:'guest-create-'+suffix,subject:'Guest question',body:'Please help'};
+  const id=await store.create(identity.actor,create,null);
+  await assert.rejects(store.create(identity.actor,{...create,orderId:reference},null),e=>e.status===403);
+  await assert.rejects(store.history(customer,id,0),e=>e.status===404);
+  await store.send(agent,id,{requestKey:'private-note-'+suffix,body:'Private',internal:true});
+  assert.equal((await store.history(identity.actor,id,0)).messages.length,1);
+  const pending=await db.$queryRaw`SELECT audience,revision FROM support_notifications WHERE conversationId=${id}`;assert.equal(pending.length,1);assert.equal(pending[0].revision,1);
+  await guest.claimGuest(customer.id);assert.equal(await guest.guestIdentity(),null);
+  assert.equal((await store.history(customer,id,0)).messages.length,1);
+  await assert.rejects(store.history(identity.actor,id,0),e=>e.status===404);
+  jar.set(...credential);assert.equal(await guest.guestIdentity(),null);
+  await assert.rejects(store.create(identity.actor,{...create,requestKey:'new-guest-'+suffix},null),e=>e.status===403);
+  await assert.rejects(store.create({...customer,id:'someone-else'},{...create,orderId:reference},null),e=>e.status===404);
+  const orderChat=await store.create(customer,{...create,requestKey:'owned-order-'+suffix,orderId:reference},null);
+  assert.equal((await store.history(customer,orderChat,0)).conversation.orderId,reference);
+  await store.send(agent,id,{requestKey:'public-reply-'+suffix,body:'We can help',internal:false});
+  await db.$executeRaw`UPDATE support_notifications SET availableAt=DATE_ADD(NOW(3),INTERVAL 1 DAY)`;
+  await db.$executeRaw`UPDATE support_notifications SET availableAt=NOW(3) WHERE conversationId=${id}`;
+  const deliveries=[];
+  const result=await notices.deliverSupportNotifications(db,async n=>{deliveries.push(n);});
+  assert.equal(result.delivered,2);assert.equal(result.failed,0);
+  assert.deepEqual(deliveries.map(n=>n.to).sort(),['hello@sureimports.com','verified@example.test'].sort());
+  assert.ok(deliveries.every(n=>n.url.endsWith(id)));assert.ok(deliveries.every(n=>!JSON.stringify(n).includes('Private')));
+  assert.equal((await notices.deliverSupportNotifications(db,async()=>{throw Error('unexpected duplicate')})).delivered,0);
+  await store.send(agent,id,{requestKey:'failed-reply-'+suffix,body:'A follow-up',internal:false});
+  await db.$executeRaw`UPDATE support_notifications SET availableAt=NOW(3) WHERE conversationId=${id}`;
+  assert.equal((await notices.deliverSupportNotifications(db,async()=>{throw Error('fake SMTP outage')})).failed,1);
+  const [retry]=await db.$queryRaw`SELECT attempts,leaseToken FROM support_notifications WHERE conversationId=${id}`;assert.equal(retry.attempts,1);assert.equal(retry.leaseToken,null);
+  await db.$executeRaw`UPDATE users SET userCid='UNVERIFIED' WHERE pidUser=${customer.id}`;
+  await db.$executeRaw`UPDATE support_notifications SET availableAt=NOW(3) WHERE conversationId=${id}`;
+  assert.equal((await notices.deliverSupportNotifications(db,async()=>{throw Error('must not email unverified account')})).skipped,1);
+ } finally {await db.$disconnect();}
+});

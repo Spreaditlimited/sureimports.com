@@ -1,0 +1,48 @@
+.page {
+  background: var(--si-canvas);
+  color: var(--si-ink);
+}
+.page :is(h2, h3) {
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+.page .hero {
+  background: var(--si-canvas);
+  border-bottom: 1px solid var(--si-border);
+}
+.copy {
+  text-align: center;
+  margin-inline: auto;
+}
+.copy > p {
+  margin-inline: auto;
+}
+.copy [data-hero-pill] {
+  margin-inline: auto;
+}
+.page .copy h1 {
+  max-width: 20ch;
+  margin: 22px auto 0;
+  font-size: clamp(40px, 4.7vw, 68px);
+  font-weight: var(--si-headline-weight);
+  letter-spacing: var(--si-headline-tracking);
+  line-height: 1.08;
+}
+.actions {
+  margin-inline: auto;
+  width: 100%;
+}
+.actions > div:first-child {
+  justify-content: center;
+}
+.actions > div:nth-child(2) {
+  margin-inline: auto;
+}
+.page section[id] {
+  scroll-margin-top: 110px;
+}
+@media (max-width: 639px) {
+  .page .copy h1 {
+    font-size: clamp(32px, 8vw, 42px);
+  }
+}

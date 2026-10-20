@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import pageStyles from '@/components/home/PublicServicePage.module.css';
 import AboutUs from '../components/AboutUs'; // Adjust path based on your folder structure
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export default function AboutPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+      <main className={pageStyles.page} data-si-page-theme="service">
         <AboutUs />
       </main>
       <Footer />

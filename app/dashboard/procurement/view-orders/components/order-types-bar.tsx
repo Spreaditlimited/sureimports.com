@@ -34,7 +34,7 @@ export default function OrderTypes({ partner }: { partner?: { status: string; co
   const path = usePathname();
   const scrollRef = useHorizontalScroll<HTMLDivElement>();
   
-  const [pidUser] = useState(user?.pidUser);
+  const pidUser = user?.pidUser;
   const [recordx, setRecord] = useState<any | null>(null);
 
   useEffect(() => {

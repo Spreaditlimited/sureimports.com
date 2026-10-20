@@ -89,6 +89,7 @@ function browser({
   host = 'www.sureimports.com',
   consent = false,
   destination = '447881194138',
+  placement = null,
 } = {}) {
   const handlers = {},
     sent = [],
@@ -96,6 +97,7 @@ function browser({
   class Element {
     closest(selector) {
       if (selector === 'a[href]') return this;
+      if (selector === '[data-whatsapp-placement]' && placement) return { getAttribute: () => placement };
       if (selector === 'footer') return {};
       return null;
     }
@@ -359,4 +361,14 @@ test('admin report and lead mutations enforce permissions and same-origin reques
     200,
   );
   assert.equal(saved, 1);
+});
+
+test('inline support picker emits an accepted analytics placement', async () => {
+  const source = fs.readFileSync('components/WhatsAppButton.tsx', 'utf8');
+  const placement = source.match(/data-whatsapp-placement=\{variant === 'inline' \? '([^']+)'/)[1];
+  const b = browser({ placement });
+  b.click();
+  const payload = JSON.parse(await b.sent[0].body.text());
+  assert.equal(policy.clickSchema.safeParse(payload).success, true);
+  assert.equal(payload.placement, 'page');
 });

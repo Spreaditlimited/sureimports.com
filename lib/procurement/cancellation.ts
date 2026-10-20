@@ -1,13 +1,13 @@
-import { createHash, randomUUID } from "node:crypto";
-import type { Prisma } from "@prisma/client";
-import { prisma } from "@/lib/prisma";
-import { decimalUnits, majorAmount } from "@/lib/refunds/money";
+import { createHash, randomUUID } from 'node:crypto';
+import type { Prisma } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
+import { decimalUnits, majorAmount } from '@/lib/refunds/money';
 import {
   canCancelProcurement,
   cancellationAmounts,
-} from "./cancellation-policy";
+} from './cancellation-policy';
 
-type Actor = { kind: "customer" | "admin"; pidUser: string };
+type Actor = { kind: 'customer' | 'admin'; pidUser: string };
 export class CancellationError extends Error {}
 
 export async function cancellationQuote(
@@ -24,8 +24,8 @@ export async function cancellationQuote(
       exchangeRate1: string | null;
     }>
   >`SELECT pidUser,status,cancellationLockedAt,exchangeRate1 FROM orders WHERE pidOrder=${pidOrder} FOR UPDATE`;
-  if (!order || (actor.kind === "customer" && order.pidUser !== actor.pidUser))
-    throw new CancellationError("Order not found.");
+  if (!order || (actor.kind === 'customer' && order.pidUser !== actor.pidUser))
+    throw new CancellationError('Order not found.');
   if (
     !canCancelProcurement(
       order.status,
@@ -34,41 +34,41 @@ export async function cancellationQuote(
     )
   )
     throw new CancellationError(
-      "This order is no longer eligible for cancellation.",
+      'This order is no longer eligible for cancellation.',
     );
   const partners = await tx.$queryRaw<
     Array<{ id: string }>
   >`SELECT id FROM procurement_partner_customer_orders WHERE releasedOrderId=${pidOrder}`;
   if (partners.length)
     throw new CancellationError(
-      "Use the partner Order adjustments workflow for this order.",
+      'Use the partner Order adjustments workflow for this order.',
     );
   const [settings] = await tx.$queryRaw<
     Array<{ feePercent: string }>
   >`SELECT feePercent FROM procurement_cancellation_settings WHERE id=1`;
   if (!settings)
-    throw new CancellationError("Cancellation settings need to be configured.");
+    throw new CancellationError('Cancellation settings need to be configured.');
   const feePercent =
-    actor.kind === "customer" || chargeFee ? String(settings.feePercent) : "0";
+    actor.kind === 'customer' || chargeFee ? String(settings.feePercent) : '0';
   const payments = await tx.payments.findMany({
     where: {
       pidUser: order.pidUser,
       serviceID: pidOrder,
-      serviceName: "PROCUREMENT",
-      paymentStatus: "PAID",
+      serviceName: 'PROCUREMENT',
+      paymentStatus: 'PAID',
     },
   });
   const totals = new Map<string, bigint>();
   const references = new Set<string>();
   for (const payment of payments) {
-    const currency = String(payment.currency || "").toUpperCase();
+    const currency = String(payment.currency || '').toUpperCase();
     if (
-      !["NGN", "USD"].includes(currency) ||
+      !['NGN', 'USD'].includes(currency) ||
       !payment.txRef ||
       references.has(payment.txRef)
     )
       throw new CancellationError(
-        "The payment records need review before cancellation.",
+        'The payment records need review before cancellation.',
       );
     references.add(payment.txRef);
     totals.set(
@@ -78,47 +78,47 @@ export async function cancellationQuote(
   }
   // Reserve previous refunds regardless of whether already paid or still available.
   const prior = await tx.refund_records.findMany({
-    where: { pidOrder, pidUser: order.pidUser, serviceType: "PROCUREMENT" },
+    where: { pidOrder, pidUser: order.pidUser, serviceType: 'PROCUREMENT' },
   });
   for (const refund of prior) {
-    const currency = String(refund.currency || "").toUpperCase();
-    let gross = decimalUnits(refund.amount || "0", 2);
-    if (refund.ext1 === "ORDER_ADJUSTMENT") {
+    const currency = String(refund.currency || '').toUpperCase();
+    let gross = decimalUnits(refund.amount || '0', 2);
+    if (refund.ext1 === 'ORDER_ADJUSTMENT') {
       let snapshot: {
         refundBeforeFeeUsd?: number;
         refundGrossAmount?: string;
         refundCurrency?: string;
       };
       try {
-        snapshot = JSON.parse(refund.ext2 || "{}");
+        snapshot = JSON.parse(refund.ext2 || '{}');
       } catch {
         throw new CancellationError(
-          "A previous refund needs review before cancellation.",
+          'A previous refund needs review before cancellation.',
         );
       }
       if (!snapshot.refundBeforeFeeUsd)
         throw new CancellationError(
-          "A previous refund needs review before cancellation.",
+          'A previous refund needs review before cancellation.',
         );
       if (snapshot.refundGrossAmount && snapshot.refundCurrency === currency) {
         gross = decimalUnits(snapshot.refundGrossAmount, 2);
-      } else if (currency === "USD") {
+      } else if (currency === 'USD') {
         gross = decimalUnits(snapshot.refundBeforeFeeUsd, 2);
       } else {
         // Older adjustments did not retain the original FX rate. Never use today's
         // order rate to reconstruct a historical refund and risk over-crediting.
         throw new CancellationError(
-          "The original currency breakdown of an earlier refund needs review before cancellation.",
+          'The original currency breakdown of an earlier refund needs review before cancellation.',
         );
       }
-    } else if (refund.ext1 !== "SHIPPING_ADJUSTMENT") {
+    } else if (refund.ext1 !== 'SHIPPING_ADJUSTMENT') {
       throw new CancellationError(
-        "This order already has a refund requiring review.",
+        'This order already has a refund requiring review.',
       );
     }
     if (!totals.has(currency) || totals.get(currency)! < gross)
       throw new CancellationError(
-        "The previous refunds and payments need review.",
+        'The previous refunds and payments need review.',
       );
     totals.set(currency, totals.get(currency)! - gross);
   }
@@ -129,7 +129,7 @@ export async function cancellationQuote(
       const { feeMinor, netMinor } = cancellationAmounts(gross, feePercent);
       if (netMinor <= BigInt(0))
         throw new CancellationError(
-          "The cancellation fee leaves no refundable balance.",
+          'The cancellation fee leaves no refundable balance.',
         );
       return {
         currency,
@@ -140,7 +140,7 @@ export async function cancellationQuote(
     });
   if (!amounts.length)
     throw new CancellationError(
-      "No confirmed refundable payment was found for this order.",
+      'No confirmed refundable payment was found for this order.',
     );
   const quote = {
     pidOrder,
@@ -151,7 +151,7 @@ export async function cancellationQuote(
   };
   return {
     ...quote,
-    token: createHash("sha256").update(JSON.stringify(quote)).digest("hex"),
+    token: createHash('sha256').update(JSON.stringify(quote)).digest('hex'),
   };
 }
 
@@ -175,10 +175,10 @@ export async function cancelProcurement(
     // Serialize retries and cancellation against order-stage updates.
     await tx.$queryRaw`SELECT pidOrder FROM orders WHERE pidOrder=${pidOrder} FOR UPDATE`;
     const existing = await tx.refund_records.findMany({
-      where: { pidOrder, ext1: "PROCUREMENT_CANCELLATION" },
+      where: { pidOrder, ext1: 'PROCUREMENT_CANCELLATION' },
     });
     if (existing.length) {
-      const snapshot = JSON.parse(existing[0].ext2 || "{}");
+      const snapshot = JSON.parse(existing[0].ext2 || '{}');
       if (
         snapshot.actorPid === actor.pidUser &&
         snapshot.actorKind === actor.kind &&
@@ -186,27 +186,27 @@ export async function cancelProcurement(
       )
         return { refundIds: existing.map((r) => r.pidRefund) };
       throw new CancellationError(
-        "This order has already been cancelled. Refresh its refund balance.",
+        'This order has already been cancelled. Refresh its refund balance.',
       );
     }
     const quote = await cancellationQuote(tx, pidOrder, actor, chargeFee);
     if (!token || token !== quote.token)
       throw new CancellationError(
-        "The order or cancellation fee changed. Review the updated amounts and confirm again.",
+        'The order or cancellation fee changed. Review the updated amounts and confirm again.',
       );
     const claimed = await tx.orders.updateMany({
       where: { pidOrder, pidUser: quote.pidUser, status: quote.status },
-      data: { status: "cancelled", updatedAt: new Date() },
+      data: { status: 'cancelled', updatedAt: new Date() },
     });
     if (claimed.count !== 1)
       throw new CancellationError(
-        "The order changed. Refresh before trying again.",
+        'The order changed. Refresh before trying again.',
       );
     const refundIds: string[] = [];
     for (const amount of quote.amounts) {
-      const pidRefund = `CANCEL${createHash("sha256")
-        .update(pidOrder + ":" + amount.currency)
-        .digest("hex")
+      const pidRefund = `CANCEL${createHash('sha256')
+        .update(pidOrder + ':' + amount.currency)
+        .digest('hex')
         .slice(0, 32)}`;
       const details = {
         ...amount,
@@ -222,9 +222,9 @@ export async function cancelProcurement(
           pidOrder,
           amount: amount.net,
           currency: amount.currency,
-          serviceType: "PROCUREMENT",
-          refundStatus: "pending",
-          ext1: "PROCUREMENT_CANCELLATION",
+          serviceType: 'PROCUREMENT',
+          refundStatus: 'pending',
+          ext1: 'PROCUREMENT_CANCELLATION',
           ext2: JSON.stringify(details),
           updatedAt: new Date(),
         },
@@ -233,7 +233,7 @@ export async function cancelProcurement(
         data: {
           id: randomUUID(),
           refundId: pidRefund,
-          eventType: "CANCELLATION_CREDIT",
+          eventType: 'CANCELLATION_CREDIT',
           actorPid: actor.pidUser,
           detailsJson: JSON.stringify(details),
         },
@@ -248,12 +248,12 @@ export async function cancelProcurement(
       data: {
         pidMessage: randomUUID(),
         pidOrder,
-        pidFrom: "hello@sureimports.com",
+        pidFrom: 'hello@sureimports.com',
         pidTo: user?.userEmail,
-        messageTitle: "Order cancelled — refund available",
+        messageTitle: 'Order cancelled — refund available',
         messageContent:
-          "Your order was cancelled and the refund balance credited. Open Dashboard > Refunds to view the fee and request a payout or wallet transfer.",
-        messageStatus: "unread",
+          'Your order was cancelled and the refund balance credited. Open Dashboard > Refunds to view the fee and request a payout or wallet transfer.',
+        messageStatus: 'unread',
       },
     });
     return { refundIds };

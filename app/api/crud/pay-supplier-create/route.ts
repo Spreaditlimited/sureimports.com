@@ -1,3 +1,4 @@
+import { featureRequestAccess } from '@/lib/features/request-access';
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import getFileExt from '@/app/utils/fileExt';
@@ -41,12 +42,14 @@ async function uploadPaySupplierFile(file: File | null, publicId: string | null)
 }
 
 export async function POST(request: Request) {
+  const access = await featureRequestAccess('pay_supplier');
+  if (access.response) return access.response;
   //GET FORM DATA
   const formData = await request.formData();
 
   const pidPaySupplier = formData.get('pidPaySupplier') as string;
-  const pidUser = formData.get('pidUser') as string;
-  const userEmail = formData.get('userEmail') as string;
+  const pidUser = access.user.pidUser;
+  const userEmail = access.user.userEmail;
   const supplierName = formData.get('supplierName') as string;
   const supplierPhone = formData.get('supplierPhone') as string;
   const supplierEmail = formData.get('supplierEmail') as string;

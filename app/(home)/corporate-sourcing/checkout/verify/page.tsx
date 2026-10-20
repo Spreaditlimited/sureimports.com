@@ -1,4 +1,5 @@
 'use client';
+import statusStyles from '@/components/home/PaymentStatus.module.css';
 
 import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -75,8 +76,8 @@ function VerifyContent() {
   }, [pidPayment, provider, reference]);
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-6 py-12 dark:bg-slate-950">
-      <div className="w-full max-w-lg rounded-3xl border border-slate-200 bg-white p-8 text-center shadow-xl dark:border-slate-800 dark:bg-slate-900">
+    <main className={statusStyles.page}>
+      <div className={statusStyles.card}>
         <div className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full ${state === 'success' ? 'bg-emerald-50 dark:bg-emerald-500/10' : state === 'error' ? 'bg-red-50 dark:bg-red-500/10' : 'bg-orange-50 dark:bg-orange-500/10'}`}>
           {state === 'loading' ? <Loader2 className="h-8 w-8 animate-spin text-brand-orange-500" /> : state === 'success' ? <CheckCircle2 className="h-8 w-8 text-emerald-600" /> : <XCircle className="h-8 w-8 text-red-600" />}
         </div>

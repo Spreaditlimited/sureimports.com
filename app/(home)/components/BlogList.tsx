@@ -1,7 +1,6 @@
 'use client';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import { useEffect, useMemo, useState, type ComponentProps } from 'react';
 import {
   Search,
@@ -189,8 +188,8 @@ export default function BlogList({
 
   // Handle tag click - filter posts by tag
   const handleTagClick = (tag: string, e: React.MouseEvent) => {
-    e.preventDefault(); 
-    e.stopPropagation(); 
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedTag(selectedTag === tag ? null : tag);
     setSearchQuery('');
     setSelectedCategory('All');
@@ -247,8 +246,8 @@ export default function BlogList({
     });
   };
 
-  const categoriesCount = blogCategories.length - 1; 
-  
+  const categoriesCount = blogCategories.length - 1;
+
   const buildPageHref = (targetPage: number) => {
     const params = new URLSearchParams(searchParams?.toString() || '');
     if (targetPage <= 1) {
@@ -261,26 +260,26 @@ export default function BlogList({
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
-      
+    <div className={styles.page}>
+
       {/* Enhanced Hero Section */}
-      <div className="public-solid-section relative overflow-hidden border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
-        <PublicHeroBackground darkOnly priority={false} />
+      <div className="relative overflow-hidden border-b border-[var(--si-border)] bg-[var(--si-canvas)]">
+
         <div className="absolute inset-0 z-0">
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
 
-<div className={`${heroLayout.fixed} relative z-10 mx-auto max-w-[1440px] px-4 pb-16 pt-48 sm:px-6 lg:px-8`}>
-          
+<div className={styles.hero}>
+
           <div className="mb-12 text-center lg:mb-16">
 <HeroPill className="mb-6">
               <BookOpen className="h-3.5 w-3.5" />
               Import Insights & Expert Guides
             </HeroPill>
 
-            <h1 className="mb-6 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="mb-6 text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Import Insights{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-blue-500">
+              <span className="text-[var(--si-accent)]">
                 Blog
               </span>
             </h1>
@@ -298,14 +297,14 @@ export default function BlogList({
                 { icon: Clock, val: totalReadTime.toLocaleString(), label: 'Minutes of Reading', color: 'text-brand-orange-500 dark:text-brand-orange-400' },
                 { icon: Tag, val: categoriesCount, label: 'Topics Covered', color: 'text-emerald-600 dark:text-emerald-400' }
               ].map((stat, i) => (
-                <div key={i} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                <div key={i} className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900/50">
                   <div className={`mb-3 flex justify-center ${stat.color}`}>
                     <stat.icon className="h-6 w-6" />
                   </div>
-                  <div className="mb-1 text-3xl font-black text-slate-900 dark:text-white">
+                  <div className="mb-1 text-3xl font-semibold text-slate-900 dark:text-white">
                     {stat.val}
                   </div>
-                  <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
+                  <div className="text-xs font-medium uppercase tracking-widest text-slate-400">
                     {stat.label}
                   </div>
                 </div>
@@ -315,13 +314,14 @@ export default function BlogList({
 
           {/* Search and Filter Section */}
           <div className="mx-auto max-w-4xl">
-            <div className="rounded-[32px] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-200/40 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6   dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
               <div className="space-y-4">
-                
+
                 {/* Search Input */}
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-slate-400" />
                   <Input
+                    aria-label="Search articles, authors, or topics"
                     placeholder="Search articles, authors, or topics..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -342,7 +342,7 @@ export default function BlogList({
                         </div>
                         <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 shadow-xl">
+                      <DropdownMenuContent className="w-56 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 ">
                         {blogCategories.map((category) => (
                           <DropdownMenuItem
                             key={category}
@@ -364,7 +364,7 @@ export default function BlogList({
                         </span>
                         <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-48 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 shadow-xl">
+                      <DropdownMenuContent className="w-48 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 ">
                         {[
                           { val: 'newest', label: 'Newest First' },
                           { val: 'oldest', label: 'Oldest First' },
@@ -389,7 +389,7 @@ export default function BlogList({
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
-                      className={`rounded-lg px-4 py-2 text-xs font-bold transition-all sm:text-sm ${
+                      className={`rounded-lg px-4 py-2 text-xs font-medium transition-all sm:text-sm ${
                         selectedCategory === category
                           ? 'bg-indigo-600 text-white shadow-md dark:bg-indigo-500'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
@@ -409,7 +409,7 @@ export default function BlogList({
                   {selectedTag ? (
                     <span className="inline-flex items-center gap-2">
                       Showing{' '}
-                      <span className="font-black text-indigo-600 dark:text-indigo-400">
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                         {filteredPosts.length}
                       </span>{' '}
                       articles tagged with{' '}
@@ -419,13 +419,13 @@ export default function BlogList({
                       >
                         <Tag className="mr-1 h-3 w-3" />
                         {selectedTag}
-                        <span className="ml-1 text-xs font-black">×</span>
+                        <span className="ml-1 text-xs font-semibold">×</span>
                       </Badge>
                     </span>
                   ) : searchQuery ? (
                     <>
                       Found{' '}
-                      <span className="font-black text-indigo-600 dark:text-indigo-400">
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                         {totalPosts}
                       </span>{' '}
                       articles for "
@@ -434,7 +434,7 @@ export default function BlogList({
                   ) : (
                     <>
                       Showing{' '}
-                      <span className="font-black text-indigo-600 dark:text-indigo-400">
+                      <span className="font-semibold text-indigo-600 dark:text-indigo-400">
                         {filteredPosts.length}
                       </span>{' '}
                       articles in{' '}
@@ -452,15 +452,15 @@ export default function BlogList({
       {searchQuery === '' && selectedCategory === 'All' && currentPage === 1 && !selectedTag && (
         <section className="public-solid-section bg-slate-50 border-b border-slate-200 py-16 lg:py-24 dark:bg-slate-900/50 dark:border-slate-800">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            
+
             <div className="mb-12 lg:mb-16">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 dark:border-brand-orange-900/30 dark:bg-brand-orange-900/10">
                 <TrendingUp className="h-4 w-4 text-brand-orange-600 dark:text-brand-orange-400" />
-                <span className="text-xs font-black uppercase tracking-widest text-brand-orange-700 dark:text-brand-orange-300">
+                <span className="text-xs font-semibold uppercase tracking-widest text-brand-orange-700 dark:text-brand-orange-300">
                   Featured Content
                 </span>
               </div>
-              <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white sm:text-4xl">
+              <h2 className="mb-4 text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl">
                 Must-Read Articles
               </h2>
             </div>
@@ -468,8 +468,8 @@ export default function BlogList({
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {featuredPosts.map((post, index) => (
                 <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
-                  <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-                    
+                  <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200  hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <ImageWithFallback
                         src={post.image}
@@ -477,7 +477,7 @@ export default function BlogList({
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute left-4 top-4">
-                        <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white border-0 shadow-md">
+                        <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white border-0 shadow-md">
                           Featured
                         </Badge>
                       </div>
@@ -489,7 +489,7 @@ export default function BlogList({
                         <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
                       </div>
 
-                      <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                      <h3 className="mb-4 text-xl font-medium leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
                         {post.title}
                       </h3>
 
@@ -501,7 +501,7 @@ export default function BlogList({
                         <div className="flex items-center gap-3">
                           <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
                           <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{post.author.name}</p>
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">{post.author.name}</p>
                             <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
                           </div>
                         </div>
@@ -519,7 +519,7 @@ export default function BlogList({
       <section className="py-16 lg:py-24">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mb-10 flex items-center justify-between">
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white sm:text-3xl">
+            <h2 className="text-2xl font-semibold text-slate-900 dark:text-white sm:text-3xl">
               {searchQuery ? 'Search Results' : 'Latest Articles'}
             </h2>
           </div>
@@ -529,8 +529,8 @@ export default function BlogList({
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
                 {filteredPosts.map((post) => (
                   <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
-                    <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-                      
+                    <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200  hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+
                       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                         <ImageWithFallback
                           src={post.image}
@@ -538,7 +538,7 @@ export default function BlogList({
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute left-4 top-4">
-                          <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
+                          <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0  backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
                             {post.category}
                           </Badge>
                         </div>
@@ -550,7 +550,7 @@ export default function BlogList({
                           <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
                         </div>
 
-                        <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                        <h3 className="mb-4 text-xl font-medium leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
                           {post.title}
                         </h3>
 
@@ -564,7 +564,7 @@ export default function BlogList({
                               <span
                                 key={tag}
                                 onClick={(e) => handleTagClick(tag, e)}
-                                className={`inline-flex cursor-pointer items-center rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest transition-colors ${
+                                className={`inline-flex cursor-pointer items-center rounded-lg px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest transition-colors ${
                                   selectedTag === tag
                                     ? 'bg-indigo-600 text-white dark:bg-indigo-500'
                                     : 'bg-slate-100 text-slate-500 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
@@ -580,7 +580,7 @@ export default function BlogList({
                           <div className="flex items-center gap-3">
                             <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
                             <div>
-                              <p className="text-sm font-bold text-slate-900 dark:text-white">{post.author.name}</p>
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">{post.author.name}</p>
                               <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
                             </div>
                           </div>
@@ -602,7 +602,7 @@ export default function BlogList({
                         />
                       </PaginationItem>
                       <PaginationItem>
-                        <span className="px-4 py-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+                        <span className="px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                           Page {currentPage} of {totalPages}
                         </span>
                       </PaginationItem>
@@ -619,11 +619,11 @@ export default function BlogList({
             </>
           ) : (
             <div className="py-20 text-center">
-              <div className="mx-auto max-w-lg rounded-[32px] border border-slate-200 bg-white p-12 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+              <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-12  dark:border-slate-800 dark:bg-slate-900">
                 <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800/50">
                   <Search className="h-10 w-10 text-slate-400" />
                 </div>
-                <h3 className="mb-3 text-2xl font-black text-slate-900 dark:text-white">
+                <h3 className="mb-3 text-2xl font-semibold text-slate-900 dark:text-white">
                   {blogPosts.length === 0 ? 'No posts published yet' : 'No articles found'}
                 </h3>
                 <p className="mb-8 text-base font-medium text-slate-500 dark:text-slate-400">
@@ -638,7 +638,7 @@ export default function BlogList({
                       setSelectedCategory('All');
                       setSelectedTag(null);
                     }}
-                    className="h-12 rounded-xl bg-indigo-600 px-8 text-base font-bold text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                    className="h-12 rounded-xl bg-indigo-600 px-8 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                   >
                     View All Articles
                   </Button>

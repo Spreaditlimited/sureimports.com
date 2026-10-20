@@ -17,7 +17,7 @@ export default function WarrantyPolicyPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+      <main className="min-h-screen bg-[var(--si-canvas)]" data-si-page-theme="editorial">
         <WarrantyPolicy />
       </main>
       <Footer />

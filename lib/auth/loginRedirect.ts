@@ -1,6 +1,6 @@
 export const PENDING_VEHICLE_REQUEST_KEY = 'sureimports:pendingVehicleRequest';
 export const VEHICLE_RESUME_PATH = '/checkout/resume-vehicle';
-export const DEFAULT_LOGIN_REDIRECT = '/dashboard/procurement';
+export const DEFAULT_LOGIN_REDIRECT = '/dashboard';
 export const POST_AUTH_REDIRECT_KEY = 'sureimports:postAuthRedirect';
 export const POST_LOGOUT_REDIRECT_KEY = 'sureimports:postLogoutRedirect';
 export const PENDING_PROCUREMENT_CHECKOUT_KEY =

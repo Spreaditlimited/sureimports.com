@@ -90,9 +90,9 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
     : [];
 
   return (
-    <main className="min-h-screen bg-slate-50/50 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        
+    <main className="si-workspace-plain">
+      <div className="si-workspace-inner">
+
         {/* --- Top Navigation --- */}
         <div className="mb-8">
           <Link
@@ -119,7 +119,7 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
               Submit a supplier link, quote, or invoice before you pay. Sure Imports will review the risk points and provide actionable next steps.
             </p>
           </div>
-          
+
           <div className="inline-flex items-center gap-2 rounded-full border border-brand-orange-500/20 bg-brand-orange-50 px-4 py-2 text-sm font-bold text-brand-orange-700 shadow-sm">
             <Sparkles className="h-4 w-4" />
             Pro Plan Feature
@@ -130,10 +130,10 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
         {/* STATE 1: LOCKED / NOT PRO */}
         {/* ------------------------------------------------------------------------- */}
         {!isPro ? (
-          <section className="mt-12 relative overflow-hidden rounded-[2rem] border border-slate-800 bg-slate-950 p-8 shadow-2xl sm:p-16 text-center">
+          <section className="si-workspace-callout mt-8 rounded-2xl border p-6 sm:p-8 text-center">
             {/* Ambient Glow */}
-            <div className="absolute left-1/2 top-0 h-[300px] w-[500px] -translate-x-1/2 rounded-full bg-brand-orange-500/10 blur-[100px] pointer-events-none" />
-            
+
+
             <div className="relative flex flex-col items-center">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-white/[0.03] border border-white/10 shadow-sm text-brand-orange-400">
                 <LockKeyhole className="h-8 w-8" />
@@ -144,7 +144,7 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
               <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-400">
                 The Starter plan gives you access to the verified supplier directory plus one monthly supplier search credit. Upgrading to <strong>Pro</strong> unlocks hands-on supplier vetting and quote review support before you commit money.
               </p>
-              
+
               <div className="mt-10">
                 <SubscribeButton
                   plan="pro"
@@ -156,12 +156,12 @@ export default async function IntelligenceReviewsPage({ searchParams }: PageProp
             </div>
           </section>
         ) : (
-          
+
         /* ------------------------------------------------------------------------- */
         /* STATE 2: ACTIVE PRO - REVIEW DASHBOARD */
         /* ------------------------------------------------------------------------- */
           <div className="mt-8 grid gap-8 lg:grid-cols-[400px_1fr] lg:gap-10">
-            
+
             {/* --- LEFT COLUMN: Form --- */}
             <aside className="h-fit">
               <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

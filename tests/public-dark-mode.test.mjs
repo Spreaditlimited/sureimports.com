@@ -68,7 +68,7 @@ test('public route groups share one maintainable dark-mode contract', () => {
   const globals = read('app/globals.css');
   assert.match(globals, /\.public-site-theme/);
   assert.match(globals, /--public-section-dark: 2 6 23/);
-  assert.match(globals, /\.public-site-theme main > section/);
+  assert.match(globals, /\.public-site-theme main:not\(\[data-si-page-theme\]\) > section/);
   assert.match(globals, /\.public-site-theme \.public-solid-section/);
   assert.match(globals, /\[class~='bg-white'\]/);
   assert.match(globals, /\[class~='text-slate-950'\]/);
@@ -87,7 +87,8 @@ test('blog hero, featured articles and related-reading area use the shared solid
   const blogList = read('app/(home)/components/BlogList.tsx');
   const blogDetail = read('app/(home)/components/BlogDetail.tsx');
 
-  assert.match(blogList, /public-solid-section relative overflow-hidden/);
+  assert.match(blogList, /className=\{styles.hero\}/);
+  assert.match(read('components/home/EditorialPage.module.css'), /var\(--si-(?:canvas|surface)\)/);
   assert.match(blogList, /public-solid-section bg-slate-50 border-b/);
   assert.match(blogDetail, /public-solid-section mt-16/);
 });

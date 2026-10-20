@@ -38,7 +38,9 @@ type Attempt = {
   kind: string;
 };
 const a = adapter;
-const cookiePolicy = socialCookiePolicy(googleConfig(a.origin)?.origin || a.origin);
+const cookiePolicy = socialCookiePolicy(
+  googleConfig(a.origin)?.origin || a.origin,
+);
 const flowCookie = cookiePolicy.flow;
 const setupCookie = cookiePolicy.setup;
 const options = {
@@ -311,7 +313,11 @@ export async function appleCallback(req: Request) {
     const p = await attempt(state, jar.get(flowCookie)?.value || '', 'FLOW');
     if (!p || p.provider !== 'apple') return fail('expired');
     await consume(state);
-    jar.set(flowCookie, '', { ...options, sameSite: cookiePolicy.secure ? 'none' : 'lax', maxAge: 0 });
+    jar.set(flowCookie, '', {
+      ...options,
+      sameSite: cookiePolicy.secure ? 'none' : 'lax',
+      maxAge: 0,
+    });
     if (form.get('error')) return fail('cancelled');
     const cfg = settings()!;
     const client = await oidc.discovery(
@@ -352,7 +358,11 @@ export async function googleCallback(req: Request) {
         400,
       );
     await consume(body.state);
-    jar.set(flowCookie, '', { ...options, sameSite: cookiePolicy.secure ? 'none' : 'lax', maxAge: 0 });
+    jar.set(flowCookie, '', {
+      ...options,
+      sameSite: cookiePolicy.secure ? 'none' : 'lax',
+      maxAge: 0,
+    });
     const { payload } = await jwtVerify(body.credential, googleKeys, {
       issuer: ['https://accounts.google.com', 'accounts.google.com'],
       audience: p.clientId,
@@ -465,7 +475,16 @@ export async function complete(req: Request) {
         : safeNext(ticket.payload.next, a.home);
     const response = json({ next });
     // Linking must preserve the current session and its persistence choice.
-    const target = ticket.payload.mode === 'link' ? undefined : await a.session(account, req, response, next, ticket.payload.rememberMe === true);
+    const target =
+      ticket.payload.mode === 'link'
+        ? undefined
+        : await a.session(
+            account,
+            req,
+            response,
+            next,
+            ticket.payload.rememberMe === true,
+          );
     if (target && target !== next) {
       const updated = json({ next: target });
       for (const cookie of response.cookies.getAll())

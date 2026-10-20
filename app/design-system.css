@@ -1,60 +1,4 @@
-/* Shared visual contract. Semantic status colours (success/error/warning) remain independent. */
-:root {
-  --si-canvas: #f6f8fc;
-  --si-hero-surface: #eeedf6;
-  --si-hero-art-opacity: .07;
-  --si-surface: #fff;
-  --si-raised: #fff;
-  --si-inset: #eef1f7;
-  --si-ink: #18243b;
-  --si-muted: #526078;
-  --si-border: #e3e8f0;
-  --si-accent: #48439b;
-  --si-primary: #48439b;
-  --si-on-primary: #fff;
-  --si-soft: #eeecfa;
-  --si-shadow: 0 8px 32px rgb(24 36 59 / 5%);
-  --background: 220 50% 98%;
-  --foreground: 220 42% 16%;
-  --card: 0 0% 100%;
-  --card-foreground: 220 42% 16%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 220 42% 16%;
-  --primary: 243 40% 44%;
-  --primary-foreground: 0 0% 100%;
-  --border: 217 30% 92%;
-  --input: 217 30% 92%;
-  --ring: 243 40% 44%;
-}
-.dark {
-  --si-canvas: #101114;
-  --si-hero-surface: #101114;
-  --si-hero-art-opacity: .24;
-  --si-surface: #191b21;
-  --si-raised: #21242c;
-  --si-inset: #13151a;
-  --si-ink: #f2f3f7;
-  --si-muted: #adb2c0;
-  --si-border: #30333e;
-  --si-accent: #b8b2ff;
-  --si-primary: #b0a7f5;
-  --si-on-primary: #19152d;
-  --si-soft: #292539;
-  --si-shadow: 0 8px 32px rgb(0 0 0 / 12%);
-  --background: 225 11% 7%;
-  --foreground: 228 24% 96%;
-  --card: 225 14% 11%;
-  --card-foreground: 228 24% 96%;
-  --popover: 224 14% 15%;
-  --popover-foreground: 228 24% 96%;
-  --primary: 247 80% 81%;
-  --primary-foreground: 250 36% 13%;
-  --border: 227 13% 22%;
-  --input: 227 13% 22%;
-  --ring: 247 80% 81%;
-  --muted: 224 14% 15%;
-  --muted-foreground: 224 13% 72%;
-}
+/* Legacy layout bridges. Tokens are owned by design-system/tokens.css. */
 body { background: var(--si-canvas); color: var(--si-ink); }
 .public-site-theme {
   --public-page-dark: 16 17 20;
@@ -111,6 +55,13 @@ body { background: var(--si-canvas); color: var(--si-ink); }
 .si-navbar :is(.text-white,.text-slate-300) { color: var(--si-ink); }
 .si-navbar a.bg-brand-orange-500 { color: var(--si-on-primary); }
 .public-site-theme .si-dark-surface {
+  --si-canvas: #101114;
+  --si-surface: #191b21;
+  --si-raised: #21242c;
+  --si-inset: #13151a;
+  --si-ink: #f2f3f7;
+  --si-control-border: #8793a7;
+  color: var(--si-ink);
   --si-accent: #b8b2ff;
   --si-primary: #b0a7f5;
   --si-on-primary: #19152d;

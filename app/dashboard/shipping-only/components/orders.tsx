@@ -1,5 +1,5 @@
 'use client';
-import darkHeader from '@/components/dashboard/DarkHeader.module.css';
+import darkHeader from '@/components/dashboard/WorkspaceHeader.module.css';
 
 import React, { useEffect, useState } from 'react';
 import OrderCard from '@/app/dashboard/shipping-only/components/OrderCardShippingOnly';
@@ -62,7 +62,7 @@ function Orders({ initialOrders }: PaymentSectionProps) {
     <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className={`${darkHeader.heading} si-on-dark-heading text-lg font-bold`}>
+          <h2 className={`${darkHeader.heading} text-lg font-bold`}>
             Shipping Requests
           </h2>
         </div>

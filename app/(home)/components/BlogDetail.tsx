@@ -1,7 +1,6 @@
 'use client';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import HeroPill from '@/components/home/HeroPill';
-import heroLayout from '@/components/home/HeroLayout.module.css';
+import styles from '@/components/home/EditorialPage.module.css';
 import { useState } from 'react';
 import {
   Calendar,
@@ -126,7 +125,7 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
         </div>
 
         {/* Right Column: Form / Success State */}
-        <div className="rounded-3xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl sm:p-8">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-xl sm:p-8">
           {downloadUrl ? (
             <div className="flex flex-col items-center justify-center space-y-5 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
@@ -304,12 +303,12 @@ export default function BlogDetail({
   };
 
   return (
-    <div className="bg-[#fcfcfd] dark:bg-slate-950 pb-24">
-<article className={`${heroLayout.fixed} mx-auto max-w-4xl px-4 pt-48 sm:px-6 lg:px-8`}>
-        
+    <div className={`${styles.page} pb-24`}>
+<article className={styles.article}>
+
         {/* Article Header */}
         <header className="mb-12 text-center">
-        <PublicHeroBackground darkOnly priority={false} />
+
           <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
             <HeroPill>
               {post.category}
@@ -333,7 +332,7 @@ export default function BlogDetail({
           </p>
 
           {/* Author Bento Box */}
-          <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center justify-between gap-6 rounded-[32px] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 sm:flex-row sm:px-8">
+          <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900/50 sm:flex-row sm:px-8">
             <div className="flex items-center gap-4 text-left">
               <ImageWithFallback
                 src={post.author.avatar}
@@ -356,7 +355,7 @@ export default function BlogDetail({
         </header>
 
         {/* Hero Image */}
-        <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50  dark:border-slate-800 dark:bg-slate-900">
           <ImageWithFallback
             src={post.image}
             alt={post.title}
@@ -404,12 +403,12 @@ export default function BlogDetail({
           )}
 
           {/* Publisher Bio Box */}
-          <div className="mt-16 rounded-[32px] border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900/50 sm:p-10">
+          <div className="mt-16 rounded-2xl border border-slate-200 bg-slate-50 p-8 dark:border-slate-800 dark:bg-slate-900/50 sm:p-10">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <ImageWithFallback
                 src={post.author.avatar}
                 alt={post.author.name}
-                className="h-24 w-24 flex-shrink-0 rounded-[24px] object-cover ring-1 ring-slate-200 dark:ring-slate-700"
+                className="h-24 w-24 flex-shrink-0 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
               <div className="flex-1">
                 <h3 className="mb-1 text-xl font-bold text-slate-900 dark:text-white">
@@ -440,7 +439,7 @@ export default function BlogDetail({
           line-height: 2; /* 36px */
           color: #475569; /* slate-600 */
         }
-        
+
         .dark .blog-html-content {
           color: #cbd5e1; /* slate-300 */
         }
@@ -496,7 +495,7 @@ export default function BlogDetail({
           text-underline-offset: 4px;
           transition: all 0.2s ease;
         }
-        
+
         .dark .blog-html-content a {
           color: #818cf8; /* indigo-400 */
           text-decoration-color: #3730a3;
@@ -765,8 +764,8 @@ export default function BlogDetail({
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {relatedPosts.map((relatedPost) => (
                 <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block h-full outline-none">
-                  <article className="group h-full flex flex-col overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-                    
+                  <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <ImageWithFallback
                         src={relatedPost.image}
@@ -774,7 +773,7 @@ export default function BlogDetail({
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute left-4 top-4">
-                        <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
+                        <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0  backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
                           {relatedPost.category}
                         </Badge>
                       </div>

@@ -18,9 +18,9 @@ test('all procurement bank-deposit states use paired semantic button colours', (
   assert.match(css, /color: #94a3b8/);
 });
 
-test('Pay Supplier empty state does not cancel the header overlap', () => {
+test('Pay Supplier empty state does not add redundant top spacing', () => {
   assert.ok(!read('app/dashboard/pay-supplier/[statusx]/page.tsx').includes('className="pt-24"'));
-  assert.ok(read('app/dashboard/pay-supplier/layout.tsx').includes('darkHeader.overlap'));
+  assert.ok(read('app/dashboard/pay-supplier/components/PaySupplierWorkspace.tsx').includes('darkHeader.overlap'));
 });
 
 test('Refunds server page does not import client hooks', () => {
@@ -40,10 +40,11 @@ test('dashboard does not reset inherited semantic theme colours', () => {
   }
 });
 
-test('shipping list preserves overlap and has readable dark-surface heading', () => {
+test('shipping list uses the compact layout and theme-aware heading', () => {
   const layout = read('app/dashboard/shipping-only/[statusx]/layout.tsx');
-  assert.ok(layout.includes('-mt-16'));
-  assert.ok(read('app/dashboard/shipping-only/components/orders.tsx').includes('si-on-dark-heading'));
+  assert.ok(layout.includes('si-workspace-body'));
+  assert.ok(!layout.includes('-mt-16'));
+  assert.ok(read('app/dashboard/shipping-only/components/orders.tsx').includes('WorkspaceHeader.module.css'));
 });
 
 test('sidebar uses navigation styles rather than primary button colours', () => {
@@ -52,14 +53,16 @@ test('sidebar uses navigation styles rather than primary button colours', () => 
   assert.ok(sidebar.includes('si-nav-item'));
 });
 
-test('corporate sourcing preserves overlap with conditional dark-surface text', () => {
+test('corporate sourcing uses a compact body and theme-aware section text', () => {
   const page = read('app/dashboard/corporate-sourcing/page.tsx');
-  assert.ok(page.includes('-mt-16'));
+  assert.ok(page.includes('si-workspace-body'));
+  assert.ok(!page.includes('-mt-16'));
+  assert.ok(page.includes('WorkspaceHeader.module.css'));
   assert.ok(page.includes("showForm ? 'text-slate-900 dark:text-white' : darkHeader.heading"));
 });
 
-test('all Sync controls explicitly use the dark-surface button treatment', () => {
-  for (const path of ['app/dashboard/corporate-sourcing/page.tsx', 'app/dashboard/pay-supplier/layout.tsx', 'app/dashboard/shipping-only/[statusx]/layout.tsx', 'app/dashboard/verify-supplier/components/SupplierVerificationDashboard.tsx']) {
+test('all Sync controls explicitly use the shared workspace button treatment', () => {
+  for (const path of ['app/dashboard/corporate-sourcing/page.tsx', 'app/dashboard/pay-supplier/components/PaySupplierWorkspace.tsx', 'app/dashboard/shipping-only/[statusx]/layout.tsx', 'app/dashboard/verify-supplier/components/SupplierVerificationDashboard.tsx']) {
     assert.ok(read(path).includes('si-dashboard-sync'), path);
   }
 });

@@ -1,12 +1,10 @@
+import ServiceHero from '@/components/home/ServiceHero';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Navigation from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
-import HeroPill from '@/components/home/HeroPill';
-import PublicHeroBackground from '@/components/home/PublicHeroBackground';
 import ImportMarkets from '@/components/home/ImportMarkets';
 import ImportReadingPath from '@/components/home/ImportReadingPath';
-import heroLayout from '@/components/home/HeroLayout.module.css';
 import styles from '@/components/home/ImportGuide.module.css';
 
 export const metadata: Metadata = {
@@ -20,23 +18,20 @@ export default function ImportHubPage() {
   return (
     <>
       <Navigation />
-      <main className={styles.page}>
-        <section className={`${heroLayout.fixed} ${styles.hero}`}>
-          <PublicHeroBackground />
-          <div className={`${styles.container} ${styles.heroContent}`}>
-            <HeroPill>Sure Imports · Import Hub</HeroPill>
-            <h1>
-              Start in China.
-              <br />
-              <span>Plan for your market.</span>
-            </h1>
-            <p className={styles.intro}>
-              The right product is only the beginning. Choose where you are
-              importing to for a clearer guide to sourcing, shipping, costs and
-              your next step.
-            </p>
-          </div>
-        </section>
+      <main className={styles.page} data-si-page-theme="service">
+        <ServiceHero
+          eyebrow="Sure Imports · Import Hub"
+          title="Start in China. Plan for your market."
+          description="The right product is only the beginning. Choose your destination for practical guidance on sourcing, shipping, costs and your next step."
+          primary={{ href: "#markets-heading", label: "Choose your destination" }}
+          secondary={{ href: "/blog", label: "Browse import guides" }}
+          summaryTitle="A clearer route from research to buying."
+          steps={[
+            { title: "Choose your market", description: "Start with guidance for Nigeria or the United Kingdom." },
+            { title: "Understand the costs", description: "Plan purchasing, shipping and destination costs together." },
+            { title: "Take the next step", description: "Find the right service when you are ready to buy." },
+          ]}
+        />
         <section
           className={`${styles.container} ${styles.section}`}
           aria-labelledby="markets-heading"

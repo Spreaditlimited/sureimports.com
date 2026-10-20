@@ -41,7 +41,7 @@ const RadText: React.FC<Props> = ({
     <>
       {/* TEXT INPUT */}
       <div className="mb-4">
-        <label className="mb-2 block text-sm font-medium text-gray-400">
+        <label htmlFor={id} className="mb-2 block text-sm font-medium text-gray-400">
           {label}
         </label>
         <div className="relative">
@@ -49,6 +49,8 @@ const RadText: React.FC<Props> = ({
             {reacticon}
           </span>
           <select
+            aria-invalid={Boolean(errorx)}
+            aria-describedby={errorx ? `${id}-error` : undefined}
             id={id}
             name={name}
             value={value ?? ''}
@@ -77,7 +79,7 @@ const RadText: React.FC<Props> = ({
             {/** LOOP RECORDS ENDS */}
           </select>
         </div>
-        <div id="question-error" aria-live="polite" aria-atomic="true">
+        <div id={`${id}-error`} aria-live="polite" aria-atomic="true">
           <p className="mt-2 text-sm text-red-500">{errorx}</p>
         </div>
       </div>

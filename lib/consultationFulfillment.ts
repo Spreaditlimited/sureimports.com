@@ -387,6 +387,11 @@ export async function fulfillConsultationPayment(
 
 export async function verifyAndFulfillConsultation(referenceInput: unknown) {
   const reference = clean(referenceInput, 140);
+  const booking = await getBooking(reference);
+  if (booking?.currency === 'USD') {
+    const { verifyPayPalConsultation } = await import('@/lib/consultationPayPal');
+    return verifyPayPalConsultation(reference);
+  }
   const paystackSecretKey = process.env.NEXT_SECRET_PAYSTACK_SECRET_KEY;
   if (!reference) throw paymentError('Payment reference is required.');
   if (!paystackSecretKey) throw new Error('Paystack secret key is not configured.');

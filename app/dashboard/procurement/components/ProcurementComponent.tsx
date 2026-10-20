@@ -42,7 +42,7 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
   ];
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] dark:bg-slate-950">
+    <div className="si-workspace">
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 px-4 py-6 backdrop-blur-md transition-all">
           <div className="relative max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-[32px] border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-[#161629]">
@@ -100,8 +100,8 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
         </div>
       )}
 
-      {/* Hero Section */}
-      <div className="bg-slate-900 pb-24 pt-10 text-white md:pb-32 md:pt-16">
+
+      <div className="si-workspace-header">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-blue-500/10 px-3 py-1 border border-blue-500/20">
@@ -110,7 +110,7 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
                 General Procurement
               </span>
             </div>
-            
+
             <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">
               {user?.userFirstname ? `Hi ${user.userFirstname}, ` : ''} 
               Shop from China.
@@ -118,13 +118,13 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
             <p className="mt-4 text-base text-slate-400 leading-relaxed md:text-lg md:mt-6">
               {partner ? partner.welcomeText || 'Paste your product links, add the quantities and specifications, then pay securely. Your business reviews your order and arranges delivery to you.' : 'Paste product links from any Chinese e-commerce site. We handle the purchase, quality inspection, and doorstep delivery.'}
             </p>
-            
+
             {/* Action Area: Stacked on Mobile, Row on Desktop */}
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-10">
               <div className="w-full sm:w-auto">
                 {partner?.createControl ?? <CreateOrder className="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-8 h-12 rounded-xl transition-all font-bold shadow-lg shadow-blue-600/20" />}
               </div>
-              
+
               <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   onClick={openModal}
@@ -134,7 +134,7 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
                   <VideoIcon className="mr-2 h-4 w-4 text-red-500" />
                   <span className="text-sm">Video Guide</span>
                 </Button>
-                
+
                 <Button
                   onClick={() => partner ? partner.onOrders() : router.push('/dashboard/procurement/view-orders/saved')}
                   variant="ghost"
@@ -149,7 +149,7 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
         </div>
       </div>
 
-      <main className="mx-auto -mt-10 max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+      <main className="si-workspace-body">
         {/* Store Selection Bar */}
         <div className="mb-8 rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/80">
           <div className="flex items-center justify-between">
@@ -162,7 +162,7 @@ export default function Procurement({ partner }: { partner?: { createControl: Re
                 <p className="text-[10px] text-slate-500 uppercase font-bold tracking-tighter sm:tracking-wider">Browse & Paste Links</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-1.5 dark:bg-slate-800">
                <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase">Live</span>

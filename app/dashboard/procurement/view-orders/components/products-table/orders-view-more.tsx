@@ -11,8 +11,7 @@ import {
 } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import styles from '../Orders.module.css';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -84,7 +83,7 @@ export default function MoreOrders({
   const router = useRouter();
   const navigateWithAlert = useNavigationWithAlert();
   const params = useParams<{ statusx: string }>();
-  
+
   const status = statusOverride || params.statusx || '';
   const status2 = statusOverride || params.statusx || '';
   const showActualShippingBreakdown = [
@@ -325,7 +324,7 @@ export default function MoreOrders({
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     toast.info('Processing...');
-    
+
     const formData = new FormData(event.currentTarget);
     formData.append('pidOrder', pidOrder);
     formData.append('pidUser', user?.pidUser as string);
@@ -417,8 +416,12 @@ export default function MoreOrders({
     }
   };
 
+  const [exporting, setExporting] = useState(false);
   const generatePDF = async () => {
-    if (!contentRef.current) return;
+    if (!contentRef.current || exporting) return;
+    setExporting(true);
+    try {
+    const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([import('html2canvas'), import('jspdf')]);
     toast.info('Generating Invoice PDF...');
     const canvas = await html2canvas(contentRef.current, {
       scale: 2,
@@ -480,6 +483,11 @@ export default function MoreOrders({
 
     pdf.save(`Order_${pidOrder}_Invoice.pdf`);
     toast.success('PDF downloaded successfully.');
+    } catch {
+      toast.error('Unable to export this order. Please try again.');
+    } finally {
+      setExporting(false);
+    }
   };
 
   const formatCurrency = (val: number) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -487,7 +495,7 @@ export default function MoreOrders({
   if (loading) return <div className="p-10"><Loader /></div>;
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className={`${styles.manifest} flex min-w-0 flex-col gap-5 p-4 sm:p-6`}>
       {showMinimumOrderModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
@@ -525,22 +533,22 @@ export default function MoreOrders({
           </div>
         </div>
       )}
-      
+
       {/* Top Action Bar */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Order Manifest</h3>
-        <Button onClick={generatePDF} variant="outline" className="h-9 rounded-xl border-slate-200 text-xs font-bold dark:border-slate-700">
-          <Download className="mr-2 h-4 w-4" /> Download PDF
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">Order manifest</h3>
+        <Button onClick={generatePDF} disabled={exporting} variant="outline" className="h-9 rounded-xl border-slate-200 text-xs font-bold dark:border-slate-700">
+          <Download className="mr-2 h-4 w-4" /> {exporting ? 'Preparing PDF…' : 'Download PDF'}
         </Button>
       </div>
 
       <div ref={contentRef} className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
-        
+
         {/* PDF Header (Only really visible/useful in PDF or top of card) */}
-        <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 p-5 dark:border-slate-800">
           <div>
             <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Order ID</p>
-            <p className="font-mono text-lg font-black text-slate-900 dark:text-white">{pidOrder}</p>
+            <p className="break-all font-mono text-sm font-semibold text-slate-900 dark:text-white">{pidOrder}</p>
           </div>
           <div className="text-right">
              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Status</p>
@@ -548,8 +556,21 @@ export default function MoreOrders({
           </div>
         </div>
 
+        <div className="mx-6 mt-6 flex items-start gap-3 rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-800 dark:bg-indigo-950/40">
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-indigo-600 dark:text-indigo-300" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-bold text-indigo-950 dark:text-indigo-100">
+              {shippingPlanUnit === 'CBM' ? 'Volume' : 'Weight'} and shipping cost are estimates
+            </p>
+            <p className="mt-1 text-sm leading-6 text-indigo-900 dark:text-indigo-200">
+              The actual {shippingPlanUnit === 'CBM' ? 'volume' : 'weight'} and shipping cost will be determined when your products arrive at our warehouse in Guangzhou, China.
+            </p>
+          </div>
+        </div>
+
         {/* 1. Itemized Table */}
-        <div className="overflow-x-auto p-6">
+        <p data-html2canvas-ignore className="px-6 pt-5 text-xs text-slate-500 dark:text-slate-400 md:hidden">Swipe across the table to see all product details and actions.</p>
+        <div role="region" aria-label="Products in this order" tabIndex={0} className="overflow-x-auto p-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-primary">
           <table className="w-full min-w-[800px] text-left text-sm">
             <thead>
               <tr className="border-b border-slate-200 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:border-slate-800">
@@ -585,7 +606,7 @@ export default function MoreOrders({
                     {usesMeasurementPricing ? datax.shippingMeasurePerUnit : datax.productWeight} {shippingPlanUnit}
                   </td>
                   <td className="py-4 font-bold text-slate-900 dark:text-white">{formatCurrency(datax.productPrice * datax.productQuantity)}</td>
-                  
+
                   {['saved', 'on-hold'].includes(status) && (
                     <td className="py-4 text-right pr-2">
                       <div className="flex items-center justify-end gap-2">
@@ -593,6 +614,7 @@ export default function MoreOrders({
                           variant="ghost" 
                           size="icon"
                           onClick={() => router.push(`/dashboard/procurement/edit-product/${datax.pidProduct}`)}
+                          aria-label={`Edit ${datax.productName}`}
                           className="h-8 w-8 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400"
                         >
                           <Edit className="h-4 w-4" />
@@ -601,6 +623,7 @@ export default function MoreOrders({
                           variant="ghost" 
                           size="icon"
                           onClick={() => actionProductDelete(datax.pidProduct)}
+                          aria-label={`Delete ${datax.productName}`}
                           className="h-8 w-8 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-900/20"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -617,13 +640,13 @@ export default function MoreOrders({
 
         {/* 2. Logistics & Finance Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-slate-100 border-t border-slate-100 bg-slate-50/50 dark:divide-slate-800 dark:border-slate-800 dark:bg-slate-900/30">
-          
+
           {/* Left: Logistics Details */}
           <div className="p-6 space-y-6">
             <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
               <MapPin className="h-4 w-4 text-slate-400" /> Shipping Information
             </h3>
-            
+
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Destination</span>
@@ -671,7 +694,7 @@ export default function MoreOrders({
             <h3 className="flex items-center gap-2 text-sm font-bold text-slate-900 dark:text-white">
               <Banknote className="h-4 w-4 text-slate-400" /> Financial Breakdown
             </h3>
-            
+
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Products Subtotal</span>
@@ -803,7 +826,7 @@ export default function MoreOrders({
         </div>
 
         {/* 3. Actions & Payments Section */}
-        
+
         {/* SAVED - Initial Payment */}
         {status === 'saved' && (
           <div className="border-t border-slate-100 bg-indigo-50/50 p-6 dark:border-slate-800 dark:bg-indigo-900/10">
@@ -884,7 +907,7 @@ export default function MoreOrders({
                 )}
               </div>
             </div>
-            
+
             {/* Coupons & Insurance Footer */}
             <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 border-t border-indigo-100 pt-6 dark:border-indigo-900/30">
                <div className="flex items-center gap-3">
@@ -909,7 +932,7 @@ export default function MoreOrders({
         {status2 === 'on-hold' && (
           <div className="border-t border-slate-100 bg-indigo-50/50 p-6 dark:border-slate-800 dark:bg-indigo-900/10">
              <div className="flex flex-col gap-6">
-                
+
                 {/* Checkbox confirmation required for all ON-HOLD actions */}
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input

@@ -1,3 +1,4 @@
+import { procurementVideo } from '@/lib/website-videos/public';
 import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
@@ -261,5 +262,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     vehiclePages = [...vehiclePages, ...(await vehicleCatalogue()).filter(m => m.published).map(m => ({ url: `${baseUrl}/cars/models/${m.slug}`, changeFrequency: 'weekly' as const, priority: 0.8 }))];
   } catch (error) { console.error('Unable to load vehicle sitemap entries', error); }
-  return [...staticPages, ...blogPages, ...reportPages, ...vehiclePages];
+  const video = await procurementVideo();
+  const videoPages: MetadataRoute.Sitemap = [{
+    url: `${baseUrl}/buy-from-chinese-websites/video`, changeFrequency: 'weekly', priority: 0.8,
+    videos: [{title: video.title, description: video.description, thumbnail_loc: `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`, player_loc: `https://www.youtube-nocookie.com/embed/${video.videoId}`, publication_date: video.uploadDate, duration: video.durationSeconds}],
+  }];
+  return [...staticPages, ...blogPages, ...reportPages, ...vehiclePages, ...videoPages];
 }

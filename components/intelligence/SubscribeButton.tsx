@@ -8,6 +8,9 @@ import type { IntelligencePlanKey } from '@/lib/intelligence/plans';
 
 type SubscribeButtonProps = {
   plan: IntelligencePlanKey;
+  currency?: 'NGN' | 'USD';
+  available?: boolean;
+  unavailableLabel?: string;
   children: React.ReactNode;
   className?: string;
 };
@@ -16,6 +19,9 @@ export default function SubscribeButton({
   plan,
   children,
   className = '',
+  currency = 'NGN',
+  available = true,
+  unavailableLabel = 'Pricing coming soon',
 }: SubscribeButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -26,11 +32,16 @@ export default function SubscribeButton({
     setError('');
 
     try {
-      const response = await fetch('/api/intelligence/subscribe', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      });
+      const response = await fetch(
+        currency === 'USD'
+          ? '/api/intelligence/paypal'
+          : '/api/intelligence/subscribe',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan, action: 'subscription' }),
+        },
+      );
 
       if (response.status === 401) {
         router.push(
@@ -59,7 +70,7 @@ export default function SubscribeButton({
       <button
         type="button"
         onClick={handleSubscribe}
-        disabled={isLoading}
+        disabled={isLoading || !available}
         className={className}
       >
         {isLoading ? (
@@ -67,8 +78,10 @@ export default function SubscribeButton({
             <Loader2 className="h-4 w-4 animate-spin" />
             Starting checkout...
           </>
-        ) : (
+        ) : available ? (
           children
+        ) : (
+          unavailableLabel
         )}
       </button>
       {error ? (

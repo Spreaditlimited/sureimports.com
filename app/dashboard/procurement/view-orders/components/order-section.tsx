@@ -21,14 +21,15 @@ interface OrderData {
 }
 
 interface OrderSectionProps {
+  onChanged?: () => void;
   initialOrders: any; // Can be an array or an object of orders
 }
 
-export default function OrderSection({ initialOrders }: OrderSectionProps) {
+export default function OrderSection({ initialOrders, onChanged }: OrderSectionProps) {
   const router = useRouter(); // MUST be called at the top level, not inside functions
   const { user } = useAuth();
-  
-  const [orders, setOrders] = useState<OrderData[]>([]);
+
+  const [orders, setOrders] = useState<OrderData[]>(() => initialOrders ? Array.isArray(initialOrders) ? initialOrders : Object.values(initialOrders) : []);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   // Safely format the incoming data into an array
@@ -37,11 +38,11 @@ export default function OrderSection({ initialOrders }: OrderSectionProps) {
       setOrders([]);
       return;
     }
-    
+
     const formattedOrders = Array.isArray(initialOrders) 
       ? initialOrders 
       : Object.values(initialOrders);
-      
+
     setOrders(formattedOrders as OrderData[]);
   }, [initialOrders]);
 
@@ -65,11 +66,12 @@ export default function OrderSection({ initialOrders }: OrderSectionProps) {
 
       if (data.responsex?.status === 'SUCCESS') {
         toast.success(data.responsex.message, { id: `delete-${pidOrder}` });
-        
+
         // Optimistic UI Update: Instantly remove it from the screen without a full reload
         setOrders((prev) => prev.filter((order) => order.pidOrder !== pidOrder));
-        
+
         // Refresh the router in the background to sync server state
+        onChanged?.();
         router.refresh();
       } else {
         toast.error(data.responsex?.message || 'Failed to delete order', { id: `delete-${pidOrder}` });
@@ -83,12 +85,12 @@ export default function OrderSection({ initialOrders }: OrderSectionProps) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-3">
       {orders.map((order, index) => (
         <div 
           key={order.pidOrder || index}
-          className={`transition-all duration-300 ${
-            isDeleting === order.pidOrder ? 'pointer-events-none opacity-50 blur-sm' : 'opacity-100'
+          className={`transition-opacity duration-150 ${
+            isDeleting === order.pidOrder ? 'pointer-events-none opacity-50' : 'opacity-100'
           }`}
         >
           <OrderCard
