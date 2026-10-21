@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
+import YouTubePosterPlayer from './YouTubePosterPlayer';
 
 interface YouTubeFrameProps {
   videoId?: string;
@@ -50,10 +51,22 @@ const YouTubeFrame: React.FC<YouTubeFrameProps> = ({
     () => getYouTubeVideoId(videoId || src || ''),
     [src, videoId],
   );
-  const thumbnailUrl = poster || `https://i.ytimg.com/vi/${resolvedVideoId}/${thumbnailQuality}.jpg`;
+  const thumbnailUrl =
+    poster ||
+    `https://i.ytimg.com/vi/${resolvedVideoId}/${thumbnailQuality}.jpg`;
   const embedUrl = `https://www.youtube-nocookie.com/embed/${resolvedVideoId}?autoplay=1&rel=0`;
 
   if (!resolvedVideoId) return null;
+  if (poster)
+    return (
+      <YouTubePosterPlayer
+        key={resolvedVideoId}
+        videoId={resolvedVideoId}
+        poster={poster}
+        title={title}
+        className={className}
+      />
+    );
 
   return (
     <div
