@@ -7,7 +7,7 @@ import { LINESCOUT_WHITE_LABEL_URL } from '@/lib/linescoutLinks';
 import styles from './start.module.css';
 
 type Goal = 'buy' | 'source';
-const videoUrl = '/buy-from-chinese-websites#how-it-works';
+const videoUrl = '/buy-from-chinese-websites/video';
 
 export default function StartGuide() {
   const [goal, setGoal] = useState<Goal | null>(null);
@@ -55,7 +55,7 @@ export default function StartGuide() {
               {(buying ? ['Pay for your orders', 'Track progress through your Sure Imports account', 'Manage this order and future orders in one place'] : ['Get help finding suppliers in China', 'Source products for bulk purchases', 'Explore products for your own brand']).map(text => <p key={text}><Check size={18} aria-hidden="true" />{text}</p>)}
             </div>
             {buying ? <Link className={styles.primary} href={videoUrl} onClick={() => destination('buy_video')}><Play size={18} aria-hidden="true" /> Watch how to place an order <ArrowRight size={18} aria-hidden="true" /></Link> : <a className={styles.primary} href={LINESCOUT_WHITE_LABEL_URL} onClick={() => destination('brand')}>Explore starting a brand <ArrowRight size={18} aria-hidden="true" /></a>}
-            <p className={styles.note}>{buying ? 'The video is on our Buy from Chinese Websites page.' : 'You’ll continue on LineScout, our sourcing platform.'}</p>
+            <p className={styles.note}>{buying ? 'Watch our step-by-step video guide to buying from Chinese websites.' : 'You’ll continue on LineScout, our sourcing platform.'}</p>
           </div>}
           {step === 0 && <p className={styles.note}>No account needed to get started.</p>}
         </section>
