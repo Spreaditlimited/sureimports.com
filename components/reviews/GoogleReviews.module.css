@@ -1,0 +1,170 @@
+.section {
+  margin-top: 48px;
+  padding: 32px;
+  border: 1px solid var(--si-border);
+  border-radius: 20px;
+  background: var(--si-surface);
+  color: var(--si-ink);
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.source {
+  display: inline-block;
+  padding: 5px 10px;
+  background: white;
+  color: #1f1f1f;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 14px;
+}
+.heading h2 {
+  margin: 0 0 12px;
+}
+.rating {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  font-size: 14px;
+  color: var(--si-muted);
+}
+.rating strong {
+  color: var(--si-ink);
+  font-size: 20px;
+}
+.rating > span,
+.stars {
+  color: #a66b00;
+}
+.allReviews {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--si-accent);
+}
+.notice,
+.terms {
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--si-muted);
+  margin-top: 16px;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+.card {
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--si-border);
+  border-radius: 14px;
+}
+.card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+.author {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.author img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.author > div {
+  min-width: 0;
+}
+.author a {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.author p {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--si-muted);
+}
+.stars {
+  margin: 16px 0 12px;
+  letter-spacing: 2px;
+}
+.quote {
+  font-size: 14px;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.quote summary {
+  cursor: pointer;
+  list-style: none;
+}
+.quote summary::-webkit-details-marker {
+  display: none;
+}
+.quote summary > span:first-child {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.quote[open] summary > span:first-child {
+  display: none;
+}
+.readMore {
+  display: block;
+  color: var(--si-accent);
+  font-size: 12px;
+  margin-top: 8px;
+  text-decoration: underline;
+}
+.quote[open] .readMore {
+  margin-bottom: 10px;
+}
+.reviewLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--si-accent);
+}
+.terms a {
+  text-decoration: underline;
+}
+.section a:focus-visible,
+.quote summary:focus-visible {
+  outline: 2px solid var(--si-accent);
+  outline-offset: 4px;
+}
+@media (max-width: 640px) {
+  .section {
+    padding: 22px 18px;
+    margin-top: 32px;
+  }
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card {
+    padding: 18px;
+  }
+}

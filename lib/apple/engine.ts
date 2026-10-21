@@ -1,4 +1,8 @@
 import 'server-only';
+import {
+  registrationAttribution,
+  scheduleRegistrationConversion,
+} from '@/lib/marketing/registrationConversion';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import * as oidc from 'openid-client';
@@ -20,6 +24,7 @@ import type { Accounts, Owner } from './types';
 
 type Provider = 'apple' | 'google';
 type Payload = {
+  facebookAttribution?: ReturnType<typeof registrationAttribution>;
   rememberMe?: boolean;
   origin: string;
   provider: Provider;
@@ -263,6 +268,10 @@ export async function start(req: Request) {
     const binding = token();
     const nonce = token();
     const p: Payload = {
+      facebookAttribution: registrationAttribution(
+        req,
+        body.facebookAttribution,
+      ),
       rememberMe: body.rememberMe === true,
       origin: cfg.origin,
       provider,
@@ -468,12 +477,23 @@ export async function complete(req: Request) {
       await consume(ticket.value, tx);
       return account;
     });
+    const registrationConversion =
+      !owner && ticket.payload.mode !== 'link'
+        ? scheduleRegistrationConversion({
+            request: req,
+            accountId: account.id,
+            email: account.email,
+            method: ticket.payload.provider,
+            attribution:
+              ticket.payload.facebookAttribution || body.facebookAttribution,
+          })
+        : null;
     (await cookies()).set(setupCookie, '', { ...options, maxAge: 0 });
     const next =
       ticket.payload.mode === 'link'
         ? a.home
         : safeNext(ticket.payload.next, a.home);
-    const response = json({ next });
+    const response = json({ next, registrationConversion });
     // Linking must preserve the current session and its persistence choice.
     const target =
       ticket.payload.mode === 'link'
@@ -486,7 +506,7 @@ export async function complete(req: Request) {
             ticket.payload.rememberMe === true,
           );
     if (target && target !== next) {
-      const updated = json({ next: target });
+      const updated = json({ next: target, registrationConversion });
       for (const cookie of response.cookies.getAll())
         updated.cookies.set(cookie);
       return updated;

@@ -193,14 +193,15 @@ export default function LeadCapturePopup() {
         window.localStorage.setItem(SUBSCRIBED_KEY, 'true');
       }
 
-      trackBrowserLeadEvent({
-        eventId: leadMeta.fbEventId,
-        value: 1,
-        currency: 'NGN',
-        contentName: 'Website Lead Capture Popup',
-        contentCategory: pageType,
-        numItems: 1,
-      });
+      if (!data?.alreadySubscribed)
+        trackBrowserLeadEvent({
+          eventId: leadMeta.fbEventId,
+          value: 1,
+          currency: 'NGN',
+          contentName: 'Website Lead Capture Popup',
+          contentCategory: pageType,
+          numItems: 1,
+        });
 
       if (data?.alreadySubscribed) {
         setSuccessTitle("You're already subscribed.");

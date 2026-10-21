@@ -1,3 +1,4 @@
+import GoogleReviews from '@/components/reviews/GoogleReviews';
 import ServiceHero from '@/components/home/ServiceHero';
 import pageStyles from '@/components/home/PublicServicePage.module.css';
 import type { Metadata } from 'next';
@@ -529,6 +530,10 @@ export default async function BuyFromChineseWebsitesPage() {
             </div>
           </div>
         </section>
+
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+          <GoogleReviews />
+        </div>
 
         {/* --- NATIVE ACCORDION FAQS --- */}
         <section className="py-20 md:py-28">

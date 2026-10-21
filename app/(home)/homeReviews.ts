@@ -19,7 +19,7 @@ export const homeReviews = [
   },
   {
     name: 'Amarachi Ndukauba Ogbuagu',
-    role: 'Businesswoman · Canada',
+    role: 'Canada',
     initials: 'AO',
     image: '/images/new/images/img3.jpg',
     quote:
@@ -35,9 +35,9 @@ export const homeReviews = [
   },
   {
     name: 'Agu Mba',
-    role: 'Customer · United Kingdom',
+    role: 'United Kingdom',
     initials: 'AM',
-    image: null,
+    image: '/home/testimonials/agu-mba.jpg',
     quote:
       'Timely arrival and impressive quality for event souvenirs. Cost-effective sourcing without stress. The gifts impressed everyone at the celebration. I would gladly use them again.',
   },

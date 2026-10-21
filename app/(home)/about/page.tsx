@@ -1,3 +1,4 @@
+import GoogleReviews from '@/components/reviews/GoogleReviews';
 import * as React from 'react';
 import type { Metadata } from 'next';
 
@@ -20,6 +21,9 @@ export default function AboutPage() {
       <Navbar />
       <main className={pageStyles.page} data-si-page-theme="service">
         <AboutUs />
+        <div className="mx-auto max-w-[1440px] px-4 pb-16 sm:px-6 lg:px-8">
+          <GoogleReviews />
+        </div>
       </main>
       <Footer />
     </>

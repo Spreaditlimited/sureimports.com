@@ -1,11 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
+import TrustedOrganizations from '@/app/(home)/components/TrustedOrganizations';
+import { homeReviews } from '@/app/(home)/homeReviews';
+import GoogleReviews from '@/components/reviews/GoogleReviews';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { procurementVideo } from '@/lib/website-videos/public';
 import { videoSchema } from '@/lib/website-videos/policy';
-import styles from './video.module.css';
+import styles from './buying-guide.module.css';
 
 export const revalidate = 60;
 const canonical = 'https://www.sureimports.com/buy-from-chinese-websites/video';
@@ -25,23 +29,9 @@ const preparation = [
     text: 'Select your destination country to see the available shipping methods. Tell us if your goods contain batteries or liquids so you can choose a suitable service.',
   },
 ];
-const guides = [
-  {
-    href: '/buy-from-chinese-websites',
-    title: 'Buying from Chinese websites',
-    text: 'Explore the service and prepare your product list.',
-  },
-  {
-    href: '/shipping-rate',
-    title: 'Shipping rates and methods',
-    text: 'Compare the available options for your destination.',
-  },
-  {
-    href: '/tools/landed-cost-estimator',
-    title: 'Plan your landed cost',
-    text: 'Estimate your budget before placing an order.',
-  },
-];
+const featuredReviews = homeReviews.filter((review) =>
+  ['Roberta Edu', 'Amarachi Ndukauba Ogbuagu', 'Agu Mba'].includes(review.name),
+);
 
 export async function generateMetadata(): Promise<Metadata> {
   const video = await procurementVideo();
@@ -126,10 +116,15 @@ export default async function BuyingGuideVideo() {
         </nav>
         <header className={styles.header}>
           <p className={styles.eyebrow}>THE SURE IMPORTS VIDEO GUIDE</p>
-          <h1>{video.title}</h1>
+          <h1>
+            Buy from 1688, Taobao and Pinduoduo from the UK, US, Nigeria and
+            Beyond
+          </h1>
           <p className={styles.intro}>
-            See how buying from Chinese websites works, then get your own order
-            ready with confidence.
+            Pay in GBP, USD or NGN and combine products from multiple suppliers
+            in one order. We handle supplier verification, purchasing, product
+            checks, consolidation, shipping and customs clearance. See how it
+            works below.
           </p>
           <div className={styles.metadata}>
             <span>{duration}</span>
@@ -157,16 +152,149 @@ export default async function BuyingGuideVideo() {
               referrerPolicy="strict-origin-when-cross-origin"
             />
           </div>
-          <div className={styles.videoFooter}>
-            <p>A walkthrough you can pause and follow at your own pace.</p>
-            <a
-              href={`https://www.youtube.com/watch?v=${video.videoId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Watch on YouTube <span aria-hidden="true">↗</span>
-              <span className="sr-only"> (opens in a new tab)</span>
-            </a>
+        </section>
+        <div className={styles.videoSignup}>
+          <Link className={styles.primary} href="/auth/signup">
+            Create a Free Account
+          </Link>
+        </div>
+        <TrustedOrganizations
+          embedded
+          label="Some of the organisations we’ve supported"
+        />
+        <section className={styles.trust} aria-labelledby="reviews-title">
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>CUSTOMER EXPERIENCES</p>
+            <h2 id="reviews-title">Real orders. People behind every one.</h2>
+            <p>
+              Hear from customers who have used Sure Imports for sourcing and
+              delivery.
+            </p>
+          </div>
+          <div className={styles.reviews}>
+            {featuredReviews.map((review, index) => (
+              <figure
+                key={review.name}
+                className={index === 0 ? styles.featuredReview : styles.review}
+              >
+                {index === 0 && review.image && (
+                  <div
+                    className={styles.reviewPortrait}
+                    style={{ position: 'relative', overflow: 'hidden' }}
+                  >
+                    <Image
+                      src={review.image}
+                      alt={review.name}
+                      fill
+                      sizes="280px"
+                    />
+                  </div>
+                )}
+                <div className={styles.reviewBody}>
+                  <figcaption className={styles.reviewAuthor}>
+                    {review.image ? (
+                      <Image
+                        className={styles.reviewAvatar}
+                        src={review.image}
+                        alt=""
+                        width={48}
+                        height={48}
+                      />
+                    ) : (
+                      <span
+                        className={styles.reviewInitials}
+                        aria-hidden="true"
+                      >
+                        {review.initials}
+                      </span>
+                    )}
+                    <div>
+                      <strong>{review.name}</strong>
+                      <span>{review.role}</span>
+                    </div>
+                  </figcaption>
+                  <blockquote>
+                    <p>“{review.quote}”</p>
+                  </blockquote>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </section>
+        <GoogleReviews />
+        <section className={styles.about} aria-labelledby="about-title">
+          <div className={styles.sectionHeading}>
+            <p className={styles.eyebrow}>ABOUT SURE IMPORTS</p>
+            <h2 id="about-title">
+              A team behind your order, from China to your door.
+            </h2>
+            <p>
+              Since 2018, Sure Importers Limited has helped customers source
+              products from China. We bring purchasing and shipping together,
+              with a team to support you through the process.
+            </p>
+          </div>
+          <div className={styles.aboutDetails}>
+            <p>
+              Share the products you want to buy. We help with supplier
+              verification, purchasing and product checks, then consolidate your
+              items at our Guangzhou warehouse for shipping and customs
+              clearance.
+            </p>
+            <p>
+              You can combine products from multiple suppliers in one order,
+              provided they use the same shop currency. Your destination and
+              product type determine the shipping options available.
+            </p>
+            <Link href="/about" className={styles.textLink}>
+              Get to know Sure Imports <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </section>
+        <section className={styles.founder} aria-labelledby="founder-title">
+          <div
+            className={styles.founderPortrait}
+            style={{ position: 'relative', overflow: 'hidden' }}
+          >
+            <Image
+              src="/images/new/images/sureimports-ceo.JPG"
+              alt="Tochukwu Nkwocha, founder of Sure Imports"
+              fill
+              sizes="(max-width: 640px) 100vw, 340px"
+            />
+          </div>
+          <div className={styles.founderCopy}>
+            <p className={styles.eyebrow}>MEET THE FOUNDER</p>
+            <h2 id="founder-title">Tochukwu Nkwocha</h2>
+            <p className={styles.founderRole}>
+              Founder &amp; Chief Executive Officer
+            </p>
+            <p>
+              Tochukwu leads Sure Imports, bringing together experience in
+              digital marketing, software development and product management to
+              make sourcing from China easier to navigate.
+            </p>
+            <p>
+              His work connects technology with the practical steps of
+              importing: finding products, working with suppliers and getting
+              orders delivered.
+            </p>
+            <nav className={styles.founderSocials} aria-label="Follow Tochukwu Nkwocha">
+              <a
+                href="https://www.facebook.com/share/19Tmj5y7fp/?mibextid=wwXIfr"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Facebook <span aria-hidden="true">↗</span>
+              </a>
+              <a
+                href="https://www.tiktok.com/@tochukwunkwocha"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                TikTok <span aria-hidden="true">↗</span>
+              </a>
+            </nav>
           </div>
         </section>
         <section className={styles.prepare} aria-labelledby="prepare-title">
@@ -188,11 +316,6 @@ export default async function BuyingGuideVideo() {
               </li>
             ))}
           </ol>
-          <p className={styles.note}>
-            <strong>A note on estimates.</strong> Weight and shipping cost are
-            estimated. Actual weight and shipping cost will be determined when
-            your products arrive at our warehouse in Guangzhou, China.
-          </p>
         </section>
         <section className={styles.cta} aria-labelledby="start-title">
           <div>
@@ -202,19 +325,6 @@ export default async function BuyingGuideVideo() {
           <Link className={styles.primary} href="/auth/signup">
             Start your order <span aria-hidden="true">→</span>
           </Link>
-        </section>
-        <section className={styles.related} aria-labelledby="related-title">
-          <h2 id="related-title">Keep planning your import</h2>
-          <div className={styles.guides}>
-            {guides.map((guide) => (
-              <Link href={guide.href} key={guide.href}>
-                <h3>
-                  {guide.title} <span aria-hidden="true">↗</span>
-                </h3>
-                <p>{guide.text}</p>
-              </Link>
-            ))}
-          </div>
         </section>
       </main>
       <Footer />

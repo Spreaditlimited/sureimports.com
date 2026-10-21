@@ -9,7 +9,8 @@ type CapiUserDataInput = {
   fbc?: string | null;
 };
 
-type CapiLeadEventInput = {
+export type CapiLeadEventInput = {
+  eventName?: 'Lead' | 'CompleteRegistration';
   pixelId: string;
   accessToken: string;
   eventId: string;
@@ -61,7 +62,7 @@ export async function sendFacebookLeadCapiEvent(input: CapiLeadEventInput) {
   const body = {
     data: [
       {
-        event_name: 'Lead',
+        event_name: input.eventName || 'Lead',
         event_time: input.eventTime || Math.floor(Date.now() / 1000),
         event_id: input.eventId,
         action_source: input.actionSource || 'website',
@@ -73,23 +74,29 @@ export async function sendFacebookLeadCapiEvent(input: CapiLeadEventInput) {
     ...(input.testEventCode ? { test_event_code: input.testEventCode } : {}),
   };
 
-  const response = await fetch(
-    `${endpoint}?access_token=${input.accessToken}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${input.accessToken}`,
     },
-  );
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(8000),
+  });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(
-      `Facebook CAPI request failed (${response.status}): ${text}`,
+    const error = new Error(
+      `Facebook CAPI request failed (${response.status})`,
     );
+    Object.assign(error, { status: response.status });
+    throw error;
   }
 
-  return response.json();
+  const result = await response.json();
+  if (
+    Number(result.events_received) < 1 ||
+    !Number.isFinite(Number(result.events_received))
+  )
+    throw new Error('Facebook CAPI did not acknowledge the event');
+  return result;
 }

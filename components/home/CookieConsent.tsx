@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { deleteCookie, hasCookie, setCookie } from 'cookies-next';
+import { hasCookie, setCookie } from 'cookies-next';
 
 export const CookieConsent = () => {
   const [showConsent, setShowConsent] = useState(false);
@@ -13,16 +13,15 @@ export const CookieConsent = () => {
 
   const acceptConsent = () => {
     setShowConsent(false);
-    setCookie('consent', 'true', { maxAge: 365 * 24 * 3600 });
+    setCookie('consent', 'true', { path: '/', maxAge: 365 * 24 * 3600 });
     // Trigger GTM or analytics scripts here
   };
 
   const declineConsent = () => {
-    setShowConsent(true);
-    setCookie('consent', 'false', { maxAge: 0 });
+    setShowConsent(false);
+    setCookie('consent', 'false', { path: '/', maxAge: 365 * 24 * 3600 });
     // Trigger GTM or analytics scripts here
 
-    deleteCookie('consent');
     window.gtag?.('consent', 'update', {
       ad_storage: 'denied',
       analytics_storage: 'denied',

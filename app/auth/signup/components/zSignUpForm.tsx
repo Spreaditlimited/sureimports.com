@@ -1,5 +1,7 @@
 'use client';
 
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
+import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Control, useForm, UseFormReturn } from 'react-hook-form';
@@ -364,6 +366,7 @@ interface User {
 
 //API RESPONSE
 interface ApiResponse {
+  registrationConversion?: { eventId: string; method: string } | null;
   messagex: any;
   statusx: string;
   successx: boolean;
@@ -438,6 +441,7 @@ const SignupPageContainer: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          facebookAttribution: buildFacebookLeadMeta(),
           userFirstname,
           userLastname,
           email,
@@ -448,6 +452,7 @@ const SignupPageContainer: React.FC = () => {
       });
       const data: ApiResponse = await res.json();
       if (data.successx) {
+        trackRegistrationConversion(data.registrationConversion);
         router.push('/auth/account-creation-success');
         setLoading(false);
       } else {

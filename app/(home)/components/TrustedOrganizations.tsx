@@ -7,6 +7,14 @@ import styles from './TrustedOrganizations.module.css';
 // Visible artwork bounds exclude transparent export margins. Originals stay intact.
 const clients = [
   {
+    name: 'Kitcha',
+    src: '/home/kitcha-logo-transparent.png',
+    width: 1679,
+    height: 937,
+    crop: [132, 163, 1491, 555],
+    displayWidth: 180,
+  },
+  {
     name: 'Moppet',
     src: '/Moppet.PNG',
     width: 1536,
@@ -48,14 +56,20 @@ const clients = [
   },
 ];
 
-export default function TrustedOrganizations() {
+export default function TrustedOrganizations({
+  embedded = false,
+  label = 'Trusted by organizations across Nigeria',
+}: {
+  embedded?: boolean;
+  label?: string;
+}) {
   const [paused, setPaused] = useState(false);
   return (
     <section
-      className={styles.trust}
+      className={`${styles.trust} ${embedded ? styles.embedded : ''}`}
       aria-label="Organizations that trust Sure Imports"
     >
-      <p>Trusted by organizations across Nigeria</p>
+      <p>{label}</p>
       <div
         className={styles.logos}
         role="region"
@@ -63,45 +77,58 @@ export default function TrustedOrganizations() {
         tabIndex={0}
       >
         <div className={styles.track} data-paused={paused}>
-        {[false, true].map(duplicate => <div key={String(duplicate)} className={styles.group} aria-hidden={duplicate || undefined}>
-        {clients.map(
-          ({
-            name,
-            src,
-            width,
-            height,
-            crop: [x, y, cropWidth, cropHeight],
-            displayWidth,
-          }) => (
-            <div key={name}>
-              <div
-                className={styles.logoArtwork}
-                style={{
-                  width: displayWidth,
-                  aspectRatio: `${cropWidth} / ${cropHeight}`,
-                }}
-              >
-                <Image
-                  src={src}
-                  alt={duplicate ? '' : name}
-                  width={width}
-                  height={height}
-                  sizes="(max-width: 760px) 520px, 640px"
-                  style={{
-                    width: `${(width / cropWidth) * 100}%`,
-                    height: `${(height / cropHeight) * 100}%`,
-                    left: `${(-x / cropWidth) * 100}%`,
-                    top: `${(-y / cropHeight) * 100}%`,
-                  }}
-                />
-              </div>
+          {[false, true].map((duplicate) => (
+            <div
+              key={String(duplicate)}
+              className={styles.group}
+              aria-hidden={duplicate || undefined}
+            >
+              {clients.map(
+                ({
+                  name,
+                  src,
+                  width,
+                  height,
+                  crop: [x, y, cropWidth, cropHeight],
+                  displayWidth,
+                }) => (
+                  <div key={name}>
+                    <div
+                      className={styles.logoArtwork}
+                      style={{
+                        width: displayWidth,
+                        aspectRatio: `${cropWidth} / ${cropHeight}`,
+                      }}
+                    >
+                      <Image
+                        src={src}
+                        alt={duplicate ? '' : name}
+                        width={width}
+                        height={height}
+                        sizes="(max-width: 760px) 520px, 640px"
+                        style={{
+                          width: `${(width / cropWidth) * 100}%`,
+                          height: `${(height / cropHeight) * 100}%`,
+                          left: `${(-x / cropWidth) * 100}%`,
+                          top: `${(-y / cropHeight) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                ),
+              )}
             </div>
-          ),
-        )}
-        </div>)}
+          ))}
         </div>
       </div>
-      <button type="button" className={styles.motionControl} aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Resume logos' : 'Pause logos'}</button>
+      <button
+        type="button"
+        className={styles.motionControl}
+        aria-pressed={paused}
+        onClick={() => setPaused((value) => !value)}
+      >
+        {paused ? 'Resume logos' : 'Pause logos'}
+      </button>
     </section>
   );
 }

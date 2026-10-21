@@ -1,4 +1,6 @@
 'use client';
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
+import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import { FormEvent, useEffect, useState } from 'react';
 import SocialShell from './SocialShell';
 import SocialButtons from './SocialButtons';
@@ -50,6 +52,7 @@ export default function SocialComplete({
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
+          facebookAttribution: buildFacebookLeadMeta(),
           firstName: form.get('firstName'),
           lastName: form.get('lastName'),
           phone: form.get('phone'),
@@ -60,6 +63,7 @@ export default function SocialComplete({
       });
       const data = await r.json();
       if (!r.ok) throw Error(data.message);
+      trackRegistrationConversion(data.registrationConversion);
       if (status?.mode === 'link') setConnectedNext(data.next);
       else window.location.assign(data.next);
     } catch (e) {

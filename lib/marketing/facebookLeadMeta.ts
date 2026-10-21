@@ -1,3 +1,4 @@
+import { queueFacebookEvent } from './facebookEvents';
 export type FacebookLeadMeta = {
   fbEventId: string;
   fbp: string | null;
@@ -16,9 +17,26 @@ function getCookie(name: string): string | null {
 function getFbcFromFbclid(): string | null {
   if (typeof window === 'undefined') return null;
   const fbclid = new URLSearchParams(window.location.search).get('fbclid');
-  if (!fbclid) return null;
-  const timestamp = Date.now();
-  return `fb.1.${timestamp}.${fbclid}`;
+  try {
+    const saved = JSON.parse(
+      sessionStorage.getItem('si:meta:attribution') || 'null',
+    );
+    if (
+      !fbclid ||
+      (saved?.clickId === fbclid && Date.now() - saved.createdAt < 86400000)
+    )
+      return saved && Date.now() - saved.createdAt < 86400000
+        ? saved.fbc
+        : null;
+    const fbc = `fb.1.${Date.now()}.${fbclid}`;
+    sessionStorage.setItem(
+      'si:meta:attribution',
+      JSON.stringify({ clickId: fbclid, fbc, createdAt: Date.now() }),
+    );
+    return fbc;
+  } catch {
+    return fbclid ? `fb.1.${Date.now()}.${fbclid}` : null;
+  }
 }
 
 function generateEventId(): string {
@@ -51,8 +69,6 @@ type BrowserLeadEventInput = {
 
 export function trackBrowserLeadEvent(input: BrowserLeadEventInput) {
   if (typeof window === 'undefined') return;
-  const fbq = (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq;
-  if (typeof fbq !== 'function') return;
 
   const payload: Record<string, string | number> = {};
   if (typeof input.value === 'number' && Number.isFinite(input.value)) {
@@ -63,5 +79,9 @@ export function trackBrowserLeadEvent(input: BrowserLeadEventInput) {
   if (input.contentCategory) payload.content_category = input.contentCategory;
   if (typeof input.numItems === 'number') payload.num_items = input.numItems;
 
-  fbq('track', 'Lead', payload, { eventID: input.eventId });
+  queueFacebookEvent({ name: 'Lead', id: input.eventId, data: payload });
+}
+
+export function captureFacebookAttribution() {
+  getFbcFromFbclid();
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
+import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import type React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -124,8 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextParam = searchParams?.get('next') || '';
     const storedNextPath =
       typeof window !== 'undefined'
-        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
-          ''
+        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) || ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
     const safeNextPath = getSafeLoginRedirect(redirectCandidate);
@@ -178,8 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const nextParam = searchParams?.get('next') || '';
     const storedNextPath =
       typeof window !== 'undefined'
-        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) ||
-          ''
+        ? window.localStorage.getItem(POST_AUTH_REDIRECT_KEY) || ''
         : '';
     const redirectCandidate = nextParam || storedNextPath;
     const safeNextPath = getSafeLoginRedirect(redirectCandidate);
@@ -248,6 +248,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        facebookAttribution: buildFacebookLeadMeta(),
         userFirstname,
         userLastname,
         userEmail,
@@ -261,6 +262,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = (await res.json()) as RegisterStoreResponse;
 
     if (res.ok) {
+      trackRegistrationConversion(
+        (
+          data as {
+            registrationConversion?: { eventId: string; method: string };
+          }
+        ).registrationConversion,
+      );
       //setUser(data.user);
       //router.push('/dashboard');
       if (data.statusx === 'SUCCESS') {

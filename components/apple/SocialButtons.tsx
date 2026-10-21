@@ -1,4 +1,5 @@
 'use client';
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
 import { useEffect, useRef, useState } from 'react';
 import styles from './SocialAuth.module.css';
 
@@ -89,6 +90,7 @@ export default function SocialButtons({
       try {
         const flow = await post('start', {
           provider: 'google',
+          facebookAttribution: buildFacebookLeadMeta(),
           mode,
           consent: mode === 'link' ? 'google' : undefined,
           next: destination(),
@@ -168,6 +170,7 @@ export default function SocialButtons({
     try {
       const data = await post('start', {
         provider: 'apple',
+        facebookAttribution: buildFacebookLeadMeta(),
         mode,
         consent: mode === 'link' ? 'apple' : undefined,
         next: destination(),

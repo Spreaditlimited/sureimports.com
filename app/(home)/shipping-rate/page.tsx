@@ -1,3 +1,4 @@
+import GoogleReviews from '@/components/reviews/GoogleReviews';
 import { getDeviceShippingSettings } from '@/lib/procurement/deviceShippingSettings';
 import ServiceHero from '@/components/home/ServiceHero';
 import pageStyles from '@/components/home/PublicServicePage.module.css';
@@ -192,6 +193,8 @@ export default async function ShippingRatePage() {
 
             <div className="mb-6 rounded-xl border border-[var(--si-border)] bg-[var(--si-surface)] p-5"><h2 className="text-lg font-semibold">Phones and laptops to Nigeria</h2><p className="mt-2">₦{deviceRates.phoneNgn.toLocaleString()} per phone · ₦{deviceRates.laptopNgn.toLocaleString()} per laptop.</p><p className="mt-2 text-sm text-[var(--si-muted)]">For safety and speed, these devices use per-device shipping instead of weight-based freight. Other goods in the same order use the rates below. These device rates apply to Nigeria only.</p></div>
             <ShippingRatesTable rates={rates} />
+
+            <GoogleReviews />
 
             <div className="si-dark-surface mt-10 flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#15171c] p-6 text-white sm:flex-row sm:items-center">
               <div>

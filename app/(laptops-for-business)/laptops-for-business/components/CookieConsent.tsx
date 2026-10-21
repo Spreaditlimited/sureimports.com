@@ -23,11 +23,13 @@ export default function CookieConsent({
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted');
+    document.cookie = 'consent=true; Path=/; Max-Age=31536000; SameSite=Lax';
     handleClose();
   };
 
   const handleDecline = () => {
     localStorage.setItem('cookie-consent', 'declined');
+    document.cookie = 'consent=false; Path=/; Max-Age=31536000; SameSite=Lax';
     handleClose();
   };
 

@@ -159,6 +159,23 @@ export default function AboutUs() {
                   </p>
                 </div>
 
+                <nav className="mb-8 flex flex-wrap gap-3" aria-label="Follow Tochukwu Nkwocha">
+                  {[
+                    { label: 'Facebook', href: 'https://www.facebook.com/share/19Tmj5y7fp/?mibextid=wwXIfr' },
+                    { label: 'TikTok', href: 'https://www.tiktok.com/@tochukwunkwocha' },
+                  ].map((social) => (
+                    <a
+                      key={social.label}
+                      href={social.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-11 items-center justify-center gap-3 rounded-lg border border-[var(--si-border)] bg-[var(--si-surface)] px-4 py-2 text-sm font-semibold text-[var(--si-accent)] hover:border-[var(--si-accent)] hover:bg-[var(--si-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--si-accent)]"
+                    >
+                      {social.label} <span aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </nav>
+
                 <div className="space-y-4">
                   <h4 className="flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-slate-900 dark:text-white">
                     <Code className="h-4 w-4 text-indigo-500" /> Expertise & Skills

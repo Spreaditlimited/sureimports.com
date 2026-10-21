@@ -1,3 +1,4 @@
+import GoogleReviews from '@/components/reviews/GoogleReviews';
 import { homeReviews } from './homeReviews';
 import TrustedOrganizations from './components/TrustedOrganizations';
 import Image from 'next/image';
@@ -369,6 +370,10 @@ export default function HomeClient() {
             ))}
           </div>
         </section>
+
+        <div className={styles.container}>
+          <GoogleReviews />
+        </div>
 
         <section
           className={`${styles.container} ${styles.closing}`}

@@ -1,5 +1,6 @@
 'use server';
 
+import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import validateEmail from '@/lib/helpers/validateEmail';
@@ -22,6 +23,7 @@ import {
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
   const {
+    facebookAttribution,
     userFirstname,
     userLastname,
     userEmail,
@@ -167,10 +169,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const userAffiliateRefx = await resolveAffiliateReference(
-    request,
-    userEmail,
-  );
+  const userAffiliateRefx = await resolveAffiliateReference(request, userEmail);
 
   // Create a user in db
   const create = await prisma.users.create({
@@ -189,6 +188,13 @@ export async function POST(request: NextRequest) {
       userAffiliateCode: randomGenerator(6),
       userAffiliateRef: userAffiliateRefx,
     },
+  });
+  const registrationConversion = scheduleRegistrationConversion({
+    request,
+    accountId: create.pidUser,
+    email: userEmail,
+    method: 'email',
+    attribution: facebookAttribution,
   });
   await claimAffiliateAttribution(request, create.pidUser, userEmail);
 
@@ -274,7 +280,11 @@ See you inside.<br /><br />
   // Redirect to login if success
   if (create) {
     return NextResponse.json(
-      { statusx: 'SUCCESS', message: 'Account was successfully created!' },
+      {
+        statusx: 'SUCCESS',
+        message: 'Account was successfully created!',
+        registrationConversion,
+      },
       { status: 200 },
     );
     //redirect("/success/registration");

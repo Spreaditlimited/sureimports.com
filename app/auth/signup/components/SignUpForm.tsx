@@ -1,9 +1,15 @@
 'use client';
+import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
+import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import AuthFrame from '@/components/auth-ui/AuthFrame';
 import AuthHeading from '@/components/auth-ui/AuthHeading';
 import AuthDivider from '@/components/auth-ui/AuthDivider';
 import SocialButtons from '@/components/apple/SocialButtons';
-import { readShopCheckoutDraft, splitShopContactName, SHOP_CHECKOUT_RESUME } from '@/lib/shop/checkoutDraft';
+import {
+  readShopCheckoutDraft,
+  splitShopContactName,
+  SHOP_CHECKOUT_RESUME,
+} from '@/lib/shop/checkoutDraft';
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -49,8 +55,12 @@ const formSchema = z
     userLastname: z.string().min(1, { message: 'Last name is required.' }),
     email: z.string().email({ message: 'Invalid email address.' }),
     phone: z.string().min(5, { message: 'Invalid phone number.' }),
-    password: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
-    confirmPassword: z.string().min(6, { message: 'Password must be at least 6 characters.' }),
+    password: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters.' }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: 'Password must be at least 6 characters.' }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match.',
@@ -60,6 +70,7 @@ const formSchema = z
 type FormValues = z.infer<typeof formSchema>;
 
 interface ApiResponse {
+  registrationConversion?: { eventId: string; method: string } | null;
   messagex?: {
     message1?: string;
   } | null;
@@ -162,8 +173,10 @@ export default function SignUpFormContainer() {
     const draft = readShopCheckoutDraft();
     if (!draft) return;
     const { firstName, lastName } = splitShopContactName(draft.name);
-    if (!form.getValues('userFirstname')) form.setValue('userFirstname', firstName);
-    if (!form.getValues('userLastname')) form.setValue('userLastname', lastName);
+    if (!form.getValues('userFirstname'))
+      form.setValue('userFirstname', firstName);
+    if (!form.getValues('userLastname'))
+      form.setValue('userLastname', lastName);
     if (!form.getValues('email')) form.setValue('email', draft.email);
   }, [form, nextParam]);
 
@@ -320,11 +333,16 @@ export default function SignUpFormContainer() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, recaptchaToken }),
+        body: JSON.stringify({
+          ...data,
+          recaptchaToken,
+          facebookAttribution: buildFacebookLeadMeta(),
+        }),
       });
       const responseData = (await res.json()) as ApiResponse;
 
       if (res.ok && responseData.successx) {
+        trackRegistrationConversion(responseData.registrationConversion);
         try {
           const pendingRedirect = window.localStorage.getItem(
             POST_AUTH_REDIRECT_KEY,
@@ -375,152 +393,281 @@ export default function SignUpFormContainer() {
   // Wait for a real auth check before rendering form to avoid stale-state redirect loops.
   if (!authChecked && !user?.userEmail) return null;
 
-  return <AuthFrame><AuthHeading title="Create your account" description="Enter your details to get started with Sure Imports." /><Form {...form}>
-              <SocialButtons /><AuthDivider /><form onSubmit={form.handleSubmit(onSubmit)} className="si-personal-details space-y-5">
-                
-                {/* Name Grid */}
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="userFirstname"
-                    render={({ field }) => (
-                      <FormItem>
-                        <label htmlFor="signup-userFirstname" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">First Name</label>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                            <Input id="signup-userFirstname" autoComplete="given-name" placeholder="John" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage className="text-[11px] font-bold text-rose-500" />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="userLastname"
-                    render={({ field }) => (
-                      <FormItem>
-                        <label htmlFor="signup-userLastname" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Last Name</label>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                            <Input id="signup-userLastname" autoComplete="family-name" placeholder="Doe" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage className="text-[11px] font-bold text-rose-500" />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Email */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <label htmlFor="signup-email" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Email Address</label>
-                      <FormControl>
-                        <div className="relative">
-                          <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input id="signup-email" autoComplete="email" type="email" placeholder="you@example.com" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[11px] font-bold text-rose-500" />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Phone */}
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <label htmlFor="signup-phone" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Phone Number</label>
-                      <FormControl>
-                        <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input id="signup-phone" autoComplete="tel" type="tel" placeholder="+234 800 000 0000" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[11px] font-bold text-rose-500" />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Passwords */}
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <label htmlFor="signup-password" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Password</label>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input id="signup-password" autoComplete="new-password" type={showPassword ? 'text' : 'password'} placeholder="Create a secure password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                          <button type="button" aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                          </button>
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[11px] font-bold text-rose-500" />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="confirmPassword"
-                  render={({ field }) => (
-                    <FormItem>
-                      <label htmlFor="signup-confirmPassword" className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Confirm Password</label>
-                      <FormControl>
-                        <div className="relative">
-                          <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                          <Input id="signup-confirmPassword" autoComplete="new-password" type={showConfirmPassword ? 'text' : 'password'} placeholder="Confirm your password" className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white" {...field} />
-                          <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-                            {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                          </button>
-                        </div>
-                      </FormControl>
-                      <FormMessage className="text-[11px] font-bold text-rose-500" />
-                    </FormItem>
-                  )}
-                />
-
-                {submitError ? (
-                  <div
-                    role="alert"
-                    className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300"
+  return (
+    <AuthFrame>
+      <AuthHeading
+        title="Create your account"
+        description="Enter your details to get started with Sure Imports."
+      />
+      <Form {...form}>
+        <SocialButtons />
+        <AuthDivider />
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="si-personal-details space-y-5"
+        >
+          {/* Name Grid */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="userFirstname"
+              render={({ field }) => (
+                <FormItem>
+                  <label
+                    htmlFor="signup-userFirstname"
+                    className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
                   >
-                    {submitError}
+                    First Name
+                  </label>
+                  <FormControl>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        id="signup-userFirstname"
+                        autoComplete="given-name"
+                        placeholder="John"
+                        className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-[11px] font-bold text-rose-500" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="userLastname"
+              render={({ field }) => (
+                <FormItem>
+                  <label
+                    htmlFor="signup-userLastname"
+                    className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
+                  >
+                    Last Name
+                  </label>
+                  <FormControl>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                      <Input
+                        id="signup-userLastname"
+                        autoComplete="family-name"
+                        placeholder="Doe"
+                        className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-[11px] font-bold text-rose-500" />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Email */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <label
+                  htmlFor="signup-email"
+                  className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
+                >
+                  Email Address
+                </label>
+                <FormControl>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      id="signup-email"
+                      autoComplete="email"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                      {...field}
+                    />
                   </div>
-                ) : null}
+                </FormControl>
+                <FormMessage className="text-[11px] font-bold text-rose-500" />
+              </FormItem>
+            )}
+          />
 
-                {/* Submit Button */}
-                <div className="pt-4">
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="h-14 w-full rounded-xl bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-70 border-0"
-                  >
-                    {isLoading ? <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Creating Account...</> : 'Create Free Account'}
-                  </Button>
-                </div>
-              </form>
-            </Form><div className="mt-8 space-y-4 text-center">
-              <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                Already have an account?{' '}
-                <Link href={loginHref} className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
-                  Login here
-                </Link>
-              </div>
+          {/* Phone */}
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <label
+                  htmlFor="signup-phone"
+                  className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
+                >
+                  Phone Number
+                </label>
+                <FormControl>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      id="signup-phone"
+                      autoComplete="tel"
+                      type="tel"
+                      placeholder="+234 800 000 0000"
+                      className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                      {...field}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage className="text-[11px] font-bold text-rose-500" />
+              </FormItem>
+            )}
+          />
 
-              <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-500">
-                By signing up, you agree to our <Link href="/terms-and-conditions" className="text-indigo-600 hover:underline dark:text-indigo-400">Terms of Service</Link> and <Link href="/privacy-policy" className="text-indigo-600 hover:underline dark:text-indigo-400">Privacy Policy</Link>. This site is protected by reCAPTCHA.
-              </div>
-            </div></AuthFrame>;
+          {/* Passwords */}
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <label
+                  htmlFor="signup-password"
+                  className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
+                >
+                  Password
+                </label>
+                <FormControl>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      id="signup-password"
+                      autoComplete="new-password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Create a secure password"
+                      className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      aria-label={
+                        showPassword ? 'Hide password' : 'Show password'
+                      }
+                      aria-pressed={showPassword}
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-[11px] font-bold text-rose-500" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="confirmPassword"
+            render={({ field }) => (
+              <FormItem>
+                <label
+                  htmlFor="signup-confirmPassword"
+                  className="text-[11px] font-bold uppercase tracking-widest text-slate-500"
+                >
+                  Confirm Password
+                </label>
+                <FormControl>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                    <Input
+                      id="signup-confirmPassword"
+                      autoComplete="new-password"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      placeholder="Confirm your password"
+                      className="h-14 rounded-xl border-slate-200 bg-slate-50 pl-12 pr-12 text-sm focus-visible:ring-brand-orange-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                      {...field}
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-5 w-5" />
+                      ) : (
+                        <Eye className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
+                </FormControl>
+                <FormMessage className="text-[11px] font-bold text-rose-500" />
+              </FormItem>
+            )}
+          />
+
+          {submitError ? (
+            <div
+              role="alert"
+              className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-300"
+            >
+              {submitError}
+            </div>
+          ) : null}
+
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="h-14 w-full rounded-xl border-0 bg-brand-orange-500 text-base font-bold text-white shadow-xl shadow-brand-orange-500/20 transition-all hover:bg-brand-orange-600 active:scale-[0.98] disabled:opacity-70"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" /> Creating
+                  Account...
+                </>
+              ) : (
+                'Create Free Account'
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
+      <div className="mt-8 space-y-4 text-center">
+        <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
+          Already have an account?{' '}
+          <Link
+            href={loginHref}
+            className="font-bold text-indigo-600 transition-colors hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+          >
+            Login here
+          </Link>
+        </div>
+
+        <div className="text-[11px] leading-relaxed text-slate-500 dark:text-slate-500">
+          By signing up, you agree to our{' '}
+          <Link
+            href="/terms-and-conditions"
+            className="text-indigo-600 hover:underline dark:text-indigo-400"
+          >
+            Terms of Service
+          </Link>{' '}
+          and{' '}
+          <Link
+            href="/privacy-policy"
+            className="text-indigo-600 hover:underline dark:text-indigo-400"
+          >
+            Privacy Policy
+          </Link>
+          . This site is protected by reCAPTCHA.
+        </div>
+      </div>
+    </AuthFrame>
+  );
 }

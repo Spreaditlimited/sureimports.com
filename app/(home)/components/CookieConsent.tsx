@@ -20,6 +20,13 @@ export default function CookieConsent({ onNavigateToPrivacyPolicy }: CookieConse
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted');
+    document.cookie = 'consent=true; Path=/; Max-Age=31536000; SameSite=Lax';
+    setIsVisible(false);
+  };
+
+  const handleDecline = () => {
+    localStorage.setItem('cookie-consent', 'declined');
+    document.cookie = 'consent=false; Path=/; Max-Age=31536000; SameSite=Lax';
     setIsVisible(false);
   };
 
@@ -47,7 +54,7 @@ export default function CookieConsent({ onNavigateToPrivacyPolicy }: CookieConse
         </div>
       </div>
       <div className="flex shrink-0 gap-3">
-        <Button onClick={() => setIsVisible(false)} variant="ghost" className="text-slate-300 hover:bg-slate-800 hover:text-white">Decline</Button>
+        <Button onClick={handleDecline} variant="ghost" className="text-slate-300 hover:bg-slate-800 hover:text-white">Decline</Button>
         <Button onClick={handleAccept} className="bg-brand-orange-500 text-white hover:bg-brand-orange-600 border-0">Accept Cookies</Button>
       </div>
     </div>

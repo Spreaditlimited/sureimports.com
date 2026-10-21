@@ -1,5 +1,6 @@
 'use server';
 
+import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
 import { after, NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import validateEmail from '@/lib/helpers/validateEmail';
@@ -21,6 +22,7 @@ import {
 export async function POST(request: NextRequest) {
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
   const {
+    facebookAttribution,
     userFirstname,
     userLastname,
     email,
@@ -192,6 +194,13 @@ export async function POST(request: NextRequest) {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+  const registrationConversion = scheduleRegistrationConversion({
+    request,
+    accountId: create.pidUser,
+    email: email,
+    method: 'email',
+    attribution: facebookAttribution,
+  });
   await claimAffiliateAttribution(request, create.pidUser, email);
 
   // Send the verification email after responding so SMTP delays do not block signup.
@@ -220,10 +229,10 @@ To gain access to your own dashboard where you can see all you can accomplish us
 <br /><br />
 
 <a href="` +
-      xButtonLink +
-      `" style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px;">` +
-      xButtonTitle +
-      `</a>
+        xButtonLink +
+        `" style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px;">` +
+        xButtonTitle +
+        `</a>
 
 <br /><br />
 
@@ -235,8 +244,8 @@ You can also copy the following link and paste in your browser if you were unabl
 
 
 Link: <div>` +
-      xButtonLink +
-      `</div>
+        xButtonLink +
+        `</div>
 <br />
 
 
@@ -266,7 +275,13 @@ See you inside.<br /><br />
   // Redirect to login if success
   if (create) {
     return NextResponse.json(
-      { messagex: null, statusx: null, successx: true, userx: null },
+      {
+        messagex: null,
+        statusx: null,
+        successx: true,
+        userx: null,
+        registrationConversion,
+      },
       { status: 200 },
     );
     //redirect("/success/registration");

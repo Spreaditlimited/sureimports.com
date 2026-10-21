@@ -79,7 +79,10 @@ async function ensureLeadMagnetLeadColumns() {
     try {
       await prisma.$executeRawUnsafe(statement);
     } catch (error: any) {
-      if (error?.code !== 'P2010' && !/Duplicate column|ER_DUP_FIELDNAME/i.test(String(error?.message || ''))) {
+      if (
+        error?.code !== 'P2010' &&
+        !/Duplicate column|ER_DUP_FIELDNAME/i.test(String(error?.message || ''))
+      ) {
         throw error;
       }
     }
@@ -92,8 +95,7 @@ export async function POST(request: Request) {
     const { email, first_name, last_name, segment_ids } = body;
     const normalizedEmail =
       typeof email === 'string' ? email.trim().toLowerCase() : '';
-    const firstName =
-      typeof first_name === 'string' ? first_name.trim() : '';
+    const firstName = typeof first_name === 'string' ? first_name.trim() : '';
     const source = cleanString(body.source) || 'lead_capture_popup';
     const requiresFirstName = !source.includes('footer_newsletter');
 
@@ -148,14 +150,19 @@ export async function POST(request: Request) {
       });
 
       const responseBody = await response.text();
-      alreadySubscribed = isAlreadySubscribedResponse(response.status, responseBody);
+      alreadySubscribed = isAlreadySubscribedResponse(
+        response.status,
+        responseBody,
+      );
       if (!response.ok && !alreadySubscribed) {
-        throw new Error(`Flodesk subscriber request failed (${response.status}): ${responseBody}`);
+        throw new Error(
+          `Flodesk subscriber request failed (${response.status}): ${responseBody}`,
+        );
       }
     }
 
     try {
-      await requestMarketingOptIn({
+      const optIn = await requestMarketingOptIn({
         email: normalizedEmail,
         firstName: firstName || null,
         lastName: cleanString(last_name),
@@ -168,13 +175,15 @@ export async function POST(request: Request) {
           channelOwner: sesOwned ? 'SES' : 'FLODESK',
         },
       });
+      alreadySubscribed ||= optIn.status === 'ALREADY_CONFIRMED';
     } catch (error) {
       console.error('Marketing contact ledger sync failed', error);
       if (sesOwned) {
         return NextResponse.json(
           {
             success: false,
-            error: 'We could not send your confirmation email. Please try again.',
+            error:
+              'We could not send your confirmation email. Please try again.',
           },
           { status: 500 },
         );
@@ -248,7 +257,8 @@ export async function POST(request: Request) {
           {
             success: false,
             code: 'MARKETING_LEAD_SAVE_FAILED',
-            error: 'We could not save your subscription details. Please try again.',
+            error:
+              'We could not save your subscription details. Please try again.',
           },
           { status: 500 },
         );
@@ -258,7 +268,11 @@ export async function POST(request: Request) {
     const pixelId = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
     const accessToken = process.env.FACEBOOK_CAPI_ACCESS_TOKEN;
 
-    if (pixelId && accessToken && body.fbEventId) {
+    const trackingDeclined = request.headers
+      .get('cookie')
+      ?.split(';')
+      .some((cookie) => cookie.trim() === 'consent=false');
+    if (!trackingDeclined && !alreadySubscribed && pixelId && accessToken && body.fbEventId) {
       try {
         await sendFacebookLeadCapiEvent({
           pixelId,
