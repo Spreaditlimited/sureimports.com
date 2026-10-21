@@ -18,6 +18,7 @@ import {
   DollarSign,
   Tags,
   Laptop,
+  Car,
   CalendarClock,
   Camera,
   Database,
@@ -52,6 +53,20 @@ import { useAuth } from '@/app/context/AuthContext';
 import ThemeToggle from '@/components/home/ThemeToggle';
 
 const MENU_ITEMS = {
+  shop: [
+    {
+      title: 'Gadgets',
+      href: '/shop',
+      icon: Laptop,
+      desc: 'Shop gadgets and electronics',
+    },
+    {
+      title: 'Cars',
+      href: '/cars',
+      icon: Car,
+      desc: 'Explore cars and commercial vehicles',
+    },
+  ],
   services: [
     {
       title: 'Supplier Intelligence',
@@ -198,16 +213,11 @@ const TOP_LEVEL_NAV = [
     match: 'prefix',
   },
   {
-    type: 'link',
+    type: 'dropdown',
     title: 'Shop',
-    href: '/shop',
-    match: 'prefix',
-  },
-  {
-    type: 'link',
-    title: 'Cars',
-    href: '/cars',
-    match: 'prefix',
+    value: 'shop',
+    items: MENU_ITEMS.shop,
+    panelClassName: 'w-[520px]',
   },
   {
     type: 'cart',
