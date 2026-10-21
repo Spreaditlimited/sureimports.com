@@ -1,3 +1,4 @@
+import { videoThumbnail } from '@/lib/website-videos/policy';
 import GoogleReviews from '@/components/reviews/GoogleReviews';
 import ServiceHero from '@/components/home/ServiceHero';
 import pageStyles from '@/components/home/PublicServicePage.module.css';
@@ -294,7 +295,7 @@ export default async function BuyFromChineseWebsitesPage() {
                   videoId={currentVideoId}
                   title={video.title}
                   thumbnailQuality="hqdefault"
-                  loadImmediately
+                  poster={videoThumbnail(currentVideoId).url.replace('https://www.sureimports.com', '')}
                 />
               </div>
               <p className="mt-4 text-center"><Link href="/buy-from-chinese-websites/video" className="font-medium text-[var(--si-accent)] underline underline-offset-4">Watch the full buying guide</Link></p>

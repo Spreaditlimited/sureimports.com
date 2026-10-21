@@ -16,6 +16,7 @@ interface YouTubeFrameProps {
   width?: string;
   height?: string;
   loadImmediately?: boolean;
+  poster?: string;
 }
 
 function getYouTubeVideoId(input: string): string {
@@ -42,13 +43,14 @@ const YouTubeFrame: React.FC<YouTubeFrameProps> = ({
   width = '100%',
   height = '100%',
   loadImmediately = false,
+  poster,
 }) => {
   const [isLoaded, setIsLoaded] = useState(loadImmediately);
   const resolvedVideoId = useMemo(
     () => getYouTubeVideoId(videoId || src || ''),
     [src, videoId],
   );
-  const thumbnailUrl = `https://i.ytimg.com/vi/${resolvedVideoId}/${thumbnailQuality}.jpg`;
+  const thumbnailUrl = poster || `https://i.ytimg.com/vi/${resolvedVideoId}/${thumbnailQuality}.jpg`;
   const embedUrl = `https://www.youtube-nocookie.com/embed/${resolvedVideoId}?autoplay=1&rel=0`;
 
   if (!resolvedVideoId) return null;

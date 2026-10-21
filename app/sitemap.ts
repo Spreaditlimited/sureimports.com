@@ -1,3 +1,4 @@
+import { videoThumbnail } from '@/lib/website-videos/policy';
 import { procurementVideo } from '@/lib/website-videos/public';
 import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
@@ -265,7 +266,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const video = await procurementVideo();
   const videoPages: MetadataRoute.Sitemap = [{
     url: `${baseUrl}/buy-from-chinese-websites/video`, changeFrequency: 'weekly', priority: 0.8,
-    videos: [{title: video.title, description: video.description, thumbnail_loc: `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`, player_loc: `https://www.youtube-nocookie.com/embed/${video.videoId}`, publication_date: video.uploadDate, duration: video.durationSeconds}],
+    videos: [{title: video.title, description: video.description, thumbnail_loc: videoThumbnail(video.videoId).url, player_loc: `https://www.youtube-nocookie.com/embed/${video.videoId}`, publication_date: video.uploadDate, duration: video.durationSeconds}],
   }];
   return [...staticPages, ...blogPages, ...reportPages, ...vehiclePages, ...videoPages];
 }

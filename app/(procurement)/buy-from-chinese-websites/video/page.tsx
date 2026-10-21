@@ -8,7 +8,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { procurementVideo } from '@/lib/website-videos/public';
-import { videoSchema } from '@/lib/website-videos/policy';
+import { videoSchema, videoThumbnail } from '@/lib/website-videos/policy';
+import YouTubeFrame from '@/components/uix/YouTubeFrame';
 import styles from './buying-guide.module.css';
 
 export const revalidate = 60;
@@ -35,7 +36,7 @@ const featuredReviews = homeReviews.filter((review) =>
 
 export async function generateMetadata(): Promise<Metadata> {
   const video = await procurementVideo();
-  const image = `https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`;
+  const image = videoThumbnail(video.videoId);
   return {
     title: video.title,
     description,
@@ -45,7 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description,
       url: canonical,
       type: 'video.other',
-      images: [{ url: image, width: 480, height: 360, alt: video.title }],
+      images: [{ ...image, alt: video.title }],
       videos: [
         {
           url: `https://www.youtube-nocookie.com/embed/${video.videoId}`,
@@ -57,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title: video.title,
       description,
-      images: [image],
+      images: [image.url],
     },
     robots: {
       index: true,
@@ -144,12 +145,10 @@ export default async function BuyingGuideVideo() {
         </header>
         <section aria-label="Watch the buying guide" className={styles.watch}>
           <div className={styles.player}>
-            <iframe
-              src={`https://www.youtube-nocookie.com/embed/${video.videoId}?rel=0`}
+            <YouTubeFrame
+              videoId={video.videoId}
               title={video.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              referrerPolicy="strict-origin-when-cross-origin"
+              poster={videoThumbnail(video.videoId).url.replace('https://www.sureimports.com', '')}
             />
           </div>
         </section>

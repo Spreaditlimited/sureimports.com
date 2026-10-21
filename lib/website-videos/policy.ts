@@ -71,13 +71,18 @@ export function validVideoMetadata(
     v.durationSeconds > 0
   );
 }
+export function videoThumbnail(videoId: string) {
+  return videoId === '5nhM9Vv1V8M'
+    ? { url: 'https://www.sureimports.com/videos/buy-from-china-thumbnail.png', width: 1672, height: 941 }
+    : { url: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`, width: 480, height: 360 };
+}
 export function videoSchema(video: VideoMetadata) {
   return {
     '@context': 'https://schema.org',
     '@type': 'VideoObject',
     name: video.title,
     description: video.description,
-    thumbnailUrl: [`https://i.ytimg.com/vi/${video.videoId}/hqdefault.jpg`],
+    thumbnailUrl: [videoThumbnail(video.videoId).url],
     uploadDate: video.uploadDate,
     duration: `PT${video.durationSeconds}S`,
     embedUrl: `https://www.youtube-nocookie.com/embed/${video.videoId}`,

@@ -42,3 +42,11 @@ test('admin endpoint enforces settings permissions, origin checks and link valid
  assert.equal((await route.PUT(request('https://attacker.test','https://youtu.be/5nhM9Vv1V8M'))).status,403);
  assert.equal((await route.PUT(request('https://admin.sureimports.com','https://youtube.com.attacker.test/watch?v=5nhM9Vv1V8M'))).status,400);assert.equal(calls,1);
 });
+
+test('approved buying-guide thumbnail is used only for its matching video', () => {
+ const thumbnail = policy.videoThumbnail('5nhM9Vv1V8M');
+ assert.equal(thumbnail.url, 'https://www.sureimports.com/videos/buy-from-china-thumbnail.png');
+ assert.ok(fs.existsSync('public/videos/buy-from-china-thumbnail.png'));
+ assert.equal(policy.videoThumbnail('HJVlH0XT0ok').url, 'https://i.ytimg.com/vi/HJVlH0XT0ok/hqdefault.jpg');
+ assert.equal(policy.videoSchema({...policy.defaultVideoMetadata,videoId:'5nhM9Vv1V8M'}).thumbnailUrl[0], thumbnail.url);
+});
