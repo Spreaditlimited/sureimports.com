@@ -1,3 +1,4 @@
+import mailTemplate from '@/lib/email/temp/mailTemplate2';
 import { prisma } from '@/lib/prisma';
 import transporter from '@/lib/email/config/nodemailerConfig';
 import { deliverSupportNotifications } from '@/lib/support/notifications';
@@ -21,6 +22,7 @@ export async function GET(request: Request) {
         to: notice.to,
         subject: notice.subject,
         messageId: notice.messageId,
+        html: mailTemplate({ zTitle: notice.subject, zBodyTitle: notice.subject, zLabel: 'SUPPORT UPDATE', zBody1: 'There is an update in your support conversation. Please open the conversation to read it and reply.', zBody2: 'For your privacy, this email contains no order or message details.', zButtonTitle: 'Open conversation', zButtonLink: notice.url }),
         text: `${notice.subject}.\n\nOpen your conversation: ${notice.url}\n\nPlease reply in the support conversation. This email contains no order or message details.`,
       });
     },
