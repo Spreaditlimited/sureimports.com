@@ -1,5 +1,5 @@
-import { queueAccountWelcome } from '@/lib/webinar/server';
 'use server';
+import { queueAccountWelcome } from '@/lib/webinar/server';
 
 import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
 import { NextRequest, NextResponse } from 'next/server';

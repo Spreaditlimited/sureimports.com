@@ -1,5 +1,5 @@
-import { queueAccountWelcome } from '@/lib/webinar/server';
 'use server';
+import { queueAccountWelcome } from '@/lib/webinar/server';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
