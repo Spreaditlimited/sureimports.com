@@ -54,3 +54,18 @@
   .savedIntro .eyebrow { font-size: 10px; }
   .orderSummary { padding: 16px; }
 }
+
+.form .helpToggle { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 8px; border: 0; border-radius: 8px; background: var(--si-soft); color: var(--si-accent); font-size: 12px; font-weight: 600; line-height: 1.4; box-shadow: none; }
+.form .helpToggle:hover { background: var(--si-inset); }
+.form .helpToggle:focus-visible { outline: 2px solid var(--si-accent); outline-offset: 2px; }
+.form .helpPanel { flex-basis: 100%; margin: 0; padding: 12px 14px; border: 1px solid var(--si-border); border-radius: 10px; background: var(--si-soft); color: var(--si-muted); font-size: 13px; line-height: 1.65; }
+
+.addressChoices { display: grid; gap: 10px; margin: 0; padding: 14px; border: 1px solid var(--si-border); border-radius: 12px; background: var(--si-soft); }
+.form .addressOption { display: flex; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; min-height: 48px; padding: 12px; border: 1px solid var(--si-border); border-radius: 10px; background: var(--si-surface); color: var(--si-ink); cursor: pointer; font-size: 14px; font-weight: 500; line-height: 1.5; text-align: left; white-space: normal; touch-action: manipulation; }
+.form .addressOption[aria-pressed='true'] { border-color: var(--si-accent); background: var(--si-soft); }
+.form .addressOption:focus-visible { outline: 2px solid var(--si-accent); outline-offset: 2px; }
+.form .addressOption:disabled { opacity: .55; cursor: not-allowed; }
+.addressIndicator { display: block; flex-shrink: 0; width: 20px; height: 20px; border: 2px solid var(--si-muted); border-radius: 50%; }
+.addressOption[aria-pressed='true'] .addressIndicator { border: 6px solid var(--si-accent); background: var(--si-surface); }
+.addressHint { margin: 0; font-size: 12px; line-height: 1.6; color: var(--si-muted); }
+.addressHint a { color: var(--si-accent); text-decoration: underline; text-underline-offset: 3px; }

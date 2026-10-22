@@ -1,5 +1,8 @@
 'use client';
 
+import { normalizeAccountCountry } from '@/lib/features/country';
+import { deliveryGuidance } from '@/lib/procurement/deliveryGuidance';
+
 import {
   isShippingPlanAllowed,
   requiresSpecialHandling,
@@ -74,7 +77,7 @@ const formSchema = z.object({
   currencyType: z.string().min(1, 'Currency type is required'),
   shippingPlan: z.string().min(1, 'Shipping plan is required'),
   orderCategory: z.string().min(1, 'Order category is required'),
-  shippingAddress: z.string().min(1, 'Shipping address is required'),
+  shippingAddress: z.string().trim().min(1, 'Shipping address is required'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -89,6 +92,17 @@ interface ReportFormProps {
 
 const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
   const [showCurrencyHelp, setShowCurrencyHelp] = useState(false);
+  const [profileAddress, setProfileAddress] = useState<{
+    address: string;
+    country: string;
+    phone: string;
+  } | null>(null);
+  const [addressLoading, setAddressLoading] = useState(!partner);
+  const [addressError, setAddressError] = useState(false);
+  const [addressMode, setAddressMode] = useState<'profile' | 'different'>(
+    'different',
+  );
+  const differentAddress = React.useRef('');
   const currencyHelpId = React.useId();
   const currencyFieldId = React.useId();
   const router = useRouter();
@@ -140,6 +154,72 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
       .finally(() => setCheckingDrafts(false));
   }, [partner]);
 
+  useEffect(() => {
+    if (partner || !pidUser) {
+      setAddressLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setAddressLoading(true);
+    setAddressError(false);
+    fetch('/api/procurement/profile-address', {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error('Profile unavailable');
+        return response.json();
+      })
+      .then(setProfileAddress)
+      .catch((error) => {
+        if (error.name !== 'AbortError') setAddressError(true);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setAddressLoading(false);
+      });
+    return () => controller.abort();
+  }, [partner, pidUser]);
+
+  const profileCountry = normalizeAccountCountry(profileAddress?.country);
+  const destinationCountry = normalizeAccountCountry(
+    selectedCountry?.countryName,
+  );
+  const addressCountryMismatch = Boolean(
+    profileCountry &&
+      destinationCountry &&
+      profileCountry !== destinationCountry,
+  );
+  const canUseProfileAddress =
+    Boolean(profileAddress?.address) && !addressCountryMismatch;
+  const chooseAddress = (mode: 'profile' | 'different') => {
+    if (mode === addressMode) return;
+    if (mode === 'profile') {
+      if (!canUseProfileAddress || !profileAddress) return;
+      differentAddress.current = watch('shippingAddress') || '';
+      setValue(
+        'shippingAddress',
+        [profileAddress.address, profileAddress.country, profileAddress.phone]
+          .filter(Boolean)
+          .join('\n'),
+        { shouldDirty: true, shouldValidate: true },
+      );
+    } else {
+      setValue('shippingAddress', differentAddress.current, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+    setAddressMode(mode);
+  };
+  useEffect(() => {
+    if (addressMode === 'profile' && addressCountryMismatch) {
+      setAddressMode('different');
+      setValue('shippingAddress', differentAddress.current, {
+        shouldDirty: true,
+      });
+    }
+  }, [addressMode, addressCountryMismatch, setValue]);
+
   const handleCountryChange = (value: string) => {
     const country = countries.find((c) => c.pidCountry === value) || null;
     setSelectedCountry(country);
@@ -167,6 +247,10 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
     (plan) => plan.pidShippingPlan === watch('shippingPlan'),
   );
   const usesCbm = selectedShippingPlan?.shippingPlanUnit === 'CBM';
+  const delivery = deliveryGuidance(
+    selectedCountry?.countryName,
+    Boolean(partner),
+  );
 
   const onSubmit: SubmitHandler<FormValues> = async (formData) => {
     if (partner) {
@@ -197,7 +281,9 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
       const data = await response.json().catch(() => null);
       if (!data?.responsex) {
-        throw new Error('The server could not save your order. Your form details are still here. Please try again shortly.');
+        throw new Error(
+          'The server could not save your order. Your form details are still here. Please try again shortly.',
+        );
       }
 
       if (data.responsex.status === 'SUCCESS') {
@@ -217,7 +303,13 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
         );
       }
     } catch (error: unknown) {
-      toast.error(error instanceof TypeError ? 'Unable to reach the server. Your form details are still here. Please try again.' : error instanceof Error ? error.message : 'Unable to save your order. Please try again.');
+      toast.error(
+        error instanceof TypeError
+          ? 'Unable to reach the server. Your form details are still here. Please try again.'
+          : error instanceof Error
+            ? error.message
+            : 'Unable to save your order. Please try again.',
+      );
     }
   };
 
@@ -416,7 +508,7 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
 
           {/* Currency */}
           <div className="space-y-3">
-            <div className="relative flex h-8 items-center gap-1">
+            <div className="flex min-h-8 flex-wrap items-center gap-x-3 gap-y-2">
               <label
                 htmlFor={currencyFieldId}
                 className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400"
@@ -428,26 +520,23 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
                 aria-label="Help choosing shop currency"
                 aria-expanded={showCurrencyHelp}
                 aria-controls={currencyHelpId}
-                onMouseEnter={() => setShowCurrencyHelp(true)}
-                onMouseLeave={() => setShowCurrencyHelp(false)}
-                onFocus={() => setShowCurrencyHelp(true)}
-                onClick={() => setShowCurrencyHelp(true)}
-                onBlur={() => setShowCurrencyHelp(false)}
+                onClick={() => setShowCurrencyHelp((shown) => !shown)}
                 onKeyDown={(event) => {
                   if (event.key === 'Escape') setShowCurrencyHelp(false);
                 }}
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center !border-0 !bg-transparent text-xs font-semibold text-slate-600 !shadow-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 dark:text-slate-200"
+                className={styles.helpToggle}
               >
-                ?
+                <Info className="h-4 w-4 shrink-0" aria-hidden="true" />
+                Currency guide
               </button>
               <p
                 id={currencyHelpId}
-                role="tooltip"
                 hidden={!showCurrencyHelp}
-                className="absolute bottom-full left-0 z-50 mb-2 w-full rounded-xl border border-slate-200 bg-white p-4 text-sm leading-relaxed text-slate-700 shadow-lg dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+                className={styles.helpPanel}
               >
-                If buying from 1688, Taobao, Pinduoduo, shop currency is CNY or
-                Yuan or RMB. If buying from Alibaba, please, use USD
+                Choose CNY (yuan or RMB) for 1688, Taobao and Pinduoduo, or USD
+                for Alibaba. Please keep products with different shop currencies
+                in separate orders.
               </p>
             </div>
             <div className="relative">
@@ -485,8 +574,6 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
             )}
           </div>
         </div>
-
-        <hr className="border-slate-100 dark:border-slate-800" />
 
         {/* Logistics Section */}
         <div className="grid gap-6 md:grid-cols-2">
@@ -552,33 +639,37 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
           </div>
 
           {/* Shipping Weight Notice */}
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/30 dark:bg-amber-900/10 md:col-span-2">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
-              <div>
-                <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
-                  {usesCbm
-                    ? 'Shipping Volume Notice'
-                    : 'Shipping Weight Notice'}
-                </h3>
-                <p className="mt-1 text-xs leading-relaxed text-amber-700 dark:text-amber-400/90">
-                  {usesCbm ? (
-                    <>
-                      For this Nigeria sea-shipping order, each product must
-                      include its estimated <strong>CBM per item</strong>. You
-                      will see a worked example when adding each product.
-                    </>
-                  ) : (
-                    <>
-                      Kindly note that for orders weighing less than{' '}
-                      <strong>10kg</strong>, we must use Air Shipping, even if
-                      Sea Shipping is selected.
-                    </>
-                  )}
-                </p>
+          {selectedCountry && (destinationCountry !== 'Nigeria' || usesCbm) && (
+            <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/30 dark:bg-amber-900/10 md:col-span-2">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                <div>
+                  <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                    {usesCbm
+                      ? 'Shipping Volume Notice'
+                      : 'Shipping Weight Notice'}
+                  </h3>
+                  <p className="mt-1 text-xs leading-relaxed text-amber-700 dark:text-amber-400/90">
+                    {usesCbm ? (
+                      <>
+                        For this Nigeria sea-shipping order, each product must
+                        include its estimated <strong>CBM per item</strong>. You
+                        will see a worked example when adding each product.
+                      </>
+                    ) : (
+                      <>
+                        Kindly note that for orders weighing less than{' '}
+                        <strong>10kg</strong>, we must use Air Shipping, even if
+                        Sea Shipping is selected. For this destination, sea
+                        shipping is billed per kg, including when volumetric
+                        weight applies.
+                      </>
+                    )}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Shipping Address */}
           <div className="space-y-3 md:col-span-2">
@@ -588,10 +679,72 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
             >
               <MapPin className="h-3 w-3" /> Final Delivery Address
             </label>
+            {!partner && (
+              <fieldset className={styles.addressChoices}>
+                <legend className="sr-only">Choose a delivery address</legend>
+                <button
+                  type="button"
+                  className={styles.addressOption}
+                  aria-pressed={addressMode === 'profile'}
+                  disabled={addressLoading || !canUseProfileAddress}
+                  onClick={() => chooseAddress('profile')}
+                >
+                  <span
+                    className={styles.addressIndicator}
+                    aria-hidden="true"
+                  />
+                  <span>Use my profile address</span>
+                </button>
+                <button
+                  type="button"
+                  className={styles.addressOption}
+                  aria-pressed={addressMode === 'different'}
+                  onClick={() => chooseAddress('different')}
+                >
+                  <span
+                    className={styles.addressIndicator}
+                    aria-hidden="true"
+                  />
+                  <span>Enter a different address</span>
+                </button>
+                <p className={styles.addressHint}>
+                  {addressLoading ? (
+                    'Loading your profile address…'
+                  ) : addressError ? (
+                    'Your profile address could not be loaded. You can still enter an address below.'
+                  ) : addressCountryMismatch ? (
+                    `Your profile address is in ${profileAddress?.country}. Please enter an address for ${selectedCountry?.countryName}.`
+                  ) : !profileAddress?.address ? (
+                    <>
+                      No address saved in your profile. Enter one below or{' '}
+                      <a
+                        href="/dashboard/profile-update"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        update your profile
+                      </a>
+                      .
+                    </>
+                  ) : addressMode === 'profile' ? (
+                    'Your saved address and phone number are filled in below. You can adjust them for this order.'
+                  ) : (
+                    'Use an address for this order without changing your profile.'
+                  )}
+                </p>
+              </fieldset>
+            )}
             <Textarea
-              {...register('shippingAddress')}
+              {...register('shippingAddress', {
+                onChange: (event) =>
+                  setValue('shippingAddress', event.target.value, {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                  }),
+              })}
               id="shippingAddress"
-              placeholder="Enter complete address including ZIP/Postal code..."
+              aria-describedby="order-delivery-guidance"
+              placeholder="Enter your complete address and phone number(s)..."
               className="min-h-[120px] w-full resize-none rounded-xl border-slate-200 bg-slate-50 p-4 text-sm focus-visible:ring-blue-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
             />
             {errors.shippingAddress && (
@@ -602,17 +755,22 @@ const CreateOrderForm: React.FC<ReportFormProps> = ({ setIsOpen, partner }) => {
           </div>
 
           {/* Delivery Info Notice */}
-          <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-900/10 md:col-span-2">
+          <div
+            id="order-delivery-guidance"
+            aria-live="polite"
+            className="rounded-2xl border border-blue-100 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-900/10 md:col-span-2"
+          >
             <div className="flex items-start gap-3">
               <Info className="mt-0.5 h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400" />
               <div>
                 <h3 className="text-sm font-bold text-blue-900 dark:text-blue-100">
-                  Delivery Logistics
+                  {delivery.title}
                 </h3>
                 <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-300/80">
-                  {partner
-                    ? 'Your business arranges final delivery or collection with you. Procurement goods are shipped to the business receiving address, not directly to this customer address.'
-                    : 'Please provide your exact delivery address and phone number(s). Orders to US, UK, Canada, etc are fulfilled by any of our partners - DHL, UPS, Royal Mail, DPD, etc. Orders to African nations are delivered by our shipping partners directly to your address. Nigerian orders arrive at our Lagos office for pickup or local forwarding.'}
+                  {delivery.address}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-blue-700 dark:text-blue-300/80">
+                  {delivery.message}
                 </p>
               </div>
             </div>
