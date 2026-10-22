@@ -1,9 +1,18 @@
 'use client';
 
+import { WEBINAR_VIDEO_ID } from '@/lib/webinar/content';
+import {
+  persistWebinarProgress,
+  recordWatchedInterval,
+} from '@/lib/webinar/progress';
+
 import { useEffect, useRef, useState } from 'react';
 
 type Player = {
   playVideo(): void;
+  getCurrentTime(): number;
+  getDuration(): number;
+  getPlayerState(): number;
   destroy(): void;
   getIframe(): HTMLIFrameElement;
 };
@@ -73,6 +82,43 @@ export default function YouTubePosterPlayer({
   const [failed, setFailed] = useState(false);
   useEffect(() => {
     let disposed = false;
+    const bins = new Set<number>();
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(`si:webinar:${videoId}`) || '[]',
+      );
+      if (Array.isArray(saved))
+        saved
+          .filter((b) => Number.isInteger(b) && b >= 0 && b < 10000)
+          .forEach((b) => bins.add(b));
+    } catch {
+      /* Start with in-memory progress. */
+    }
+    let previous = 0;
+    let sampledAt = Date.now();
+    let wasPlaying = false;
+    let savedAt = 0;
+    const timer = window.setInterval(() => {
+      if (videoId !== WEBINAR_VIDEO_ID || !player.current) return;
+      const current = player.current.getCurrentTime();
+      const playing = player.current.getPlayerState() === 1;
+      const now = Date.now();
+      // Sample only continuous playback; seeking and paused time do not count.
+      if (playing && wasPlaying)
+        recordWatchedInterval(
+          bins,
+          previous,
+          current,
+          (now - sampledAt) / 1000,
+        );
+      previous = current;
+      sampledAt = now;
+      wasPlaying = playing;
+      if (now - savedAt > 15000) {
+        persistWebinarProgress(videoId, bins, player.current.getDuration());
+        savedAt = now;
+      }
+    }, 6000);
     let instance: Player | undefined;
     setReady(false);
     setStarted(false);
@@ -111,6 +157,9 @@ export default function YouTubePosterPlayer({
       });
     return () => {
       disposed = true;
+      window.clearInterval(timer);
+      if (player.current)
+        persistWebinarProgress(videoId, bins, player.current.getDuration());
       player.current = null;
       instance?.destroy();
       target.remove();

@@ -1,3 +1,6 @@
+import { cookies } from 'next/headers';
+import { rememberWebinar } from '@/lib/webinar/server';
+import { WEBINAR_COOKIE, WEBINAR_VIDEO_ID } from '@/lib/webinar/content';
 import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 
@@ -42,6 +45,8 @@ export async function requestMarketingOptIn(input: {
   context?: Prisma.InputJsonValue;
 }) {
   const email = input.email.trim().toLowerCase();
+  try { await rememberWebinar(email, (await cookies()).get(WEBINAR_COOKIE)?.value === WEBINAR_VIDEO_ID); }
+  catch (error) { console.error('Unable to record webinar preference', error); }
   const existing = await prisma.marketing_contacts.findUnique({
     where: { email },
   });

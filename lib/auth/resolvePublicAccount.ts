@@ -1,3 +1,4 @@
+import { queueAccountWelcome } from '@/lib/webinar/server';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
@@ -163,6 +164,7 @@ export async function resolvePublicAccount(
           email,
         );
       }
+      queueAccountWelcome(input.attributionRequest, user.userEmail, user.pidUser);
       return { status: 'ready', user, createdNewAccount: true };
     } catch (error) {
       const concurrentUser = await prisma.users.findUnique({

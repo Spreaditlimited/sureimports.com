@@ -1,3 +1,4 @@
+import { queueAccountWelcome } from '@/lib/webinar/server';
 import 'server-only';
 import {
   registrationAttribution,
@@ -477,6 +478,7 @@ export async function complete(req: Request) {
       await consume(ticket.value, tx);
       return account;
     });
+    if (!owner && ticket.payload.mode !== 'link') queueAccountWelcome(req, account.email, account.id);
     const registrationConversion =
       !owner && ticket.payload.mode !== 'link'
         ? scheduleRegistrationConversion({

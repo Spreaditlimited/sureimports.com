@@ -1,3 +1,4 @@
+import { queueAccountWelcome } from '@/lib/webinar/server';
 'use server';
 
 import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
@@ -194,6 +195,7 @@ export async function POST(request: NextRequest) {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+  queueAccountWelcome(request, create.userEmail, create.pidUser);
   const registrationConversion = scheduleRegistrationConversion({
     request,
     accountId: create.pidUser,

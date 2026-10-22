@@ -1,3 +1,4 @@
+import { queueAccountWelcome } from '@/lib/webinar/server';
 'use server';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -171,6 +172,7 @@ export async function POST(request: NextRequest) {
       userAffiliateRef: userAffiliateRefx,
     },
   });
+  queueAccountWelcome(request, create.userEmail, create.pidUser);
   await claimAffiliateAttribution(request, create.pidUser, email);
 
   //send mail
