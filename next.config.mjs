@@ -7,6 +7,11 @@ const nextConfig = {
     async redirects() {
       return [
         {
+          source: '/faya',
+          destination: 'https://myfaya.co.uk',
+          permanent: true,
+        },
+        {
           source: '/faya-warranty-policy',
           destination: '/warranty-policy#faya-warranty',
           permanent: true,
