@@ -1,3 +1,4 @@
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 
@@ -90,6 +91,14 @@ async function ensureLeadMagnetLeadColumns() {
 }
 
 export async function POST(request: Request) {
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'subscribe',
+    action: 'subscribe',
+    ipMax: 10,
+    identityMax: 3,
+  });
+  if (securityFailure) return securityFailure;
+
   try {
     const body: SubscriberData = await request.json();
     const { email, first_name, last_name, segment_ids } = body;
@@ -124,8 +133,51 @@ export async function POST(request: Request) {
 
     const cleanedSegmentIds = cleanSegmentIds(segment_ids);
     const leadMagnetSlug = cleanString(body.lead_magnet_slug);
-    const leadMagnetTitle = cleanString(body.lead_magnet_title);
-    const leadMagnetDownloadUrl = cleanString(body.lead_magnet_download_url);
+    // Resolve email content from our catalogue, never from a caller-supplied URL/title.
+    let leadMagnetTitle: string | null = null;
+    let leadMagnetDownloadUrl: string | null = null;
+    if (leadMagnetSlug) {
+      if (!/^[a-z0-9-]{1,180}$/.test(leadMagnetSlug)) {
+        return NextResponse.json(
+          { success: false, error: 'Invalid guide.' },
+          { status: 400 },
+        );
+      }
+      const guides = await prisma.$queryRaw<
+        Array<{ title: string }>
+      >`SELECT title FROM blog_lead_magnets
+        WHERE slug = ${leadMagnetSlug} AND status IN ('draft', 'active') LIMIT 1`;
+      if (!guides[0])
+        return NextResponse.json(
+          { success: false, error: 'Guide not found.' },
+          { status: 404 },
+        );
+      leadMagnetTitle = guides[0].title;
+      const url = new URL(
+        `/api/lead-magnets/${encodeURIComponent(leadMagnetSlug)}/download`,
+        'https://www.sureimports.com',
+      );
+      url.searchParams.set('email', normalizedEmail);
+      url.searchParams.set('source', 'blog_lead_magnet');
+      leadMagnetDownloadUrl = url.toString();
+    } else if (body.lead_magnet_download_url) {
+      return NextResponse.json(
+        { success: false, error: 'A valid guide is required.' },
+        { status: 400 },
+      );
+    }
+    const escapeEmailHtml = (value: string) =>
+      value.replace(
+        /[&<>"']/g,
+        (char) =>
+          ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;',
+          })[char] || char,
+      );
     const offerCta = cleanString(body.offer_cta);
 
     if (leadMagnetSlug || leadMagnetDownloadUrl) {
@@ -272,7 +324,13 @@ export async function POST(request: Request) {
       .get('cookie')
       ?.split(';')
       .some((cookie) => cookie.trim() === 'consent=false');
-    if (!trackingDeclined && !alreadySubscribed && pixelId && accessToken && body.fbEventId) {
+    if (
+      !trackingDeclined &&
+      !alreadySubscribed &&
+      pixelId &&
+      accessToken &&
+      body.fbEventId
+    ) {
       try {
         await sendFacebookLeadCapiEvent({
           pixelId,
@@ -323,9 +381,9 @@ export async function POST(request: Request) {
           xTitle: leadMagnetTitle || 'Your SureImports guide is ready',
           xBodyTitle: leadMagnetTitle || 'Your guide is ready',
           xBody1:
-            `Hello ${firstName},<br /><br />` +
+            `Hello ${escapeEmailHtml(firstName)},<br /><br />` +
             `Here is the guide you requested from SureImports.<br /><br />` +
-            `${cleanString(body.lead_magnet_title) ? `<b>${cleanString(body.lead_magnet_title)}</b><br /><br />` : ''}` +
+            `${leadMagnetTitle ? `<b>${escapeEmailHtml(leadMagnetTitle)}</b><br /><br />` : ''}` +
             `You can download it right away using the button below.<br /><br />` +
             `Next week, I will send you the first lesson in our practical China importation series.`,
           xButtonTitle: 'Download the guide',

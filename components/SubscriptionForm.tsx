@@ -2,6 +2,7 @@
 
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { useState, FormEvent } from 'react';
 
 export default function SubscriptionForm() {
@@ -19,6 +20,7 @@ export default function SubscriptionForm() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('subscribe'),
           email,
           first_name,
           last_name,

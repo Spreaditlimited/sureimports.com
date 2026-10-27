@@ -1,3 +1,4 @@
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import validateEmail from '@/lib/helpers/validateEmail';
 import validatePassword from '@/lib/helpers/validatePassword';
 import { prisma } from '@/lib/prisma';
@@ -12,13 +13,21 @@ import { randomBytes } from 'node:crypto';
 
 //PROCESS REGISTRATION FORM REQUEST
 export async function POST(request: Request) {
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'customer-mail',
+    action: 'password_reset',
+    ipMax: 10,
+    identityMax: 3,
+  });
+  if (securityFailure) return securityFailure;
+
   // Read form data off req body
   const body = await request.json();
 
   const { userEmail } = body;
 
   // Validate email
-  // if (!validateEmail(userEmail)) {
+  // if (!validateEmail(userEmail).isValid) {
   //   /////////////// RETURN RESPONSE ///////////////
   //   const responsex = {
   //     message: 'Please provide a vaild email.',

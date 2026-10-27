@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import router from 'next/router';
+import { loadFlutterwave } from '@/lib/loadFlutterwave';
 import { useState } from 'react';
 import Image from 'next/image';
 import { CreditCard, Landmark } from 'lucide-react';
@@ -62,11 +62,12 @@ export default function PaymentButton({
   isDisabled,
   minimumOrderNgn = DEFAULT_PROCUREMENT_MINIMUM_ORDER_NGN,
 }: PaymentButtonProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showFlutterwaveLimitModal, setShowFlutterwaveLimitModal] =
     useState(false);
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     let amountNairax = amountNaira as any;
     let totalWeightx = totalWeight as any;
     let destinationCountryx = destinationCountry as any;
@@ -127,7 +128,17 @@ export default function PaymentButton({
       setIsLoading(true);
     }
 
-    //useEffect(() => {
+    try {
+      await loadFlutterwave();
+    } catch (error) {
+      setIsLoading(false);
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Unable to load checkout. Please try again.',
+      );
+      return;
+    }
     window.FlutterwaveCheckout({
       //TRANSACTION DATA
       //public_key: process.env.NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY,
@@ -190,8 +201,6 @@ export default function PaymentButton({
         }),
       });
       const data = await response.json();
-
-      const router = useRouter();
 
       if (data.status === 'success') {
         alert('Payment verified successfully!');

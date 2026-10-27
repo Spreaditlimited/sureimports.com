@@ -1,3 +1,5 @@
+import { trackOpenAIRegistration } from './openaiEvents';
+
 // No account details are stored here: only event IDs and non-identifying event parameters.
 type MetaEvent = {
   name: 'Lead' | 'CompleteRegistration';
@@ -77,6 +79,7 @@ export function trackRegistrationConversion(
   conversion?: { eventId: string; method: string } | null,
 ) {
   if (!conversion) return;
+  trackOpenAIRegistration(conversion.eventId);
   queueFacebookEvent({
     name: 'CompleteRegistration',
     id: conversion.eventId,

@@ -1,7 +1,7 @@
 'use client';
 import HeroPill from '@/components/home/HeroPill';
 import styles from '@/components/home/EditorialPage.module.css';
-import { useEffect, useMemo, useState, type ComponentProps } from 'react';
+import { useEffect, useState, type ComponentProps } from 'react';
 import {
   Search,
   Calendar,
@@ -34,54 +34,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from './ui/pagination';
-
-// Blog categories
-const blogCategories = [
-  'All',
-  'Import Guide',
-  'Business Tips',
-  'Sourcing Gadgets',
-];
-
-function getBlogPostsByCategory(
-  posts: BlogListPost[],
-  category: string,
-): BlogListPost[] {
-  if (category === 'All') return posts;
-  return posts.filter((post) => post.category === category);
-}
-
-function searchBlogPosts(posts: BlogListPost[], query: string): BlogListPost[] {
-  const searchPhrase = normalizeSearchText(query);
-  if (!searchPhrase) return posts;
-
-  return posts.filter((post) => {
-    const searchableContent = normalizeSearchText(
-      [
-        post.title,
-        post.slug,
-        post.slug.replace(/-/g, ' '),
-        post.excerpt,
-        post.category,
-        post.author.name,
-        ...post.tags,
-      ].join(' '),
-    );
-
-    return searchableContent.includes(searchPhrase);
-  });
-}
-
-function normalizeSearchText(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/^https?:\/\/[^/]+\/blog\//, '')
-    .replace(/^\/?blog\//, '')
-    .replace(/[-_]+/g, ' ')
-    .replace(/[^a-z0-9\s]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
 
 // Lightweight image component that supports StaticImageData and provides a simple fallback
 type ImageSource = string | StaticImageData;
@@ -129,6 +81,9 @@ interface BlogListProps {
   featuredPosts: BlogListPost[];
   initialSearchQuery?: string;
   initialTag?: string;
+  initialCategory?: string;
+  initialSort?: 'newest' | 'oldest';
+  categories?: string[];
   currentPage: number;
   totalPages: number;
   totalPosts: number;
@@ -140,6 +95,9 @@ export default function BlogList({
   featuredPosts,
   initialSearchQuery = '',
   initialTag,
+  initialCategory,
+  initialSort = 'newest',
+  categories = ['Import Guide', 'Business Tips', 'Sourcing Gadgets'],
   currentPage,
   totalPages,
   totalPosts,
@@ -149,94 +107,36 @@ export default function BlogList({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedTag, setSelectedTag] = useState<string | null>(
-    initialTag || null,
-  );
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>(
-    'newest',
-  );
+  const selectedCategory = initialCategory || 'All';
+  const selectedTag = initialTag || null;
+  const sortBy = initialSort;
+  const blogCategories = ['All', ...categories];
+  const filteredPosts = blogPosts;
 
   useEffect(() => {
     setSearchQuery(initialSearchQuery);
   }, [initialSearchQuery]);
 
-  useEffect(() => {
-    const nextSearch = searchQuery.trim();
-    const currentSearch = searchParams?.get('q') || '';
+  const updateFilters = (changes: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams?.toString() || '');
+    params.delete('page');
+    for (const [key, value] of Object.entries(changes)) {
+      if (value && value !== 'All' && !(key === 'sort' && value === 'newest'))
+        params.set(key, value);
+      else params.delete(key);
+    }
+    const query = params.toString();
+    router.push(query ? `${pathname}?${query}` : pathname || '/blog', {
+      scroll: false,
+    });
+  };
 
-    if (nextSearch === currentSearch) return;
-
-    const timeoutId = window.setTimeout(() => {
-      const params = new URLSearchParams(searchParams?.toString() || '');
-      params.delete('page');
-
-      if (nextSearch) {
-        params.set('q', nextSearch);
-      } else {
-        params.delete('q');
-      }
-
-      const query = params.toString();
-      router.replace(query ? `${pathname}?${query}` : pathname || '/blog', {
-        scroll: false,
-      });
-    }, 350);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [pathname, router, searchParams, searchQuery]);
-
-  // Handle tag click - filter posts by tag
   const handleTagClick = (tag: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedTag(selectedTag === tag ? null : tag);
-    setSearchQuery('');
-    setSelectedCategory('All');
+    updateFilters({ tag: selectedTag === tag ? '' : tag, q: '', category: '' });
   };
-
-  // Clear tag filter
-  const clearTagFilter = () => {
-    setSelectedTag(null);
-  };
-
-  const filteredPosts = useMemo(() => {
-    let posts = blogPosts;
-
-    if (selectedTag) {
-      posts = posts.filter((post) =>
-        post.tags.some(
-          (tag) => tag.toLowerCase() === selectedTag.toLowerCase(),
-        ),
-      );
-    } else if (searchQuery && searchQuery !== initialSearchQuery) {
-      posts = searchBlogPosts(posts, searchQuery);
-    } else {
-      posts = getBlogPostsByCategory(posts, selectedCategory);
-    }
-
-    switch (sortBy) {
-      case 'newest':
-        posts = [...posts].sort(
-          (a, b) =>
-            new Date(b.publishDate).getTime() -
-            new Date(a.publishDate).getTime(),
-        );
-        break;
-      case 'oldest':
-        posts = [...posts].sort(
-          (a, b) =>
-            new Date(a.publishDate).getTime() -
-            new Date(b.publishDate).getTime(),
-        );
-        break;
-      case 'popular':
-        posts = [...posts].sort((a, b) => b.readTime - a.readTime);
-        break;
-    }
-
-    return posts;
-  }, [searchQuery, initialSearchQuery, selectedCategory, selectedTag, sortBy, blogPosts]);
+  const clearTagFilter = () => updateFilters({ tag: '' });
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -261,27 +161,22 @@ export default function BlogList({
 
   return (
     <div className={styles.page}>
-
       {/* Enhanced Hero Section */}
       <div className="relative overflow-hidden border-b border-[var(--si-border)] bg-[var(--si-canvas)]">
-
         <div className="absolute inset-0 z-0">
           <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
         </div>
 
-<div className={styles.hero}>
-
+        <div className={styles.hero}>
           <div className="mb-12 text-center lg:mb-16">
-<HeroPill className="mb-6">
+            <HeroPill className="mb-6">
               <BookOpen className="h-3.5 w-3.5" />
               Import Insights & Expert Guides
             </HeroPill>
 
             <h1 className="mb-6 text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
               Import Insights{' '}
-              <span className="text-[var(--si-accent)]">
-                Blog
-              </span>
+              <span className="text-[var(--si-accent)]">Blog</span>
             </h1>
 
             <p className="mx-auto mb-12 max-w-3xl text-lg font-medium leading-relaxed text-slate-500 dark:text-slate-400 sm:text-xl">
@@ -293,11 +188,29 @@ export default function BlogList({
             {/* Stats Row Bento */}
             <div className="mx-auto mb-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
               {[
-                { icon: BookOpen, val: `${totalPosts}+`, label: 'Articles Published', color: 'text-indigo-600 dark:text-indigo-400' },
-                { icon: Clock, val: totalReadTime.toLocaleString(), label: 'Minutes of Reading', color: 'text-brand-orange-500 dark:text-brand-orange-400' },
-                { icon: Tag, val: categoriesCount, label: 'Topics Covered', color: 'text-emerald-600 dark:text-emerald-400' }
+                {
+                  icon: BookOpen,
+                  val: `${totalPosts}`,
+                  label: 'Articles',
+                  color: 'text-indigo-600 dark:text-indigo-400',
+                },
+                {
+                  icon: Clock,
+                  val: totalReadTime.toLocaleString(),
+                  label: 'Minutes of Reading',
+                  color: 'text-brand-orange-500 dark:text-brand-orange-400',
+                },
+                {
+                  icon: Tag,
+                  val: categoriesCount,
+                  label: 'Topics Covered',
+                  color: 'text-emerald-600 dark:text-emerald-400',
+                },
               ].map((stat, i) => (
-                <div key={i} className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900/50">
+                <div
+                  key={i}
+                  className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50"
+                >
                   <div className={`mb-3 flex justify-center ${stat.color}`}>
                     <stat.icon className="h-6 w-6" />
                   </div>
@@ -314,20 +227,31 @@ export default function BlogList({
 
           {/* Search and Filter Section */}
           <div className="mx-auto max-w-4xl">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6   dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none">
               <div className="space-y-4">
-
                 {/* Search Input */}
-                <div className="relative">
+                <form
+                  className="relative"
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    updateFilters({ q: searchQuery.trim() });
+                  }}
+                >
                   <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 transform text-slate-400" />
                   <Input
                     aria-label="Search articles, authors, or topics"
                     placeholder="Search articles, authors, or topics..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="h-14 rounded-2xl border-slate-200 bg-slate-50 pl-12 pr-4 text-base text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950/50 dark:text-white dark:placeholder-slate-500 dark:focus:ring-indigo-400"
+                    className="h-14 rounded-2xl border-slate-200 bg-slate-50 pl-12 pr-24 text-base text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950/50 dark:text-white dark:placeholder-slate-500 dark:focus:ring-indigo-400"
                   />
-                </div>
+                  <button
+                    type="submit"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white"
+                  >
+                    Search
+                  </button>
+                </form>
 
                 {/* Filter Row */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
@@ -342,12 +266,12 @@ export default function BlogList({
                         </div>
                         <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 ">
+                      <DropdownMenuContent className="w-56 rounded-xl border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
                         {blogCategories.map((category) => (
                           <DropdownMenuItem
                             key={category}
-                            onClick={() => setSelectedCategory(category)}
-                            className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 py-2"
+                            onClick={() => updateFilters({ category })}
+                            className="cursor-pointer rounded-lg py-2 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400"
                           >
                             {category}
                           </DropdownMenuItem>
@@ -360,20 +284,19 @@ export default function BlogList({
                     <DropdownMenu>
                       <DropdownMenuTrigger className="flex h-12 w-full items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 text-slate-700 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-300 dark:hover:bg-slate-800 sm:w-auto">
                         <span className="text-sm font-semibold sm:text-base">
-                          Sort: {sortBy === 'newest' ? 'Newest' : sortBy === 'oldest' ? 'Oldest' : 'Popular'}
+                          Sort: {sortBy === 'newest' ? 'Newest' : 'Oldest'}
                         </span>
                         <ChevronDown className="h-4 w-4 text-slate-400" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-48 rounded-xl border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 p-2 ">
+                      <DropdownMenuContent className="w-48 rounded-xl border-slate-200 bg-white p-2 dark:border-slate-800 dark:bg-slate-900">
                         {[
                           { val: 'newest', label: 'Newest First' },
                           { val: 'oldest', label: 'Oldest First' },
-                          { val: 'popular', label: 'Most Popular' }
-                        ].map(opt => (
+                        ].map((opt) => (
                           <DropdownMenuItem
                             key={opt.val}
-                            onClick={() => setSortBy(opt.val as any)}
-                            className="cursor-pointer rounded-lg text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400 py-2"
+                            onClick={() => updateFilters({ sort: opt.val })}
+                            className="cursor-pointer rounded-lg py-2 text-sm font-medium text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400"
                           >
                             {opt.label}
                           </DropdownMenuItem>
@@ -388,7 +311,7 @@ export default function BlogList({
                   {blogCategories.slice(1, 5).map((category) => (
                     <button
                       key={category}
-                      onClick={() => setSelectedCategory(category)}
+                      onClick={() => updateFilters({ category })}
                       className={`rounded-lg px-4 py-2 text-xs font-medium transition-all sm:text-sm ${
                         selectedCategory === category
                           ? 'bg-indigo-600 text-white shadow-md dark:bg-indigo-500'
@@ -410,7 +333,7 @@ export default function BlogList({
                     <span className="inline-flex items-center gap-2">
                       Showing{' '}
                       <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                        {filteredPosts.length}
+                        {totalPosts}
                       </span>{' '}
                       articles tagged with{' '}
                       <Badge
@@ -429,16 +352,21 @@ export default function BlogList({
                         {totalPosts}
                       </span>{' '}
                       articles for "
-                      <span className="text-slate-900 dark:text-white">{searchQuery}</span>"
+                      <span className="text-slate-900 dark:text-white">
+                        {searchQuery}
+                      </span>
+                      "
                     </>
                   ) : (
                     <>
                       Showing{' '}
                       <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                        {filteredPosts.length}
+                        {totalPosts}
                       </span>{' '}
                       articles in{' '}
-                      <span className="text-slate-900 dark:text-white">{selectedCategory}</span>
+                      <span className="text-slate-900 dark:text-white">
+                        {selectedCategory}
+                      </span>
                     </>
                   )}
                 </p>
@@ -449,71 +377,90 @@ export default function BlogList({
       </div>
 
       {/* Featured Posts Section */}
-      {searchQuery === '' && selectedCategory === 'All' && currentPage === 1 && !selectedTag && (
-        <section className="public-solid-section bg-slate-50 border-b border-slate-200 py-16 lg:py-24 dark:bg-slate-900/50 dark:border-slate-800">
-          <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-
-            <div className="mb-12 lg:mb-16">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 dark:border-brand-orange-900/30 dark:bg-brand-orange-900/10">
-                <TrendingUp className="h-4 w-4 text-brand-orange-600 dark:text-brand-orange-400" />
-                <span className="text-xs font-semibold uppercase tracking-widest text-brand-orange-700 dark:text-brand-orange-300">
-                  Featured Content
-                </span>
+      {searchQuery === '' &&
+        selectedCategory === 'All' &&
+        currentPage === 1 &&
+        !selectedTag && (
+          <section className="public-solid-section border-b border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50 lg:py-24">
+            <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+              <div className="mb-12 lg:mb-16">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-orange-200 bg-brand-orange-50 px-3 py-1 dark:border-brand-orange-900/30 dark:bg-brand-orange-900/10">
+                  <TrendingUp className="h-4 w-4 text-brand-orange-600 dark:text-brand-orange-400" />
+                  <span className="text-xs font-semibold uppercase tracking-widest text-brand-orange-700 dark:text-brand-orange-300">
+                    Featured Content
+                  </span>
+                </div>
+                <h2 className="mb-4 text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl">
+                  Must-Read Articles
+                </h2>
               </div>
-              <h2 className="mb-4 text-3xl font-semibold text-slate-900 dark:text-white sm:text-4xl">
-                Must-Read Articles
-              </h2>
-            </div>
 
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-              {featuredPosts.map((post, index) => (
-                <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
-                  <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200  hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-
-                    <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-                      <ImageWithFallback
-                        src={post.image}
-                        alt={post.title}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                      <div className="absolute left-4 top-4">
-                        <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white border-0 shadow-md">
-                          Featured
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 flex-col p-6 sm:p-8">
-                      <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(post.publishDate)}</span>
-                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+                {featuredPosts.map((post, index) => (
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="block h-full outline-none"
+                  >
+                    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-indigo-200 hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                        <ImageWithFallback
+                          src={post.image}
+                          alt={post.title}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                        <div className="absolute left-4 top-4">
+                          <Badge className="border-0 bg-brand-orange-500 px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-white shadow-md hover:bg-brand-orange-600">
+                            Featured
+                          </Badge>
+                        </div>
                       </div>
 
-                      <h3 className="mb-4 text-xl font-medium leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
-                        {post.title}
-                      </h3>
+                      <div className="flex flex-1 flex-col p-6 sm:p-8">
+                        <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(post.publishDate)}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4" />
+                            {post.readTime} min
+                          </span>
+                        </div>
 
-                      <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                        {post.excerpt}
-                      </p>
+                        <h3 className="mb-4 text-xl font-medium leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
+                          {post.title}
+                        </h3>
 
-                      <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
-                        <div className="flex items-center gap-3">
-                          <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
-                          <div>
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">{post.author.name}</p>
-                            <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
+                        <p className="mb-6 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                          {post.excerpt}
+                        </p>
+
+                        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800">
+                          <div className="flex items-center gap-3">
+                            <ImageWithFallback
+                              src={post.author.avatar}
+                              alt={post.author.name}
+                              className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
+                            />
+                            <div>
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                {post.author.name}
+                              </p>
+                              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                {post.author.role}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </article>
-                </Link>
-              ))}
+                    </article>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
 
       {/* All Posts Section */}
       <section className="py-16 lg:py-24">
@@ -528,9 +475,12 @@ export default function BlogList({
             <>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
                 {filteredPosts.map((post) => (
-                  <Link key={post.id} href={`/blog/${post.slug}`} className="block h-full outline-none">
-                    <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200  hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-
+                  <Link
+                    key={post.id}
+                    href={`/blog/${post.slug}`}
+                    className="block h-full outline-none"
+                  >
+                    <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-indigo-200 hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
                       <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                         <ImageWithFallback
                           src={post.image}
@@ -538,7 +488,7 @@ export default function BlogList({
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute left-4 top-4">
-                          <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0  backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
+                          <Badge className="border-0 bg-white/90 text-slate-900 backdrop-blur-sm hover:bg-white dark:bg-slate-900/90 dark:text-white">
                             {post.category}
                           </Badge>
                         </div>
@@ -546,15 +496,21 @@ export default function BlogList({
 
                       <div className="flex flex-1 flex-col p-6 sm:p-8">
                         <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                          <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(post.publishDate)}</span>
-                          <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{post.readTime} min</span>
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="h-4 w-4" />
+                            {formatDate(post.publishDate)}
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <Clock className="h-4 w-4" />
+                            {post.readTime} min
+                          </span>
                         </div>
 
                         <h3 className="mb-4 text-xl font-medium leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
                           {post.title}
                         </h3>
 
-                        <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                        <p className="mb-6 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                           {post.excerpt}
                         </p>
 
@@ -576,12 +532,20 @@ export default function BlogList({
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
+                        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800">
                           <div className="flex items-center gap-3">
-                            <ImageWithFallback src={post.author.avatar} alt={post.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
+                            <ImageWithFallback
+                              src={post.author.avatar}
+                              alt={post.author.name}
+                              className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
+                            />
                             <div>
-                              <p className="text-sm font-medium text-slate-900 dark:text-white">{post.author.name}</p>
-                              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                {post.author.name}
+                              </p>
+                              <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                {post.author.role}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -591,14 +555,22 @@ export default function BlogList({
                 ))}
               </div>
 
-              {selectedCategory === 'All' && !selectedTag && totalPages > 1 && (
+              {totalPages > 1 && (
                 <div className="mt-16 flex justify-center">
                   <Pagination>
                     <PaginationContent>
                       <PaginationItem>
                         <PaginationPrevious
-                          href={currentPage > 1 ? buildPageHref(currentPage - 1) : '#'}
-                          className={currentPage > 1 ? 'text-slate-600 dark:text-slate-300' : 'pointer-events-none opacity-50'}
+                          href={
+                            currentPage > 1
+                              ? buildPageHref(currentPage - 1)
+                              : '#'
+                          }
+                          className={
+                            currentPage > 1
+                              ? 'text-slate-600 dark:text-slate-300'
+                              : 'pointer-events-none opacity-50'
+                          }
                         />
                       </PaginationItem>
                       <PaginationItem>
@@ -608,8 +580,16 @@ export default function BlogList({
                       </PaginationItem>
                       <PaginationItem>
                         <PaginationNext
-                          href={currentPage < totalPages ? buildPageHref(currentPage + 1) : '#'}
-                          className={currentPage < totalPages ? 'text-slate-600 dark:text-slate-300' : 'pointer-events-none opacity-50'}
+                          href={
+                            currentPage < totalPages
+                              ? buildPageHref(currentPage + 1)
+                              : '#'
+                          }
+                          className={
+                            currentPage < totalPages
+                              ? 'text-slate-600 dark:text-slate-300'
+                              : 'pointer-events-none opacity-50'
+                          }
                         />
                       </PaginationItem>
                     </PaginationContent>
@@ -619,24 +599,23 @@ export default function BlogList({
             </>
           ) : (
             <div className="py-20 text-center">
-              <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-12  dark:border-slate-800 dark:bg-slate-900">
+              <div className="mx-auto max-w-lg rounded-2xl border border-slate-200 bg-white p-12 dark:border-slate-800 dark:bg-slate-900">
                 <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800/50">
                   <Search className="h-10 w-10 text-slate-400" />
                 </div>
                 <h3 className="mb-3 text-2xl font-semibold text-slate-900 dark:text-white">
-                  {blogPosts.length === 0 ? 'No posts published yet' : 'No articles found'}
+                  No articles found
                 </h3>
                 <p className="mb-8 text-base font-medium text-slate-500 dark:text-slate-400">
-                  {blogPosts.length === 0
-                    ? 'Check back soon for exciting content about importing and international trade.'
-                    : 'Try adjusting your search terms or browse all categories.'}
+                  Try adjusting your search terms or browse all categories.
                 </p>
-                {blogPosts.length > 0 && (
+                {(initialSearchQuery ||
+                  selectedTag ||
+                  selectedCategory !== 'All') && (
                   <Button
                     onClick={() => {
                       setSearchQuery('');
-                      setSelectedCategory('All');
-                      setSelectedTag(null);
+                      updateFilters({ category: '', tag: '', q: '' });
                     }}
                     className="h-12 rounded-xl bg-indigo-600 px-8 text-base font-medium text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                   >

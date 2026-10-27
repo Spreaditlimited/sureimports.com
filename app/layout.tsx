@@ -13,6 +13,7 @@ import { AuthProvider } from '@/app/context/AuthContext';
 import SupportProvider from '@/components/support/SupportProvider';
 import InstallProvider from '@/components/install/InstallProvider';
 import DeferredGlobalEnhancements from '@/components/DeferredGlobalEnhancements';
+import OpenAIAdsPixel from '@/components/OpenAIAdsPixel';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import SiteThemeProvider from '@/components/theme/SiteThemeProvider';
 import { AffiliateTracker } from '@/app/(home)/components/AffiliateTracker';
@@ -30,7 +31,11 @@ const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID || 'AW-998486805';
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
-  appleWebApp: { capable: true, title: 'Sure Imports', statusBarStyle: 'default' },
+  appleWebApp: {
+    capable: true,
+    title: 'Sure Imports',
+    statusBarStyle: 'default',
+  },
   icons: { apple: '/app-icons/icon-180.png' },
   title: {
     default: 'Sure Imports - Import from China with Confidence',
@@ -129,7 +134,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html data-si-foundation="1" lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html
+      data-si-foundation="1"
+      lang="en"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <link rel="icon" type="image/png" href="/favico.png" />
       </head>
@@ -183,13 +193,18 @@ export default function RootLayout({
             />
 
             <AffiliateTracker />
+            <OpenAIAdsPixel />
             <Script src="/whatsapp-tracking.js" strategy="afterInteractive" />
-            <InstallProvider><SupportProvider enabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}>{children}</SupportProvider></InstallProvider>
+            <InstallProvider>
+              <SupportProvider
+                enabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}
+              >
+                {children}
+              </SupportProvider>
+            </InstallProvider>
 
-            <DeferredGlobalEnhancements supportEnabled={process.env.SUPPORT_CHAT_ENABLED === 'true'} />
-            <Script
-              src="https://checkout.flutterwave.com/v3.js"
-              strategy="lazyOnload"
+            <DeferredGlobalEnhancements
+              supportEnabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}
             />
             <Toaster />
             <SonnerToaster position="top-right" richColors />

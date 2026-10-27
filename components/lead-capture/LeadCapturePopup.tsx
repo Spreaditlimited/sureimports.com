@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { usePathname } from 'next/navigation';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, Mail, X } from 'lucide-react';
@@ -172,6 +173,7 @@ export default function LeadCapturePopup() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('subscribe'),
           email: email.trim(),
           first_name: firstName.trim(),
           segment_ids: [LEAD_SEGMENT_ID],

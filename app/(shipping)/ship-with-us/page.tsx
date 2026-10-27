@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports China to Nigeria shipping service',
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: 'Ship From China to Nigeria After Buying Goods',
     description:
       'Shipping-only logistics for Nigerian importers who already bought goods from Chinese suppliers.',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
   },
 };
 

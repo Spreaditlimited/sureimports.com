@@ -1,3 +1,4 @@
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import { sessionCookieLifetime } from '@/lib/auth/session-policy.mjs';
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
@@ -8,7 +9,15 @@ import { prisma } from '@/lib/prisma';
 import { claimAffiliateAttribution } from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
-  const { userEmail, userPassword, recaptchaToken, rememberMe } = await request.json();
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'customer-login',
+    ipMax: 30,
+    identityMax: 10,
+  });
+  if (securityFailure) return securityFailure;
+
+  const { userEmail, userPassword, recaptchaToken, rememberMe } =
+    await request.json();
 
   const isCaptchaValid = await verifyRecaptchaToken(
     recaptchaToken,

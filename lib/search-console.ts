@@ -4,7 +4,8 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
+const SEARCH_CONSOLE_SCOPE =
+  'https://www.googleapis.com/auth/webmasters.readonly';
 const DEFAULT_SITE_URL = 'sc-domain:sureimports.com';
 const DEFAULT_ROW_LIMIT = 25000;
 
@@ -86,7 +87,9 @@ type SearchPageType =
   | 'public_page';
 
 function clean(value: unknown, max = 1000) {
-  return String(value || '').trim().slice(0, max);
+  return String(value || '')
+    .trim()
+    .slice(0, max);
 }
 
 function dateOnly(date: Date) {
@@ -126,8 +129,12 @@ function parseServiceAccountJson(value: string) {
 
 function getSearchConsoleCredentials(): SearchConsoleCredentials {
   const json =
-    parseServiceAccountJson(process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON || '') ||
-    parseServiceAccountJson(process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON_BASE64 || '');
+    parseServiceAccountJson(
+      process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON || '',
+    ) ||
+    parseServiceAccountJson(
+      process.env.GOOGLE_SEARCH_CONSOLE_SERVICE_ACCOUNT_JSON_BASE64 || '',
+    );
 
   const clientEmail =
     clean(json?.client_email, 255) ||
@@ -137,7 +144,9 @@ function getSearchConsoleCredentials(): SearchConsoleCredentials {
     clean(process.env.GOOGLE_SEARCH_CONSOLE_PRIVATE_KEY, 5000);
 
   if (!clientEmail || !privateKey) {
-    throw new Error('Google Search Console service account credentials are not configured.');
+    throw new Error(
+      'Google Search Console service account credentials are not configured.',
+    );
   }
 
   return {
@@ -179,7 +188,11 @@ async function getSearchConsoleAccessToken() {
 
   const body = await response.json().catch(() => null);
   if (!response.ok || !body?.access_token) {
-    throw new Error(body?.error_description || body?.error || 'Could not get Google access token.');
+    throw new Error(
+      body?.error_description ||
+        body?.error ||
+        'Could not get Google access token.',
+    );
   }
 
   return clean(body.access_token, 2000);
@@ -192,6 +205,7 @@ async function querySearchConsole(input: {
   endDate: string;
   rowLimit: number;
   startRow: number;
+  dimensions?: string[];
 }) {
   const endpoint = `https://searchconsole.googleapis.com/webmasters/v3/sites/${encodeURIComponent(
     input.siteUrl,
@@ -206,13 +220,26 @@ async function querySearchConsole(input: {
     body: JSON.stringify({
       startDate: input.startDate,
       endDate: input.endDate,
-      dimensions: ['date', 'page', 'query', 'country', 'device'],
+      dimensions: input.dimensions || [
+        'date',
+        'page',
+        'query',
+        'country',
+        'device',
+      ],
+      aggregationType: (input.dimensions || ['page']).includes('page')
+        ? 'auto'
+        : 'byProperty',
+      type: 'web',
+      dataState: 'final',
       rowLimit: input.rowLimit,
       startRow: input.startRow,
     }),
   });
 
-  const body = (await response.json().catch(() => null)) as SearchConsoleQueryResponse | null;
+  const body = (await response
+    .json()
+    .catch(() => null)) as SearchConsoleQueryResponse | null;
   if (!response.ok) {
     const message =
       (body as any)?.error?.message ||
@@ -225,6 +252,27 @@ async function querySearchConsole(input: {
 }
 
 export async function ensureSearchConsoleTables() {
+  // These independent rollups include anonymized queries. Never derive headline
+  // property/page totals by adding the detailed query rows below.
+  await prisma.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS search_console_summary_stats (
+      pidStat VARCHAR(80) NOT NULL PRIMARY KEY,
+      siteUrl VARCHAR(255) NOT NULL,
+      date DATE NOT NULL,
+      scope VARCHAR(20) NOT NULL,
+      pageUrl TEXT NULL,
+      country VARCHAR(20) NULL,
+      device VARCHAR(40) NULL,
+      clicks INT NOT NULL,
+      impressions INT NOT NULL,
+      ctr DECIMAL(12,8) NOT NULL,
+      position DECIMAL(12,4) NOT NULL,
+      runId VARCHAR(80) NOT NULL,
+      updatedAt DATETIME NOT NULL,
+      KEY gsc_summary_site_date (siteUrl, date),
+      KEY gsc_summary_scope_date (scope, date)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  `);
   await prisma.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS search_console_import_runs (
       id INT NOT NULL AUTO_INCREMENT,
@@ -430,7 +478,7 @@ function resolveImportWindow(options: ImportOptions) {
 
   const days = Math.min(30, Math.max(1, Number(options.days || 3)));
   const end = new Date();
-  end.setUTCDate(end.getUTCDate() - 2);
+  end.setUTCDate(end.getUTCDate() - 3);
   const start = new Date(end);
   start.setUTCDate(start.getUTCDate() - (days - 1));
 
@@ -459,7 +507,10 @@ function normalizeOpportunityPageUrl(pageUrl: string) {
     url.pathname = url.pathname.replace(/\/+$/, '') || '/';
     return url.toString().replace(/\/$/, url.pathname === '/' ? '/' : '');
   } catch {
-    return pageUrl.toLowerCase().replace(/[?#].*$/, '').replace(/\/$/, '');
+    return pageUrl
+      .toLowerCase()
+      .replace(/[?#].*$/, '')
+      .replace(/\/$/, '');
   }
 }
 
@@ -495,10 +546,16 @@ function isEligibleSearchPage(pageUrl: string) {
   try {
     const url = new URL(pageUrl);
     const host = url.hostname.toLowerCase();
-    if (host !== 'www.sureimports.com' && host !== 'sureimports.com' && host !== 'linescout.sureimports.com') {
+    if (
+      host !== 'www.sureimports.com' &&
+      host !== 'sureimports.com' &&
+      host !== 'linescout.sureimports.com'
+    ) {
       return false;
     }
-    return !/^\/(api|auth|dashboard|internal|sign-in|sign-up)(\/|$)/.test(url.pathname);
+    return !/^\/(api|auth|dashboard|internal|sign-in|sign-up)(\/|$)/.test(
+      url.pathname,
+    );
   } catch {
     return false;
   }
@@ -508,20 +565,38 @@ function inferCtaIntent(query: string, pageUrl: string) {
   const text = `${query} ${pageUrl}`.toLowerCase();
   if (
     pageUrl.includes('/corporate-sourcing') ||
-    /\b(bank|financial institution|government|ministry|corporate organisation|corporate organization|large company|school|church|ngo|hospital|institutional procurement)\b/.test(text)
+    /\b(bank|financial institution|government|ministry|corporate organisation|corporate organization|large company|school|church|ngo|hospital|institutional procurement)\b/.test(
+      text,
+    )
   ) {
     return 'corporate_sourcing';
   }
-  if (/\b(white label|white-label|private label|private-label|oem|odm|custom brand|branded product)\b/.test(text)) {
+  if (
+    /\b(white label|white-label|private label|private-label|oem|odm|custom brand|branded product)\b/.test(
+      text,
+    )
+  ) {
     return 'linescout_white_label';
   }
-  if (/\b(machine|machines|machinery|equipment|industrial|production line|factory equipment|packaging machine)\b/.test(text)) {
+  if (
+    /\b(machine|machines|machinery|equipment|industrial|production line|factory equipment|packaging machine)\b/.test(
+      text,
+    )
+  ) {
     return 'linescout_machine_sourcing';
   }
-  if (/\b(verify|verification|scam|supplier check|fake supplier|trusted supplier)\b/.test(text)) {
+  if (
+    /\b(verify|verification|scam|supplier check|fake supplier|trusted supplier)\b/.test(
+      text,
+    )
+  ) {
     return 'supplier_intelligence';
   }
-  if (/\b(ship|shipping|freight|air freight|sea freight|customs|clearing|delivery)\b/.test(text)) {
+  if (
+    /\b(ship|shipping|freight|air freight|sea freight|customs|clearing|delivery)\b/.test(
+      text,
+    )
+  ) {
     return 'ship_with_us';
   }
   if (/\b(pay|payment|rmb|yuan|alipay|wechat|supplier payment)\b/.test(text)) {
@@ -533,7 +608,11 @@ function inferCtaIntent(query: string, pageUrl: string) {
   if (/\b(laptop|laptops|macbook|computer)\b/.test(text)) {
     return 'laptop_sourcing';
   }
-  if (/\b(bulk|wholesale|manufacturer|manufacturers|moq|supplier comparison|custom product|quality check|quality control|sourcing strategy|product sourcing)\b/.test(text)) {
+  if (
+    /\b(bulk|wholesale|manufacturer|manufacturers|moq|supplier comparison|custom product|quality check|quality control|sourcing strategy|product sourcing)\b/.test(
+      text,
+    )
+  ) {
     return 'linescout_bulk_sourcing';
   }
   return 'buy_from_chinese_websites';
@@ -564,8 +643,9 @@ async function saveSearchConsoleStatRecords(
 
   for (const chunk of chunks) {
     const now = new Date();
-    const values = chunk.map((record) =>
-      Prisma.sql`(
+    const values = chunk.map(
+      (record) =>
+        Prisma.sql`(
         ${randomPid('GSCSTAT')},
         ${sqlDate(record.date)},
         ${input.siteUrl},
@@ -606,10 +686,12 @@ async function createOrRefreshOpportunity(
   startDate: string,
   endDate: string,
 ) {
-  const [existing] = await prisma.$queryRaw<Array<{
-    pidOpportunity: string;
-    status: string;
-  }>>(
+  const [existing] = await prisma.$queryRaw<
+    Array<{
+      pidOpportunity: string;
+      status: string;
+    }>
+  >(
     Prisma.sql`
       SELECT pidOpportunity, status
       FROM seo_opportunities
@@ -701,7 +783,10 @@ export async function generateSearchConsoleOpportunities(input: {
 
   const minImpressions = Math.max(10, Number(input.minImpressions || 50));
   const productMinImpressions = Math.max(10, Math.round(minImpressions / 5));
-  const supportingPageMinImpressions = Math.max(20, Math.round(minImpressions / 2));
+  const supportingPageMinImpressions = Math.max(
+    20,
+    Math.round(minImpressions / 2),
+  );
   const rows = await prisma.$queryRaw<
     Array<{
       pageUrl: string;
@@ -753,7 +838,11 @@ export async function generateSearchConsoleOpportunities(input: {
       if (impressions >= requiredImpressions && ctr < 0.015 && position <= 12) {
         opportunityType = 'low_ctr';
         confidence = Math.min(0.95, 0.82 + impressions / 10000);
-      } else if (impressions >= requiredImpressions && position >= 5 && position <= 20) {
+      } else if (
+        impressions >= requiredImpressions &&
+        position >= 5 &&
+        position <= 20
+      ) {
         opportunityType = 'ranking_push';
         confidence = Math.min(0.93, 0.78 + impressions / 12000);
       }
@@ -776,11 +865,14 @@ export async function generateSearchConsoleOpportunities(input: {
         queryCluster: [clean(row.query, 700)],
       };
     })
-    .filter((candidate): candidate is OpportunityCandidate => Boolean(candidate));
+    .filter((candidate): candidate is OpportunityCandidate =>
+      Boolean(candidate),
+    );
 
   const candidatesByPage = new Map<string, OpportunityCandidate[]>();
   for (const candidate of candidates) {
-    const pageKey = candidate.blogSlug || normalizeOpportunityPageUrl(candidate.pageUrl);
+    const pageKey =
+      candidate.blogSlug || normalizeOpportunityPageUrl(candidate.pageUrl);
     const pageCandidates = candidatesByPage.get(pageKey) || [];
     pageCandidates.push(candidate);
     candidatesByPage.set(pageKey, pageCandidates);
@@ -788,24 +880,37 @@ export async function generateSearchConsoleOpportunities(input: {
 
   const pageCandidates = Array.from(candidatesByPage.values())
     .map((items) => {
-      const ranked = [...items].sort((left, right) => right.impressions - left.impressions);
+      const ranked = [...items].sort(
+        (left, right) => right.impressions - left.impressions,
+      );
       const primary = ranked[0];
       return {
         ...primary,
-        queryCluster: Array.from(new Set(ranked.map((item) => item.primaryQuery))),
+        queryCluster: Array.from(
+          new Set(ranked.map((item) => item.primaryQuery)),
+        ),
       };
     })
     .sort((left, right) => right.impressions - left.impressions);
 
   const saved: string[] = [];
   for (const candidate of pageCandidates.slice(0, 50)) {
-    saved.push(await createOrRefreshOpportunity(candidate, input.startDate, input.endDate));
+    saved.push(
+      await createOrRefreshOpportunity(
+        candidate,
+        input.startDate,
+        input.endDate,
+      ),
+    );
   }
 
-  const candidatesByPageType = pageCandidates.reduce<Record<string, number>>((totals, candidate) => {
-    totals[candidate.pageType] = (totals[candidate.pageType] || 0) + 1;
-    return totals;
-  }, {});
+  const candidatesByPageType = pageCandidates.reduce<Record<string, number>>(
+    (totals, candidate) => {
+      totals[candidate.pageType] = (totals[candidate.pageType] || 0) + 1;
+      return totals;
+    },
+    {},
+  );
 
   return {
     actionableQueries: candidates.length,
@@ -847,13 +952,15 @@ export async function startSearchConsolePerformanceImport(
       `,
     );
 
-    const activeRuns = await transaction.$queryRaw<Array<{
-      pidRun: string;
-      siteUrl: string;
-      startDate: Date;
-      endDate: Date;
-      startedAt: Date | null;
-    }>>(
+    const activeRuns = await transaction.$queryRaw<
+      Array<{
+        pidRun: string;
+        siteUrl: string;
+        startDate: Date;
+        endDate: Date;
+        startedAt: Date | null;
+      }>
+    >(
       Prisma.sql`
         SELECT pidRun, siteUrl, startDate, endDate, startedAt
         FROM search_console_import_runs
@@ -895,6 +1002,64 @@ export async function startSearchConsolePerformanceImport(
       run: { pidRun, siteUrl, startDate, endDate, rowLimit },
     };
   });
+}
+
+async function importSearchConsoleSummaries(
+  run: SearchConsoleImportReservation,
+  accessToken: string,
+) {
+  const groups = [
+    { scope: 'property', dimensions: ['date'] },
+    { scope: 'page', dimensions: ['date', 'page'] },
+    { scope: 'device', dimensions: ['date', 'device'] },
+    { scope: 'country', dimensions: ['date', 'country'] },
+  ];
+  let saved = 0;
+  for (const group of groups) {
+    const allRows: SearchConsoleRow[] = [];
+    for (let startRow = 0; ; startRow += DEFAULT_ROW_LIMIT) {
+      const rows = await querySearchConsole({
+        ...run,
+        accessToken,
+        rowLimit: DEFAULT_ROW_LIMIT,
+        startRow,
+        dimensions: group.dimensions,
+      });
+      allRows.push(...rows);
+      if (rows.length < DEFAULT_ROW_LIMIT) break;
+    }
+    // Replace only this scope/window after fetching successfully, removing stale
+    // rows when Google revises finalized data without touching other rollups.
+    await prisma.$transaction(
+      async (tx) => {
+        await tx.$executeRaw`DELETE FROM search_console_summary_stats
+        WHERE siteUrl = ${run.siteUrl} AND scope = ${group.scope}
+        AND date >= ${sqlDate(run.startDate)} AND date <= ${sqlDate(run.endDate)}`;
+        for (let offset = 0; offset < allRows.length; offset += 200) {
+          const values = allRows
+            .slice(offset, offset + 200)
+            .filter((row) => row.keys?.[0])
+            .map((row) => {
+              const [date, value = ''] = row.keys!;
+              const id = crypto
+                .createHash('sha256')
+                .update(JSON.stringify([run.siteUrl, group.scope, date, value]))
+                .digest('hex');
+              return Prisma.sql`(${id}, ${run.siteUrl}, ${sqlDate(date)}, ${group.scope},
+            ${group.scope === 'page' ? value : null}, ${group.scope === 'country' ? value : null}, ${group.scope === 'device' ? value : null},
+            ${Math.round(Number(row.clicks || 0))}, ${Math.round(Number(row.impressions || 0))}, ${Number(row.ctr || 0)}, ${Number(row.position || 0)}, ${run.pidRun}, ${new Date()})`;
+            });
+          if (values.length)
+            await tx.$executeRaw(Prisma.sql`INSERT INTO search_console_summary_stats
+          (pidStat, siteUrl, date, scope, pageUrl, country, device, clicks, impressions, ctr, position, runId, updatedAt)
+          VALUES ${Prisma.join(values)}`);
+        }
+      },
+      { timeout: 60000 },
+    );
+    saved += allRows.length;
+  }
+  return saved;
 }
 
 export async function executeSearchConsolePerformanceImport(
@@ -955,6 +1120,8 @@ export async function executeSearchConsolePerformanceImport(
       if (startRow >= 100000) break;
     }
 
+    const summaryRows = await importSearchConsoleSummaries(run, accessToken);
+
     const opportunities = await generateSearchConsoleOpportunities({
       startDate,
       endDate,
@@ -979,6 +1146,7 @@ export async function executeSearchConsolePerformanceImport(
       startDate,
       endDate,
       rows: totalRows,
+      summaryRows,
       opportunities,
     };
   } catch (error) {
@@ -996,10 +1164,14 @@ export async function executeSearchConsolePerformanceImport(
   }
 }
 
-export async function importSearchConsolePerformance(options: ImportOptions = {}) {
+export async function importSearchConsolePerformance(
+  options: ImportOptions = {},
+) {
   const reservation = await startSearchConsolePerformanceImport(options);
   if (!reservation.started) {
-    throw new Error(`Search Console import ${reservation.run.pidRun} is already running.`);
+    throw new Error(
+      `Search Console import ${reservation.run.pidRun} is already running.`,
+    );
   }
   return executeSearchConsolePerformanceImport(reservation.run);
 }

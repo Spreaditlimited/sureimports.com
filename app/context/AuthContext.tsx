@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
 import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import type React from 'react';
@@ -223,7 +224,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userEmail, userPassword, userFirstname }),
+      body: JSON.stringify({
+        recaptchaToken: await executePublicCaptcha('register'),
+        email: userEmail,
+        password: userPassword,
+        confirmPassword: userPassword,
+        userFirstname,
+      }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -248,6 +255,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        recaptchaToken: await executePublicCaptcha('register'),
         facebookAttribution: buildFacebookLeadMeta(),
         userFirstname,
         userLastname,

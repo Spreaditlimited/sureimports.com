@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Control, useForm, UseFormReturn } from 'react-hook-form';
@@ -436,6 +437,7 @@ const SignupPageContainer: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('register'),
           userFirstname,
           userLastname,
           email,
@@ -454,7 +456,7 @@ const SignupPageContainer: React.FC = () => {
         setLoading(false);
       }
     } catch (error: any) {
-      //setError(error.message);
+      setMessage(error?.message || 'Unable to submit. Please try again.');
     } finally {
       //setIsLoading(false);
       //alert('Taking Final Action');

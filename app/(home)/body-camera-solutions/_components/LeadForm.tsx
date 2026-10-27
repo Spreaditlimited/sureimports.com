@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { FormEvent, useState } from 'react';
 import { ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import {
@@ -109,7 +110,11 @@ export default function LeadForm({
       const response = await fetch('/api/body-camera-assessment', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ ...payload, source }),
+        body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('body_camera'),
+          ...payload,
+          source,
+        }),
       });
       const result = (await response.json()) as { message?: string };
       if (!response.ok)

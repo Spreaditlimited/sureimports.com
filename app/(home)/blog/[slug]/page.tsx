@@ -1,6 +1,8 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
-import Script from 'next/script';
+import { JsonLdScript } from '@/components/seo/JsonLd';
+import AdSenseEditorial from '@/components/AdSenseEditorial';
+import AdSensePrivacyChoices from '@/components/AdSensePrivacyChoices';
 
 import BlogDetail from '@/app/(home)/components/BlogDetail';
 import {
@@ -16,6 +18,7 @@ import {
   getBlogReadingTime,
   getBlogWordCount,
 } from '@/lib/blogReadingTime';
+import { enhanceBlogTables } from '@/lib/blogHtml';
 import { getBlogRedirectTarget } from '@/lib/blogRedirects';
 
 type PageProps = {
@@ -123,10 +126,7 @@ export async function generateMetadata({
       images: [
         {
           url: ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`,
-          width: 1200,
-          height: 630,
           alt: ogTitle,
-          type: 'image/png',
         },
       ],
     },
@@ -189,8 +189,6 @@ export default async function BlogDetailsPage({ params }: PageProps) {
     image: {
       '@type': 'ImageObject',
       url: ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`,
-      width: 1200,
-      height: 630,
     },
     datePublished: post.publishDate,
     dateModified: post.updatedDate,
@@ -234,6 +232,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
+    '@id': `${canonicalUrl}#breadcrumb`,
     itemListElement: [
       {
         '@type': 'ListItem',
@@ -289,31 +288,36 @@ export default async function BlogDetailsPage({ params }: PageProps) {
 
   // Fetch related posts for passing to the component
   const relatedPosts = await fetchRelatedBlogs(post.category, post.id, 3);
+  const { content, ...displayPost } = post;
+  const relatedCards = relatedPosts.map(
+    ({ content: _content, ...card }) => card,
+  );
 
   return (
     <>
       {/* JSON-LD Structured Data */}
-      <Script
-        id="article-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <Script
-        id="breadcrumb-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
-      <Script
-        id="webpage-jsonld"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
-      />
+      <JsonLdScript data={[articleJsonLd, breadcrumbJsonLd, webPageJsonLd]} />
 
       <Navbar />
-      <main className="min-h-screen bg-[var(--si-canvas)]" data-si-page-theme="editorial">
-        <BlogDetail post={post} relatedPosts={relatedPosts} />
+      <main
+        className="min-h-screen bg-[var(--si-canvas)]"
+        data-si-page-theme="editorial"
+      >
+        <BlogDetail post={displayPost} relatedPosts={relatedCards}>
+          {/<[a-z][\s\S]*>/i.test(content) ? (
+            <div
+              dangerouslySetInnerHTML={{ __html: enhanceBlogTables(content) }}
+            />
+          ) : (
+            <div className="whitespace-pre-wrap">{content}</div>
+          )}
+        </BlogDetail>
       </main>
+      <div className="mx-auto max-w-6xl px-6">
+        <AdSensePrivacyChoices />
+      </div>
       <Footer />
+      <AdSenseEditorial />
     </>
   );
 }

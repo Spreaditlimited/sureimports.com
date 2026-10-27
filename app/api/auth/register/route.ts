@@ -1,4 +1,5 @@
 'use server';
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import { queueAccountWelcome } from '@/lib/webinar/server';
 
 import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
@@ -21,6 +22,15 @@ import {
 } from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'customer-signup',
+    action: 'register',
+    signup: true,
+    ipMax: 8,
+    identityMax: 3,
+  });
+  if (securityFailure) return securityFailure;
+
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
   const {
     facebookAttribution,
@@ -32,23 +42,6 @@ export async function POST(request: NextRequest) {
     confirmPassword,
     recaptchaToken,
   } = await request.json();
-
-  const isCaptchaValid = await verifyRecaptchaToken(
-    recaptchaToken,
-    request,
-    'register',
-  );
-  if (!isCaptchaValid) {
-    const messagex = {
-      message1: 'Captcha verification failed. Please try again.',
-      message2: 'SUCCESS',
-      message3: 200,
-    };
-    return NextResponse.json(
-      { messagex, statusx: 'FAILED_CAPTCHA', successx: false, userx: null },
-      { status: 400 },
-    );
-  }
 
   const sessioncode = randomGenerator(10);
 

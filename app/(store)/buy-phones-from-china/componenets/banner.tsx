@@ -21,7 +21,9 @@ const Banner: React.FC = () => {
   }, []);
 
   return (
-    <div className={`${heroLayout.fixed} banner-image relative overflow-hidden bg-slate-950 pb-[75px] pt-[190px] max-xl17:pb-[50px] max-xl17:pt-[100px] max-xl14:pt-[120px] max-xl:pb-[30px] max-xl:pt-[140px] max-lg:pb-[10px] max-lg:pt-[90px] max-md:pb-[35px] max-sm:pb-[0px] max-sm:pt-[70px] max-[120px]:pt-[10px]`}>
+    <div
+      className={`${heroLayout.fixed} banner-image relative overflow-hidden bg-slate-950 pb-[75px] pt-[190px] max-xl17:pb-[50px] max-xl17:pt-[100px] max-xl14:pt-[120px] max-xl:pb-[30px] max-xl:pt-[140px] max-lg:pb-[10px] max-lg:pt-[90px] max-md:pb-[35px] max-sm:pb-[0px] max-sm:pt-[70px] max-[120px]:pt-[10px]`}
+    >
       <PublicHeroBackground />
       <div className="relative z-10 px-[30px] max-sm:px-[20px]">
         <div className="fix-width">
@@ -30,15 +32,15 @@ const Banner: React.FC = () => {
               className="w-full max-w-[573px] max-lg:mb-[40px] max-lg:max-w-[100%] max-lg:text-center"
               data-aos="fade-up"
             >
-<HeroPill>
-                We ship only genuine devices. No fakes.
-              </HeroPill>
-              <h1 className="main-title mt-6 text-5xl font-black uppercase leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl max-sm:hidden">
-                Buy phones & laptops from china - with ease, confidence and
-                warranty
-              </h1>
-              <h1 className="main-title mt-6 hidden text-5xl font-black uppercase leading-[1.1] tracking-tight text-white max-sm:block">
-                Buy genuine phones and laptops from china
+              <HeroPill>We ship only genuine devices. No fakes.</HeroPill>
+              <h1 className="main-title mt-6 text-5xl font-black uppercase leading-[1.1] tracking-tight text-white sm:text-6xl md:text-7xl">
+                <span className="max-sm:hidden">
+                  Buy phones & laptops from china - with ease, confidence and
+                  warranty
+                </span>
+                <span className="hidden max-sm:block">
+                  Buy genuine phones and laptops from china
+                </span>
               </h1>
               <p className="mt-[10px] max-w-[523px] text-[20px] font-normal leading-[190%] text-slate-300 max-xl:text-[18px] max-lg:mx-auto max-sm:mt-[15px] max-sm:hidden max-sm:leading-[155%] max-[420px]:text-[16px]">
                 Get brand new and pre-owned phones or laptops shipped directly
@@ -53,7 +55,7 @@ const Banner: React.FC = () => {
               <div className="banner-btn-group mt-[30px] flex gap-[15px] max-lg:justify-center max-sm:hidden">
                 <Link
                   href="/auth/signup-store"
-                  className="duration-300 inline-flex items-center justify-center rounded-[30px] border border-store-white bg-store-lightwhitebg p-[11px_42px] text-base font-bold leading-[155%] text-white transition-all hover:bg-store-white hover:text-store-blue max-xl14:p-[11px_30px]"
+                  className="inline-flex items-center justify-center rounded-[30px] border border-store-white bg-store-lightwhitebg p-[11px_42px] text-base font-bold leading-[155%] text-white transition-all duration-300 hover:bg-store-white hover:text-store-blue max-xl14:p-[11px_30px]"
                 >
                   Browse Devices
                 </Link>

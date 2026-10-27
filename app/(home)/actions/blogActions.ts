@@ -1,38 +1,13 @@
 'use server';
 
+import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
+import { resolveBlogMediaUrl } from '@/lib/blogMedia';
 import { getBlogReadingTime } from '@/lib/blogReadingTime';
 import { routeBlogSourcingLinks } from '@/lib/blogSourcingRouting';
 
-// Media base URL for serving filename-based images during migration
-const MEDIA_PUBLIC_URL =
-  process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
-  process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL ||
-  '';
-
-function resolveBlogImageUrl(imagePath: string | null): string {
-  if (!imagePath) return '/images/new/images/logo.png';
-
-  const media = imagePath.trim();
-
-  if (
-    media.startsWith('http://') ||
-    media.startsWith('https://') ||
-    media.startsWith('/')
-  ) {
-    return media;
-  }
-
-  const base = MEDIA_PUBLIC_URL.replace(/\/$/, '');
-
-  // Admin blog uploads may store only the generated public ID.
-  // Cloudinary can serve the asset by public ID when the admin folder is restored.
-  if (base && /^BLOG_[A-Z0-9]+$/.test(media)) {
-    return `${base}/admin-sureimports/blog/${media}`;
-  }
-
-  return base ? `${base}/${media.replace(/^\//, '')}` : media;
-}
+const MEDIA_PUBLIC_URL = process.env.NEXT_PUBLIC_CLOUDINARY_BASE_URL || '';
 
 function getPublishedBlogWhere() {
   return {
@@ -178,6 +153,7 @@ export interface BlogListPageResult {
   totalPosts: number;
   totalPages: number;
   totalReadTime: number;
+  categories: string[];
 }
 
 function toLitePost(dbBlog: DbBlog): BlogListPost {
@@ -206,33 +182,6 @@ function parseJsonArray(value: string | null): string[] {
 
 async function getActiveLeadMagnet(pidBlog: string) {
   try {
-    await prisma.$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS blog_lead_magnets (
-        id INT NOT NULL AUTO_INCREMENT,
-        pidMagnet VARCHAR(80) NOT NULL,
-        pidBlog VARCHAR(80) NOT NULL,
-        blogSlug VARCHAR(500) NULL,
-        slug VARCHAR(255) NOT NULL,
-        status VARCHAR(40) NOT NULL DEFAULT 'draft',
-        title VARCHAR(255) NOT NULL,
-        offerHeadline VARCHAR(255) NULL,
-        description TEXT NULL,
-        buttonText VARCHAR(120) NULL,
-        bulletsJson LONGTEXT NULL,
-        emailSubject VARCHAR(255) NULL,
-        deliveryMessage TEXT NULL,
-        pdfJson LONGTEXT NULL,
-        recommendedCta VARCHAR(120) NULL,
-        sourceQuery VARCHAR(700) NULL,
-        model VARCHAR(120) NULL,
-        createdAt DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-        updatedAt DATETIME NULL,
-        PRIMARY KEY (id),
-        UNIQUE KEY blog_lead_magnets_pidMagnet_key (pidMagnet),
-        UNIQUE KEY blog_lead_magnets_pidBlog_key (pidBlog),
-        UNIQUE KEY blog_lead_magnets_slug_key (slug)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    `);
     const rows = await prisma.$queryRaw<
       Array<{
         slug: string;
@@ -403,7 +352,12 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
   const readTime = getBlogReadingTime(routedContent);
 
   // Get image URL
-  const imageUrl = resolveBlogImageUrl(dbBlog.blogImage);
+  const imageUrl = resolveBlogMediaUrl(dbBlog.blogImage);
+  seo.ogImage = resolveBlogMediaUrl(seo.ogImage || dbBlog.blogImage, imageUrl);
+  seo.twitterImage = resolveBlogMediaUrl(
+    seo.twitterImage || seo.ogImage,
+    imageUrl,
+  );
 
   // Helper to construct media image URL - handles various path formats
   const getMediaImageUrl = (imagePath: string | null): string | undefined => {
@@ -472,7 +426,9 @@ function transformBlogPost(dbBlog: DbBlog): BlogPost {
       .split('T')[0],
     readTime,
     featured: dbBlog.blogFeatured === true || seo.featured === true,
-    image: imageUrl,
+    image: imageUrl.startsWith('https://www.sureimports.com/')
+      ? imageUrl.replace('https://www.sureimports.com', '')
+      : imageUrl,
     slug: dbBlog.blogSlug || dbBlog.pidBlog,
     seo,
   };
@@ -502,6 +458,7 @@ export async function fetchPublishedBlogsLite(
   page = 1,
   pageSize = 9,
   searchQuery = '',
+  filters: { tag?: string; category?: string; sort?: 'newest' | 'oldest' } = {},
 ): Promise<BlogListPageResult> {
   try {
     const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
@@ -509,14 +466,52 @@ export async function fetchPublishedBlogsLite(
       Number.isFinite(pageSize) && pageSize > 0
         ? Math.min(9, Math.floor(pageSize))
         : 9;
-    const where = buildPublishedBlogWhere(searchQuery);
-    const priorityWhere = buildPublishedBlogPriorityWhere(searchQuery);
+    // Tags are stored in legacy JSON text. Resolve exact matches from metadata,
+    // then constrain the database query BEFORE counting, sorting and pagination.
+    const facets = await prisma.blog.findMany({
+      where: getPublishedBlogWhere(),
+      select: {
+        pidBlog: true,
+        blogExt2: true,
+        category: { select: { categoryName: true } },
+      },
+    });
+    const categoryOf = (row: (typeof facets)[number]) =>
+      row.category?.categoryName ||
+      parseSEOData(row.blogExt2).category ||
+      'Import Guide';
+    const categories = [...new Set(facets.map(categoryOf))].sort();
+    const matchingIds = facets
+      .filter(
+        (row) =>
+          (!filters.category ||
+            categoryOf(row).toLowerCase() === filters.category.toLowerCase()) &&
+          (!filters.tag ||
+            (parseSEOData(row.blogExt2).tags || []).some(
+              (tag) => tag.toLowerCase() === filters.tag!.toLowerCase(),
+            )),
+      )
+      .map((row) => row.pidBlog);
+    const where: Prisma.blogWhereInput = {
+      AND: [
+        buildPublishedBlogWhere(searchQuery),
+        { pidBlog: { in: matchingIds } },
+      ],
+    };
+    const prioritySearch = buildPublishedBlogPriorityWhere(searchQuery);
+    const priorityWhere: Prisma.blogWhereInput | null = prioritySearch
+      ? { AND: [where, prioritySearch] }
+      : null;
+    const orderBy: Prisma.blogOrderByWithRelationInput[] = [
+      { createdAt: filters.sort === 'oldest' ? 'asc' : 'desc' },
+      { id: filters.sort === 'oldest' ? 'asc' : 'desc' },
+    ];
 
     const priorityRows = priorityWhere
       ? await prisma.blog.findMany({
           where: priorityWhere,
           select: { pidBlog: true },
-          orderBy: { createdAt: 'desc' },
+          orderBy,
         })
       : [];
     const priorityIds = priorityRows.map((blog) => blog.pidBlog);
@@ -603,7 +598,7 @@ export async function fetchPublishedBlogsLite(
       ? await prisma.blog.findMany({
           where: remainderWhere,
           select: postSelect,
-          orderBy: { createdAt: 'desc' },
+          orderBy,
           take: remainingSlots,
           skip: remainderSkip,
         })
@@ -613,7 +608,10 @@ export async function fetchPublishedBlogsLite(
     const featuredBlogs = await prisma.blog.findMany({
       where: {
         ...where,
-        OR: [{ blogFeatured: true }, { blogExt2: { contains: '"featured":true' } }],
+        OR: [
+          { blogFeatured: true },
+          { blogExt2: { contains: '"featured":true' } },
+        ],
       },
       select: postSelect,
       orderBy: {
@@ -623,7 +621,9 @@ export async function fetchPublishedBlogsLite(
     });
 
     const posts = blogs.map((blog) => toLitePost(blog as DbBlog));
-    const featuredPosts = featuredBlogs.map((blog) => toLitePost(blog as DbBlog));
+    const featuredPosts = featuredBlogs.map((blog) =>
+      toLitePost(blog as DbBlog),
+    );
 
     return {
       posts,
@@ -633,6 +633,7 @@ export async function fetchPublishedBlogsLite(
       totalPosts,
       totalPages,
       totalReadTime,
+      categories,
     };
   } catch (error) {
     console.error('Error fetching lite blogs:', error);
@@ -644,6 +645,7 @@ export async function fetchPublishedBlogsLite(
       totalPosts: 0,
       totalPages: 1,
       totalReadTime: 0,
+      categories: [],
     };
   }
 }
@@ -700,28 +702,34 @@ export async function fetchRelatedBlogs(
   }
 }
 
+const getBlogBySlugForRequest = cache(
+  async (slug: string): Promise<BlogPost | null> => {
+    try {
+      const blog = await prisma.blog.findFirst({
+        where: {
+          ...getPublishedBlogWhere(),
+          OR: [{ blogSlug: slug }, { pidBlog: slug }],
+        },
+        include: {
+          publisher: true,
+          category: true,
+        },
+      });
+
+      if (!blog) return null;
+
+      const post = transformBlogPost(blog as DbBlog);
+      post.leadMagnet = await getActiveLeadMagnet(post.id);
+      return post;
+    } catch (error) {
+      console.error('Error fetching blog:', error);
+      return null;
+    }
+  },
+);
+
 export async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
-  try {
-    const blog = await prisma.blog.findFirst({
-      where: {
-        ...getPublishedBlogWhere(),
-        OR: [{ blogSlug: slug }, { pidBlog: slug }],
-      },
-      include: {
-        publisher: true,
-        category: true,
-      },
-    });
-
-    if (!blog) return null;
-
-    const post = transformBlogPost(blog as DbBlog);
-    post.leadMagnet = await getActiveLeadMagnet(post.id);
-    return post;
-  } catch (error) {
-    console.error('Error fetching blog:', error);
-    return null;
-  }
+  return getBlogBySlugForRequest(slug);
 }
 
 export async function searchBlogs(query: string): Promise<BlogPost[]> {

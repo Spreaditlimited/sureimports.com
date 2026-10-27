@@ -52,7 +52,7 @@ test('GSC import and opportunity generation never invoke OpenAI', () => {
 test('actionable queries are reduced to one highest-impression opportunity per public page', () => {
   assert.match(importerSource, /candidatesByPage/);
   assert.match(importerSource, /right\.impressions - left\.impressions/);
-  assert.match(importerSource, /queryCluster: Array\.from\(new Set/);
+  assert.match(importerSource, /queryCluster:\s*Array\.from\(\s*new Set/);
   assert.match(importerSource, /for \(const candidate of pageCandidates\.slice\(0, 50\)\)/);
   assert.doesNotMatch(
     importerSource.split('async function createOrRefreshOpportunity')[1]

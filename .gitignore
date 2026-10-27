@@ -48,5 +48,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# Private operational exports (keep local; implementation files are versioned)
+/docs/marketing/google-search-uk-2026-10-23.json
+/docs/marketing/openai-ads-uk-2026-10-23.json
+/docs/security/spam-hardening-2026-10-23.json
+
 # VS Code
 .vscode/extensions.json

@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { buildFacebookLeadMeta } from '@/lib/marketing/facebookLeadMeta';
 import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import * as React from 'react';
@@ -439,6 +440,7 @@ const SignupPageContainer: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('register'),
           facebookAttribution: buildFacebookLeadMeta(),
           userFirstname,
           userLastname,
@@ -459,7 +461,7 @@ const SignupPageContainer: React.FC = () => {
         setLoading(false);
       }
     } catch (error: any) {
-      //setError(error.message);
+      setMessage(error?.message || 'Unable to submit. Please try again.');
     } finally {
       //setIsLoading(false);
       //alert('Taking Final Action');

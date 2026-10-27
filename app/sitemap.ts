@@ -22,26 +22,22 @@ export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.sureimports.com';
-  const currentDate = new Date().toISOString();
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}/contact-us`, lastModified: currentDate, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/contact-us`, changeFrequency: 'monthly', priority: 0.7 },
     {
       url: baseUrl,
-      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.9,
     },
@@ -59,133 +55,111 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/import-from-china-to-nigeria`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.95,
     },
     {
       url: `${baseUrl}/supplier-intelligence`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/supplier-verification`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.95,
     },
     {
       url: `${baseUrl}/supplier-intelligence/reports`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
       url: `${baseUrl}/start`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/buy-from-chinese-websites`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/ship-with-us`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/track`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/shipping-rate`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/buy-phones-from-china`,
-      lastModified: currentDate,
       changeFrequency: 'daily',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/corporate-sourcing`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/laptops-for-business`,
-      lastModified: currentDate,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/tools/air-vs-sea-calculator`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/tools/cbm-volumetric-weight-calculator`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/tools/carton-optimization`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/tools/generator-sizing`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/tools/landed-cost-estimator`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/tools/retail-price-builder`,
-      lastModified: currentDate,
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
       url: `${baseUrl}/privacy-policy`,
-      lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/terms-and-conditions`,
-      lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/shipping-policy`,
-      lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
       url: `${baseUrl}/warranty-policy`,
-      lastModified: currentDate,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
@@ -195,7 +169,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     staticPages.push(
       ...bodyCameraLaunchPaths.map((path, index) => ({
         url: `${baseUrl}${path}`,
-        lastModified: currentDate,
         changeFrequency: 'weekly' as const,
         priority: index === 0 ? 0.95 : 0.85,
       })),
@@ -235,7 +208,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         lastModified:
           blog.updatedAt?.toISOString() ||
           blog.createdAt?.toISOString() ||
-          currentDate,
+          undefined,
         changeFrequency: 'weekly' as const,
         priority: 0.7,
       }));
@@ -248,7 +221,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { reports } = await getPublicPublishedReports();
     reportPages = reports.map((report) => ({
       url: `${baseUrl}/supplier-intelligence/reports/${report.slug}`,
-      lastModified: report.updatedAt || report.publishedAt || currentDate,
+      lastModified: report.updatedAt || report.publishedAt || undefined,
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     }));
@@ -259,14 +232,46 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
   }
 
-  let vehiclePages: MetadataRoute.Sitemap = [{ url: `${baseUrl}/cars`, changeFrequency: 'weekly', priority: 0.9 }];
+  let vehiclePages: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/cars`, changeFrequency: 'weekly', priority: 0.9 },
+  ];
   try {
-    vehiclePages = [...vehiclePages, ...(await vehicleCatalogue()).filter(m => m.published).map(m => ({ url: `${baseUrl}/cars/models/${m.slug}`, changeFrequency: 'weekly' as const, priority: 0.8 }))];
-  } catch (error) { console.error('Unable to load vehicle sitemap entries', error); }
+    vehiclePages = [
+      ...vehiclePages,
+      ...(await vehicleCatalogue())
+        .filter((m) => m.published)
+        .map((m) => ({
+          url: `${baseUrl}/cars/models/${m.slug}`,
+          changeFrequency: 'weekly' as const,
+          priority: 0.8,
+        })),
+    ];
+  } catch (error) {
+    console.error('Unable to load vehicle sitemap entries', error);
+  }
   const video = await procurementVideo();
-  const videoPages: MetadataRoute.Sitemap = [{
-    url: `${baseUrl}/buy-from-chinese-websites/video`, changeFrequency: 'weekly', priority: 0.8,
-    videos: [{title: video.title, description: video.description, thumbnail_loc: videoThumbnail(video.videoId).url, player_loc: `https://www.youtube-nocookie.com/embed/${video.videoId}`, publication_date: video.uploadDate, duration: video.durationSeconds}],
-  }];
-  return [...staticPages, ...blogPages, ...reportPages, ...vehiclePages, ...videoPages];
+  const videoPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/buy-from-chinese-websites/video`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      videos: [
+        {
+          title: video.title,
+          description: video.description,
+          thumbnail_loc: videoThumbnail(video.videoId).url,
+          player_loc: `https://www.youtube-nocookie.com/embed/${video.videoId}`,
+          publication_date: video.uploadDate,
+          duration: video.durationSeconds,
+        },
+      ],
+    },
+  ];
+  return [
+    ...staticPages,
+    ...blogPages,
+    ...reportPages,
+    ...vehiclePages,
+    ...videoPages,
+  ];
 }

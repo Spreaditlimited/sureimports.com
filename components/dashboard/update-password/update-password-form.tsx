@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -69,7 +70,10 @@ function UpdatePasswordForm() {
       const res = await fetch('/api/auth/password-reset-mail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail }),
+        body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('password_reset'),
+          userEmail,
+        }),
       });
 
       // GET & PROCESS RESPONSE FROM API

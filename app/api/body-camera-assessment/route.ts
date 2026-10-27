@@ -1,3 +1,4 @@
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -25,10 +26,6 @@ const assessmentSchema = z.object({
   website: z.string().max(200).optional().default(''),
 });
 
-const requestLog = new Map<string, number[]>();
-const WINDOW_MS = 15 * 60 * 1000;
-const MAX_REQUESTS = 4;
-
 function escapeHtml(value: string) {
   return value.replace(
     /[&<>'"]/g,
@@ -43,28 +40,14 @@ function escapeHtml(value: string) {
   );
 }
 
-function isRateLimited(identifier: string) {
-  const now = Date.now();
-  const recent = (requestLog.get(identifier) || []).filter(
-    (time) => now - time < WINDOW_MS,
-  );
-  if (recent.length >= MAX_REQUESTS) return true;
-  recent.push(now);
-  requestLog.set(identifier, recent);
-  return false;
-}
-
 export async function POST(request: NextRequest) {
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (isRateLimited(ip)) {
-    return NextResponse.json(
-      {
-        message: 'Too many requests. Please wait a few minutes and try again.',
-      },
-      { status: 429 },
-    );
-  }
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'body-camera',
+    action: 'body_camera',
+    ipMax: 4,
+    identityMax: 3,
+  });
+  if (securityFailure) return securityFailure;
 
   let raw: unknown;
   try {

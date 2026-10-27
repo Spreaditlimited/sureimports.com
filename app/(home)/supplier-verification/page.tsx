@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports China Supplier Verification',
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     title: 'China Supplier Verification Service',
     description:
       'Check supplier identity, registration and business details before committing funds.',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
   },
 };
 

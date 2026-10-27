@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-24",
+  "ngnPerRmb": 211,
+  "status": "CONFIRMED",
+  "rows": [
+    ["Z Fold 3", 256, "2 SIMs", 1950, 500],
+    ["Z Fold 4", 256, "2 SIMs", 2300, 500],
+    ["Z Fold 5", 256, "2 SIMs", 3000, 500],
+    ["Z Fold 6", 256, "1 SIM", 3700, 500],
+    ["Z Fold 6", 256, "2 SIMs", 4100, 500],
+    ["Z Fold 7", 256, "1 SIM", 5300, 800],
+    ["Z Fold 7", 512, "SIM unspecified", 5500, 800],
+    ["S21 Ultra", 256, "SIM unspecified", 1900, 500],
+    ["S22 Ultra", 256, "SIM unspecified", 2250, 500],
+    ["S23 Ultra", 256, "SIM unspecified", 2700, 500],
+    ["S24 Ultra", 256, "2 SIMs", 3250, 500],
+    ["S25 Ultra", 256, "1 SIM", 4200, 500],
+    ["S25 Ultra", 256, "2 SIMs", 4350, 500]
+  ]
+}

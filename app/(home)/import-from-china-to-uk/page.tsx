@@ -1,12 +1,7 @@
 import ServiceHero from '@/components/home/ServiceHero';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import {
-  ShoppingCart,
-  PackageCheck,
-  Factory,
-  ChevronDown,
-} from 'lucide-react';
+import { ShoppingCart, PackageCheck, Factory, ChevronDown } from 'lucide-react';
 import Navigation from '@/app/(home)/components/Navigation';
 import Footer from '@/app/(home)/components/Footer';
 import ImportMarkets from '@/components/home/ImportMarkets';
@@ -36,7 +31,7 @@ export const metadata: Metadata = {
     locale: 'en_GB',
     images: [
       {
-        url: 'https://www.sureimports.com/og-image.jpg',
+        url: 'https://www.sureimports.com/images/sure-imports-social-card.png',
         width: 1200,
         height: 630,
         alt: 'Sure Imports — China sourcing and shipping',
@@ -47,7 +42,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: ['https://www.sureimports.com/og-image.jpg'],
+    images: ['https://www.sureimports.com/images/sure-imports-social-card.png'],
   },
 };
 
@@ -175,13 +170,31 @@ export default function ImportFromChinaToUKPage() {
           eyebrow="China to the United Kingdom"
           title="Import from China. Build your UK business."
           description="Buy products you have found, source stock for your business, or put your brand on a product—with a team in China and a UK point of contact."
-          primary={{ href: "#choose-your-route", label: "Find your starting point" }}
-          secondary={{ href: LINESCOUT_WHITE_LABEL_URL, label: "Explore white-label ideas" }}
+          primary={{
+            href: '#choose-your-route',
+            label: 'Find your starting point',
+          }}
+          secondary={{
+            href: LINESCOUT_WHITE_LABEL_URL,
+            label: 'Explore white-label ideas',
+          }}
           summaryTitle="Buying, branding and shipping, connected."
           steps={[
-            { title: "Start with what you have", description: "Bring a product link, an idea or goods waiting to ship." },
-            { title: "Plan for your market", description: "Work through the UK checklist and understand your costs." },
-            { title: "Choose your route", description: "Get sourcing, purchasing and shipping support for your order." },
+            {
+              title: 'Start with what you have',
+              description:
+                'Bring a product link, an idea or goods waiting to ship.',
+            },
+            {
+              title: 'Plan for your market',
+              description:
+                'Work through the UK checklist and understand your costs.',
+            },
+            {
+              title: 'Choose your route',
+              description:
+                'Get sourcing, purchasing and shipping support for your order.',
+            },
           ]}
         >
           <ImportMarkets active="uk" />

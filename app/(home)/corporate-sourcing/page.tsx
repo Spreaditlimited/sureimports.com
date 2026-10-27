@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports corporate sourcing from China',
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
     title: 'Corporate Procurement from China for Nigerian Organisations',
     description:
       'Formal China procurement support for established Nigerian organisations and institutional buyers.',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
   },
 };
 

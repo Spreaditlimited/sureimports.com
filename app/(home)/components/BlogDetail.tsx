@@ -1,7 +1,8 @@
 'use client';
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import HeroPill from '@/components/home/HeroPill';
 import styles from '@/components/home/EditorialPage.module.css';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Calendar,
   Clock,
@@ -33,7 +34,9 @@ const XIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
+type BlogDisplayPost = Omit<BlogPost, 'content'> & { content?: string };
+
+const BlogLeadMagnetCta = ({ post }: { post: BlogDisplayPost }) => {
   const magnet = post.leadMagnet;
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
@@ -60,12 +63,16 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
 
     setIsSubmitting(true);
     try {
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.sureimports.com';
+      const origin =
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : 'https://www.sureimports.com';
       const urlWithEmail = `${origin}${computedDownloadUrl}?email=${encodeURIComponent(email.trim().toLowerCase())}&source=blog_lead_magnet`;
       const response = await fetch('/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('subscribe'),
           email: email.trim(),
           first_name: firstName.trim(),
           segment_ids: ['67699403ee348d7f8cb68f3a'],
@@ -73,8 +80,12 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
           message_variant: 'blog_lead_magnet',
           page_type: 'blog',
           page_url: typeof window !== 'undefined' ? window.location.href : null,
-          pathname: typeof window !== 'undefined' ? window.location.pathname : `/blog/${post.slug}`,
-          referrer: typeof document !== 'undefined' ? document.referrer || null : null,
+          pathname:
+            typeof window !== 'undefined'
+              ? window.location.pathname
+              : `/blog/${post.slug}`,
+          referrer:
+            typeof document !== 'undefined' ? document.referrer || null : null,
           lead_magnet_slug: magnet.slug,
           lead_magnet_title: magnet.title,
           lead_magnet_download_url: urlWithEmail,
@@ -82,10 +93,17 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
         }),
       });
       const data = await response.json().catch(() => null);
-      if (!response.ok) throw new Error(data?.error || 'Could not deliver the guide right now.');
+      if (!response.ok)
+        throw new Error(
+          data?.error || 'Could not deliver the guide right now.',
+        );
       setDownloadUrl(data?.leadMagnetDownloadUrl || urlWithEmail);
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'Could not deliver the guide right now.');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Could not deliver the guide right now.',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +133,10 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
           {magnet.bullets.length > 0 && (
             <ul className="grid gap-3 pt-2">
               {magnet.bullets.slice(0, 5).map((item) => (
-                <li key={item} className="flex items-start gap-3 text-sm text-slate-300">
+                <li
+                  key={item}
+                  className="flex items-start gap-3 text-sm text-slate-300"
+                >
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange-400" />
                   <span className="leading-relaxed">{item}</span>
                 </li>
@@ -132,9 +153,12 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
                 <CheckCircle2 className="h-7 w-7" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">You're all set!</h3>
+                <h3 className="text-lg font-bold text-white">
+                  You're all set!
+                </h3>
                 <p className="mt-2 text-sm leading-relaxed text-slate-400">
-                  The guide has been sent to your email. You can also access it directly below.
+                  The guide has been sent to your email. You can also access it
+                  directly below.
                 </p>
               </div>
               <a
@@ -154,14 +178,14 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
                 <input
                   value={firstName}
                   onChange={(event) => setFirstName(event.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
                   placeholder="First name"
                   required
                 />
                 <input
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white placeholder:text-slate-500 outline-none transition-all focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
+                  className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3.5 text-sm text-white outline-none transition-all placeholder:text-slate-500 focus:border-brand-orange-500/50 focus:bg-white/[0.05] focus:ring-1 focus:ring-brand-orange-500/50"
                   placeholder="Email address"
                   type="email"
                   required
@@ -184,7 +208,9 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
                 ) : (
                   <Mail className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 )}
-                {isSubmitting ? 'Sending guide...' : magnet.buttonText || 'Send me the guide'}
+                {isSubmitting
+                  ? 'Sending guide...'
+                  : magnet.buttonText || 'Send me the guide'}
               </button>
 
               <p className="text-center text-[10px] font-medium tracking-wide text-slate-500">
@@ -202,9 +228,21 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogPost }) => {
 const PublisherSocialLinks = ({ publisher }: { publisher: BlogPublisher }) => {
   const socialLinks = [
     { url: publisher.publisherSocialX, icon: XIcon, label: 'X (Twitter)' },
-    { url: publisher.publisherSocialLinkedin, icon: Linkedin, label: 'LinkedIn' },
-    { url: publisher.publisherSocialFacebook, icon: Facebook, label: 'Facebook' },
-    { url: publisher.publisherSocialInstagram, icon: Instagram, label: 'Instagram' },
+    {
+      url: publisher.publisherSocialLinkedin,
+      icon: Linkedin,
+      label: 'LinkedIn',
+    },
+    {
+      url: publisher.publisherSocialFacebook,
+      icon: Facebook,
+      label: 'Facebook',
+    },
+    {
+      url: publisher.publisherSocialInstagram,
+      icon: Instagram,
+      label: 'Instagram',
+    },
     { url: publisher.publisherWebsite, icon: Globe, label: 'Website' },
   ].filter((link) => link.url);
 
@@ -236,6 +274,8 @@ const ImageWithFallback = ({
   width = 900,
   height = 560,
   fallbackSrc = '/images/new/images/logo.png',
+  preload = false,
+  sizes,
 }: {
   src: string | { src: string };
   alt: string;
@@ -243,12 +283,12 @@ const ImageWithFallback = ({
   width?: number;
   height?: number;
   fallbackSrc?: string;
+  preload?: boolean;
+  sizes?: string;
 }) => {
   const [hasError, setHasError] = useState(false);
   const source = typeof src === 'string' ? src : src && (src as any).src;
-  const resolvedSrc = hasError
-    ? fallbackSrc
-    : source || fallbackSrc;
+  const resolvedSrc = hasError ? fallbackSrc : source || fallbackSrc;
   return (
     <Image
       src={resolvedSrc}
@@ -256,14 +296,17 @@ const ImageWithFallback = ({
       width={width}
       height={height}
       className={className}
+      preload={preload}
+      sizes={sizes}
       onError={() => setHasError(true)}
     />
   );
 };
 
 interface BlogDetailProps {
-  post: BlogPost;
-  relatedPosts?: BlogPost[];
+  post: BlogDisplayPost;
+  relatedPosts?: BlogDisplayPost[];
+  children?: ReactNode;
   onBack?: () => void;
   onSelectPost?: (slug: string) => void;
 }
@@ -271,6 +314,7 @@ interface BlogDetailProps {
 export default function BlogDetail({
   post,
   relatedPosts = [],
+  children,
 }: BlogDetailProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -290,11 +334,11 @@ export default function BlogDetail({
         });
       } catch (err) {
         navigator.clipboard.writeText(window.location.href);
-        toast.success("Link copied to clipboard");
+        toast.success('Link copied to clipboard');
       }
     } else {
       navigator.clipboard.writeText(window.location.href);
-      toast.success("Link copied to clipboard");
+      toast.success('Link copied to clipboard');
     }
   };
 
@@ -304,15 +348,11 @@ export default function BlogDetail({
 
   return (
     <div className={`${styles.page} pb-24`}>
-<article className={styles.article}>
-
+      <article className={styles.article}>
         {/* Article Header */}
         <header className="mb-12 text-center">
-
           <div className="mb-6 flex flex-wrap items-center justify-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
-            <HeroPill>
-              {post.category}
-            </HeroPill>
+            <HeroPill>{post.category}</HeroPill>
             <span className="flex items-center gap-1.5 uppercase tracking-widest">
               <Calendar className="h-3.5 w-3.5" />
               {formatDate(post.publishDate)}
@@ -323,7 +363,7 @@ export default function BlogDetail({
             </span>
           </div>
 
-          <h1 className="mb-8 text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl leading-[1.1]">
+          <h1 className="mb-8 text-4xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl">
             {post.title}
           </h1>
 
@@ -332,7 +372,7 @@ export default function BlogDetail({
           </p>
 
           {/* Author Bento Box */}
-          <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900/50 sm:flex-row sm:px-8">
+          <div className="mx-auto mt-12 flex max-w-2xl flex-col items-center justify-between gap-6 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900/50 sm:flex-row sm:px-8">
             <div className="flex items-center gap-4 text-left">
               <ImageWithFallback
                 src={post.author.avatar}
@@ -340,14 +380,18 @@ export default function BlogDetail({
                 className="h-14 w-14 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
               <div>
-                <p className="font-bold text-slate-900 dark:text-white">{post.author.name}</p>
-                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{post.author.role}</p>
+                <p className="font-bold text-slate-900 dark:text-white">
+                  {post.author.name}
+                </p>
+                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+                  {post.author.role}
+                </p>
               </div>
             </div>
 
             <Button
               onClick={handleShare}
-              className="h-12 w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-600 font-bold hover:bg-slate-100 hover:text-indigo-600 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-indigo-400 sm:w-auto px-6"
+              className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-6 font-bold text-slate-600 hover:bg-slate-100 hover:text-indigo-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/80 dark:hover:text-indigo-400 sm:w-auto"
             >
               <Share2 className="mr-2 h-4 w-4" /> Share Article
             </Button>
@@ -355,15 +399,17 @@ export default function BlogDetail({
         </header>
 
         {/* Hero Image */}
-        <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50  dark:border-slate-800 dark:bg-slate-900">
+        <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
           <ImageWithFallback
             src={post.image}
+            preload
+            sizes="(max-width: 768px) 100vw, 960px"
             alt={post.title}
             className="h-[300px] w-full object-cover md:h-[500px]"
           />
           {post.featured && (
             <div className="absolute left-6 top-6">
-              <Badge className="bg-brand-orange-500 hover:bg-brand-orange-600 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white border-0 shadow-lg">
+              <Badge className="border-0 bg-brand-orange-500 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg hover:bg-brand-orange-600">
                 Featured Report
               </Badge>
             </div>
@@ -373,17 +419,16 @@ export default function BlogDetail({
         {/* Article Content */}
         <div className="mx-auto max-w-3xl">
           <div className="blog-html-content">
-            {isHtmlContent(post.content) ? (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: enhanceBlogTables(post.content),
-                }}
-              />
-            ) : (
-              <div className="whitespace-pre-wrap">
-                {post.content}
-              </div>
-            )}
+            {children ??
+              (isHtmlContent(post.content || '') ? (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: enhanceBlogTables(post.content || ''),
+                  }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap">{post.content}</div>
+              ))}
           </div>
 
           <BlogLeadMagnetCta post={post} />
@@ -391,7 +436,9 @@ export default function BlogDetail({
           {/* Tags */}
           {post.tags && post.tags.length > 0 && (
             <div className="mt-16 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-8 dark:border-slate-800">
-              <span className="mr-2 text-sm font-bold uppercase tracking-widest text-slate-400">Filed Under:</span>
+              <span className="mr-2 text-sm font-bold uppercase tracking-widest text-slate-400">
+                Filed Under:
+              </span>
               {post.tags.map((tag) => (
                 <Link key={tag} href={`/blog?tag=${encodeURIComponent(tag)}`}>
                   <span className="inline-flex cursor-pointer items-center rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-600 transition-colors hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-400">
@@ -709,7 +756,12 @@ export default function BlogDetail({
           color: #cbd5e1;
         }
 
-        .dark .blog-html-content .blog-table-scroll tbody tr:nth-child(even) td {
+        .dark
+          .blog-html-content
+          .blog-table-scroll
+          tbody
+          tr:nth-child(even)
+          td {
           background: rgb(30 41 59 / 0.55);
         }
 
@@ -752,10 +804,12 @@ export default function BlogDetail({
 
       {/* Related Articles */}
       {relatedPosts.length > 0 && (
-        <section className="public-solid-section mt-16 bg-slate-50 border-t border-slate-200 py-16 dark:bg-slate-900/50 dark:border-slate-800">
+        <section className="public-solid-section mt-16 border-t border-slate-200 bg-slate-50 py-16 dark:border-slate-800 dark:bg-slate-900/50">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
-              <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">Keep Reading</h2>
+              <h2 className="mb-4 text-3xl font-black text-slate-900 dark:text-white">
+                Keep Reading
+              </h2>
               <p className="text-lg font-medium text-slate-500 dark:text-slate-400">
                 Explore more insights on this topic
               </p>
@@ -763,9 +817,12 @@ export default function BlogDetail({
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
               {relatedPosts.map((relatedPost) => (
-                <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block h-full outline-none">
-                  <article className="group h-full flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white  transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
-
+                <Link
+                  key={relatedPost.id}
+                  href={`/blog/${relatedPost.slug}`}
+                  className="block h-full outline-none"
+                >
+                  <article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700 dark:hover:shadow-none">
                     <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                       <ImageWithFallback
                         src={relatedPost.image}
@@ -773,7 +830,7 @@ export default function BlogDetail({
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                       <div className="absolute left-4 top-4">
-                        <Badge className="bg-white/90 text-slate-900 hover:bg-white border-0  backdrop-blur-sm dark:bg-slate-900/90 dark:text-white">
+                        <Badge className="border-0 bg-white/90 text-slate-900 backdrop-blur-sm hover:bg-white dark:bg-slate-900/90 dark:text-white">
                           {relatedPost.category}
                         </Badge>
                       </div>
@@ -781,23 +838,35 @@ export default function BlogDetail({
 
                     <div className="flex flex-1 flex-col p-6 sm:p-8">
                       <div className="mb-4 flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        <span className="flex items-center gap-1.5"><Calendar className="h-4 w-4" />{formatDate(relatedPost.publishDate)}</span>
-                        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" />{relatedPost.readTime} min</span>
+                        <span className="flex items-center gap-1.5">
+                          <Calendar className="h-4 w-4" />
+                          {formatDate(relatedPost.publishDate)}
+                        </span>
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="h-4 w-4" />
+                          {relatedPost.readTime} min
+                        </span>
                       </div>
 
                       <h3 className="mb-4 text-xl font-bold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-400">
                         {relatedPost.title}
                       </h3>
 
-                      <p className="mb-6 flex-1 line-clamp-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      <p className="mb-6 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
                         {relatedPost.excerpt}
                       </p>
 
-                      <div className="flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800 mt-auto">
+                      <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-6 dark:border-slate-800">
                         <div className="flex items-center gap-3">
-                          <ImageWithFallback src={relatedPost.author.avatar} alt={relatedPost.author.name} className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700" />
+                          <ImageWithFallback
+                            src={relatedPost.author.avatar}
+                            alt={relatedPost.author.name}
+                            className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
+                          />
                           <div>
-                            <p className="text-sm font-bold text-slate-900 dark:text-white">{relatedPost.author.name}</p>
+                            <p className="text-sm font-bold text-slate-900 dark:text-white">
+                              {relatedPost.author.name}
+                            </p>
                           </div>
                         </div>
                       </div>

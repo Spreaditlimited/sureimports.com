@@ -2,6 +2,7 @@
 
 import HeroPill from '@/components/home/HeroPill';
 import styles from '@/components/home/EditorialPage.module.css';
+import AdSensePrivacyChoices from '@/components/AdSensePrivacyChoices';
 import React, { useEffect, useState } from 'react';
 import {
   Shield,
@@ -15,7 +16,7 @@ import {
   FileText,
   Mail,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
 } from 'lucide-react';
 
 export default function PrivacyPolicy() {
@@ -31,7 +32,7 @@ export default function PrivacyPolicy() {
           }
         });
       },
-      { rootMargin: '-20% 0px -70% 0px' }
+      { rootMargin: '-20% 0px -70% 0px' },
     );
 
     document.querySelectorAll('section[id]').forEach((section) => {
@@ -41,7 +42,10 @@ export default function PrivacyPolicy() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+  const scrollToSection = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    id: string,
+  ) => {
     e.preventDefault();
     const element = document.getElementById(id);
     if (element) {
@@ -66,29 +70,29 @@ export default function PrivacyPolicy() {
 
   return (
     <div className={styles.page}>
-
       {/* Premium Page Header */}
-<div className={styles.hero}>
-
+      <div className={styles.hero}>
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-<HeroPill className="mb-6">
+            <HeroPill className="mb-6">
               <Shield className="h-3.5 w-3.5" /> Legal Documentation
             </HeroPill>
             <h1 className="text-4xl font-black tracking-tight text-slate-900 dark:text-white sm:text-5xl">
               Privacy Policy
             </h1>
             <p className="mt-4 text-lg font-medium text-slate-500 dark:text-slate-400">
-              A transparent breakdown of how we collect, use, and safeguard your personal information while you use Sure Imports.
+              A transparent breakdown of how we collect, use, and safeguard your
+              personal information while you use Sure Imports.
             </p>
-            <p className="mt-2 text-sm font-semibold text-slate-400">Last Updated: May 2026</p>
+            <p className="mt-2 text-sm font-semibold text-slate-400">
+              Last Updated: 27 October 2026
+            </p>
           </div>
         </div>
       </div>
 
       <div className="mx-auto max-w-[1440px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
-
           {/* LEFT: Sticky Table of Contents */}
           <div className="hidden w-64 shrink-0 lg:sticky lg:top-32 lg:block">
             <h3 className="mb-4 text-xs font-black uppercase tracking-widest text-slate-400">
@@ -109,7 +113,9 @@ export default function PrivacyPolicy() {
                         : '-ml-[2px] border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-900 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:text-white'
                     }`}
                   >
-                    <Icon className={`h-4 w-4 ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`} />
+                    <Icon
+                      className={`h-4 w-4 ${isActive ? 'opacity-100' : 'opacity-50 group-hover:opacity-100'}`}
+                    />
                     {section.title}
                   </a>
                 );
@@ -119,7 +125,6 @@ export default function PrivacyPolicy() {
 
           {/* RIGHT: Document Content */}
           <div className="flex-1 space-y-16 lg:max-w-3xl">
-
             {/* Our Commitment */}
             <section id="commitment" className="scroll-mt-32">
               <h2 className="mb-6 flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
@@ -128,7 +133,10 @@ export default function PrivacyPolicy() {
               </h2>
               <div className="prose prose-slate dark:prose-invert max-w-none text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 <p>
-                  We are committed to protecting the privacy and security of our users' personal information. This Privacy Policy outlines how we collect, use, and safeguard the information you provide to us when using our website and services.
+                  We are committed to protecting the privacy and security of our
+                  users' personal information. This Privacy Policy outlines how
+                  we collect, use, and safeguard the information you provide to
+                  us when using our website and services.
                 </p>
               </div>
             </section>
@@ -141,7 +149,9 @@ export default function PrivacyPolicy() {
               </h2>
               <div className="prose prose-slate dark:prose-invert max-w-none text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 <p className="mb-6">
-                  We collect personal information from users in various ways, including when you register on our website, place an order, or communicate with us via email or other channels.
+                  We collect personal information from users in various ways,
+                  including when you register on our website, place an order, or
+                  communicate with us via email or other channels.
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   {[
@@ -149,11 +159,16 @@ export default function PrivacyPolicy() {
                     'Billing and shipping address',
                     'Payment information',
                     'Order details and preferences',
-                    'Communications and correspondence with us'
+                    'Communications and correspondence with us',
                   ].map((item, i) => (
-                    <div key={i} className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4  dark:border-slate-800 dark:bg-slate-900">
+                    <div
+                      key={i}
+                      className="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+                    >
                       <CheckCircleIcon className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item}</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                        {item}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -173,13 +188,18 @@ export default function PrivacyPolicy() {
                   'To provide customer support and assistance.',
                   'To improve our website, services, and user experience.',
                   'To personalize your experience and tailor our offerings to your preferences.',
-                  'To send periodic emails and updates regarding our products, promotions, or relevant info.'
+                  'To send periodic emails and updates regarding our products, promotions, or relevant info.',
                 ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-4 rounded-2xl bg-slate-50 p-5 dark:bg-slate-900/50">
+                  <li
+                    key={i}
+                    className="flex items-start gap-4 rounded-2xl bg-slate-50 p-5 dark:bg-slate-900/50"
+                  >
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
                       {i + 1}
                     </div>
-                    <span className="text-base font-medium leading-relaxed text-slate-700 dark:text-slate-300">{item}</span>
+                    <span className="text-base font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+                      {item}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -192,18 +212,31 @@ export default function PrivacyPolicy() {
                 Data Security
               </h2>
               <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                We implement a variety of security measures to maintain the safety and integrity of your personal information, including:
+                We implement a variety of security measures to maintain the
+                safety and integrity of your personal information, including:
               </p>
               <div className="mb-6 grid gap-4 sm:grid-cols-2">
-                {['Encryption', 'Secure socket layer (SSL) technology', 'Firewalls', 'Regular security audits'].map((measure, i) => (
-                  <div key={i} className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-900/30 dark:bg-emerald-900/10">
+                {[
+                  'Encryption',
+                  'Secure socket layer (SSL) technology',
+                  'Firewalls',
+                  'Regular security audits',
+                ].map((measure, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 dark:border-emerald-900/30 dark:bg-emerald-900/10"
+                  >
                     <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-sm font-bold text-emerald-900 dark:text-emerald-300">{measure}</span>
+                    <span className="text-sm font-bold text-emerald-900 dark:text-emerald-300">
+                      {measure}
+                    </span>
                   </div>
                 ))}
               </div>
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                We restrict access to your personal information to authorized personnel only and ensure that our third-party service providers adhere to strict security standards.
+                We restrict access to your personal information to authorized
+                personnel only and ensure that our third-party service providers
+                adhere to strict security standards.
               </p>
             </section>
 
@@ -217,12 +250,17 @@ export default function PrivacyPolicy() {
               {/* Highlight Box */}
               <div className="mb-6 rounded-2xl border border-brand-orange-500/20 bg-brand-orange-500/10 p-6">
                 <p className="text-base font-bold text-brand-orange-800 dark:text-brand-orange-200">
-                  We do not sell, trade, or otherwise transfer your personal information to third parties without your consent, except as required or permitted by law.
+                  We do not sell, trade, or otherwise transfer your personal
+                  information to third parties without your consent, except as
+                  required or permitted by law.
                 </p>
               </div>
 
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                We may share your information with trusted third-party service providers who assist us in operating our website, conducting business, or servicing you, as long as they agree to keep your information confidential.
+                We may share your information with trusted third-party service
+                providers who assist us in operating our website, conducting
+                business, or servicing you, as long as they agree to keep your
+                information confidential.
               </p>
             </section>
 
@@ -233,11 +271,88 @@ export default function PrivacyPolicy() {
                 Cookies and Tracking Technologies
               </h2>
               <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                We use cookies and similar tracking technologies to enhance your browsing experience, analyze website traffic, and gather information about how you interact with our website.
+                We use cookies and similar tracking technologies to enhance your
+                browsing experience, analyze website traffic, and gather
+                information about how you interact with our website.
               </p>
-              <div className="rounded-xl border border-slate-200 bg-white p-5  dark:border-slate-800 dark:bg-slate-900">
+              <p className="mb-4 leading-relaxed text-slate-600">
+                With your cookie consent, we use the OpenAI advertising
+                measurement pixel to measure completed free account
+                registrations and attribute them to ChatGPT ads. It receives a
+                registration event identifier and browser and advertising
+                attribution information. Its automatic matching may use contact
+                information detected on the page, hashed in your browser before
+                transmission, to match conversions. Raw contact details and
+                order details are not included in our registration event. You
+                can decline optional cookies in the cookie banner. Learn more in
+                the{' '}
+                <a
+                  href="https://openai.com/policies/privacy-policy/"
+                  className="underline"
+                >
+                  OpenAI Privacy Policy
+                </a>
+                .
+              </p>
+              <h3 className="mb-3 mt-8 text-xl font-semibold text-slate-900 dark:text-white">
+                Google advertising and your choices
+              </h3>
+              <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
+                Where Google AdSense advertisements appear on this site, Google
+                and other advertising vendors may use cookies or similar
+                identifiers to select and measure ads. Google advertising
+                cookies can enable Google and its partners to show ads using
+                information about earlier visits to this website and other
+                websites. The ads and data processing available to you depend on
+                your location and consent choices.
+              </p>
+              <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
+                You can manage personalised Google ads in{' '}
+                <a href="https://myadcenter.google.com/" className="underline">
+                  My Ad Center
+                </a>
+                , and find participating third-party advertising opt-outs at{' '}
+                <a
+                  href="https://www.aboutads.info/choices/"
+                  className="underline"
+                >
+                  YourAdChoices
+                </a>
+                . Read how Google uses information from partner sites in{' '}
+                <a
+                  href="https://policies.google.com/technologies/partner-sites"
+                  className="underline"
+                >
+                  Google’s partner-site privacy information
+                </a>
+                . Turning off personalisation does not necessarily remove all
+                advertisements.
+              </p>
+              <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
+                When a separate advertising consent message is presented, use
+                its settings to choose advertising purposes and vendors or
+                withdraw consent. You can reopen our optional website-cookie
+                notice below. Essential cookies needed for sign-in, security and
+                your shopping cart are separate from optional advertising
+                choices.
+              </p>
+              <button
+                type="button"
+                className="mb-6 rounded-lg border border-slate-300 px-4 py-2 font-semibold text-slate-800 dark:text-slate-100"
+                onClick={() =>
+                  window.dispatchEvent(new Event('si:open-consent'))
+                }
+              >
+                Change optional cookie preferences
+              </button>
+              <div>
+                <AdSensePrivacyChoices />
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                 <p className="text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
-                  You can choose to disable cookies through your browser settings; however, please note that some features of our website may not function properly if cookies are disabled.
+                  You can choose to disable cookies through your browser
+                  settings; however, please note that some features of our
+                  website may not function properly if cookies are disabled.
                 </p>
               </div>
             </section>
@@ -249,7 +364,12 @@ export default function PrivacyPolicy() {
                 Third-Party Links
               </h2>
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                Our website may contain links to third-party websites or services that are not operated or controlled by Sure Importers Limited. We are not responsible for the privacy practices or content of these third-party sites and encourage you to review their privacy policies before providing any personal information.
+                Our website may contain links to third-party websites or
+                services that are not operated or controlled by Sure Importers
+                Limited. We are not responsible for the privacy practices or
+                content of these third-party sites and encourage you to review
+                their privacy policies before providing any personal
+                information.
               </p>
             </section>
 
@@ -261,7 +381,11 @@ export default function PrivacyPolicy() {
               </h2>
               <div className="rounded-2xl border border-purple-100 bg-purple-50 p-6 dark:border-purple-900/30 dark:bg-purple-900/10">
                 <p className="text-base font-medium leading-relaxed text-purple-900 dark:text-purple-200">
-                  Our website and services are not intended for children under the age of 18. We do not knowingly collect personal information from children, and if we become aware that we have inadvertently collected information from a child, we will take steps to delete it promptly.
+                  Our website and services are not intended for children under
+                  the age of 18. We do not knowingly collect personal
+                  information from children, and if we become aware that we have
+                  inadvertently collected information from a child, we will take
+                  steps to delete it promptly.
                 </p>
               </div>
             </section>
@@ -273,17 +397,27 @@ export default function PrivacyPolicy() {
                 Your Rights
               </h2>
               <p className="mb-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                You have the right to access, update, or delete your personal information at any time. Your rights include:
+                You have the right to access, update, or delete your personal
+                information at any time. Your rights include:
               </p>
               <div className="mb-6 flex flex-wrap gap-3">
-                {['Access your info', 'Update your info', 'Delete your info'].map((right, i) => (
-                  <div key={i} className="flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                {[
+                  'Access your info',
+                  'Update your info',
+                  'Delete your info',
+                ].map((right, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 dark:bg-blue-900/20 dark:text-blue-400"
+                  >
                     <ChevronRight className="h-4 w-4" /> {right}
                   </div>
                 ))}
               </div>
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                If you would like to exercise any of these rights or have questions about our Privacy Policy, please contact us using the information provided below.
+                If you would like to exercise any of these rights or have
+                questions about our Privacy Policy, please contact us using the
+                information provided below.
               </p>
             </section>
 
@@ -294,7 +428,11 @@ export default function PrivacyPolicy() {
                 Changes to This Privacy Policy
               </h2>
               <p className="text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                We reserve the right to update or revise this Privacy Policy at any time without prior notice. Any changes will be posted on this page, and the effective date will be updated accordingly. We encourage you to review this Privacy Policy periodically for any updates or changes.
+                We reserve the right to update or revise this Privacy Policy at
+                any time without prior notice. Any changes will be posted on
+                this page, and the effective date will be updated accordingly.
+                We encourage you to review this Privacy Policy periodically for
+                any updates or changes.
               </p>
             </section>
 
@@ -304,9 +442,11 @@ export default function PrivacyPolicy() {
                 <Mail className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                 Contact Us
               </h2>
-              <div className="rounded-2xl border border-slate-200 bg-white p-6  dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 sm:p-8">
                 <p className="mb-4 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                  If you have any questions, comments, or concerns about our Privacy Policy or our practices regarding your personal information, please contact us at:
+                  If you have any questions, comments, or concerns about our
+                  Privacy Policy or our practices regarding your personal
+                  information, please contact us at:
                 </p>
                 <a
                   href="mailto:hello@sureimports.com"
@@ -318,12 +458,12 @@ export default function PrivacyPolicy() {
             </section>
 
             {/* Footer Agreement */}
-            <div className="mt-16 rounded-2xl bg-slate-900 p-8 text-center dark:bg-slate-900/50 dark:border dark:border-slate-800">
+            <div className="mt-16 rounded-2xl bg-slate-900 p-8 text-center dark:border dark:border-slate-800 dark:bg-slate-900/50">
               <p className="text-sm font-medium leading-relaxed text-slate-300">
-                By using our website and services, you acknowledge that you have read, understood, and agree to be bound by this Privacy Policy.
+                By using our website and services, you acknowledge that you have
+                read, understood, and agree to be bound by this Privacy Policy.
               </p>
             </div>
-
           </div>
         </div>
       </div>

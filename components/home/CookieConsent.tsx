@@ -11,15 +11,23 @@ export const CookieConsent = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const open = () => setShowConsent(true);
+    window.addEventListener('si:open-consent', open);
+    return () => window.removeEventListener('si:open-consent', open);
+  }, []);
+
   const acceptConsent = () => {
     setShowConsent(false);
     setCookie('consent', 'true', { path: '/', maxAge: 365 * 24 * 3600 });
+    window.dispatchEvent(new Event('si:consent-change'));
     // Trigger GTM or analytics scripts here
   };
 
   const declineConsent = () => {
     setShowConsent(false);
     setCookie('consent', 'false', { path: '/', maxAge: 365 * 24 * 3600 });
+    window.dispatchEvent(new Event('si:consent-change'));
     // Trigger GTM or analytics scripts here
 
     window.gtag?.('consent', 'update', {

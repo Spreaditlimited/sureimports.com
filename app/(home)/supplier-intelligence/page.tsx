@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports Supplier Intelligence',
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     title: 'China Supplier Intelligence for Global Importers',
     description:
       'Research-backed supplier intelligence and pre-payment review support for importers buying from China.',
-    images: [`${baseUrl}/og-image.jpg`],
+    images: [`${baseUrl}/images/sure-imports-social-card.png`],
   },
 };
 

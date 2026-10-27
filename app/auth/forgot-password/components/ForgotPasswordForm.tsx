@@ -1,4 +1,5 @@
 'use client';
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import AuthFrame from '@/components/auth-ui/AuthFrame';
 import AuthHeading from '@/components/auth-ui/AuthHeading';
 
@@ -60,7 +61,10 @@ export default function ForgotPasswordForm() {
       const res = await fetch('/api/auth/password-reset-mail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail: data.email }),
+        body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('password_reset'),
+          userEmail: data.email,
+        }),
       });
 
       const responseData: ApiResponse = await res.json();

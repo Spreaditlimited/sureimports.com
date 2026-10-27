@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: `${baseUrl}/og-image.jpg`,
+        url: `${baseUrl}/images/sure-imports-social-card.png`,
         width: 1200,
         height: 630,
         alt: 'Sure Imports China importation hub for Nigerians',
@@ -155,7 +155,7 @@ const calculators = [
   ['Retail Price Builder', '/tools/retail-price-builder'],
   ['Air vs Sea Calculator', '/tools/air-vs-sea-calculator'],
   ['CBM & Volumetric Calculator', '/tools/cbm-volumetric-weight-calculator'],
-  ['Carton Optimization', '/tools/carton-optimization-tool'],
+  ['Carton Optimization', '/tools/carton-optimization'],
 ];
 
 const faqs = [
@@ -244,26 +244,41 @@ export default async function ImportFromChinaHubPage() {
       <Navigation />
 
       {/* --- HERO SECTION --- */}
-<ServiceHero
-          eyebrow="China to Nigeria"
-          title="Import from China to Nigeria with a clear plan."
-          description="Learn the process, choose the right service, estimate costs and move from research to a practical import plan."
-          primary={{ href: "/supplier-intelligence", label: "Research suppliers" }}
-          secondary={{ href: "/blog", label: "Browse import guides" }}
-          summaryTitle="Know what to check before you buy."
-          steps={[
-            { title: "Choose your products", description: "Explore buying and sourcing options for your business." },
-            { title: "Calculate your costs", description: "Use the calculators to plan shipping and selling prices." },
-            { title: "Prepare your order", description: "Check suppliers and product details before committing." },
-          ]}
-        >
-          <ImportMarkets active="ng" />
-        </ServiceHero>
+      <ServiceHero
+        eyebrow="China to Nigeria"
+        title="Import from China to Nigeria with a clear plan."
+        description="Learn the process, choose the right service, estimate costs and move from research to a practical import plan."
+        primary={{
+          href: '/supplier-intelligence',
+          label: 'Research suppliers',
+        }}
+        secondary={{ href: '/blog', label: 'Browse import guides' }}
+        summaryTitle="Know what to check before you buy."
+        steps={[
+          {
+            title: 'Choose your products',
+            description:
+              'Explore buying and sourcing options for your business.',
+          },
+          {
+            title: 'Calculate your costs',
+            description:
+              'Use the calculators to plan shipping and selling prices.',
+          },
+          {
+            title: 'Prepare your order',
+            description:
+              'Check suppliers and product details before committing.',
+          },
+        ]}
+      >
+        <ImportMarkets active="ng" />
+      </ServiceHero>
 
       {visibleFeaturedGuides.length > 0 && (
         <section className="py-20 md:py-28">
           <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-            <div className="max-w-3xl mb-12">
+            <div className="mb-12 max-w-3xl">
               <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                 Foundation Knowledge
               </span>
@@ -274,16 +289,16 @@ export default async function ImportFromChinaHubPage() {
 
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
               {visibleFeaturedGuides.map((guide) => (
-                <Link 
-                  key={guide.href} 
-                  href={guide.href} 
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-8  transition-all  hover:shadow-xl hover:border-brand-orange-200 dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700"
+                <Link
+                  key={guide.href}
+                  href={guide.href}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 transition-all hover:border-brand-orange-200 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/50 dark:hover:border-slate-700"
                 >
                   <div>
-                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500 group-hover:scale-110 transition-transform">
+                    <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-orange-50 text-brand-orange-500 transition-transform group-hover:scale-110 dark:bg-brand-orange-500/10">
                       <guide.icon className="h-6 w-6" />
                     </div>
-                    <h3 className="text-xl font-medium text-slate-950 dark:text-white leading-tight group-hover:text-brand-orange-600 dark:group-hover:text-brand-orange-400 transition-colors">
+                    <h3 className="text-xl font-medium leading-tight text-slate-950 transition-colors group-hover:text-brand-orange-600 dark:text-white dark:group-hover:text-brand-orange-400">
                       {guide.title}
                     </h3>
                   </div>
@@ -300,7 +315,7 @@ export default async function ImportFromChinaHubPage() {
       {/* --- PATHWAYS --- */}
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-16 text-center mx-auto">
+          <div className="mx-auto mb-16 max-w-3xl text-center">
             <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">
               Service Routes
             </span>
@@ -308,21 +323,22 @@ export default async function ImportFromChinaHubPage() {
               Choose the right path for your situation.
             </h2>
             <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
-              Matching your need to the right service saves time and prevents costly mistakes.
+              Matching your need to the right service saves time and prevents
+              costly mistakes.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visiblePathways.map((pathway) => (
-              <Link 
-                key={pathway.title} 
-                href={pathway.href} 
-                className="group rounded-2xl border border-slate-200 bg-white p-8  transition-all hover:border-brand-orange-300  dark:border-slate-800 dark:bg-slate-950/60 dark:hover:border-slate-700"
+              <Link
+                key={pathway.title}
+                href={pathway.href}
+                className="group rounded-2xl border border-slate-200 bg-white p-8 transition-all hover:border-brand-orange-300 dark:border-slate-800 dark:bg-slate-950/60 dark:hover:border-slate-700"
               >
-                <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500 mb-6">
+                <p className="mb-6 text-xs font-medium uppercase tracking-widest text-brand-orange-500">
                   {pathway.eyebrow}
                 </p>
-                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-900 dark:bg-slate-800 dark:text-white">
                   <pathway.icon className="h-6 w-6" />
                 </div>
                 <h3 className="text-xl font-medium text-slate-950 dark:text-white">
@@ -339,27 +355,29 @@ export default async function ImportFromChinaHubPage() {
 
       {/* --- CALCULATORS --- */}
       <section className="py-20 md:py-28">
-        <div className="mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-8 lg:items-center">
+        <div className="mx-auto grid max-w-[1440px] gap-12 px-4 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:px-8">
           <div>
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 dark:bg-brand-orange-500/10 text-brand-orange-500 mb-6">
+            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange-50 text-brand-orange-500 dark:bg-brand-orange-500/10">
               <Calculator className="h-6 w-6" />
             </div>
             <h2 className="text-3xl font-medium tracking-tight text-slate-950 dark:text-white md:text-5xl">
               Calculate before you commit.
             </h2>
             <p className="mt-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-              Cost mistakes usually happen before payment. Use these tools before deciding on product price, order size, shipping method, or your final retail selling price.
+              Cost mistakes usually happen before payment. Use these tools
+              before deciding on product price, order size, shipping method, or
+              your final retail selling price.
             </p>
           </div>
-          
+
           <div className="grid gap-4 sm:grid-cols-2">
             {calculators.map(([label, href]) => (
-              <Link 
-                key={href} 
-                href={href} 
-                className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6  transition-all hover:border-brand-orange-300  dark:border-slate-800 dark:bg-slate-900"
+              <Link
+                key={href}
+                href={href}
+                className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-6 transition-all hover:border-brand-orange-300 dark:border-slate-800 dark:bg-slate-900"
               >
-                <span className="font-medium text-slate-950 dark:text-white group-hover:text-brand-orange-600 dark:group-hover:text-brand-orange-400 transition-colors">
+                <span className="font-medium text-slate-950 transition-colors group-hover:text-brand-orange-600 dark:text-white dark:group-hover:text-brand-orange-400">
                   {label}
                 </span>
                 <ArrowRight className="h-4 w-4 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-brand-orange-500" />
@@ -380,7 +398,8 @@ export default async function ImportFromChinaHubPage() {
                 Deepen your knowledge.
               </h2>
               <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                Read current Sure Imports guides that are already live on the blog.
+                Read current Sure Imports guides that are already live on the
+                blog.
               </p>
             </div>
 
@@ -389,7 +408,7 @@ export default async function ImportFromChinaHubPage() {
                 <Link
                   key={post.slug}
                   href={`/blog/${post.slug}`}
-                  className="group flex min-h-[260px] flex-col justify-between rounded-2xl border border-slate-200 bg-white p-8  transition-all  hover:border-brand-orange-300  dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+                  className="group flex min-h-[260px] flex-col justify-between rounded-2xl border border-slate-200 bg-white p-8 transition-all hover:border-brand-orange-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
                 >
                   <div>
                     <p className="mb-5 text-xs font-medium uppercase tracking-widest text-brand-orange-500">
@@ -403,7 +422,8 @@ export default async function ImportFromChinaHubPage() {
                     </p>
                   </div>
                   <span className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-slate-900 transition-colors group-hover:text-brand-orange-600 dark:text-white dark:group-hover:text-brand-orange-400">
-                    Read guide <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    Read guide{' '}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Link>
               ))}
@@ -425,26 +445,29 @@ export default async function ImportFromChinaHubPage() {
       <section className="py-20 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-[2.5rem] bg-slate-950 px-6 py-16 text-center text-white shadow-2xl sm:px-12 md:py-20 lg:px-16">
-            <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-orange-500/20 blur-[100px] pointer-events-none" />
-            
-            <ShieldCheck className="mx-auto h-12 w-12 text-brand-orange-400 mb-6" />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-orange-500/20 blur-[100px]" />
+
+            <ShieldCheck className="mx-auto mb-6 h-12 w-12 text-brand-orange-400" />
             <h2 className="text-3xl font-medium tracking-tight sm:text-4xl md:text-5xl">
               Not sure which path fits your import?
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
-              Individuals and small businesses can use LineScout for supplier comparison, custom branding, bulk products and machines. Corporate Sourcing is reserved for established organisations with formal procurement needs.
+              Individuals and small businesses can use LineScout for supplier
+              comparison, custom branding, bulk products and machines. Corporate
+              Sourcing is reserved for established organisations with formal
+              procurement needs.
             </p>
-            
+
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link 
+              <Link
                 href={LINESCOUT_BULK_SOURCING_URL}
-                className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-sm font-medium text-white transition hover:bg-brand-orange-600"
+                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-brand-orange-500 px-8 text-sm font-medium text-white transition hover:bg-brand-orange-600 sm:w-auto"
               >
                 Start with LineScout <PackageCheck className="h-4 w-4" />
               </Link>
-              <Link 
-                href="/buy-from-chinese-websites" 
-                className="inline-flex h-14 w-full sm:w-auto items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/10"
+              <Link
+                href="/buy-from-chinese-websites"
+                className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/10 sm:w-auto"
               >
                 Submit Product Links <ShoppingCart className="h-4 w-4" />
               </Link>
@@ -463,9 +486,9 @@ export default async function ImportFromChinaHubPage() {
             {faqs.map((faq) => (
               <details
                 key={faq.question}
-                className="group rounded-2xl border border-slate-200 bg-white  dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
+                className="group rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 [&_summary::-webkit-details-marker]:hidden"
               >
-                <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium text-slate-950 dark:text-white outline-none transition hover:text-brand-orange-500 dark:hover:text-brand-orange-400">
+                <summary className="flex cursor-pointer items-center justify-between p-6 text-lg font-medium text-slate-950 outline-none transition hover:text-brand-orange-500 dark:text-white dark:hover:text-brand-orange-400">
                   <span>{faq.question}</span>
                   <span className="ml-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-50 transition group-open:rotate-180 dark:bg-slate-800">
                     <ChevronDown className="h-4 w-4 text-slate-500" />

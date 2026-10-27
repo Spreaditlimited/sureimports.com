@@ -14,3 +14,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Use the admin's `BLOG` + millisecond timestamp convention for new `pidBlog` values. All articles must use author **Tochukwu Nkwocha**, `publisherId: PUB1767167254459`, and `blogBy: Tochukwu Nkwocha`. Use that existing author profile and image, not an editorial-team byline. Link an active existing category and keep SEO category metadata consistent with it.
 - Every new article must have at least 2,000 useful body words and an article-specific feature image generated according to the established blog image brief, uploaded through the Cloudinary blog-image workflow before publication. A generic social card is not a substitute. Preserve images the owner has already generated.
 - Validate publication eligibility, internal links, canonical, SEO and social metadata, image availability, and author/category records before publishing. Keep before/after records and reject concurrent edits. Preserve existing slugs when correcting technical fields, and migrate dependent references when changing a blog ID.
+
+## Sure Imports: Git-only deployments (standing owner rule, 27 October 2026)
+
+- Every production and preview code deployment for Sure Imports and every Sure Imports subdomain/repository MUST originate from committed code pushed to Git and the hosting provider's Git integration. This includes the main website, admin, partner, affiliate, LineScout and related applications.
+- Never deploy an uncommitted working tree. Do not use `vercel deploy`, `vercel --prod`, CLI redeployment/promotion, or any equivalent direct source-upload deployment. Vercel CLI may be used for read-only inspection, logs and verification.
+- Before a release, inspect the currently deployed source, deployment method and commit. Reconcile and preserve any live CLI-only or uncommitted changes in Git before introducing the new change. Do not assume the repository HEAD contains everything previously deployed.
+- Commit all intended application changes, run the relevant checks, push the intended deployment branch, and verify that the resulting deployment reports Git as its source and the exact pushed commit SHA. Rollbacks must also use Git changes.
+- Preserve unrelated work. Keep credentials, environment files and private operational exports out of public Git history.

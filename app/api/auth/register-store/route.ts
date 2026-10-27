@@ -1,4 +1,5 @@
 'use server';
+import { guardPublicForm } from '@/lib/security/publicFormGuard';
 import { queueAccountWelcome } from '@/lib/webinar/server';
 
 import { scheduleRegistrationConversion } from '@/lib/marketing/registrationConversion';
@@ -22,6 +23,15 @@ import {
 } from '@/lib/affiliate/attribution';
 
 export async function POST(request: NextRequest) {
+  const securityFailure = await guardPublicForm(request, {
+    scope: 'customer-signup',
+    action: 'register',
+    signup: true,
+    ipMax: 8,
+    identityMax: 3,
+  });
+  if (securityFailure) return securityFailure;
+
   ///////////// SIGNUP FORM VERIFICATION STARTS /////////////
   const {
     facebookAttribution,

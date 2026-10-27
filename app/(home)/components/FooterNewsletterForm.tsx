@@ -1,5 +1,6 @@
 'use client';
 
+import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -20,6 +21,7 @@ export default function FooterNewsletterForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          recaptchaToken: await executePublicCaptcha('subscribe'),
           email,
           source: 'footer_newsletter',
           message_variant: 'site',

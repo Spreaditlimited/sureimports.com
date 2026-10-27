@@ -1,110 +1,98 @@
-import * as React from 'react';
 import type { Metadata } from 'next';
-
+import { notFound } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import BlogList from '../components/BlogList';
 import { fetchPublishedBlogsLite } from '../actions/blogActions';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import { generateBreadcrumbSchema } from '@/lib/seo/schema';
+import {
+  blogListingHref,
+  parseBlogListingParams,
+  type BlogListingParams,
+} from '@/lib/blogListing';
 
-// Safely use environment variables with a fallback
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sureimports.com';
-
-// OPTIMIZATION: Revalidate this page every hour (3600 seconds). 
-// This gives you the speed of a static page, while ensuring new posts appear automatically.
+const baseUrl = 'https://www.sureimports.com';
 export const revalidate = 3600;
+type PageProps = { searchParams: Promise<BlogListingParams> };
 
-export const metadata: Metadata = {
-  title: 'Import Insights Blog - Expert Guides & Tips',
-  description:
-    'Master the art of international trade with expert insights, success stories, and practical guides to help you build a thriving import business from China.',
-  keywords: [
-    'import blog',
-    'china import guide',
-    'international trade tips',
-    'import business',
-    'sourcing from china',
-    'import success stories',
-  ],
-  openGraph: {
-    title: 'Import Insights Blog | Sure Imports',
-    description:
-      'Expert insights and guides for import professionals. Learn how to successfully import from China.',
-    type: 'website',
-    url: `${baseUrl}/blog`,
-    images: [
-      {
-        url: 'https://www.sureimports.com/images/sure-imports-social-card.png',
-        width: 1200,
-        height: 630,
-        alt: 'Sure Imports Blog',
+export async function generateMetadata({
+  searchParams,
+}: PageProps): Promise<Metadata> {
+  const params = parseBlogListingParams(await searchParams);
+  const filtered = Boolean(
+    params.q || params.tag || params.category || params.sort === 'oldest',
+  );
+  const title = `Import Insights Blog${params.page > 1 ? ` — Page ${params.page}` : ''}`;
+  const description =
+    'Practical guides to sourcing products, checking suppliers, planning shipping and calculating import costs from China to Nigeria.';
+  const canonical = `${baseUrl}${blogListingHref(params)}`;
+  const image = `${baseUrl}/images/sure-imports-social-card.png`;
+  return {
+    title,
+    description,
+    robots: { index: !filtered, follow: true },
+    alternates: {
+      canonical,
+      types: {
+        'application/rss+xml': [
+          { url: `${baseUrl}/blog/rss`, title: 'Sure Imports Blog RSS Feed' },
+        ],
       },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Import Insights Blog | Sure Imports',
-    description: 'Expert insights and guides for import professionals.',
-    images: [
-      'https://www.sureimports.com/images/sure-imports-social-card.png',
-    ],
-  },
-  alternates: {
-    canonical: `${baseUrl}/blog`,
-    types: {
-      'application/rss+xml': [
-        {
-          url: 'https://www.sureimports.com/blog/rss',
-          title: 'Sure Imports Blog RSS Feed',
-        },
+    },
+    openGraph: {
+      title,
+      description,
+      type: 'website',
+      url: canonical,
+      images: [
+        { url: image, width: 1200, height: 630, alt: 'Sure Imports Blog' },
       ],
     },
-  },
-};
-
-// Breadcrumb schema for the blog listing page
-const blogBreadcrumbSchema = generateBreadcrumbSchema([
-  { name: 'Home', url: '/' },
-  { name: 'Blog', url: '/blog' },
-]);
-
-type PageProps = {
-  searchParams: Promise<{ tag?: string; page?: string; q?: string }>;
-};
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 export default async function BlogPage({ searchParams }: PageProps) {
-  const { tag, page, q } = await searchParams;
-  const currentPage = Number.parseInt(page || '1', 10);
-  const searchQuery = typeof q === 'string' ? q.trim() : '';
-  const {
-    posts,
-    featuredPosts,
-    totalPages,
-    totalPosts,
-    totalReadTime,
-    page: resolvedPage,
-  } =
-    await fetchPublishedBlogsLite(
-      Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1,
-      9,
-      searchQuery,
-    );
-
+  const params = parseBlogListingParams(await searchParams);
+  const result = await fetchPublishedBlogsLite(
+    params.page,
+    9,
+    params.q,
+    params,
+  );
+  // Never serve the last page at an unlimited number of invented page URLs.
+  if (params.page > result.totalPages) notFound();
   return (
     <>
-      <JsonLdScript data={blogBreadcrumbSchema} />
+      <JsonLdScript
+        data={generateBreadcrumbSchema([
+          { name: 'Home', url: '/' },
+          { name: 'Blog', url: '/blog' },
+        ])}
+      />
       <Navbar />
-      <main className="min-h-screen bg-[var(--si-canvas)]" data-si-page-theme="editorial">
+      <main
+        className="min-h-screen bg-[var(--si-canvas)]"
+        data-si-page-theme="editorial"
+      >
         <BlogList
-          blogPosts={posts}
-          featuredPosts={featuredPosts}
-          initialSearchQuery={searchQuery}
-          initialTag={tag}
-          currentPage={resolvedPage}
-          totalPages={totalPages}
-          totalPosts={totalPosts}
-          totalReadTime={totalReadTime}
+          blogPosts={result.posts}
+          featuredPosts={result.featuredPosts}
+          initialSearchQuery={params.q}
+          initialTag={params.tag}
+          initialCategory={params.category}
+          initialSort={params.sort}
+          categories={result.categories}
+          currentPage={result.page}
+          totalPages={result.totalPages}
+          totalPosts={result.totalPosts}
+          totalReadTime={result.totalReadTime}
         />
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-import { shouldBypassLocalCaptcha } from './localCaptchaBypass';
+import { shouldBypassLocalCaptcha as isLocalDevelopmentHost } from './localCaptchaBypass';
 
 export async function verifyRecaptchaToken(
   token: string | undefined | null,
@@ -7,13 +7,14 @@ export async function verifyRecaptchaToken(
 ): Promise<boolean> {
   const secret = process.env.GOOGLE_CAPTCHA_SECRET_KEY;
 
-  if (request && shouldBypassLocalCaptcha(new URL(request.url).hostname))
+  if (request && isLocalDevelopmentHost(new URL(request.url).hostname))
     return true;
 
-  // If not configured, keep behavior unchanged.
-  if (!secret) return true;
+  // Production/preview fail closed, including when configuration is missing.
+  if (!secret || !request) return false;
 
-  if (!token) return false;
+  if (typeof token !== 'string' || !token.trim() || token.length > 8192)
+    return false;
 
   try {
     const response = await fetch(
@@ -27,6 +28,7 @@ export async function verifyRecaptchaToken(
           secret,
           response: token,
         }),
+        signal: AbortSignal.timeout(8000),
       },
     );
 
@@ -36,6 +38,8 @@ export async function verifyRecaptchaToken(
       success?: boolean;
       score?: number;
       action?: string;
+      hostname?: string;
+      challenge_ts?: string;
       'error-codes'?: string[];
     };
 
@@ -48,9 +52,26 @@ export async function verifyRecaptchaToken(
 
     if (expectedAction && payload.action !== expectedAction) return false;
 
+    const expectedHost = (
+      request.headers.get('host') || new URL(request.url).host
+    )
+      .toLowerCase()
+      .replace(/:\d+$/, '')
+      .replace(/\.$/, '');
+    if (payload.hostname?.toLowerCase().replace(/\.$/, '') !== expectedHost)
+      return false;
+    // Google enforces token expiry and single use. challenge_ts describes the
+    // challenge load, not necessarily the moment execute() issued this token.
+
     if (expectedAction && typeof payload.score !== 'number') return false;
 
-    if (typeof payload.score === 'number' && payload.score < 0.5) return false;
+    if (
+      typeof payload.score === 'number' &&
+      (!Number.isFinite(payload.score) ||
+        payload.score < 0.5 ||
+        payload.score > 1)
+    )
+      return false;
 
     return true;
   } catch (error) {

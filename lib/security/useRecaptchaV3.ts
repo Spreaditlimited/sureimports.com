@@ -16,58 +16,79 @@ declare global {
 }
 
 const siteKey = process.env.NEXT_PUBLIC_GOOGLE_CAPTCHA_SITE_KEY;
-let recaptchaScriptPromise: Promise<void> | null = null;
+let scriptPromise: Promise<void> | null = null;
 
-function isValidSiteKey(configuredSiteKey: string): boolean {
-  return /^[A-Za-z0-9_-]+$/.test(configuredSiteKey);
-}
-
-function loadRecaptchaScript(configuredSiteKey: string): Promise<void> {
+function loadScript(key: string): Promise<void> {
   if (window.grecaptcha) return Promise.resolve();
-  if (recaptchaScriptPromise) return recaptchaScriptPromise;
-
-  recaptchaScriptPromise = new Promise((resolve, reject) => {
-    if (!isValidSiteKey(configuredSiteKey)) {
-      reject(new Error('Invalid reCAPTCHA site key.'));
-      return;
-    }
-
+  if (scriptPromise) return scriptPromise;
+  if (!/^[A-Za-z0-9_-]+$/.test(key))
+    return Promise.reject(new Error('Security verification is unavailable.'));
+  scriptPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(
-      configuredSiteKey,
-    )}`;
+    const fail = () => {
+      clearTimeout(timer);
+      script.remove();
+      reject(
+        new Error('Security verification could not load. Please try again.'),
+      );
+    };
+    const timer = setTimeout(fail, 15000);
+    script.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(key)}`;
     script.async = true;
     script.defer = true;
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error('Unable to load reCAPTCHA.'));
+    script.onload = () => {
+      clearTimeout(timer);
+      resolve();
+    };
+    script.onerror = fail;
     document.head.appendChild(script);
+  }).catch((error) => {
+    scriptPromise = null;
+    throw error;
   });
+  return scriptPromise;
+}
 
-  return recaptchaScriptPromise;
+export async function executePublicCaptcha(
+  action: string,
+): Promise<string | undefined> {
+  if (
+    typeof window === 'undefined' ||
+    shouldBypassLocalCaptcha(window.location.hostname)
+  )
+    return undefined;
+  if (!siteKey)
+    throw new Error(
+      'Security verification is temporarily unavailable. Please try again shortly.',
+    );
+  await loadScript(siteKey);
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () =>
+        reject(new Error('Security verification timed out. Please try again.')),
+      15000,
+    );
+    const grecaptcha = window.grecaptcha;
+    if (!grecaptcha) {
+      clearTimeout(timer);
+      reject(new Error('Security verification is unavailable.'));
+      return;
+    }
+    grecaptcha.ready(() => {
+      grecaptcha
+        .execute(siteKey, { action })
+        .then((token) => {
+          clearTimeout(timer);
+          resolve(token);
+        })
+        .catch((error) => {
+          clearTimeout(timer);
+          reject(error);
+        });
+    });
+  });
 }
 
 export function useRecaptchaV3() {
-  return useCallback(async (action: string): Promise<string | undefined> => {
-    if (
-      typeof window === 'undefined' ||
-      shouldBypassLocalCaptcha(window.location.hostname) ||
-      !siteKey
-    ) {
-      return undefined;
-    }
-
-    await loadRecaptchaScript(siteKey);
-
-    return new Promise((resolve, reject) => {
-      const grecaptcha = window.grecaptcha;
-      if (!grecaptcha) {
-        reject(new Error('reCAPTCHA is unavailable.'));
-        return;
-      }
-
-      grecaptcha.ready(() => {
-        grecaptcha.execute(siteKey, { action }).then(resolve).catch(reject);
-      });
-    });
-  }, []);
+  return useCallback(executePublicCaptcha, []);
 }
