@@ -89,8 +89,8 @@ test('blog hero, featured articles and related-reading area use the shared solid
 
   assert.match(blogList, /className=\{styles.hero\}/);
   assert.match(read('components/home/EditorialPage.module.css'), /var\(--si-(?:canvas|surface)\)/);
-  assert.match(blogList, /public-solid-section bg-slate-50 border-b/);
-  assert.match(blogDetail, /public-solid-section mt-16/);
+  assert.match(blogList, /className="(?=[^"]*\bpublic-solid-section\b)(?=[^"]*\bbg-slate-50\b)(?=[^"]*\bborder-b\b)/);
+  assert.match(blogDetail, /className="(?=[^"]*\bpublic-solid-section\b)(?=[^"]*\bmt-16\b)/);
 });
 
 test('the shared public footer has no section separator lines', () => {
@@ -103,7 +103,7 @@ test('noncritical global enhancements wait until the browser is idle', () => {
   const rootLayout = read('app/layout.tsx');
   const deferred = read('components/DeferredGlobalEnhancements.tsx');
 
-  assert.match(rootLayout, /<DeferredGlobalEnhancements \/>/);
+  assert.match(rootLayout, /<DeferredGlobalEnhancements\b[^>]*\/>/);
   assert.doesNotMatch(rootLayout, /<LeadCapturePopup \/>/);
   assert.match(deferred, /requestIdleCallback/);
   assert.match(deferred, /timeout: 2_000/);

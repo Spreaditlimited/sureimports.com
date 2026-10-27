@@ -24,7 +24,8 @@ import {
   serviceSchema,
 } from '@/lib/seo/schema';
 
-const inter = Inter({ subsets: ['latin'] });
+// Keep text stable on slow connections when the web font arrives late.
+const inter = Inter({ subsets: ['latin'], display: 'optional' });
 
 const baseUrl = 'https://www.sureimports.com';
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-PT46CZ69';
