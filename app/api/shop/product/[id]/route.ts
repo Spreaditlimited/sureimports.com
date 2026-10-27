@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { getShopProduct, getRelatedProducts } from '@/lib/shop/catalogue';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -18,14 +18,9 @@ export async function GET(
       );
     }
 
-    // Fetch product by pidProduct
-    const product = await prisma.store.findUnique({
-      where: {
-        pidProduct: id,
-      },
-    });
+    const product = await getShopProduct(id);
 
-    if (!product || !product.productVisibility) {
+    if (!product) {
       return NextResponse.json(
         {
           statusx: 'FAILED',
@@ -35,20 +30,7 @@ export async function GET(
       );
     }
 
-    // Fetch related products (same category, different product)
-    const relatedProducts = await prisma.store.findMany({
-      where: {
-        productCategory: product.productCategory,
-        pidProduct: {
-          not: id,
-        },
-        productVisibility: true,
-      },
-      take: 4,
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    const relatedProducts = await getRelatedProducts(product);
 
     return NextResponse.json(
       {
@@ -67,7 +49,6 @@ export async function GET(
       {
         statusx: 'FAILED',
         message: 'Internal server error occurred while fetching product',
-        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     );

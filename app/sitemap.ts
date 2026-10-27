@@ -5,6 +5,8 @@ import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 import { prisma } from '@/lib/prisma';
 import { isRedirectedBlogSlug } from '@/lib/blogRedirects';
 import { vehicleCatalogue } from '@/lib/vehicles/data';
+import { resolveMediaUrl } from '@/lib/cloudinary/url';
+import { shopCategories, shopProductUrl } from '@/lib/shop/discovery';
 import {
   BODY_CAMERA_LAUNCH_READY,
   bodyCameraLaunchPaths,
@@ -244,11 +246,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           url: `${baseUrl}/cars/models/${m.slug}`,
           changeFrequency: 'weekly' as const,
           priority: 0.8,
+          images: m.images.filter((url) => /^https?:\/\//.test(url)),
         })),
     ];
   } catch (error) {
     console.error('Unable to load vehicle sitemap entries', error);
   }
+  const products = await prisma.store.findMany({
+    where: { productVisibility: true },
+    select: {
+      pidProduct: true,
+      productCategory: true,
+      productImage: true,
+      updatedAt: true,
+      createdAt: true,
+    },
+  });
+  const shopPages: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/shop`, changeFrequency: 'daily', priority: 0.9 },
+    ...shopCategories
+      .filter((category) =>
+        products.some((product) => product.productCategory === category.value),
+      )
+      .map((category) => ({
+        url: `${baseUrl}/shop/category/${category.slug}`,
+        changeFrequency: 'daily' as const,
+        priority: 0.8,
+      })),
+    ...products.map((product) => {
+      const image = resolveMediaUrl(product.productImage);
+      return {
+        url: shopProductUrl(product.pidProduct),
+        lastModified: product.updatedAt || product.createdAt || undefined,
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+        ...(image ? { images: [new URL(image, baseUrl).href] } : {}),
+      };
+    }),
+  ];
   const video = await procurementVideo();
   const videoPages: MetadataRoute.Sitemap = [
     {
@@ -272,6 +307,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPages,
     ...reportPages,
     ...vehiclePages,
+    ...shopPages,
     ...videoPages,
   ];
 }

@@ -1,3 +1,4 @@
+import '../dashboard-refinements.css';
 import { redirect } from 'next/navigation';
 import DashboardLayoutProvider from './providers';
 import { checkAuth } from '@/lib/auth/checkAuth';

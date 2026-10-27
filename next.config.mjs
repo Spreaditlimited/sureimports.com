@@ -55,6 +55,8 @@ const nextConfig = {
     },
   
     experimental: {
+      // Avoid merging unrelated route styles into every public page.
+      cssChunking: false,
       serverActions: {
         bodySizeLimit: '55mb',
       },

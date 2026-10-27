@@ -4,7 +4,6 @@ import Script from 'next/script';
 import './globals.css';
 import './design-system.css';
 import './public-refinements.css';
-import './dashboard-refinements.css';
 import '../design-system/tokens.css';
 import '../design-system/components.css';
 import { Toaster } from '@/components/ui/toaster';

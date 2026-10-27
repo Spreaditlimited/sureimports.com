@@ -107,7 +107,9 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
         >
           <div className="vehicle-grid">
             {filtered.map(({ model: m, variants, budgetOverlap }) => {
-              const href = `/cars/models/${m.slug}?configuration=${encodeURIComponent(variants[0].id)}`;
+              // The default collection links to each canonical model page. A
+              // filtered match may deep-link to the matching configuration.
+              const href = `/cars/models/${m.slug}${params.size ? `?configuration=${encodeURIComponent(variants[0].id)}` : ''}`;
               const bounds = variants
                 .map(landedBounds)
                 .filter(

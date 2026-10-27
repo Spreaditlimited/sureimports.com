@@ -71,6 +71,7 @@ export default async function VehiclePage({ params, searchParams }: Props) {
       vehicleEntitySchema(vehicle),
       {
         '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumb`,
         itemListElement: [
           {
             '@type': 'ListItem',
@@ -86,6 +87,15 @@ export default async function VehiclePage({ params, searchParams }: Props) {
           },
           { '@type': 'ListItem', position: 3, name: model.name, item: url },
         ],
+      },
+      {
+        '@type': 'WebPage',
+        '@id': `${url}#webpage`,
+        url,
+        name: `${model.name} in Nigeria`,
+        description: model.description,
+        breadcrumb: { '@id': `${url}#breadcrumb` },
+        isPartOf: { '@id': 'https://www.sureimports.com/#website' },
       },
     ],
   };

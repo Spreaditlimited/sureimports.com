@@ -1,111 +1,61 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/shop/ProductCard';
 import CartSidebar from '@/app/dashboard/shop/components/CartSidebar';
-import { useSearchParams } from 'next/navigation';
-import { Search, ShieldCheck, Globe, Clock, ShoppingCart } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  shopListingHref,
+  shopCategories,
+  SHOP_PAGE_SIZE,
+  type ShopQuery,
+  type ShopCardProduct,
+} from '@/lib/shop/discovery';
+import { Search, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 import heroStyles from './ShopHero.module.css';
 import ServiceHero from '@/components/home/ServiceHero';
 
-export type StoreProduct = {
-  pidProduct: string;
-  productName: string | null;
-  productBrand: string | null;
-  productPrice: number | null;
-  productImage: string | null;
-  productCategory: string | null;
-  productCondition: string | null;
-  productMOQ: number | null;
-};
-
+export type StoreProduct = ShopCardProduct;
 type ShopInitialData = {
   products: StoreProduct[];
   categories: string[];
   totalCount: number;
 };
-
 export default function ShopContent({
   initialData,
+  query,
 }: {
   initialData: ShopInitialData;
+  query: ShopQuery;
 }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { cartCount } = useShopCart();
-  const [activeCategory, setActiveCategory] = useState('All Products');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [products, setProducts] = useState<StoreProduct[]>(
-    initialData.products,
-  );
-  const [categories, setCategories] = useState<string[]>([
-    'All Products',
-    ...initialData.categories,
-  ]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(
-    Math.ceil(initialData.totalCount / 24),
-  );
-  const [totalCount, setTotalCount] = useState(initialData.totalCount);
-  const initialRequest = useRef(true);
+  const [searchQuery, setSearchQuery] = useState(query.q);
+  const [loading, startTransition] = useTransition();
+  const activeCategory = query.category || 'All Products';
+  const products = initialData.products;
+  const categories = ['All Products', ...initialData.categories];
+  const page = query.page;
+  const totalPages = Math.ceil(initialData.totalCount / SHOP_PAGE_SIZE);
+  const totalCount = initialData.totalCount;
   const [showCartSidebar, setShowCartSidebar] = useState(false);
   const categoryRowRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    if (initialRequest.current) {
-      initialRequest.current = false;
-      return;
-    }
-    const controller = new AbortController();
-    const loadProducts = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          search: searchQuery,
-          category: activeCategory === 'All Products' ? 'all' : activeCategory,
-          sortBy: 'newest',
-          page: String(page),
-          limit: '24',
-        });
-
-        const res = await fetch(`/api/shop/products?${params.toString()}`, {
-          cache: 'no-store',
-          signal: controller.signal,
-        });
-        const json = await res.json();
-        if (json?.statusx !== 'SUCCESS') {
-          throw new Error(json?.message || 'Failed to load products');
-        }
-        setProducts(
-          Array.isArray(json?.data?.products) ? json.data.products : [],
-        );
-        setTotalPages(json.data.pagination.totalPages);
-        setTotalCount(json.data.pagination.totalCount);
-      } catch (error: unknown) {
-        if (controller.signal.aborted) return;
-        const message =
-          error instanceof Error ? error.message : 'Failed to load products';
-        toast.error(message);
-        setProducts([]);
-        setTotalPages(0);
-        setTotalCount(0);
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
-      }
-    };
-    const timer = window.setTimeout(loadProducts, 250);
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [searchQuery, activeCategory, page]);
-
+  const selectedCategory = shopCategories.find(
+    (category) => category.value === query.category,
+  );
   useEffect(() => {
     // Prevent restoring a stale horizontal scroll offset that can hide the first chip.
     categoryRowRef.current?.scrollTo({ left: 0, behavior: 'auto' });
@@ -151,8 +101,15 @@ export default function ShopContent({
       >
         <ServiceHero
           eyebrow="Guangzhou to Lagos"
-          title="Your next phone, laptop or everyday upgrade."
-          description="Explore technology sourced from China, with clear pricing, order tracking and delivery to your doorstep in Nigeria."
+          title={
+            selectedCategory
+              ? `${selectedCategory.name} from China to Nigeria`
+              : 'Your next phone, laptop or everyday upgrade.'
+          }
+          description={
+            selectedCategory?.description ||
+            'Explore technology sourced from China, with clear pricing, order tracking and delivery to your doorstep in Nigeria.'
+          }
           primary={{ href: '#shop-products', label: 'Browse products' }}
           secondary={{ href: '/contact-us', label: 'Get help choosing' }}
           summaryTitle="Choose your tech. We’ll handle the order."
@@ -180,19 +137,37 @@ export default function ShopContent({
         >
           <div className={heroStyles.toolbar}>
             <div className={heroStyles.searchRow}>
-              <div className={heroStyles.searchField}>
+              <form
+                className={heroStyles.searchField}
+                action={shopListingHref({ ...query, q: '', page: 1 })}
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  startTransition(() =>
+                    router.push(
+                      shopListingHref({
+                        ...query,
+                        q: searchQuery.trim(),
+                        page: 1,
+                      }) + '#shop-products',
+                    ),
+                  );
+                }}
+              >
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <Input
                   placeholder="Search products or models…"
                   aria-label="Search products"
+                  name="q"
                   value={searchQuery}
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
-                    setPage(1);
                   }}
                   className={heroStyles.searchInput}
                 />
-              </div>
+                <button type="submit" className={heroStyles.searchSubmit}>
+                  Search
+                </button>
+              </form>
               <button
                 type="button"
                 onClick={() => setShowCartSidebar(true)}
@@ -212,36 +187,33 @@ export default function ShopContent({
               aria-label="Product categories"
             >
               {categories.map((category) => (
-                <button
+                <Link
                   key={category}
-                  onClick={() => {
-                    setActiveCategory(category);
-                    setPage(1);
-                  }}
-                  aria-pressed={activeCategory === category}
+                  href={
+                    shopListingHref({
+                      ...query,
+                      category: category === 'All Products' ? '' : category,
+                      page: 1,
+                    }) + '#shop-products'
+                  }
+                  aria-current={
+                    activeCategory === category ? 'page' : undefined
+                  }
                   className={heroStyles.categoryButton}
                 >
-                  {category}
-                </button>
+                  {shopCategories.find((item) => item.value === category)
+                    ?.name || category}
+                </Link>
               ))}
             </div>
             <div className={heroStyles.resultsRow}>
               <p role="status" aria-live="polite">
                 {loading
                   ? 'Finding products…'
-                  : `${totalCount} ${totalCount === 1 ? 'product' : 'products'}${searchQuery.trim() ? ` matching “${searchQuery.trim()}”` : ''}`}
+                  : `${totalCount} ${totalCount === 1 ? 'product' : 'products'}${query.q ? ` matching “${query.q}”` : ''}`}
               </p>
-              {(searchQuery || activeCategory !== 'All Products') && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setActiveCategory('All Products');
-                    setPage(1);
-                  }}
-                >
-                  Clear filters
-                </button>
+              {(query.q || activeCategory !== 'All Products') && (
+                <Link href="/shop#shop-products">Clear filters</Link>
               )}
             </div>
           </div>
@@ -263,23 +235,33 @@ export default function ShopContent({
           </div>
           {totalPages > 1 && (
             <nav className={heroStyles.pagination} aria-label="Product pages">
-              <button
-                type="button"
-                disabled={loading || page === 1}
-                onClick={() => setPage((p) => p - 1)}
-              >
-                Previous
-              </button>
+              {page > 1 ? (
+                <Link
+                  href={
+                    shopListingHref({ ...query, page: page - 1 }) +
+                    '#shop-products'
+                  }
+                >
+                  Previous
+                </Link>
+              ) : (
+                <span aria-disabled="true">Previous</span>
+              )}
               <span>
                 Page {page} of {totalPages}
               </span>
-              <button
-                type="button"
-                disabled={loading || page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-              >
-                Next
-              </button>
+              {page < totalPages ? (
+                <Link
+                  href={
+                    shopListingHref({ ...query, page: page + 1 }) +
+                    '#shop-products'
+                  }
+                >
+                  Next
+                </Link>
+              ) : (
+                <span aria-disabled="true">Next</span>
+              )}
             </nav>
           )}
         </section>

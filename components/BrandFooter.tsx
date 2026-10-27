@@ -23,6 +23,10 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
           <h2>Explore</h2>
           <Link href={`${mainSite}/import-hub`}>Import Hub</Link>
           <Link href={`${mainSite}/cars`}>Cars & commercial vehicles</Link>
+          <Link href={`${mainSite}/shop`}>Gadget shop</Link>
+          <Link href={`${mainSite}/shop/category/phones`}>Phones</Link>
+          <Link href={`${mainSite}/shop/category/laptops`}>Laptops</Link>
+          <Link href={`${mainSite}/shop/category/watches`}>Watches</Link>
           <a href="https://linescout.sureimports.com/white-label">White label products</a>
           <a href="https://linescout.sureimports.com">LineScout sourcing</a>
           <a href="https://partner.sureimports.com/partners">Become a partner</a>

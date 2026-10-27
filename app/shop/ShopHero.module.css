@@ -33,14 +33,14 @@
   font-size: 14px;
   color: var(--si-muted);
 }
-.pagination button {
+.pagination a {
   padding: 12px 20px;
   border-radius: 10px;
   border: 1px solid var(--si-border);
   color: var(--si-ink);
   background: var(--si-surface);
 }
-.pagination button:disabled {
+.pagination [aria-disabled] {
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -63,7 +63,7 @@
 .searchInput.searchInput {
   width: 100%;
   height: 52px;
-  padding: 0 16px 0 48px;
+  padding: 0 86px 0 48px;
   border: 1px solid var(--si-border);
   border-radius: 12px;
   background: var(--si-surface);
@@ -121,11 +121,11 @@
   background: var(--si-surface);
   color: var(--si-ink);
 }
-.categoryButton[aria-pressed='true'] {
+.categoryButton[aria-current='page'] {
   background: var(--si-ink);
   color: var(--si-canvas);
 }
-.toolbar button:focus-visible {
+.toolbar :is(button, a):focus-visible {
   outline: 2px solid var(--si-accent);
   outline-offset: 3px;
 }
@@ -141,7 +141,7 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
-.resultsRow button {
+.resultsRow a {
   color: var(--si-ink);
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -165,4 +165,16 @@
   .categoryButton {
     padding: 9px 12px;
   }
+}
+
+.searchSubmit {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--si-ink);
+  color: var(--si-canvas);
+  font-size: 13px;
 }

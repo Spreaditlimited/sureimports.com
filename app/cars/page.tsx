@@ -5,8 +5,9 @@ import {
   publicVehicle,
 } from '@/lib/vehicles/data';
 import Catalogue from './Catalogue';
+import { emptyFilters } from '@/lib/vehicles/search';
 import { carsSocialImage } from '@/lib/vehicles/social';
-export const metadata: Metadata = {
+const catalogueMetadata: Metadata = {
   title: 'Electric Cars, Vans & Cargo Trucks in Nigeria',
   description:
     'Import electric vehicles from China to Nigeria. Compare electric cars, SUVs, vans and cargo trucks, Naira prices, specifications and landed-cost estimates.',
@@ -28,6 +29,15 @@ export const metadata: Metadata = {
     images: [{ url: carsSocialImage.url, alt: carsSocialImage.alt }],
   },
 };
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}): Promise<Metadata> {
+  const query = await searchParams;
+  const filtered = Object.keys(emptyFilters).some((key) => Boolean(query[key]));
+  return { ...catalogueMetadata, robots: { index: !filtered, follow: true } };
+}
 export const dynamic = 'force-dynamic';
 export default async function CarsPage() {
   const [models, rates] = await Promise.all([

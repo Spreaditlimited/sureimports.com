@@ -7,22 +7,20 @@ const baseUrl = 'https://www.sureimports.com';
 export const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${baseUrl}/#organization`,
   name: 'Sure Imports',
   url: baseUrl,
   logo: `${baseUrl}/images/svg-logo-white.svg`,
   description:
     'Import quality products from China with confidence. Sure Imports guarantees quality, authenticity, and reliable shipping for all your import needs.',
-  foundingDate: '2020',
   sameAs: [
-    'https://twitter.com/sureimports',
-    'https://facebook.com/sureimports',
-    'https://instagram.com/sureimports',
-    'https://linkedin.com/company/sureimports',
+    'https://www.instagram.com/sureimport',
+    'https://www.youtube.com/@sureimports',
   ],
   contactPoint: [
     {
       '@type': 'ContactPoint',
-      telephone: '+234-XXX-XXX-XXXX',
+      telephone: '+2348037649956',
       contactType: 'customer service',
       areaServed: ['NG', 'GH', 'KE', 'ZA', 'GB', 'US'],
       availableLanguage: ['English'],
@@ -30,6 +28,8 @@ export const organizationSchema = {
   ],
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '5 Olutosin Ajayi Street, Ajao Estate',
+    addressLocality: 'Lagos',
     addressCountry: 'NG',
   },
 };
@@ -38,6 +38,7 @@ export const organizationSchema = {
 export const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
+  '@id': `${baseUrl}/#website`,
   name: 'Sure Imports',
   url: baseUrl,
   description:
@@ -46,7 +47,7 @@ export const websiteSchema = {
     '@type': 'SearchAction',
     target: {
       '@type': 'EntryPoint',
-      urlTemplate: `${baseUrl}/search?q={search_term_string}`,
+      urlTemplate: `${baseUrl}/shop?q={search_term_string}`,
     },
     'query-input': 'required name=search_term_string',
   },
@@ -59,7 +60,7 @@ export const localBusinessSchema = {
   name: 'Sure Imports',
   image: `${baseUrl}/images/svg-logo-white.svg`,
   url: baseUrl,
-  telephone: '+234-XXX-XXX-XXXX',
+  telephone: '+2348037649956',
   priceRange: '$$',
   address: {
     '@type': 'PostalAddress',

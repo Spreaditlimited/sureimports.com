@@ -11,14 +11,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/dashboard/', '/auth/', '/private/'],
       },
       {
-        userAgent: 'Googlebot',
+        userAgent: ['Googlebot', 'Bingbot', 'OAI-SearchBot', 'ChatGPT-User'],
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/auth/'],
-      },
-      {
-        userAgent: 'Bingbot',
-        allow: '/',
-        disallow: ['/api/', '/dashboard/', '/auth/'],
+        disallow: ['/api/', '/dashboard/', '/auth/', '/private/'],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -5,6 +5,7 @@ import { Check, ShoppingCart } from 'lucide-react';
 import ProductImage from './ProductImage';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import styles from './ProductCard.module.css';
+import { productConditionLabel } from '@/lib/shop/discovery';
 
 interface ProductCardProps {
   id: string;
@@ -33,14 +34,9 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { addToCart, isInCart } = useShopCart();
   const inCart = isInCart(id);
-  const conditionLabel =
-    condition === 'PRE_OWNED'
-      ? /iphone/i.test(name)
-        ? 'Refurbished'
-        : 'Pre-owned'
-      : condition === 'BRAND_NEW' || condition === 'NEW'
-        ? 'Brand new'
-        : '';
+  const conditionLabel = condition
+    ? productConditionLabel({ productName: name, productCondition: condition })
+    : '';
   const title = name.replace(/ — (Refurbished|Brand new)$/i, '');
   return (
     <article className={styles.card}>
@@ -80,14 +76,17 @@ export default function ProductCard({
             }
             onClick={() => {
               if (inCart) return;
-              addToCart({
-                pidProduct: id,
-                productName: name,
-                productPrice: priceNGN,
-                productImage: image || '/images/default.png',
-                productBrand: brand,
-                productCategory: category,
-              });
+              addToCart(
+                {
+                  pidProduct: id,
+                  productName: name,
+                  productPrice: priceNGN,
+                  productImage: image || '/images/default.png',
+                  productBrand: brand,
+                  productCategory: category,
+                },
+                Math.max(1, Math.ceil(minimumQuantity || 1)),
+              );
               if (openCartOnAdd)
                 window.dispatchEvent(new Event('open-shop-cart'));
             }}

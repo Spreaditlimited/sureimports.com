@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { shopSearchPatterns } from '@/lib/shop/search';
+import { publicProductSelect } from '@/lib/shop/catalogue';
 
 export async function GET(request: NextRequest) {
   try {
@@ -97,6 +98,7 @@ export async function GET(request: NextRequest) {
     const [products, totalCount] = await Promise.all([
       prisma.store.findMany({
         where,
+        select: publicProductSelect,
         orderBy: [orderBy, { id: 'desc' }],
         skip,
         take: limit,
