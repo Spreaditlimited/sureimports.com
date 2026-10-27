@@ -26,7 +26,8 @@ import {
 import Image, { type StaticImageData } from 'next/image';
 import type { BlogListPost } from '../actions/blogActions';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { blogListingHref, parseBlogListingParams } from '@/lib/blogListing';
 import {
   Pagination,
   PaginationContent,
@@ -103,32 +104,34 @@ export default function BlogList({
   totalPosts,
   totalReadTime,
 }: BlogListProps) {
-  const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const selectedCategory = initialCategory || 'All';
   const selectedTag = initialTag || null;
   const sortBy = initialSort;
   const blogCategories = ['All', ...categories];
   const filteredPosts = blogPosts;
+  // Use the filters that produced these server results. Router search params
+  // can still describe the prior navigation while the new result props render.
+  const listingParams = {
+    q: initialSearchQuery,
+    tag: initialTag || '',
+    category: initialCategory || '',
+    sort: initialSort,
+    page: currentPage,
+  };
 
   useEffect(() => {
     setSearchQuery(initialSearchQuery);
   }, [initialSearchQuery]);
 
   const updateFilters = (changes: Record<string, string>) => {
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    params.delete('page');
-    for (const [key, value] of Object.entries(changes)) {
-      if (value && value !== 'All' && !(key === 'sort' && value === 'newest'))
-        params.set(key, value);
-      else params.delete(key);
-    }
-    const query = params.toString();
-    router.push(query ? `${pathname}?${query}` : pathname || '/blog', {
-      scroll: false,
-    });
+    router.push(
+      blogListingHref(
+        parseBlogListingParams({ ...listingParams, ...changes, page: '1' }),
+      ),
+      { scroll: false },
+    );
   };
 
   const handleTagClick = (tag: string, e: React.MouseEvent) => {
@@ -149,16 +152,8 @@ export default function BlogList({
 
   const categoriesCount = blogCategories.length - 1;
 
-  const buildPageHref = (targetPage: number) => {
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    if (targetPage <= 1) {
-      params.delete('page');
-    } else {
-      params.set('page', String(targetPage));
-    }
-    const query = params.toString();
-    return query ? `${pathname}?${query}` : pathname || '/blog';
-  };
+  const buildPageHref = (targetPage: number) =>
+    blogListingHref({ ...listingParams, page: targetPage });
 
   return (
     <div className={styles.page}>
@@ -327,7 +322,9 @@ export default function BlogList({
             </div>
 
             {/* Results Summary */}
-            {(searchQuery || selectedCategory !== 'All' || selectedTag) && (
+            {(initialSearchQuery ||
+              selectedCategory !== 'All' ||
+              selectedTag) && (
               <div className="mt-8 text-center">
                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
                   {selectedTag ? (
@@ -346,7 +343,7 @@ export default function BlogList({
                         <span className="ml-1 text-xs font-semibold">×</span>
                       </Badge>
                     </span>
-                  ) : searchQuery ? (
+                  ) : initialSearchQuery ? (
                     <>
                       Found{' '}
                       <span className="font-semibold text-indigo-600 dark:text-indigo-400">
@@ -354,7 +351,7 @@ export default function BlogList({
                       </span>{' '}
                       articles for "
                       <span className="text-slate-900 dark:text-white">
-                        {searchQuery}
+                        {initialSearchQuery}
                       </span>
                       "
                     </>
@@ -378,7 +375,7 @@ export default function BlogList({
       </div>
 
       {/* Featured Posts Section */}
-      {searchQuery === '' &&
+      {initialSearchQuery === '' &&
         selectedCategory === 'All' &&
         currentPage === 1 &&
         !selectedTag && (
