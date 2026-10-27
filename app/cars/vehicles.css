@@ -178,7 +178,7 @@
   left: 0;
   top: 2px;
   font-size: 11px;
-  color: #77906d;
+  color: var(--v-muted);
 }
 .vehicle-trust strong {
   font-size: 14px;
@@ -302,7 +302,7 @@
 .vehicle-card-body .vehicle-eyebrow {
   font-size: 12px;
   margin: 0 0 9px;
-  color: #768270;
+  color: var(--v-muted);
 }
 .vehicle-card h3 {
   display: flex;
@@ -372,7 +372,7 @@
   position: absolute;
   left: 0;
   font-size: 11px;
-  color: #718c62;
+  color: var(--v-muted);
 }
 .vehicle-how strong {
   font-size: 16px;
@@ -2181,4 +2181,6 @@
   background: var(--si-primary);
 }
 
-.vehicle-hero-copy .vehicle-hero-note { justify-content:center; }
+.vehicle-hero-copy .vehicle-hero-note {
+  justify-content: center;
+}

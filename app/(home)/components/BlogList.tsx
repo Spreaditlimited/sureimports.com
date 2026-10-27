@@ -1,5 +1,5 @@
 'use client';
-import HeroPill from '@/components/home/HeroPill';
+import BlogIntro from './BlogIntro';
 import styles from '@/components/home/EditorialPage.module.css';
 import { useEffect, useState, type ComponentProps } from 'react';
 import {
@@ -88,6 +88,7 @@ interface BlogListProps {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
+  showIntro?: boolean;
 }
 
 export default function BlogList({
@@ -101,6 +102,7 @@ export default function BlogList({
   currentPage,
   totalPages,
   totalPosts,
+  showIntro = true,
 }: BlogListProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
@@ -157,25 +159,13 @@ export default function BlogList({
     <div className={styles.page}>
       {/* Enhanced Hero Section */}
       <div className="relative overflow-hidden border-b border-[var(--si-border)] bg-[var(--si-canvas)]">
-        <div aria-hidden="true" className={styles.heroGlow} />
+        {showIntro && <div aria-hidden="true" className={styles.heroGlow} />}
 
-        <div className={styles.hero}>
+        <div
+          className={`${styles.hero} ${!showIntro ? styles.listingBody : ''}`}
+        >
           <div className="mb-12 text-center lg:mb-16">
-            <HeroPill className="mb-6">
-              <BookOpen className="h-3.5 w-3.5" />
-              Import Insights & Expert Guides
-            </HeroPill>
-
-            <h1 className="mb-6 text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl md:text-6xl lg:text-7xl">
-              Import Insights{' '}
-              <span className="text-[var(--si-accent)]">Blog</span>
-            </h1>
-
-            <p className="mx-auto mb-12 max-w-3xl text-lg font-medium leading-relaxed text-slate-500 dark:text-slate-400 sm:text-xl">
-              Master the art of international trade with expert insights,
-              success stories, and practical guides to help you build a thriving
-              import business.
-            </p>
+            {showIntro && <BlogIntro />}
 
             {/* Stats Row Bento */}
             <div className="mx-auto mb-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">

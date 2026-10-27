@@ -6,11 +6,9 @@ import Image from 'next/image';
 import { ArrowUpRight, Zap, X } from 'lucide-react';
 import type { PublicVehicle } from '@/lib/vehicles/data';
 import { naira } from '@/lib/vehicles/policy';
-import VehicleHeroCarousel from './VehicleHeroCarousel';
 import VehicleComparison from './VehicleComparison';
 import guides from '@/content/vehicle-guides/manifest.json';
 import VehicleFaqs from './VehicleFaqs';
-import HeroPill from '@/components/home/HeroPill';
 import VehicleSearchFilters from './VehicleSearchFilters';
 import {
   emptyFilters,
@@ -45,31 +43,7 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
     );
   }
   return (
-    <main className="vehicle-catalogue">
-      <section className="vehicle-hero-surface">
-        <div className="vehicle-hero">
-          <div className="vehicle-hero-copy">
-            <HeroPill>Your next move, made electric</HeroPill>
-            <h1>
-              Electric ambition.
-              <br />
-              <em>Delivered.</em>
-            </h1>
-            <p className="vehicle-hero-description">
-              Discover electric cars, SUVs, vans and trucks from China. Clear
-              Naira pricing. One team, from your first enquiry to arrival in
-              Nigeria.
-            </p>
-            <a href="#range" className="vehicle-button">
-              Find your vehicle <ArrowUpRight size={18} />
-            </a>
-            <div className="vehicle-hero-note">
-              <Zap size={17} /> Electric cars and commercial vehicles
-            </div>
-          </div>
-          <VehicleHeroCarousel models={models} />
-        </div>
-      </section>
+    <div>
       <section className="vehicle-trust" aria-label="Buying with Sure Imports">
         <div>
           <span>01</span>
@@ -326,6 +300,6 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
           if (compare.length === 1) setShowCompare(false);
         }}
       />
-    </main>
+    </div>
   );
 }

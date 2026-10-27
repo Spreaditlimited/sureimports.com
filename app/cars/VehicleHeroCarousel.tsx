@@ -91,7 +91,8 @@ export default function VehicleHeroCarousel({
               src={model.images[0]}
               alt={model.name}
               fill
-              priority={position === 0}
+              loading="lazy"
+              fetchPriority={position === 0 ? 'high' : 'auto'}
               sizes="(max-width: 800px) 100vw, 52vw"
             />
             <div className="vehicle-image-caption">

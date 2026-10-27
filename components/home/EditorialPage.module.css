@@ -93,3 +93,12 @@
     line-height: 1.8;
   }
 }
+
+/* Keep the introductory text outside the data boundary on the blog index. */
+.hero.listingIntro {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+.hero.listingBody {
+  padding-top: 0;
+}

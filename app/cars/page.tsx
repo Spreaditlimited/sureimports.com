@@ -1,4 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import VehicleCatalogueHero from './VehicleCatalogueHero';
+import VehicleHeroCarousel from './VehicleHeroCarousel';
+import type { PublicVehicle } from '@/lib/vehicles/data';
 import {
   vehicleCatalogue,
   vehicleRates,
@@ -39,11 +43,22 @@ export async function generateMetadata({
   return { ...catalogueMetadata, robots: { index: !filtered, follow: true } };
 }
 export const dynamic = 'force-dynamic';
-export default async function CarsPage() {
+async function loadPublicCatalogue() {
   const [models, rates] = await Promise.all([
     vehicleCatalogue(),
     vehicleRates(),
   ]);
+  return models
+    .filter((model) => model.published)
+    .map((model) => publicVehicle(model, rates));
+}
+
+type CatalogueData = { modelsPromise: Promise<PublicVehicle[]> };
+async function HeroModels({ modelsPromise }: CatalogueData) {
+  return <VehicleHeroCarousel models={await modelsPromise} />;
+}
+async function CatalogueResults({ modelsPromise }: CatalogueData) {
+  const models = await modelsPromise;
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
@@ -51,14 +66,12 @@ export default async function CarsPage() {
     url: 'https://www.sureimports.com/cars',
     mainEntity: {
       '@type': 'ItemList',
-      itemListElement: models
-        .filter((m) => m.published)
-        .map((m, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: m.name,
-          url: `https://www.sureimports.com/cars/models/${m.slug}`,
-        })),
+      itemListElement: models.map((m, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: m.name,
+        url: `https://www.sureimports.com/cars/models/${m.slug}`,
+      })),
     },
   };
   return (
@@ -70,11 +83,31 @@ export default async function CarsPage() {
           __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
         }}
       />
-      <Catalogue
-        models={models
-          .filter((m) => m.published)
-          .map((m) => publicVehicle(m, rates))}
-      />
+      <Catalogue models={models} />
     </>
+  );
+}
+
+export default function CarsPage() {
+  const modelsPromise = loadPublicCatalogue();
+  return (
+    <main className="vehicle-catalogue">
+      <VehicleCatalogueHero>
+        <Suspense
+          fallback={<div className="vehicle-hero-image" aria-hidden="true" />}
+        >
+          <HeroModels modelsPromise={modelsPromise} />
+        </Suspense>
+      </VehicleCatalogueHero>
+      <Suspense
+        fallback={
+          <section id="range" className="vehicle-range">
+            <p role="status">Loading vehicles and current prices…</p>
+          </section>
+        }
+      >
+        <CatalogueResults modelsPromise={modelsPromise} />
+      </Suspense>
+    </main>
   );
 }
