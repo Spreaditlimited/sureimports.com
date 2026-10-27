@@ -193,7 +193,7 @@ export default function BlogList({
                   <div className="mb-1 text-3xl font-semibold text-slate-900 dark:text-white">
                     {stat.val}
                   </div>
-                  <div className="text-xs font-medium uppercase tracking-widest text-slate-400">
+                  <div className="text-xs font-medium uppercase tracking-widest text-[var(--si-muted)]">
                     {stat.label}
                   </div>
                 </div>
@@ -385,6 +385,7 @@ export default function BlogList({
                         <ImageWithFallback
                           src={post.image}
                           alt={post.title}
+                          sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) 50vw, 450px"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute left-4 top-4">
@@ -419,6 +420,9 @@ export default function BlogList({
                             <ImageWithFallback
                               src={post.author.avatar}
                               alt={post.author.name}
+                              width={40}
+                              height={40}
+                              sizes="40px"
                               className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
                             />
                             <div>
@@ -463,6 +467,7 @@ export default function BlogList({
                         <ImageWithFallback
                           src={post.image}
                           alt={post.title}
+                          sizes="(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) 50vw, 450px"
                           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
                         <div className="absolute left-4 top-4">
@@ -515,6 +520,9 @@ export default function BlogList({
                             <ImageWithFallback
                               src={post.author.avatar}
                               alt={post.author.name}
+                              width={40}
+                              height={40}
+                              sizes="40px"
                               className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
                             />
                             <div>

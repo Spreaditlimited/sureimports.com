@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import './design-system.css';
@@ -22,9 +21,6 @@ import {
   websiteSchema,
   serviceSchema,
 } from '@/lib/seo/schema';
-
-// Keep text stable on slow connections when the web font arrives late.
-const inter = Inter({ subsets: ['latin'], display: 'optional' });
 
 const baseUrl = 'https://www.sureimports.com';
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-PT46CZ69';
@@ -145,7 +141,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" href="/favico.png" />
       </head>
 
-      <body className={`${inter.className} hide-scrollbar`}>
+      <body className="font-sans hide-scrollbar">
         <SiteThemeProvider>
           <AuthProvider>
             <GoogleMarketingTags gtmId={GTM_ID} adsId={GOOGLE_ADS_ID} />
