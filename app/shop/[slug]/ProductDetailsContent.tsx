@@ -261,9 +261,9 @@ export default function ProductDetailsContent({
                         <Wallet className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-900 dark:text-white">
+                        <h2 className="font-bold text-slate-900 dark:text-white">
                           Pay Small Small
-                        </h4>
+                        </h2>
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
                           Lock this item and pay in installments.
                         </p>
@@ -313,9 +313,9 @@ export default function ProductDetailsContent({
               <div className="space-y-8">
                 {product.productDescription && (
                   <div>
-                    <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                    <h2 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
                       Overview
-                    </h3>
+                    </h2>
                     <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere] dark:text-slate-400">
                       {product.productDescription}
                     </p>
@@ -324,9 +324,9 @@ export default function ProductDetailsContent({
 
                 {product.productFeature && (
                   <div>
-                    <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                    <h2 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
                       Key Features
-                    </h3>
+                    </h2>
                     <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words text-slate-600 [overflow-wrap:anywhere]">
                       {product.productFeature}
                     </div>
@@ -335,9 +335,9 @@ export default function ProductDetailsContent({
 
                 {product.productSpecification && (
                   <div>
-                    <h3 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
+                    <h2 className="mb-3 text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white">
                       Product details
-                    </h3>
+                    </h2>
                     <div className="prose prose-sm dark:prose-invert max-w-none whitespace-pre-wrap break-words rounded-2xl bg-slate-50 p-6 text-slate-600 [overflow-wrap:anywhere] dark:bg-slate-900/50">
                       {product.productSpecification}
                     </div>

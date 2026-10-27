@@ -92,7 +92,6 @@ export default async function BlogPage({ searchParams }: PageProps) {
           currentPage={result.page}
           totalPages={result.totalPages}
           totalPosts={result.totalPosts}
-          totalReadTime={result.totalReadTime}
         />
       </main>
       <Footer />

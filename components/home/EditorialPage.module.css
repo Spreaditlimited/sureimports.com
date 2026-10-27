@@ -2,6 +2,23 @@
   background: var(--si-canvas);
   color: var(--si-ink);
 }
+.heroGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 32rem 24rem at 50% 0,
+    rgb(72 67 155 / 5%),
+    transparent
+  );
+}
+:global(.dark) .heroGlow {
+  background: radial-gradient(
+    ellipse 32rem 24rem at 50% 0,
+    rgb(176 167 245 / 8%),
+    transparent
+  );
+}
 .hero {
   padding: 155px var(--si-gutter) 64px;
   text-align: center;

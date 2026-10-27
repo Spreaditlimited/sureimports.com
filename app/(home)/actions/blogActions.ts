@@ -1,6 +1,7 @@
 'use server';
 
 import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import { resolveBlogMediaUrl } from '@/lib/blogMedia';
@@ -152,7 +153,6 @@ export interface BlogListPageResult {
   pageSize: number;
   totalPosts: number;
   totalPages: number;
-  totalReadTime: number;
   categories: string[];
 }
 
@@ -454,200 +454,223 @@ export async function fetchPublishedBlogs(): Promise<BlogPost[]> {
   }
 }
 
+// This app has not enabled Cache Components. Use its supported Data Cache API
+// for a short-lived public listing, without changing article publication gates.
+const cachedBlogListing = unstable_cache(
+  (page: number, pageSize: number) => loadPublishedBlogsLite(page, pageSize),
+  ['public-blog-listing-v2'],
+  { revalidate: 60, tags: ['public-blog-listing'] },
+);
+
 export async function fetchPublishedBlogsLite(
   page = 1,
   pageSize = 9,
   searchQuery = '',
   filters: { tag?: string; category?: string; sort?: 'newest' | 'oldest' } = {},
 ): Promise<BlogListPageResult> {
+  const safePage = Number.isSafeInteger(page) && page > 0 ? page : 1;
+  const safePageSize =
+    Number.isFinite(pageSize) && pageSize > 0
+      ? Math.min(9, Math.floor(pageSize))
+      : 9;
   try {
-    const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
-    const safePageSize =
-      Number.isFinite(pageSize) && pageSize > 0
-        ? Math.min(9, Math.floor(pageSize))
-        : 9;
-    // Tags are stored in legacy JSON text. Resolve exact matches from metadata,
-    // then constrain the database query BEFORE counting, sorting and pagination.
-    const facets = await prisma.blog.findMany({
-      where: getPublishedBlogWhere(),
-      select: {
-        pidBlog: true,
-        blogExt2: true,
-        category: { select: { categoryName: true } },
-      },
-    });
-    const categoryOf = (row: (typeof facets)[number]) =>
-      row.category?.categoryName ||
-      parseSEOData(row.blogExt2).category ||
-      'Import Guide';
-    const categories = [...new Set(facets.map(categoryOf))].sort();
-    const matchingIds = facets
-      .filter(
-        (row) =>
-          (!filters.category ||
-            categoryOf(row).toLowerCase() === filters.category.toLowerCase()) &&
-          (!filters.tag ||
-            (parseSEOData(row.blogExt2).tags || []).some(
-              (tag) => tag.toLowerCase() === filters.tag!.toLowerCase(),
-            )),
-      )
-      .map((row) => row.pidBlog);
-    const where: Prisma.blogWhereInput = {
-      AND: [
-        buildPublishedBlogWhere(searchQuery),
-        { pidBlog: { in: matchingIds } },
-      ],
-    };
-    const prioritySearch = buildPublishedBlogPriorityWhere(searchQuery);
-    const priorityWhere: Prisma.blogWhereInput | null = prioritySearch
-      ? { AND: [where, prioritySearch] }
-      : null;
-    const orderBy: Prisma.blogOrderByWithRelationInput[] = [
-      { createdAt: filters.sort === 'oldest' ? 'asc' : 'desc' },
-      { id: filters.sort === 'oldest' ? 'asc' : 'desc' },
-    ];
-
-    const priorityRows = priorityWhere
-      ? await prisma.blog.findMany({
-          where: priorityWhere,
-          select: { pidBlog: true },
-          orderBy,
-        })
-      : [];
-    const priorityIds = priorityRows.map((blog) => blog.pidBlog);
-
-    const [totalPosts, readingTimeRows] = await Promise.all([
-      prisma.blog.count({ where }),
-      prisma.blog.findMany({
-        where,
-        select: { blogContent: true },
-      }),
-    ]);
-    const totalReadTime = readingTimeRows.reduce(
-      (total, blog) => total + getBlogReadingTime(blog.blogContent),
-      0,
+    if (
+      !searchQuery &&
+      !filters.tag &&
+      !filters.category &&
+      filters.sort !== 'oldest' &&
+      safePage <= 100
+    ) {
+      return await cachedBlogListing(safePage, safePageSize);
+    }
+    return await loadPublishedBlogsLite(
+      safePage,
+      safePageSize,
+      searchQuery,
+      filters,
     );
-
-    const totalPages = Math.max(1, Math.ceil(totalPosts / safePageSize));
-    const resolvedPage = Math.min(safePage, totalPages);
-    const postSelect = {
-      id: true,
-      pidBlog: true,
-      blogTitle: true,
-      blogContent: true,
-      blogSlug: true,
-      blogPublished: true,
-      blogFeatured: true,
-      blogImage: true,
-      blogBy: true,
-      publisherId: true,
-      blogExt1: true,
-      blogExt2: true,
-      xStaus: true,
-      createdAt: true,
-      updatedAt: true,
-      publisher: {
-        select: {
-          pidPublisher: true,
-          publisherName: true,
-          publisherSlug: true,
-          publisherEmail: true,
-          publisherBio: true,
-          publisherRole: true,
-          publisherImage: true,
-          publisherSocialX: true,
-          publisherSocialLinkedin: true,
-          publisherSocialFacebook: true,
-          publisherSocialInstagram: true,
-          publisherWebsite: true,
-        },
-      },
-      category: {
-        select: {
-          categoryName: true,
-        },
-      },
-    } as const;
-
-    const pageOffset = (resolvedPage - 1) * safePageSize;
-    const priorityPageIds = priorityIds.slice(
-      pageOffset,
-      pageOffset + safePageSize,
-    );
-    const priorityPageRows = priorityPageIds.length
-      ? await prisma.blog.findMany({
-          where: { ...where, pidBlog: { in: priorityPageIds } },
-          select: postSelect,
-        })
-      : [];
-    const priorityOrder = new Map(
-      priorityPageIds.map((pidBlog, index) => [pidBlog, index]),
-    );
-    priorityPageRows.sort(
-      (left, right) =>
-        (priorityOrder.get(left.pidBlog) ?? 0) -
-        (priorityOrder.get(right.pidBlog) ?? 0),
-    );
-
-    const remainingSlots = safePageSize - priorityPageRows.length;
-    const remainderSkip = Math.max(0, pageOffset - priorityIds.length);
-    const remainderWhere = priorityIds.length
-      ? { ...where, pidBlog: { notIn: priorityIds } }
-      : where;
-    const remainderRows = remainingSlots
-      ? await prisma.blog.findMany({
-          where: remainderWhere,
-          select: postSelect,
-          orderBy,
-          take: remainingSlots,
-          skip: remainderSkip,
-        })
-      : [];
-    const blogs = [...priorityPageRows, ...remainderRows];
-
-    const featuredBlogs = await prisma.blog.findMany({
-      where: {
-        ...where,
-        OR: [
-          { blogFeatured: true },
-          { blogExt2: { contains: '"featured":true' } },
-        ],
-      },
-      select: postSelect,
-      orderBy: {
-        createdAt: 'desc',
-      },
-      take: 3,
-    });
-
-    const posts = blogs.map((blog) => toLitePost(blog as DbBlog));
-    const featuredPosts = featuredBlogs.map((blog) =>
-      toLitePost(blog as DbBlog),
-    );
-
-    return {
-      posts,
-      featuredPosts,
-      page: resolvedPage,
-      pageSize: safePageSize,
-      totalPosts,
-      totalPages,
-      totalReadTime,
-      categories,
-    };
   } catch (error) {
+    // Failed queries are never persisted as an empty successful cache entry.
     console.error('Error fetching lite blogs:', error);
     return {
       posts: [],
       featuredPosts: [],
       page: 1,
-      pageSize: 9,
+      pageSize: safePageSize,
       totalPosts: 0,
       totalPages: 1,
-      totalReadTime: 0,
       categories: [],
     };
   }
+}
+
+async function loadPublishedBlogsLite(
+  page = 1,
+  pageSize = 9,
+  searchQuery = '',
+  filters: { tag?: string; category?: string; sort?: 'newest' | 'oldest' } = {},
+): Promise<BlogListPageResult> {
+  const safePage = Number.isFinite(page) && page > 0 ? Math.floor(page) : 1;
+  const safePageSize =
+    Number.isFinite(pageSize) && pageSize > 0
+      ? Math.min(9, Math.floor(pageSize))
+      : 9;
+  // Tags are stored in legacy JSON text. Resolve exact matches from metadata,
+  // then constrain the database query BEFORE counting, sorting and pagination.
+  const facets = await prisma.blog.findMany({
+    where: getPublishedBlogWhere(),
+    select: {
+      pidBlog: true,
+      blogExt2: true,
+      category: { select: { categoryName: true } },
+    },
+  });
+  const categoryOf = (row: (typeof facets)[number]) =>
+    row.category?.categoryName ||
+    parseSEOData(row.blogExt2).category ||
+    'Import Guide';
+  const categories = [...new Set(facets.map(categoryOf))].sort();
+  const matchingIds = facets
+    .filter(
+      (row) =>
+        (!filters.category ||
+          categoryOf(row).toLowerCase() === filters.category.toLowerCase()) &&
+        (!filters.tag ||
+          (parseSEOData(row.blogExt2).tags || []).some(
+            (tag) => tag.toLowerCase() === filters.tag!.toLowerCase(),
+          )),
+    )
+    .map((row) => row.pidBlog);
+  const where: Prisma.blogWhereInput = {
+    AND: [
+      buildPublishedBlogWhere(searchQuery),
+      { pidBlog: { in: matchingIds } },
+    ],
+  };
+  const prioritySearch = buildPublishedBlogPriorityWhere(searchQuery);
+  const priorityWhere: Prisma.blogWhereInput | null = prioritySearch
+    ? { AND: [where, prioritySearch] }
+    : null;
+  const orderBy: Prisma.blogOrderByWithRelationInput[] = [
+    { createdAt: filters.sort === 'oldest' ? 'asc' : 'desc' },
+    { id: filters.sort === 'oldest' ? 'asc' : 'desc' },
+  ];
+
+  const priorityRows = priorityWhere
+    ? await prisma.blog.findMany({
+        where: priorityWhere,
+        select: { pidBlog: true },
+        orderBy,
+      })
+    : [];
+  const priorityIds = priorityRows.map((blog) => blog.pidBlog);
+
+  const totalPosts = await prisma.blog.count({ where });
+
+  const totalPages = Math.max(1, Math.ceil(totalPosts / safePageSize));
+  const resolvedPage = Math.min(safePage, totalPages);
+  const postSelect = {
+    id: true,
+    pidBlog: true,
+    blogTitle: true,
+    blogContent: true,
+    blogSlug: true,
+    blogPublished: true,
+    blogFeatured: true,
+    blogImage: true,
+    blogBy: true,
+    publisherId: true,
+    blogExt1: true,
+    blogExt2: true,
+    xStaus: true,
+    createdAt: true,
+    updatedAt: true,
+    publisher: {
+      select: {
+        pidPublisher: true,
+        publisherName: true,
+        publisherSlug: true,
+        publisherEmail: true,
+        publisherBio: true,
+        publisherRole: true,
+        publisherImage: true,
+        publisherSocialX: true,
+        publisherSocialLinkedin: true,
+        publisherSocialFacebook: true,
+        publisherSocialInstagram: true,
+        publisherWebsite: true,
+      },
+    },
+    category: {
+      select: {
+        categoryName: true,
+      },
+    },
+  } as const;
+
+  const pageOffset = (resolvedPage - 1) * safePageSize;
+  const priorityPageIds = priorityIds.slice(
+    pageOffset,
+    pageOffset + safePageSize,
+  );
+  const priorityPageRows = priorityPageIds.length
+    ? await prisma.blog.findMany({
+        where: { ...where, pidBlog: { in: priorityPageIds } },
+        select: postSelect,
+      })
+    : [];
+  const priorityOrder = new Map(
+    priorityPageIds.map((pidBlog, index) => [pidBlog, index]),
+  );
+  priorityPageRows.sort(
+    (left, right) =>
+      (priorityOrder.get(left.pidBlog) ?? 0) -
+      (priorityOrder.get(right.pidBlog) ?? 0),
+  );
+
+  const remainingSlots = safePageSize - priorityPageRows.length;
+  const remainderSkip = Math.max(0, pageOffset - priorityIds.length);
+  const remainderWhere = priorityIds.length
+    ? { ...where, pidBlog: { notIn: priorityIds } }
+    : where;
+  const remainderRows = remainingSlots
+    ? await prisma.blog.findMany({
+        where: remainderWhere,
+        select: postSelect,
+        orderBy,
+        take: remainingSlots,
+        skip: remainderSkip,
+      })
+    : [];
+  const blogs = [...priorityPageRows, ...remainderRows];
+
+  const featuredBlogs = await prisma.blog.findMany({
+    where: {
+      ...where,
+      OR: [
+        { blogFeatured: true },
+        { blogExt2: { contains: '"featured":true' } },
+      ],
+    },
+    select: postSelect,
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 3,
+  });
+
+  const posts = blogs.map((blog) => toLitePost(blog as DbBlog));
+  const featuredPosts = featuredBlogs.map((blog) => toLitePost(blog as DbBlog));
+
+  return {
+    posts,
+    featuredPosts,
+    page: resolvedPage,
+    pageSize: safePageSize,
+    totalPosts,
+    totalPages,
+    categories,
+  };
 }
 
 export async function fetchPublishedBlogSlugs(): Promise<string[]> {

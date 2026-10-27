@@ -88,7 +88,6 @@ interface BlogListProps {
   currentPage: number;
   totalPages: number;
   totalPosts: number;
-  totalReadTime: number;
 }
 
 export default function BlogList({
@@ -102,7 +101,6 @@ export default function BlogList({
   currentPage,
   totalPages,
   totalPosts,
-  totalReadTime,
 }: BlogListProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
@@ -159,9 +157,7 @@ export default function BlogList({
     <div className={styles.page}>
       {/* Enhanced Hero Section */}
       <div className="relative overflow-hidden border-b border-[var(--si-border)] bg-[var(--si-canvas)]">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute left-1/2 top-0 h-[40rem] w-[40rem] -translate-x-1/2 rounded-full bg-indigo-600/5 blur-[120px] dark:bg-indigo-600/10" />
-        </div>
+        <div aria-hidden="true" className={styles.heroGlow} />
 
         <div className={styles.hero}>
           <div className="mb-12 text-center lg:mb-16">
@@ -182,19 +178,13 @@ export default function BlogList({
             </p>
 
             {/* Stats Row Bento */}
-            <div className="mx-auto mb-10 grid max-w-3xl grid-cols-1 gap-4 sm:grid-cols-3 sm:gap-6">
+            <div className="mx-auto mb-10 grid max-w-3xl grid-cols-2 gap-4 sm:gap-6">
               {[
                 {
                   icon: BookOpen,
                   val: `${totalPosts}`,
                   label: 'Articles',
                   color: 'text-indigo-600 dark:text-indigo-400',
-                },
-                {
-                  icon: Clock,
-                  val: totalReadTime.toLocaleString(),
-                  label: 'Minutes of Reading',
-                  color: 'text-brand-orange-500 dark:text-brand-orange-400',
                 },
                 {
                   icon: Tag,
