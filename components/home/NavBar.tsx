@@ -457,6 +457,7 @@ export default function Navbar(_props: NavbarProps) {
             <Sheet>
               <SheetTrigger asChild>
                 <Button
+                  aria-label="Open navigation menu"
                   variant="ghost"
                   size="icon"
                   className={`border-0 ${useLightNavbar ? 'text-slate-800 hover:bg-slate-100 dark:text-white dark:hover:bg-white/10' : 'text-white hover:bg-white/10'}`}

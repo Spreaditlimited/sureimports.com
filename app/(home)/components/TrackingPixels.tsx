@@ -1,7 +1,8 @@
 'use client';
 import Script from 'next/script';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { useOptionalConsent } from '@/lib/marketing/useOptionalConsent';
 
 const TT_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || 'CUGVPGRC77U7F7KCBAEG';
 const GA_ID = process.env.NEXT_PUBLIC_GA4_ID || 'G-CMGHVCHW1D';
@@ -9,11 +10,23 @@ const GA_ID = process.env.NEXT_PUBLIC_GA4_ID || 'G-CMGHVCHW1D';
 export function TrackingPixels() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const consent = useOptionalConsent();
+  const [gaReady, setGaReady] = useState(false);
+
+  useEffect(() => {
+    const ttq = (
+      window as typeof window & {
+        ttq?: { disableCookie?: () => void; enableCookie?: () => void };
+      }
+    ).ttq;
+    if (consent) ttq?.enableCookie?.();
+    else ttq?.disableCookie?.();
+  }, [consent]);
 
   // Send GA4 page_view on client-side route changes (and initial load)
   useEffect(() => {
     const gtag = (window as Window & { gtag?: Window['gtag'] }).gtag;
-    if (!gtag || !GA_ID) return;
+    if (!consent || !gaReady || !gtag || !GA_ID) return;
     const query = searchParams?.toString();
     const page_location = `${window.location.origin}${pathname}${query ? `?${query}` : ''}`;
     gtag('event', 'page_view', {
@@ -22,7 +35,9 @@ export function TrackingPixels() {
       page_path: pathname,
       send_to: GA_ID,
     });
-  }, [pathname, searchParams]);
+  }, [pathname, searchParams, consent, gaReady]);
+
+  if (!consent) return null;
 
   return (
     <>
@@ -67,6 +82,7 @@ export function TrackingPixels() {
       <Script
         id="ga4-init"
         strategy="afterInteractive"
+        onReady={() => setGaReady(true)}
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

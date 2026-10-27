@@ -19,7 +19,9 @@ export default function OpenAIAdsPixel() {
 
   // These acquisition routes previously had no consent choice.
   return pathname.startsWith('/buy-from-chinese-websites') ||
-    pathname.startsWith('/auth/') ? (
+    pathname.startsWith('/auth/') ||
+    pathname.startsWith('/blog') ||
+    pathname === '/privacy-policy' ? (
     <CookieConsent />
   ) : null;
 }

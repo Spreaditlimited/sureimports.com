@@ -26,6 +26,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { enhanceBlogTables } from '@/lib/blogHtml';
+import { formatBlogDate } from '@/lib/blogDate';
 
 // X (Twitter) icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -316,13 +317,7 @@ export default function BlogDetail({
   relatedPosts = [],
   children,
 }: BlogDetailProps) {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  const formatDate = formatBlogDate;
 
   const handleShare = async () => {
     if (navigator.share && post) {
@@ -376,6 +371,9 @@ export default function BlogDetail({
             <div className="flex items-center gap-4 text-left">
               <ImageWithFallback
                 src={post.author.avatar}
+                width={56}
+                height={56}
+                sizes="56px"
                 alt={post.author.name}
                 className="h-14 w-14 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
@@ -402,7 +400,6 @@ export default function BlogDetail({
         <div className="relative mb-16 overflow-hidden rounded-[40px] border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900">
           <ImageWithFallback
             src={post.image}
-            preload
             sizes="(max-width: 768px) 100vw, 960px"
             alt={post.title}
             className="h-[300px] w-full object-cover md:h-[500px]"
@@ -454,6 +451,9 @@ export default function BlogDetail({
             <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
               <ImageWithFallback
                 src={post.author.avatar}
+                width={96}
+                height={96}
+                sizes="96px"
                 alt={post.author.name}
                 className="h-24 w-24 flex-shrink-0 rounded-2xl object-cover ring-1 ring-slate-200 dark:ring-slate-700"
               />
@@ -860,6 +860,9 @@ export default function BlogDetail({
                         <div className="flex items-center gap-3">
                           <ImageWithFallback
                             src={relatedPost.author.avatar}
+                            width={40}
+                            height={40}
+                            sizes="40px"
                             alt={relatedPost.author.name}
                             className="h-10 w-10 rounded-full border border-slate-200 dark:border-slate-700"
                           />

@@ -1,4 +1,5 @@
 import { trackOpenAIRegistration } from './openaiEvents';
+import { hasOptionalCookieConsent } from './optionalConsent';
 
 // No account details are stored here: only event IDs and non-identifying event parameters.
 type MetaEvent = {
@@ -33,7 +34,7 @@ function save(name: string, value: unknown) {
 export function flushFacebookEvents() {
   if (typeof window === 'undefined') return;
   const pixel = window as unknown as PixelWindow;
-  if (document.cookie.split(';').some((c) => c.trim() === 'consent=false')) {
+  if (!hasOptionalCookieConsent()) {
     pending = [];
     save(QUEUE, []);
     return;

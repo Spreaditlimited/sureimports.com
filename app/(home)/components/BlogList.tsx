@@ -143,6 +143,7 @@ export default function BlogList({
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      timeZone: 'UTC',
     });
   };
 
