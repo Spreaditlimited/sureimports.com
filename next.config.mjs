@@ -57,6 +57,10 @@ const nextConfig = {
     experimental: {
       // Avoid merging unrelated route styles into every public page.
       cssChunking: false,
+      // Deliver styles with the first HTML response for mobile search visitors.
+      // This removes the render-blocking CSS round trip; styles are no longer
+      // cached separately on a full page load (Next.js inlineCss trade-off).
+      inlineCss: true,
       serverActions: {
         bodySizeLimit: '55mb',
       },
