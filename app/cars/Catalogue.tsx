@@ -1,12 +1,12 @@
 'use client';
 import { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight, Zap, X } from 'lucide-react';
 import type { PublicVehicle } from '@/lib/vehicles/data';
 import { naira } from '@/lib/vehicles/policy';
-import VehicleComparison from './VehicleComparison';
 import guides from '@/content/vehicle-guides/manifest.json';
 import VehicleFaqs from './VehicleFaqs';
 import VehicleSearchFilters from './VehicleSearchFilters';
@@ -17,6 +17,12 @@ import {
   landedBounds,
   type VehicleFilters,
 } from '@/lib/vehicles/search';
+
+// Comparison is an optional interaction. Load its dialog and controls only
+// after a vehicle is selected, keeping ordinary catalogue visits lighter.
+const VehicleComparison = dynamic(() => import('./VehicleComparison'), {
+  ssr: false,
+});
 
 export default function Catalogue({ models }: { models: PublicVehicle[] }) {
   const params = useSearchParams();
@@ -282,24 +288,26 @@ export default function Catalogue({ models }: { models: PublicVehicle[] }) {
           </button>
         </div>
       )}
-      <VehicleComparison
-        models={models
-          .filter((model) => compare.includes(model.slug))
-          .map((model) => ({
-            ...model,
-            variants: [...model.variants].sort(
-              (a, b) =>
-                Number(b.id === compareVariants[model.slug]) -
-                Number(a.id === compareVariants[model.slug]),
-            ),
-          }))}
-        open={showCompare}
-        onClose={() => setShowCompare(false)}
-        onRemove={(slug) => {
-          setCompare((current) => current.filter((value) => value !== slug));
-          if (compare.length === 1) setShowCompare(false);
-        }}
-      />
+      {compare.length > 0 && (
+        <VehicleComparison
+          models={models
+            .filter((model) => compare.includes(model.slug))
+            .map((model) => ({
+              ...model,
+              variants: [...model.variants].sort(
+                (a, b) =>
+                  Number(b.id === compareVariants[model.slug]) -
+                  Number(a.id === compareVariants[model.slug]),
+              ),
+            }))}
+          open={showCompare}
+          onClose={() => setShowCompare(false)}
+          onRemove={(slug) => {
+            setCompare((current) => current.filter((value) => value !== slug));
+            if (compare.length === 1) setShowCompare(false);
+          }}
+        />
+      )}
     </div>
   );
 }
