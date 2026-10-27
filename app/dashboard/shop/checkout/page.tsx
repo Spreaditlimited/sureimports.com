@@ -474,11 +474,16 @@ function CheckoutContent() {
                     ₦
                     {walletBalance.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </div>
                   {walletBalance < cartTotal && walletBalance > 0 && (
                     <p className="mt-2 flex items-center gap-1 text-[10px] font-bold uppercase text-rose-500">
-                      Short by ₦{(cartTotal - walletBalance).toLocaleString()}
+                      Short by ₦
+                      {(cartTotal - walletBalance).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </p>
                   )}
                 </div>

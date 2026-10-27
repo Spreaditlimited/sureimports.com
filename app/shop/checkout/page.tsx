@@ -641,13 +641,18 @@ function CheckoutContent() {
                     ₦
                     {walletBalance.toLocaleString(undefined, {
                       minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
                     })}
                   </div>
 
                   {walletBalance < cartTotal && walletBalance > 0 && (
                     <div className="relative z-10 mt-3 inline-flex items-center gap-1.5 rounded-lg bg-rose-500/20 px-3 py-1 text-xs font-bold text-rose-100 backdrop-blur-sm">
                       <AlertCircle className="h-3.5 w-3.5" />
-                      Short by ₦{(cartTotal - walletBalance).toLocaleString()}
+                      Short by ₦
+                      {(cartTotal - walletBalance).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </div>
                   )}
                   {walletBalance >= cartTotal && (
