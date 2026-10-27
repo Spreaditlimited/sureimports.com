@@ -214,7 +214,7 @@ const BlogLeadMagnetCta = ({ post }: { post: BlogDisplayPost }) => {
                   : magnet.buttonText || 'Send me the guide'}
               </button>
 
-              <p className="text-center text-[10px] font-medium tracking-wide text-slate-500">
+              <p className="text-center text-xs font-medium tracking-wide text-slate-300">
                 Your information is secure. No spam.
               </p>
             </form>

@@ -4,7 +4,6 @@ import type { Metadata } from 'next';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import PrivacyPolicy from '../components/PrivacyPolicy'; // Adjust path if needed based on your folder structure
-import AdSenseEditorial from '@/components/AdSenseEditorial';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | Sure Imports',
@@ -26,7 +25,6 @@ export default function PrivacyPolicyPage() {
         <PrivacyPolicy />
       </main>
       <Footer />
-      <AdSenseEditorial />
     </>
   );
 }

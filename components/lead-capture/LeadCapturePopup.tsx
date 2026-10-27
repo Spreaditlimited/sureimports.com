@@ -315,7 +315,7 @@ export default function LeadCapturePopup() {
               </span>
               <span className="text-[10px] font-medium italic text-slate-500 dark:text-slate-400">
                 — Tochukwu Nkwocha,{' '}
-                <span className="text-[9px] font-bold uppercase not-italic tracking-wider opacity-70">
+                <span className="text-[9px] font-bold uppercase not-italic tracking-wider">
                   CEO
                 </span>
               </span>

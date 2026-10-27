@@ -84,6 +84,10 @@ for (const remember of [false, true])
         cookie = r.headers.get('set-cookie');
       } else {
         const mod = load('app/api/auth/login/route.ts', {
+          // Security rejection paths are covered in public-form-security.test.mjs.
+          '@/lib/security/publicFormGuard': {
+            guardPublicForm: async () => null,
+          },
           '@/lib/auth/session-policy.mjs': policy,
           bcryptjs: { compare: async () => true, compareSync: () => true },
           '@/lib/jwt': { generateToken: () => 'test' },

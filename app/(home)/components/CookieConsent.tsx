@@ -79,16 +79,16 @@ export default function CookieConsent({
             {onNavigateToPrivacyPolicy ? (
               <button
                 onClick={onNavigateToPrivacyPolicy}
-                className="text-indigo-400 hover:underline"
+                className="text-indigo-600 underline underline-offset-2"
               >
-                Learn more
+                Read our privacy policy
               </button>
             ) : (
               <Link
                 href="/privacy-policy"
-                className="text-indigo-400 hover:underline"
+                className="text-indigo-600 underline underline-offset-2"
               >
-                Learn more
+                Read our privacy policy
               </Link>
             )}
             .

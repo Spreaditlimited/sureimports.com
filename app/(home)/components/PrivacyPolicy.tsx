@@ -2,7 +2,6 @@
 
 import HeroPill from '@/components/home/HeroPill';
 import styles from '@/components/home/EditorialPage.module.css';
-import AdSensePrivacyChoices from '@/components/AdSensePrivacyChoices';
 import React, { useEffect, useState } from 'react';
 import {
   Shield,
@@ -295,16 +294,13 @@ export default function PrivacyPolicy() {
                 .
               </p>
               <h3 className="mb-3 mt-8 text-xl font-semibold text-slate-900 dark:text-white">
-                Google advertising and your choices
+                Advertising measurement and your choices
               </h3>
               <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
-                Where Google AdSense advertisements appear on this site, Google
-                and other advertising vendors may use cookies or similar
-                identifiers to select and measure ads. Google advertising
-                cookies can enable Google and its partners to show ads using
-                information about earlier visits to this website and other
-                websites. The ads and data processing available to you depend on
-                your location and consent choices.
+                If you accept optional cookies, our advertising and analytics
+                partners may use cookies or similar identifiers to measure
+                visits and the effectiveness of our advertising campaigns. We do
+                not currently display Google AdSense advertisements.
               </p>
               <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
                 You can manage personalised Google ads in{' '}
@@ -329,12 +325,10 @@ export default function PrivacyPolicy() {
                 advertisements.
               </p>
               <p className="mb-4 leading-relaxed text-slate-600 dark:text-slate-400">
-                When a separate advertising consent message is presented, use
-                its settings to choose advertising purposes and vendors or
-                withdraw consent. You can reopen our optional website-cookie
-                notice below. Essential cookies needed for sign-in, security and
-                your shopping cart are separate from optional advertising
-                choices.
+                You can reopen our optional website-cookie notice below to
+                change your choice. Essential cookies needed for sign-in,
+                security and your shopping cart are separate from optional
+                advertising choices.
               </p>
               <button
                 type="button"
@@ -345,9 +339,6 @@ export default function PrivacyPolicy() {
               >
                 Change optional cookie preferences
               </button>
-              <div>
-                <AdSensePrivacyChoices />
-              </div>
               <div className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
                 <p className="text-sm font-medium leading-relaxed text-slate-600 dark:text-slate-400">
                   You can choose to disable cookies through your browser

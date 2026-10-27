@@ -18,7 +18,7 @@ The owner now requires every Sure Imports and subdomain deployment to originate 
 - Fixed blog filtering before pagination, pagination canonicals, empty-page responses, malformed social-image URLs, broken internal tool links and matching breadcrumb identifiers.
 - Server-rendered initial shop/phone content, removed global Flutterwave loading, reduced article data duplicated into client props and deferred embedded video loading.
 - Followed the mobile performance trace: optional Google, Facebook and TikTok scripts now require an affirmative cookie choice; withdrawal updates their consent state. Blog dates use UTC consistently to prevent time-zone hydration mismatches, small author portraits request appropriate image sizes, and the mobile menu has an accessible name.
-- Added AdSense code on article/privacy pages, Google privacy disclosures and advertising privacy controls. Published a Sure Imports-specific European consent message in the existing AdSense account.
+- Added Google privacy disclosures and optional website-cookie controls. At the owner's subsequent request, removed AdSense loading and publisher-ad privacy controls and disabled the AdSense consent message. AdSense review is deferred while website quality and functionality are the priority.
 - Refreshed Search Console data through 24 October, stored property/page/device/country totals separately from query rows and added stale-data visibility. Imports remain manual.
 
 ## Verification

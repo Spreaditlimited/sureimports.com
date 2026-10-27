@@ -1,8 +1,6 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import { JsonLdScript } from '@/components/seo/JsonLd';
-import AdSenseEditorial from '@/components/AdSenseEditorial';
-import AdSensePrivacyChoices from '@/components/AdSensePrivacyChoices';
 
 import BlogDetail from '@/app/(home)/components/BlogDetail';
 import {
@@ -313,11 +311,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
           )}
         </BlogDetail>
       </main>
-      <div className="mx-auto max-w-6xl px-6">
-        <AdSensePrivacyChoices />
-      </div>
       <Footer />
-      <AdSenseEditorial />
     </>
   );
 }

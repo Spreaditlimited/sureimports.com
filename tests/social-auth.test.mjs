@@ -183,39 +183,41 @@ function harness() {
     },
   ).outputText;
   const mockRequire = (id) =>
-    id === '@/lib/marketing/registrationConversion'
-      ? {
-          registrationAttribution: () => ({}),
-          scheduleRegistrationConversion: (input) => {
-            conversions.push(input);
-            return {
-              eventId: 'registration-' + input.accountId,
-              method: input.method,
-            };
-          },
-        }
-      : id === 'server-only'
-        ? {}
-        : id === 'next/headers'
-          ? { cookies: async () => cookies }
-          : id === './adapter'
-            ? { adapter }
-            : id === './policy.mjs'
-              ? policy
-              : id === 'openid-client'
-                ? {
-                    discovery: async () => ({}),
-                    enableNonRepudiationChecks() {},
-                    authorizationCodeGrant: async () => ({
-                      claims: () => claims,
-                    }),
-                  }
-                : id === 'jose'
+    id === '@/lib/webinar/server'
+      ? { queueAccountWelcome: async () => {} }
+      : id === '@/lib/marketing/registrationConversion'
+        ? {
+            registrationAttribution: () => ({}),
+            scheduleRegistrationConversion: (input) => {
+              conversions.push(input);
+              return {
+                eventId: 'registration-' + input.accountId,
+                method: input.method,
+              };
+            },
+          }
+        : id === 'server-only'
+          ? {}
+          : id === 'next/headers'
+            ? { cookies: async () => cookies }
+            : id === './adapter'
+              ? { adapter }
+              : id === './policy.mjs'
+                ? policy
+                : id === 'openid-client'
                   ? {
-                      createRemoteJWKSet: () => ({}),
-                      jwtVerify: async () => ({ payload: claims }),
+                      discovery: async () => ({}),
+                      enableNonRepudiationChecks() {},
+                      authorizationCodeGrant: async () => ({
+                        claims: () => claims,
+                      }),
                     }
-                  : require(id);
+                  : id === 'jose'
+                    ? {
+                        createRemoteJWKSet: () => ({}),
+                        jwtVerify: async () => ({ payload: claims }),
+                      }
+                    : require(id);
   vm.runInNewContext('(function(require,module,exports){' + code + '\n})', {
     URL,
     URLSearchParams,
