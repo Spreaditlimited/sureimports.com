@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
+import { unstable_cache } from 'next/cache';
 import VehicleCatalogueHero from './VehicleCatalogueHero';
 import VehicleHeroCarousel from './VehicleHeroCarousel';
 import type { PublicVehicle } from '@/lib/vehicles/data';
@@ -53,6 +54,16 @@ async function loadPublicCatalogue() {
     .map((model) => publicVehicle(model, rates));
 }
 
+// Share the public browsing snapshot briefly across visitors. The model-detail,
+// quotation and order paths continue to read fresh data through their existing
+// loaders; this cache contains only public catalogue data and estimated prices.
+// This app uses the Data Cache API until Cache Components is enabled.
+const publicCatalogueSnapshot = unstable_cache(
+  loadPublicCatalogue,
+  ['public-vehicle-catalogue-v1'],
+  { revalidate: 60, tags: ['public-vehicle-catalogue'] },
+);
+
 type CatalogueData = { modelsPromise: Promise<PublicVehicle[]> };
 async function HeroModels({ modelsPromise }: CatalogueData) {
   return <VehicleHeroCarousel models={await modelsPromise} />;
@@ -89,7 +100,7 @@ async function CatalogueResults({ modelsPromise }: CatalogueData) {
 }
 
 export default function CarsPage() {
-  const modelsPromise = loadPublicCatalogue();
+  const modelsPromise = publicCatalogueSnapshot();
   return (
     <main className="vehicle-catalogue">
       <VehicleCatalogueHero>
