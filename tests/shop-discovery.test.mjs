@@ -6,6 +6,7 @@ import {
   shopProductSchema,
   productAvailability,
 } from '../lib/shop/discovery.ts';
+import { serviceSchema, generateProductSchema } from '../lib/seo/schema.ts';
 
 const product = {
   pidProduct: 'PHONE_1',
@@ -83,4 +84,16 @@ test('minimum quantities are carried into offers without changing the unit price
   );
   assert.equal(schema.offers.eligibleQuantity.minValue, 5);
   assert.equal(schema.offers.price, product.productPrice);
+});
+test('shared schema helpers do not invent ready-to-ship stock', () => {
+  assert.equal(serviceSchema.offers, undefined);
+  const schema = generateProductSchema({
+    name: 'Order-sourced phone',
+    description: 'For Nigerian buyers',
+    image: 'https://example.com/phone.jpg',
+    price: 500000,
+    url: 'https://www.sureimports.com/shop/phone',
+  });
+  assert.equal(schema.offers.availability, undefined);
+  assert.equal(schema.offers.eligibleRegion.name, 'Nigeria');
 });

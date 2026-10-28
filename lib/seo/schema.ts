@@ -93,10 +93,6 @@ export const serviceSchema = {
     name: 'Nigeria',
   },
   serviceType: 'Import/Export Services',
-  offers: {
-    '@type': 'Offer',
-    availability: 'https://schema.org/InStock',
-  },
 };
 
 // Blog/Article Schema generator
@@ -202,7 +198,10 @@ export function generateProductSchema(product: {
       url: product.url,
       priceCurrency: product.currency || 'NGN',
       price: product.price,
-      availability: `https://schema.org/${product.availability || 'InStock'}`,
+      eligibleRegion: { '@type': 'Country', name: 'Nigeria' },
+      ...(product.availability
+        ? { availability: `https://schema.org/${product.availability}` }
+        : {}),
       seller: {
         '@type': 'Organization',
         name: 'Sure Imports',
