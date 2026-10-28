@@ -1,7 +1,7 @@
 import 'server-only';
 import { prisma } from '@/lib/prisma';
 import { currentUser } from '@/lib/auth/current-user';
-import { guestIdentity } from './guest';
+import { guestIdentity, guestContact } from './guest';
 import { supportBrand } from './policy';
 import { supportStore } from './store';
 import { supportEndpoints } from './http';
@@ -36,10 +36,14 @@ export async function customerIdentity() {
     country: user.country,
   };
 }
-export const customerSupport = supportEndpoints(
-  supportStore(prisma),
-  async () => (await customerIdentity()) || (await guestIdentity()),
-);
+async function supportIdentity(edit: boolean) {
+  const customer = await customerIdentity();
+  if (customer) return customer;
+  const guest = await guestIdentity();
+  if (guest && (!edit || (await guestContact()))) return guest;
+  return null;
+}
+export const customerSupport = supportEndpoints(supportStore(prisma), supportIdentity);
 
 import { attachmentEndpoints } from './attachment-http';
-export const customerAttachments = attachmentEndpoints(prisma, async () => (await customerIdentity()) || (await guestIdentity()));
+export const customerAttachments = attachmentEndpoints(prisma, async () => supportIdentity(true));

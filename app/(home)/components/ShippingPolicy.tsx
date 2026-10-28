@@ -315,15 +315,15 @@ export default function ShippingPolicy() {
 
               <div className="rounded-2xl border border-brand-orange-500/20 bg-brand-orange-500/10 p-8 ">
                 <p className="mb-4 text-lg font-bold text-brand-orange-800 dark:text-brand-orange-200">
-                  Items ordered on the Sure Imports online store have a standard shipping timeline of 10 business days from order to arrival at our Lagos office.
+                  Gadget orders are sourced from China after payment. Estimated delivery to your address in Nigeria is 10–15 business days.
                 </p>
                 <p className="text-base text-brand-orange-700 dark:text-brand-orange-300/80">
-                  We maintain the same timeline for gadgets going to Ghana, Cameroon, and other eligible countries.
+                  The gadget shop and its displayed Naira prices are for Nigeria only. Nationwide doorstep delivery is included in the displayed price.
                 </p>
               </div>
 
               <p className="mt-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
-                For last-mile delivery in Nigeria, we partner with trusted local delivery companies who determine the final delivery speed. You also have the option to pick up your gadget directly from our Lagos office.
+                The 10–15 business day estimate includes delivery to your address. We will update you if a supplier or carrier delay changes your expected delivery date.
               </p>
             </section>
 

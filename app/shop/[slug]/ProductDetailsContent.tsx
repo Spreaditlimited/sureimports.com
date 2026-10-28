@@ -195,13 +195,11 @@ export default function ProductDetailsContent({
                 Sourced from China after you order. Prices and delivery are for
                 Nigeria only.{' '}
                 {product.productStatus === 'available'
-                  ? 'Available to order, subject to supplier confirmation.'
+                  ? 'Available to order, subject to supplier confirmation. Estimated delivery to your address in Nigeria: 10–15 business days after payment.'
                   : product.productStatus === 'unavailable'
                     ? 'Currently unavailable.'
                     : 'Confirm availability before ordering.'}{' '}
-                {/iphone/i.test(product.productName || '')
-                  ? 'Nigeria doorstep delivery is included.'
-                  : 'Confirm delivery arrangements before ordering.'}{' '}
+                Nigeria doorstep delivery is included in the displayed price.{' '}
                 <Link href="/shipping-policy" className="underline">
                   Shipping policy
                 </Link>

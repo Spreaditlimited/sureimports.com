@@ -57,11 +57,9 @@ export default function ProductCard({
         </Link>
         <div className={styles.purchase}>
           <p className={styles.price}>₦{priceNGN.toLocaleString('en-NG')}</p>
-          {/iphone/i.test(name) && (
-            <p className={styles.delivery}>
-              Nigeria doorstep delivery included
-            </p>
-          )}
+          <p className={styles.delivery}>
+            Nigeria doorstep delivery included · 10–15 business days
+          </p>
           {minimumQuantity && minimumQuantity > 1 ? (
             <p className={styles.delivery}>
               Minimum quantity: {minimumQuantity}
