@@ -631,7 +631,7 @@ export default function PublicOrderFlow() {
             )}
             {country?.countryName.trim().toLowerCase() === 'nigeria' && (
               <label>
-                Product type
+                Product shipping override
                 <select
                   className="mt-2 w-full px-4"
                   value={current.productCategory || 'OTHER'}
@@ -645,7 +645,7 @@ export default function PublicOrderFlow() {
                   }
                 >
                   <option value="OTHER">
-                    Other goods (including accessories)
+                    Use order shipping (default)
                   </option>
                   <option value="PHONE">Phone</option>
                   <option value="LAPTOP">Laptop</option>

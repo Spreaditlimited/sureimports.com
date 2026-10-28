@@ -1,4 +1,4 @@
-import { usesDeviceFlatFee } from './deviceShipping';
+import { usesDeviceFlatFee, normalizeDeviceType } from './deviceShipping';
 import { z } from 'zod';
 import { normalizeProductUrl } from '../productUrl';
 
@@ -35,7 +35,7 @@ export function inspectProductLink(link: string) {
 }
 export const productDraftSchema = z.object({
   id: z.string(),
-  productCategory: z.enum(['OTHER', 'PHONE', 'LAPTOP']).default('OTHER'),
+  productCategory: z.preprocess(normalizeDeviceType, z.enum(['OTHER', 'PHONE', 'LAPTOP'])),
   productName: z.string(),
   productLink: z.string(),
   productPrice: z.string(),
@@ -87,6 +87,8 @@ export function productProblem(
   currency: string,
   countryName?: string,
 ) {
+  if (!['OTHER', 'PHONE', 'LAPTOP'].includes(normalizeDeviceType(product.productCategory) as string))
+    return 'Choose a valid product shipping override.';
   const link = inspectProductLink(product.productLink);
   if (!link.url) return 'Please enter a valid product web link.';
   if (link.shop && link.shop.currency !== currency)

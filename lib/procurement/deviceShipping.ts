@@ -3,6 +3,12 @@ export const deviceTypes = ['OTHER', 'PHONE', 'LAPTOP'] as const;
 export type DeviceType = (typeof deviceTypes)[number];
 export const validDeviceType = (value: unknown): value is DeviceType =>
   deviceTypes.includes(value as DeviceType);
+/** Missing overrides inherit the order's weight/volume shipping, not a device fee. */
+export function normalizeDeviceType(value: unknown): unknown {
+  return value == null || (typeof value === 'string' && value.trim() === '')
+    ? 'OTHER'
+    : value;
+}
 export type DeviceRates = { phoneNgn: number; laptopNgn: number };
 export const defaultDeviceRates: DeviceRates = {
   phoneNgn: 25000,
@@ -42,7 +48,7 @@ export function deviceShippingBreakdown(
     otherLines = 0,
     unclassified = 0;
   for (const product of products) {
-    if (rates && !validDeviceType(product.productCategory)) unclassified++;
+    if (rates && !validDeviceType(normalizeDeviceType(product.productCategory))) unclassified++;
     const quantity = Number(product.productQuantity || 0);
     if (
       rates &&
