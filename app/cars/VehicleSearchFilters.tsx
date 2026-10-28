@@ -8,7 +8,8 @@ import {
   SheetDescription,
   SheetClose,
 } from '@/components/ui/sheet';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
+import CatalogueSearch from '@/components/catalogue/CatalogueSearch';
 import VehiclePicker from '@/components/vehicles/VehiclePicker';
 import type { PublicVehicle } from '@/lib/vehicles/data';
 import {
@@ -225,39 +226,17 @@ export default function VehicleSearchFilters({
         {panel()}
       </aside>
       <div className="vehicle-search-results">
-        <div
-          role="search"
-          aria-label="Find a vehicle"
-          className="vehicle-search vehicle-discovery-search"
-        >
-          <Search size={20} aria-hidden="true" />
-          <label htmlFor="vehicle-query" className="sr-only">
-            Search vehicles
-          </label>
-          <input
-            id="vehicle-query"
-            type="search"
-            maxLength={200}
-            value={filters.q}
-            onChange={(e) => onChange({ q: e.target.value })}
-            placeholder="Model, brand or budget…"
-            aria-describedby="vehicle-search-help"
-          />
-          {filters.q && (
-            <button
-              type="button"
-              className="vehicle-query-clear"
-              aria-label="Clear vehicle search"
-              onClick={() => onChange({ q: '' })}
-            >
-              <X size={18} aria-hidden="true" />
-            </button>
-          )}
-        </div>
-        <p id="vehicle-search-help" className="vehicle-discovery-help">
-          Results update as you type. Search by model, use, seats or landed
-          budget.
-        </p>
+        <CatalogueSearch
+          label="Search vehicles"
+          placeholder="Model, brand or budget…"
+          value={filters.q}
+          onChange={(q) => onChange({ q })}
+          onSubmit={(event) => {
+            event.preventDefault();
+            onChange({ q: filters.q.trim() });
+          }}
+          helper="Results update as you type. Search by model, use, seats or landed budget."
+        />
         <div
           className="vehicle-query-examples"
           aria-label="Example vehicle searches"

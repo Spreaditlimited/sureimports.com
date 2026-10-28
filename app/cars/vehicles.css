@@ -2185,41 +2185,6 @@
   justify-content: center;
 }
 
-/* Keep the search field flexible at narrow widths, with a separate touch target. */
-.vehicle-discovery .vehicle-discovery-search {
-  padding: 4px 8px 4px 14px;
-  min-height: 54px;
-  gap: 10px;
-}
-.vehicle-discovery-search > svg {
-  flex-shrink: 0;
-}
-.vehicle-discovery .vehicle-discovery-search input {
-  appearance: none;
-  -webkit-appearance: none;
-  flex: 1;
-  width: 0;
-  min-height: 44px;
-  padding: 0;
-  border: 0;
-  box-shadow: none;
-  background: transparent;
-}
-.vehicle-discovery-search input::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-}
-.vehicle-discovery-search:focus-within {
-  outline: 2px solid var(--si-primary);
-  outline-offset: 2px;
-}
-.vehicle-query-clear {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 44px;
-  height: 44px;
-  border-radius: 8px;
-}
 .vehicle-query-examples {
   display: flex;
   flex-wrap: wrap;
