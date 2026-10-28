@@ -2184,20 +2184,3 @@
 .vehicle-hero-copy .vehicle-hero-note {
   justify-content: center;
 }
-
-.vehicle-query-examples {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin: 10px 0;
-  font-size: 12px;
-}
-.vehicle-query-examples button {
-  min-height: 44px;
-  padding: 6px 10px;
-  border: 1px solid var(--si-border);
-  border-radius: 8px;
-  background: var(--si-surface);
-  color: var(--si-ink);
-}

@@ -135,16 +135,28 @@ export default function ShopContent({
           id="shop-products"
           className="mx-auto max-w-[1440px] scroll-mt-28 px-4 py-12 sm:px-6 lg:px-8"
         >
-          <h2 className="mb-6 text-2xl font-semibold text-[var(--si-ink)]">
-            {query.q
-              ? 'Search results'
-              : selectedCategory?.name || 'All products'}
-          </h2>
+          <div className={heroStyles.catalogueHeading}>
+            <h2 className="text-2xl font-semibold text-[var(--si-ink)]">
+              {query.q
+                ? 'Search results'
+                : selectedCategory?.name || 'All products'}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setShowCartSidebar(true)}
+              className={heroStyles.cartButton}
+              aria-label={`Open cart, ${cartCount} items`}
+            >
+              <ShoppingCart size={19} aria-hidden="true" />
+              <span className={heroStyles.cartLabel}>Cart</span>
+              <span className={heroStyles.cartCount}>{cartCount}</span>
+            </button>
+          </div>
           <div className={heroStyles.toolbar}>
             <div className={heroStyles.searchRow}>
               <CatalogueSearch
-                label="Search products"
-                placeholder="Products or models…"
+                label="Search catalogue"
+                placeholder="Search by brand or model…"
                 value={searchQuery}
                 onChange={setSearchQuery}
                 onClear={() => {
@@ -156,7 +168,7 @@ export default function ShopContent({
                     ),
                   );
                 }}
-                helper="Search by product, brand or model."
+                helper="Enter a brand or model, then select Search."
                 action={shopListingHref({ ...query, q: '', page: 1 })}
                 onSubmit={(event) => {
                   event.preventDefault();
@@ -171,16 +183,6 @@ export default function ShopContent({
                   );
                 }}
               />
-              <button
-                type="button"
-                onClick={() => setShowCartSidebar(true)}
-                className={heroStyles.cartButton}
-                aria-label={`Open cart, ${cartCount} items`}
-              >
-                <ShoppingCart size={19} aria-hidden="true" />
-                <span className={heroStyles.cartLabel}>Cart</span>
-                <span className={heroStyles.cartCount}>{cartCount}</span>
-              </button>
             </div>
 
             <div

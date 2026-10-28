@@ -1,5 +1,5 @@
 'use client';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   Sheet,
   SheetTrigger,
@@ -36,6 +36,10 @@ export default function VehicleSearchFilters({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(filters.q);
+  useEffect(() => {
+    setSearchQuery(filters.q);
+  }, [filters.q]);
   const [tray, setTray] = useState<HTMLDivElement | null>(null);
   const picker = (
     key: keyof VehicleFilters,
@@ -227,33 +231,20 @@ export default function VehicleSearchFilters({
       </aside>
       <div className="vehicle-search-results">
         <CatalogueSearch
-          label="Search vehicles"
-          placeholder="Model, brand or budget…"
-          value={filters.q}
-          onChange={(q) => onChange({ q })}
+          label="Search catalogue"
+          placeholder="Search by brand or model…"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onClear={() => {
+            setSearchQuery('');
+            onChange({ q: '' });
+          }}
           onSubmit={(event) => {
             event.preventDefault();
-            onChange({ q: filters.q.trim() });
+            onChange({ q: searchQuery.trim() });
           }}
-          helper="Results update as you type. Search by model, use, seats or landed budget."
+          helper="Enter a brand or model, then select Search."
         />
-        <div
-          className="vehicle-query-examples"
-          aria-label="Example vehicle searches"
-        >
-          <span>Try:</span>
-          {['BYD', 'Electric SUV under ₦30m', '7-seater', 'Delivery van'].map(
-            (example) => (
-              <button
-                type="button"
-                key={example}
-                onClick={() => onChange({ q: example })}
-              >
-                {example}
-              </button>
-            ),
-          )}
-        </div>
         <div className="vehicle-catalogue-controls">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
