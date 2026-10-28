@@ -39,6 +39,7 @@ export default function CatalogueSearch({
         </label>
         <input
           id={id}
+          data-si-unstyled
           className={styles.input}
           type="search"
           name="q"
