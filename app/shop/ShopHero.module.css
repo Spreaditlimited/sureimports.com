@@ -167,11 +167,17 @@
   }
 }
 
-.searchSubmit {
+/* Keep the embedded action inside the field despite global submit-button sizes. */
+.searchField .searchSubmit.searchSubmit[type='submit'] {
   position: absolute;
-  right: 6px;
-  top: 6px;
-  height: 40px;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-height: 44px;
   padding: 0 12px;
   border-radius: 8px;
   background: var(--si-ink);
