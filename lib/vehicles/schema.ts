@@ -15,6 +15,7 @@ export function vehicleEntitySchema(vehicle: PublicVehicle) {
         url: `${url}?configuration=${encodeURIComponent(variant.id)}`,
         price,
         priceCurrency: 'NGN',
+        eligibleRegion: { '@type': 'Country', name: 'Nigeria' },
         seller: { '@type': 'Organization', name: 'Sure Imports' },
       },
     ];

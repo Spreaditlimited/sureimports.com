@@ -108,7 +108,7 @@ export default function ShopContent({
           }
           description={
             selectedCategory?.description ||
-            'Explore technology sourced from China, with clear pricing, order tracking and delivery to your doorstep in Nigeria.'
+            'Explore technology sourced from China after you order, with prices in Naira for Nigerian buyers, order tracking and delivery within Nigeria.'
           }
           primary={{ href: '#shop-products', label: 'Browse products' }}
           secondary={{ href: '/contact-us', label: 'Get help choosing' }}

@@ -307,6 +307,11 @@ export default function VehicleDetail({
               <ShieldCheck size={18} /> Shipping includes clearing, all duties
               and taxes.
             </p>
+            <p>
+              Vehicles are sourced from China on order. These Naira estimates
+              and delivery arrangements apply to Nigeria only; we confirm the
+              final specification and availability before your quotation.
+            </p>
           </div>
           <Link className="vehicle-button" href="#enquire">
             {v.price ? 'Request this vehicle' : 'Request a quotation'}

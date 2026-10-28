@@ -192,8 +192,10 @@ export default function ProductDetailsContent({
               </div>
 
               <p className="mb-4 text-sm text-slate-600 dark:text-slate-300">
+                Sourced from China after you order. Prices and delivery are for
+                Nigeria only.{' '}
                 {product.productStatus === 'available'
-                  ? 'Available to order.'
+                  ? 'Available to order, subject to supplier confirmation.'
                   : product.productStatus === 'unavailable'
                     ? 'Currently unavailable.'
                     : 'Confirm availability before ordering.'}{' '}

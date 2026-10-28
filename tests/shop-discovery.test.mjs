@@ -29,12 +29,13 @@ test('category, query and page survive crawlable pagination without tracking par
   for (const page of ['0', '-3', 'oops', 'Infinity', '99999999999999999'])
     assert.equal(parseShopQuery({ page }).page, 1);
 });
-test('public product schema matches real price, SKU, condition and confirmed stock', () => {
+test('public product schema matches Nigerian price and avoids claiming on-order stock', () => {
   const schema = shopProductSchema(product, 'https://example.com/phone.jpg');
   assert.equal(schema['@type'], 'Product');
   assert.equal(schema.offers.price, 991700);
   assert.equal(schema.offers.priceCurrency, 'NGN');
-  assert.equal(schema.offers.availability, 'https://schema.org/InStock');
+  assert.equal(schema.offers.availability, undefined);
+  assert.equal(schema.offers.eligibleRegion.name, 'Nigeria');
   assert.equal(schema.itemCondition, 'https://schema.org/RefurbishedCondition');
   assert.equal(schema.sku, 'PHONE_1');
   assert.equal(schema.gtin, undefined);

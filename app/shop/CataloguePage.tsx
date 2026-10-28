@@ -17,7 +17,7 @@ export function catalogueMetadata(query: ShopQuery): Metadata {
   const title = `${category ? `${category.name} from China to Nigeria` : 'Shop Phones, Laptops and Watches'}${query.page > 1 ? ` — Page ${query.page}` : ''}`;
   const description =
     category?.description ||
-    'Browse phones, laptops and watches from Sure Imports. Compare product specifications, condition, prices and minimum order quantities.';
+    'Shop phones, laptops and watches sourced from China on order for delivery in Nigeria. Compare specifications, condition and prices in Naira for Nigerian buyers.';
   const url = `${SHOP_ORIGIN}${shopListingHref(query)}`;
   const image = `${SHOP_ORIGIN}/images/sure-imports-social-card.png`;
   return {
