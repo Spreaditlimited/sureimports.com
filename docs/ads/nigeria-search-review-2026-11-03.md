@@ -92,11 +92,11 @@ Sitelinks:
 
 ## Conversion investigation and fix
 
-The paused UK Search campaign spent US$73.23 for 61 clicks and recorded zero conversions. The existing `Sure Imports Sign up` action has recorded 55 conversions historically, so a completely broken Google tag is not established. Its trigger is a page load at `/auth/account-creation-success`; the main Next.js signup flow reaches that URL via client navigation, creating a measurement gap. The site now sends the new Ads event with its unique registration event ID only after the registration API succeeds and optional marketing consent is present. The former page-load action is secondary to prevent it from counting alongside the new event in the primary Conversions column. No test signup has been attributed to a paid click yet, so live attribution still needs validation before the campaign runs.
+The paused UK Search campaign spent US$73.23 for 61 clicks and recorded zero conversions. The existing `Sure Imports Sign up` action has recorded 55 conversions historically, so a completely broken Google tag is not established. Its trigger is a page load at `/auth/account-creation-success`; the Next.js signup flows reach that URL via client navigation, creating a measurement gap. The site now sends the new Ads event with its unique registration event ID only after the registration API succeeds and optional marketing consent is present, including the active sourcing signup path. The former page-load action is secondary to prevent it from counting alongside the new event in the primary Conversions column. No test signup has been attributed to a paid click yet, so live attribution still needs validation before the campaign runs.
 
 ## Release gate
 
-1. Publish the website code through Git and verify its Git-sourced production deployment.
+1. Publish the website code through Git and verify its Git-sourced production deployment. The initial WhatsApp and conversion change is live from Git commit `565b18475849b09ab44e3959fbdbd914995f6ae9`; the sourcing-path follow-up must pass the same gate.
 2. Validate the new signup event in Google Tag Assistant with a real consented test registration. Avoid interpreting a zero-conversion campaign as a tag failure until an actual attributed signup has occurred.
 3. Add the campaign negative keywords and inspect the ad and image approval status.
 4. Show the owner this review. Publish or enable the campaign only after explicit approval.

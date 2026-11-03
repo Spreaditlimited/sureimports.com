@@ -1,6 +1,7 @@
 'use client';
 
 import { executePublicCaptcha } from '@/lib/security/useRecaptchaV3';
+import { trackRegistrationConversion } from '@/lib/marketing/facebookEvents';
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Control, useForm, UseFormReturn } from 'react-hook-form';
@@ -367,6 +368,7 @@ interface ApiResponse {
   statusx: string;
   successx: boolean;
   userx: User;
+  registrationConversion?: { eventId: string; method: string } | null;
   // Add other properties as needed
 }
 
@@ -449,6 +451,7 @@ const SignupPageContainer: React.FC = () => {
       });
       const data: ApiResponse = await res.json();
       if (data.successx) {
+        trackRegistrationConversion(data.registrationConversion);
         router.push('/auth/account-creation-success');
         setLoading(false);
       } else {
