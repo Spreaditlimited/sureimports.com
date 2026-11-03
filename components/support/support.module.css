@@ -552,6 +552,47 @@
   border-radius: 12px;
   box-shadow: var(--si-shadow);
 }
+.globalWhatsapp {
+  position: fixed;
+  z-index: 45;
+  right: 20px;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  width: min(340px, calc(100vw - 40px));
+  pointer-events: none;
+}
+.globalWhatsapp .whatsappPicker {
+  width: 100%;
+  pointer-events: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+.globalWhatsapp .whatsappPicker > div {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+.globalWhatsapp .whatsappTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  width: auto;
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--si-primary);
+  color: var(--si-on-primary);
+  box-shadow: 0 6px 24px #0003;
+  font-weight: 600;
+}
+.globalWhatsapp .whatsappTrigger:hover {
+  background: var(--si-primary);
+  filter: brightness(1.08);
+}
+.globalWhatsapp [data-whatsapp-tray] {
+  left: auto;
+  right: 0;
+  width: 100%;
+}
 
 /* Native arrows ignore right padding; position a consistent inset chevron. */
 .threadHeader select,

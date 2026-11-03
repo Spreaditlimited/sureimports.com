@@ -13,6 +13,7 @@ import InstallProvider from '@/components/install/InstallProvider';
 import DeferredGlobalEnhancements from '@/components/DeferredGlobalEnhancements';
 import OpenAIAdsPixel from '@/components/OpenAIAdsPixel';
 import GoogleMarketingTags from '@/components/GoogleMarketingTags';
+import { supportChatEnabled } from '@/lib/support/availability';
 import { JsonLdScript } from '@/components/seo/JsonLd';
 import SiteThemeProvider from '@/components/theme/SiteThemeProvider';
 import { AffiliateTracker } from '@/app/(home)/components/AffiliateTracker';
@@ -156,14 +157,14 @@ export default function RootLayout({
             <Script src="/whatsapp-tracking.js" strategy="afterInteractive" />
             <InstallProvider>
               <SupportProvider
-                enabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}
+                enabled={supportChatEnabled}
               >
                 {children}
               </SupportProvider>
             </InstallProvider>
 
             <DeferredGlobalEnhancements
-              supportEnabled={process.env.SUPPORT_CHAT_ENABLED === 'true'}
+              supportEnabled
             />
             <Toaster />
             <SonnerToaster position="top-right" richColors />

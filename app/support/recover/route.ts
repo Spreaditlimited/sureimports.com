@@ -2,8 +2,10 @@ import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 import { cookieName } from '@/lib/support/guest';
 import { verifySupportRecoveryToken } from '@/lib/support/recovery';
+import { supportChatEnabled } from '@/lib/support/availability';
 
 export async function GET(request: Request) {
+  if (!supportChatEnabled) return new Response('Support is unavailable.', { status: 404 });
   const token = new URL(request.url).searchParams.get('token') || '';
   const recovery = verifySupportRecoveryToken(token);
   if (!recovery) return new Response('This chat link has expired.', { status: 410 });

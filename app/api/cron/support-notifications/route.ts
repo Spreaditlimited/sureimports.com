@@ -1,4 +1,5 @@
 import mailTemplate from '@/lib/email/temp/mailTemplate2';
+import { supportChatEnabled } from '@/lib/support/availability';
 import { prisma } from '@/lib/prisma';
 import transporter from '@/lib/email/config/nodemailerConfig';
 import { deliverSupportNotifications } from '@/lib/support/notifications';
@@ -10,7 +11,7 @@ export async function GET(request: Request) {
   )
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   if (
-    process.env.SUPPORT_CHAT_ENABLED !== 'true' ||
+    !supportChatEnabled ||
     process.env.SUPPORT_NOTIFICATIONS_ENABLED !== 'true'
   )
     return Response.json({ disabled: true });

@@ -1,4 +1,5 @@
 import 'server-only';
+import { supportChatEnabled } from './availability';
 import { SupportError, trustedSupportMutation } from './policy';
 export async function publicSupportRequest(
   request: Request,
@@ -6,7 +7,7 @@ export async function publicSupportRequest(
 ) {
   const headers = { 'Cache-Control': 'private, no-store', Vary: 'Cookie' };
   try {
-    if (process.env.SUPPORT_CHAT_ENABLED !== 'true')
+    if (!supportChatEnabled)
       throw new SupportError(404, 'Support is not available.');
     if (request.method !== 'GET' && !trustedSupportMutation(request))
       throw new SupportError(403, 'Please use the support page.');

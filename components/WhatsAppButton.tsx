@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { useSupportEnabled } from './support/SupportProvider';
+import { useSupportEnabled, useWhatsAppOnly } from './support/SupportProvider';
 import { ChevronDown, X } from 'lucide-react';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -18,6 +18,7 @@ interface WhatsAppButtonProps {
   variant?: 'floating' | 'inline';
   triggerClassName?: string;
   triggerLabel?: string;
+  showInlineIcon?: boolean;
 }
 
 const LegacyWhatsAppButton: React.FC<WhatsAppButtonProps> = ({
@@ -28,6 +29,7 @@ const LegacyWhatsAppButton: React.FC<WhatsAppButtonProps> = ({
   variant = 'floating',
   triggerClassName,
   triggerLabel = 'Chat on WhatsApp',
+  showInlineIcon = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [managedContacts, setManagedContacts] = useState<WhatsAppContact[] | null>(
@@ -211,7 +213,7 @@ const LegacyWhatsAppButton: React.FC<WhatsAppButtonProps> = ({
         aria-label={variant === 'inline' ? triggerLabel : 'Contact us on WhatsApp'}
         title="Contact us on WhatsApp"
       >
-        {variant === 'inline' ? triggerLabel : <span className="relative flex items-center">
+        {variant === 'inline' ? <>{showInlineIcon && <FaWhatsapp size={20} aria-hidden="true" />}<span>{triggerLabel}</span></> : <span className="relative flex items-center">
           <FaWhatsapp size={28} />
           <ChevronDown
             size={14}
@@ -279,6 +281,7 @@ const LegacyWhatsAppButton: React.FC<WhatsAppButtonProps> = ({
 
 export default function WhatsAppButton(props: WhatsAppButtonProps) {
  const supportEnabled = useSupportEnabled();
- if (supportEnabled && (props.variant || 'floating') === 'floating') return null;
+ const whatsappOnly = useWhatsAppOnly();
+ if ((supportEnabled || whatsappOnly) && (props.variant || 'floating') === 'floating') return null;
  return <LegacyWhatsAppButton {...props}/>;
 }

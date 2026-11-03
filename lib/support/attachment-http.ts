@@ -1,4 +1,5 @@
 import 'server-only';
+import { supportChatEnabled } from './availability';
 import { createHash, randomBytes } from 'node:crypto';
 import type { PrismaClient } from '@prisma/client';
 import { conversationId, requestKey, SupportError, trustedSupportMutation } from './policy';
@@ -11,7 +12,7 @@ export function attachmentEndpoints(db: PrismaClient, resolve: (edit:boolean)=>P
   const store = supportStore(db);
   return async (request:Request, id:string, messageId?:string) => {
     try {
-      if (process.env.SUPPORT_CHAT_ENABLED !== 'true') throw new SupportError(404,'Support is unavailable.');
+      if (!supportChatEnabled) throw new SupportError(404,'Support is unavailable.');
       const edit = request.method === 'POST';
       if (edit && !trustedSupportMutation(request)) throw new SupportError(403,'Use the support inbox.');
       const identity = await resolve(edit);

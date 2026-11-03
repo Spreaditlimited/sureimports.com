@@ -1,4 +1,5 @@
 import 'server-only';
+import { supportChatEnabled } from './availability';
 import type { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 import {
@@ -162,7 +163,7 @@ export function managementEndpoints(
     id?: string,
   ) => {
     try {
-      if (process.env.SUPPORT_CHAT_ENABLED !== 'true')
+      if (!supportChatEnabled)
         throw new SupportError(404, 'Support is unavailable.');
       if (request.method !== 'GET' && !trustedSupportMutation(request))
         throw new SupportError(403, 'Use the support inbox.');
