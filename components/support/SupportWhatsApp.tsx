@@ -7,7 +7,7 @@ export default function SupportWhatsApp() {
       <WhatsAppButton
         waID="CUR7YKW3K3RBA1"
         variant="inline"
-        triggerLabel="WhatsApp support"
+        triggerLabel="Support"
         showInlineIcon
         triggerClassName={styles.whatsappTrigger}
       />
