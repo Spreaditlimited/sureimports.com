@@ -7,7 +7,7 @@ Status on 3 November 2026: **Google Ads draft; not published or serving.** Accou
 - Name: `SI | Nigeria | China Buying Agents | Signups | Search`
 - Objective and type: Leads, Google Search.
 - Conversion goal: Sign-ups; primary action `Sure Imports - Completed signup (event)`.
-- Landing page: `https://www.sureimports.com/buy-from-chinese-websites`.
+- Ad final URL: `https://www.sureimports.com/buy-from-chinese-websites/video` (owner correction, 3 November 2026). The live page returns HTTP 200 and has a Create a Free Account link. After owner Touch ID verification, Google Ads showed "All changes saved"; the ad final URL, revised headline and description, and sitelink were verified again after reloading the draft. The optional keyword-suggestion URL still points to the parent buying page and does not control ad clicks.
 - Location: Nigeria, people in or regularly in Nigeria. Language: English.
 - Google Search Partners: off. Google Display Network: off. AI Max, text customisation, and final URL expansion: off.
 - Bidding: Maximise clicks with a US$1.00 maximum CPC bid limit for the initial measurement phase. Reassess after enough verified signup events are recorded.
@@ -70,13 +70,13 @@ Headlines (Google rotates and combines them):
 5. Sure Imports Buying Support
 6. Source From China To Nigeria
 7. China Purchasing Support
-8. Start Your Order Online
+8. Watch How 1688 Orders Work
 
 Descriptions:
 
 1. Send 1688 or Taobao product links. We help with buying, product checks and shipping.
 2. Start your order in Nigeria. Review costs and track progress in your account.
-3. Buy from Chinese websites through one order flow for products, payment and delivery.
+3. Watch how buying works, then create an account to submit links and start your order.
 4. Create a free account, add product links and get support from the Sure Imports team.
 
 Image: an imagegen-created, unbranded sourcing workspace, uploaded to Google Ads as square and 1.91:1 crops. Source asset: `assets/ads/nigeria-search/sourcing-workspace.png`. The image is attached to the draft, but whether Google serves it depends on its image-asset approval and account eligibility.
@@ -86,7 +86,7 @@ Sitelinks:
 | Text | Destination | Description lines |
 | --- | --- | --- |
 | Create Free Account | `/auth/signup` | Start your Sure Imports order; Save links and track progress |
-| Watch Buying Guide | `/buy-from-chinese-websites/video` | See how Chinese orders work; Prepare links before you buy |
+| Explore Buying Service | `/buy-from-chinese-websites` | See our buying service and steps; Choose how to start your order |
 | Check Shipping Rates | `/shipping-rate` | View China shipping estimates; Plan costs before placing an order |
 | Contact Sure Imports | `/contact-us` | Ask about your China order; Get help before you commit |
 
