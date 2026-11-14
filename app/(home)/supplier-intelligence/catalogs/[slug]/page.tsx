@@ -8,6 +8,7 @@ import Footer from '@/app/(home)/components/Footer';
 import Navigation from '@/app/(home)/components/Navigation';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { catalogSearchContent } from '@/lib/intelligence/catalogSearchContent';
+import { catalogSourcingContent } from '@/lib/intelligence/catalogSourcingContent';
 import {
   freeCatalogBySlug,
   freeCatalogs,
@@ -28,12 +29,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const catalog = freeCatalogBySlug.get(slug);
   const content = catalogSearchContent[slug];
-  if (!catalog || !content)
+  const sourcing = catalogSourcingContent[slug];
+  if (!catalog || !content || !sourcing)
     return { title: 'Catalog not found | Sure Imports' };
 
   const url = `${baseUrl}/supplier-intelligence/catalogs/${slug}`;
-  const title = `Free ${catalog.title} Catalog`;
-  const description = `${content.intro.split('.')[0]}.`;
+  const title = `${sourcing.heading} | Free catalog`;
+  const description = `${sourcing.summary.split('. ')[0]}.`;
   return {
     title,
     description,
@@ -60,7 +62,8 @@ export default async function FreeCatalogPage({ params }: Props) {
   const { slug } = await params;
   const catalog = freeCatalogBySlug.get(slug);
   const content = catalogSearchContent[slug];
-  if (!catalog || !content) notFound();
+  const sourcing = catalogSourcingContent[slug];
+  if (!catalog || !content || !sourcing) notFound();
 
   const url = `${baseUrl}/supplier-intelligence/catalogs/${slug}`;
   const pdfUrl = `/api/intelligence/free-catalogs/${slug}/download`;
@@ -77,8 +80,8 @@ export default async function FreeCatalogPage({ params }: Props) {
         '@type': 'CollectionPage',
         '@id': `${url}#page`,
         url,
-        name: `${catalog.title} Catalog`,
-        description: content.intro,
+        name: sourcing.heading,
+        description: sourcing.summary,
         image: catalog.coverImageUrl,
         mainEntity: { '@id': `${url}#document` },
       },
@@ -86,7 +89,7 @@ export default async function FreeCatalogPage({ params }: Props) {
         '@type': 'DigitalDocument',
         '@id': `${url}#document`,
         name: `${catalog.title} Catalog`,
-        description: content.intro,
+        description: sourcing.summary,
         encodingFormat: 'application/pdf',
         thumbnailUrl: catalog.coverImageUrl,
         numberOfPages: catalog.pageCount,
@@ -146,8 +149,8 @@ export default async function FreeCatalogPage({ params }: Props) {
             </div>
             <div className={styles.heroContent}>
               <p className={styles.eyebrow}>Free product catalog</p>
-              <h1>{catalog.title}</h1>
-              <p className={styles.lead}>{content.intro}</p>
+              <h1>{sourcing.heading}</h1>
+              <p className={styles.lead}>{sourcing.summary}</p>
               <dl className={styles.facts}>
                 <div>
                   <dt>Format</dt>
@@ -187,6 +190,7 @@ export default async function FreeCatalogPage({ params }: Props) {
             <section aria-labelledby="inside-heading">
               <p className={styles.eyebrow}>What you will find</p>
               <h2 id="inside-heading">Inside the catalog</h2>
+              <p className={styles.insideIntro}>{content.intro}</p>
               <ul className={styles.inside}>
                 {content.inside.map((item) => (
                   <li key={item}>{item}</li>
@@ -204,6 +208,46 @@ export default async function FreeCatalogPage({ params }: Props) {
               </p>
             </section>
           </div>
+
+          <section
+            className={styles.sourcing}
+            aria-labelledby="sourcing-heading"
+          >
+            <div className={styles.sourcingIntro}>
+              <p className={styles.eyebrow}>China sourcing guide</p>
+              <h2 id="sourcing-heading">
+                From a catalog listing to a confirmed order
+              </h2>
+              <p>{sourcing.buyingNote}</p>
+              <p>
+                This catalog is a shortlist, not a live stock list. For delivery
+                to Nigeria, send us the product code or PDF page, your chosen
+                specifications, quantity and delivery city. We will check the
+                supplier&apos;s current terms and give you a final delivered
+                quote before you pay.
+              </p>
+              <p>
+                Planning a larger import? See our{' '}
+                <Link href="/import-from-china-to-nigeria">
+                  China to Nigeria import guide
+                </Link>{' '}
+                for buying, shipping and sourcing routes.
+              </p>
+            </div>
+            <div className={styles.checklist}>
+              <h3>What to send for a useful quote</h3>
+              <ol>
+                {sourcing.checks.map((check) => (
+                  <li key={check}>{check}</li>
+                ))}
+              </ol>
+              <p>
+                {priceCurrency} prices in the PDF are supplier references. Your
+                confirmed quote accounts for the selected variant, quantity and
+                delivery; it may differ from the catalog figure.
+              </p>
+            </div>
+          </section>
         </article>
 
         <section className={styles.related} aria-labelledby="related-heading">

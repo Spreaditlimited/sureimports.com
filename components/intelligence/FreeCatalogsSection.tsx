@@ -4,6 +4,7 @@ import { ArrowDownToLine, ArrowUpRight } from 'lucide-react';
 
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { freeCatalogs } from '@/lib/intelligence/freeCatalogs';
+import { catalogSourcingContent } from '@/lib/intelligence/catalogSourcingContent';
 
 import styles from './FreeCatalogsSection.module.css';
 
@@ -28,7 +29,7 @@ export default function FreeCatalogsSection() {
         </p>
         <h4>
           <Link href={`/supplier-intelligence/catalogs/${catalog.slug}`}>
-            {catalog.title}
+            {catalogSourcingContent[catalog.slug].heading}
           </Link>
         </h4>
         <p>{catalog.description}</p>
@@ -59,12 +60,13 @@ export default function FreeCatalogsSection() {
           <div>
             <p className={styles.eyebrow}>Complimentary catalogs</p>
             <h2 id="free-catalogs-heading" className={styles.heading}>
-              Discover the collection.
+              Source products from China.
             </h2>
           </div>
           <p className={styles.introCopy}>
-            Browse free product catalogs, choose an item, and send us its code
-            or page on WhatsApp for an availability check and final quote.
+            Explore products to import from China. Download a free catalog,
+            choose a listing, and send us its code or page on WhatsApp for a
+            supplier check and delivered quote.
           </p>
         </div>
 
@@ -100,7 +102,7 @@ export default function FreeCatalogsSection() {
                   <Link
                     href={`/supplier-intelligence/catalogs/${catalog.slug}`}
                   >
-                    {catalog.title}
+                    {catalogSourcingContent[catalog.slug].heading}
                   </Link>
                 </h3>
                 <p className={styles.description}>{catalog.description}</p>
@@ -180,9 +182,11 @@ export default function FreeCatalogsSection() {
             </p>
           </div>
           <p className={styles.collectionIntro}>
-            These catalogs show supplier product references and RMB prices. Tell
-            us the product and variant you want; we will confirm sourcing,
-            minimum quantity, delivery and your final price before payment.
+            These focused China supplier catalogs show product specifications
+            and RMB price references. Each catalog page explains what to check
+            before sourcing its products. Tell us the exact variant and
+            quantity; we will confirm availability, minimum order, delivery and
+            your final price before payment.
           </p>
           <div className={styles.productGrid}>
             {productCatalogs.slice(0, 6).map(renderProductCatalog)}
