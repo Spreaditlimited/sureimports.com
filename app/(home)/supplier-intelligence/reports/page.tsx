@@ -10,13 +10,15 @@ import { getPublicPublishedReports } from '@/lib/intelligence/reports';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'China Supplier Reports and Free Product Catalogs | Sure Imports',
+  title: 'China Supplier Reports and Free Product Catalogs',
   description:
-    'Search paid China supplier reports and download free product catalogs, including Futura lace frontal wigs. Choose a style and ask Sure Imports to source it.',
+    'Search paid China supplier reports and browse free product catalogs for wigs, phone accessories, chargers, audio, wearables and more. Download a PDF and request a sourcing quote.',
   keywords: [
     'China supplier reports',
     'free product catalogs',
     'Futura wigs catalog',
+    'phone accessories catalog',
+    'China product catalog',
     'search China manufacturers',
     'verified supplier list China',
     'China sourcing reports',

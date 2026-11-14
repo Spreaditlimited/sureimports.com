@@ -42,6 +42,24 @@
   letter-spacing: -0.045em;
 }
 
+.catalogTitle a,
+.productContent h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.catalogTitle a:hover,
+.productContent h4 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.catalogTitle a:focus-visible,
+.productContent h4 a:focus-visible {
+  outline: 3px solid #a56d55;
+  outline-offset: 4px;
+}
+
 .heading {
   margin: 0;
   font-size: clamp(2.45rem, 5vw, 4.2rem);

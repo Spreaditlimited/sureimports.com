@@ -25,3 +25,8 @@ are each assigned to one catalog.
 The published PDF and cover IDs are recorded in `lib/intelligence/freeCatalogs.ts`.
 Product prices are supplier references; the website asks customers to confirm
 availability, minimum quantity, delivery, and their final quote before payment.
+
+Each catalog has a public HTML page under `/supplier-intelligence/catalogs/`.
+Those pages carry the canonical URLs and appear in the sitemap; the signed PDF
+download route stays outside the search index. Add a matching entry to
+`lib/intelligence/catalogSearchContent.ts` when publishing another catalog.

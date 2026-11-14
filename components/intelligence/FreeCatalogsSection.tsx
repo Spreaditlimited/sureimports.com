@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { ArrowDownToLine, ArrowUpRight } from 'lucide-react';
 
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -25,7 +26,11 @@ export default function FreeCatalogsSection() {
           Free catalog <span aria-hidden="true">·</span> {catalog.pageCount}{' '}
           pages
         </p>
-        <h4>{catalog.title}</h4>
+        <h4>
+          <Link href={`/supplier-intelligence/catalogs/${catalog.slug}`}>
+            {catalog.title}
+          </Link>
+        </h4>
         <p>{catalog.description}</p>
         <div className={styles.productActions}>
           <a href={`/api/intelligence/free-catalogs/${catalog.slug}/download`}>
@@ -91,7 +96,13 @@ export default function FreeCatalogsSection() {
                   <span>Free to download</span>
                   <span>{catalog.pageCount}-page PDF</span>
                 </div>
-                <h3 className={styles.catalogTitle}>{catalog.title}</h3>
+                <h3 className={styles.catalogTitle}>
+                  <Link
+                    href={`/supplier-intelligence/catalogs/${catalog.slug}`}
+                  >
+                    {catalog.title}
+                  </Link>
+                </h3>
                 <p className={styles.description}>{catalog.description}</p>
 
                 <dl className={styles.details}>
