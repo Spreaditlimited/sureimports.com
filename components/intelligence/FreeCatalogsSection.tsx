@@ -40,7 +40,7 @@ export default function FreeCatalogsSection() {
                 <div className="relative aspect-[595/842] w-full max-w-[320px] overflow-hidden rounded-xl bg-white shadow-2xl shadow-slate-950/15">
                   <Image
                     src={catalog.coverImageUrl}
-                    alt={`${catalog.title} catalog cover showing three wigs from the collection`}
+                    alt={`${catalog.title} catalog cover featuring a long brown lace frontal wig`}
                     fill
                     sizes="(max-width: 1023px) 320px, 320px"
                     className="object-cover"

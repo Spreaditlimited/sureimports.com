@@ -17,9 +17,9 @@ export const freeCatalogs: FreeCatalog[] = [
     description:
       'Browse 150 photographed lace frontal wig styles made with Japanese Futura fibre. The catalog includes style codes, 13 × 4 and 13 × 6 lace options, a one-piece minimum order and indicative USD product prices.',
     coverImageUrl:
-      'https://res.cloudinary.com/djprcwnsz/image/upload/v1794658233/sureimports/free-catalogs/futura-premium-wigs-cover-2026.png',
+      'https://res.cloudinary.com/djprcwnsz/image/upload/v1794659360/sureimports/free-catalogs/futura-premium-wigs-cover-minimal-2026.png',
     cloudinaryPublicId:
-      'sureimports/free-catalogs/futura-premium-wigs-catalogue-2026.pdf',
+      'sureimports/free-catalogs/futura-premium-wigs-catalogue-minimal-2026.pdf',
     filename: 'Sure-Imports-Futura-Premium-Wigs-Catalogue.pdf',
     styleCount: 150,
     pageCount: 7,
