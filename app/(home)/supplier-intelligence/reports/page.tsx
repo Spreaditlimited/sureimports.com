@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'China Supplier Reports and Free Product Catalogs',
   description:
-    'Search paid China supplier reports and browse free catalogs for importing wigs, phone cases, chargers and other products from China to Nigeria. Download a PDF and request a sourcing quote.',
+    'Search paid China supplier reports and browse free catalogs for sourcing wigs, phone cases, chargers and other products from China. Download a PDF and request a quote for your destination.',
   keywords: [
     'China supplier reports',
     'free product catalogs',

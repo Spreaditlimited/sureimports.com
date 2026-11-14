@@ -11,13 +11,13 @@ export const catalogSourcingContent: Record<string, CatalogSourcingContent> = {
   'futura-premium-wigs': {
     heading: 'Import Futura wigs from China',
     summary:
-      'Use this free catalog to identify a photographed Futura wig style before asking Sure Imports to source it from China for delivery to Nigeria. A JY style code is more useful than a general photo because the same silhouette can have different lengths, colours and lace choices.',
+      'Use this free catalog to identify a photographed Futura wig style before asking Sure Imports to source it from China. A JY style code is more useful than a general photo because the same silhouette can have different lengths, colours and lace choices.',
     buyingNote:
       'Ask for the exact fibre, lace construction and finished length to be confirmed against your chosen JY code. A supplier image alone cannot tell you which combination will be supplied.',
     checks: [
       'Quote the JY style code and the number of pieces you want.',
       'Specify colour, length and whether you want 13 × 4 or 13 × 6 lace.',
-      'Confirm the selected variant, availability and delivered Nigeria price before payment.',
+      'Confirm the selected variant, availability and final price for your destination before payment.',
     ],
   },
   'phone-cases': {
@@ -47,7 +47,7 @@ export const catalogSourcingContent: Record<string, CatalogSourcingContent> = {
   'screen-protectors': {
     heading: 'Source screen protectors from China',
     summary:
-      'This focused PDF helps Nigeria buyers compare China supplier glass and protective film listings. Screen shape, cut-outs and packaging vary by device, so a generic phone family name is too broad for a sourcing request.',
+      'This focused PDF helps buyers compare China supplier glass and protective film listings. Screen shape, cut-outs and packaging vary by device, so a generic phone family name is too broad for a sourcing request.',
     buyingNote:
       'Use the exact device model and protector type when requesting a quote. Ask whether the supplier unit includes an installation kit, retail packaging or only the film.',
     checks: [
@@ -71,7 +71,7 @@ export const catalogSourcingContent: Record<string, CatalogSourcingContent> = {
   'wall-chargers': {
     heading: 'Source wall chargers from China',
     summary:
-      'Use these China supplier adapter listings to compare plug formats, port combinations and stated power. For Nigeria, the plug type and what is included in the box matter as much as the wattage printed on a product image.',
+      'Use these China supplier adapter listings to compare plug formats, port combinations and stated power. The plug type must suit the destination, and what is included in the box matters as much as the wattage printed on a product image.',
     buyingNote:
       'Tell us the destination and devices to be charged so the supplier can confirm the correct plug, input rating, output and cable bundle. Ask for the exact model rather than assuming all listed variants share one specification.',
     checks: [
@@ -251,7 +251,7 @@ export const catalogSourcingContent: Record<string, CatalogSourcingContent> = {
   'gaming-keyboards': {
     heading: 'Import gaming keyboards from China',
     summary:
-      'This focused China supplier PDF shows the SMS-GM01 illuminated keyboard with a 104-key layout and lighting modes. Check the actual key layout and connection before sourcing for Nigerian buyers.',
+      'This focused China supplier PDF shows the SMS-GM01 illuminated keyboard with a 104-key layout and lighting modes. Check the actual key layout and connection before sourcing for your market.',
     buyingNote:
       'A 104-key count does not identify every printed key position. Ask for the exact layout, connection, dimensions and package contents before confirming an order.',
     checks: [

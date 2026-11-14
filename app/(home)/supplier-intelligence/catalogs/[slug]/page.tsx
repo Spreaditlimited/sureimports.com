@@ -220,18 +220,15 @@ export default async function FreeCatalogPage({ params }: Props) {
               </h2>
               <p>{sourcing.buyingNote}</p>
               <p>
-                This catalog is a shortlist, not a live stock list. For delivery
-                to Nigeria, send us the product code or PDF page, your chosen
-                specifications, quantity and delivery city. We will check the
-                supplier&apos;s current terms and give you a final delivered
-                quote before you pay.
+                This catalog is a shortlist, not a live stock list. Send us the
+                product code or PDF page, your chosen specifications, quantity
+                and delivery destination. We will check the supplier&apos;s
+                current terms and give you a final quote before you pay.
               </p>
               <p>
-                Planning a larger import? See our{' '}
-                <Link href="/import-from-china-to-nigeria">
-                  China to Nigeria import guide
-                </Link>{' '}
-                for buying, shipping and sourcing routes.
+                Planning a larger import? Explore our{' '}
+                <Link href="/import-hub">China importing hub</Link> for buying,
+                shipping and sourcing routes by destination.
               </p>
             </div>
             <div className={styles.checklist}>
