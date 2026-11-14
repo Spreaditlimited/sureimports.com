@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import ReportCover from '@/components/intelligence/ReportCover';
+import FreeCatalogsSection from '@/components/intelligence/FreeCatalogsSection';
 import { formatReportPrice } from '@/lib/intelligence/reports';
 
 type ReportResult = {
@@ -260,8 +261,16 @@ export default function ReportSearchExperience({
               </button>
             ))}
           </div>
+          <a
+            href="#free-catalogs"
+            className="mt-6 inline-flex text-sm font-semibold text-indigo-700 underline-offset-4 hover:underline"
+          >
+            Explore free product catalogs ↓
+          </a>
         </div>
       </section>
+
+      <FreeCatalogsSection />
 
       <section
         ref={resultsRef}
