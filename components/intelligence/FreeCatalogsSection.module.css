@@ -76,7 +76,12 @@
   flex-direction: column;
   align-items: center;
   padding: 2.3rem clamp(1.5rem, 3.5vw, 3.2rem) 2rem;
-  background: radial-gradient(circle at 50% 42%, #e8e3db 0%, #e4dfd7 48%, #d9d3ca 100%);
+  background: radial-gradient(
+    circle at 50% 42%,
+    #e8e3db 0%,
+    #e4dfd7 48%,
+    #d9d3ca 100%
+  );
 }
 
 .coverTopline {
@@ -92,7 +97,9 @@
   width: min(100%, 330px);
   aspect-ratio: 595 / 842;
   background: #f8f6f2;
-  box-shadow: 0 28px 45px -18px #2b242c4d, 0 2px 5px #2b242c26;
+  box-shadow:
+    0 28px 45px -18px #2b242c4d,
+    0 2px 5px #2b242c26;
 }
 
 .coverImage {
@@ -223,7 +230,10 @@
   font-weight: 650;
   line-height: 1.2;
   text-decoration: none;
-  transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
 }
 
 .downloadButton {
@@ -262,7 +272,178 @@
   line-height: 1.55;
 }
 
+.collection {
+  margin-top: clamp(4.5rem, 8vw, 7rem);
+}
+
+.collectionHeading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-top: 1px solid #d9d1c8;
+  padding-top: 2rem;
+}
+
+.collectionHeading .eyebrow {
+  margin-bottom: 0.7rem;
+}
+
+.collectionHeading h3 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+}
+
+.collectionHeading > p {
+  margin: 0 0 0.35rem;
+  color: #8a817a;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.collectionIntro {
+  max-width: 44rem;
+  margin: 1.15rem 0 2rem;
+  color: #716d6b;
+  font-size: 0.94rem;
+  line-height: 1.7;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.productCard {
+  display: flex;
+  min-width: 0;
+  gap: 1.15rem;
+  border: 1px solid #e3ded7;
+  border-radius: 0.9rem;
+  background: #fff;
+  padding: 1rem;
+}
+
+.productCover {
+  position: relative;
+  flex: 0 0 34%;
+  align-self: flex-start;
+  aspect-ratio: 595 / 842;
+  background: #f7f3ed;
+  box-shadow: 0 10px 20px -13px #2b242c80;
+}
+
+.productCoverImage {
+  object-fit: cover;
+}
+
+.productContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.productMeta {
+  margin: 0;
+  color: #a56d55;
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.productMeta span {
+  padding: 0 0.15rem;
+}
+
+.productContent h4 {
+  margin: 0.65rem 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.productContent > p:not(.productMeta) {
+  margin: 0.55rem 0 0;
+  color: #77706b;
+  font-size: 0.77rem;
+  line-height: 1.5;
+}
+
+.productActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+  margin-top: auto;
+  padding-top: 0.8rem;
+}
+
+.productActions a,
+.productWhatsApp {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #6f4f43;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.productActions a:focus-visible,
+.productWhatsApp:focus-visible,
+.moreCatalogs summary:focus-visible {
+  outline: 3px solid #a56d55;
+  outline-offset: 4px;
+}
+
+.moreCatalogs {
+  margin-top: 1.5rem;
+}
+
+.moreCatalogs summary {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.6rem;
+  border-bottom: 1px solid #29252a;
+  padding: 0.35rem 0;
+  color: #29252a;
+  font-size: 0.86rem;
+  font-weight: 650;
+  list-style: none;
+  cursor: pointer;
+}
+
+.moreCatalogs summary::-webkit-details-marker {
+  display: none;
+}
+
+.moreCatalogs[open] summary {
+  margin-bottom: 1.5rem;
+}
+
+.moreCatalogs[open] summary svg {
+  transform: rotate(90deg);
+}
+
 @media (max-width: 900px) {
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .catalog {
     grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   }
@@ -281,6 +462,21 @@
 }
 
 @media (max-width: 700px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .collectionHeading {
+    display: block;
+  }
+
+  .collectionHeading > p {
+    margin-top: 0.8rem;
+  }
+
+  .productCover {
+    flex-basis: 26%;
+  }
   .section {
     padding: 4rem 1rem;
   }

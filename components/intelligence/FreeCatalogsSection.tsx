@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ArrowDownToLine } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpRight } from 'lucide-react';
 
 import WhatsAppButton from '@/components/WhatsAppButton';
 import { freeCatalogs } from '@/lib/intelligence/freeCatalogs';
@@ -7,8 +7,48 @@ import { freeCatalogs } from '@/lib/intelligence/freeCatalogs';
 import styles from './FreeCatalogsSection.module.css';
 
 export default function FreeCatalogsSection() {
+  const [featuredCatalog, ...productCatalogs] = freeCatalogs;
+
+  const renderProductCatalog = (catalog: (typeof freeCatalogs)[number]) => (
+    <article key={catalog.slug} className={styles.productCard}>
+      <div className={styles.productCover}>
+        <Image
+          src={catalog.coverImageUrl}
+          alt={`${catalog.title} catalog cover`}
+          fill
+          sizes="(max-width: 600px) 38vw, (max-width: 900px) 25vw, 180px"
+          className={styles.productCoverImage}
+        />
+      </div>
+      <div className={styles.productContent}>
+        <p className={styles.productMeta}>
+          Free catalog <span aria-hidden="true">·</span> {catalog.pageCount}{' '}
+          pages
+        </p>
+        <h4>{catalog.title}</h4>
+        <p>{catalog.description}</p>
+        <div className={styles.productActions}>
+          <a href={`/api/intelligence/free-catalogs/${catalog.slug}/download`}>
+            Download PDF <ArrowDownToLine aria-hidden="true" size={15} />
+          </a>
+          <WhatsAppButton
+            waID="CUR7YKW3K3RBA1"
+            variant="inline"
+            triggerLabel="Ask about products"
+            triggerClassName={styles.productWhatsApp}
+            message={`Hello Sure Imports, I found a product in the ${catalog.title} catalog. Please help me confirm availability and a delivered quote.`}
+          />
+        </div>
+      </div>
+    </article>
+  );
+
   return (
-    <section id="free-catalogs" aria-labelledby="free-catalogs-heading" className={styles.section}>
+    <section
+      id="free-catalogs"
+      aria-labelledby="free-catalogs-heading"
+      className={styles.section}
+    >
       <div className={styles.container}>
         <div className={styles.intro}>
           <div>
@@ -18,13 +58,13 @@ export default function FreeCatalogsSection() {
             </h2>
           </div>
           <p className={styles.introCopy}>
-            Explore real products at your own pace. Find a style you love, then
-            send us its code and we&apos;ll source it for you.
+            Browse free product catalogs, choose an item, and send us its code
+            or page on WhatsApp for an availability check and final quote.
           </p>
         </div>
 
         <div className={styles.catalogList}>
-          {freeCatalogs.map((catalog, index) => (
+          {[featuredCatalog].map((catalog, index) => (
             <article key={catalog.slug} className={styles.catalog}>
               <div className={styles.coverPanel}>
                 <div className={styles.coverTopline}>
@@ -41,7 +81,8 @@ export default function FreeCatalogsSection() {
                   />
                 </div>
                 <p className={styles.coverCaption}>
-                  Japanese Futura fibre <span aria-hidden="true">·</span> Lace frontal wigs
+                  Japanese Futura fibre <span aria-hidden="true">·</span> Lace
+                  frontal wigs
                 </p>
               </div>
 
@@ -71,9 +112,23 @@ export default function FreeCatalogsSection() {
                 <div className={styles.orderGuide}>
                   <p className={styles.guideTitle}>How it works</p>
                   <ol>
-                    <li><span>01</span><p>Download the catalog and choose a JY style code.</p></li>
-                    <li><span>02</span><p>Share your colour, length and lace choice on WhatsApp.</p></li>
-                    <li><span>03</span><p>We confirm availability and your final quote before payment.</p></li>
+                    <li>
+                      <span>01</span>
+                      <p>Download the catalog and choose a JY style code.</p>
+                    </li>
+                    <li>
+                      <span>02</span>
+                      <p>
+                        Share your colour, length and lace choice on WhatsApp.
+                      </p>
+                    </li>
+                    <li>
+                      <span>03</span>
+                      <p>
+                        We confirm availability and your final quote before
+                        payment.
+                      </p>
+                    </li>
                   </ol>
                 </div>
 
@@ -100,6 +155,38 @@ export default function FreeCatalogsSection() {
               </div>
             </article>
           ))}
+        </div>
+
+        <div className={styles.collection}>
+          <div className={styles.collectionHeading}>
+            <div>
+              <p className={styles.eyebrow}>The product library</p>
+              <h3>Explore by product.</h3>
+            </div>
+            <p>
+              {productCatalogs.length} focused catalogs{' '}
+              <span aria-hidden="true">·</span> Free PDFs
+            </p>
+          </div>
+          <p className={styles.collectionIntro}>
+            These catalogs show supplier product references and RMB prices. Tell
+            us the product and variant you want; we will confirm sourcing,
+            minimum quantity, delivery and your final price before payment.
+          </p>
+          <div className={styles.productGrid}>
+            {productCatalogs.slice(0, 6).map(renderProductCatalog)}
+          </div>
+          {productCatalogs.length > 6 && (
+            <details className={styles.moreCatalogs}>
+              <summary>
+                View all {productCatalogs.length} product catalogs{' '}
+                <ArrowUpRight aria-hidden="true" size={16} />
+              </summary>
+              <div className={styles.productGrid}>
+                {productCatalogs.slice(6).map(renderProductCatalog)}
+              </div>
+            </details>
+          )}
         </div>
       </div>
     </section>
