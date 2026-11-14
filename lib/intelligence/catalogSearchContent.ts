@@ -178,7 +178,7 @@ export const catalogSearchContent: Record<string, CatalogSearchContent> = {
     inside: [
       'SMS-ZB66 Wi-Fi camera listing',
       'Motion detection and two-way voice details',
-      'RMB supplier price reference',
+      'RMB price for the listed camera',
     ],
     choosing:
       'Tell us where you intend to install it and what connectivity you have. We will confirm power, app and storage requirements before quoting.',
@@ -233,7 +233,7 @@ export const catalogSearchContent: Record<string, CatalogSearchContent> = {
     inside: [
       'SMS-GM01 gaming keyboard',
       '104-key layout and nine lighting modes',
-      'RMB supplier price reference',
+      'RMB price for the listed keyboard',
     ],
     choosing:
       'Tell us the keyboard layout and connection you need. We will confirm those details and the available colour before ordering.',
