@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    outputFileTracingIncludes: {
+      '/api/shop/phone-price-list': ['./public/images/logo.png'],
+    },
     allowedDevOrigins: ['192.168.1.173'],
     async headers() {
       return [{ source: '/support/embed', headers: [{ key: 'Content-Security-Policy', value: "frame-ancestors 'self' https://linescout.sureimports.com https://affiliate.sureimports.com https://partner.sureimports.com" }] }];

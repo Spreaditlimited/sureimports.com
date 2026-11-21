@@ -1,0 +1,12 @@
+.wrap { min-width: 0; }
+.button { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 64px; padding: 0 20px; border: 1px solid var(--si-border, #dfe2ea); border-radius: 12px; background: var(--si-surface, #fff); color: var(--si-ink, #172033); font-size: 14px; font-weight: 600; cursor: pointer; transition: border-color .15s, background .15s; }
+.button svg { flex-shrink: 0; color: var(--si-accent, #48439b); }
+.button:hover { border-color: var(--si-accent, #48439b); background: var(--si-canvas, #f7f8fb); }
+.button:focus-visible { outline: 2px solid var(--si-accent, #48439b); outline-offset: 3px; }
+.button:disabled { opacity: .7; cursor: wait; }
+.format { padding: 3px 6px; border-radius: 5px; background: var(--si-canvas, #f7f8fb); color: var(--si-muted, #617087); font-size: 10px; letter-spacing: .04em; }
+.error { margin-top: 8px; max-width: 320px; color: #b42318; font-size: 12px; line-height: 1.5; }
+.spinner { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 700px) { .button { width: 100%; min-height: 48px; padding: 10px 14px; font-size: 13px; } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .button { transition: none; } }

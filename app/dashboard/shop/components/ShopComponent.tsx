@@ -25,6 +25,7 @@ import ProductGrid from './ProductGrid';
 import FilterPanel from './FilterPanel';
 import CartSidebar from './CartSidebar';
 import { toast } from 'sonner';
+import PhonePriceListButton from '@/components/shop/PhonePriceListButton';
 
 export default function ShopComponent() {
   const router = useRouter();
@@ -147,6 +148,7 @@ export default function ShopComponent() {
   return (
     <>
       <div className="mx-auto w-full max-w-7xl">
+        <div className="mb-5 flex justify-end"><PhonePriceListButton /></div>
         
         {/* Floating Action Bar */}
         <div className="sticky top-[88px] z-[5] mb-8 rounded-2xl border border-slate-200/60 bg-white p-3 shadow-lg shadow-slate-200/20  dark:border-slate-800/60 dark:bg-slate-900 dark:shadow-none">

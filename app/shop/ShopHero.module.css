@@ -149,9 +149,16 @@
 }
 
 .catalogueHeading {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+}
+.catalogueHeading > h2 { min-width: 0; }
+@media (max-width: 700px) {
+  .catalogueHeading { grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
+  .catalogueHeading > .cartButton { grid-column: 2; grid-row: 1; }
+  .priceListAction { grid-column: 1 / -1; grid-row: 2; }
 }

@@ -26,6 +26,7 @@ import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 import heroStyles from './ShopHero.module.css';
 import ServiceHero from '@/components/home/ServiceHero';
+import PhonePriceListButton from '@/components/shop/PhonePriceListButton';
 
 export type StoreProduct = ShopCardProduct;
 type ShopInitialData = {
@@ -141,6 +142,7 @@ export default function ShopContent({
                 ? 'Search results'
                 : selectedCategory?.name || 'All products'}
             </h2>
+            <PhonePriceListButton className={heroStyles.priceListAction} />
             <button
               type="button"
               onClick={() => setShowCartSidebar(true)}
