@@ -20,8 +20,8 @@ export default function VehicleCatalogueHero({
           </h1>
           <p className="vehicle-hero-description">
             Discover electric cars, SUVs, vans and trucks from China. Clear
-            Naira pricing. One team, from your first enquiry to arrival in
-            Nigeria.
+            Naira estimates for buyers in Nigeria only. Each vehicle is sourced
+            from China after your order, with one team from enquiry to arrival.
           </p>
           <a href="#range" className="vehicle-button">
             Find your vehicle <ArrowUpRight size={18} />

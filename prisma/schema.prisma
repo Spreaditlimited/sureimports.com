@@ -3239,6 +3239,8 @@ model support_guests {
  tokenHash String @unique @db.Char(64)
  expiresAt DateTime @db.DateTime(3)
  claimedBy String? @db.VarChar(191)
+ contactName String? @db.VarChar(120)
+ contactEmail String? @db.VarChar(254)
  createdAt DateTime @default(now()) @db.DateTime(3)
  @@index([expiresAt], map: "support_guest_expiry")
 }

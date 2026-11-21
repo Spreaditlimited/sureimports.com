@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   );
   if (!model) notFound();
   const title = `${model.name} in Nigeria: Specifications & Import Price`;
-  const description = `Compare ${model.name} configurations, specifications and Naira import estimates. Order from China with shipping, clearing, duties and taxes included in shipping.`;
+  const description = `Compare ${model.name} specifications and Naira import estimates for Nigeria only. Sourced from China on order; shipping includes clearing, duties and taxes.`;
   const url = `https://www.sureimports.com/cars/models/${slug}`;
   const photo = model.images.find((image) =>
     image.startsWith('https://res.cloudinary.com/'),

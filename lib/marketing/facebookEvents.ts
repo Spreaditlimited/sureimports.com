@@ -1,5 +1,6 @@
 import { trackOpenAIRegistration } from './openaiEvents';
 import { hasOptionalCookieConsent } from './optionalConsent';
+import { trackGoogleSignupConversion } from './googleAdsSignup';
 
 // No account details are stored here: only event IDs and non-identifying event parameters.
 type MetaEvent = {
@@ -80,6 +81,7 @@ export function trackRegistrationConversion(
   conversion?: { eventId: string; method: string } | null,
 ) {
   if (!conversion) return;
+  trackGoogleSignupConversion(conversion.eventId);
   trackOpenAIRegistration(conversion.eventId);
   queueFacebookEvent({
     name: 'CompleteRegistration',

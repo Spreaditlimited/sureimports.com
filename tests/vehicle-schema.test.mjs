@@ -40,6 +40,7 @@ test('confirmed configurations use the displayed landed price and configuration 
   assert.equal(result.offers.length, 1);
   assert.equal(result.offers[0].price, 12345678.25);
   assert.equal(result.offers[0].priceCurrency, 'NGN');
+  assert.equal(result.offers[0].eligibleRegion.name, 'Nigeria');
   assert.ok(result.offers[0].url.endsWith('?configuration=a%20b'));
   assert.equal(result.aggregateRating, undefined);
 });

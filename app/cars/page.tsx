@@ -15,7 +15,7 @@ import { carsSocialImage } from '@/lib/vehicles/social';
 const catalogueMetadata: Metadata = {
   title: 'Electric Cars, Vans & Cargo Trucks in Nigeria',
   description:
-    'Import electric vehicles from China to Nigeria. Compare electric cars, SUVs, vans and cargo trucks, Naira prices, specifications and landed-cost estimates.',
+    'Compare electric cars, SUVs, vans and trucks sourced from China on order. Naira landed-cost estimates and delivery are for buyers in Nigeria only.',
   alternates: { canonical: 'https://www.sureimports.com/cars' },
   openGraph: {
     title: 'Electric Vehicles from China to Nigeria | Sure Imports',

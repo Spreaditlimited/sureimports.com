@@ -26,6 +26,8 @@ class SupportFallback extends Component<
 }
 const SupportEnabled = createContext(false);
 export const useSupportEnabled = () => useContext(SupportEnabled);
+const WhatsAppOnly = createContext(false);
+export const useWhatsAppOnly = () => useContext(WhatsAppOnly);
 export default function SupportProvider({
   enabled,
   children,
@@ -35,12 +37,18 @@ export default function SupportProvider({
 }) {
   return (
     <SupportEnabled.Provider value={enabled}>
-      {children}
-      {enabled && (
-        <SupportFallback>
-          <SupportLauncher />
-        </SupportFallback>
-      )}
+      <WhatsAppOnly.Provider value={!enabled}>
+        {children}
+        {enabled ? (
+          <SupportFallback>
+            <SupportLauncher />
+          </SupportFallback>
+        ) : (
+          <div className={styles.globalWhatsapp}>
+            <SupportWhatsApp />
+          </div>
+        )}
+      </WhatsAppOnly.Provider>
     </SupportEnabled.Provider>
   );
 }

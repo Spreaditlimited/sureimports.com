@@ -2,6 +2,7 @@ import { videoThumbnail } from '@/lib/website-videos/policy';
 import { procurementVideo } from '@/lib/website-videos/public';
 import { MetadataRoute } from 'next';
 import { getPublicPublishedReports } from '@/lib/intelligence/reports';
+import { freeCatalogs } from '@/lib/intelligence/freeCatalogs';
 import { prisma } from '@/lib/prisma';
 import { isRedirectedBlogSlug } from '@/lib/blogRedirects';
 import { vehicleCatalogue } from '@/lib/vehicles/data';
@@ -302,10 +303,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       ],
     },
   ];
+  const catalogPages: MetadataRoute.Sitemap = freeCatalogs.map((catalog) => ({
+    url: `${baseUrl}/supplier-intelligence/catalogs/${catalog.slug}`,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+    images: [catalog.coverImageUrl],
+  }));
   return [
     ...staticPages,
     ...blogPages,
     ...reportPages,
+    ...catalogPages,
     ...vehiclePages,
     ...shopPages,
     ...videoPages,

@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+import { supportChatEnabled } from './availability';
 import {
   conversationId,
   createSchema,
@@ -51,7 +52,7 @@ export function supportEndpoints(
     work: (identity: Identity) => Promise<unknown>,
   ) {
     try {
-      if (process.env.SUPPORT_CHAT_ENABLED !== 'true')
+      if (!supportChatEnabled)
         throw new SupportError(404, 'Support pilot is not available.');
       const edit = request.method !== 'GET';
       if (edit && !trustedSupportMutation(request))

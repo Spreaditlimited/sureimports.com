@@ -16,7 +16,39 @@ function load(file, mocks = {}) {
   return exports;
 }
 const draft = load('lib/procurement/publicDraft.ts');
-const product = () => ({ ...draft.emptyProduct(), id: 'one', productName: 'Test item', productLink: 'https://detail.1688.com/offer/123.html', productPrice: '12.50', productWeight: '0.5', productQuantity: '2', currency: 'CNY' });
+const product = () => ({ ...draft.emptyProduct(), productCategory: 'OTHER', id: 'one', productName: 'Test item', productLink: 'https://detail.1688.com/offer/123.html', productPrice: '12.50', productWeight: '0.5', productQuantity: '2', currency: 'CNY' });
+test('new and restored products inherit order shipping without a device override', () => {
+  assert.equal(draft.emptyProduct().productCategory, 'OTHER');
+  const old = product(); delete old.productCategory;
+  assert.equal(draft.productDraftSchema.parse(old).productCategory, 'OTHER');
+  for (const value of ['', undefined, null]) {
+    assert.equal(draft.productProblem({ ...product(), productCategory: value }, '1688', 'CNY'), null);
+    assert.equal(draft.productDraftSchema.parse({ ...product(), productCategory: value }).productCategory, 'OTHER');
+  }
+  for (const value of ['OTHER', 'PHONE', 'LAPTOP']) {
+    assert.equal(draft.productProblem({ ...product(), productCategory: value }, '1688', 'CNY'), null);
+  }
+});
+test('bootstrap rejects invalid nonblank device overrides without writes', async () => {
+  for (const value of ['ACCESSORY', 'other', 12]) {
+    const api = apiSetup(); const body = api.payload();
+    body.products[0].productCategory = value;
+    const response = await api.send(body);
+    assert.equal(response.status, 400);
+    assert.match((await response.json()).message, /shipping override/);
+    assert.equal(api.count(), 0);
+    assert.equal(api.orders.size, 0);
+  }
+});
+test('bootstrap accepts omitted and blank overrides as order shipping', async () => {
+  for (const value of [undefined, null, '', '  ']) {
+    const api = apiSetup(); const body = api.payload();
+    body.products[0].productCategory = value;
+    const response = await api.send(body);
+    assert.equal(response.status, 200);
+    assert.equal(api.count(), 2);
+  }
+});
 test('detects marketplace from full URLs and share text, never hostname lookalikes', () => {
   assert.equal(draft.inspectProductLink('See https://detail.1688.com/offer/123.html').shop.id, '1688');
   assert.equal(draft.inspectProductLink('https://www.alibaba.com/product-detail/123.html').shop.currency, 'USD');
@@ -142,6 +174,19 @@ test('Nigeria phones and laptops need no measurement; other destinations and acc
     assert.match(draft.productProblem({ ...item, productCategory: 'OTHER' }, '1688', 'CNY', 'Nigeria'), /measurement/);
   }
 });
+test('add and edit APIs reject invalid nonblank overrides before database access', async () => {
+  for (const action of ['add', 'edit']) {
+    const route = load('app/api/crud/procurement-' + action + '-product/route.ts', {
+      '@prisma/client': { PrismaClient: function () { return {}; } },
+      '@/lib/procurement/assistance': { requireProcurementUser: async () => ({ pidUser: 'owner' }) },
+    });
+    for (const productCategory of ['ACCESSORY', 'other', 12]) {
+      const result = await route.POST({ json: async () => ({ ...product(), productCategory }) });
+      assert.equal(result.status, 400);
+      assert.equal((await result.json()).responsex.status, 'INVALID_PRODUCT');
+    }
+  }
+});
 test('add-product API waives measurement only for Nigeria devices and stores zero', async () => {
   let country = 'Nigeria', saved;
   const db = {
@@ -165,4 +210,11 @@ test('add-product API waives measurement only for Nigeria devices and stores zer
   country = 'Nigeria';
   result = await route.POST({ json: async () => ({ ...body, productCategory: 'OTHER' }) });
   assert.equal(result.status, 400);
+  for (const productCategory of [undefined, null, '', '  ']) {
+    saved = undefined;
+    result = await route.POST({ json: async () => ({ ...body, productCategory, productWeight: '0.5' }) });
+    assert.equal((await result.json()).responsex.status, 'SUCCESS');
+    assert.equal(saved.productCategory, 'OTHER');
+    assert.equal(saved.shippingMeasurePerUnit, 0.5);
+  }
 });

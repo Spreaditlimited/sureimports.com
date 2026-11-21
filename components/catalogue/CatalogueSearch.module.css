@@ -1,0 +1,89 @@
+.wrapper {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+.field.field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 64px;
+  padding: 8px 8px 8px 16px;
+  margin: 0;
+  border: 1px solid var(--si-border);
+  border-radius: 12px;
+  background: var(--si-surface);
+  color: var(--si-ink);
+}
+.field:focus-within {
+  outline: 2px solid var(--si-primary);
+  outline-offset: 2px;
+}
+.icon {
+  flex-shrink: 0;
+  color: var(--si-muted);
+}
+/* Override the public form defaults only within this composite search field. */
+.wrapper .field.field .input.input.input[type='search'] {
+  appearance: none;
+  -webkit-appearance: none;
+  display: block;
+  flex: 1;
+  width: 0;
+  min-width: 0;
+  height: 44px;
+  min-height: 44px;
+  padding: 10px 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--si-ink);
+  font: inherit;
+  font-size: 16px;
+  box-shadow: none;
+  outline: none;
+}
+.input::placeholder {
+  color: var(--si-muted);
+  opacity: 1;
+}
+.input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+.field.field .submit.submit[type='submit'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--si-ink);
+  color: var(--si-canvas);
+  font-size: 14px;
+  font-weight: 600;
+}
+.helpRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 14px 4px 0;
+}
+.help {
+  flex: 1;
+  margin: 0;
+  color: var(--si-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.clear {
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--si-primary);
+  font-size: 13px;
+  text-decoration: underline;
+}

@@ -105,7 +105,7 @@ export default function TrustedOrganizations({
                         alt={duplicate ? '' : name}
                         width={width}
                         height={height}
-                        sizes="(max-width: 760px) 520px, 640px"
+                        sizes={`${Math.ceil((displayWidth * width) / cropWidth)}px`}
                         style={{
                           width: `${(width / cropWidth) * 100}%`,
                           height: `${(height / cropHeight) * 100}%`,

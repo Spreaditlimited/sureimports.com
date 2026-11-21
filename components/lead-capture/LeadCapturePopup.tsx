@@ -17,6 +17,41 @@ const SUBSCRIBED_KEY = 'sureimports_lead_subscribed';
 const DISMISS_COUNT_KEY = 'sureimports_lead_dismiss_count';
 const LAST_DISMISSED_KEY = 'sureimports_lead_last_dismissed_at';
 const SESSION_DISMISSED_KEY = 'sureimports_lead_dismissed_this_session';
+const LAST_SHOWN_KEY = 'sureimports_lead_last_shown_at';
+const DAY = 24 * 60 * 60 * 1000;
+
+// Storage can be unavailable in restricted browsers. Never let that break closing.
+function readPreference(key: string) {
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function savePreference(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    /* Optional UI preference. */
+  }
+}
+function popupSuppressed() {
+  try {
+    const recent = (key: string, days: number) => {
+      const timestamp = Date.parse(window.localStorage.getItem(key) || '');
+      return Number.isFinite(timestamp) && Date.now() - timestamp < days * DAY;
+    };
+    return (
+      window.localStorage.getItem(SUBSCRIBED_KEY) === 'true' ||
+      window.sessionStorage.getItem(SESSION_DISMISSED_KEY) === 'true' ||
+      recent(LAST_DISMISSED_KEY, 30) ||
+      recent(LAST_SHOWN_KEY, 7)
+    );
+  } catch {
+    // Avoid repeatedly interrupting visitors when persistence is blocked.
+    return true;
+  }
+}
 const LEAD_SEGMENT_ID = '67699403ee348d7f8cb68f3a';
 
 const excludedPathPrefixes = [
@@ -64,10 +99,8 @@ function getAttribution(pathname: string) {
     utm_content: getParam('utm_content'),
     utm_term: getParam('utm_term'),
     fbclid: getParam('fbclid'),
-    first_seen_at: window.localStorage.getItem(FIRST_SEEN_KEY),
-    dismiss_count: Number(
-      window.localStorage.getItem(DISMISS_COUNT_KEY) || '0',
-    ),
+    first_seen_at: readPreference(FIRST_SEEN_KEY),
+    dismiss_count: Number(readPreference(DISMISS_COUNT_KEY) || '0'),
   };
 }
 
@@ -94,24 +127,19 @@ export default function LeadCapturePopup() {
 
     if (typeof window === 'undefined') return;
 
-    const hasSubscribed =
-      window.localStorage.getItem(SUBSCRIBED_KEY) === 'true';
-    const dismissedThisSession =
-      window.sessionStorage.getItem(SESSION_DISMISSED_KEY) === 'true';
-
-    if (hasSubscribed || dismissedThisSession) {
+    if (popupSuppressed()) {
       setIsVisible(false);
       return;
     }
-
-    if (!window.localStorage.getItem(FIRST_SEEN_KEY)) {
-      window.localStorage.setItem(FIRST_SEEN_KEY, new Date().toISOString());
+    if (!readPreference(FIRST_SEEN_KEY)) {
+      savePreference(FIRST_SEEN_KEY, new Date().toISOString());
     }
 
     let hasTriggered = false;
     const showPopup = () => {
-      if (hasTriggered) return;
+      if (hasTriggered || popupSuppressed()) return;
       hasTriggered = true;
+      savePreference(LAST_SHOWN_KEY, new Date().toISOString());
       setIsVisible(true);
     };
 
@@ -138,12 +166,14 @@ export default function LeadCapturePopup() {
 
   const closePopup = () => {
     if (typeof window !== 'undefined') {
-      const dismissCount = Number(
-        window.localStorage.getItem(DISMISS_COUNT_KEY) || '0',
-      );
-      window.localStorage.setItem(DISMISS_COUNT_KEY, String(dismissCount + 1));
-      window.localStorage.setItem(LAST_DISMISSED_KEY, new Date().toISOString());
-      window.sessionStorage.setItem(SESSION_DISMISSED_KEY, 'true');
+      const dismissCount = Number(readPreference(DISMISS_COUNT_KEY) || '0');
+      savePreference(DISMISS_COUNT_KEY, String(dismissCount + 1));
+      savePreference(LAST_DISMISSED_KEY, new Date().toISOString());
+      try {
+        window.sessionStorage.setItem(SESSION_DISMISSED_KEY, 'true');
+      } catch {
+        /* Local preference already saved. */
+      }
     }
     setIsVisible(false);
   };
@@ -192,7 +222,7 @@ export default function LeadCapturePopup() {
       }
 
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem(SUBSCRIBED_KEY, 'true');
+        savePreference(SUBSCRIBED_KEY, 'true');
       }
 
       if (!data?.alreadySubscribed)

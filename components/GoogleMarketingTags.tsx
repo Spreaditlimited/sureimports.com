@@ -3,6 +3,7 @@
 import Script from 'next/script';
 import { useEffect } from 'react';
 import { useOptionalConsent } from '@/lib/marketing/useOptionalConsent';
+import { flushGoogleSignupConversions } from '@/lib/marketing/googleAdsSignup';
 
 export default function GoogleMarketingTags({
   gtmId,
@@ -27,6 +28,7 @@ export default function GoogleMarketingTags({
       ad_user_data: consent ? 'granted' : 'denied',
       ad_personalization: consent ? 'granted' : 'denied',
     });
+    if (consent) flushGoogleSignupConversions();
   }, [consent]);
 
   if (!consent) return null;

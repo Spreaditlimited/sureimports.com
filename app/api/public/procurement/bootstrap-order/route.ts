@@ -1,4 +1,4 @@
-import { validDeviceType, usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
+import { validDeviceType, usesDeviceFlatFee, normalizeDeviceType } from '@/lib/procurement/deviceShipping';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import {
@@ -113,6 +113,7 @@ export async function POST(request: NextRequest) {
 
     const normalizedProducts = products.map((item) => ({
       ...item,
+      productCategory: normalizeDeviceType(item.productCategory) as string,
       productLink: normalizeProductUrl(item.productLink),
     }));
 
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
         !item.productLink ||
         !Number.isFinite(Number(item.productPrice)) ||
         Number(item.productPrice) < 0.01 ||
-        !validDeviceType(item.productCategory ?? 'OTHER') ||
+        !validDeviceType(item.productCategory) ||
         !Number.isSafeInteger(Number(item.productQuantity)) ||
         Number(item.productQuantity) < 1,
     );
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
         {
           statusx: 'FAILED_VALIDATION',
           message:
-            'Each product requires a valid web link, name, and valid price/weight/quantity values.',
+            'Each product requires a valid web link, name, price/weight/quantity and product shipping override.',
         },
         { status: 400 },
       );
@@ -310,7 +311,7 @@ export async function POST(request: NextRequest) {
             productName: normalize(item.productName),
             productLink: item.productLink!,
             productPrice: Number(item.productPrice),
-            productCategory: item.productCategory ?? 'OTHER',
+            productCategory: item.productCategory,
             shippingMeasurePerUnit: Number(item.productWeight),
             productQuantity: Number(item.productQuantity),
             productInfo: normalize(item.productInfo),

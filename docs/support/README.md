@@ -1,5 +1,9 @@
 # Customer support pilot
 
+## Guest contact and email return links (28 October 2026)
+
+Guests now enter a name and email before starting a conversation. An additive migration, `20261028010000_support_guest_contact`, stores those details on the guest session. The customer notification worker emails the guest on a public agent reply and supplies a signed 30-day return link that restores the guest chat session on another browser. Links stop working when the guest session expires or is claimed by an account. The email's Reply-To points to the support mailbox, so a customer may reply to a staff member by email; inbound email is not automatically inserted into the website conversation. The subject carries a conversation reference. Do not deploy the new chat code before applying this migration. The signing secret is `SUPPORT_RECOVERY_SECRET`, falling back to the existing `CRON_SECRET`.
+
 Status: signed-in and guest customer / agent workflows implemented locally. Not deployed or enabled. The production Overview redirect was released separately on 17 October 2026.
 
 ## Implemented

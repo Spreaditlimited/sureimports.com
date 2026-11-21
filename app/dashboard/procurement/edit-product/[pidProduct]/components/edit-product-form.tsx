@@ -121,10 +121,10 @@ export default function EditProductForm({
       productWeight: toMeasurementValue(
         product?.shippingMeasurePerUnit ?? product?.productWeight,
       ),
-      productCategory: ['PHONE', 'LAPTOP'].includes(
+      productCategory: ['OTHER', 'PHONE', 'LAPTOP'].includes(
         product?.productCategory || '',
       )
-        ? (product?.productCategory as 'PHONE' | 'LAPTOP')
+        ? (product?.productCategory as 'OTHER' | 'PHONE' | 'LAPTOP')
         : 'OTHER',
       productQuantity: product?.productQuantity?.toString() || '1',
       productInfo: product?.productInfo || '',
@@ -201,7 +201,7 @@ export default function EditProductForm({
   };
 
   const quantity = Number(form.watch('productQuantity') || 0);
-  const flatFee = isNigeria && deviceFeesEnabled && form.watch('productCategory') !== 'OTHER';
+  const flatFee = isNigeria && deviceFeesEnabled && ['PHONE', 'LAPTOP'].includes(form.watch('productCategory'));
   const perItemMeasurement = Number(form.watch('productWeight') || 0);
   const lineMeasurement = quantity * perItemMeasurement;
   const measurementName = measurementUnit === 'CBM' ? 'volume' : 'weight';
@@ -507,14 +507,14 @@ export default function EditProductForm({
               name="productCategory"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product type</FormLabel>
+                  <FormLabel>Product shipping override</FormLabel>
                   <FormControl>
                     <select
                       {...field}
                       className="h-12 w-full rounded-xl border border-slate-200 bg-white px-4 pr-10 text-base"
                     >
                       <option value="OTHER">
-                        Other goods (including accessories)
+                        Use order shipping (default)
                       </option>
                       <option value="PHONE">Phone</option>
                       <option value="LAPTOP">Laptop</option>

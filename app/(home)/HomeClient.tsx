@@ -135,6 +135,7 @@ export default function HomeClient() {
             </h2>
             <div
               className={styles.marketplaces}
+              role="group"
               aria-label="Buy from Chinese marketplaces"
             >
               <span>1688</span>
@@ -340,6 +341,7 @@ export default function HomeClient() {
                 <div className={styles.reviewBody}>
                   <div
                     className={styles.reviewRating}
+                    role="img"
                     aria-label="5 out of 5 stars"
                   >
                     {Array.from({ length: 5 }, (_, star) => (

@@ -95,9 +95,11 @@ export function productDescription(product: ShopProduct) {
     .slice(0, 170);
 }
 export function productAvailability(status: string | null) {
-  if (status === 'available') return 'https://schema.org/InStock';
   if (status === 'unavailable') return 'https://schema.org/OutOfStock';
-  return undefined; // Missing inventory data is not proof of stock.
+  // An orderable item is sourced from China after purchase; it is not held
+  // as ready-to-ship inventory. Do not label it InStock without a verified
+  // fulfilment promise for the exact item.
+  return undefined;
 }
 export function productConditionLabel(
   product: Pick<ShopProduct, 'productName' | 'productCondition'>,
@@ -152,6 +154,7 @@ export function shopProductSchema(product: ShopProduct, image?: string) {
       url,
       price,
       priceCurrency: 'NGN',
+      eligibleRegion: { '@type': 'Country', name: 'Nigeria' },
       ...(condition ? { itemCondition: condition } : {}),
       ...(productAvailability(product.productStatus)
         ? { availability: productAvailability(product.productStatus) }

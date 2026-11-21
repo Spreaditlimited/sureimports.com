@@ -1,6 +1,7 @@
 import 'server-only';
 import { createHash, randomBytes } from 'node:crypto';
 import type { PrismaClient } from '@prisma/client';
+import { createSupportRecoveryToken } from './recovery';
 
 type Notice = {
   id: number;
@@ -45,6 +46,7 @@ export async function deliverSupportNotifications(
         }>
       >`SELECT customerId, ownerKind, brand, assignedTo FROM support_conversations WHERE id=${notice.conversationId}`;
       let to: string | null = null;
+      let customerUrl: string | null = null;
       let recipients: string[] = [];
       if (conversation?.brand === 'SURE_IMPORTS') {
         if (notice.audience === 'TEAM') {
@@ -87,6 +89,14 @@ export async function deliverSupportNotifications(
             )
           )
             to = user.userEmail;
+        } else if (conversation.ownerKind === 'GUEST') {
+          const [guest] = await prisma.$queryRaw<Array<{ contactEmail: string | null }>>`
+            SELECT contactEmail FROM support_guests WHERE id=${conversation.customerId}
+            AND expiresAt>NOW(3) AND claimedBy IS NULL`;
+          if (guest?.contactEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(guest.contactEmail)) {
+            to = guest.contactEmail;
+            customerUrl = `https://www.sureimports.com/support/recover?token=${encodeURIComponent(createSupportRecoveryToken(conversation.customerId, notice.conversationId))}`;
+          }
         }
       }
       if (to) recipients = [to];
@@ -106,8 +116,8 @@ export async function deliverSupportNotifications(
               to: recipient,
               subject: team
                 ? 'A customer is waiting for support'
-                : 'You have a reply from Sure Imports support',
-              url: `https://${team ? 'admin.' : ''}sureimports.com/dashboard/support?conversation=${notice.conversationId}`,
+                : `You have a reply from Sure Imports support [SI-${notice.conversationId}]`,
+              url: customerUrl || `https://${team ? 'admin.' : 'www.'}sureimports.com/${team ? 'dashboard' : 'support'}?conversation=${notice.conversationId}`,
               messageId: `<support-${notice.id}-${notice.revision}-${recipientHash.slice(0, 16)}@sureimports.com>`,
             });
             await prisma.$executeRaw`INSERT IGNORE INTO support_email_receipts (noticeId,revision,recipientHash) VALUES (${notice.id},${notice.revision},${recipientHash})`;

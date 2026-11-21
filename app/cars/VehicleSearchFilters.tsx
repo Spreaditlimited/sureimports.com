@@ -1,5 +1,5 @@
 'use client';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   Sheet,
   SheetTrigger,
@@ -8,7 +8,8 @@ import {
   SheetDescription,
   SheetClose,
 } from '@/components/ui/sheet';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
+import CatalogueSearch from '@/components/catalogue/CatalogueSearch';
 import VehiclePicker from '@/components/vehicles/VehiclePicker';
 import type { PublicVehicle } from '@/lib/vehicles/data';
 import {
@@ -35,6 +36,10 @@ export default function VehicleSearchFilters({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(filters.q);
+  useEffect(() => {
+    setSearchQuery(filters.q);
+  }, [filters.q]);
   const [tray, setTray] = useState<HTMLDivElement | null>(null);
   const picker = (
     key: keyof VehicleFilters,
@@ -225,20 +230,21 @@ export default function VehicleSearchFilters({
         {panel()}
       </aside>
       <div className="vehicle-search-results">
-        <label className="vehicle-search vehicle-discovery-search">
-          <Search size={20} aria-hidden="true" />
-          <span className="sr-only">Search vehicles</span>
-          <input
-            type="search"
-            value={filters.q}
-            onChange={(e) => onChange({ q: e.target.value })}
-            placeholder="Try ‘electric SUV under ₦30m’ or ‘7-seater’"
-            aria-describedby="vehicle-search-help"
-          />
-        </label>
-        <p id="vehicle-search-help" className="sr-only">
-          Search by model, use, seats or landed budget.
-        </p>
+        <CatalogueSearch
+          label="Search catalogue"
+          placeholder="Search by brand or model…"
+          value={searchQuery}
+          onChange={setSearchQuery}
+          onClear={() => {
+            setSearchQuery('');
+            onChange({ q: '' });
+          }}
+          onSubmit={(event) => {
+            event.preventDefault();
+            onChange({ q: searchQuery.trim() });
+          }}
+          helper="Enter a brand or model, then select Search."
+        />
         <div className="vehicle-catalogue-controls">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>

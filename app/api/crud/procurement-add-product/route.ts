@@ -1,4 +1,4 @@
-import { validDeviceType, usesDeviceFlatFee } from '@/lib/procurement/deviceShipping';
+import { validDeviceType, usesDeviceFlatFee, normalizeDeviceType } from '@/lib/procurement/deviceShipping';
 // app/api/upload/route.ts
 import { PrismaClient } from '@prisma/client';
 import { random } from 'lodash';
@@ -24,12 +24,13 @@ export async function POST(request: Request) {
     emailUser,
     productName,
     productLink,
-    productCategory = 'OTHER',
+    productCategory: rawProductCategory,
     productPrice,
     productWeight,
     productQuantity,
     productInfo,
   } = await request.json();
+  const productCategory = normalizeDeviceType(rawProductCategory);
   if (!validDeviceType(productCategory)) return NextResponse.json({ responsex: { status: 'INVALID_PRODUCT', message: 'Choose Phone, Laptop or Other goods.' }, successx: false }, { status: 400 });
   const normalizedProductLink = normalizeProductUrl(productLink);
   let measurementValue = Number(productWeight);

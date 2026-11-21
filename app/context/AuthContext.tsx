@@ -268,16 +268,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const data = (await res.json()) as RegisterStoreResponse;
 
     if (res.ok) {
-      trackRegistrationConversion(
-        (
-          data as {
-            registrationConversion?: { eventId: string; method: string };
-          }
-        ).registrationConversion,
-      );
       //setUser(data.user);
       //router.push('/dashboard');
       if (data.statusx === 'SUCCESS') {
+        trackRegistrationConversion(
+          (
+            data as {
+              registrationConversion?: { eventId: string; method: string };
+            }
+          ).registrationConversion,
+        );
         //router.push('/auth/account-creation-success');
         return data;
       } else if (data.statusx === 'FAILED_VALIDATION') {

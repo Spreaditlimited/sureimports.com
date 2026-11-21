@@ -20,8 +20,8 @@ import {
   type ShopQuery,
   type ShopCardProduct,
 } from '@/lib/shop/discovery';
-import { Search, ShoppingCart } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { ShoppingCart } from 'lucide-react';
+import CatalogueSearch from '@/components/catalogue/CatalogueSearch';
 import { useShopCart } from '@/app/context/ShopCartContext';
 import { resolveMediaUrl } from '@/lib/cloudinary/url';
 import heroStyles from './ShopHero.module.css';
@@ -108,7 +108,7 @@ export default function ShopContent({
           }
           description={
             selectedCategory?.description ||
-            'Explore technology sourced from China, with clear pricing, order tracking and delivery to your doorstep in Nigeria.'
+            'Explore technology sourced from China after you order, with prices in Naira for Nigerian buyers, order tracking and delivery within Nigeria.'
           }
           primary={{ href: '#shop-products', label: 'Browse products' }}
           secondary={{ href: '/contact-us', label: 'Get help choosing' }}
@@ -135,13 +135,40 @@ export default function ShopContent({
           id="shop-products"
           className="mx-auto max-w-[1440px] scroll-mt-28 px-4 py-12 sm:px-6 lg:px-8"
         >
-          <h2 className="mb-6 text-2xl font-semibold text-[var(--si-ink)]">
-            {query.q ? 'Search results' : selectedCategory?.name || 'All products'}
-          </h2>
+          <div className={heroStyles.catalogueHeading}>
+            <h2 className="text-2xl font-semibold text-[var(--si-ink)]">
+              {query.q
+                ? 'Search results'
+                : selectedCategory?.name || 'All products'}
+            </h2>
+            <button
+              type="button"
+              onClick={() => setShowCartSidebar(true)}
+              className={heroStyles.cartButton}
+              aria-label={`Open cart, ${cartCount} items`}
+            >
+              <ShoppingCart size={19} aria-hidden="true" />
+              <span className={heroStyles.cartLabel}>Cart</span>
+              <span className={heroStyles.cartCount}>{cartCount}</span>
+            </button>
+          </div>
           <div className={heroStyles.toolbar}>
             <div className={heroStyles.searchRow}>
-              <form
-                className={heroStyles.searchField}
+              <CatalogueSearch
+                label="Search catalogue"
+                placeholder="Search by brand or model…"
+                value={searchQuery}
+                onChange={setSearchQuery}
+                onClear={() => {
+                  setSearchQuery('');
+                  startTransition(() =>
+                    router.push(
+                      shopListingHref({ ...query, q: '', page: 1 }) +
+                        '#shop-products',
+                    ),
+                  );
+                }}
+                helper="Enter a brand or model, then select Search."
                 action={shopListingHref({ ...query, q: '', page: 1 })}
                 onSubmit={(event) => {
                   event.preventDefault();
@@ -155,32 +182,7 @@ export default function ShopContent({
                     ),
                   );
                 }}
-              >
-                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                <Input
-                  placeholder="Search products or models…"
-                  aria-label="Search products"
-                  name="q"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                  }}
-                  className={heroStyles.searchInput}
-                />
-                <button type="submit" className={heroStyles.searchSubmit}>
-                  Search
-                </button>
-              </form>
-              <button
-                type="button"
-                onClick={() => setShowCartSidebar(true)}
-                className={heroStyles.cartButton}
-                aria-label={`Open cart, ${cartCount} items`}
-              >
-                <ShoppingCart size={19} aria-hidden="true" />
-                <span className={heroStyles.cartLabel}>Cart</span>
-                <span className={heroStyles.cartCount}>{cartCount}</span>
-              </button>
+              />
             </div>
 
             <div

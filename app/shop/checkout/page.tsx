@@ -607,6 +607,11 @@ function CheckoutContent() {
                     FREE
                   </span>
                 </div>
+                <p className="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                  Sourced from China after payment. Estimated delivery to your
+                  address in Nigeria: 10–15 business days. Nationwide doorstep
+                  delivery is included in the total shown.
+                </p>
 
                 <div className="my-6 border-t border-dashed border-slate-200 dark:border-slate-800" />
 
