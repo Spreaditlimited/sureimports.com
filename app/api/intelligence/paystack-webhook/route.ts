@@ -1,3 +1,5 @@
+import { findProcurementCheckout, settleProcurementCheckout } from '@/lib/procurement/paystackCheckout';
+import { POST as verifyLegacyProcurementPayment } from '@/app/api/paystack-payment/procurement/route';
 import crypto from 'crypto';
 import { finalizeShopCheckout, processShopEffects } from '@/lib/shop/checkout';
 import { after, NextResponse } from 'next/server';
@@ -119,6 +121,23 @@ export async function POST(request: Request) {
 
   const payload = JSON.parse(rawBody);
   const event = String(payload?.event || '').trim();
+  if (event === 'charge.success' && String(payload?.data?.reference || '').startsWith('PROCPAY_')) {
+    try {
+      const payment = payload.data;
+      const checkout = await findProcurementCheckout(payment.reference);
+      if (checkout) await settleProcurementCheckout(payment.reference, payment);
+      else {
+        // Checkouts opened before this release still settle from verified provider metadata.
+        const result = await verifyLegacyProcurementPayment(new Request(request.url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ reference: payment.reference, amount: Number(payment.amount) / 100, currency: payment.currency, consumer_id: payment.metadata?.consumer_id, service_id: payment.metadata?.service_id, service_name: 'PROCUREMENT' }) }));
+        if (!result.ok) throw new Error('Legacy procurement payment requires reconciliation.');
+      }
+      return NextResponse.json({ received: true });
+    } catch (error) {
+      console.error('Procurement webhook requires retry', error);
+      return NextResponse.json({ message: 'Procurement payment reconciliation requires retry.' }, { status: 503 });
+    }
+  }
+
   if (event === 'charge.success' && String(payload?.data?.reference || '').startsWith('SHOP2_')) {
     try {
       const checkout = await finalizeShopCheckout(payload.data.reference, payload.data);

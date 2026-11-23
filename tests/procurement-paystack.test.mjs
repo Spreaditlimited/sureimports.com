@@ -9,6 +9,7 @@ globalThis.__procPay=fixture;
 const inline=s=>({url:'data:text/javascript,'+encodeURIComponent(s),shortCircuit:true});
 const hook=registerHooks({resolve(s,c,n){
  if(s==='next/server')return inline('export const NextResponse=Response');
+ if(s==='@/lib/procurement/paystackCheckout')return inline('export const findProcurementCheckout=async()=>null; export const verifyProcurementCheckout=async()=>({})');
  if(s==='@/lib/prisma')return inline('export const prisma=globalThis.__procPay.db');
  if(s==='@/lib/email/xMail')return inline('export default async function mail(v){globalThis.__procPay.mails.push(v)}');
  if(s==='@/lib/helpers/randomGenerator')return inline('export default ()=>"synthetic"');
@@ -18,7 +19,7 @@ const hook=registerHooks({resolve(s,c,n){
  return n(s,c);
 }});
 const {POST}=await import('../app/api/paystack-payment/procurement/route.ts');hook.deregister();
-globalThis.fetch=async(url)=>{assert.match(url,/api.paystack.co\/transaction\/verify\/PROCPAY_fixture/);return Response.json({status:true,data:{status:'success',amount:fixture.verifiedAmount,currency:'NGN',reference:'PROCPAY_fixture'}})};
+globalThis.fetch=async(url)=>{assert.match(url,/api.paystack.co\/transaction\/verify\/PROCPAY_fixture/);return Response.json({status:true,data:{status:'success',amount:fixture.verifiedAmount,currency:'NGN',reference:'PROCPAY_fixture',metadata:{consumer_id:'customer',service_id:'order'}}})};
 const pay=()=>POST(new Request('https://sureimports.test/api/paystack-payment/procurement',{method:'POST',body:JSON.stringify({reference:'PROCPAY_fixture',consumer_id:'customer',service_id:'order',currency:'NGN',amount:250000})}));
 test('ordinary Sure Imports procurement verifies, records payment, freezes pricing and sends receipts',async()=>{
  fixture.verifiedAmount=100;assert.equal((await pay()).status,400);assert.equal(fixture.payments.length,0);

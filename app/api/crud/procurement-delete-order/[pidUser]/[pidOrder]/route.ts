@@ -30,22 +30,12 @@ export async function GET(
   // );
 
   try {
-    const deleteOrder = await prisma.orders.deleteMany({
-      where: {
-        pidUser: pidUser,
-        pidOrder: pidOrder,
-        status: 'saved',
-        partnerOwnership: { is: null },
-      },
-    });
-
-    const deleteProduct = await prisma.products.deleteMany({
-      where: {
-        pidUser: pidUser,
-        pidOrder: pidOrder,
-        //status: 'saved',
-        orders: { partnerOwnership: { is: null } },
-      },
+    const deleteOrder = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT pidOrder FROM orders WHERE pidOrder=${pidOrder} FOR UPDATE`;
+      const payment = await tx.payments.findFirst({ where: { serviceID: pidOrder } });
+      const checkouts = await tx.$queryRaw<{reference:string}[]>`SELECT reference FROM procurement_paystack_checkouts WHERE pidOrder=${pidOrder} AND status IN ('PENDING','PAID','REVIEW') LIMIT 1`;
+      if (payment || checkouts.length) return { count: 0 };
+      return tx.orders.updateMany({ where: { pidUser, pidOrder, status: 'saved', partnerOwnership: { is: null } }, data: { status: 'cancelled-saved', updatedAt: new Date() } });
     });
 
     if (deleteOrder.count > 0) {

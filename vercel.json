@@ -41,6 +41,10 @@
     {
       "path": "/api/cron/support-attachments",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/procurement-payments",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

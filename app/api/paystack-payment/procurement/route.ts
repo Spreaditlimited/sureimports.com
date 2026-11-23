@@ -1,3 +1,4 @@
+import { findProcurementCheckout, verifyProcurementCheckout } from '@/lib/procurement/paystackCheckout';
 import { prisma } from '@/lib/prisma';
 import xMail from '@/lib/email/xMail';
 import randomGenerator from '@/lib/helpers/randomGenerator';
@@ -73,10 +74,19 @@ export async function POST(request: Request) {
       );
     }
 
+    const checkout = await findProcurementCheckout(reference);
+    if (checkout) {
+      if (checkout.pidOrder !== service_id || checkout.pidUser !== consumer_id) return NextResponse.json({ status: 'error', message: 'Payment belongs to another order.' }, { status: 400 });
+      const result = await verifyProcurementCheckout(reference);
+      if (!['PAID', 'REVIEW'].includes(result.status)) return NextResponse.json({ status: 'pending', message: 'Payment confirmation is pending. Do not pay again; we will check automatically.' }, { status: 202 });
+      return NextResponse.json({ status: 'success', nextStatus: result.nextStatus, message: 'Payment verified successfully' });
+    }
+
     const existingPayment = await prisma.payments.findFirst({
       where: { txRef: reference, paymentStatus: 'PAID' },
     });
     if (existingPayment) {
+      if (existingPayment.pidUser !== consumer_id || existingPayment.serviceID !== service_id) return NextResponse.json({ status: 'error', message: 'Payment belongs to another order.' }, { status: 400 });
       const paidLifecycle = await getProcurementOrderLifecycle(
         service_id,
         consumer_id,
@@ -196,6 +206,7 @@ export async function POST(request: Request) {
     }
 
     const paymentData = data.data;
+    if (paymentData.metadata?.consumer_id !== consumer_id || paymentData.metadata?.service_id !== service_id) return NextResponse.json({ status: 'error', message: 'Payment does not belong to this order.' }, { status: 400 });
     const verifiedAmount = Number(paymentData.amount || 0) / 100;
     const paidCurrency = String(paymentData.currency || '').toUpperCase();
 

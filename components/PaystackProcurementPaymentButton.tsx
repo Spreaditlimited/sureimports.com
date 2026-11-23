@@ -228,7 +228,6 @@ export default function PaystackProcurementPaymentButton({
       router.refresh();
       return;
     }
-    const reference = `PROCPAY_${Date.now()}`;
 
     const paystackReady = await ensurePaystackScript();
     const paystack = getPaystackPop();
@@ -238,15 +237,31 @@ export default function PaystackProcurementPaymentButton({
       return;
     }
 
+    let checkout;
+    try {
+      const response = await fetch('/api/paystack-payment/procurement/checkout', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pidOrder: service_id }),
+      });
+      checkout = await response.json();
+      if (!response.ok) throw new Error(checkout.message || 'Unable to save checkout.');
+      if (checkout.currency !== payCurrency || Math.abs(checkout.amount - payAmount) > 0.01) throw new Error('The order amount changed. Refresh before paying.');
+    } catch (error) {
+      setIsLoading(false);
+      setPaymentFeedback({ type: 'error', title: 'Checkout unavailable', message: error instanceof Error ? error.message : 'Please try again.', redirectTo: '' });
+      return;
+    }
+    const reference = checkout.reference;
+
     const handler = paystack.setup({
       key: publicKey,
-      email,
-      amount: Math.round(payAmount * 100),
+      email: checkout.email,
+      amount: Math.round(checkout.amount * 100),
       currency: payCurrency,
       ref: reference,
       metadata: {
         service_id,
-        service_name,
+        service_name: 'PROCUREMENT',
         consumer_id,
         destinationCountry,
       },
