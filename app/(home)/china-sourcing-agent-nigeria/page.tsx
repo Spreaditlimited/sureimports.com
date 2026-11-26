@@ -47,11 +47,14 @@ export default function ChinaSourcingAgentNigeriaPage() {
       <JsonLdScript data={{
         '@context': 'https://schema.org',
         '@type': 'Service',
+        '@id': `${url}#service`,
         name: 'China product and supplier sourcing for Nigerian businesses',
         serviceType: 'Product and supplier sourcing',
         url,
+        description: 'Supplier search and comparison for wholesale goods, custom products and machinery requested by Nigerian buyers.',
         areaServed: { '@type': 'Country', name: 'Nigeria' },
-        provider: { '@type': 'Organization', name: 'Sure Imports', url: 'https://www.sureimports.com' },
+        provider: { '@id': 'https://www.sureimports.com/#organization' },
+        mainEntityOfPage: url,
       }} />
       <Navigation />
       <ServiceHero
@@ -87,6 +90,32 @@ export default function ChinaSourcingAgentNigeriaPage() {
         </div>
       </section>
 
+      <section className="py-20 md:py-24" aria-labelledby="sourcing-comparison-title">
+        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+          <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Before choosing a factory</p>
+          <h2 id="sourcing-comparison-title" className="mt-4 max-w-4xl text-3xl text-slate-950 dark:text-white md:text-4xl">Compare like-for-like supplier quotations, not only unit prices.</h2>
+          <p className="mt-5 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">For a Nigerian buyer sourcing from China, two quotations are comparable only when they describe the same product and order terms. Ask for the evidence below before deciding which supplier to use.</p>
+          <div className="mt-9 grid gap-5 md:grid-cols-2">
+            {[
+              { title: 'Product and sample', text: 'Match material, size, colour, components, packaging and branding to the brief. A sample can reveal differences a product photo cannot.' },
+              { title: 'Supplier and capability', text: 'Record the legal company name, contact, production role and capacity. A marketplace listing or low quote alone does not establish who will make the goods.' },
+              { title: 'Quantity and timing', text: 'Compare minimum order quantity, price breaks, sample lead time, production lead time and what happens if a variant is unavailable.' },
+              { title: 'Total order scope', text: 'Check whether the quote includes tooling, labels, inspection, China-side delivery and export packing. Confirm the payment stages and where shipping responsibility begins.' },
+            ].map((check) => (
+              <div key={check.title} className="rounded-2xl border border-slate-200 bg-white p-7 dark:border-slate-800 dark:bg-slate-950">
+                <h3 className="text-xl text-slate-950 dark:text-white">{check.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{check.text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-7 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">Example: if one supplier quotes a finished, branded product and another quotes an unbranded item without packaging, the lower unit price does not answer which order will cost less to deliver. Put both offers against one written specification first.</p>
+          <div className="mt-9 max-w-3xl rounded-2xl border-l-4 border-brand-orange-500 bg-white p-7 dark:bg-slate-950">
+            <h3 className="text-xl text-slate-950 dark:text-white">Experience across multi-product orders</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Sure Imports has worked with network-marketing companies that buy several kinds of products from China. The team has sourced many of those products end to end, alongside supplier-payment support. That experience is why a sourcing brief needs to separate each product’s specification, quantity and supplier terms instead of treating a mixed order as one interchangeable quote.</p>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-24" aria-labelledby="sourcing-fit-title">
         <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <div>
@@ -110,6 +139,8 @@ export default function ChinaSourcingAgentNigeriaPage() {
         <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
           <h2 id="sourcing-brief-title" className="text-3xl text-slate-950 dark:text-white md:text-4xl">Prepare a brief that produces useful quotations.</h2>
           <p className="mt-5 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">Include reference photos or technical drawings where available, exact variants and quantities, material or performance requirements, packaging or branding, your target cost and delivery location. Ask which checks are included and whether samples, factory visits, inspection, shipping or customs handling need separate approval.</p>
+          <p className="mt-4 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">Tell the team whether you want an existing wholesale product, a private-label version or a product made to your own specification. That changes the likely minimum order, sample work and questions to put to suppliers. For machinery, add the required output per hour, local power supply, installation space, consumables and spare-part needs.</p>
+          <p className="mt-4 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">The agreed project scope should say which supplier checks, samples, inspections and shipping tasks are included. Fees, lead times and final landed costs depend on the product and quotation; confirm them before committing to an order. You can estimate the freight volume with the <Link href="/tools/cbm-volumetric-weight-calculator" className="font-medium text-brand-orange-600 underline underline-offset-4">CBM calculator</Link> once packed dimensions are available.</p>
           <Link href={LINESCOUT_BULK_SOURCING_URL} className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-7 py-4 text-sm font-medium text-white transition hover:bg-brand-orange-600">Start in LineScout <ArrowRight size={17} aria-hidden="true" /></Link>
         </div>
       </section>

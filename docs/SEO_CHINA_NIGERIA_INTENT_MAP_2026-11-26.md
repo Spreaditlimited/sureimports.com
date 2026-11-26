@@ -32,3 +32,28 @@ For `how to pay chinese suppliers from nigeria`, the RMB-control article had 44 
 CBM query volume was small: the calculator had 7 impressions for `cbm to volumetric weight` and 2 for `cbm shipping calculator`. The calculator now explains China-to-Nigeria use and a worked measurement example without claiming to quote freight prices.
 
 Search Console can show more than one URL for a query without proving harmful cannibalization. Recheck query-to-page distribution, impressions, clicks, CTR and average position after indexing. Inspect the new URLs in Search Console to confirm Google selected their declared canonicals. Search results alone are not a reliable baseline because they vary by user, location and time.
+
+## Indexing check and release gate, 26 November 2026
+
+The read-only Search Console URL Inspection API returned:
+
+| URL | Google index state | Google-selected canonical | Last crawl |
+| --- | --- | --- | --- |
+| `/import-from-china-to-nigeria` | Submitted and indexed | Declared canonical | 22 November 2026 |
+| `/china-sourcing-agent-nigeria` | URL is unknown to Google | None yet | None |
+| `/china-supplier-payment-service-nigeria` | URL is unknown to Google | None yet | None |
+| `/tools/cbm-volumetric-weight-calculator` | Submitted and indexed | Declared canonical | 1 November 2026 |
+
+The two unknown URLs return HTTP 200, permit indexing, declare self-canonicals and appear in the live sitemap. They are new and have not yet been crawled/indexed. Search Console last downloaded the main sitemap on 24 November 2026, before these URLs were added; it reports zero errors and two warnings. The local review release strengthens contextual links from six existing guides and the footer. After the owner approves the Git release, recheck URL Inspection, request indexing in the Search Console UI if still unknown, and monitor Google's selected canonical. The current service account is read-only and cannot request indexing; Chrome's browser-access host was unavailable during this audit.
+
+## Ranking work, not just page creation
+
+The hub answers the broad import question and routes readers by their stage. The sourcing page answers the commercial agent query with a written-brief and supplier-comparison workflow. The Pay Supplier page addresses the defined-invoice transaction and links to the broader payment-method article. The CBM page owns the measurement/calculator query with an actual working calculator. These targets should not be merged or duplicated merely to repeat keywords.
+
+Before release, check that each page's title, description, H1, canonical, indexability, internal links, and JSON-LD appear in server-rendered HTML. Keep the existing articles as instructional supporting content. Do not claim unpublished customer outcomes, guaranteed delivery, automatic supplier verification, or a particular FX rate. If the owner later provides a more detailed, approved project example, add its verified facts as first-hand evidence instead of inventing a case study.
+
+The owner confirmed that Sure Imports has worked with network-marketing companies, paying Chinese suppliers across several products and sourcing many of those products end to end. The sourcing and payment pages use only that high-level experience; no product names, quantities, client identities, savings or outcomes have been invented.
+
+After release, compare these query families weekly in Search Console, with page as a second dimension: `import from china to nigeria`, `china sourcing agent` / `sourcing agent nigeria`, `pay chinese suppliers from nigeria` / `supplier payment`, and `cbm calculator` / `volumetric weight china nigeria`. Record indexed status, impressions, clicks, CTR and average position for the intended page and competing site pages at day 0, 14, 30 and 60. If the wrong page gains most impressions for a query, improve links and intent distinction based on those results; do not automatically create another URL. If the intended page is still unknown or excluded after the release, resolve indexing first.
+
+Google's guidance is to prioritize useful, original, first-hand information and crawlable content; schema is descriptive metadata rather than a ranking shortcut. General SEO best practices also apply to Google's AI search features. Sources: https://developers.google.com/search/docs/fundamentals/creating-helpful-content and https://developers.google.com/search/docs/appearance/ai-features.

@@ -20,7 +20,6 @@ import { AffiliateTracker } from '@/app/(home)/components/AffiliateTracker';
 import {
   organizationSchema,
   websiteSchema,
-  serviceSchema,
 } from '@/lib/seo/schema';
 
 const baseUrl = 'https://www.sureimports.com';
@@ -149,7 +148,7 @@ export default function RootLayout({
 
             {/* JSON-LD Structured Data */}
             <JsonLdScript
-              data={[organizationSchema, websiteSchema, serviceSchema]}
+              data={[organizationSchema, websiteSchema]}
             />
 
             <AffiliateTracker />

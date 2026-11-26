@@ -203,9 +203,7 @@ const schema = [
     description:
       'A Sure Imports resource hub for Nigerian buyers who want to learn how to import from China, calculate costs and choose the right buying, sourcing or shipping route.',
     publisher: {
-      '@type': 'Organization',
-      name: 'Sure Imports',
-      url: baseUrl,
+      '@id': `${baseUrl}/#organization`,
     },
   },
   {
@@ -297,6 +295,9 @@ export default async function ImportFromChinaHubPage() {
             <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
               Importing from China to Nigeria is a sequence of decisions, not one shipping booking. The right starting point depends on whether you have a product link, a supplier, or only a brief.
             </p>
+            <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">
+              In practical terms, define the product and quantity, compare or confirm a supplier, agree the invoice and payment terms, plan freight using packed dimensions, then arrange the product-specific import documents and final delivery. If you already have an invoice, you may need payment support; if you have purchased the goods, you may only need shipping. This page helps you choose that route without starting over.
+            </p>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {[
@@ -315,6 +316,28 @@ export default async function ImportFromChinaHubPage() {
           <p className="mt-8 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
             For documentation, customs and product-specific checks, read the <Link href={detailedGuideHref} className="font-medium text-brand-orange-600 underline underline-offset-4">detailed China to Nigeria import guides</Link>. Requirements vary by product and shipment; confirm current rules with the relevant Nigerian authorities and your clearance professional.
           </p>
+        </div>
+      </section>
+
+      <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-24" aria-labelledby="import-quote-title">
+        <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Before asking for a quote</p>
+            <h2 id="import-quote-title" className="mt-4 text-3xl text-slate-950 dark:text-white md:text-4xl">Bring enough detail to price the whole journey.</h2>
+            <p className="mt-5 leading-relaxed text-slate-600 dark:text-slate-400">A product screenshot or supplier unit price is only a starting point. The final cost in Nigeria depends on the order terms, carton size and weight, freight mode, applicable import requirements, clearance and delivery destination. Ask for a written breakdown so you can see what is included.</p>
+            <p className="mt-4 leading-relaxed text-slate-600 dark:text-slate-400">If your supplier has not packed the order yet, request an estimated carton count and dimensions. Recheck those figures before freight is booked: a larger package can change sea volume or air chargeable weight. Use the <Link href="/tools/cbm-volumetric-weight-calculator" className="font-medium text-brand-orange-600 underline underline-offset-4">CBM and volumetric weight calculator</Link> for the measurement step.</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white p-7 dark:border-slate-800 dark:bg-slate-950 sm:p-9">
+            <h3 className="text-xl text-slate-950 dark:text-white">The order details to collect</h3>
+            <ul className="mt-5 list-disc space-y-3 pl-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+              <li>Product specification, variants, quantity and intended use.</li>
+              <li>Supplier or product link, quotation and pro forma invoice if available.</li>
+              <li>China pickup point, packed carton count, dimensions and gross weight.</li>
+              <li>Nigerian delivery location and whether you need sourcing, payment, inspection, shipping or a combination.</li>
+              <li>Any product-specific approval, testing or labelling requirement to confirm before purchase.</li>
+            </ul>
+            <p className="mt-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Need a supplier first? Start with <Link href="/china-sourcing-agent-nigeria" className="font-medium text-brand-orange-600 underline underline-offset-4">China sourcing support</Link>. Have a supplier and invoice? Read the <Link href="/china-supplier-payment-service-nigeria" className="font-medium text-brand-orange-600 underline underline-offset-4">Pay Supplier route</Link>.</p>
+          </div>
         </div>
       </section>
 
