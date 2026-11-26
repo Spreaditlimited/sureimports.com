@@ -110,8 +110,8 @@ export default function ChinaSourcingAgentNigeriaPage() {
           </div>
           <p className="mt-7 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">Example: if one supplier quotes a finished, branded product and another quotes an unbranded item without packaging, the lower unit price does not answer which order will cost less to deliver. Put both offers against one written specification first.</p>
           <div className="mt-9 max-w-3xl rounded-2xl border-l-4 border-brand-orange-500 bg-white p-7 dark:bg-slate-950">
-            <h3 className="text-xl text-slate-950 dark:text-white">Experience across multi-product orders</h3>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Sure Imports has worked with network-marketing companies that buy several kinds of products from China. The team has sourced many of those products end to end, alongside supplier-payment support. That experience is why a sourcing brief needs to separate each product’s specification, quantity and supplier terms instead of treating a mixed order as one interchangeable quote.</p>
+            <h3 className="text-xl text-slate-950 dark:text-white">Sourcing experience for business buyers</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Sure Imports has sourced products from China end to end for network-marketing companies. We have also helped these companies pay Chinese suppliers across several products. If you need us to find suppliers as well as support the purchase, start with a sourcing brief so we can agree the work your order requires.</p>
           </div>
         </div>
       </section>

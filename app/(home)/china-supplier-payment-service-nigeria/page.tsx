@@ -99,8 +99,8 @@ export default function ChinaSupplierPaymentServiceNigeriaPage() {
           </ol>
           <p className="mt-7 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">A payment request does not by itself prove that the supplier is genuine or that the goods meet your specification. If the supplier, quotation or beneficiary needs independent checking, review <Link href="/supplier-intelligence" className="font-medium text-brand-orange-600 underline underline-offset-4">supplier and quote review options</Link> before paying. Product inspection and shipping should be agreed separately where needed.</p>
           <div className="mt-9 max-w-3xl rounded-2xl border-l-4 border-brand-orange-500 bg-slate-50 p-7 dark:bg-slate-900">
-            <h3 className="text-xl text-slate-950 dark:text-white">Experience with repeat business purchases</h3>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Sure Imports has helped network-marketing companies pay Chinese suppliers across several products. Some of those products were also sourced end to end by the team. For each new payment request, the supplier, invoice, RMB amount and recipient still need to be checked against that specific order; a previous successful purchase is not a substitute for current documents.</p>
+            <h3 className="text-xl text-slate-950 dark:text-white">Payment support for business buyers</h3>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Sure Imports has helped network-marketing companies pay Chinese suppliers across several products. We have also sourced many of those products end to end. Pay Supplier is for a purchase where you already have the supplier and invoice; if you need help finding a supplier, use the <Link href="/china-sourcing-agent-nigeria" className="font-medium text-brand-orange-600 underline underline-offset-4">sourcing route</Link>.</p>
           </div>
         </div>
       </section>
