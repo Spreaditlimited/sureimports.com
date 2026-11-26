@@ -24,4 +24,4 @@
 .bottom a { font-size:12px; }
 @media(max-width:1000px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px; } .identity,.lastColumn { grid-column:1/-1; } }
 @media(max-width:600px) { .container { padding:36px 20px 24px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 20px; } .helpNav { grid-column:1/-1; } .identity p { max-width:40ch; } .bottom { align-items:flex-start; flex-direction:column-reverse; gap:18px; } }
-@media(max-width:420px) { .grid { grid-template-columns:minmax(0,1fr); } .identity,.helpNav,.lastColumn { grid-column:auto; } }
+@media(max-width:420px) { .grid { column-gap:16px; } .grid nav { gap:8px; } }
