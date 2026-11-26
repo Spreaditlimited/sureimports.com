@@ -125,6 +125,20 @@ const MENU_ITEMS = {
       color: 'from-amber-400 to-orange-500',
     },
     {
+      title: 'Sourcing for Nigerian Businesses',
+      href: '/china-sourcing-agent-nigeria',
+      icon: Sparkles,
+      desc: 'Find and compare China suppliers for wholesale or custom orders',
+      color: 'from-indigo-500 to-indigo-800',
+    },
+    {
+      title: 'Pay Supplier',
+      href: '/china-supplier-payment-service-nigeria',
+      icon: DollarSign,
+      desc: 'Payment support when you already have a supplier and invoice',
+      color: 'from-brand-orange-400 to-brand-orange-600',
+    },
+    {
       title: 'Laptops for Business',
       href: '/laptops-for-business',
       icon: Laptop,

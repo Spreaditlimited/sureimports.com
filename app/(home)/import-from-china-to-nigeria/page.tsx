@@ -37,24 +37,20 @@ const pageUrl = `${baseUrl}/import-from-china-to-nigeria`;
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Import From China to Nigeria: Complete Sure Imports Hub',
+  title: 'Import from China to Nigeria: Buying, Sourcing & Shipping',
   description:
-    'Learn how to import from China to Nigeria with guides, calculators, shipping resources, sourcing support and Sure Imports service routes for different buyer needs.',
+    'Plan a China to Nigeria order from product selection to delivery. Compare buying, supplier sourcing and shipping routes, calculate costs and see what to check before paying.',
   keywords: [
     'import from China to Nigeria',
     'how to import from China to Nigeria',
-    'China sourcing Nigeria',
-    'shipping from China to Nigeria',
-    'China procurement agent Nigeria',
-    'mini importation Nigeria',
-    '1688 Nigeria',
-    'Alibaba Nigeria',
+    'China to Nigeria import process',
+    'buy from China and ship to Nigeria',
   ],
   alternates: {
     canonical: pageUrl,
   },
   openGraph: {
-    title: 'Import From China to Nigeria: Complete Sure Imports Hub',
+    title: 'Import from China to Nigeria: Buying, Sourcing & Shipping',
     description:
       'A practical starting point for Nigerian buyers who want to source, buy, ship and plan China imports with fewer mistakes.',
     url: pageUrl,
@@ -115,10 +111,17 @@ const pathways = [
   },
   {
     eyebrow: 'I need sourcing help',
-    title: 'Start a LineScout project',
-    text: 'For individuals and small businesses sourcing white-label products, wholesale stock or other products in bulk.',
-    href: LINESCOUT_BULK_SOURCING_URL,
+    title: 'Find a China sourcing agent',
+    text: 'For Nigerian businesses that need supplier search, comparison, white-label products or wholesale stock before buying.',
+    href: '/china-sourcing-agent-nigeria',
     icon: FileSearch,
+  },
+  {
+    eyebrow: 'I have a supplier and invoice',
+    title: 'Arrange supplier payment',
+    text: 'See the Pay Supplier route when the supplier, goods and payment details are already defined.',
+    href: '/china-supplier-payment-service-nigeria',
+    icon: ShieldCheck,
   },
   {
     eyebrow: 'I already bought goods',
@@ -159,6 +162,16 @@ const calculators = [
 ];
 
 const faqs = [
+  {
+    question: 'What information do I need before importing from China to Nigeria?',
+    answer:
+      'Start with the exact product, quantity, specifications, supplier or listing link if you have one, destination in Nigeria and a target budget. Ask for the packed carton dimensions and weight so shipping can be estimated. Check product-specific import requirements before paying.',
+  },
+  {
+    question: 'Can Sure Imports help pay a supplier I already found?',
+    answer:
+      'Yes. The Pay Supplier route is for an existing supplier and a defined invoice. If you still need the products sourced or bought from marketplace links, use the sourcing or website-buying route instead.',
+  },
   {
     question: 'What is the best way to import from China to Nigeria?',
     answer:
@@ -237,6 +250,10 @@ export default async function ImportFromChinaHubPage() {
     ...pathway,
     href: resolvePublicHref(pathway.href, publishedSlugs),
   }));
+  const detailedGuideHref = resolvePublicHref(
+    '/blog/import-from-china-to-nigeria-practical-2026-pillar-guide',
+    publishedSlugs,
+  );
 
   return (
     <main className={pageStyles.page} data-si-page-theme="service">
@@ -248,11 +265,8 @@ export default async function ImportFromChinaHubPage() {
         eyebrow="China to Nigeria"
         title="Import from China to Nigeria with a clear plan."
         description="Learn the process, choose the right service, estimate costs and move from research to a practical import plan."
-        primary={{
-          href: '/supplier-intelligence',
-          label: 'Research suppliers',
-        }}
-        secondary={{ href: '/blog', label: 'Browse import guides' }}
+        primary={{ href: '#service-routes', label: 'Choose your route' }}
+        secondary={{ href: detailedGuideHref, label: 'Read import guides' }}
         summaryTitle="Know what to check before you buy."
         steps={[
           {
@@ -274,6 +288,35 @@ export default async function ImportFromChinaHubPage() {
       >
         <ImportMarkets active="ng" />
       </ServiceHero>
+
+      <section className="py-20 md:py-24" aria-labelledby="import-process-heading">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">The import process</p>
+            <h2 id="import-process-heading" className="mt-4 text-3xl text-slate-950 dark:text-white md:text-5xl">From a product idea to a delivered order.</h2>
+            <p className="mt-5 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+              Importing from China to Nigeria is a sequence of decisions, not one shipping booking. The right starting point depends on whether you have a product link, a supplier, or only a brief.
+            </p>
+          </div>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              { number: '01', title: 'Define the order', text: 'Record the product, specifications, quantity, destination and target budget. For regulated categories, check the applicable Nigerian requirements before ordering.' },
+              { number: '02', title: 'Choose the buying route', text: 'Use product-link buying when the listing is already chosen. Use sourcing when you need suppliers compared, and shipping-only when goods are already purchased.' },
+              { number: '03', title: 'Check the full cost', text: 'Compare product price, China-side delivery, payment and inspection costs, packed dimensions, freight, clearing and final delivery. An early estimate is not a final quote.' },
+              { number: '04', title: 'Confirm before payment', text: 'Match the supplier, product specification, invoice and recipient details. Agree on inspection and shipping responsibilities, then keep the order and payment records.' },
+            ].map((step) => (
+              <div key={step.number} className="rounded-2xl border border-slate-200 bg-white p-7 dark:border-slate-800 dark:bg-slate-900">
+                <span className="text-sm font-semibold text-brand-orange-500">{step.number}</span>
+                <h3 className="mt-5 text-xl text-slate-950 dark:text-white">{step.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{step.text}</p>
+              </div>
+            ))}
+          </div>
+          <p className="mt-8 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            For documentation, customs and product-specific checks, read the <Link href={detailedGuideHref} className="font-medium text-brand-orange-600 underline underline-offset-4">detailed China to Nigeria import guides</Link>. Requirements vary by product and shipment; confirm current rules with the relevant Nigerian authorities and your clearance professional.
+          </p>
+        </div>
+      </section>
 
       {visibleFeaturedGuides.length > 0 && (
         <section className="py-20 md:py-28">
@@ -313,7 +356,7 @@ export default async function ImportFromChinaHubPage() {
       )}
 
       {/* --- PATHWAYS --- */}
-      <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
+      <section id="service-routes" className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-28">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <div className="mx-auto mb-16 max-w-3xl text-center">
             <span className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">

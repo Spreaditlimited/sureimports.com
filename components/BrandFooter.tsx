@@ -22,6 +22,8 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         <nav aria-label="Explore Sure Imports">
           <h2>Explore</h2>
           <Link href={`${mainSite}/import-hub`}>Import Hub</Link>
+          <Link href={`${mainSite}/import-from-china-to-nigeria`}>Import from China to Nigeria</Link>
+          <Link href={`${mainSite}/china-sourcing-agent-nigeria`}>China sourcing for Nigerian businesses</Link>
           <Link href={`${mainSite}/cars`}>Cars & commercial vehicles</Link>
           <Link href={`${mainSite}/shop`}>Gadget shop</Link>
           <Link href={`${mainSite}/shop/category/phones`}>Phones</Link>
@@ -38,6 +40,7 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
           <Link href={`${mainSite}/install`}>Install Sure Imports</Link>
           <Link href={`${mainSite}/track`}>Track a shipment</Link>
           <Link href={`${mainSite}/shipping-rate`}>Shipping rates</Link>
+          <Link href={`${mainSite}/china-supplier-payment-service-nigeria`}>Pay a Chinese supplier</Link>
           <Link href={`${mainSite}/about`}>About Sure Imports</Link>
           <a href="mailto:hello@sureimports.com">hello@sureimports.com</a>
         </nav>

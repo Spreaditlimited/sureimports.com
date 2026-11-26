@@ -3,22 +3,22 @@ import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   "title": {
-    "absolute": "CBM & Volumetric Weight Calculator | Sure Imports"
+    "absolute": "CBM Calculator for China to Nigeria Shipping | Sure Imports"
   },
-  "description": "Calculate carton CBM for sea freight and volumetric weight for air freight. Compare shipment measurements before importing from China to Nigeria.",
+  "description": "Calculate carton CBM for China to Nigeria sea shipping and volumetric weight for air freight. Enter packed dimensions and quantity, then use the result to request a shipment quote.",
   "alternates": {
     "canonical": "https://www.sureimports.com/tools/cbm-volumetric-weight-calculator"
   },
   "openGraph": {
-    "title": "CBM & Volumetric Weight Calculator | Sure Imports",
-    "description": "Calculate carton CBM for sea freight and volumetric weight for air freight. Compare shipment measurements before importing from China to Nigeria.",
+    "title": "CBM Calculator for China to Nigeria Shipping | Sure Imports",
+    "description": "Calculate carton CBM for China to Nigeria sea shipping and volumetric weight for air freight.",
     "url": "https://www.sureimports.com/tools/cbm-volumetric-weight-calculator",
     "type": "website"
   },
   "twitter": {
     "card": "summary_large_image",
-    "title": "CBM & Volumetric Weight Calculator | Sure Imports",
-    "description": "Calculate carton CBM for sea freight and volumetric weight for air freight. Compare shipment measurements before importing from China to Nigeria."
+    "title": "CBM Calculator for China to Nigeria Shipping | Sure Imports",
+    "description": "Calculate carton CBM for China to Nigeria sea shipping and volumetric weight for air freight."
   }
 };
 

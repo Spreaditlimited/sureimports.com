@@ -176,7 +176,7 @@ const serviceLinks = [
   {
     title: 'Pay Supplier',
     text: 'Already have a confirmed supplier and invoice? Sign in to use Pay Supplier from your dashboard.',
-    href: '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate',
+    href: '/china-supplier-payment-service-nigeria',
     icon: CreditCard,
   },
   {

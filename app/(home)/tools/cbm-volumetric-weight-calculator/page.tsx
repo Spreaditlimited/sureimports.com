@@ -1,6 +1,7 @@
 'use client';
 
 import HeroPill from '@/components/home/HeroPill';
+import Link from 'next/link';
 import styles from '../Tools.module.css';
 import { useMemo, useState } from 'react';
 import {
@@ -120,15 +121,15 @@ export default function CbmVolumetricWeightCalculatorPage() {
             Freight Estimation
           </HeroPill>
           <h1 className="mb-6 text-4xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-            CBM & Volumetric{' '}
+            China to Nigeria CBM &{' '}
             <span className="bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent">
-              Weight Calculator
+              Volumetric Weight Calculator
             </span>
           </h1>
           <p className="max-w-3xl text-lg font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-            Calculate space and weight metrics before shipping from China.
-            Understand your chargeable weight for air freight and total volume
-            for sea freight.
+            Enter the packed carton dimensions and quantity to calculate cubic
+            metres for sea freight and estimated chargeable weight for air freight.
+            Use these measurements when planning a shipment from China to Nigeria.
           </p>
         </header>
 
@@ -243,7 +244,7 @@ export default function CbmVolumetricWeightCalculatorPage() {
 
             <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm font-medium text-amber-800 dark:border-amber-900/30 dark:bg-amber-900/10 dark:text-amber-200">
               <HelpCircle className="h-5 w-5 shrink-0 text-amber-500" />
-              Standard formula: (L x W x H) / 6000
+              Air volumetric weight uses (L × W × H) ÷ 6000 as a planning assumption. Confirm your carrier’s divisor before booking.
             </div>
           </section>
 
@@ -334,6 +335,26 @@ export default function CbmVolumetricWeightCalculatorPage() {
             )}
           </section>
         </div>
+
+        <section className="mt-20 rounded-2xl border border-slate-200 bg-white p-7 dark:border-slate-800 dark:bg-slate-900 sm:p-10" aria-labelledby="cbm-example-title">
+          <h2 id="cbm-example-title" className="text-2xl font-semibold text-slate-900 dark:text-white sm:text-3xl">How to calculate CBM for a China to Nigeria shipment</h2>
+          <p className="mt-4 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">
+            Ask the supplier for the outside dimensions of each packed carton, not the product dimensions. Convert centimetres to metres, multiply length × width × height, then multiply by the number of identical cartons. For mixed carton sizes, calculate each group separately and add the volumes.
+          </p>
+          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+            <div className="rounded-xl bg-slate-50 p-5 dark:bg-slate-800/60"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Example carton</p><p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">60 × 40 × 50 cm</p></div>
+            <div className="rounded-xl bg-slate-50 p-5 dark:bg-slate-800/60"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Sea volume</p><p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">0.12 m³ each · 1.2 m³ for 10</p></div>
+            <div className="rounded-xl bg-slate-50 p-5 dark:bg-slate-800/60"><p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Air volume weight</p><p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">20 kg each · 200 kg for 10</p></div>
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            These are measurement examples, not freight prices. A carrier may use a different volumetric divisor, minimum charge or rounding rule. Your shipment quote may also include consolidation, customs, clearance and local delivery. Confirm the packed details and quote terms for your actual cargo.
+          </p>
+          <div className="mt-7 flex flex-wrap gap-5 text-sm font-semibold">
+            <Link href="/shipping-rate" className="text-brand-orange-600 underline underline-offset-4">See shipping rates</Link>
+            <Link href="/ship-with-us" className="text-brand-orange-600 underline underline-offset-4">Request shipping support</Link>
+            <Link href="/import-from-china-to-nigeria" className="text-brand-orange-600 underline underline-offset-4">Plan the full import</Link>
+          </div>
+        </section>
 
         {/* FAQ Section */}
         <section className="mt-24 border-t border-slate-200 pt-16 dark:border-slate-800">

@@ -158,7 +158,7 @@ const faqSchema = {
 };
 
 
-const paySupplierHref = '/auth/login?next=%2Fdashboard%2Fpay-supplier%2Fcreate';
+const paySupplierHref = '/china-supplier-payment-service-nigeria';
 const inlineServiceLinkClass =
   'font-bold text-brand-orange-600 underline decoration-brand-orange-300 underline-offset-4 transition hover:text-brand-orange-700 dark:text-brand-orange-400 dark:decoration-brand-orange-500/60 dark:hover:text-brand-orange-300';
 

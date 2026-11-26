@@ -62,6 +62,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.95,
     },
     {
+      url: `${baseUrl}/china-sourcing-agent-nigeria`,
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/china-supplier-payment-service-nigeria`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
       url: `${baseUrl}/supplier-intelligence`,
       changeFrequency: 'weekly',
       priority: 0.9,
