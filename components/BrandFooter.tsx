@@ -19,34 +19,42 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
           <p>From finding the right products to bringing them home. Import from China with confidence.</p>
           <span className={styles.locations}>Nigeria · United Kingdom · China</span>
         </div>
-        <nav aria-label="Explore Sure Imports">
-          <h2>Explore</h2>
+        <nav aria-label="Import and sourcing" className={styles.importNav}>
+          <h2>Import &amp; sourcing</h2>
           <Link href={`${mainSite}/import-hub`}>Import Hub</Link>
           <Link href={`${mainSite}/import-from-china-to-nigeria`}>Import from China to Nigeria</Link>
           <Link href={`${mainSite}/china-sourcing-agent-nigeria`}>China sourcing for Nigerian businesses</Link>
+          <Link href={`${mainSite}/china-supplier-payment-service-nigeria`}>Pay a Chinese supplier</Link>
+          <a href="https://linescout.sureimports.com/white-label">White label products</a>
+          <a href="https://linescout.sureimports.com">LineScout sourcing</a>
+        </nav>
+        <nav aria-label="Shop Sure Imports" className={styles.shopNav}>
+          <h2>Shop</h2>
           <Link href={`${mainSite}/cars`}>Cars & commercial vehicles</Link>
           <Link href={`${mainSite}/shop`}>Gadget shop</Link>
           <Link href={`${mainSite}/shop/category/phones`}>Phones</Link>
           <Link href={`${mainSite}/shop/category/laptops`}>Laptops</Link>
           <Link href={`${mainSite}/shop/category/watches`}>Watches</Link>
-          <a href="https://linescout.sureimports.com/white-label">White label products</a>
-          <a href="https://linescout.sureimports.com">LineScout sourcing</a>
-          <a href="https://partner.sureimports.com/partners">Become a partner</a>
-          <a href="https://affiliate.sureimports.com">Affiliate programme</a>
         </nav>
-        <nav aria-label="Help and company">
+        <nav aria-label="Help and company" className={styles.helpNav}>
           <h2>Here to help</h2>
           <Link href={`${mainSite}/contact-us`}>Contact us</Link>
           <Link href={`${mainSite}/install`}>Install Sure Imports</Link>
           <Link href={`${mainSite}/track`}>Track a shipment</Link>
           <Link href={`${mainSite}/shipping-rate`}>Shipping rates</Link>
-          <Link href={`${mainSite}/china-supplier-payment-service-nigeria`}>Pay a Chinese supplier</Link>
           <Link href={`${mainSite}/about`}>About Sure Imports</Link>
           <a href="mailto:hello@sureimports.com">hello@sureimports.com</a>
         </nav>
         <div className={styles.lastColumn}>
           <h2>{newsletter ? 'Import insights' : `Your ${brand.toLowerCase()} journey`}</h2>
           {newsletter ? newsletter : <nav aria-label={`${brand} resources`}>{programmeLinks.map(link => <a key={link.href} href={link.href}>{link.label}</a>)}</nav>}
+          {newsletter && <div className={styles.programmes}>
+            <h2>Work with us</h2>
+            <nav aria-label="Partner programmes">
+              <a href="https://partner.sureimports.com/partners">Become a partner</a>
+              <a href="https://affiliate.sureimports.com">Affiliate programme</a>
+            </nav>
+          </div>}
           <div className={styles.socials} aria-label="Follow Sure Imports">
             <a href="https://www.instagram.com/sureimport" target="_blank" rel="noopener noreferrer">Instagram</a>
             <a href="https://www.youtube.com/@sureimports" target="_blank" rel="noopener noreferrer">YouTube</a>

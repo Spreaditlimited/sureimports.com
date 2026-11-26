@@ -18,6 +18,7 @@ import {
 } from '@/lib/blogReadingTime';
 import { enhanceBlogTables } from '@/lib/blogHtml';
 import { getBlogRedirectTarget } from '@/lib/blogRedirects';
+import { getBlogJourneyLinks } from '@/lib/seo/blogJourneyLinks';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -301,7 +302,7 @@ export default async function BlogDetailsPage({ params }: PageProps) {
         className="min-h-screen bg-[var(--si-canvas)]"
         data-si-page-theme="editorial"
       >
-        <BlogDetail post={displayPost} relatedPosts={relatedCards}>
+        <BlogDetail post={displayPost} relatedPosts={relatedCards} journeyLinks={getBlogJourneyLinks(slug)}>
           {/<[a-z][\s\S]*>/i.test(content) ? (
             <div
               dangerouslySetInnerHTML={{ __html: enhanceBlogTables(content) }}

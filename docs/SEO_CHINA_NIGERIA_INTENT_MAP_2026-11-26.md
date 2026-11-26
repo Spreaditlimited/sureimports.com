@@ -12,6 +12,8 @@ This map keeps the main commercial and information pages distinct. Do not create
 
 `/corporate-sourcing` retains its institutional procurement scope. `/import-hub` retains the country-selection scope. Existing articles remain supporting material rather than duplicate service landing pages. Internal link text should describe the destination task; avoid using the same exact keyword as every anchor.
 
+The blog renderer adds a relevant next-step panel only to six existing guides: both broad import guides point to the import hub; the procurement-agent guide points to the sourcing service; the general payment guide points to Pay Supplier; the RMB-specific guide points to the broader payment guide and Pay Supplier; and the shipping/cost pillar points to the CBM calculator. The published article bodies and metadata remain intact.
+
 ## Search Console baseline, 26 November 2026
 
 Chrome browser access was unavailable, so these figures came from the site's configured read-only Search Console service account for `sc-domain:sureimports.com`, Google web search, final data.

@@ -1,6 +1,6 @@
 .footer { background:#101113; color:#c2c3cc; font-size:14px; line-height:1.6; margin-top:auto; }
 .container { max-width:1440px; margin:0 auto; padding:48px 32px 24px; }
-.grid { display:grid; grid-template-columns:1.2fr 1fr 1fr 1.2fr; gap:36px; }
+.grid { display:grid; grid-template-columns:1.3fr 1.1fr .85fr 1fr 1.15fr; gap:28px; }
 .footer .brand { display:inline-flex; flex-direction:column; gap:9px; color:#fff; }
 .brand img { display:block; width:200px; height:32px; max-width:100%; object-fit:contain; object-position:left; }
 .brand span { font-size:11px; font-weight:650; letter-spacing:.2em; text-transform:uppercase; }
@@ -10,6 +10,8 @@
 .locations { font-size:12px; color:#a5a7b3; }
 .footer nav { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
 .footer nav h2 { margin-bottom:6px; }
+.programmes { margin-top:24px; }
+.programmes nav { gap:6px; }
 .footer a { color:#c2c3cc; text-decoration:none; font-size:14px; line-height:1.6; overflow-wrap:anywhere; }
 .footer a:hover { color:#fff; text-decoration:underline; text-underline-offset:4px; }
 .footer a:focus-visible { outline:2px solid #b9afff; outline-offset:5px; border-radius:3px; }
@@ -20,5 +22,6 @@
 .bottom p span { display:block; color:#a5a7b3; }
 .bottom nav { flex-direction:row; flex-wrap:wrap; gap:10px 20px; }
 .bottom a { font-size:12px; }
-@media(max-width:1000px) { .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:32px; } }
-@media(max-width:600px) { .container { padding:36px 20px 24px; } .grid { gap:28px 20px; } .identity,.lastColumn { grid-column:1/-1; } .identity p { max-width:40ch; } .bottom { align-items:flex-start; flex-direction:column-reverse; gap:18px; } }
+@media(max-width:1000px) { .grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:32px; } .identity,.lastColumn { grid-column:1/-1; } }
+@media(max-width:600px) { .container { padding:36px 20px 24px; } .grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:28px 20px; } .helpNav { grid-column:1/-1; } .identity p { max-width:40ch; } .bottom { align-items:flex-start; flex-direction:column-reverse; gap:18px; } }
+@media(max-width:420px) { .grid { grid-template-columns:minmax(0,1fr); } .identity,.helpNav,.lastColumn { grid-column:auto; } }

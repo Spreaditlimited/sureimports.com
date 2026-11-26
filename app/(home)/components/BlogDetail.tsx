@@ -27,6 +27,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { enhanceBlogTables } from '@/lib/blogHtml';
 import { formatBlogDate } from '@/lib/blogDate';
+import type { BlogJourneyLink } from '@/lib/seo/blogJourneyLinks';
 
 // X (Twitter) icon component
 const XIcon = ({ className }: { className?: string }) => (
@@ -307,6 +308,7 @@ const ImageWithFallback = ({
 interface BlogDetailProps {
   post: BlogDisplayPost;
   relatedPosts?: BlogDisplayPost[];
+  journeyLinks?: readonly BlogJourneyLink[];
   children?: ReactNode;
   onBack?: () => void;
   onSelectPost?: (slug: string) => void;
@@ -315,6 +317,7 @@ interface BlogDetailProps {
 export default function BlogDetail({
   post,
   relatedPosts = [],
+  journeyLinks = [],
   children,
 }: BlogDetailProps) {
   const formatDate = formatBlogDate;
@@ -427,6 +430,33 @@ export default function BlogDetail({
                 <div className="whitespace-pre-wrap">{post.content}</div>
               ))}
           </div>
+
+          {journeyLinks.length > 0 && (
+            <nav
+              aria-label="Related import services"
+              className="mt-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-800 dark:bg-slate-900 sm:p-8"
+            >
+              <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
+                Put this guide to work
+              </h2>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                {journeyLinks.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="rounded-xl border border-slate-200 bg-white p-5 transition hover:border-brand-orange-300 dark:border-slate-700 dark:bg-slate-950 dark:hover:border-brand-orange-500"
+                  >
+                    <span className="text-sm font-semibold text-brand-orange-600 dark:text-brand-orange-400">
+                      {item.label}
+                    </span>
+                    <span className="mt-2 block text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                      {item.description}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            </nav>
+          )}
 
           <BlogLeadMagnetCta post={post} />
 
