@@ -16,7 +16,7 @@ The blog renderer adds a relevant next-step panel only to six existing guides: b
 
 ## Search Console baseline, 26 November 2026
 
-Chrome browser access was unavailable, so these figures came from the site's configured read-only Search Console service account for `sc-domain:sureimports.com`, Google web search, final data.
+These figures came from the site's configured read-only Search Console service account for `sc-domain:sureimports.com`, Google web search, final data.
 
 | Window | Clicks | Impressions |
 | --- | ---: | ---: |
@@ -44,7 +44,22 @@ The read-only Search Console URL Inspection API returned:
 | `/china-supplier-payment-service-nigeria` | URL is unknown to Google | None yet | None |
 | `/tools/cbm-volumetric-weight-calculator` | Submitted and indexed | Declared canonical | 1 November 2026 |
 
-The two unknown URLs return HTTP 200, permit indexing, declare self-canonicals and appear in the live sitemap. They are new and have not yet been crawled/indexed. Search Console last downloaded the main sitemap on 24 November 2026, before these URLs were added; it reports zero errors and two warnings. The local review release strengthens contextual links from six existing guides and the footer. After the owner approves the Git release, recheck URL Inspection, request indexing in the Search Console UI if still unknown, and monitor Google's selected canonical. The current service account is read-only and cannot request indexing; Chrome's browser-access host was unavailable during this audit.
+The two unknown URLs return HTTP 200, permit indexing, declare self-canonicals and appear in the live sitemap. They are new and had not been crawled/indexed at the day-zero check. Search Console last downloaded the main sitemap on 24 November 2026, before these URLs were added; it reported zero errors and two warnings. The released changes strengthen contextual links from six existing guides and the footer. On 26 November, the Search Console live tests found both new service URLs available to Google, and the UI accepted indexing requests for both. The main sitemap was resubmitted successfully. Requests are not confirmation of indexing; check URL Inspection again at the review dates.
+
+## Release and 60-day measurement log
+
+The reviewed changes were deployed on 26 November 2026 through the Git integration. Production deployment `dpl_3AGzHo1mBWtR9GgQ9cdRghpjv5rS` was Ready, reported `source: git`, and matched `master` commit `c0838ec0b9ad15b6894e3499ccd71acf583cd5c7`. The four target URLs returned HTTP 200 after release. The two new service pages were still shown as unknown to Google before the accepted indexing requests.
+
+Day-zero query/page baseline uses **final web data from 28 October–24 November 2026**, the latest final date available at release. Each group is a union of case-insensitive Search Console `contains` filters; duplicate query/page rows are counted once. These are observed searches on this site, **not** keyword-market search volume. A group may include longer product-specific queries, so compare the same filters and the intended URL over time.
+
+| Query group and `contains` filters | Site clicks | Site impressions | Intended URL clicks | Intended URL impressions |
+| --- | ---: | ---: | ---: | ---: |
+| Import: `import from china to nigeria`; `importation from china to nigeria` | 15 | 254 | 1 | 77 |
+| Sourcing: `china sourcing agent`; `sourcing agent nigeria` | 0 | 15 | 0 | 0 |
+| Payment: `pay chinese suppliers from nigeria`; `supplier payment china` | 0 | 19 | 0 | 0 |
+| CBM: `cbm calculator`; `volumetric weight china nigeria` | 0 | 3 | 0 | 3 |
+
+Review dates are 10 December 2026 (day 14), 26 December 2026 (day 30), and 25 January 2027 (day 60). At each review, use the latest *final* 28-day GSC web window, the same query filters, and the same intended page URLs. Record clicks, impressions, CTR, average position, index status and Google-selected canonical. Check whether supporting pages are taking most impressions for a commercial intent. These dates are review checkpoints, not automated monitoring appointments.
 
 ## Ranking work, not just page creation
 
