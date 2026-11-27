@@ -1,0 +1,464 @@
+.page {
+  background: var(--si-canvas, #f7f8fa);
+  color: var(--si-ink, #18243b);
+  min-height: 100vh;
+  --hub-indigo: var(--si-accent, #48439b);
+  --hub-orange: #f95a0e;
+  --hub-line: var(--si-border, #dce0e8);
+}
+.page main {
+  overflow: clip;
+}
+.page section[id] {
+  scroll-margin-top: 110px;
+}
+.page a:focus-visible,
+.page input:focus-visible {
+  outline: 3px solid var(--hub-orange);
+  outline-offset: 5px;
+}
+.hero {
+  padding: 150px 24px 72px;
+  background: linear-gradient(
+    135deg,
+    var(--si-canvas, #f7f8fa),
+    var(--si-surface, #fff)
+  );
+}
+.heroInner {
+  max-width: 1240px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.12fr 1fr;
+  gap: 52px;
+  align-items: center;
+}
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hub-indigo);
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-size: clamp(36px, 4.4vw, 62px);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
+  font-weight: 650;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--hub-indigo);
+}
+.intro {
+  font-size: 18px;
+  line-height: 1.75;
+  max-width: 650px;
+  margin-top: 25px;
+}
+.actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  min-height: 50px;
+}
+.primary {
+  background: var(--hub-orange);
+  color: #18243b;
+}
+.primary:hover {
+  background: #ff7433;
+}
+.secondary {
+  border: 1px solid var(--hub-line);
+  background: var(--si-surface, #fff);
+  color: inherit;
+}
+.heroNote {
+  font-size: 13px;
+  margin-top: 21px;
+  opacity: 0.75;
+}
+.heroImage {
+  margin: 0;
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid var(--hub-line);
+  background: var(--si-surface, #fff);
+}
+.heroImage img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1.32;
+  object-fit: cover;
+}
+.heroImage figcaption {
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 15px 20px;
+  opacity: 0.8;
+}
+.jumpBar {
+  border-block: 1px solid var(--hub-line);
+  padding: 20px 24px;
+}
+.jumpBar nav {
+  max-width: 1240px;
+  margin: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 36px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.jumpBar a {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.directory,
+.editorial {
+  max-width: 1240px;
+  margin: auto;
+  padding: 80px 24px;
+}
+.directory h2,
+.editorial h2,
+.cta h2 {
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+}
+.lead {
+  font-size: 18px;
+  line-height: 1.8;
+  max-width: 820px;
+  margin-top: 22px;
+}
+.search {
+  margin: 36px 0;
+  max-width: 680px;
+}
+.search label {
+  display: block;
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 10px;
+}
+.search input {
+  width: 100%;
+  padding: 15px 17px;
+  font-size: 16px;
+  border: 1px solid var(--hub-line);
+  border-radius: 8px;
+  background: var(--si-surface, #fff);
+  color: inherit;
+}
+.search p {
+  font-size: 13px;
+  margin-top: 10px;
+  opacity: 0.7;
+}
+.guideGroup {
+  margin-top: 42px;
+}
+.guideGroup > h3 {
+  font-size: 23px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.guideGroup > h3 span {
+  font-size: 13px;
+  padding: 3px 10px;
+  border: 1px solid var(--hub-line);
+  border-radius: 30px;
+}
+.guideGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.guideCard {
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--hub-line);
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.guideCard:hover {
+  border-color: var(--hub-indigo);
+}
+.guideLabel {
+  font-size: 11px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--hub-indigo);
+  font-weight: 700;
+  margin: 0 0 15px !important;
+}
+.guideCard h4 {
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+.guideCard h4 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.guideCard > p {
+  font-size: 14px;
+  line-height: 1.8;
+  margin-top: 15px;
+}
+.readLink {
+  margin-top: auto;
+  padding-top: 24px;
+  font-size: 14px;
+  font-weight: 650;
+  color: var(--hub-indigo);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+.editorial {
+  border-top: 1px solid var(--hub-line);
+}
+.editorialHeading {
+  max-width: 850px;
+}
+.byline {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-top: 20px;
+}
+.editorialLayout {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 780px);
+  gap: 70px;
+  margin-top: 55px;
+  align-items: start;
+}
+.contents {
+  position: sticky;
+  top: 115px;
+  border-left: 3px solid var(--hub-orange);
+  padding-left: 20px;
+}
+.contents h3 {
+  font-size: 16px;
+  font-weight: 650;
+  margin-bottom: 18px;
+}
+.contents nav {
+  display: grid;
+  gap: 13px;
+}
+.contents a {
+  font-size: 13px;
+  line-height: 1.65;
+  opacity: 0.8;
+}
+.contents a:hover {
+  text-decoration: underline;
+}
+.prose > section {
+  margin-bottom: 44px;
+}
+.prose h3 {
+  font-size: 26px;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.prose p {
+  font-size: 17px;
+  line-height: 1.95;
+  margin-top: 19px;
+}
+.prose a {
+  color: var(--hub-indigo);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.checklist {
+  padding: 28px;
+  background: var(--si-surface, #fff);
+  border: 1px solid var(--hub-line);
+  border-radius: 12px;
+}
+.checklist ul {
+  padding-left: 23px;
+  list-style: disc;
+  margin-top: 20px;
+}
+.checklist li {
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+.references {
+  border-top: 1px solid var(--hub-line);
+  padding-top: 30px;
+}
+.references p {
+  font-size: 14px;
+}
+.cta {
+  max-width: 1192px;
+  margin: 0 auto 80px;
+  padding: 48px;
+  background: #18243b;
+  color: #fff;
+  border-radius: 20px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 65px;
+}
+.cta p {
+  line-height: 1.85;
+  margin: 20px 0;
+}
+.cta .eyebrow {
+  margin-top: 0;
+}
+.briefNote {
+  border-left: 1px solid #ffffff35;
+  padding-left: 35px;
+}
+.briefNote h3 {
+  font-size: 20px;
+  font-weight: 600;
+}
+.briefNote ol {
+  list-style: decimal;
+  padding-left: 20px;
+  line-height: 1.9;
+  margin-top: 20px;
+}
+.briefNote p {
+  font-size: 14px;
+  opacity: 0.8;
+}
+.notice {
+  padding: 25px;
+  border: 1px solid var(--hub-line);
+  margin-top: 30px;
+}
+.notice h3 {
+  font-size: 22px;
+}
+.notice p {
+  margin-block: 12px;
+}
+.notice a {
+  text-decoration: underline;
+}
+@media (max-width: 1000px) {
+  .heroInner {
+    gap: 28px;
+  }
+  .guideGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .editorialLayout {
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 35px;
+  }
+  .cta {
+    margin-inline: 24px;
+    gap: 35px;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    padding: 120px 20px 45px;
+  }
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+  .hero h1 {
+    font-size: 42px;
+  }
+  .heroImage {
+    max-width: 550px;
+  }
+  .heroImage img {
+    aspect-ratio: 1.7;
+  }
+  .directory,
+  .editorial {
+    padding: 55px 20px;
+  }
+  .guideGrid {
+    grid-template-columns: 1fr;
+  }
+  .guideCard {
+    padding: 24px;
+  }
+  .editorialLayout {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    margin-top: 30px;
+  }
+  .contents {
+    position: static;
+  }
+  .contents nav {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 20px;
+  }
+  .prose p {
+    font-size: 16px;
+    line-height: 1.9;
+  }
+  .prose h3 {
+    font-size: 25px;
+  }
+  .cta {
+    grid-template-columns: 1fr;
+    margin: 0 20px 50px;
+    padding: 30px;
+    gap: 20px;
+  }
+  .briefNote {
+    border-left: 0;
+    border-top: 1px solid #ffffff35;
+    padding: 25px 0 0;
+  }
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .jumpBar nav {
+    font-size: 13px;
+    gap: 14px 20px;
+  }
+  .lead {
+    font-size: 17px;
+  }
+  .checklist {
+    padding: 22px;
+  }
+}
+
+.cta .eyebrow {
+  color: #ff9b66;
+}

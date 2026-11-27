@@ -30,6 +30,7 @@ export default function BrandFooter({ home = '/', logo = '/images/svg-logo-white
         </nav>
         <nav aria-label="Shop Sure Imports" className={styles.shopNav}>
           <h2>Shop</h2>
+          <Link href={`${mainSite}/machines`}>Machines</Link>
           <Link href={`${mainSite}/cars`}>Cars & commercial vehicles</Link>
           <Link href={`${mainSite}/shop`}>Gadget shop</Link>
           <Link href={`${mainSite}/shop/category/phones`}>Phones</Link>
