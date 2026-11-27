@@ -111,8 +111,7 @@ export default async function MachinesPage() {
                 Sure Imports · Machines &amp; production lines
               </p>
               <h1 id="machines-title">
-                Source machines from China.
-                <br />
+                Source machines from China.{' '}
                 <em>Build your production in Nigeria.</em>
               </h1>
               <p className={styles.intro}>
