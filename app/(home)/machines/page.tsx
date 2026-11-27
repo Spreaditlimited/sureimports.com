@@ -127,11 +127,11 @@ export default async function MachinesPage() {
                   data-whatsapp-placement="page"
                 >
                   {contact.startsWith('https://wa.me/')
-                    ? 'Discuss your machine on WhatsApp'
-                    : 'Contact Sure Imports about a machine'}
+                    ? 'WhatsApp us'
+                    : 'Contact us'}
                 </a>
                 <a href="#machine-guides" className={styles.secondary}>
-                  Explore machine guides
+                  View guides
                 </a>
               </div>
               <p className={styles.heroNote}>
@@ -304,8 +304,8 @@ export default async function MachinesPage() {
               data-whatsapp-placement="page"
             >
               {contact.startsWith('https://wa.me/')
-                ? 'Discuss your machine on WhatsApp'
-                : 'Contact Sure Imports about a machine'}
+                ? 'WhatsApp us'
+                : 'Contact us'}
             </a>
           </div>
           <div className={styles.briefNote}>

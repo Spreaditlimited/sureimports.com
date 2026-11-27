@@ -26,3 +26,7 @@ The shared footer links Machines under Shop. `/machines` appears in the sitemap.
 ## Verification
 
 Run `node --test --experimental-strip-types tests/machine-guides.test.mjs`. Check `/machines`, footer entry, canonical/social metadata, JSON-LD, guide links, empty search and scheduled visibility. Release only committed Git changes through the hosting Git integration.
+
+## Visual consistency
+
+Use the existing site colour tokens and shared public-page button treatment. Do not add page-specific colours or orange buttons. Keep visible button labels short (for example, “WhatsApp us” and “View guides”); explain the action in the surrounding copy.
