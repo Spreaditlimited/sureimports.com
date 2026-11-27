@@ -2,10 +2,12 @@
   background: var(--si-canvas);
   color: var(--si-ink);
   border-bottom: 1px solid var(--si-border);
-  padding: 155px var(--si-gutter) 72px;
+  --service-gutter: 16px;
+  padding: 155px 0 72px;
 }
 .layout {
-  max-width: 1376px;
+  max-width: var(--si-content-width, 1440px);
+  padding-inline: var(--service-gutter);
   margin-inline: auto;
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
@@ -207,3 +209,6 @@
 @media (max-width: 767px) {
   .summary { display: none; }
 }
+
+@media (min-width: 640px) { .hero { --service-gutter: 24px; } }
+@media (min-width: 1024px) { .hero { --service-gutter: 32px; } }

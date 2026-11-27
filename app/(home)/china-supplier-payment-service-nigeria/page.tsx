@@ -63,7 +63,7 @@ export default function ChinaSupplierPaymentServiceNigeriaPage() {
       />
 
       <section id="before-you-request" className="py-20 md:py-24" aria-labelledby="payment-checklist-title">
-        <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <div>
             <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Before you request payment</p>
             <h2 id="payment-checklist-title" className="mt-4 text-3xl text-slate-950 dark:text-white md:text-4xl">Make the payment match the purchase.</h2>
@@ -80,7 +80,7 @@ export default function ChinaSupplierPaymentServiceNigeriaPage() {
       </section>
 
       <section className="py-20 md:py-24" aria-labelledby="payment-workflow-title">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Pay Supplier in practice</p>
           <h2 id="payment-workflow-title" className="mt-4 max-w-4xl text-3xl text-slate-950 dark:text-white md:text-4xl">How a Nigerian buyer submits a Chinese supplier payment request.</h2>
           <p className="mt-5 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">Pay Supplier is designed for a defined purchase, not for finding a factory or deciding whether an unknown seller is trustworthy. The dashboard asks for the supplier details, a pro forma invoice and the amount in RMB. It shows a Naira equivalent using the available rate before you submit the request.</p>
@@ -106,7 +106,7 @@ export default function ChinaSupplierPaymentServiceNigeriaPage() {
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-24" aria-labelledby="payment-route-title">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <h2 id="payment-route-title" className="text-3xl text-slate-950 dark:text-white md:text-4xl">Choose the route that matches your order.</h2>
           <div className="mt-9 grid gap-5 md:grid-cols-3">
             {[

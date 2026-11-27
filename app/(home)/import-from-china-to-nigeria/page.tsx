@@ -320,7 +320,7 @@ export default async function ImportFromChinaHubPage() {
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-24" aria-labelledby="import-quote-title">
-        <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <div>
             <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Before asking for a quote</p>
             <h2 id="import-quote-title" className="mt-4 text-3xl text-slate-950 dark:text-white md:text-4xl">Bring enough detail to price the whole journey.</h2>

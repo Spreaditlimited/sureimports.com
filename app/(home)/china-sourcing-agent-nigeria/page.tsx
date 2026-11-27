@@ -72,7 +72,7 @@ export default function ChinaSourcingAgentNigeriaPage() {
       />
 
       <section id="how-sourcing-works" className="py-20 md:py-28" aria-labelledby="sourcing-process-title">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">The sourcing workflow</p>
           <h2 id="sourcing-process-title" className="mt-4 max-w-3xl text-3xl text-slate-950 dark:text-white md:text-5xl">What a sourcing agent should help you decide.</h2>
           <p className="mt-5 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">
@@ -91,7 +91,7 @@ export default function ChinaSourcingAgentNigeriaPage() {
       </section>
 
       <section className="py-20 md:py-24" aria-labelledby="sourcing-comparison-title">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <p className="text-xs font-medium uppercase tracking-widest text-brand-orange-500">Before choosing a factory</p>
           <h2 id="sourcing-comparison-title" className="mt-4 max-w-4xl text-3xl text-slate-950 dark:text-white md:text-4xl">Compare like-for-like supplier quotations, not only unit prices.</h2>
           <p className="mt-5 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">For a Nigerian buyer sourcing from China, two quotations are comparable only when they describe the same product and order terms. Ask for the evidence below before deciding which supplier to use.</p>
@@ -117,7 +117,7 @@ export default function ChinaSourcingAgentNigeriaPage() {
       </section>
 
       <section className="border-y border-slate-200 bg-slate-50 py-20 dark:border-slate-800 dark:bg-slate-900/40 md:py-24" aria-labelledby="sourcing-fit-title">
-        <div className="mx-auto grid max-w-[1200px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+        <div className="mx-auto grid max-w-[1440px] gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
           <div>
             <h2 id="sourcing-fit-title" className="text-3xl text-slate-950 dark:text-white md:text-4xl">Is sourcing the right route?</h2>
             <p className="mt-5 leading-relaxed text-slate-600 dark:text-slate-400">Use sourcing when the product or supplier still needs to be identified or compared. This includes wholesale stock, white-label products, custom manufacturing and equipment with detailed specifications.</p>
@@ -136,7 +136,7 @@ export default function ChinaSourcingAgentNigeriaPage() {
       </section>
 
       <section className="py-20 md:py-24" aria-labelledby="sourcing-brief-title">
-        <div className="mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
           <h2 id="sourcing-brief-title" className="text-3xl text-slate-950 dark:text-white md:text-4xl">Prepare a brief that produces useful quotations.</h2>
           <p className="mt-5 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">Include reference photos or technical drawings where available, exact variants and quantities, material or performance requirements, packaging or branding, your target cost and delivery location. Ask which checks are included and whether samples, factory visits, inspection, shipping or customs handling need separate approval.</p>
           <p className="mt-4 max-w-3xl leading-relaxed text-slate-600 dark:text-slate-400">Tell the team whether you want an existing wholesale product, a private-label version or a product made to your own specification. That changes the likely minimum order, sample work and questions to put to suppliers. For machinery, add the required output per hour, local power supply, installation space, consumables and spare-part needs.</p>

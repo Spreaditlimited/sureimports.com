@@ -2,6 +2,7 @@
   background: var(--si-canvas, #f7f8fa);
   color: var(--si-ink, #18243b);
   min-height: 100vh;
+  --machine-gutter: 16px;
   --hub-indigo: var(--si-accent, #48439b);
   --hub-orange: #f95a0e;
   --hub-line: var(--si-border, #dce0e8);
@@ -18,7 +19,7 @@
   outline-offset: 5px;
 }
 .hero {
-  padding: 150px 24px 72px;
+  padding: 150px 0 72px;
   background: linear-gradient(
     135deg,
     var(--si-canvas, #f7f8fa),
@@ -26,7 +27,8 @@
   );
 }
 .heroInner {
-  max-width: 1240px;
+  padding-inline: var(--machine-gutter);
+  max-width: var(--si-content-width, 1440px);
   margin: auto;
   display: grid;
   grid-template-columns: 1.12fr 1fr;
@@ -113,10 +115,11 @@
 }
 .jumpBar {
   border-block: 1px solid var(--hub-line);
-  padding: 20px 24px;
+  padding: 20px 0;
 }
 .jumpBar nav {
-  max-width: 1240px;
+  padding-inline: var(--machine-gutter);
+  max-width: var(--si-content-width, 1440px);
   margin: auto;
   display: flex;
   flex-wrap: wrap;
@@ -130,9 +133,9 @@
 }
 .directory,
 .editorial {
-  max-width: 1240px;
+  max-width: var(--si-content-width, 1440px);
   margin: auto;
-  padding: 80px 24px;
+  padding: 80px var(--machine-gutter);
 }
 .directory h2,
 .editorial h2,
@@ -250,7 +253,7 @@
 }
 .editorialLayout {
   display: grid;
-  grid-template-columns: 260px minmax(0, 780px);
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 70px;
   margin-top: 55px;
   align-items: start;
@@ -321,7 +324,8 @@
   font-size: 14px;
 }
 .cta {
-  max-width: 1192px;
+  width: calc(100% - 2 * var(--machine-gutter));
+  max-width: calc(var(--si-content-width, 1440px) - 2 * var(--machine-gutter));
   margin: 0 auto 80px;
   padding: 48px;
   background: #18243b;
@@ -372,6 +376,7 @@
 }
 @media (max-width: 1000px) {
   .heroInner {
+    padding-inline: var(--machine-gutter);
     gap: 28px;
   }
   .guideGrid {
@@ -382,15 +387,15 @@
     gap: 35px;
   }
   .cta {
-    margin-inline: 24px;
     gap: 35px;
   }
 }
 @media (max-width: 760px) {
   .hero {
-    padding: 120px 20px 45px;
+    padding: 120px 0 45px;
   }
   .heroInner {
+    padding-inline: var(--machine-gutter);
     grid-template-columns: 1fr;
     gap: 35px;
   }
@@ -405,7 +410,7 @@
   }
   .directory,
   .editorial {
-    padding: 55px 20px;
+    padding: 55px var(--machine-gutter);
   }
   .guideGrid {
     grid-template-columns: 1fr;
@@ -434,7 +439,7 @@
   }
   .cta {
     grid-template-columns: 1fr;
-    margin: 0 20px 50px;
+    margin: 0 auto 50px;
     padding: 30px;
     gap: 20px;
   }
@@ -448,6 +453,7 @@
     align-items: stretch;
   }
   .jumpBar nav {
+    padding-inline: var(--machine-gutter);
     font-size: 13px;
     gap: 14px 20px;
   }
@@ -461,4 +467,20 @@
 
 .cta .eyebrow {
   color: #ff9b66;
+}
+
+/* Match the navigation and public-page container gutters. */
+@media (min-width: 640px) {
+  .page {
+    --machine-gutter: 24px;
+  }
+}
+@media (min-width: 1024px) {
+  .page {
+    --machine-gutter: 32px;
+  }
+}
+.prose {
+  max-width: 780px;
+  min-width: 0;
 }
